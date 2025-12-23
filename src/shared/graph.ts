@@ -3,6 +3,7 @@ export type PortKind = 'audio' | 'cv' | 'gate' | 'sync'
 export type ModuleType =
   | 'oscillator'
   | 'gain'
+  | 'cv-vca'
   | 'output'
   | 'lab'
   | 'lfo'

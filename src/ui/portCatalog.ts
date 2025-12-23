@@ -32,6 +32,13 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
     ],
     outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
   },
+  'cv-vca': {
+    inputs: [
+      { id: 'in', label: 'In', kind: 'cv', direction: 'in' },
+      { id: 'cv', label: 'CV', kind: 'cv', direction: 'in' },
+    ],
+    outputs: [{ id: 'out', label: 'Out', kind: 'cv', direction: 'out' }],
+  },
   output: {
     inputs: [{ id: 'in', label: 'In', kind: 'audio', direction: 'in' }],
     outputs: [],
@@ -67,6 +74,7 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
     inputs: [],
     outputs: [
       { id: 'cv-out', label: 'CV', kind: 'cv', direction: 'out' },
+      { id: 'vel-out', label: 'Vel', kind: 'cv', direction: 'out' },
       { id: 'gate-out', label: 'Gate', kind: 'gate', direction: 'out' },
       { id: 'sync-out', label: 'Sync', kind: 'sync', direction: 'out' },
     ],

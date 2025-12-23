@@ -22,6 +22,17 @@ type DragState = {
   validTargets?: Set<string>
 }
 
+const MIDI_NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+
+const clampMidiNote = (value: number) => Math.max(0, Math.min(127, Math.round(value)))
+
+const formatMidiNote = (note: number) => {
+  const clamped = clampMidiNote(note)
+  const name = MIDI_NOTE_NAMES[clamped % 12]
+  const octave = Math.floor(clamped / 12) - 1
+  return `${name}${octave}`
+}
+
 function App() {
   const engine = useMemo(() => new AudioEngine(), [])
   const [graph, setGraph] = useState<GraphState>(defaultGraph)
@@ -37,10 +48,15 @@ function App() {
   const [dragTargets, setDragTargets] = useState<Set<string> | null>(null)
   const [hoverTargetKey, setHoverTargetKey] = useState<string | null>(null)
   const [activeStep, setActiveStep] = useState<number | null>(null)
+  const [midiAccess, setMidiAccess] = useState<MIDIAccess | null>(null)
+  const [midiInputs, setMidiInputs] = useState<MIDIInput[]>([])
+  const [midiError, setMidiError] = useState<string | null>(null)
   const rackRef = useRef<HTMLDivElement | null>(null)
   const dragRef = useRef<DragState | null>(null)
   const controlGateRef = useRef({ manual: false, key: false, seq: false })
   const syncTimeoutRef = useRef<number | null>(null)
+  const midiInputRef = useRef<MIDIInput | null>(null)
+  const heldNotesRef = useRef<Array<{ note: number; velocity: number }>>([])
   const sequencerRef = useRef<{ timer: number | null; gateTimer: number | null; step: number }>({
     timer: null,
     gateTimer: null,
@@ -63,6 +79,14 @@ function App() {
   const seqOn = Boolean(controlModule?.params.seqOn)
   const seqTempo = Math.max(30, Number(controlModule?.params.seqTempo ?? 120))
   const seqGateRatio = Math.min(0.9, Math.max(0.1, Number(controlModule?.params.seqGate ?? 0.6)))
+  const midiSupported = typeof navigator !== 'undefined' && 'requestMIDIAccess' in navigator
+  const midiEnabled = Boolean(controlModule?.params.midiEnabled)
+  const midiUseVelocity = controlModule?.params.midiVelocity !== false
+  const midiChannel = Number(controlModule?.params.midiChannel ?? 0)
+  const midiRoot = clampMidiNote(Number(controlModule?.params.midiRoot ?? 60))
+  const midiVelSlew = Math.max(0, Number(controlModule?.params.midiVelSlew ?? 0.008))
+  const midiInputId =
+    typeof controlModule?.params.midiInputId === 'string' ? controlModule.params.midiInputId : ''
 
   useEffect(() => {
     if (!controlModuleId) {
@@ -112,6 +136,12 @@ function App() {
 
     return () => stopSequencer()
   }, [controlModuleId, seqOn, seqTempo, seqGateRatio])
+
+  useEffect(() => {
+    if (midiEnabled && controlModuleId && seqOn) {
+      updateParam(controlModuleId, 'seqOn', false)
+    }
+  }, [midiEnabled, controlModuleId, seqOn])
 
   useLayoutEffect(() => {
     const updatePositions = () => {
@@ -173,6 +203,7 @@ function App() {
     moduleId: string,
     paramId: string,
     value: number | string | boolean,
+    options?: { skipEngine?: boolean },
   ) => {
     setGraph((prev) => ({
       ...prev,
@@ -183,10 +214,169 @@ function App() {
       ),
     }))
 
-    if (status === 'running') {
+    if (status === 'running' && !options?.skipEngine) {
       engine.setParam(moduleId, paramId, value)
     }
   }
+
+  const syncMidiInputs = (access: MIDIAccess) => {
+    const inputs = Array.from(access.inputs.values())
+    setMidiInputs(inputs)
+    if (!controlModuleId) {
+      return
+    }
+    const hasSelected = inputs.some((input) => input.id === midiInputId)
+    if (!hasSelected) {
+      const nextId = inputs[0]?.id ?? ''
+      updateParam(controlModuleId, 'midiInputId', nextId)
+    }
+  }
+
+  const handleMidiToggle = async () => {
+    if (!controlModuleId) {
+      return
+    }
+    if (midiEnabled) {
+      updateParam(controlModuleId, 'midiEnabled', false)
+      return
+    }
+    if (!midiSupported) {
+      setMidiError('Web MIDI is not supported in this browser.')
+      return
+    }
+    try {
+      setMidiError(null)
+      let access = midiAccess
+      if (!access) {
+        access = await navigator.requestMIDIAccess({ sysex: false })
+        setMidiAccess(access)
+      }
+      syncMidiInputs(access)
+      updateParam(controlModuleId, 'midiEnabled', true)
+    } catch (error) {
+      console.error(error)
+      setMidiError('MIDI access denied or unavailable.')
+    }
+  }
+
+  useEffect(() => {
+    if (!midiAccess) {
+      return
+    }
+    syncMidiInputs(midiAccess)
+    const handleStateChange = () => syncMidiInputs(midiAccess)
+    midiAccess.onstatechange = handleStateChange
+    return () => {
+      midiAccess.onstatechange = null
+    }
+  }, [midiAccess, controlModuleId, midiInputId])
+
+  useEffect(() => {
+    if (!midiEnabled || !midiAccess || !controlModuleId) {
+      if (midiInputRef.current) {
+        midiInputRef.current.onmidimessage = null
+        midiInputRef.current = null
+      }
+      if (heldNotesRef.current.length > 0) {
+        heldNotesRef.current = []
+        if (controlModuleId) {
+          controlGateRef.current.key = false
+          setControlGate(controlModuleId, { key: false })
+        }
+      }
+      return
+    }
+
+    const input =
+      midiInputs.find((entry) => entry.id === midiInputId) ?? midiInputs[0] ?? null
+    if (!input) {
+      if (midiInputRef.current) {
+        midiInputRef.current.onmidimessage = null
+        midiInputRef.current = null
+      }
+      return
+    }
+    if (midiInputRef.current && midiInputRef.current !== input) {
+      midiInputRef.current.onmidimessage = null
+    }
+
+    midiInputRef.current = input
+
+    const handleMessage = (event: MIDIMessageEvent) => {
+      const data = event.data
+      if (!data || data.length < 2) {
+        return
+      }
+      const status = data[0] & 0xf0
+      const channel = data[0] & 0x0f
+      if (midiChannel > 0 && channel !== midiChannel - 1) {
+        return
+      }
+      const note = data[1]
+      const velocity = data.length > 2 ? data[2] : 0
+      const velocityValue = Math.max(0, Math.min(1, velocity / 127))
+      const noteOn = status === 0x90 && velocity > 0
+      const noteOff = status === 0x80 || (status === 0x90 && velocity === 0)
+      if (!noteOn && !noteOff) {
+        return
+      }
+
+      if (noteOn) {
+        const held = heldNotesRef.current
+        const existingIndex = held.findIndex((entry) => entry.note === note)
+        if (existingIndex !== -1) {
+          held.splice(existingIndex, 1)
+        }
+        held.push({ note, velocity: velocityValue })
+        updateParam(controlModuleId, 'cv', (note - midiRoot) / 12)
+        if (midiUseVelocity) {
+          updateParam(controlModuleId, 'velocity', velocityValue, { skipEngine: true })
+          engine.setControlVelocity(controlModuleId, velocityValue, midiVelSlew)
+        }
+        controlGateRef.current.key = true
+        setControlGate(controlModuleId, { key: true })
+        triggerSync(controlModuleId)
+        return
+      }
+
+      if (noteOff) {
+        const held = heldNotesRef.current.filter((entry) => entry.note !== note)
+        heldNotesRef.current = held
+        if (held.length === 0) {
+          controlGateRef.current.key = false
+          setControlGate(controlModuleId, { key: false })
+        } else {
+          const last = held[held.length - 1]
+          updateParam(controlModuleId, 'cv', (last.note - midiRoot) / 12)
+          if (midiUseVelocity) {
+            updateParam(controlModuleId, 'velocity', last.velocity, { skipEngine: true })
+            engine.setControlVelocity(controlModuleId, last.velocity, midiVelSlew)
+          }
+          controlGateRef.current.key = true
+          setControlGate(controlModuleId, { key: true })
+        }
+      }
+    }
+
+    input.onmidimessage = handleMessage
+
+    return () => {
+      if (input.onmidimessage === handleMessage) {
+        input.onmidimessage = null
+      }
+    }
+  }, [
+    midiEnabled,
+    midiAccess,
+    midiInputs,
+    midiInputId,
+    midiChannel,
+    midiRoot,
+    midiUseVelocity,
+    midiVelSlew,
+    controlModuleId,
+    engine,
+  ])
 
   const cloneGraph = (nextGraph: GraphState): GraphState =>
     JSON.parse(JSON.stringify(nextGraph)) as GraphState
@@ -730,6 +920,20 @@ function App() {
       )
     }
 
+    if (module.type === 'cv-vca') {
+      return (
+        <RotaryKnob
+          label="Depth"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.gain ?? 1)}
+          onChange={(value) => updateParam(module.id, 'gain', value)}
+          format={(value) => value.toFixed(2)}
+        />
+      )
+    }
+
     if (module.type === 'output') {
       return (
         <RotaryKnob
@@ -991,6 +1195,13 @@ function App() {
       const cvMode = String(module.params.cvMode ?? 'bipolar')
       const cvMin = cvMode === 'unipolar' ? 0 : -1
       const cvValue = Number(module.params.cv ?? 0)
+      const midiEnabled = Boolean(module.params.midiEnabled)
+      const midiVelocity = module.params.midiVelocity !== false
+      const midiChannel = Number(module.params.midiChannel ?? 0)
+      const midiRoot = clampMidiNote(Number(module.params.midiRoot ?? 60))
+      const midiVelSlew = Math.max(0, Number(module.params.midiVelSlew ?? 0.008))
+      const midiInputId =
+        typeof module.params.midiInputId === 'string' ? module.params.midiInputId : ''
       const handleGateDown = () => setControlGate(module.id, { manual: true })
       const handleGateUp = () => setControlGate(module.id, { manual: false })
       const handleKeyDown = (semitone: number) => {
@@ -1012,6 +1223,15 @@ function App() {
             step={0.01}
             value={cvValue}
             onChange={(value) => updateParam(module.id, 'cv', value)}
+            format={(value) => value.toFixed(2)}
+          />
+          <RotaryKnob
+            label="Vel Out"
+            min={0}
+            max={1}
+            step={0.01}
+            value={Number(module.params.velocity ?? 1)}
+            onChange={(value) => updateParam(module.id, 'velocity', value)}
             format={(value) => value.toFixed(2)}
           />
           <RotaryKnob
@@ -1074,6 +1294,103 @@ function App() {
                 {key.label}
               </button>
             ))}
+          </div>
+          <div className="midi-panel">
+            <div className="midi-header">
+              <span className="midi-title">MIDI</span>
+              <button
+                type="button"
+                className={`midi-toggle ${midiEnabled ? 'active' : ''}`}
+                onClick={handleMidiToggle}
+                disabled={!midiSupported}
+              >
+                {midiEnabled ? 'On' : 'Enable'}
+              </button>
+            </div>
+            <div className="midi-controls">
+              <div className="midi-field">
+                <label className="midi-label" htmlFor={`${module.id}-midi-input`}>
+                  Input
+                </label>
+                <select
+                  id={`${module.id}-midi-input`}
+                  className="midi-select"
+                  value={midiInputId}
+                  onChange={(event) =>
+                    updateParam(module.id, 'midiInputId', event.target.value)
+                  }
+                  disabled={!midiAccess || midiInputs.length === 0}
+                >
+                  {midiInputs.length === 0 ? (
+                    <option value="">No devices</option>
+                  ) : (
+                    midiInputs.map((input) => (
+                      <option key={input.id} value={input.id}>
+                        {input.name || `Input ${input.id}`}
+                      </option>
+                    ))
+                  )}
+                </select>
+              </div>
+              <div className="midi-field">
+                <label className="midi-label" htmlFor={`${module.id}-midi-channel`}>
+                  Channel
+                </label>
+                <select
+                  id={`${module.id}-midi-channel`}
+                  className="midi-select"
+                  value={midiChannel}
+                  onChange={(event) =>
+                    updateParam(module.id, 'midiChannel', Number(event.target.value))
+                  }
+                  disabled={!midiAccess}
+                >
+                  <option value={0}>Omni</option>
+                  {Array.from({ length: 16 }, (_, index) => (
+                    <option key={index + 1} value={index + 1}>
+                      Ch {index + 1}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className="midi-options">
+              <button
+                type="button"
+                className={`midi-option ${midiVelocity ? 'active' : ''}`}
+                onClick={() => updateParam(module.id, 'midiVelocity', !midiVelocity)}
+                disabled={!midiAccess}
+              >
+                Velocity
+              </button>
+            </div>
+            <div className="midi-knobs">
+              <RotaryKnob
+                label="Root"
+                min={24}
+                max={84}
+                step={1}
+                value={midiRoot}
+                onChange={(value) => updateParam(module.id, 'midiRoot', value)}
+                format={(value) => `${formatMidiNote(value)} (${value})`}
+              />
+              <RotaryKnob
+                label="Vel Slew"
+                min={0}
+                max={0.03}
+                step={0.001}
+                value={midiVelSlew}
+                onChange={(value) => updateParam(module.id, 'midiVelSlew', value)}
+                format={(value) => `${Math.round(value * 1000)}ms`}
+              />
+            </div>
+            <div className={`midi-status ${midiError ? 'error' : ''}`}>
+              {!midiSupported && 'Web MIDI unavailable.'}
+              {midiSupported && midiError && midiError}
+              {midiSupported && !midiError && midiEnabled && midiInputs.length === 0 &&
+                'No MIDI inputs detected.'}
+              {midiSupported && !midiError && !midiEnabled && 'MIDI is off.'}
+            </div>
           </div>
           <div className="seq-panel">
             <div className="seq-header">
@@ -1324,6 +1641,7 @@ function App() {
               <span className="chip">VCO</span>
               <span className="chip">VCF</span>
               <span className="chip">VCA</span>
+              <span className="chip">Mod VCA</span>
               <span className="chip">Mixer</span>
               <span className="chip">Chorus</span>
               <span className="chip">LFO</span>

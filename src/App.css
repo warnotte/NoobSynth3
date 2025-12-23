@@ -608,6 +608,138 @@
   border: 1px solid rgba(80, 92, 112, 0.6);
 }
 
+.midi-panel {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 14px;
+  background: rgba(16, 21, 28, 0.75);
+  border: 1px solid rgba(80, 92, 112, 0.6);
+}
+
+.midi-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.midi-title {
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(190, 204, 220, 0.7);
+}
+
+.midi-toggle {
+  border-radius: 999px;
+  padding: 6px 12px;
+  border: 1px solid rgba(80, 92, 112, 0.8);
+  background: rgba(20, 26, 34, 0.9);
+  color: rgba(210, 220, 238, 0.85);
+  font-size: 0.55rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease,
+    color 0.2s ease;
+}
+
+.midi-toggle.active {
+  color: #0f1613;
+  background: linear-gradient(160deg, rgba(61, 242, 166, 0.95), rgba(34, 201, 128, 0.9));
+  border-color: rgba(61, 242, 166, 0.9);
+  box-shadow: 0 8px 16px rgba(12, 22, 18, 0.4);
+}
+
+.midi-toggle:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.midi-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  align-items: start;
+}
+
+.midi-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.midi-option {
+  border-radius: 999px;
+  padding: 6px 12px;
+  border: 1px solid rgba(80, 92, 112, 0.8);
+  background: rgba(20, 26, 34, 0.9);
+  color: rgba(210, 220, 238, 0.85);
+  font-size: 0.55rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease,
+    color 0.2s ease;
+}
+
+.midi-option.active {
+  color: #0f1613;
+  background: linear-gradient(160deg, rgba(86, 184, 255, 0.9), rgba(48, 146, 255, 0.85));
+  border-color: rgba(86, 184, 255, 0.9);
+  box-shadow: 0 8px 14px rgba(10, 22, 40, 0.45);
+}
+
+.midi-option:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.midi-field {
+  display: grid;
+  gap: 6px;
+}
+
+.midi-label {
+  font-size: 0.55rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(190, 204, 220, 0.65);
+}
+
+.midi-select {
+  border-radius: 10px;
+  padding: 6px 8px;
+  border: 1px solid rgba(80, 92, 112, 0.8);
+  background: rgba(18, 24, 32, 0.9);
+  color: rgba(210, 220, 238, 0.85);
+  font: inherit;
+}
+
+.midi-select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.midi-knobs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 10px;
+}
+
+.midi-status {
+  min-height: 14px;
+  font-size: 0.55rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(190, 204, 220, 0.55);
+}
+
+.midi-status.error {
+  color: rgba(255, 170, 160, 0.9);
+}
+
 .seq-header {
   display: flex;
   align-items: center;

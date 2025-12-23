@@ -5,8 +5,9 @@ Modular synth workbench built with React + AudioWorklet. Goal: a powerful, patch
 ## Features
 
 - Modular patching with drag-to-connect cables (double-click near a cable to remove it).
-- AudioWorklet engine (VCO, LFO, VCF, ADSR, Mixer, VCA, Chorus, Scope, Control IO).
-- Control IO with mini keyboard and a simple sequencer for hands-free auditioning.
+- AudioWorklet engine (VCO, LFO, VCF, ADSR, Mixer, VCA, Mod VCA, Chorus, Scope, Control IO).
+- Control IO with mini keyboard, MIDI input (mono), and a simple sequencer for hands-free auditioning.
+- MIDI velocity CV output with optional slew to avoid clicks.
 - Preset loader with curated demo patches (Jupiter Pad, Jupiter Brass, PWM Strings).
 - Stereo chorus to add width and character.
 
@@ -27,6 +28,7 @@ Open the app, click Power On, then hit Run in Control IO or play the mini keyboa
 - Control IO:
   - Gate button is momentary.
   - Mini keyboard sends CV + Gate.
+  - MIDI panel lets you select an input/channel and enables velocity output.
   - Sequencer can Run/Stop and is useful for live tweaking.
 
 ## Presets
@@ -49,8 +51,8 @@ npx tsc -p tsconfig.app.json --noEmit
 
 ## Roadmap
 
-- MIDI input (mono first, poly later).
-- True polyphony with voice allocation.
+- Polyphony with voice allocation.
+- MIDI enhancements (pitch bend, CC mapping).
 - Better filter models and oversampling.
 - More effects (reverb, delay) and richer presets.
 

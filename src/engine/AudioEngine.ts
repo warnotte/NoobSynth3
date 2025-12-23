@@ -84,6 +84,12 @@ export class AudioEngine {
       }
     }
 
+    if (module.type === 'cv-vca' && module.node instanceof AudioWorkletNode) {
+      if (paramId === 'gain' && typeof value === 'number') {
+        module.node.parameters.get('gain')?.setValueAtTime(value, context.currentTime)
+      }
+    }
+
     if (module.type === 'output' && module.node instanceof GainNode) {
       if (paramId === 'level' && typeof value === 'number') {
         module.node.gain.setValueAtTime(value, context.currentTime)
@@ -188,6 +194,7 @@ export class AudioEngine {
 
     if (module.type === 'control') {
       const cvSource = module.outputs['cv-out']?.node
+      const velSource = module.outputs['vel-out']?.node
       const gateSource = module.outputs['gate-out']?.node
       const syncSource = module.outputs['sync-out']?.node
       if (paramId === 'cv' && typeof value === 'number' && cvSource instanceof ConstantSourceNode) {
@@ -200,6 +207,9 @@ export class AudioEngine {
         } else {
           cvSource.offset.setValueAtTime(value, time)
         }
+      }
+      if (paramId === 'velocity' && typeof value === 'number' && velSource instanceof ConstantSourceNode) {
+        velSource.offset.setValueAtTime(Math.max(0, Math.min(1, value)), context.currentTime)
       }
       if (paramId === 'gate' && typeof value !== 'string' && gateSource instanceof ConstantSourceNode) {
         const numeric = typeof value === 'boolean' ? (value ? 1 : 0) : value
@@ -224,6 +234,27 @@ export class AudioEngine {
       if (paramId === 'level' && typeof value === 'number') {
         module.node.gain.setValueAtTime(value, context.currentTime)
       }
+    }
+  }
+
+  setControlVelocity(moduleId: string, value: number, slewSeconds = 0): void {
+    const module = this.modules.get(moduleId)
+    const context = this.context
+    if (!module || !context || module.type !== 'control') {
+      return
+    }
+    const velSource = module.outputs['vel-out']?.node
+    if (!(velSource instanceof ConstantSourceNode)) {
+      return
+    }
+    const clamped = Math.max(0, Math.min(1, value))
+    const time = context.currentTime
+    velSource.offset.cancelScheduledValues(time)
+    if (slewSeconds > 0) {
+      velSource.offset.setValueAtTime(velSource.offset.value, time)
+      velSource.offset.linearRampToValueAtTime(clamped, time + slewSeconds)
+    } else {
+      velSource.offset.setValueAtTime(clamped, time)
     }
   }
 
@@ -422,6 +453,29 @@ export class AudioEngine {
           cv: { node: gain, inputIndex: 1 },
         },
         outputs: { out: { node: gain } },
+      }
+    }
+
+    if (module.type === 'cv-vca') {
+      const cvVca = new AudioWorkletNode(this.context, 'gain-processor', {
+        numberOfInputs: 2,
+        numberOfOutputs: 1,
+        channelCountMode: 'explicit',
+        outputChannelCount: [1],
+      })
+      const gainParam = cvVca.parameters.get('gain')
+      if (gainParam) {
+        gainParam.setValueAtTime(Number(module.params.gain ?? 1), this.context.currentTime)
+      }
+      return {
+        id: module.id,
+        type: module.type,
+        node: cvVca,
+        inputs: {
+          in: { node: cvVca, inputIndex: 0 },
+          cv: { node: cvVca, inputIndex: 1 },
+        },
+        outputs: { out: { node: cvVca } },
       }
     }
 
@@ -634,11 +688,15 @@ export class AudioEngine {
       const cvSource = new ConstantSourceNode(this.context, {
         offset: Number(module.params.cv ?? 0),
       })
+      const velSource = new ConstantSourceNode(this.context, {
+        offset: Number(module.params.velocity ?? 1),
+      })
       const gateSource = new ConstantSourceNode(this.context, {
         offset: Number(module.params.gate ?? 0),
       })
       const syncSource = new ConstantSourceNode(this.context, { offset: 0 })
       cvSource.start()
+      velSource.start()
       gateSource.start()
       syncSource.start()
       this.controlGlide.set(module.id, Number(module.params.glide ?? 0))
@@ -649,11 +707,13 @@ export class AudioEngine {
         inputs: {},
         outputs: {
           'cv-out': { node: cvSource },
+          'vel-out': { node: velSource },
           'gate-out': { node: gateSource },
           'sync-out': { node: syncSource },
         },
         dispose: () => {
           cvSource.stop()
+          velSource.stop()
           gateSource.stop()
           syncSource.stop()
         },

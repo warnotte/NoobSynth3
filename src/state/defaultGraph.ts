@@ -85,6 +85,13 @@ export const defaultGraph: GraphState = {
       params: { gain: 0.85 },
     },
     {
+      id: 'mod-1',
+      type: 'cv-vca',
+      name: 'Mod VCA',
+      position: { x: 520, y: 320 },
+      params: { gain: 1 },
+    },
+    {
       id: 'scope-1',
       type: 'scope',
       name: 'Scope',
@@ -127,8 +134,15 @@ export const defaultGraph: GraphState = {
       params: {
         cv: 0,
         cvMode: 'unipolar',
+        velocity: 1,
+        midiVelocity: true,
         gate: 0,
         glide: 0.07,
+        midiEnabled: false,
+        midiChannel: 0,
+        midiRoot: 60,
+        midiInputId: '',
+        midiVelSlew: 0.008,
         seqOn: true,
         seqTempo: 68,
         seqGate: 0.9,
@@ -198,6 +212,16 @@ export const defaultGraph: GraphState = {
     },
     {
       from: { moduleId: 'adsr-1', portId: 'env' },
+      to: { moduleId: 'mod-1', portId: 'in' },
+      kind: 'cv',
+    },
+    {
+      from: { moduleId: 'ctrl-1', portId: 'vel-out' },
+      to: { moduleId: 'mod-1', portId: 'cv' },
+      kind: 'cv',
+    },
+    {
+      from: { moduleId: 'mod-1', portId: 'out' },
       to: { moduleId: 'gain-1', portId: 'cv' },
       kind: 'cv',
     },
