@@ -13,6 +13,8 @@ export type ModuleType =
   | 'vcf'
   | 'mixer'
   | 'chorus'
+  | 'delay'
+  | 'reverb'
 
 export interface ModuleSpec {
   id: string

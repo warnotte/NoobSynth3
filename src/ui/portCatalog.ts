@@ -63,6 +63,14 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
     inputs: [{ id: 'in', label: 'In', kind: 'audio', direction: 'in' }],
     outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
   },
+  delay: {
+    inputs: [{ id: 'in', label: 'In', kind: 'audio', direction: 'in' }],
+    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
+  },
+  reverb: {
+    inputs: [{ id: 'in', label: 'In', kind: 'audio', direction: 'in' }],
+    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
+  },
   lfo: {
     inputs: [
       { id: 'rate', label: 'Rate', kind: 'cv', direction: 'in' },

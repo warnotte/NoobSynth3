@@ -5,7 +5,7 @@ Modular synth workbench built with React + AudioWorklet. Goal: a powerful, patch
 ## Features
 
 - Modular patching with drag-to-connect cables (double-click near a cable to remove it).
-- AudioWorklet engine (VCO, LFO, VCF, ADSR, Mixer, VCA, Mod VCA, Chorus, Scope, Control IO).
+- AudioWorklet engine (VCO, LFO, VCF, ADSR, Mixer, VCA, Mod VCA, Chorus, Delay, Reverb, Scope, Control IO).
 - Polyphony (1/2/4/8 voices) with voice stealing and per-voice modulation.
 - Control IO with mini keyboard, MIDI input (poly), and a simple sequencer for hands-free auditioning.
 - MIDI velocity CV output with optional slew to avoid clicks.

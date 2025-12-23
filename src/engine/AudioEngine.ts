@@ -207,6 +207,40 @@ export class AudioEngine {
         }
       }
 
+      if (module.type === 'delay' && module.node instanceof AudioWorkletNode) {
+        if (paramId === 'time' && typeof value === 'number') {
+          module.node.parameters.get('time')?.setValueAtTime(value, context.currentTime)
+        }
+        if (paramId === 'feedback' && typeof value === 'number') {
+          module.node.parameters.get('feedback')?.setValueAtTime(value, context.currentTime)
+        }
+        if (paramId === 'mix' && typeof value === 'number') {
+          module.node.parameters.get('mix')?.setValueAtTime(value, context.currentTime)
+        }
+        if (paramId === 'tone' && typeof value === 'number') {
+          module.node.parameters.get('tone')?.setValueAtTime(value, context.currentTime)
+        }
+        if (paramId === 'pingPong' && typeof value !== 'string') {
+          const numeric = typeof value === 'boolean' ? (value ? 1 : 0) : value
+          module.node.parameters.get('pingPong')?.setValueAtTime(numeric, context.currentTime)
+        }
+      }
+
+      if (module.type === 'reverb' && module.node instanceof AudioWorkletNode) {
+        if (paramId === 'time' && typeof value === 'number') {
+          module.node.parameters.get('time')?.setValueAtTime(value, context.currentTime)
+        }
+        if (paramId === 'damp' && typeof value === 'number') {
+          module.node.parameters.get('damp')?.setValueAtTime(value, context.currentTime)
+        }
+        if (paramId === 'preDelay' && typeof value === 'number') {
+          module.node.parameters.get('preDelay')?.setValueAtTime(value, context.currentTime)
+        }
+        if (paramId === 'mix' && typeof value === 'number') {
+          module.node.parameters.get('mix')?.setValueAtTime(value, context.currentTime)
+        }
+      }
+
       if (module.type === 'adsr' && module.node instanceof AudioWorkletNode) {
         if (paramId === 'attack' && typeof value === 'number') {
           module.node.parameters.get('attack')?.setValueAtTime(value, context.currentTime)
@@ -438,6 +472,12 @@ export class AudioEngine {
     )
     await this.context.audioWorklet.addModule(
       new URL('./worklets/chorus-processor.ts', import.meta.url),
+    )
+    await this.context.audioWorklet.addModule(
+      new URL('./worklets/delay-processor.ts', import.meta.url),
+    )
+    await this.context.audioWorklet.addModule(
+      new URL('./worklets/reverb-processor.ts', import.meta.url),
     )
     this.workletsLoaded = true
   }
@@ -976,6 +1016,65 @@ export class AudioEngine {
         node: chorus,
         inputs: { in: { node: chorus, inputIndex: 0 } },
         outputs: { out: { node: chorus } },
+      }
+    }
+
+    if (module.type === 'delay') {
+      const delay = new AudioWorkletNode(this.context, 'delay-processor', {
+        numberOfInputs: 1,
+        numberOfOutputs: 1,
+        channelCountMode: 'explicit',
+        outputChannelCount: [2],
+      })
+      delay.parameters
+        .get('time')
+        ?.setValueAtTime(Number(module.params.time ?? 360), this.context.currentTime)
+      delay.parameters
+        .get('feedback')
+        ?.setValueAtTime(Number(module.params.feedback ?? 0.35), this.context.currentTime)
+      delay.parameters
+        .get('mix')
+        ?.setValueAtTime(Number(module.params.mix ?? 0.25), this.context.currentTime)
+      delay.parameters
+        .get('tone')
+        ?.setValueAtTime(Number(module.params.tone ?? 0.55), this.context.currentTime)
+      delay.parameters
+        .get('pingPong')
+        ?.setValueAtTime(module.params.pingPong ? 1 : 0, this.context.currentTime)
+      return {
+        id: module.id,
+        type: module.type,
+        node: delay,
+        inputs: { in: { node: delay, inputIndex: 0 } },
+        outputs: { out: { node: delay } },
+      }
+    }
+
+    if (module.type === 'reverb') {
+      const reverb = new AudioWorkletNode(this.context, 'reverb-processor', {
+        numberOfInputs: 1,
+        numberOfOutputs: 1,
+        channelCountMode: 'explicit',
+        outputChannelCount: [2],
+      })
+      reverb.parameters
+        .get('time')
+        ?.setValueAtTime(Number(module.params.time ?? 0.62), this.context.currentTime)
+      reverb.parameters
+        .get('damp')
+        ?.setValueAtTime(Number(module.params.damp ?? 0.4), this.context.currentTime)
+      reverb.parameters
+        .get('preDelay')
+        ?.setValueAtTime(Number(module.params.preDelay ?? 18), this.context.currentTime)
+      reverb.parameters
+        .get('mix')
+        ?.setValueAtTime(Number(module.params.mix ?? 0.25), this.context.currentTime)
+      return {
+        id: module.id,
+        type: module.type,
+        node: reverb,
+        inputs: { in: { node: reverb, inputIndex: 0 } },
+        outputs: { out: { node: reverb } },
       }
     }
 

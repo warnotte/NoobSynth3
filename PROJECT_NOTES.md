@@ -8,6 +8,7 @@ This file is meant to be reread by the coding assistant to keep context, decisio
 - Audio: AudioWorklet graph in `src/engine`.
 - Patching: drag-to-connect, double-click cable to remove.
 - Default demo: Jupiter Pad style patch with chorus and sequencer.
+- FX: global delay + reverb after chorus (mix controls for bypass).
 - MIDI: Web MIDI input wired to Control IO (poly voice allocation) with velocity CV out + MIDI-only velocity slew.
 - Polyphony: 1/2/4/8 voices, per-voice VCO/LFO/VCF/ADSR/VCA/Mod VCA, global chorus/out.
 
@@ -21,6 +22,8 @@ This file is meant to be reread by the coding assistant to keep context, decisio
 - Mod VCA (CV multiplier)
 - Mixer (A/B)
 - Chorus (stereo)
+- Delay (stereo)
+- Reverb (stereo)
 - Scope
 - Control IO (CV/Gate/Sync + mini sequencer + glide)
 - Lab Panel (test module, not in audio chain)

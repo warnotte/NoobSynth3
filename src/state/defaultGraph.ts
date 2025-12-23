@@ -78,6 +78,31 @@ export const defaultGraph: GraphState = {
       },
     },
     {
+      id: 'delay-1',
+      type: 'delay',
+      name: 'Delay',
+      position: { x: 1140, y: 140 },
+      params: {
+        time: 420,
+        feedback: 0.32,
+        mix: 0.22,
+        tone: 0.6,
+        pingPong: true,
+      },
+    },
+    {
+      id: 'reverb-1',
+      type: 'reverb',
+      name: 'Reverb',
+      position: { x: 1340, y: 140 },
+      params: {
+        time: 0.62,
+        damp: 0.45,
+        preDelay: 18,
+        mix: 0.24,
+      },
+    },
+    {
       id: 'gain-1',
       type: 'gain',
       name: 'VCA 1',
@@ -233,6 +258,16 @@ export const defaultGraph: GraphState = {
     },
     {
       from: { moduleId: 'chorus-1', portId: 'out' },
+      to: { moduleId: 'delay-1', portId: 'in' },
+      kind: 'audio',
+    },
+    {
+      from: { moduleId: 'delay-1', portId: 'out' },
+      to: { moduleId: 'reverb-1', portId: 'in' },
+      kind: 'audio',
+    },
+    {
+      from: { moduleId: 'reverb-1', portId: 'out' },
       to: { moduleId: 'scope-1', portId: 'in' },
       kind: 'audio',
     },

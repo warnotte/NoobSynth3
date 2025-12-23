@@ -1231,6 +1231,104 @@ function App() {
       )
     }
 
+    if (module.type === 'delay') {
+      const pingPong = Boolean(module.params.pingPong)
+      return (
+        <>
+          <RotaryKnob
+            label="Time"
+            min={20}
+            max={1200}
+            step={1}
+            unit="ms"
+            value={Number(module.params.time ?? 360)}
+            onChange={(value) => updateParam(module.id, 'time', value)}
+            format={(value) => Math.round(value).toString()}
+          />
+          <RotaryKnob
+            label="Feedback"
+            min={0}
+            max={0.9}
+            step={0.01}
+            value={Number(module.params.feedback ?? 0.35)}
+            onChange={(value) => updateParam(module.id, 'feedback', value)}
+            format={(value) => value.toFixed(2)}
+          />
+          <RotaryKnob
+            label="Mix"
+            min={0}
+            max={1}
+            step={0.01}
+            value={Number(module.params.mix ?? 0.25)}
+            onChange={(value) => updateParam(module.id, 'mix', value)}
+            format={(value) => value.toFixed(2)}
+          />
+          <RotaryKnob
+            label="Tone"
+            min={0}
+            max={1}
+            step={0.01}
+            value={Number(module.params.tone ?? 0.55)}
+            onChange={(value) => updateParam(module.id, 'tone', value)}
+            format={(value) => `${Math.round(value * 100)}%`}
+          />
+          <div className="toggle-group">
+            <button
+              type="button"
+              className={`toggle-btn ${pingPong ? 'active' : ''}`}
+              onClick={() => updateParam(module.id, 'pingPong', !pingPong)}
+            >
+              Ping Pong
+            </button>
+          </div>
+        </>
+      )
+    }
+
+    if (module.type === 'reverb') {
+      return (
+        <>
+          <RotaryKnob
+            label="Time"
+            min={0.1}
+            max={0.98}
+            step={0.01}
+            value={Number(module.params.time ?? 0.62)}
+            onChange={(value) => updateParam(module.id, 'time', value)}
+            format={(value) => `${Math.round(value * 100)}%`}
+          />
+          <RotaryKnob
+            label="Damp"
+            min={0}
+            max={1}
+            step={0.01}
+            value={Number(module.params.damp ?? 0.4)}
+            onChange={(value) => updateParam(module.id, 'damp', value)}
+            format={(value) => `${Math.round(value * 100)}%`}
+          />
+          <RotaryKnob
+            label="Pre"
+            min={0}
+            max={80}
+            step={1}
+            unit="ms"
+            value={Number(module.params.preDelay ?? 18)}
+            onChange={(value) => updateParam(module.id, 'preDelay', value)}
+            format={(value) => Math.round(value).toString()}
+          />
+          <RotaryKnob
+            label="Mix"
+            min={0}
+            max={1}
+            step={0.01}
+            value={Number(module.params.mix ?? 0.25)}
+            onChange={(value) => updateParam(module.id, 'mix', value)}
+            format={(value) => value.toFixed(2)}
+          />
+        </>
+      )
+    }
+
     if (module.type === 'vcf') {
       const mode = String(module.params.mode ?? 'lp')
       const slope = Number(module.params.slope ?? 24)
@@ -1800,6 +1898,8 @@ function App() {
               <span className="chip">Mod VCA</span>
               <span className="chip">Mixer</span>
               <span className="chip">Chorus</span>
+              <span className="chip">Delay</span>
+              <span className="chip">Reverb</span>
               <span className="chip">LFO</span>
               <span className="chip">ADSR</span>
               <span className="chip">Scope</span>
