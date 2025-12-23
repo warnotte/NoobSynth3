@@ -66,6 +66,9 @@ function App() {
   const voiceClockRef = useRef(0)
   const activeVoiceCountRef = useRef<number | null>(null)
   const graphRef = useRef(graph)
+  const statusRef = useRef(status)
+  const pendingRestartRef = useRef<GraphState | null>(null)
+  const restartInFlightRef = useRef(false)
   const sequencerRef = useRef<{ timer: number | null; gateTimer: number | null; step: number }>({
     timer: null,
     gateTimer: null,
@@ -77,6 +80,10 @@ function App() {
   useEffect(() => {
     graphRef.current = graph
   }, [graph])
+
+  useEffect(() => {
+    statusRef.current = status
+  }, [status])
 
   useEffect(() => {
     if (status === 'running') {
@@ -113,32 +120,20 @@ function App() {
   }, [voiceCount])
 
   useEffect(() => {
-    if (midiEnabled && controlModuleId && seqOn) {
-      updateParam(controlModuleId, 'seqOn', false)
-    }
-  }, [midiEnabled, controlModuleId, seqOn])
-
-  useEffect(() => {
-    if (status !== 'running' || isBooting) {
+    if (status !== 'running') {
       return
     }
     if (activeVoiceCountRef.current === voiceCount) {
       return
     }
-    setIsBooting(true)
-    const nextGraph = graphRef.current
-    engine
-      .start(nextGraph)
-      .then(() => {
-        setStatus('running')
-        activeVoiceCountRef.current = voiceCount
-      })
-      .catch((error) => {
-        console.error(error)
-        setStatus('error')
-      })
-      .finally(() => setIsBooting(false))
-  }, [voiceCount, status, isBooting, engine])
+    queueEngineRestart(graphRef.current)
+  }, [voiceCount, status])
+
+  useEffect(() => {
+    if (midiEnabled && controlModuleId && seqOn) {
+      updateParam(controlModuleId, 'seqOn', false)
+    }
+  }, [midiEnabled, controlModuleId, seqOn])
 
   useLayoutEffect(() => {
     const updatePositions = () => {
@@ -526,26 +521,87 @@ function App() {
     return clampVoiceCount(Number(control?.params.voices ?? 1))
   }
 
-  const applyPreset = async (nextGraph: GraphState) => {
+  const hasSameModuleShape = (currentGraph: GraphState, nextGraph: GraphState) => {
+    if (currentGraph.modules.length !== nextGraph.modules.length) {
+      return false
+    }
+    return currentGraph.modules.every((module, index) => {
+      const next = nextGraph.modules[index]
+      return next && module.id === next.id && module.type === next.type
+    })
+  }
+
+  const hasSameConnections = (currentGraph: GraphState, nextGraph: GraphState) => {
+    if (currentGraph.connections.length !== nextGraph.connections.length) {
+      return false
+    }
+    const serialize = (connection: GraphState['connections'][number]) =>
+      `${connection.kind}:${connection.from.moduleId}.${connection.from.portId}->${connection.to.moduleId}.${connection.to.portId}`
+    const current = currentGraph.connections.map(serialize).sort()
+    const next = nextGraph.connections.map(serialize).sort()
+    return current.every((value, index) => value === next[index])
+  }
+
+  const applyGraphParams = (nextGraph: GraphState) => {
+    if (statusRef.current !== 'running') {
+      return
+    }
+    nextGraph.modules.forEach((module) => {
+      Object.entries(module.params).forEach(([paramId, value]) => {
+        engine.setParam(module.id, paramId, value)
+      })
+    })
+  }
+
+  const queueEngineRestart = (nextGraph: GraphState) => {
+    if (statusRef.current !== 'running') {
+      return
+    }
+    pendingRestartRef.current = nextGraph
+    if (restartInFlightRef.current) {
+      setIsBooting(true)
+      return
+    }
+    restartInFlightRef.current = true
+    setIsBooting(true)
+    const run = async () => {
+      while (pendingRestartRef.current && statusRef.current === 'running') {
+        const graphToStart = pendingRestartRef.current
+        pendingRestartRef.current = null
+        try {
+          await engine.start(graphToStart)
+          setStatus('running')
+          activeVoiceCountRef.current = getVoiceCountFromGraph(graphToStart)
+        } catch (error) {
+          console.error(error)
+          setStatus('error')
+          pendingRestartRef.current = null
+          break
+        }
+      }
+      restartInFlightRef.current = false
+      setIsBooting(false)
+    }
+    void run()
+  }
+
+  const applyPreset = (nextGraph: GraphState) => {
     const cloned = cloneGraph(nextGraph)
     setSelectedPort(null)
     setGhostCable(null)
     setDragTargets(null)
     setHoverTargetKey(null)
     setGraph(cloned)
-    if (status === 'running') {
-      setIsBooting(true)
-      try {
-        await engine.start(cloned)
-        setStatus('running')
-        activeVoiceCountRef.current = getVoiceCountFromGraph(cloned)
-      } catch (error) {
-        console.error(error)
-        setStatus('error')
-      } finally {
-        setIsBooting(false)
-      }
+    const shouldRestart =
+      statusRef.current === 'running' &&
+      (!hasSameModuleShape(graphRef.current, cloned) ||
+        !hasSameConnections(graphRef.current, cloned) ||
+        getVoiceCountFromGraph(graphRef.current) !== getVoiceCountFromGraph(cloned))
+    if (shouldRestart) {
+      queueEngineRestart(cloned)
+      return
     }
+    applyGraphParams(cloned)
   }
 
   const getCenterFromElement = (element: HTMLElement): PortPosition => {
@@ -938,6 +994,8 @@ function App() {
   }
   const handleStart = async () => {
     setIsBooting(true)
+    pendingRestartRef.current = null
+    restartInFlightRef.current = false
     try {
       await engine.start(graph)
       setStatus('running')
@@ -954,6 +1012,8 @@ function App() {
     await engine.stop()
     setStatus('idle')
     activeVoiceCountRef.current = null
+    pendingRestartRef.current = null
+    restartInFlightRef.current = false
   }
 
   const statusLabel = status === 'running' ? 'Live' : status === 'error' ? 'Error' : 'Standby'

@@ -133,12 +133,13 @@ export const demoPresets: PresetSpec[] = [
   buildPreset('glass-bell', 'Glass Bell', 'Bright bell with airy tails.', {
     'osc-1': { frequency: 220, type: 'sine', pwm: 0.5, unison: 1, detune: 0 },
     'osc-2': { frequency: 220.8, type: 'triangle', pwm: 0.5, unison: 1, detune: 1.5 },
-    'mix-1': { levelA: 0.75, levelB: 0.25 },
+    'mix-1': { levelA: 0.9, levelB: 0.45 },
+    'gain-1': { gain: 0.95 },
     'vcf-1': {
-      cutoff: 1800,
-      resonance: 0.35,
-      drive: 0.05,
-      envAmount: 0.5,
+      cutoff: 2400,
+      resonance: 0.45,
+      drive: 0.2,
+      envAmount: 0.6,
       modAmount: 0.1,
       keyTrack: 0.8,
       slope: 12,
