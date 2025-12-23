@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { AudioEngine } from './engine/AudioEngine'
 import { defaultGraph } from './state/defaultGraph'
 import { demoPresets } from './state/presets'
@@ -22,9 +22,17 @@ type DragState = {
   validTargets?: Set<string>
 }
 
+type VoiceState = {
+  note: number | null
+  velocity: number
+  age: number
+}
+
 const MIDI_NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 
 const clampMidiNote = (value: number) => Math.max(0, Math.min(127, Math.round(value)))
+
+const clampVoiceCount = (value: number) => Math.max(1, Math.min(8, Math.round(value)))
 
 const formatMidiNote = (note: number) => {
   const clamped = clampMidiNote(note)
@@ -53,10 +61,11 @@ function App() {
   const [midiError, setMidiError] = useState<string | null>(null)
   const rackRef = useRef<HTMLDivElement | null>(null)
   const dragRef = useRef<DragState | null>(null)
-  const controlGateRef = useRef({ manual: false, key: false, seq: false })
-  const syncTimeoutRef = useRef<number | null>(null)
   const midiInputRef = useRef<MIDIInput | null>(null)
-  const heldNotesRef = useRef<Array<{ note: number; velocity: number }>>([])
+  const voiceStateRef = useRef<VoiceState[]>([])
+  const voiceClockRef = useRef(0)
+  const activeVoiceCountRef = useRef<number | null>(null)
+  const graphRef = useRef(graph)
   const sequencerRef = useRef<{ timer: number | null; gateTimer: number | null; step: number }>({
     timer: null,
     gateTimer: null,
@@ -64,6 +73,10 @@ function App() {
   })
 
   useEffect(() => () => engine.dispose(), [engine])
+
+  useEffect(() => {
+    graphRef.current = graph
+  }, [graph])
 
   useEffect(() => {
     if (status === 'running') {
@@ -87,61 +100,45 @@ function App() {
   const midiVelSlew = Math.max(0, Number(controlModule?.params.midiVelSlew ?? 0.008))
   const midiInputId =
     typeof controlModule?.params.midiInputId === 'string' ? controlModule.params.midiInputId : ''
+  const voiceCount = clampVoiceCount(Number(controlModule?.params.voices ?? 4))
+  const manualVelocity = Math.max(0, Math.min(1, Number(controlModule?.params.velocity ?? 1)))
 
   useEffect(() => {
-    if (!controlModuleId) {
-      return
-    }
-    const steps = [0, 2, 4, 5]
-    const stepMs = 60000 / seqTempo
-
-    const stopSequencer = () => {
-      if (sequencerRef.current.timer) {
-        window.clearInterval(sequencerRef.current.timer)
-        sequencerRef.current.timer = null
-      }
-      if (sequencerRef.current.gateTimer) {
-        window.clearTimeout(sequencerRef.current.gateTimer)
-        sequencerRef.current.gateTimer = null
-      }
-      sequencerRef.current.step = 0
-      setActiveStep(null)
-      setControlGate(controlModuleId, { seq: false })
-    }
-
-    if (!seqOn) {
-      stopSequencer()
-      return
-    }
-
-    const tick = () => {
-      const stepIndex = sequencerRef.current.step % steps.length
-      const semitone = steps[stepIndex]
-      updateParam(controlModuleId, 'cv', semitone / 12)
-      setControlGate(controlModuleId, { seq: true })
-      triggerSync(controlModuleId)
-      setActiveStep(stepIndex)
-      if (sequencerRef.current.gateTimer) {
-        window.clearTimeout(sequencerRef.current.gateTimer)
-      }
-      sequencerRef.current.gateTimer = window.setTimeout(() => {
-        setControlGate(controlModuleId, { seq: false })
-      }, stepMs * seqGateRatio)
-      sequencerRef.current.step = (sequencerRef.current.step + 1) % steps.length
-    }
-
-    stopSequencer()
-    tick()
-    sequencerRef.current.timer = window.setInterval(tick, stepMs)
-
-    return () => stopSequencer()
-  }, [controlModuleId, seqOn, seqTempo, seqGateRatio])
+    voiceStateRef.current = Array.from({ length: voiceCount }, () => ({
+      note: null,
+      velocity: 0,
+      age: 0,
+    }))
+    voiceClockRef.current = 0
+  }, [voiceCount])
 
   useEffect(() => {
     if (midiEnabled && controlModuleId && seqOn) {
       updateParam(controlModuleId, 'seqOn', false)
     }
   }, [midiEnabled, controlModuleId, seqOn])
+
+  useEffect(() => {
+    if (status !== 'running' || isBooting) {
+      return
+    }
+    if (activeVoiceCountRef.current === voiceCount) {
+      return
+    }
+    setIsBooting(true)
+    const nextGraph = graphRef.current
+    engine
+      .start(nextGraph)
+      .then(() => {
+        setStatus('running')
+        activeVoiceCountRef.current = voiceCount
+      })
+      .catch((error) => {
+        console.error(error)
+        setStatus('error')
+      })
+      .finally(() => setIsBooting(false))
+  }, [voiceCount, status, isBooting, engine])
 
   useLayoutEffect(() => {
     const updatePositions = () => {
@@ -199,38 +196,210 @@ function App() {
     }
   }, [graph.modules.length])
 
-  const updateParam = (
-    moduleId: string,
-    paramId: string,
-    value: number | string | boolean,
-    options?: { skipEngine?: boolean },
-  ) => {
-    setGraph((prev) => ({
-      ...prev,
-      modules: prev.modules.map((module) =>
-        module.id === moduleId
-          ? { ...module, params: { ...module.params, [paramId]: value } }
-          : module,
-      ),
-    }))
+  const updateParam = useCallback(
+    (
+      moduleId: string,
+      paramId: string,
+      value: number | string | boolean,
+      options?: { skipEngine?: boolean },
+    ) => {
+      setGraph((prev) => ({
+        ...prev,
+        modules: prev.modules.map((module) =>
+          module.id === moduleId
+            ? { ...module, params: { ...module.params, [paramId]: value } }
+            : module,
+        ),
+      }))
 
-    if (status === 'running' && !options?.skipEngine) {
-      engine.setParam(moduleId, paramId, value)
+      if (status === 'running' && !options?.skipEngine) {
+        engine.setParam(moduleId, paramId, value)
+      }
+    },
+    [engine, status],
+  )
+
+  const ensureVoiceState = useCallback(() => {
+    if (voiceStateRef.current.length === voiceCount) {
+      return
     }
-  }
+    voiceStateRef.current = Array.from({ length: voiceCount }, () => ({
+      note: null,
+      velocity: 0,
+      age: 0,
+    }))
+    voiceClockRef.current = 0
+  }, [voiceCount])
 
-  const syncMidiInputs = (access: MIDIAccess) => {
-    const inputs = Array.from(access.inputs.values())
-    setMidiInputs(inputs)
+  const allocateVoice = useCallback(
+    (note: number, velocity: number) => {
+      ensureVoiceState()
+      const states = voiceStateRef.current
+      let index = states.findIndex((state) => state.note === null)
+      if (index === -1) {
+        let oldestIndex = 0
+        let oldestAge = states[0]?.age ?? 0
+        states.forEach((state, idx) => {
+          if (state.age < oldestAge) {
+            oldestAge = state.age
+            oldestIndex = idx
+          }
+        })
+        index = oldestIndex
+      }
+      const age = voiceClockRef.current + 1
+      voiceClockRef.current = age
+      states[index] = { note, velocity, age }
+      return index
+    },
+    [ensureVoiceState],
+  )
+
+  const releaseVoice = useCallback((note: number) => {
+    const states = voiceStateRef.current
+    const index = states.findIndex((state) => state.note === note)
+    if (index === -1) {
+      return null
+    }
+    states[index] = { note: null, velocity: 0, age: 0 }
+    return index
+  }, [])
+
+  const releaseAllVoices = useCallback(() => {
+    if (controlModuleId) {
+      voiceStateRef.current.forEach((state, index) => {
+        if (state.note !== null) {
+          engine.setControlVoiceGate(controlModuleId, index, 0)
+        }
+      })
+    }
+    voiceStateRef.current = Array.from({ length: voiceCount }, () => ({
+      note: null,
+      velocity: 0,
+      age: 0,
+    }))
+    voiceClockRef.current = 0
+  }, [controlModuleId, engine, voiceCount])
+
+  const triggerVoiceNote = useCallback(
+    (
+      note: number,
+      velocity: number,
+      options?: { useVelocity?: boolean; velocitySlew?: number },
+    ) => {
+      if (!controlModuleId) {
+        return
+      }
+      const useVelocity = options?.useVelocity ?? true
+      const clampedVelocity = Math.max(0, Math.min(1, velocity))
+      const voiceIndex = allocateVoice(note, clampedVelocity)
+      const cv = (note - midiRoot) / 12
+      updateParam(controlModuleId, 'cv', cv, { skipEngine: true })
+      if (useVelocity) {
+        updateParam(controlModuleId, 'velocity', clampedVelocity, { skipEngine: true })
+      }
+      engine.setControlVoiceCv(controlModuleId, voiceIndex, cv)
+      if (useVelocity) {
+        engine.setControlVoiceVelocity(
+          controlModuleId,
+          voiceIndex,
+          clampedVelocity,
+          options?.velocitySlew ?? 0,
+        )
+      }
+      engine.triggerControlVoiceGate(controlModuleId, voiceIndex)
+      engine.triggerControlVoiceSync(controlModuleId, voiceIndex)
+    },
+    [allocateVoice, controlModuleId, engine, midiRoot, updateParam],
+  )
+
+  const releaseVoiceNote = useCallback(
+    (note: number) => {
+      if (!controlModuleId) {
+        return
+      }
+      const voiceIndex = releaseVoice(note)
+      if (voiceIndex === null) {
+        return
+      }
+      engine.setControlVoiceGate(controlModuleId, voiceIndex, 0)
+    },
+    [controlModuleId, engine, releaseVoice],
+  )
+
+  useEffect(() => {
     if (!controlModuleId) {
       return
     }
-    const hasSelected = inputs.some((input) => input.id === midiInputId)
-    if (!hasSelected) {
-      const nextId = inputs[0]?.id ?? ''
-      updateParam(controlModuleId, 'midiInputId', nextId)
+    const steps = [0, 2, 4, 5]
+    const stepMs = 60000 / seqTempo
+
+    const stopSequencer = () => {
+      if (sequencerRef.current.timer) {
+        window.clearInterval(sequencerRef.current.timer)
+        sequencerRef.current.timer = null
+      }
+      if (sequencerRef.current.gateTimer) {
+        window.clearTimeout(sequencerRef.current.gateTimer)
+        sequencerRef.current.gateTimer = null
+      }
+      sequencerRef.current.step = 0
+      setActiveStep(null)
+      releaseAllVoices()
     }
-  }
+
+    if (!seqOn) {
+      stopSequencer()
+      return
+    }
+
+    const tick = () => {
+      const stepIndex = sequencerRef.current.step % steps.length
+      const semitone = steps[stepIndex]
+      const noteNumber = midiRoot + semitone
+      triggerVoiceNote(noteNumber, manualVelocity, { useVelocity: true, velocitySlew: 0 })
+      setActiveStep(stepIndex)
+      if (sequencerRef.current.gateTimer) {
+        window.clearTimeout(sequencerRef.current.gateTimer)
+      }
+      sequencerRef.current.gateTimer = window.setTimeout(() => {
+        releaseVoiceNote(noteNumber)
+      }, stepMs * seqGateRatio)
+      sequencerRef.current.step = (sequencerRef.current.step + 1) % steps.length
+    }
+
+    stopSequencer()
+    tick()
+    sequencerRef.current.timer = window.setInterval(tick, stepMs)
+
+    return () => stopSequencer()
+  }, [
+    controlModuleId,
+    seqOn,
+    seqTempo,
+    seqGateRatio,
+    midiRoot,
+    manualVelocity,
+    releaseAllVoices,
+    releaseVoiceNote,
+    triggerVoiceNote,
+  ])
+
+  const syncMidiInputs = useCallback(
+    (access: MIDIAccess) => {
+      const inputs = Array.from(access.inputs.values())
+      setMidiInputs(inputs)
+      if (!controlModuleId) {
+        return
+      }
+      const hasSelected = inputs.some((input) => input.id === midiInputId)
+      if (!hasSelected) {
+        const nextId = inputs[0]?.id ?? ''
+        updateParam(controlModuleId, 'midiInputId', nextId)
+      }
+    },
+    [controlModuleId, midiInputId, updateParam],
+  )
 
   const handleMidiToggle = async () => {
     if (!controlModuleId) {
@@ -269,7 +438,7 @@ function App() {
     return () => {
       midiAccess.onstatechange = null
     }
-  }, [midiAccess, controlModuleId, midiInputId])
+  }, [midiAccess, syncMidiInputs])
 
   useEffect(() => {
     if (!midiEnabled || !midiAccess || !controlModuleId) {
@@ -277,13 +446,7 @@ function App() {
         midiInputRef.current.onmidimessage = null
         midiInputRef.current = null
       }
-      if (heldNotesRef.current.length > 0) {
-        heldNotesRef.current = []
-        if (controlModuleId) {
-          controlGateRef.current.key = false
-          setControlGate(controlModuleId, { key: false })
-        }
-      }
+      releaseAllVoices()
       return
     }
 
@@ -322,39 +485,15 @@ function App() {
       }
 
       if (noteOn) {
-        const held = heldNotesRef.current
-        const existingIndex = held.findIndex((entry) => entry.note === note)
-        if (existingIndex !== -1) {
-          held.splice(existingIndex, 1)
-        }
-        held.push({ note, velocity: velocityValue })
-        updateParam(controlModuleId, 'cv', (note - midiRoot) / 12)
-        if (midiUseVelocity) {
-          updateParam(controlModuleId, 'velocity', velocityValue, { skipEngine: true })
-          engine.setControlVelocity(controlModuleId, velocityValue, midiVelSlew)
-        }
-        controlGateRef.current.key = true
-        setControlGate(controlModuleId, { key: true })
-        triggerSync(controlModuleId)
+        triggerVoiceNote(note, velocityValue, {
+          useVelocity: midiUseVelocity,
+          velocitySlew: midiVelSlew,
+        })
         return
       }
 
       if (noteOff) {
-        const held = heldNotesRef.current.filter((entry) => entry.note !== note)
-        heldNotesRef.current = held
-        if (held.length === 0) {
-          controlGateRef.current.key = false
-          setControlGate(controlModuleId, { key: false })
-        } else {
-          const last = held[held.length - 1]
-          updateParam(controlModuleId, 'cv', (last.note - midiRoot) / 12)
-          if (midiUseVelocity) {
-            updateParam(controlModuleId, 'velocity', last.velocity, { skipEngine: true })
-            engine.setControlVelocity(controlModuleId, last.velocity, midiVelSlew)
-          }
-          controlGateRef.current.key = true
-          setControlGate(controlModuleId, { key: true })
-        }
+        releaseVoiceNote(note)
       }
     }
 
@@ -371,15 +510,21 @@ function App() {
     midiInputs,
     midiInputId,
     midiChannel,
-    midiRoot,
     midiUseVelocity,
     midiVelSlew,
     controlModuleId,
-    engine,
+    releaseAllVoices,
+    releaseVoiceNote,
+    triggerVoiceNote,
   ])
 
   const cloneGraph = (nextGraph: GraphState): GraphState =>
     JSON.parse(JSON.stringify(nextGraph)) as GraphState
+
+  const getVoiceCountFromGraph = (nextGraph: GraphState) => {
+    const control = nextGraph.modules.find((module) => module.type === 'control')
+    return clampVoiceCount(Number(control?.params.voices ?? 1))
+  }
 
   const applyPreset = async (nextGraph: GraphState) => {
     const cloned = cloneGraph(nextGraph)
@@ -393,6 +538,7 @@ function App() {
       try {
         await engine.start(cloned)
         setStatus('running')
+        activeVoiceCountRef.current = getVoiceCountFromGraph(cloned)
       } catch (error) {
         console.error(error)
         setStatus('error')
@@ -658,25 +804,14 @@ function App() {
     window.addEventListener('pointercancel', handleUp)
   }
 
-  const setControlGate = (
-    moduleId: string,
-    next: Partial<{ manual: boolean; key: boolean; seq: boolean }>,
-  ) => {
-    controlGateRef.current = { ...controlGateRef.current, ...next }
-    const { manual, key, seq } = controlGateRef.current
-    const value = manual || key || seq ? 1 : 0
-    updateParam(moduleId, 'gate', value)
+  const setManualGate = (moduleId: string, isOn: boolean) => {
+    updateParam(moduleId, 'gate', isOn ? 1 : 0, { skipEngine: true })
+    engine.setControlVoiceGate(moduleId, 0, isOn ? 1 : 0)
   }
 
-  const triggerSync = (moduleId: string) => {
-    if (syncTimeoutRef.current) {
-      window.clearTimeout(syncTimeoutRef.current)
-    }
-    updateParam(moduleId, 'sync', 1)
-    syncTimeoutRef.current = window.setTimeout(() => {
-      updateParam(moduleId, 'sync', 0)
-      syncTimeoutRef.current = null
-    }, 40)
+  const triggerManualSync = (moduleId: string) => {
+    updateParam(moduleId, 'sync', 1, { skipEngine: true })
+    engine.triggerControlVoiceSync(moduleId, 0)
   }
 
   const selectedPortKey = selectedPort ? `${selectedPort.moduleId}:${selectedPort.id}` : null
@@ -806,6 +941,7 @@ function App() {
     try {
       await engine.start(graph)
       setStatus('running')
+      activeVoiceCountRef.current = voiceCount
     } catch (error) {
       console.error(error)
       setStatus('error')
@@ -817,6 +953,7 @@ function App() {
   const handleStop = async () => {
     await engine.stop()
     setStatus('idle')
+    activeVoiceCountRef.current = null
   }
 
   const statusLabel = status === 'running' ? 'Live' : status === 'error' ? 'Error' : 'Standby'
@@ -1200,19 +1337,19 @@ function App() {
       const midiChannel = Number(module.params.midiChannel ?? 0)
       const midiRoot = clampMidiNote(Number(module.params.midiRoot ?? 60))
       const midiVelSlew = Math.max(0, Number(module.params.midiVelSlew ?? 0.008))
+      const manualVelocity = Math.max(0, Math.min(1, Number(module.params.velocity ?? 1)))
+      const voices = clampVoiceCount(Number(module.params.voices ?? 4))
       const midiInputId =
         typeof module.params.midiInputId === 'string' ? module.params.midiInputId : ''
-      const handleGateDown = () => setControlGate(module.id, { manual: true })
-      const handleGateUp = () => setControlGate(module.id, { manual: false })
+      const handleGateDown = () => setManualGate(module.id, true)
+      const handleGateUp = () => setManualGate(module.id, false)
       const handleKeyDown = (semitone: number) => {
-        controlGateRef.current.key = true
-        updateParam(module.id, 'cv', semitone / 12)
-        setControlGate(module.id, { key: true })
-        triggerSync(module.id)
+        const noteNumber = midiRoot + semitone
+        triggerVoiceNote(noteNumber, manualVelocity, { useVelocity: true, velocitySlew: 0 })
       }
-      const handleKeyUp = () => {
-        controlGateRef.current.key = false
-        setControlGate(module.id, { key: false })
+      const handleKeyUp = (semitone: number) => {
+        const noteNumber = midiRoot + semitone
+        releaseVoiceNote(noteNumber)
       }
       return (
         <>
@@ -1271,7 +1408,11 @@ function App() {
             >
               Gate
             </button>
-            <button type="button" className="control-button" onClick={() => triggerSync(module.id)}>
+            <button
+              type="button"
+              className="control-button"
+              onClick={() => triggerManualSync(module.id)}
+            >
               Sync
             </button>
           </div>
@@ -1287,9 +1428,9 @@ function App() {
                 type="button"
                 className="mini-key"
                 onPointerDown={() => handleKeyDown(key.semitone)}
-                onPointerUp={handleKeyUp}
-                onPointerCancel={handleKeyUp}
-                onPointerLeave={handleKeyUp}
+                onPointerUp={() => handleKeyUp(key.semitone)}
+                onPointerCancel={() => handleKeyUp(key.semitone)}
+                onPointerLeave={() => handleKeyUp(key.semitone)}
               >
                 {key.label}
               </button>
@@ -1390,6 +1531,21 @@ function App() {
               {midiSupported && !midiError && midiEnabled && midiInputs.length === 0 &&
                 'No MIDI inputs detected.'}
               {midiSupported && !midiError && !midiEnabled && 'MIDI is off.'}
+            </div>
+          </div>
+          <div className="poly-panel">
+            <span className="poly-label">Voices</span>
+            <div className="poly-buttons">
+              {[1, 2, 4, 8].map((count) => (
+                <button
+                  key={count}
+                  type="button"
+                  className={`poly-btn ${voices === count ? 'active' : ''}`}
+                  onClick={() => updateParam(module.id, 'voices', count)}
+                >
+                  {count}
+                </button>
+              ))}
             </div>
           </div>
           <div className="seq-panel">

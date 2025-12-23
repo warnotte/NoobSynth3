@@ -143,6 +143,7 @@ export const defaultGraph: GraphState = {
         midiRoot: 60,
         midiInputId: '',
         midiVelSlew: 0.008,
+        voices: 4,
         seqOn: true,
         seqTempo: 68,
         seqGate: 0.9,

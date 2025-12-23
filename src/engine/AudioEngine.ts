@@ -15,12 +15,29 @@ type RuntimeModule = {
   dispose?: () => void
 }
 
+type RuntimeConnection = {
+  connection: Connection
+  mixNodes?: GainNode[]
+}
+
 export class AudioEngine {
   private context: AudioContext | null = null
   private modules = new Map<string, RuntimeModule>()
-  private connectionMap = new Map<string, Connection>()
+  private voiceModules = new Map<string, RuntimeModule[]>()
+  private connectionMap = new Map<string, RuntimeConnection>()
   private workletsLoaded = false
   private controlGlide = new Map<string, number>()
+  private voiceCount = 1
+  private polyTypes = new Set<ModuleType>([
+    'oscillator',
+    'gain',
+    'cv-vca',
+    'lfo',
+    'adsr',
+    'mixer',
+    'vcf',
+    'control',
+  ])
 
   async start(graph: GraphState): Promise<void> {
     await this.init()
@@ -47,200 +64,279 @@ export class AudioEngine {
   }
 
   setParam(moduleId: string, paramId: string, value: number | string | boolean): void {
-    const module = this.modules.get(moduleId)
+    const context = this.context
+    if (!context) {
+      return
+    }
+    const runtimeModules = this.getRuntimeModules(moduleId)
+    if (!runtimeModules) {
+      return
+    }
+    if (paramId === 'glide' && typeof value === 'number') {
+      this.controlGlide.set(moduleId, Math.max(0, value))
+    }
+
+    runtimeModules.forEach((module) => {
+      if (module.type === 'oscillator' && module.node instanceof AudioWorkletNode) {
+        if (paramId === 'frequency' && typeof value === 'number') {
+          module.node.parameters.get('baseFrequency')?.setValueAtTime(value, context.currentTime)
+        }
+        if (paramId === 'type' && typeof value === 'string') {
+          const waveformIndex = this.waveformIndex(value)
+          module.node.parameters.get('waveform')?.setValueAtTime(waveformIndex, context.currentTime)
+        }
+        if (paramId === 'pwm' && typeof value === 'number') {
+          module.node.parameters.get('pwm')?.setValueAtTime(value, context.currentTime)
+        }
+        if (paramId === 'unison' && typeof value === 'number') {
+          module.node.parameters.get('unison')?.setValueAtTime(value, context.currentTime)
+        }
+        if (paramId === 'detune' && typeof value === 'number') {
+          module.node.parameters.get('detune')?.setValueAtTime(value, context.currentTime)
+        }
+        if (paramId === 'fmLin' && typeof value === 'number') {
+          module.node.parameters.get('fmLinDepth')?.setValueAtTime(value, context.currentTime)
+        }
+        if (paramId === 'fmExp' && typeof value === 'number') {
+          module.node.parameters.get('fmExpDepth')?.setValueAtTime(value, context.currentTime)
+        }
+      }
+
+      if (module.type === 'gain' && module.node instanceof AudioWorkletNode) {
+        if (paramId === 'gain' && typeof value === 'number') {
+          module.node.parameters.get('gain')?.setValueAtTime(value, context.currentTime)
+        }
+      }
+
+      if (module.type === 'cv-vca' && module.node instanceof AudioWorkletNode) {
+        if (paramId === 'gain' && typeof value === 'number') {
+          module.node.parameters.get('gain')?.setValueAtTime(value, context.currentTime)
+        }
+      }
+
+      if (module.type === 'output' && module.node instanceof GainNode) {
+        if (paramId === 'level' && typeof value === 'number') {
+          module.node.gain.setValueAtTime(value, context.currentTime)
+        }
+      }
+
+      if (module.type === 'lfo' && module.node instanceof AudioWorkletNode) {
+        if (paramId === 'rate' && typeof value === 'number') {
+          module.node.parameters.get('rate')?.setValueAtTime(value, context.currentTime)
+        }
+        if (paramId === 'shape' && typeof value === 'string') {
+          const waveformIndex = this.waveformIndex(value)
+          module.node.parameters.get('shape')?.setValueAtTime(waveformIndex, context.currentTime)
+        }
+        if (paramId === 'depth' && typeof value === 'number') {
+          module.node.parameters.get('depth')?.setValueAtTime(value, context.currentTime)
+        }
+        if (paramId === 'offset' && typeof value === 'number') {
+          module.node.parameters.get('offset')?.setValueAtTime(value, context.currentTime)
+        }
+        if (paramId === 'bipolar' && typeof value !== 'string') {
+          const numeric = typeof value === 'boolean' ? (value ? 1 : 0) : value
+          module.node.parameters.get('bipolar')?.setValueAtTime(numeric, context.currentTime)
+        }
+      }
+
+      if (module.type === 'vcf' && module.node instanceof AudioWorkletNode) {
+        if (paramId === 'cutoff' && typeof value === 'number') {
+          module.node.parameters.get('cutoff')?.setValueAtTime(value, context.currentTime)
+        }
+        if (paramId === 'resonance' && typeof value === 'number') {
+          module.node.parameters.get('resonance')?.setValueAtTime(value, context.currentTime)
+        }
+        if (paramId === 'drive' && typeof value === 'number') {
+          module.node.parameters.get('drive')?.setValueAtTime(value, context.currentTime)
+        }
+        if (paramId === 'envAmount' && typeof value === 'number') {
+          module.node.parameters.get('envAmount')?.setValueAtTime(value, context.currentTime)
+        }
+        if (paramId === 'modAmount' && typeof value === 'number') {
+          module.node.parameters.get('modAmount')?.setValueAtTime(value, context.currentTime)
+        }
+        if (paramId === 'keyTrack' && typeof value === 'number') {
+          module.node.parameters.get('keyTrack')?.setValueAtTime(value, context.currentTime)
+        }
+        if (paramId === 'mode' && typeof value === 'string') {
+          module.node.parameters
+            .get('mode')
+            ?.setValueAtTime(this.filterModeIndex(value), context.currentTime)
+        }
+        if (paramId === 'model' && typeof value === 'string') {
+          module.node.parameters
+            .get('model')
+            ?.setValueAtTime(this.filterModelIndex(value), context.currentTime)
+        }
+        if (paramId === 'slope' && typeof value !== 'string') {
+          const numeric = typeof value === 'boolean' ? (value ? 1 : 0) : value
+          module.node.parameters
+            .get('slope')
+            ?.setValueAtTime(this.filterSlopeIndex(numeric), context.currentTime)
+        }
+      }
+
+      if (module.type === 'mixer' && module.node instanceof AudioWorkletNode) {
+        if (paramId === 'levelA' && typeof value === 'number') {
+          module.node.parameters.get('levelA')?.setValueAtTime(value, context.currentTime)
+        }
+        if (paramId === 'levelB' && typeof value === 'number') {
+          module.node.parameters.get('levelB')?.setValueAtTime(value, context.currentTime)
+        }
+      }
+
+      if (module.type === 'chorus' && module.node instanceof AudioWorkletNode) {
+        if (paramId === 'rate' && typeof value === 'number') {
+          module.node.parameters.get('rate')?.setValueAtTime(value, context.currentTime)
+        }
+        if (paramId === 'depth' && typeof value === 'number') {
+          module.node.parameters.get('depth')?.setValueAtTime(value, context.currentTime)
+        }
+        if (paramId === 'delay' && typeof value === 'number') {
+          module.node.parameters.get('delay')?.setValueAtTime(value, context.currentTime)
+        }
+        if (paramId === 'mix' && typeof value === 'number') {
+          module.node.parameters.get('mix')?.setValueAtTime(value, context.currentTime)
+        }
+        if (paramId === 'feedback' && typeof value === 'number') {
+          module.node.parameters.get('feedback')?.setValueAtTime(value, context.currentTime)
+        }
+        if (paramId === 'spread' && typeof value === 'number') {
+          module.node.parameters.get('spread')?.setValueAtTime(value, context.currentTime)
+        }
+      }
+
+      if (module.type === 'adsr' && module.node instanceof AudioWorkletNode) {
+        if (paramId === 'attack' && typeof value === 'number') {
+          module.node.parameters.get('attack')?.setValueAtTime(value, context.currentTime)
+        }
+        if (paramId === 'decay' && typeof value === 'number') {
+          module.node.parameters.get('decay')?.setValueAtTime(value, context.currentTime)
+        }
+        if (paramId === 'sustain' && typeof value === 'number') {
+          module.node.parameters.get('sustain')?.setValueAtTime(value, context.currentTime)
+        }
+        if (paramId === 'release' && typeof value === 'number') {
+          module.node.parameters.get('release')?.setValueAtTime(value, context.currentTime)
+        }
+      }
+
+      if (module.type === 'control') {
+        const cvSource = module.outputs['cv-out']?.node
+        const velSource = module.outputs['vel-out']?.node
+        const gateSource = module.outputs['gate-out']?.node
+        const syncSource = module.outputs['sync-out']?.node
+        if (paramId === 'cv' && typeof value === 'number' && cvSource instanceof ConstantSourceNode) {
+          const glide = this.controlGlide.get(moduleId) ?? 0
+          const time = context.currentTime
+          cvSource.offset.cancelScheduledValues(time)
+          if (glide > 0) {
+            cvSource.offset.setValueAtTime(cvSource.offset.value, time)
+            cvSource.offset.linearRampToValueAtTime(value, time + glide)
+          } else {
+            cvSource.offset.setValueAtTime(value, time)
+          }
+        }
+        if (
+          paramId === 'velocity' &&
+          typeof value === 'number' &&
+          velSource instanceof ConstantSourceNode
+        ) {
+          velSource.offset.setValueAtTime(Math.max(0, Math.min(1, value)), context.currentTime)
+        }
+        if (
+          paramId === 'gate' &&
+          typeof value !== 'string' &&
+          gateSource instanceof ConstantSourceNode
+        ) {
+          const numeric = typeof value === 'boolean' ? (value ? 1 : 0) : value
+          gateSource.offset.setValueAtTime(numeric, context.currentTime)
+        }
+        if (
+          paramId === 'sync' &&
+          typeof value === 'number' &&
+          syncSource instanceof ConstantSourceNode
+        ) {
+          const time = context.currentTime
+          syncSource.offset.cancelScheduledValues(time)
+          if (value > 0.5) {
+            syncSource.offset.setValueAtTime(1, time)
+            syncSource.offset.setValueAtTime(0, time + 0.02)
+          } else {
+            syncSource.offset.setValueAtTime(0, time)
+          }
+        }
+      }
+
+      if (module.type === 'lab' && module.node instanceof GainNode) {
+        if (paramId === 'level' && typeof value === 'number') {
+          module.node.gain.setValueAtTime(value, context.currentTime)
+        }
+      }
+    })
+  }
+
+  setControlVoiceCv(moduleId: string, voiceIndex: number, value: number): void {
+    const module = this.getControlVoice(moduleId, voiceIndex)
     const context = this.context
     if (!module || !context) {
       return
     }
-
-    if (module.type === 'oscillator' && module.node instanceof AudioWorkletNode) {
-      if (paramId === 'frequency' && typeof value === 'number') {
-        module.node.parameters.get('baseFrequency')?.setValueAtTime(value, context.currentTime)
-      }
-      if (paramId === 'type' && typeof value === 'string') {
-        const waveformIndex = this.waveformIndex(value)
-        module.node.parameters.get('waveform')?.setValueAtTime(waveformIndex, context.currentTime)
-      }
-      if (paramId === 'pwm' && typeof value === 'number') {
-        module.node.parameters.get('pwm')?.setValueAtTime(value, context.currentTime)
-      }
-      if (paramId === 'unison' && typeof value === 'number') {
-        module.node.parameters.get('unison')?.setValueAtTime(value, context.currentTime)
-      }
-      if (paramId === 'detune' && typeof value === 'number') {
-        module.node.parameters.get('detune')?.setValueAtTime(value, context.currentTime)
-      }
-      if (paramId === 'fmLin' && typeof value === 'number') {
-        module.node.parameters.get('fmLinDepth')?.setValueAtTime(value, context.currentTime)
-      }
-      if (paramId === 'fmExp' && typeof value === 'number') {
-        module.node.parameters.get('fmExpDepth')?.setValueAtTime(value, context.currentTime)
-      }
+    const cvSource = module.outputs['cv-out']?.node
+    if (!(cvSource instanceof ConstantSourceNode)) {
+      return
     }
-
-    if (module.type === 'gain' && module.node instanceof AudioWorkletNode) {
-      if (paramId === 'gain' && typeof value === 'number') {
-        module.node.parameters.get('gain')?.setValueAtTime(value, context.currentTime)
-      }
-    }
-
-    if (module.type === 'cv-vca' && module.node instanceof AudioWorkletNode) {
-      if (paramId === 'gain' && typeof value === 'number') {
-        module.node.parameters.get('gain')?.setValueAtTime(value, context.currentTime)
-      }
-    }
-
-    if (module.type === 'output' && module.node instanceof GainNode) {
-      if (paramId === 'level' && typeof value === 'number') {
-        module.node.gain.setValueAtTime(value, context.currentTime)
-      }
-    }
-
-    if (module.type === 'lfo' && module.node instanceof AudioWorkletNode) {
-      if (paramId === 'rate' && typeof value === 'number') {
-        module.node.parameters.get('rate')?.setValueAtTime(value, context.currentTime)
-      }
-      if (paramId === 'shape' && typeof value === 'string') {
-        const waveformIndex = this.waveformIndex(value)
-        module.node.parameters.get('shape')?.setValueAtTime(waveformIndex, context.currentTime)
-      }
-      if (paramId === 'depth' && typeof value === 'number') {
-        module.node.parameters.get('depth')?.setValueAtTime(value, context.currentTime)
-      }
-      if (paramId === 'offset' && typeof value === 'number') {
-        module.node.parameters.get('offset')?.setValueAtTime(value, context.currentTime)
-      }
-      if (paramId === 'bipolar' && typeof value !== 'string') {
-        const numeric = typeof value === 'boolean' ? (value ? 1 : 0) : value
-        module.node.parameters.get('bipolar')?.setValueAtTime(numeric, context.currentTime)
-      }
-    }
-
-    if (module.type === 'vcf' && module.node instanceof AudioWorkletNode) {
-      if (paramId === 'cutoff' && typeof value === 'number') {
-        module.node.parameters.get('cutoff')?.setValueAtTime(value, context.currentTime)
-      }
-      if (paramId === 'resonance' && typeof value === 'number') {
-        module.node.parameters.get('resonance')?.setValueAtTime(value, context.currentTime)
-      }
-      if (paramId === 'drive' && typeof value === 'number') {
-        module.node.parameters.get('drive')?.setValueAtTime(value, context.currentTime)
-      }
-      if (paramId === 'envAmount' && typeof value === 'number') {
-        module.node.parameters.get('envAmount')?.setValueAtTime(value, context.currentTime)
-      }
-      if (paramId === 'modAmount' && typeof value === 'number') {
-        module.node.parameters.get('modAmount')?.setValueAtTime(value, context.currentTime)
-      }
-      if (paramId === 'keyTrack' && typeof value === 'number') {
-        module.node.parameters.get('keyTrack')?.setValueAtTime(value, context.currentTime)
-      }
-      if (paramId === 'mode' && typeof value === 'string') {
-        module.node.parameters.get('mode')?.setValueAtTime(this.filterModeIndex(value), context.currentTime)
-      }
-      if (paramId === 'model' && typeof value === 'string') {
-        module.node.parameters.get('model')?.setValueAtTime(this.filterModelIndex(value), context.currentTime)
-      }
-      if (paramId === 'slope' && typeof value !== 'string') {
-        const numeric = typeof value === 'boolean' ? (value ? 1 : 0) : value
-        module.node.parameters.get('slope')?.setValueAtTime(this.filterSlopeIndex(numeric), context.currentTime)
-      }
-    }
-
-    if (module.type === 'mixer' && module.node instanceof AudioWorkletNode) {
-      if (paramId === 'levelA' && typeof value === 'number') {
-        module.node.parameters.get('levelA')?.setValueAtTime(value, context.currentTime)
-      }
-      if (paramId === 'levelB' && typeof value === 'number') {
-        module.node.parameters.get('levelB')?.setValueAtTime(value, context.currentTime)
-      }
-    }
-
-    if (module.type === 'chorus' && module.node instanceof AudioWorkletNode) {
-      if (paramId === 'rate' && typeof value === 'number') {
-        module.node.parameters.get('rate')?.setValueAtTime(value, context.currentTime)
-      }
-      if (paramId === 'depth' && typeof value === 'number') {
-        module.node.parameters.get('depth')?.setValueAtTime(value, context.currentTime)
-      }
-      if (paramId === 'delay' && typeof value === 'number') {
-        module.node.parameters.get('delay')?.setValueAtTime(value, context.currentTime)
-      }
-      if (paramId === 'mix' && typeof value === 'number') {
-        module.node.parameters.get('mix')?.setValueAtTime(value, context.currentTime)
-      }
-      if (paramId === 'feedback' && typeof value === 'number') {
-        module.node.parameters.get('feedback')?.setValueAtTime(value, context.currentTime)
-      }
-      if (paramId === 'spread' && typeof value === 'number') {
-        module.node.parameters.get('spread')?.setValueAtTime(value, context.currentTime)
-      }
-    }
-
-    if (module.type === 'adsr' && module.node instanceof AudioWorkletNode) {
-      if (paramId === 'attack' && typeof value === 'number') {
-        module.node.parameters.get('attack')?.setValueAtTime(value, context.currentTime)
-      }
-      if (paramId === 'decay' && typeof value === 'number') {
-        module.node.parameters.get('decay')?.setValueAtTime(value, context.currentTime)
-      }
-      if (paramId === 'sustain' && typeof value === 'number') {
-        module.node.parameters.get('sustain')?.setValueAtTime(value, context.currentTime)
-      }
-      if (paramId === 'release' && typeof value === 'number') {
-        module.node.parameters.get('release')?.setValueAtTime(value, context.currentTime)
-      }
-    }
-
-    if (module.type === 'control') {
-      const cvSource = module.outputs['cv-out']?.node
-      const velSource = module.outputs['vel-out']?.node
-      const gateSource = module.outputs['gate-out']?.node
-      const syncSource = module.outputs['sync-out']?.node
-      if (paramId === 'cv' && typeof value === 'number' && cvSource instanceof ConstantSourceNode) {
-        const glide = this.controlGlide.get(moduleId) ?? 0
-        const time = context.currentTime
-        cvSource.offset.cancelScheduledValues(time)
-        if (glide > 0) {
-          cvSource.offset.setValueAtTime(cvSource.offset.value, time)
-          cvSource.offset.linearRampToValueAtTime(value, time + glide)
-        } else {
-          cvSource.offset.setValueAtTime(value, time)
-        }
-      }
-      if (paramId === 'velocity' && typeof value === 'number' && velSource instanceof ConstantSourceNode) {
-        velSource.offset.setValueAtTime(Math.max(0, Math.min(1, value)), context.currentTime)
-      }
-      if (paramId === 'gate' && typeof value !== 'string' && gateSource instanceof ConstantSourceNode) {
-        const numeric = typeof value === 'boolean' ? (value ? 1 : 0) : value
-        gateSource.offset.setValueAtTime(numeric, context.currentTime)
-      }
-      if (paramId === 'sync' && typeof value === 'number' && syncSource instanceof ConstantSourceNode) {
-        const time = context.currentTime
-        syncSource.offset.cancelScheduledValues(time)
-        if (value > 0.5) {
-          syncSource.offset.setValueAtTime(1, time)
-          syncSource.offset.setValueAtTime(0, time + 0.02)
-        } else {
-          syncSource.offset.setValueAtTime(0, time)
-        }
-      }
-      if (paramId === 'glide' && typeof value === 'number') {
-        this.controlGlide.set(moduleId, Math.max(0, value))
-      }
-    }
-
-    if (module.type === 'lab' && module.node instanceof GainNode) {
-      if (paramId === 'level' && typeof value === 'number') {
-        module.node.gain.setValueAtTime(value, context.currentTime)
-      }
+    const glide = this.controlGlide.get(moduleId) ?? 0
+    const time = context.currentTime
+    cvSource.offset.cancelScheduledValues(time)
+    if (glide > 0) {
+      cvSource.offset.setValueAtTime(cvSource.offset.value, time)
+      cvSource.offset.linearRampToValueAtTime(value, time + glide)
+    } else {
+      cvSource.offset.setValueAtTime(value, time)
     }
   }
 
-  setControlVelocity(moduleId: string, value: number, slewSeconds = 0): void {
-    const module = this.modules.get(moduleId)
+  setControlVoiceGate(moduleId: string, voiceIndex: number, value: number | boolean): void {
+    const module = this.getControlVoice(moduleId, voiceIndex)
     const context = this.context
-    if (!module || !context || module.type !== 'control') {
+    if (!module || !context) {
+      return
+    }
+    const gateSource = module.outputs['gate-out']?.node
+    if (!(gateSource instanceof ConstantSourceNode)) {
+      return
+    }
+    const numeric = typeof value === 'boolean' ? (value ? 1 : 0) : value
+    gateSource.offset.setValueAtTime(numeric, context.currentTime)
+  }
+
+  triggerControlVoiceGate(moduleId: string, voiceIndex: number): void {
+    const module = this.getControlVoice(moduleId, voiceIndex)
+    const context = this.context
+    if (!module || !context) {
+      return
+    }
+    const gateSource = module.outputs['gate-out']?.node
+    if (!(gateSource instanceof ConstantSourceNode)) {
+      return
+    }
+    const time = context.currentTime
+    gateSource.offset.cancelScheduledValues(time)
+    gateSource.offset.setValueAtTime(0, time)
+    gateSource.offset.setValueAtTime(1, time + 0.001)
+  }
+
+  setControlVoiceVelocity(
+    moduleId: string,
+    voiceIndex: number,
+    value: number,
+    slewSeconds = 0,
+  ): void {
+    const module = this.getControlVoice(moduleId, voiceIndex)
+    const context = this.context
+    if (!module || !context) {
       return
     }
     const velSource = module.outputs['vel-out']?.node
@@ -258,8 +354,53 @@ export class AudioEngine {
     }
   }
 
+  triggerControlVoiceSync(moduleId: string, voiceIndex: number): void {
+    const module = this.getControlVoice(moduleId, voiceIndex)
+    const context = this.context
+    if (!module || !context) {
+      return
+    }
+    const syncSource = module.outputs['sync-out']?.node
+    if (!(syncSource instanceof ConstantSourceNode)) {
+      return
+    }
+    const time = context.currentTime
+    syncSource.offset.cancelScheduledValues(time)
+    syncSource.offset.setValueAtTime(1, time)
+    syncSource.offset.setValueAtTime(0, time + 0.02)
+  }
+
+  private getRuntimeModules(moduleId: string): RuntimeModule[] | null {
+    const voices = this.voiceModules.get(moduleId)
+    if (voices && voices.length > 0) {
+      return voices
+    }
+    const module = this.modules.get(moduleId)
+    return module ? [module] : null
+  }
+
+  private getControlVoice(moduleId: string, voiceIndex: number): RuntimeModule | null {
+    const voices = this.voiceModules.get(moduleId)
+    if (!voices || voices.length === 0) {
+      return null
+    }
+    const index = this.getVoiceIndex(voiceIndex)
+    const module = voices[index]
+    if (!module || module.type !== 'control') {
+      return null
+    }
+    return module
+  }
+
+  private getVoiceIndex(voiceIndex: number): number {
+    if (this.voiceCount <= 1) {
+      return 0
+    }
+    return Math.max(0, Math.min(this.voiceCount - 1, Math.floor(voiceIndex)))
+  }
+
   setConnections(connections: Connection[]): void {
-    if (!this.context || this.modules.size === 0) {
+    if (!this.context || (this.modules.size === 0 && this.voiceModules.size === 0)) {
       return
     }
     this.syncConnections(connections)
@@ -303,16 +444,34 @@ export class AudioEngine {
 
   private loadGraph(graph: GraphState): void {
     this.clearGraph()
+    this.voiceCount = this.resolveVoiceCount(graph)
     graph.modules.forEach((module) => {
-      const runtime = this.createModule(module)
-      if (runtime) {
-        this.modules.set(runtime.id, runtime)
+      if (this.polyTypes.has(module.type)) {
+        const voices: RuntimeModule[] = []
+        for (let i = 0; i < this.voiceCount; i += 1) {
+          const runtime = this.createModule(module)
+          if (runtime) {
+            runtime.id = `${module.id}#${i + 1}`
+            voices.push(runtime)
+          }
+        }
+        if (voices.length > 0) {
+          this.voiceModules.set(module.id, voices)
+        }
+      } else {
+        const runtime = this.createModule(module)
+        if (runtime) {
+          this.modules.set(runtime.id, runtime)
+        }
       }
     })
     this.syncConnections(graph.connections)
   }
 
   private clearGraph(): void {
+    this.connectionMap.forEach((connection) => {
+      this.disconnect(connection)
+    })
     this.connectionMap.clear()
     this.controlGlide.clear()
     this.modules.forEach((module) => {
@@ -327,57 +486,221 @@ export class AudioEngine {
       module.dispose?.()
     })
     this.modules.clear()
+    this.voiceModules.forEach((voices) => {
+      voices.forEach((module) => {
+        try {
+          module.node.disconnect()
+        } catch {
+          // Ignore disconnect errors on teardown.
+        }
+        if (module.type === 'oscillator' && module.node instanceof OscillatorNode) {
+          module.node.stop()
+        }
+        module.dispose?.()
+      })
+    })
+    this.voiceModules.clear()
   }
 
   private syncConnections(connections: Connection[]): void {
-    const nextMap = new Map<string, Connection>()
+    const nextMap = new Map<string, RuntimeConnection>()
 
     connections.forEach((connection) => {
       const key = this.connectionKey(connection)
-      nextMap.set(key, connection)
-      if (!this.connectionMap.has(key)) {
-        this.connect(connection)
+      const existing = this.connectionMap.get(key)
+      if (existing) {
+        nextMap.set(key, existing)
+        return
+      }
+      const runtime = this.connect(connection)
+      if (runtime) {
+        nextMap.set(key, runtime)
       }
     })
 
-    this.connectionMap.forEach((connection, key) => {
+    this.connectionMap.forEach((runtime, key) => {
       if (!nextMap.has(key)) {
-        this.disconnect(connection)
+        this.disconnect(runtime)
       }
     })
 
     this.connectionMap = nextMap
   }
 
-  private connect(connection: Connection): void {
+  private connect(connection: Connection): RuntimeConnection | null {
+    const sourceVoices = this.voiceModules.get(connection.from.moduleId)
+    const targetVoices = this.voiceModules.get(connection.to.moduleId)
     const source = this.modules.get(connection.from.moduleId)
     const target = this.modules.get(connection.to.moduleId)
-    if (!source || !target) {
-      return
+    const sourceIsPoly = Boolean(sourceVoices && sourceVoices.length > 0)
+    const targetIsPoly = Boolean(targetVoices && targetVoices.length > 0)
+    const runtime: RuntimeConnection = { connection }
+    let didConnect = false
+
+    if (sourceIsPoly && targetIsPoly && sourceVoices && targetVoices) {
+      const voiceTotal = Math.min(sourceVoices.length, targetVoices.length)
+      for (let i = 0; i < voiceTotal; i += 1) {
+        const voiceSource = sourceVoices[i]
+        const voiceTarget = targetVoices[i]
+        const output = voiceSource.outputs[connection.from.portId]
+        const input = voiceTarget.inputs[connection.to.portId]
+        if (!output || !input) {
+          continue
+        }
+        output.node.connect(input.node, output.outputIndex ?? 0, input.inputIndex ?? 0)
+        didConnect = true
+      }
+      return didConnect ? runtime : null
     }
-    const output = source.outputs[connection.from.portId]
-    const input = target.inputs[connection.to.portId]
-    if (!output || !input) {
-      return
+
+    if (sourceIsPoly && !targetIsPoly && sourceVoices && target) {
+      if (connection.kind === 'audio') {
+        const gainScale = 1 / Math.max(1, sourceVoices.length)
+        runtime.mixNodes = []
+        sourceVoices.forEach((voice) => {
+          const output = voice.outputs[connection.from.portId]
+          const input = target.inputs[connection.to.portId]
+          if (!output || !input || !this.context) {
+            return
+          }
+          const mixGain = new GainNode(this.context, { gain: gainScale })
+          output.node.connect(mixGain, output.outputIndex ?? 0)
+          mixGain.connect(input.node, 0, input.inputIndex ?? 0)
+          runtime.mixNodes?.push(mixGain)
+          didConnect = true
+        })
+        return didConnect ? runtime : null
+      }
+      const voice = sourceVoices[0]
+      const output = voice.outputs[connection.from.portId]
+      const input = target.inputs[connection.to.portId]
+      if (!output || !input) {
+        return null
+      }
+      output.node.connect(input.node, output.outputIndex ?? 0, input.inputIndex ?? 0)
+      return runtime
     }
-    output.node.connect(input.node, output.outputIndex ?? 0, input.inputIndex ?? 0)
+
+    if (!sourceIsPoly && targetIsPoly && targetVoices && source) {
+      const output = source.outputs[connection.from.portId]
+      if (!output) {
+        return null
+      }
+      targetVoices.forEach((voice) => {
+        const input = voice.inputs[connection.to.portId]
+        if (!input) {
+          return
+        }
+        output.node.connect(input.node, output.outputIndex ?? 0, input.inputIndex ?? 0)
+        didConnect = true
+      })
+      return didConnect ? runtime : null
+    }
+
+    if (source && target) {
+      const output = source.outputs[connection.from.portId]
+      const input = target.inputs[connection.to.portId]
+      if (!output || !input) {
+        return null
+      }
+      output.node.connect(input.node, output.outputIndex ?? 0, input.inputIndex ?? 0)
+      return runtime
+    }
+
+    return null
   }
 
-  private disconnect(connection: Connection): void {
+  private disconnect(runtime: RuntimeConnection): void {
+    const connection = runtime.connection
+    const sourceVoices = this.voiceModules.get(connection.from.moduleId)
+    const targetVoices = this.voiceModules.get(connection.to.moduleId)
     const source = this.modules.get(connection.from.moduleId)
     const target = this.modules.get(connection.to.moduleId)
-    if (!source || !target) {
+    const sourceIsPoly = Boolean(sourceVoices && sourceVoices.length > 0)
+    const targetIsPoly = Boolean(targetVoices && targetVoices.length > 0)
+
+    if (runtime.mixNodes && sourceVoices && target) {
+      sourceVoices.forEach((voice, index) => {
+        const output = voice.outputs[connection.from.portId]
+        const input = target.inputs[connection.to.portId]
+        const mix = runtime.mixNodes?.[index]
+        if (!output || !input || !mix) {
+          return
+        }
+        try {
+          output.node.disconnect(mix)
+          mix.disconnect(input.node)
+        } catch {
+          // Ignore disconnect errors on teardown.
+        }
+      })
       return
     }
-    const output = source.outputs[connection.from.portId]
-    const input = target.inputs[connection.to.portId]
-    if (!output || !input) {
+
+    if (sourceIsPoly && targetIsPoly && sourceVoices && targetVoices) {
+      const voiceTotal = Math.min(sourceVoices.length, targetVoices.length)
+      for (let i = 0; i < voiceTotal; i += 1) {
+        const voiceSource = sourceVoices[i]
+        const voiceTarget = targetVoices[i]
+        const output = voiceSource.outputs[connection.from.portId]
+        const input = voiceTarget.inputs[connection.to.portId]
+        if (!output || !input) {
+          continue
+        }
+        try {
+          output.node.disconnect(input.node)
+        } catch {
+          // Ignore disconnect errors on teardown.
+        }
+      }
       return
     }
-    try {
-      output.node.disconnect(input.node)
-    } catch {
-      // Ignore disconnect errors on teardown.
+
+    if (sourceIsPoly && !targetIsPoly && sourceVoices && target) {
+      const voice = sourceVoices[0]
+      const output = voice.outputs[connection.from.portId]
+      const input = target.inputs[connection.to.portId]
+      if (!output || !input) {
+        return
+      }
+      try {
+        output.node.disconnect(input.node)
+      } catch {
+        // Ignore disconnect errors on teardown.
+      }
+      return
+    }
+
+    if (!sourceIsPoly && targetIsPoly && targetVoices && source) {
+      const output = source.outputs[connection.from.portId]
+      if (!output) {
+        return
+      }
+      targetVoices.forEach((voice) => {
+        const input = voice.inputs[connection.to.portId]
+        if (!input) {
+          return
+        }
+        try {
+          output.node.disconnect(input.node)
+        } catch {
+          // Ignore disconnect errors on teardown.
+        }
+      })
+      return
+    }
+
+    if (source && target) {
+      const output = source.outputs[connection.from.portId]
+      const input = target.inputs[connection.to.portId]
+      if (!output || !input) {
+        return
+      }
+      try {
+        output.node.disconnect(input.node)
+      } catch {
+        // Ignore disconnect errors on teardown.
+      }
     }
   }
 
@@ -735,6 +1058,15 @@ export class AudioEngine {
     }
 
     return null
+  }
+
+  private resolveVoiceCount(graph: GraphState): number {
+    const control = graph.modules.find((module) => module.type === 'control')
+    const raw = Number(control?.params.voices ?? 1)
+    if (!Number.isFinite(raw)) {
+      return 1
+    }
+    return Math.max(1, Math.min(8, Math.round(raw)))
   }
 
   private waveformIndex(type: string): number {

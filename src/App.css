@@ -740,6 +740,50 @@
   color: rgba(255, 170, 160, 0.9);
 }
 
+.poly-panel {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border-radius: 14px;
+  background: rgba(18, 24, 32, 0.7);
+  border: 1px solid rgba(80, 92, 112, 0.6);
+}
+
+.poly-label {
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(190, 204, 220, 0.7);
+}
+
+.poly-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.poly-btn {
+  border-radius: 10px;
+  padding: 6px 8px;
+  border: 1px solid rgba(80, 92, 112, 0.8);
+  background: rgba(20, 26, 34, 0.9);
+  color: rgba(210, 220, 238, 0.85);
+  font-size: 0.55rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease,
+    color 0.2s ease;
+}
+
+.poly-btn.active {
+  color: #0f1613;
+  background: linear-gradient(160deg, rgba(86, 184, 255, 0.9), rgba(48, 146, 255, 0.85));
+  border-color: rgba(86, 184, 255, 0.9);
+  box-shadow: 0 8px 14px rgba(10, 22, 40, 0.45);
+}
+
 .seq-header {
   display: flex;
   align-items: center;

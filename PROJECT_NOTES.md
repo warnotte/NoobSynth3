@@ -8,7 +8,8 @@ This file is meant to be reread by the coding assistant to keep context, decisio
 - Audio: AudioWorklet graph in `src/engine`.
 - Patching: drag-to-connect, double-click cable to remove.
 - Default demo: Jupiter Pad style patch with chorus and sequencer.
-- MIDI: Web MIDI input wired to Control IO (mono, last-note priority) with velocity CV out + MIDI-only velocity slew.
+- MIDI: Web MIDI input wired to Control IO (poly voice allocation) with velocity CV out + MIDI-only velocity slew.
+- Polyphony: 1/2/4/8 voices, per-voice VCO/LFO/VCF/ADSR/VCA/Mod VCA, global chorus/out.
 
 ## Current modules
 
@@ -35,8 +36,9 @@ Presets live in `src/state/presets.ts` and are loaded from the Presets panel.
 ## Known issues / risks
 
 - VCF 24 dB can distort at high resonance. 12 dB sounds more stable.
-- No polyphony yet (unison is mono stacking only).
-- MIDI is mono-only and disables the mini sequencer when enabled. Velocity can be toggled in Control IO.
+- Polyphony is implemented; unison remains per-voice.
+- MIDI disables the mini sequencer when enabled. Velocity can be toggled in Control IO.
+- Rapidly changing voice count while running can cause instability; adjust slowly.
 
 ## Decisions
 
@@ -46,10 +48,10 @@ Presets live in `src/state/presets.ts` and are loaded from the Presets panel.
 
 ## TODO (short list)
 
-- Polyphony + voice allocation.
 - Refine VCF 24 dB stability.
 - Add reverb for showcase depth.
 - Optional: expand sequencer (8 steps, per-step toggles).
+- MIDI enhancements (pitch bend, CC mapping).
 
 ## How to update
 
