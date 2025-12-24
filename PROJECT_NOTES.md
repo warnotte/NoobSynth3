@@ -57,6 +57,7 @@ Presets live in `src/state/presets.ts` and are loaded from the Presets panel. So
 ## TODO (short list)
 
 - Refine VCF 24 dB stability.
+- Add macro panel (global knobs driving multiple params).
 - Optional: expand sequencer (8 steps, per-step toggles).
 - MIDI enhancements (pitch bend, CC mapping).
 
