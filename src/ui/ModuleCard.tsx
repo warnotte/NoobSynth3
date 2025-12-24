@@ -6,6 +6,8 @@ type ModuleCardProps = {
   module: ModuleSpec
   inputs: PortDefinition[]
   outputs: PortDefinition[]
+  size?: string
+  portLayout?: 'stacked' | 'strip'
   selectedPortKey?: string | null
   connectedInputs?: Set<string>
   validTargets?: Set<string> | null
@@ -22,6 +24,8 @@ export const ModuleCard = ({
   module,
   inputs,
   outputs,
+  size = '1x1',
+  portLayout = 'stacked',
   selectedPortKey,
   connectedInputs,
   validTargets,
@@ -29,7 +33,7 @@ export const ModuleCard = ({
   onPortPointerDown,
   children,
 }: ModuleCardProps) => (
-  <div className="module-card">
+  <div className={`module-card module-size-${size} layout-${portLayout}`}>
     <div className="module-header">
       <div>
         <div className="module-name">{module.name}</div>
@@ -39,16 +43,19 @@ export const ModuleCard = ({
     </div>
     <div className="module-controls">{children}</div>
     <div className="module-ports">
-      <div className="ports-column">
+      <div className="ports-group inputs">
+        <div className="ports-title">IN</div>
+        <div className="ports-column">
         {inputs.map((port) => {
           const portKey = `${module.id}:${port.id}`
           const isSelected = selectedPortKey === portKey
           const isConnected = connectedInputs?.has(portKey) ?? false
           const isValidTarget = validTargets?.has(portKey) ?? false
           const isHoverTarget = hoverTargetKey === portKey
+          const hideLabel = port.label.trim().toLowerCase() === 'in'
           return (
-            <div key={port.id} className="port-group">
-              <span>{port.label}</span>
+            <div key={port.id} className={`port-group ${hideLabel ? 'label-hidden' : ''}`}>
+              <span className="port-label">{port.label}</span>
               <span className="port-kind">{port.kind}</span>
               <button
                 type="button"
@@ -67,16 +74,20 @@ export const ModuleCard = ({
             </div>
           )
         })}
+        </div>
       </div>
-      <div className="ports-column right">
+      <div className="ports-group outputs">
+        <div className="ports-title">OUT</div>
+        <div className="ports-column right">
         {outputs.map((port) => {
           const portKey = `${module.id}:${port.id}`
           const isSelected = selectedPortKey === portKey
           const isValidTarget = validTargets?.has(portKey) ?? false
           const isHoverTarget = hoverTargetKey === portKey
+          const hideLabel = port.label.trim().toLowerCase() === 'out'
           return (
-            <div key={port.id} className="port-group">
-              <span>{port.label}</span>
+            <div key={port.id} className={`port-group ${hideLabel ? 'label-hidden' : ''}`}>
+              <span className="port-label">{port.label}</span>
               <span className="port-kind">{port.kind}</span>
               <button
                 type="button"
@@ -95,6 +106,7 @@ export const ModuleCard = ({
             </div>
           )
         })}
+        </div>
       </div>
     </div>
   </div>

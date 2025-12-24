@@ -166,7 +166,10 @@
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  --rack-unit-x: 260px;
+  --rack-unit-y: 180px;
+  grid-template-columns: repeat(auto-fill, minmax(var(--rack-unit-x), var(--rack-unit-x)));
+  grid-auto-rows: var(--rack-unit-y);
   gap: 18px;
 }
 
@@ -224,6 +227,62 @@
   flex-direction: column;
   gap: 14px;
   border: 1px solid var(--border-soft);
+  height: 100%;
+}
+
+.module-size-1x1 {
+  grid-column: span 1;
+  grid-row: span 1;
+}
+
+.module-size-1x2 {
+  grid-column: span 1;
+  grid-row: span 2;
+}
+
+.module-size-1x3 {
+  grid-column: span 1;
+  grid-row: span 3;
+}
+
+.module-size-2x1 {
+  grid-column: span 2;
+  grid-row: span 1;
+}
+
+.module-size-2x2 {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+
+.module-size-2x3 {
+  grid-column: span 2;
+  grid-row: span 3;
+}
+
+.module-size-2x4 {
+  grid-column: span 2;
+  grid-row: span 4;
+}
+
+.module-size-2x5 {
+  grid-column: span 2;
+  grid-row: span 5;
+}
+
+.module-size-3x2 {
+  grid-column: span 3;
+  grid-row: span 2;
+}
+
+.module-size-3x3 {
+  grid-column: span 3;
+  grid-row: span 3;
+}
+
+.module-size-3x4 {
+  grid-column: span 3;
+  grid-row: span 4;
 }
 
 .module-header {
@@ -853,7 +912,68 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-  margin-top: 4px;
+  margin-top: auto;
+}
+
+.ports-group {
+  display: grid;
+  gap: 8px;
+  padding: 10px 8px;
+  border-radius: 12px;
+  border: 1px solid rgba(120, 140, 170, 0.25);
+  background: rgba(12, 16, 22, 0.35);
+}
+
+.ports-group.inputs {
+  border-color: rgba(86, 184, 255, 0.35);
+  background: rgba(20, 28, 40, 0.45);
+}
+
+.ports-group.outputs {
+  border-color: rgba(61, 242, 166, 0.35);
+  background: rgba(16, 34, 30, 0.4);
+}
+
+.ports-title {
+  font-size: 0.55rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(200, 210, 228, 0.55);
+  text-align: center;
+}
+
+.module-card.layout-strip .module-ports {
+  gap: 10px;
+}
+
+.module-card.layout-strip .ports-group {
+  padding: 8px 6px;
+}
+
+.module-card.layout-strip .ports-column {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(34px, 1fr);
+  align-items: end;
+  justify-items: center;
+  gap: 10px;
+}
+
+.module-card.layout-strip .ports-column.right {
+  justify-items: center;
+}
+
+.module-card.layout-strip .port-group {
+  gap: 4px;
+  font-size: 0.6rem;
+}
+
+.module-card.layout-strip .port-kind {
+  display: none;
+}
+
+.module-card.layout-strip .port-label {
+  display: none;
 }
 
 .ports-column {
@@ -875,6 +995,14 @@
   font-size: 0.7rem;
   letter-spacing: 0.08em;
   color: var(--text-dim);
+}
+
+.port-group.label-hidden .port-label {
+  display: none;
+}
+
+.port-label {
+  text-align: center;
 }
 
 .port-kind {

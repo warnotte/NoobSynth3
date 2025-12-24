@@ -1010,6 +1010,32 @@ function App() {
       ? 'Audio init failed. Check console.'
       : 'AudioWorklet graph ready for patching.'
 
+  const moduleSizes: Record<string, string> = {
+    oscillator: '2x3',
+    vcf: '2x3',
+    control: '2x5',
+    scope: '2x2',
+    adsr: '1x2',
+    lfo: '2x3',
+    chorus: '2x2',
+    delay: '1x3',
+    reverb: '1x2',
+    mixer: '1x2',
+    gain: '1x2',
+    'cv-vca': '1x2',
+    output: '1x2',
+    lab: '2x2',
+  }
+
+  const modulePortLayouts: Record<string, 'stacked' | 'strip'> = {
+    oscillator: 'strip',
+    vcf: 'strip',
+    control: 'strip',
+    lab: 'strip',
+    adsr: 'strip',
+    lfo: 'strip',
+  }
+
   const renderModuleControls = (module: ModuleSpec) => {
     if (module.type === 'oscillator') {
       return (
@@ -1920,6 +1946,8 @@ function App() {
                 module={module}
                 inputs={modulePorts[module.type].inputs}
                 outputs={modulePorts[module.type].outputs}
+                size={moduleSizes[module.type] ?? '1x1'}
+                portLayout={modulePortLayouts[module.type] ?? 'stacked'}
                 selectedPortKey={selectedPortKey}
                 connectedInputs={connectedInputs}
                 validTargets={dragTargets}
