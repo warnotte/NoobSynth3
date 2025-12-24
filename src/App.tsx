@@ -1040,30 +1040,32 @@ function App() {
     if (module.type === 'oscillator') {
       return (
         <>
-          <RotaryKnob
-            label="Frequency"
-            min={40}
-            max={1200}
-            step={1}
-            unit="Hz"
-            value={Number(module.params.frequency ?? 220)}
-            onChange={(value) => updateParam(module.id, 'frequency', value)}
-            format={(value) => Math.round(value).toString()}
-          />
-          <WaveformSelector
-            label="Waveform"
-            value={String(module.params.type ?? 'sawtooth')}
-            onChange={(value) => updateParam(module.id, 'type', value)}
-          />
+          <div className="control-row vco-row">
+            <RotaryKnob
+              label="Frequency"
+              min={40}
+              max={1200}
+              step={1}
+              unit="Hz"
+              value={Number(module.params.frequency ?? 220)}
+              onChange={(value) => updateParam(module.id, 'frequency', value)}
+              format={(value) => Math.round(value).toString()}
+            />
+            <WaveformSelector
+              label="Waveform"
+              value={String(module.params.type ?? 'sawtooth')}
+              onChange={(value) => updateParam(module.id, 'type', value)}
+            />
+          </div>
           <div className="filter-row">
             <div className="filter-group">
               <span className="filter-label">Unison</span>
-              <div className="filter-buttons">
+              <div className="filter-buttons filter-wide">
                 {[1, 2, 3, 4].map((count) => (
                   <button
                     key={count}
                     type="button"
-                    className={`filter-btn ${
+                    className={`ui-btn filter-btn ${
                       Number(module.params.unison ?? 1) === count ? 'active' : ''
                     }`}
                     onClick={() => updateParam(module.id, 'unison', count)}
@@ -1199,14 +1201,14 @@ function App() {
           <div className="toggle-group">
             <button
               type="button"
-              className={`toggle-btn ${bipolar ? 'active' : ''}`}
+              className={`ui-btn ui-btn--pill toggle-btn ${bipolar ? 'active' : ''}`}
               onClick={() => updateParam(module.id, 'bipolar', true)}
             >
               Bipolar
             </button>
             <button
               type="button"
-              className={`toggle-btn ${!bipolar ? 'active' : ''}`}
+              className={`ui-btn ui-btn--pill toggle-btn ${!bipolar ? 'active' : ''}`}
               onClick={() => updateParam(module.id, 'bipolar', false)}
             >
               Unipolar
@@ -1349,7 +1351,7 @@ function App() {
           <div className="toggle-group">
             <button
               type="button"
-              className={`toggle-btn ${pingPong ? 'active' : ''}`}
+              className={`ui-btn ui-btn--pill toggle-btn ${pingPong ? 'active' : ''}`}
               onClick={() => updateParam(module.id, 'pingPong', !pingPong)}
             >
               Ping Pong
@@ -1472,7 +1474,7 @@ function App() {
                   <button
                     key={option}
                     type="button"
-                    className={`filter-btn ${mode === option ? 'active' : ''}`}
+                    className={`ui-btn filter-btn ${mode === option ? 'active' : ''}`}
                     onClick={() => updateParam(module.id, 'mode', option)}
                   >
                     {option.toUpperCase()}
@@ -1487,7 +1489,7 @@ function App() {
                   <button
                     key={option}
                     type="button"
-                    className={`filter-btn ${slope === option ? 'active' : ''}`}
+                    className={`ui-btn filter-btn ${slope === option ? 'active' : ''}`}
                     onClick={() => updateParam(module.id, 'slope', option)}
                   >
                     {option}dB
@@ -1556,14 +1558,14 @@ function App() {
           <div className="toggle-group">
             <button
               type="button"
-              className={`toggle-btn ${cvMode === 'bipolar' ? 'active' : ''}`}
+              className={`ui-btn ui-btn--pill toggle-btn ${cvMode === 'bipolar' ? 'active' : ''}`}
               onClick={() => updateParam(module.id, 'cvMode', 'bipolar')}
             >
               Bipolar
             </button>
             <button
               type="button"
-              className={`toggle-btn ${cvMode === 'unipolar' ? 'active' : ''}`}
+              className={`ui-btn ui-btn--pill toggle-btn ${cvMode === 'unipolar' ? 'active' : ''}`}
               onClick={() => updateParam(module.id, 'cvMode', 'unipolar')}
             >
               Unipolar
@@ -1572,7 +1574,7 @@ function App() {
           <div className="control-buttons">
             <button
               type="button"
-              className="control-button"
+              className="ui-btn control-button"
               onPointerDown={handleGateDown}
               onPointerUp={handleGateUp}
               onPointerCancel={handleGateUp}
@@ -1582,7 +1584,7 @@ function App() {
             </button>
             <button
               type="button"
-              className="control-button"
+              className="ui-btn control-button"
               onClick={() => triggerManualSync(module.id)}
             >
               Sync
@@ -1613,7 +1615,7 @@ function App() {
               <span className="midi-title">MIDI</span>
               <button
                 type="button"
-                className={`midi-toggle ${midiEnabled ? 'active' : ''}`}
+                className={`ui-btn ui-btn--pill midi-toggle ${midiEnabled ? 'active' : ''}`}
                 onClick={handleMidiToggle}
                 disabled={!midiSupported}
               >
@@ -1670,7 +1672,7 @@ function App() {
             <div className="midi-options">
               <button
                 type="button"
-                className={`midi-option ${midiVelocity ? 'active' : ''}`}
+                className={`ui-btn ui-btn--pill ui-btn--blue midi-option ${midiVelocity ? 'active' : ''}`}
                 onClick={() => updateParam(module.id, 'midiVelocity', !midiVelocity)}
                 disabled={!midiAccess}
               >
@@ -1712,7 +1714,7 @@ function App() {
                 <button
                   key={count}
                   type="button"
-                  className={`poly-btn ${voices === count ? 'active' : ''}`}
+                  className={`ui-btn ui-btn--blue poly-btn ${voices === count ? 'active' : ''}`}
                   onClick={() => updateParam(module.id, 'voices', count)}
                 >
                   {count}
@@ -1725,7 +1727,7 @@ function App() {
               <span className="seq-title">Sequencer</span>
               <button
                 type="button"
-                className={`seq-toggle ${seqOn ? 'active' : ''}`}
+              className={`ui-btn ui-btn--pill seq-toggle ${seqOn ? 'active' : ''}`}
                 onClick={() => updateParam(module.id, 'seqOn', !seqOn)}
               >
                 {seqOn ? 'Stop' : 'Run'}
@@ -1835,7 +1837,7 @@ function App() {
                   <button
                     key={scale}
                     type="button"
-                    className={`scope-btn ${timeScale === scale ? 'active' : ''}`}
+                    className={`ui-btn scope-btn ${timeScale === scale ? 'active' : ''}`}
                     onClick={() => updateParam(module.id, 'time', scale)}
                   >
                     {scale}x
@@ -1850,7 +1852,7 @@ function App() {
                   <button
                     key={scale}
                     type="button"
-                    className={`scope-btn ${gainScale === scale ? 'active' : ''}`}
+                    className={`ui-btn scope-btn ${gainScale === scale ? 'active' : ''}`}
                     onClick={() => updateParam(module.id, 'gain', scale)}
                   >
                     {scale}x
@@ -1860,7 +1862,7 @@ function App() {
             </div>
             <button
               type="button"
-              className={`scope-btn scope-toggle ${frozen ? 'active' : ''}`}
+              className={`ui-btn scope-btn scope-toggle ${frozen ? 'active' : ''}`}
               onClick={() => updateParam(module.id, 'freeze', !frozen)}
             >
               Freeze

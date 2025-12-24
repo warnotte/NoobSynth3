@@ -309,4 +309,37 @@ export const demoPresets: PresetSpec[] = [
       add: [makeConnection('adsr-2', 'env', 'osc-2', 'pwm', 'cv')],
     },
   ),
+  buildPreset(
+    'showcase-stack',
+    'Showcase Stack',
+    'Big modern stack with wide FX.',
+    {
+      'osc-1': { frequency: 110, type: 'sawtooth', pwm: 0.5, unison: 4, detune: 10 },
+      'osc-2': { frequency: 110.2, type: 'sawtooth', pwm: 0.45, unison: 3, detune: 8 },
+      'mix-1': { levelA: 0.7, levelB: 0.6 },
+      'vcf-1': {
+        cutoff: 980,
+        resonance: 0.22,
+        drive: 0.14,
+        envAmount: 0.42,
+        modAmount: 0.25,
+        keyTrack: 0.52,
+        slope: 12,
+        mode: 'lp',
+      },
+      'chorus-1': { rate: 0.18, depth: 16, delay: 20, mix: 0.55, spread: 0.8, feedback: 0.16 },
+      'delay-1': { time: 420, feedback: 0.32, mix: 0.24, tone: 0.6, pingPong: true },
+      'reverb-1': { time: 0.78, damp: 0.45, preDelay: 26, mix: 0.4 },
+      'adsr-1': { attack: 0.4, decay: 0.9, sustain: 0.8, release: 1.1 },
+      'adsr-2': { attack: 0.3, decay: 0.8, sustain: 0.3, release: 0.9 },
+      'lfo-1': { rate: 0.12, depth: 0.2 },
+      'ctrl-1': { glide: 0.08, seqOn: true, seqTempo: 64, seqGate: 0.8, voices: 4 },
+    },
+    {
+      add: [
+        makeConnection('lfo-1', 'cv-out', 'osc-1', 'pwm', 'cv'),
+        makeConnection('ctrl-1', 'sync-out', 'lfo-1', 'sync', 'sync'),
+      ],
+    },
+  ),
 ]

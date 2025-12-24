@@ -317,6 +317,18 @@
   align-items: start;
 }
 
+.control-row {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) minmax(220px, 2fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.control-row .waveform {
+  grid-column: auto;
+}
+
 .scope-view {
   grid-column: 1 / -1;
   height: 140px;
@@ -362,25 +374,52 @@
   gap: 6px;
 }
 
-.scope-btn {
-  border-radius: 10px;
-  padding: 6px 8px;
-  border: 1px solid rgba(80, 92, 112, 0.8);
-  background: rgba(18, 24, 32, 0.9);
-  color: rgba(210, 220, 238, 0.85);
-  font-size: 0.55rem;
-  letter-spacing: 0.14em;
+.ui-btn {
+  --ui-btn-radius: 10px;
+  --ui-btn-padding: 6px 8px;
+  --ui-btn-border: rgba(80, 92, 112, 0.8);
+  --ui-btn-bg: rgba(18, 24, 32, 0.9);
+  --ui-btn-text: rgba(210, 220, 238, 0.85);
+  --ui-btn-font: 0.55rem;
+  --ui-btn-letter: 0.14em;
+  --ui-btn-active-text: #0f1613;
+  --ui-btn-active-bg: linear-gradient(160deg, rgba(61, 242, 166, 0.95), rgba(34, 201, 128, 0.9));
+  --ui-btn-active-border: rgba(61, 242, 166, 0.9);
+  --ui-btn-active-shadow: 0 8px 16px rgba(12, 22, 18, 0.4);
+  border-radius: var(--ui-btn-radius);
+  padding: var(--ui-btn-padding);
+  border: 1px solid var(--ui-btn-border);
+  background: var(--ui-btn-bg);
+  color: var(--ui-btn-text);
+  font-size: var(--ui-btn-font);
+  letter-spacing: var(--ui-btn-letter);
   text-transform: uppercase;
   cursor: pointer;
   transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease,
     color 0.2s ease;
 }
 
-.scope-btn.active {
-  color: #0f1613;
-  background: linear-gradient(160deg, rgba(61, 242, 166, 0.95), rgba(34, 201, 128, 0.9));
-  border-color: rgba(61, 242, 166, 0.9);
-  box-shadow: 0 8px 16px rgba(12, 22, 18, 0.4);
+.ui-btn.active {
+  color: var(--ui-btn-active-text);
+  background: var(--ui-btn-active-bg);
+  border-color: var(--ui-btn-active-border);
+  box-shadow: var(--ui-btn-active-shadow);
+}
+
+.ui-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.ui-btn--pill {
+  --ui-btn-radius: 999px;
+  --ui-btn-padding: 6px 12px;
+}
+
+.ui-btn--blue {
+  --ui-btn-active-bg: linear-gradient(160deg, rgba(86, 184, 255, 0.9), rgba(48, 146, 255, 0.85));
+  --ui-btn-active-border: rgba(86, 184, 255, 0.9);
+  --ui-btn-active-shadow: 0 8px 14px rgba(10, 22, 40, 0.45);
 }
 
 .scope-toggle {
@@ -416,24 +455,7 @@
 }
 
 .filter-btn {
-  border-radius: 10px;
-  padding: 6px 8px;
-  border: 1px solid rgba(80, 92, 112, 0.8);
-  background: rgba(18, 24, 32, 0.9);
-  color: rgba(210, 220, 238, 0.85);
-  font-size: 0.55rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease,
-    color 0.2s ease;
-}
-
-.filter-btn.active {
-  color: #0f1613;
-  background: linear-gradient(160deg, rgba(61, 242, 166, 0.95), rgba(34, 201, 128, 0.9));
-  border-color: rgba(61, 242, 166, 0.9);
-  box-shadow: 0 8px 16px rgba(12, 22, 18, 0.4);
+  /* Uses ui-btn base styles. */
 }
 
 .rotary {
@@ -589,22 +611,10 @@
 }
 
 .toggle-btn {
-  border-radius: 999px;
-  padding: 6px 8px;
-  border: 1px solid rgba(80, 92, 112, 0.8);
-  background: rgba(20, 26, 34, 0.9);
-  color: rgba(190, 200, 220, 0.8);
-  font-size: 0.55rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
-}
-
-.toggle-btn.active {
-  color: #0f1613;
-  background: linear-gradient(160deg, rgba(61, 242, 166, 0.95), rgba(34, 201, 128, 0.9));
-  border-color: rgba(61, 242, 166, 0.9);
+  --ui-btn-padding: 6px 8px;
+  --ui-btn-letter: 0.18em;
+  --ui-btn-text: rgba(190, 200, 220, 0.8);
+  --ui-btn-bg: rgba(20, 26, 34, 0.9);
 }
 
 .control-buttons {
@@ -615,16 +625,12 @@
 }
 
 .control-button {
-  border-radius: 12px;
-  padding: 8px 10px;
-  border: 1px solid rgba(80, 92, 112, 0.8);
-  background: rgba(20, 26, 34, 0.9);
-  color: rgba(210, 220, 238, 0.9);
-  font-size: 0.65rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  --ui-btn-radius: 12px;
+  --ui-btn-padding: 8px 10px;
+  --ui-btn-font: 0.65rem;
+  --ui-btn-letter: 0.14em;
+  --ui-btn-bg: rgba(20, 26, 34, 0.9);
+  --ui-btn-text: rgba(210, 220, 238, 0.9);
 }
 
 .control-button:active {
@@ -691,29 +697,7 @@
 }
 
 .midi-toggle {
-  border-radius: 999px;
-  padding: 6px 12px;
-  border: 1px solid rgba(80, 92, 112, 0.8);
-  background: rgba(20, 26, 34, 0.9);
-  color: rgba(210, 220, 238, 0.85);
-  font-size: 0.55rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease,
-    color 0.2s ease;
-}
-
-.midi-toggle.active {
-  color: #0f1613;
-  background: linear-gradient(160deg, rgba(61, 242, 166, 0.95), rgba(34, 201, 128, 0.9));
-  border-color: rgba(61, 242, 166, 0.9);
-  box-shadow: 0 8px 16px rgba(12, 22, 18, 0.4);
-}
-
-.midi-toggle:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+  --ui-btn-bg: rgba(20, 26, 34, 0.9);
 }
 
 .midi-controls {
@@ -730,29 +714,7 @@
 }
 
 .midi-option {
-  border-radius: 999px;
-  padding: 6px 12px;
-  border: 1px solid rgba(80, 92, 112, 0.8);
-  background: rgba(20, 26, 34, 0.9);
-  color: rgba(210, 220, 238, 0.85);
-  font-size: 0.55rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease,
-    color 0.2s ease;
-}
-
-.midi-option.active {
-  color: #0f1613;
-  background: linear-gradient(160deg, rgba(86, 184, 255, 0.9), rgba(48, 146, 255, 0.85));
-  border-color: rgba(86, 184, 255, 0.9);
-  box-shadow: 0 8px 14px rgba(10, 22, 40, 0.45);
-}
-
-.midi-option:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+  --ui-btn-bg: rgba(20, 26, 34, 0.9);
 }
 
 .midi-field {
@@ -823,24 +785,7 @@
 }
 
 .poly-btn {
-  border-radius: 10px;
-  padding: 6px 8px;
-  border: 1px solid rgba(80, 92, 112, 0.8);
-  background: rgba(20, 26, 34, 0.9);
-  color: rgba(210, 220, 238, 0.85);
-  font-size: 0.55rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease,
-    color 0.2s ease;
-}
-
-.poly-btn.active {
-  color: #0f1613;
-  background: linear-gradient(160deg, rgba(86, 184, 255, 0.9), rgba(48, 146, 255, 0.85));
-  border-color: rgba(86, 184, 255, 0.9);
-  box-shadow: 0 8px 14px rgba(10, 22, 40, 0.45);
+  --ui-btn-bg: rgba(20, 26, 34, 0.9);
 }
 
 .seq-header {
@@ -857,24 +802,7 @@
 }
 
 .seq-toggle {
-  border-radius: 999px;
-  padding: 6px 12px;
-  border: 1px solid rgba(80, 92, 112, 0.8);
-  background: rgba(20, 26, 34, 0.9);
-  color: rgba(210, 220, 238, 0.85);
-  font-size: 0.55rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease,
-    color 0.2s ease;
-}
-
-.seq-toggle.active {
-  color: #0f1613;
-  background: linear-gradient(160deg, rgba(61, 242, 166, 0.95), rgba(34, 201, 128, 0.9));
-  border-color: rgba(61, 242, 166, 0.9);
-  box-shadow: 0 8px 16px rgba(12, 22, 18, 0.4);
+  --ui-btn-bg: rgba(20, 26, 34, 0.9);
 }
 
 .seq-controls {

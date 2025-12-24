@@ -38,6 +38,7 @@ This file is meant to be reread by the coding assistant to keep context, decisio
 - Moog Bass
 - Edge Lead
 - 80s Pluck
+- Showcase Stack
 
 Presets live in `src/state/presets.ts` and are loaded from the Presets panel. Some presets also adjust routing.
 
