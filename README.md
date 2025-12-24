@@ -5,6 +5,7 @@ Modular synth workbench built with React + AudioWorklet. Goal: a powerful, patch
 ## Features
 
 - Modular patching with drag-to-connect cables (double-click near a cable to remove it).
+- Module library lets you add/remove modules and start a new empty rack.
 - AudioWorklet engine (VCO, LFO, VCF, ADSR, Mixer, VCA, Mod VCA, Chorus, Delay, Reverb, Scope, Control IO).
 - Polyphony (1/2/4/8 voices) with voice stealing and per-voice modulation.
 - Control IO with mini keyboard, MIDI input (poly), and a simple sequencer for hands-free auditioning.
@@ -33,6 +34,11 @@ Open the app, click Power On, then hit Run in Control IO or play the mini keyboa
   - Voices selector controls polyphony.
   - Avoid rapidly switching voice counts while the engine is running.
   - Sequencer can Run/Stop and is useful for live tweaking.
+- Module Library:
+  - Click a module chip to add it.
+  - Use New Rack to clear all modules.
+  - Remove modules from their header.
+  - Control IO and Main Out are limited to one instance.
 
 ## Presets
 

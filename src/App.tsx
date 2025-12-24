@@ -2,7 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import { AudioEngine } from './engine/AudioEngine'
 import { defaultGraph } from './state/defaultGraph'
 import { demoPresets } from './state/presets'
-import type { GraphState, ModuleSpec, PortKind } from './shared/graph'
+import type { GraphState, ModuleSpec, ModuleType, PortKind } from './shared/graph'
 import { ModuleCard } from './ui/ModuleCard'
 import { RotaryKnob } from './ui/RotaryKnob'
 import { WaveformSelector } from './ui/WaveformSelector'
@@ -107,7 +107,7 @@ function App() {
   const midiVelSlew = Math.max(0, Number(controlModule?.params.midiVelSlew ?? 0.008))
   const midiInputId =
     typeof controlModule?.params.midiInputId === 'string' ? controlModule.params.midiInputId : ''
-  const voiceCount = clampVoiceCount(Number(controlModule?.params.voices ?? 4))
+  const voiceCount = clampVoiceCount(Number(controlModule?.params.voices ?? 1))
   const manualVelocity = Math.max(0, Math.min(1, Number(controlModule?.params.velocity ?? 1)))
 
   useEffect(() => {
@@ -1036,6 +1036,189 @@ function App() {
     lfo: 'strip',
   }
 
+  const moduleCatalog: { type: ModuleType; label: string }[] = [
+    { type: 'oscillator', label: 'VCO' },
+    { type: 'vcf', label: 'VCF' },
+    { type: 'gain', label: 'VCA' },
+    { type: 'cv-vca', label: 'Mod VCA' },
+    { type: 'mixer', label: 'Mixer' },
+    { type: 'chorus', label: 'Chorus' },
+    { type: 'delay', label: 'Delay' },
+    { type: 'reverb', label: 'Reverb' },
+    { type: 'adsr', label: 'ADSR' },
+    { type: 'lfo', label: 'LFO' },
+    { type: 'scope', label: 'Scope' },
+    { type: 'control', label: 'Control IO' },
+    { type: 'output', label: 'Main Out' },
+    { type: 'lab', label: 'Lab' },
+  ]
+
+  const modulePrefixes: Record<ModuleType, string> = {
+    oscillator: 'osc',
+    vcf: 'vcf',
+    gain: 'gain',
+    'cv-vca': 'mod',
+    mixer: 'mix',
+    chorus: 'chorus',
+    delay: 'delay',
+    reverb: 'reverb',
+    adsr: 'adsr',
+    lfo: 'lfo',
+    scope: 'scope',
+    control: 'ctrl',
+    output: 'out',
+    lab: 'lab',
+  }
+
+  const moduleLabels: Record<ModuleType, string> = {
+    oscillator: 'VCO',
+    vcf: 'VCF',
+    gain: 'VCA',
+    'cv-vca': 'Mod VCA',
+    mixer: 'Mixer',
+    chorus: 'Chorus',
+    delay: 'Delay',
+    reverb: 'Reverb',
+    adsr: 'ADSR',
+    lfo: 'LFO',
+    scope: 'Scope',
+    control: 'Control IO',
+    output: 'Main Out',
+    lab: 'Lab Panel',
+  }
+
+  const moduleDefaults: Record<ModuleType, Record<string, number | string | boolean>> = {
+    oscillator: {
+      frequency: 220,
+      type: 'sawtooth',
+      pwm: 0.5,
+      unison: 1,
+      detune: 0,
+      fmLin: 0,
+      fmExp: 0,
+    },
+    vcf: {
+      cutoff: 800,
+      resonance: 0.2,
+      drive: 0.1,
+      envAmount: 0,
+      modAmount: 0,
+      keyTrack: 0.5,
+      model: 'svf',
+      mode: 'lp',
+      slope: 12,
+    },
+    gain: { gain: 0.7 },
+    'cv-vca': { gain: 1 },
+    mixer: { levelA: 0.6, levelB: 0.6 },
+    chorus: { rate: 0.3, depth: 8, delay: 18, mix: 0.4, spread: 0.6, feedback: 0.1 },
+    delay: { time: 360, feedback: 0.25, mix: 0.2, tone: 0.6, pingPong: false },
+    reverb: { time: 0.6, damp: 0.4, preDelay: 18, mix: 0.2 },
+    adsr: { attack: 0.02, decay: 0.2, sustain: 0.65, release: 0.5 },
+    lfo: { rate: 0.5, depth: 0.6, offset: 0, shape: 'sine', bipolar: true },
+    scope: { time: 1, gain: 1, freeze: false },
+    control: {
+      cv: 0,
+      cvMode: 'unipolar',
+      velocity: 1,
+      midiVelocity: true,
+      gate: 0,
+      glide: 0.02,
+      midiEnabled: false,
+      midiChannel: 0,
+      midiRoot: 60,
+      midiInputId: '',
+      midiVelSlew: 0.008,
+      voices: 4,
+      seqOn: false,
+      seqTempo: 90,
+      seqGate: 0.6,
+    },
+    output: { level: 0.8 },
+    lab: { level: 0.5, drive: 0.3, bias: 0, shape: 'triangle' },
+  }
+
+  const hasControlModule = graph.modules.some((module) => module.type === 'control')
+  const hasOutputModule = graph.modules.some((module) => module.type === 'output')
+
+  const getNextModuleIndex = (type: ModuleType, modules: ModuleSpec[]) => {
+    const prefix = `${modulePrefixes[type]}-`
+    let maxIndex = 0
+    modules.forEach((module) => {
+      if (!module.id.startsWith(prefix)) {
+        return
+      }
+      const suffix = Number(module.id.slice(prefix.length))
+      if (Number.isFinite(suffix)) {
+        maxIndex = Math.max(maxIndex, suffix)
+      }
+    })
+    return maxIndex + 1
+  }
+
+  const buildModuleSpec = (type: ModuleType, modules: ModuleSpec[]): ModuleSpec => {
+    const index = getNextModuleIndex(type, modules)
+    const label = moduleLabels[type]
+    const name = index === 1 ? label : `${label} ${index}`
+    return {
+      id: `${modulePrefixes[type]}-${index}`,
+      type,
+      name,
+      position: { x: 0, y: 0 },
+      params: { ...moduleDefaults[type] },
+    }
+  }
+
+  const resetPatchState = () => {
+    setSelectedPort(null)
+    setGhostCable(null)
+    setDragTargets(null)
+    setHoverTargetKey(null)
+  }
+
+  const applyGraphUpdate = (nextGraph: GraphState) => {
+    resetPatchState()
+    graphRef.current = nextGraph
+    setGraph(nextGraph)
+    queueEngineRestart(nextGraph)
+  }
+
+  const handleAddModule = (type: ModuleType) => {
+    if (type === 'control' && hasControlModule) {
+      return
+    }
+    if (type === 'output' && hasOutputModule) {
+      return
+    }
+    const current = graphRef.current
+    const nextModule = buildModuleSpec(type, current.modules)
+    applyGraphUpdate({
+      ...current,
+      modules: [...current.modules, nextModule],
+    })
+  }
+
+  const handleRemoveModule = (moduleId: string) => {
+    const current = graphRef.current
+    if (!current.modules.some((module) => module.id === moduleId)) {
+      return
+    }
+    const nextModules = current.modules.filter((module) => module.id !== moduleId)
+    const nextConnections = current.connections.filter(
+      (connection) =>
+        connection.from.moduleId !== moduleId && connection.to.moduleId !== moduleId,
+    )
+    applyGraphUpdate({
+      ...current,
+      modules: nextModules,
+      connections: nextConnections,
+    })
+  }
+
+  const handleClearRack = () => {
+    applyGraphUpdate({ modules: [], connections: [] })
+  }
+
   const renderModuleControls = (module: ModuleSpec) => {
     if (module.type === 'oscillator') {
       return (
@@ -1950,6 +2133,7 @@ function App() {
                 outputs={modulePorts[module.type].outputs}
                 size={moduleSizes[module.type] ?? '1x1'}
                 portLayout={modulePortLayouts[module.type] ?? 'stacked'}
+                onRemove={handleRemoveModule}
                 selectedPortKey={selectedPortKey}
                 connectedInputs={connectedInputs}
                 validTargets={dragTargets}
@@ -1966,21 +2150,36 @@ function App() {
           <div className="panel-section">
             <h3>Module Library</h3>
             <p className="muted">
-              Drag modules here once patching is wired. Planning: filters, envelopes,
-              sequencers.
+              Click a module to add it to the rack. Use New Rack to clear everything.
             </p>
+            <div className="library-actions">
+              <button
+                type="button"
+                className="ui-btn ui-btn--pill library-clear"
+                onClick={handleClearRack}
+              >
+                New Rack
+              </button>
+            </div>
             <div className="chip-row">
-              <span className="chip">VCO</span>
-              <span className="chip">VCF</span>
-              <span className="chip">VCA</span>
-              <span className="chip">Mod VCA</span>
-              <span className="chip">Mixer</span>
-              <span className="chip">Chorus</span>
-              <span className="chip">Delay</span>
-              <span className="chip">Reverb</span>
-              <span className="chip">LFO</span>
-              <span className="chip">ADSR</span>
-              <span className="chip">Scope</span>
+              {moduleCatalog.map((entry) => {
+                const isSingleton = entry.type === 'control' || entry.type === 'output'
+                const isDisabled =
+                  (entry.type === 'control' && hasControlModule) ||
+                  (entry.type === 'output' && hasOutputModule)
+                return (
+                  <button
+                    key={entry.type}
+                    type="button"
+                    className="chip"
+                    onClick={() => handleAddModule(entry.type)}
+                    disabled={isSingleton && isDisabled}
+                    title={isDisabled ? `${entry.label} already exists` : `Add ${entry.label}`}
+                  >
+                    {entry.label}
+                  </button>
+                )
+              })}
             </div>
           </div>
           <div className="panel-section">

@@ -8,6 +8,8 @@ type ModuleCardProps = {
   outputs: PortDefinition[]
   size?: string
   portLayout?: 'stacked' | 'strip'
+  removable?: boolean
+  onRemove?: (moduleId: string) => void
   selectedPortKey?: string | null
   connectedInputs?: Set<string>
   validTargets?: Set<string> | null
@@ -26,6 +28,8 @@ export const ModuleCard = ({
   outputs,
   size = '1x1',
   portLayout = 'stacked',
+  removable = true,
+  onRemove,
   selectedPortKey,
   connectedInputs,
   validTargets,
@@ -39,7 +43,19 @@ export const ModuleCard = ({
         <div className="module-name">{module.name}</div>
         <div className="module-subtitle">{module.id}</div>
       </div>
-      <div className="module-badge">{module.type}</div>
+      <div className="module-actions">
+        <div className="module-badge">{module.type}</div>
+        {onRemove && removable ? (
+          <button
+            type="button"
+            className="ui-btn ui-btn--pill module-remove"
+            onClick={() => onRemove(module.id)}
+            aria-label={`Remove ${module.name}`}
+          >
+            Remove
+          </button>
+        ) : null}
+      </div>
     </div>
     <div className="module-controls">{children}</div>
     <div className="module-ports">

@@ -291,6 +291,12 @@
   align-items: center;
 }
 
+.module-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .module-name {
   font-weight: 600;
 }
@@ -308,6 +314,19 @@
   border-radius: 8px;
   background: rgba(86, 184, 255, 0.12);
   border: 1px solid rgba(86, 184, 255, 0.3);
+}
+
+.module-remove {
+  --ui-btn-padding: 4px 8px;
+  --ui-btn-font: 0.5rem;
+  --ui-btn-letter: 0.18em;
+  --ui-btn-bg: rgba(26, 32, 42, 0.9);
+  --ui-btn-border: rgba(120, 140, 170, 0.45);
+}
+
+.module-remove:hover {
+  --ui-btn-border: rgba(232, 120, 110, 0.8);
+  --ui-btn-text: rgba(255, 220, 210, 0.95);
 }
 
 .module-controls {
@@ -900,10 +919,6 @@
   display: none;
 }
 
-.module-card.layout-strip .port-label {
-  display: none;
-}
-
 .ports-column {
   display: flex;
   flex-direction: column;
@@ -1134,6 +1149,34 @@
   letter-spacing: 0.08em;
   background: rgba(86, 184, 255, 0.1);
   border: 1px solid rgba(86, 184, 255, 0.25);
+  color: rgba(200, 214, 234, 0.85);
+  cursor: pointer;
+  appearance: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease,
+    color 0.2s ease;
+}
+
+.chip:hover:not(:disabled) {
+  border-color: rgba(120, 140, 170, 0.9);
+}
+
+.chip:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.library-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
+.library-clear {
+  --ui-btn-padding: 6px 12px;
+  --ui-btn-font: 0.55rem;
+  --ui-btn-letter: 0.18em;
+  --ui-btn-bg: rgba(24, 30, 40, 0.9);
+  --ui-btn-border: rgba(120, 140, 170, 0.5);
 }
 
 .signal-strip {
