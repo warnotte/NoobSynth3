@@ -1,28 +1,36 @@
-@import url('https://fonts.googleapis.com/css2?family=Prata&family=Space+Grotesk:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=Sora:wght@400;500;600&display=swap');
 
 :root {
-  font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
-  line-height: 1.4;
+  --font-ui: 'Sora', 'Segoe UI', sans-serif;
+  --font-display: 'Cormorant Garamond', 'Times New Roman', serif;
+  font-family: var(--font-ui);
+  line-height: 1.45;
   font-weight: 400;
-  color: #f2f6ff;
-  background-color: #0f1115;
+  color: #f4f7fb;
+  background-color: #0b0d10;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  --bg-0: #0f1115;
-  --bg-1: #151922;
-  --surface-0: #1b2129;
-  --surface-1: #222933;
-  --surface-2: #141920;
-  --surface-3: #2a313c;
+  --bg-0: #0a0c10;
+  --bg-1: #0f1319;
+  --steel-0: #161c23;
+  --steel-1: #1f2832;
+  --steel-2: #2a3644;
+  --glass-0: rgba(15, 20, 28, 0.62);
+  --glass-1: rgba(24, 32, 42, 0.78);
+  --glass-2: rgba(12, 16, 22, 0.7);
   --border-soft: rgba(255, 255, 255, 0.08);
-  --border-strong: rgba(255, 255, 255, 0.16);
-  --text-strong: #f2f6ff;
-  --text-muted: rgba(200, 210, 228, 0.7);
-  --text-dim: rgba(200, 210, 228, 0.5);
-  --accent: #3df2a6;
-  --accent-2: #56b8ff;
-  --accent-warm: #f3a94c;
+  --border-strong: rgba(255, 255, 255, 0.18);
+  --text-strong: #f2f6fb;
+  --text-muted: rgba(214, 224, 238, 0.72);
+  --text-dim: rgba(214, 224, 238, 0.45);
+  --accent-cool: #5bb6ff;
+  --accent-mint: #42e2b1;
+  --accent-warm: #f0b06b;
+  --accent-rose: #ff6fae;
+  --accent-ink: #0b1115;
+  --shadow-soft: 0 12px 24px rgba(0, 0, 0, 0.32);
+  --shadow-deep: 0 30px 60px rgba(0, 0, 0, 0.55);
 }
 
 *,
@@ -34,10 +42,47 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background: radial-gradient(circle at 20% 20%, rgba(49, 71, 102, 0.5), transparent 45%),
-    radial-gradient(circle at 80% 0%, rgba(24, 63, 54, 0.5), transparent 40%),
-    linear-gradient(160deg, #12141a, #0c0f14 60%, #0a0c10);
+  position: relative;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(86, 140, 200, 0.24), transparent 42%),
+    radial-gradient(circle at 90% 8%, rgba(64, 175, 140, 0.2), transparent 38%),
+    radial-gradient(circle at 55% 85%, rgba(216, 150, 92, 0.18), transparent 48%),
+    linear-gradient(155deg, #0b0e12 0%, #0a0c10 50%, #06070a 100%);
   color: inherit;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(
+      120deg,
+      rgba(255, 255, 255, 0.05) 0px,
+      rgba(255, 255, 255, 0.05) 1px,
+      transparent 1px,
+      transparent 6px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.025) 0px,
+      rgba(255, 255, 255, 0.025) 1px,
+      transparent 1px,
+      transparent 4px
+    );
+  opacity: 0.32;
+  pointer-events: none;
+  z-index: -1;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 50% 20%, transparent 40%, rgba(0, 0, 0, 0.55) 100%);
+  opacity: 0.6;
+  pointer-events: none;
+  z-index: -1;
 }
 
 #root {

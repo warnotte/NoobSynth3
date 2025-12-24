@@ -1,4 +1,13 @@
 import type { Connection, GraphState, ModuleSpec, ModuleType } from '../shared/graph'
+import gainProcessorUrl from './worklets/gain-processor.ts?worker&url'
+import vcoProcessorUrl from './worklets/vco-processor.ts?worker&url'
+import lfoProcessorUrl from './worklets/lfo-processor.ts?worker&url'
+import adsrProcessorUrl from './worklets/adsr-processor.ts?worker&url'
+import vcfProcessorUrl from './worklets/vcf-processor.ts?worker&url'
+import mixerProcessorUrl from './worklets/mixer-processor.ts?worker&url'
+import chorusProcessorUrl from './worklets/chorus-processor.ts?worker&url'
+import delayProcessorUrl from './worklets/delay-processor.ts?worker&url'
+import reverbProcessorUrl from './worklets/reverb-processor.ts?worker&url'
 
 type PortNode = {
   node: AudioNode
@@ -452,33 +461,15 @@ export class AudioEngine {
     if (!this.context || this.workletsLoaded) {
       return
     }
-    await this.context.audioWorklet.addModule(
-      new URL('./worklets/gain-processor.ts', import.meta.url),
-    )
-    await this.context.audioWorklet.addModule(
-      new URL('./worklets/vco-processor.ts', import.meta.url),
-    )
-    await this.context.audioWorklet.addModule(
-      new URL('./worklets/lfo-processor.ts', import.meta.url),
-    )
-    await this.context.audioWorklet.addModule(
-      new URL('./worklets/adsr-processor.ts', import.meta.url),
-    )
-    await this.context.audioWorklet.addModule(
-      new URL('./worklets/vcf-processor.ts', import.meta.url),
-    )
-    await this.context.audioWorklet.addModule(
-      new URL('./worklets/mixer-processor.ts', import.meta.url),
-    )
-    await this.context.audioWorklet.addModule(
-      new URL('./worklets/chorus-processor.ts', import.meta.url),
-    )
-    await this.context.audioWorklet.addModule(
-      new URL('./worklets/delay-processor.ts', import.meta.url),
-    )
-    await this.context.audioWorklet.addModule(
-      new URL('./worklets/reverb-processor.ts', import.meta.url),
-    )
+    await this.context.audioWorklet.addModule(gainProcessorUrl)
+    await this.context.audioWorklet.addModule(vcoProcessorUrl)
+    await this.context.audioWorklet.addModule(lfoProcessorUrl)
+    await this.context.audioWorklet.addModule(adsrProcessorUrl)
+    await this.context.audioWorklet.addModule(vcfProcessorUrl)
+    await this.context.audioWorklet.addModule(mixerProcessorUrl)
+    await this.context.audioWorklet.addModule(chorusProcessorUrl)
+    await this.context.audioWorklet.addModule(delayProcessorUrl)
+    await this.context.audioWorklet.addModule(reverbProcessorUrl)
     this.workletsLoaded = true
   }
 

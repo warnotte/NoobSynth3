@@ -2201,7 +2201,7 @@ function App() {
                   </div>
                   <button
                     type="button"
-                    className="preset-load"
+                    className="ui-btn ui-btn--pill preset-load"
                     onClick={() => applyPreset(preset.graph)}
                   >
                     Load
