@@ -8,8 +8,27 @@ type PresetSpec = {
   graph: GraphState
 }
 
+type ConnectionSpec = GraphState['connections'][number]
+
+type ConnectionPatch = {
+  add?: ConnectionSpec[]
+  remove?: ConnectionSpec[]
+}
+
 const cloneGraph = (graph: GraphState): GraphState =>
   JSON.parse(JSON.stringify(graph)) as GraphState
+
+const makeConnection = (
+  fromModuleId: string,
+  fromPortId: string,
+  toModuleId: string,
+  toPortId: string,
+  kind: ConnectionSpec['kind'],
+): ConnectionSpec => ({
+  from: { moduleId: fromModuleId, portId: fromPortId },
+  to: { moduleId: toModuleId, portId: toPortId },
+  kind,
+})
 
 const applyParams = (
   graph: GraphState,
@@ -31,13 +50,31 @@ const applyParams = (
   }),
 })
 
+const connectionKey = (connection: ConnectionSpec) =>
+  `${connection.kind}:${connection.from.moduleId}.${connection.from.portId}->${connection.to.moduleId}.${connection.to.portId}`
+
+const applyConnections = (graph: GraphState, patch?: ConnectionPatch): GraphState => {
+  if (!patch) {
+    return graph
+  }
+  const removeKeys = new Set((patch.remove ?? []).map(connectionKey))
+  const nextConnections = graph.connections.filter(
+    (connection) => !removeKeys.has(connectionKey(connection)),
+  )
+  return {
+    ...graph,
+    connections: [...nextConnections, ...(patch.add ?? [])],
+  }
+}
+
 const buildPreset = (
   id: string,
   name: string,
   description: string,
   updates: Record<string, Record<string, number | string | boolean>>,
+  connectionPatch?: ConnectionPatch,
 ): PresetSpec => {
-  const graph = applyParams(cloneGraph(defaultGraph), updates)
+  const graph = applyConnections(applyParams(cloneGraph(defaultGraph), updates), connectionPatch)
   return { id, name, description, graph }
 }
 
@@ -108,10 +145,14 @@ export const demoPresets: PresetSpec[] = [
     'lfo-1': { rate: 0.16, depth: 0.22 },
     'ctrl-1': { glide: 0.06, seqOn: true, seqTempo: 84, seqGate: 0.8 },
   }),
-  buildPreset('dream-pad', 'Dream Pad', 'Slow bloom with lush tails.', {
-    'osc-1': { frequency: 110, type: 'sawtooth', pwm: 0.5, unison: 3, detune: 9 },
-    'osc-2': { frequency: 110.1, type: 'sawtooth', pwm: 0.5, unison: 3, detune: 8 },
-    'mix-1': { levelA: 0.65, levelB: 0.6 },
+  buildPreset(
+    'dream-pad',
+    'Dream Pad',
+    'Slow bloom with lush tails.',
+    {
+      'osc-1': { frequency: 110, type: 'sawtooth', pwm: 0.5, unison: 3, detune: 9 },
+      'osc-2': { frequency: 110.1, type: 'sawtooth', pwm: 0.5, unison: 3, detune: 8 },
+      'mix-1': { levelA: 0.65, levelB: 0.6 },
     'vcf-1': {
       cutoff: 900,
       resonance: 0.2,
@@ -126,37 +167,59 @@ export const demoPresets: PresetSpec[] = [
     'delay-1': { time: 520, feedback: 0.38, mix: 0.28, tone: 0.55, pingPong: true },
     'reverb-1': { time: 0.82, damp: 0.52, preDelay: 28, mix: 0.45 },
     'adsr-1': { attack: 0.9, decay: 1.2, sustain: 0.85, release: 1.6 },
-    'adsr-2': { attack: 0.7, decay: 1.1, sustain: 0.4, release: 1.2 },
-    'lfo-1': { rate: 0.08, depth: 0.2 },
-    'ctrl-1': { glide: 0.12, seqOn: true, seqTempo: 52, seqGate: 0.9, voices: 4 },
-  }),
-  buildPreset('glass-bell', 'Glass Bell', 'Bright bell with airy tails.', {
-    'osc-1': { frequency: 220, type: 'sine', pwm: 0.5, unison: 1, detune: 0 },
-    'osc-2': { frequency: 220.8, type: 'triangle', pwm: 0.5, unison: 1, detune: 1.5 },
-    'mix-1': { levelA: 0.9, levelB: 0.45 },
-    'gain-1': { gain: 0.95 },
-    'vcf-1': {
-      cutoff: 2400,
-      resonance: 0.45,
-      drive: 0.2,
-      envAmount: 0.6,
-      modAmount: 0.1,
-      keyTrack: 0.8,
-      slope: 12,
-      mode: 'bp',
+      'adsr-2': { attack: 0.7, decay: 1.1, sustain: 0.4, release: 1.2 },
+      'lfo-1': { rate: 0.08, depth: 0.2 },
+      'ctrl-1': { glide: 0.12, seqOn: true, seqTempo: 52, seqGate: 0.9, voices: 4 },
     },
-    'chorus-1': { rate: 0.25, depth: 8, delay: 14, mix: 0.2, spread: 0.5, feedback: 0.06 },
-    'delay-1': { time: 480, feedback: 0.42, mix: 0.3, tone: 0.7, pingPong: true },
-    'reverb-1': { time: 0.75, damp: 0.35, preDelay: 20, mix: 0.4 },
-    'adsr-1': { attack: 0.01, decay: 1.2, sustain: 0, release: 1.4 },
-    'adsr-2': { attack: 0.002, decay: 1.1, sustain: 0, release: 1.2 },
-    'lfo-1': { rate: 0.2, depth: 0.04 },
-    'ctrl-1': { glide: 0, seqOn: true, seqTempo: 76, seqGate: 0.35, voices: 4 },
-  }),
-  buildPreset('moog-bass', 'Moog Bass', 'Round, punchy mono bass.', {
-    'osc-1': { frequency: 110, type: 'sawtooth', pwm: 0.5, unison: 1, detune: 0 },
-    'osc-2': { frequency: 110, type: 'square', pwm: 0.45, unison: 1, detune: 0 },
-    'mix-1': { levelA: 0.8, levelB: 0.45 },
+    {
+      add: [
+        makeConnection('lfo-1', 'cv-out', 'osc-1', 'pwm', 'cv'),
+        makeConnection('ctrl-1', 'sync-out', 'lfo-1', 'sync', 'sync'),
+      ],
+    },
+  ),
+  buildPreset(
+    'glass-bell',
+    'Glass Bell',
+    'Bright bell with airy tails.',
+    {
+      'osc-1': { frequency: 220, type: 'sine', pwm: 0.5, unison: 1, detune: 0, fmExp: 0 },
+      'osc-2': { frequency: 220.8, type: 'triangle', pwm: 0.5, unison: 1, detune: 1.5 },
+      'mix-1': { levelA: 0.75, levelB: 0.35 },
+      'gain-1': { gain: 0.85 },
+      'vcf-1': {
+        cutoff: 2600,
+        resonance: 0.2,
+        drive: 0.05,
+        envAmount: 0.4,
+        modAmount: 0,
+        keyTrack: 0.6,
+        slope: 12,
+        mode: 'lp',
+      },
+      'chorus-1': { rate: 0.2, depth: 6, delay: 12, mix: 0.12, spread: 0.4, feedback: 0.05 },
+      'delay-1': { time: 520, feedback: 0.38, mix: 0.25, tone: 0.75, pingPong: true },
+      'reverb-1': { time: 0.8, damp: 0.3, preDelay: 24, mix: 0.38 },
+      'adsr-1': { attack: 0.005, decay: 1.4, sustain: 0, release: 1.2 },
+      'adsr-2': { attack: 0.003, decay: 1, sustain: 0, release: 0.9 },
+      'lfo-1': { rate: 0.2, depth: 0.04 },
+      'ctrl-1': { glide: 0, seqOn: true, seqTempo: 76, seqGate: 0.35, voices: 4 },
+    },
+    {
+      remove: [
+        makeConnection('lfo-1', 'cv-out', 'vcf-1', 'mod', 'cv'),
+        makeConnection('lfo-1', 'cv-out', 'osc-2', 'pwm', 'cv'),
+      ],
+    },
+  ),
+  buildPreset(
+    'moog-bass',
+    'Moog Bass',
+    'Round, punchy mono bass.',
+    {
+      'osc-1': { frequency: 110, type: 'sawtooth', pwm: 0.5, unison: 1, detune: 0 },
+      'osc-2': { frequency: 110, type: 'square', pwm: 0.45, unison: 1, detune: 0 },
+      'mix-1': { levelA: 0.8, levelB: 0.45 },
     'vcf-1': {
       cutoff: 220,
       resonance: 0.22,
@@ -171,17 +234,28 @@ export const demoPresets: PresetSpec[] = [
     'delay-1': { time: 180, feedback: 0.15, mix: 0.12, tone: 0.5, pingPong: false },
     'reverb-1': { time: 0.35, damp: 0.3, preDelay: 8, mix: 0.12 },
     'adsr-1': { attack: 0.005, decay: 0.2, sustain: 0.65, release: 0.18 },
-    'adsr-2': { attack: 0.002, decay: 0.22, sustain: 0.1, release: 0.18 },
-    'lfo-1': { rate: 0.3, depth: 0.05 },
-    'ctrl-1': { glide: 0.02, seqOn: true, seqTempo: 92, seqGate: 0.5, voices: 1 },
-  }),
-  buildPreset('edge-lead', 'Edge Lead', 'Cutting lead with short echoes.', {
-    'osc-1': { frequency: 110, type: 'sawtooth', pwm: 0.5, unison: 2, detune: 4 },
-    'osc-2': { frequency: 110.2, type: 'square', pwm: 0.35, unison: 2, detune: 3 },
-    'mix-1': { levelA: 0.65, levelB: 0.6 },
-    'vcf-1': {
-      cutoff: 1400,
-      resonance: 0.35,
+      'adsr-2': { attack: 0.002, decay: 0.22, sustain: 0.1, release: 0.18 },
+      'lfo-1': { rate: 0.3, depth: 0.05 },
+      'ctrl-1': { glide: 0.02, seqOn: true, seqTempo: 92, seqGate: 0.5, voices: 1 },
+    },
+    {
+      remove: [
+        makeConnection('lfo-1', 'cv-out', 'vcf-1', 'mod', 'cv'),
+        makeConnection('lfo-1', 'cv-out', 'osc-2', 'pwm', 'cv'),
+      ],
+    },
+  ),
+  buildPreset(
+    'edge-lead',
+    'Edge Lead',
+    'Cutting lead with short echoes.',
+    {
+      'osc-1': { frequency: 110, type: 'sawtooth', pwm: 0.5, unison: 2, detune: 4 },
+      'osc-2': { frequency: 110.2, type: 'square', pwm: 0.35, unison: 2, detune: 3, fmExp: 0.25 },
+      'mix-1': { levelA: 0.65, levelB: 0.6 },
+      'vcf-1': {
+        cutoff: 1400,
+        resonance: 0.35,
       drive: 0.2,
       envAmount: 0.5,
       modAmount: 0.15,
@@ -193,14 +267,25 @@ export const demoPresets: PresetSpec[] = [
     'delay-1': { time: 280, feedback: 0.32, mix: 0.2, tone: 0.65, pingPong: false },
     'reverb-1': { time: 0.5, damp: 0.35, preDelay: 12, mix: 0.18 },
     'adsr-1': { attack: 0.02, decay: 0.3, sustain: 0.7, release: 0.35 },
-    'adsr-2': { attack: 0.01, decay: 0.35, sustain: 0.3, release: 0.4 },
-    'lfo-1': { rate: 0.5, depth: 0.08 },
-    'ctrl-1': { glide: 0.04, seqOn: true, seqTempo: 96, seqGate: 0.6, voices: 2 },
-  }),
-  buildPreset('pluck-80s', '80s Pluck', 'Short pluck with roomy tail.', {
-    'osc-1': { frequency: 110, type: 'sawtooth', pwm: 0.5, unison: 2, detune: 6 },
-    'osc-2': { frequency: 111, type: 'square', pwm: 0.4, unison: 1, detune: 2 },
-    'mix-1': { levelA: 0.6, levelB: 0.5 },
+      'adsr-2': { attack: 0.01, decay: 0.35, sustain: 0.3, release: 0.4 },
+      'lfo-1': { rate: 0.5, depth: 0.08 },
+      'ctrl-1': { glide: 0.04, seqOn: true, seqTempo: 96, seqGate: 0.6, voices: 2 },
+    },
+    {
+      add: [
+        makeConnection('adsr-2', 'env', 'osc-2', 'fm-exp', 'cv'),
+        makeConnection('ctrl-1', 'sync-out', 'osc-2', 'sync', 'sync'),
+      ],
+    },
+  ),
+  buildPreset(
+    'pluck-80s',
+    '80s Pluck',
+    'Short pluck with roomy tail.',
+    {
+      'osc-1': { frequency: 110, type: 'sawtooth', pwm: 0.5, unison: 2, detune: 6 },
+      'osc-2': { frequency: 111, type: 'square', pwm: 0.4, unison: 1, detune: 2 },
+      'mix-1': { levelA: 0.6, levelB: 0.5 },
     'vcf-1': {
       cutoff: 1100,
       resonance: 0.25,
@@ -215,8 +300,13 @@ export const demoPresets: PresetSpec[] = [
     'delay-1': { time: 320, feedback: 0.28, mix: 0.28, tone: 0.65, pingPong: true },
     'reverb-1': { time: 0.55, damp: 0.4, preDelay: 18, mix: 0.22 },
     'adsr-1': { attack: 0.005, decay: 0.3, sustain: 0.2, release: 0.25 },
-    'adsr-2': { attack: 0.005, decay: 0.25, sustain: 0, release: 0.2 },
-    'lfo-1': { rate: 0.25, depth: 0.1 },
-    'ctrl-1': { glide: 0.02, seqOn: true, seqTempo: 102, seqGate: 0.35, voices: 4 },
-  }),
+      'adsr-2': { attack: 0.005, decay: 0.25, sustain: 0, release: 0.2 },
+      'lfo-1': { rate: 0.25, depth: 0.1 },
+      'ctrl-1': { glide: 0.02, seqOn: true, seqTempo: 102, seqGate: 0.35, voices: 4 },
+    },
+    {
+      remove: [makeConnection('lfo-1', 'cv-out', 'osc-2', 'pwm', 'cv')],
+      add: [makeConnection('adsr-2', 'env', 'osc-2', 'pwm', 'cv')],
+    },
+  ),
 ]

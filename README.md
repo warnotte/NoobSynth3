@@ -36,7 +36,7 @@ Open the app, click Power On, then hit Run in Control IO or play the mini keyboa
 
 ## Presets
 
-Use the Presets panel to load curated demo patches.
+Use the Presets panel to load curated demo patches. Some presets also change patch routing.
 
 ## Architecture
 

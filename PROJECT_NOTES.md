@@ -10,7 +10,7 @@ This file is meant to be reread by the coding assistant to keep context, decisio
 - Default demo: Jupiter Pad style patch with chorus and sequencer.
 - FX: global delay + reverb after chorus (mix controls for bypass).
 - MIDI: Web MIDI input wired to Control IO (poly voice allocation) with velocity CV out + MIDI-only velocity slew.
-- Polyphony: 1/2/4/8 voices, per-voice VCO/LFO/VCF/ADSR/VCA/Mod VCA, global chorus/out.
+- Polyphony: 1/2/4/8 voices, per-voice VCO/LFO/VCF/ADSR/VCA/Mod VCA, global chorus/delay/reverb/out.
 
 ## Current modules
 
@@ -33,8 +33,13 @@ This file is meant to be reread by the coding assistant to keep context, decisio
 - Jupiter Pad
 - Jupiter Brass
 - PWM Strings
+- Dream Pad
+- Glass Bell
+- Moog Bass
+- Edge Lead
+- 80s Pluck
 
-Presets live in `src/state/presets.ts` and are loaded from the Presets panel.
+Presets live in `src/state/presets.ts` and are loaded from the Presets panel. Some presets also adjust routing.
 
 ## Known issues / risks
 
@@ -52,7 +57,6 @@ Presets live in `src/state/presets.ts` and are loaded from the Presets panel.
 ## TODO (short list)
 
 - Refine VCF 24 dB stability.
-- Add reverb for showcase depth.
 - Optional: expand sequencer (8 steps, per-step toggles).
 - MIDI enhancements (pitch bend, CC mapping).
 

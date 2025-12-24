@@ -531,17 +531,6 @@ function App() {
     })
   }
 
-  const hasSameConnections = (currentGraph: GraphState, nextGraph: GraphState) => {
-    if (currentGraph.connections.length !== nextGraph.connections.length) {
-      return false
-    }
-    const serialize = (connection: GraphState['connections'][number]) =>
-      `${connection.kind}:${connection.from.moduleId}.${connection.from.portId}->${connection.to.moduleId}.${connection.to.portId}`
-    const current = currentGraph.connections.map(serialize).sort()
-    const next = nextGraph.connections.map(serialize).sort()
-    return current.every((value, index) => value === next[index])
-  }
-
   const applyGraphParams = (nextGraph: GraphState) => {
     if (statusRef.current !== 'running') {
       return
@@ -595,7 +584,6 @@ function App() {
     const shouldRestart =
       statusRef.current === 'running' &&
       (!hasSameModuleShape(graphRef.current, cloned) ||
-        !hasSameConnections(graphRef.current, cloned) ||
         getVoiceCountFromGraph(graphRef.current) !== getVoiceCountFromGraph(cloned))
     if (shouldRestart) {
       queueEngineRestart(cloned)
