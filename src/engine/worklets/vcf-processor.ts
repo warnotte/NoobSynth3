@@ -113,19 +113,20 @@ class VcfProcessor extends AudioWorkletProcessor {
     const clampedCutoff = Math.min(cutoff, sampleRate * 0.45)
     const g = Math.tan(Math.PI * clampedCutoff / sampleRate)
     const slope24 = slope >= 0.5
-    const resonanceScaled = resonance * (slope24 ? 0.6 : 1)
-    const q = 0.7 + resonanceScaled * (slope24 ? 6 : 8)
+    const resonanceScaled = resonance * (slope24 ? 0.45 : 1)
+    const q = 0.7 + resonanceScaled * (slope24 ? 4.5 : 8)
     const k = 1 / q
 
-    const driveGain = 1 + drive * (slope24 ? 1.6 : 3)
+    const driveGain = 1 + drive * (slope24 ? 1.2 : 2.6)
     const shapedInput = saturate(input * driveGain)
 
     const stage1 = this.processSvfStage(shapedInput, g, k, this.svfStageA)
     if (slope >= 0.5) {
-      const stage2 = this.processSvfStage(stage1.lp, g, k, this.svfStageB)
+      const stage1Out = saturate(stage1.lp * (1 + drive * 0.25))
+      const stage2 = this.processSvfStage(stage1Out, g, k, this.svfStageB)
       const out = this.selectMode(stage2, mode)
-      const resComp = 1 / (1 + resonanceScaled * 0.9)
-      return saturate(out * 0.6 * resComp)
+      const resComp = 1 / (1 + resonanceScaled * 1.2)
+      return saturate(out * 0.55 * resComp)
     }
     const out = this.selectMode(stage1, mode)
     const resComp = 1 / (1 + resonanceScaled * 0.6)
