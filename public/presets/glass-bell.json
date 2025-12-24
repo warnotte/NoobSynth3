@@ -1,0 +1,98 @@
+{
+  "version": 1,
+  "id": "glass-bell",
+  "name": "Glass Bell",
+  "description": "Bright bell with airy tails.",
+  "updates": {
+    "osc-1": {
+      "frequency": 220,
+      "type": "sine",
+      "pwm": 0.5,
+      "unison": 1,
+      "detune": 0,
+      "fmExp": 0
+    },
+    "osc-2": {
+      "frequency": 220.8,
+      "type": "triangle",
+      "pwm": 0.5,
+      "unison": 1,
+      "detune": 1.5
+    },
+    "mix-1": {
+      "levelA": 0.75,
+      "levelB": 0.35
+    },
+    "gain-1": {
+      "gain": 0.85
+    },
+    "vcf-1": {
+      "cutoff": 2600,
+      "resonance": 0.2,
+      "drive": 0.05,
+      "envAmount": 0.4,
+      "modAmount": 0,
+      "keyTrack": 0.6,
+      "slope": 12,
+      "mode": "lp"
+    },
+    "chorus-1": {
+      "rate": 0.2,
+      "depth": 6,
+      "delay": 12,
+      "mix": 0.12,
+      "spread": 0.4,
+      "feedback": 0.05
+    },
+    "delay-1": {
+      "time": 520,
+      "feedback": 0.38,
+      "mix": 0.25,
+      "tone": 0.75,
+      "pingPong": true
+    },
+    "reverb-1": {
+      "time": 0.8,
+      "damp": 0.3,
+      "preDelay": 24,
+      "mix": 0.38
+    },
+    "adsr-1": {
+      "attack": 0.005,
+      "decay": 1.4,
+      "sustain": 0,
+      "release": 1.2
+    },
+    "adsr-2": {
+      "attack": 0.003,
+      "decay": 1,
+      "sustain": 0,
+      "release": 0.9
+    },
+    "lfo-1": {
+      "rate": 0.2,
+      "depth": 0.04
+    },
+    "ctrl-1": {
+      "glide": 0,
+      "seqOn": true,
+      "seqTempo": 76,
+      "seqGate": 0.35,
+      "voices": 4
+    }
+  },
+  "connectionPatch": {
+    "remove": [
+      {
+        "from": { "moduleId": "lfo-1", "portId": "cv-out" },
+        "to": { "moduleId": "vcf-1", "portId": "mod" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "lfo-1", "portId": "cv-out" },
+        "to": { "moduleId": "osc-2", "portId": "pwm" },
+        "kind": "cv"
+      }
+    ]
+  }
+}

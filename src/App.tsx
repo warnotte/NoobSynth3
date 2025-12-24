@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { AudioEngine } from './engine/AudioEngine'
 import { defaultGraph } from './state/defaultGraph'
-import { demoPresets } from './state/presets'
+import { loadPresets, type PresetSpec } from './state/presets'
 import type { GraphState, ModuleSpec, ModuleType, PortKind } from './shared/graph'
 import { ModuleCard } from './ui/ModuleCard'
 import { RotaryKnob } from './ui/RotaryKnob'
@@ -29,6 +29,44 @@ type VoiceState = {
 }
 
 const MIDI_NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null
+
+const isPortRef = (value: unknown): value is { moduleId: string; portId: string } =>
+  isRecord(value) &&
+  typeof value.moduleId === 'string' &&
+  typeof value.portId === 'string'
+
+const isModuleSpec = (value: unknown): value is GraphState['modules'][number] => {
+  if (!isRecord(value)) {
+    return false
+  }
+  const position = value.position
+  const params = value.params
+  return (
+    typeof value.id === 'string' &&
+    typeof value.type === 'string' &&
+    typeof value.name === 'string' &&
+    isRecord(position) &&
+    typeof position.x === 'number' &&
+    typeof position.y === 'number' &&
+    isRecord(params)
+  )
+}
+
+const isConnection = (value: unknown): value is GraphState['connections'][number] =>
+  isRecord(value) &&
+  isPortRef(value.from) &&
+  isPortRef(value.to) &&
+  typeof value.kind === 'string'
+
+const isGraphState = (value: unknown): value is GraphState =>
+  isRecord(value) &&
+  Array.isArray(value.modules) &&
+  value.modules.every(isModuleSpec) &&
+  Array.isArray(value.connections) &&
+  value.connections.every(isConnection)
 
 const clampMidiNote = (value: number) => Math.max(0, Math.min(127, Math.round(value)))
 
@@ -59,9 +97,14 @@ function App() {
   const [midiAccess, setMidiAccess] = useState<MIDIAccess | null>(null)
   const [midiInputs, setMidiInputs] = useState<MIDIInput[]>([])
   const [midiError, setMidiError] = useState<string | null>(null)
+  const [presets, setPresets] = useState<PresetSpec[]>([])
+  const [presetStatus, setPresetStatus] = useState<'loading' | 'ready' | 'error'>('loading')
+  const [presetError, setPresetError] = useState<string | null>(null)
+  const [importError, setImportError] = useState<string | null>(null)
   const rackRef = useRef<HTMLDivElement | null>(null)
   const dragRef = useRef<DragState | null>(null)
   const midiInputRef = useRef<MIDIInput | null>(null)
+  const presetFileRef = useRef<HTMLInputElement | null>(null)
   const voiceStateRef = useRef<VoiceState[]>([])
   const voiceClockRef = useRef(0)
   const activeVoiceCountRef = useRef<number | null>(null)
@@ -76,6 +119,35 @@ function App() {
   })
 
   useEffect(() => () => engine.dispose(), [engine])
+
+  useEffect(() => {
+    let active = true
+    setPresetStatus('loading')
+    setPresetError(null)
+    loadPresets()
+      .then((result) => {
+        if (!active) {
+          return
+        }
+        setPresets(result.presets)
+        setPresetStatus('ready')
+        if (result.errors.length > 0) {
+          setPresetError(`Some presets failed to load (${result.errors.length}).`)
+        }
+      })
+      .catch((error) => {
+        console.error(error)
+        if (!active) {
+          return
+        }
+        setPresets([])
+        setPresetStatus('error')
+        setPresetError('Unable to load presets.')
+      })
+    return () => {
+      active = false
+    }
+  }, [])
 
   useEffect(() => {
     graphRef.current = graph
@@ -591,6 +663,49 @@ function App() {
     }
     applyGraphParams(cloned)
   }
+
+  const handleExportPreset = useCallback(() => {
+    const payload = { version: 1, graph: graphRef.current }
+    const json = JSON.stringify(payload, null, 2)
+    const blob = new Blob([json], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
+    link.href = url
+    link.download = `noobsynth3-patch-${timestamp}.json`
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    URL.revokeObjectURL(url)
+  }, [])
+
+  const handleImportPreset = useCallback(() => {
+    setImportError(null)
+    presetFileRef.current?.click()
+  }, [])
+
+  const handlePresetFileChange = useCallback(
+    async (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0]
+      event.target.value = ''
+      if (!file) {
+        return
+      }
+      try {
+        const text = await file.text()
+        const payload = JSON.parse(text) as unknown
+        if (!isRecord(payload) || payload.version !== 1 || !isGraphState(payload.graph)) {
+          throw new Error('Invalid preset file.')
+        }
+        setImportError(null)
+        applyPreset(payload.graph)
+      } catch (error) {
+        console.error(error)
+        setImportError('Import failed. Unsupported or corrupt file.')
+      }
+    },
+    [applyPreset],
+  )
 
   const getCenterFromElement = (element: HTMLElement): PortPosition => {
     const rect = element.getBoundingClientRect()
@@ -2192,8 +2307,39 @@ function App() {
           <div className="panel-section">
             <h3>Presets</h3>
             <p className="muted">Pick a curated patch to audition the synth.</p>
+            <div className="preset-actions">
+              <button
+                type="button"
+                className="ui-btn ui-btn--pill preset-action"
+                onClick={handleExportPreset}
+              >
+                Export
+              </button>
+              <button
+                type="button"
+                className="ui-btn ui-btn--pill preset-action"
+                onClick={handleImportPreset}
+              >
+                Import
+              </button>
+              <input
+                ref={presetFileRef}
+                type="file"
+                accept="application/json"
+                className="preset-file"
+                onChange={handlePresetFileChange}
+              />
+            </div>
+            {presetError && <div className="preset-error">{presetError}</div>}
+            {importError && <div className="preset-error">{importError}</div>}
+            {presetStatus === 'loading' && (
+              <div className="preset-status">Loading presets...</div>
+            )}
+            {presetStatus === 'ready' && presets.length === 0 && (
+              <div className="preset-status">No presets found.</div>
+            )}
             <div className="preset-list">
-              {demoPresets.map((preset) => (
+              {presets.map((preset) => (
                 <div key={preset.id} className="preset-card">
                   <div>
                     <div className="preset-name">{preset.name}</div>

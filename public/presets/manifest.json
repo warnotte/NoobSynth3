@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "presets": [
+    {
+      "id": "jupiter-pad",
+      "name": "Jupiter Pad",
+      "description": "Wide, slow pad with chorus.",
+      "file": "jupiter-pad.json"
+    },
+    {
+      "id": "jupiter-brass",
+      "name": "Jupiter Brass",
+      "description": "Bright, snappy brass hit.",
+      "file": "jupiter-brass.json"
+    },
+    {
+      "id": "pwm-strings",
+      "name": "PWM Strings",
+      "description": "Glossy PWM string shimmer.",
+      "file": "pwm-strings.json"
+    },
+    {
+      "id": "dream-pad",
+      "name": "Dream Pad",
+      "description": "Slow bloom with lush tails.",
+      "file": "dream-pad.json"
+    },
+    {
+      "id": "glass-bell",
+      "name": "Glass Bell",
+      "description": "Bright bell with airy tails.",
+      "file": "glass-bell.json"
+    },
+    {
+      "id": "moog-bass",
+      "name": "Moog Bass",
+      "description": "Round, punchy mono bass.",
+      "file": "moog-bass.json"
+    },
+    {
+      "id": "edge-lead",
+      "name": "Edge Lead",
+      "description": "Cutting lead with short echoes.",
+      "file": "edge-lead.json"
+    },
+    {
+      "id": "pluck-80s",
+      "name": "80s Pluck",
+      "description": "Short pluck with roomy tail.",
+      "file": "pluck-80s.json"
+    },
+    {
+      "id": "showcase-stack",
+      "name": "Showcase Stack",
+      "description": "Big modern stack with wide FX.",
+      "file": "showcase-stack.json"
+    }
+  ]
+}

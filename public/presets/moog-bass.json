@@ -1,0 +1,94 @@
+{
+  "version": 1,
+  "id": "moog-bass",
+  "name": "Moog Bass",
+  "description": "Round, punchy mono bass.",
+  "updates": {
+    "osc-1": {
+      "frequency": 110,
+      "type": "sawtooth",
+      "pwm": 0.5,
+      "unison": 1,
+      "detune": 0
+    },
+    "osc-2": {
+      "frequency": 110,
+      "type": "square",
+      "pwm": 0.45,
+      "unison": 1,
+      "detune": 0
+    },
+    "mix-1": {
+      "levelA": 0.8,
+      "levelB": 0.45
+    },
+    "vcf-1": {
+      "cutoff": 220,
+      "resonance": 0.22,
+      "drive": 0.35,
+      "envAmount": 0.7,
+      "modAmount": 0,
+      "keyTrack": 0.2,
+      "slope": 12,
+      "mode": "lp"
+    },
+    "chorus-1": {
+      "rate": 0.18,
+      "depth": 6,
+      "delay": 12,
+      "mix": 0.1,
+      "spread": 0.4,
+      "feedback": 0.08
+    },
+    "delay-1": {
+      "time": 180,
+      "feedback": 0.15,
+      "mix": 0.12,
+      "tone": 0.5,
+      "pingPong": false
+    },
+    "reverb-1": {
+      "time": 0.35,
+      "damp": 0.3,
+      "preDelay": 8,
+      "mix": 0.12
+    },
+    "adsr-1": {
+      "attack": 0.005,
+      "decay": 0.2,
+      "sustain": 0.65,
+      "release": 0.18
+    },
+    "adsr-2": {
+      "attack": 0.002,
+      "decay": 0.22,
+      "sustain": 0.1,
+      "release": 0.18
+    },
+    "lfo-1": {
+      "rate": 0.3,
+      "depth": 0.05
+    },
+    "ctrl-1": {
+      "glide": 0.02,
+      "seqOn": true,
+      "seqTempo": 92,
+      "seqGate": 0.5,
+      "voices": 1
+    }
+  },
+  "connectionPatch": {
+    "remove": [
+      {
+        "from": { "moduleId": "lfo-1", "portId": "cv-out" },
+        "to": { "moduleId": "vcf-1", "portId": "mod" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "lfo-1", "portId": "cv-out" },
+        "to": { "moduleId": "osc-2", "portId": "pwm" },
+        "kind": "cv"
+      }
+    ]
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "version": 1,
+  "id": "jupiter-pad",
+  "name": "Jupiter Pad",
+  "description": "Wide, slow pad with chorus.",
+  "updates": {
+    "osc-1": {
+      "frequency": 110,
+      "type": "sawtooth",
+      "pwm": 0.5,
+      "unison": 2,
+      "detune": 7
+    },
+    "osc-2": {
+      "frequency": 110.3,
+      "type": "sawtooth",
+      "pwm": 0.5,
+      "unison": 2,
+      "detune": 5
+    },
+    "mix-1": {
+      "levelA": 0.7,
+      "levelB": 0.65
+    },
+    "vcf-1": {
+      "cutoff": 850,
+      "resonance": 0.18,
+      "drive": 0.1,
+      "envAmount": 0.35,
+      "modAmount": 0.18,
+      "keyTrack": 0.55,
+      "slope": 12,
+      "mode": "lp"
+    },
+    "chorus-1": {
+      "rate": 0.22,
+      "depth": 14,
+      "delay": 19,
+      "mix": 0.6,
+      "spread": 0.8,
+      "feedback": 0.14
+    },
+    "delay-1": {
+      "time": 420,
+      "feedback": 0.35,
+      "mix": 0.25,
+      "tone": 0.6,
+      "pingPong": true
+    },
+    "reverb-1": {
+      "time": 0.7,
+      "damp": 0.5,
+      "preDelay": 22,
+      "mix": 0.32
+    },
+    "adsr-1": {
+      "attack": 0.3,
+      "decay": 0.7,
+      "sustain": 0.8,
+      "release": 0.8
+    },
+    "adsr-2": {
+      "attack": 0.25,
+      "decay": 0.9,
+      "sustain": 0.3,
+      "release": 0.8
+    },
+    "lfo-1": {
+      "rate": 0.12,
+      "depth": 0.12
+    },
+    "ctrl-1": {
+      "glide": 0.07,
+      "seqOn": true,
+      "seqTempo": 68,
+      "seqGate": 0.9
+    }
+  }
+}

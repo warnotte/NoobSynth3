@@ -1,0 +1,95 @@
+{
+  "version": 1,
+  "id": "edge-lead",
+  "name": "Edge Lead",
+  "description": "Cutting lead with short echoes.",
+  "updates": {
+    "osc-1": {
+      "frequency": 110,
+      "type": "sawtooth",
+      "pwm": 0.5,
+      "unison": 2,
+      "detune": 4
+    },
+    "osc-2": {
+      "frequency": 110.2,
+      "type": "square",
+      "pwm": 0.35,
+      "unison": 2,
+      "detune": 3,
+      "fmExp": 0.25
+    },
+    "mix-1": {
+      "levelA": 0.65,
+      "levelB": 0.6
+    },
+    "vcf-1": {
+      "cutoff": 1400,
+      "resonance": 0.35,
+      "drive": 0.2,
+      "envAmount": 0.5,
+      "modAmount": 0.15,
+      "keyTrack": 0.5,
+      "slope": 12,
+      "mode": "lp"
+    },
+    "chorus-1": {
+      "rate": 0.25,
+      "depth": 10,
+      "delay": 16,
+      "mix": 0.3,
+      "spread": 0.5,
+      "feedback": 0.1
+    },
+    "delay-1": {
+      "time": 280,
+      "feedback": 0.32,
+      "mix": 0.2,
+      "tone": 0.65,
+      "pingPong": false
+    },
+    "reverb-1": {
+      "time": 0.5,
+      "damp": 0.35,
+      "preDelay": 12,
+      "mix": 0.18
+    },
+    "adsr-1": {
+      "attack": 0.02,
+      "decay": 0.3,
+      "sustain": 0.7,
+      "release": 0.35
+    },
+    "adsr-2": {
+      "attack": 0.01,
+      "decay": 0.35,
+      "sustain": 0.3,
+      "release": 0.4
+    },
+    "lfo-1": {
+      "rate": 0.5,
+      "depth": 0.08
+    },
+    "ctrl-1": {
+      "glide": 0.04,
+      "seqOn": true,
+      "seqTempo": 96,
+      "seqGate": 0.6,
+      "voices": 2
+    }
+  },
+  "connectionPatch": {
+    "add": [
+      {
+        "from": { "moduleId": "adsr-2", "portId": "env" },
+        "to": { "moduleId": "osc-2", "portId": "fm-exp" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "sync-out" },
+        "to": { "moduleId": "osc-2", "portId": "sync" },
+        "kind": "sync"
+      }
+    ]
+  }
+}

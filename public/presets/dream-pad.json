@@ -1,0 +1,94 @@
+{
+  "version": 1,
+  "id": "dream-pad",
+  "name": "Dream Pad",
+  "description": "Slow bloom with lush tails.",
+  "updates": {
+    "osc-1": {
+      "frequency": 110,
+      "type": "sawtooth",
+      "pwm": 0.5,
+      "unison": 3,
+      "detune": 9
+    },
+    "osc-2": {
+      "frequency": 110.1,
+      "type": "sawtooth",
+      "pwm": 0.5,
+      "unison": 3,
+      "detune": 8
+    },
+    "mix-1": {
+      "levelA": 0.65,
+      "levelB": 0.6
+    },
+    "vcf-1": {
+      "cutoff": 900,
+      "resonance": 0.2,
+      "drive": 0.12,
+      "envAmount": 0.25,
+      "modAmount": 0.18,
+      "keyTrack": 0.5,
+      "slope": 12,
+      "mode": "lp"
+    },
+    "chorus-1": {
+      "rate": 0.2,
+      "depth": 16,
+      "delay": 21,
+      "mix": 0.7,
+      "spread": 0.9,
+      "feedback": 0.18
+    },
+    "delay-1": {
+      "time": 520,
+      "feedback": 0.38,
+      "mix": 0.28,
+      "tone": 0.55,
+      "pingPong": true
+    },
+    "reverb-1": {
+      "time": 0.82,
+      "damp": 0.52,
+      "preDelay": 28,
+      "mix": 0.45
+    },
+    "adsr-1": {
+      "attack": 0.9,
+      "decay": 1.2,
+      "sustain": 0.85,
+      "release": 1.6
+    },
+    "adsr-2": {
+      "attack": 0.7,
+      "decay": 1.1,
+      "sustain": 0.4,
+      "release": 1.2
+    },
+    "lfo-1": {
+      "rate": 0.08,
+      "depth": 0.2
+    },
+    "ctrl-1": {
+      "glide": 0.12,
+      "seqOn": true,
+      "seqTempo": 52,
+      "seqGate": 0.9,
+      "voices": 4
+    }
+  },
+  "connectionPatch": {
+    "add": [
+      {
+        "from": { "moduleId": "lfo-1", "portId": "cv-out" },
+        "to": { "moduleId": "osc-1", "portId": "pwm" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "sync-out" },
+        "to": { "moduleId": "lfo-1", "portId": "sync" },
+        "kind": "sync"
+      }
+    ]
+  }
+}

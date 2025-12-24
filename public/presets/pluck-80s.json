@@ -1,0 +1,96 @@
+{
+  "version": 1,
+  "id": "pluck-80s",
+  "name": "80s Pluck",
+  "description": "Short pluck with roomy tail.",
+  "updates": {
+    "osc-1": {
+      "frequency": 110,
+      "type": "sawtooth",
+      "pwm": 0.5,
+      "unison": 2,
+      "detune": 6
+    },
+    "osc-2": {
+      "frequency": 111,
+      "type": "square",
+      "pwm": 0.4,
+      "unison": 1,
+      "detune": 2
+    },
+    "mix-1": {
+      "levelA": 0.6,
+      "levelB": 0.5
+    },
+    "vcf-1": {
+      "cutoff": 1100,
+      "resonance": 0.25,
+      "drive": 0.15,
+      "envAmount": 0.6,
+      "modAmount": 0.2,
+      "keyTrack": 0.45,
+      "slope": 12,
+      "mode": "lp"
+    },
+    "chorus-1": {
+      "rate": 0.25,
+      "depth": 12,
+      "delay": 17,
+      "mix": 0.5,
+      "spread": 0.7,
+      "feedback": 0.12
+    },
+    "delay-1": {
+      "time": 320,
+      "feedback": 0.28,
+      "mix": 0.28,
+      "tone": 0.65,
+      "pingPong": true
+    },
+    "reverb-1": {
+      "time": 0.55,
+      "damp": 0.4,
+      "preDelay": 18,
+      "mix": 0.22
+    },
+    "adsr-1": {
+      "attack": 0.005,
+      "decay": 0.3,
+      "sustain": 0.2,
+      "release": 0.25
+    },
+    "adsr-2": {
+      "attack": 0.005,
+      "decay": 0.25,
+      "sustain": 0,
+      "release": 0.2
+    },
+    "lfo-1": {
+      "rate": 0.25,
+      "depth": 0.1
+    },
+    "ctrl-1": {
+      "glide": 0.02,
+      "seqOn": true,
+      "seqTempo": 102,
+      "seqGate": 0.35,
+      "voices": 4
+    }
+  },
+  "connectionPatch": {
+    "remove": [
+      {
+        "from": { "moduleId": "lfo-1", "portId": "cv-out" },
+        "to": { "moduleId": "osc-2", "portId": "pwm" },
+        "kind": "cv"
+      }
+    ],
+    "add": [
+      {
+        "from": { "moduleId": "adsr-2", "portId": "env" },
+        "to": { "moduleId": "osc-2", "portId": "pwm" },
+        "kind": "cv"
+      }
+    ]
+  }
+}

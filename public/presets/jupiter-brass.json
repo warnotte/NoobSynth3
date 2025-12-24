@@ -1,0 +1,79 @@
+{
+  "version": 1,
+  "id": "jupiter-brass",
+  "name": "Jupiter Brass",
+  "description": "Bright, snappy brass hit.",
+  "updates": {
+    "osc-1": {
+      "frequency": 110,
+      "type": "sawtooth",
+      "pwm": 0.5,
+      "unison": 1,
+      "detune": 2
+    },
+    "osc-2": {
+      "frequency": 110.2,
+      "type": "square",
+      "pwm": 0.42,
+      "unison": 1,
+      "detune": 2
+    },
+    "mix-1": {
+      "levelA": 0.75,
+      "levelB": 0.5
+    },
+    "vcf-1": {
+      "cutoff": 720,
+      "resonance": 0.28,
+      "drive": 0.18,
+      "envAmount": 0.7,
+      "modAmount": 0.12,
+      "keyTrack": 0.4,
+      "slope": 12,
+      "mode": "lp"
+    },
+    "chorus-1": {
+      "rate": 0.3,
+      "depth": 10,
+      "delay": 16,
+      "mix": 0.45,
+      "spread": 0.6,
+      "feedback": 0.1
+    },
+    "delay-1": {
+      "time": 260,
+      "feedback": 0.25,
+      "mix": 0.15,
+      "tone": 0.65,
+      "pingPong": false
+    },
+    "reverb-1": {
+      "time": 0.45,
+      "damp": 0.35,
+      "preDelay": 12,
+      "mix": 0.18
+    },
+    "adsr-1": {
+      "attack": 0.02,
+      "decay": 0.25,
+      "sustain": 0.65,
+      "release": 0.2
+    },
+    "adsr-2": {
+      "attack": 0.01,
+      "decay": 0.28,
+      "sustain": 0.2,
+      "release": 0.2
+    },
+    "lfo-1": {
+      "rate": 0.4,
+      "depth": 0.08
+    },
+    "ctrl-1": {
+      "glide": 0.02,
+      "seqOn": true,
+      "seqTempo": 110,
+      "seqGate": 0.5
+    }
+  }
+}

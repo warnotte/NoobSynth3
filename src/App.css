@@ -1179,6 +1179,37 @@
   gap: 10px;
 }
 
+.preset-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.preset-action {
+  --ui-btn-padding: 7px 12px;
+  --ui-btn-font: 0.6rem;
+  --ui-btn-letter: 0.12em;
+  --ui-btn-bg: rgba(16, 22, 30, 0.9);
+  --ui-btn-border: rgba(90, 104, 126, 0.8);
+}
+
+.preset-file {
+  display: none;
+}
+
+.preset-status {
+  margin-bottom: 8px;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.preset-error {
+  margin-bottom: 8px;
+  font-size: 0.7rem;
+  color: rgba(230, 134, 134, 0.9);
+}
+
 .preset-card {
   display: flex;
   align-items: center;
