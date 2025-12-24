@@ -1,0 +1,57 @@
+/* VCF Module layout */
+
+.vcf-module {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 8px;
+}
+
+.vcf-module__section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.vcf-module__section--mode {
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.vcf-module__section--knobs {
+  flex: 1;
+  justify-content: center;
+  gap: 12px;
+}
+
+.vcf-module__knob-row {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.vcf-module__section--ports {
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.vcf-module__ports-row {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.vcf-module__ports-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.vcf-module__ports-col--inputs {
+  align-items: flex-start;
+}
+
+.vcf-module__ports-col--outputs {
+  align-items: flex-end;
+  justify-content: center;
+}

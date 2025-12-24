@@ -10,6 +10,7 @@ import { Oscilloscope } from './ui/Oscilloscope'
 import { modulePorts } from './ui/portCatalog'
 import type { PortDefinition, PortDirection } from './ui/portCatalog'
 import './App.css'
+import './vcv-style.css'
 
 type PortHandle = PortDefinition & { moduleId: string }
 type PortPosition = { x: number; y: number }
@@ -1126,19 +1127,19 @@ function App() {
       : 'AudioWorklet graph ready for patching.'
 
   const moduleSizes: Record<string, string> = {
-    oscillator: '2x3',
-    vcf: '2x3',
-    control: '2x5',
+    oscillator: '2x2',
+    vcf: '2x2',
+    control: '2x6',
     scope: '2x2',
-    adsr: '1x2',
-    lfo: '2x3',
+    adsr: '1x3',
+    lfo: '2x2',
     chorus: '2x2',
-    delay: '1x3',
-    reverb: '1x2',
-    mixer: '1x2',
-    gain: '1x2',
-    'cv-vca': '1x2',
-    output: '1x2',
+    delay: '2x2',
+    reverb: '2x1',
+    mixer: '1x1',
+    gain: '1x1',
+    'cv-vca': '1x1',
+    output: '1x1',
     lab: '2x2',
   }
 
@@ -1338,42 +1339,16 @@ function App() {
     if (module.type === 'oscillator') {
       return (
         <>
-          <div className="control-row vco-row">
-            <RotaryKnob
-              label="Frequency"
-              min={40}
-              max={1200}
-              step={1}
-              unit="Hz"
-              value={Number(module.params.frequency ?? 220)}
-              onChange={(value) => updateParam(module.id, 'frequency', value)}
-              format={(value) => Math.round(value).toString()}
-            />
-            <WaveformSelector
-              label="Waveform"
-              value={String(module.params.type ?? 'sawtooth')}
-              onChange={(value) => updateParam(module.id, 'type', value)}
-            />
-          </div>
-          <div className="filter-row">
-            <div className="filter-group">
-              <span className="filter-label">Unison</span>
-              <div className="filter-buttons filter-wide">
-                {[1, 2, 3, 4].map((count) => (
-                  <button
-                    key={count}
-                    type="button"
-                    className={`ui-btn filter-btn ${
-                      Number(module.params.unison ?? 1) === count ? 'active' : ''
-                    }`}
-                    onClick={() => updateParam(module.id, 'unison', count)}
-                  >
-                    {count}x
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
+          <RotaryKnob
+            label="Freq"
+            min={40}
+            max={1200}
+            step={1}
+            unit="Hz"
+            value={Number(module.params.frequency ?? 220)}
+            onChange={(value) => updateParam(module.id, 'frequency', value)}
+            format={(value) => Math.round(value).toString()}
+          />
           <RotaryKnob
             label="Detune"
             min={0}
@@ -1413,6 +1388,30 @@ function App() {
             onChange={(value) => updateParam(module.id, 'fmExp', value)}
             format={(value) => value.toFixed(2)}
           />
+          <WaveformSelector
+            label="Wave"
+            value={String(module.params.type ?? 'sawtooth')}
+            onChange={(value) => updateParam(module.id, 'type', value)}
+          />
+          <div className="filter-row">
+            <div className="filter-group">
+              <span className="filter-label">Unison</span>
+              <div className="filter-buttons filter-wide">
+                {[1, 2, 3, 4].map((count) => (
+                  <button
+                    key={count}
+                    type="button"
+                    className={`ui-btn filter-btn ${
+                      Number(module.params.unison ?? 1) === count ? 'active' : ''
+                    }`}
+                    onClick={() => updateParam(module.id, 'unison', count)}
+                  >
+                    {count}x
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
         </>
       )
     }

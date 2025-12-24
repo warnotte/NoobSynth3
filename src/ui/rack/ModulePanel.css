@@ -1,0 +1,154 @@
+/* ModulePanel - VCV Rack style module panel */
+
+.module-panel {
+  position: absolute;
+  left: var(--panel-left);
+  top: 0;
+  width: var(--panel-width);
+  height: var(--panel-height);
+  display: flex;
+  flex-direction: column;
+  border-radius: 2px;
+  overflow: hidden;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  z-index: 1;
+}
+
+.module-panel--dragging {
+  z-index: 100;
+  transform: scale(1.02);
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.6),
+    0 0 0 2px rgba(66, 226, 177, 0.5);
+  cursor: grabbing;
+}
+
+.module-panel--drop-target {
+  box-shadow:
+    0 0 0 2px rgba(66, 226, 177, 0.8),
+    0 0 20px rgba(66, 226, 177, 0.3);
+}
+
+/* Panel background with brushed metal texture */
+.module-panel__background {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg,
+      rgba(255, 255, 255, 0.08) 0%,
+      transparent 3%,
+      transparent 97%,
+      rgba(0, 0, 0, 0.15) 100%
+    ),
+    linear-gradient(90deg,
+      rgba(255, 255, 255, 0.03) 0%,
+      transparent 2%,
+      transparent 98%,
+      rgba(0, 0, 0, 0.08) 100%
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.02) 0px,
+      rgba(255, 255, 255, 0.02) 1px,
+      transparent 1px,
+      transparent 3px
+    ),
+    var(--panel-color);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+    inset 1px 0 0 rgba(255, 255, 255, 0.05),
+    inset -1px 0 0 rgba(0, 0, 0, 0.1);
+}
+
+/* Screws */
+.module-panel__screw {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 35%, #888, #444 50%, #222 100%);
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.3),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.5),
+    0 1px 3px rgba(0, 0, 0, 0.5);
+  z-index: 10;
+}
+
+.module-panel__screw::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 6px;
+  height: 1px;
+  margin-left: -3px;
+  margin-top: -0.5px;
+  background: rgba(0, 0, 0, 0.6);
+  transform: rotate(45deg);
+}
+
+.module-panel__screw--tl { top: 6px; left: 6px; }
+.module-panel__screw--tr { top: 6px; right: 6px; }
+.module-panel__screw--bl { bottom: 6px; left: 6px; }
+.module-panel__screw--br { bottom: 6px; right: 6px; }
+
+/* Header */
+.module-panel__header {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 24px;
+  cursor: grab;
+}
+
+.module-panel__header:active {
+  cursor: grabbing;
+}
+
+.module-panel__name {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+.module-panel__remove {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.3);
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.module-panel:hover .module-panel__remove {
+  opacity: 1;
+}
+
+.module-panel__remove:hover {
+  background: rgba(220, 60, 60, 0.8);
+  color: white;
+}
+
+/* Content */
+.module-panel__content {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 8px 12px 16px;
+  gap: 12px;
+}

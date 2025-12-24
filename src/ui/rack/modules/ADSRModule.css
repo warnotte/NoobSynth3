@@ -1,0 +1,24 @@
+/* ADSR Module layout */
+
+.adsr-module {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 16px;
+}
+
+.adsr-module__knobs {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  align-content: center;
+  justify-items: center;
+}
+
+.adsr-module__ports {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}

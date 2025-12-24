@@ -1,0 +1,41 @@
+/* Rack system base styles and variables */
+
+:root {
+  /* Colors */
+  --rack-bg: #0a0a0a;
+  --rack-rail: #3a3a3a;
+  --panel-bg: #1a1f2e;
+
+  /* Port colors */
+  --port-audio: #5bb6ff;
+  --port-cv: #42e2b1;
+  --port-gate: #f0b06b;
+  --port-sync: #ff6fae;
+
+  /* Dimensions */
+  --hp-width: 15px;
+  --rack-height: 380px;
+
+  /* Typography */
+  --font-ui: 'Inter', 'Segoe UI', -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Shadows */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-inset: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* Import all component styles */
+@import './Rack.css';
+@import './ModulePanel.css';
+@import './RackPort.css';
+@import './RackKnob.css';
+@import './RackSwitch.css';
+@import './PatchCable.css';
+@import './modules/VCOModule.css';
+@import './modules/VCFModule.css';
+@import './modules/VCAModule.css';
+@import './modules/ADSRModule.css';
+@import './RackDemo.css';

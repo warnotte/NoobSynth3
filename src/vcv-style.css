@@ -1,0 +1,813 @@
+/**
+ * VCV Rack Style Enhancements
+ * This file adds VCV Rack-inspired visual improvements
+ * Import this after App.css to override styles
+ */
+
+/* ============================================
+   RACK CONTAINER - Eurorack-style with rails
+   ============================================ */
+
+.rack {
+  background:
+    /* Vertical HP lines */
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.03) 0px,
+      rgba(255, 255, 255, 0.03) 1px,
+      transparent 1px,
+      transparent 15px
+    ),
+    /* Base gradient */
+    linear-gradient(180deg, #0c0c0c 0%, #1a1a1a 50%, #0c0c0c 100%);
+  border-radius: 8px;
+  position: relative;
+  padding: 16px 24px;
+  box-shadow:
+    inset 0 4px 20px rgba(0, 0, 0, 0.8),
+    0 10px 40px rgba(0, 0, 0, 0.6);
+}
+
+/* Top and bottom rails */
+.rack::before,
+.rack::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 14px;
+  background:
+    linear-gradient(180deg,
+      #4a4a4a 0%,
+      #3a3a3a 30%,
+      #2a2a2a 70%,
+      #1a1a1a 100%
+    );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+    0 2px 8px rgba(0, 0, 0, 0.5);
+  z-index: 10;
+}
+
+.rack::before {
+  top: 0;
+  border-radius: 8px 8px 0 0;
+}
+
+.rack::after {
+  bottom: 0;
+  border-radius: 0 0 8px 8px;
+  background:
+    linear-gradient(180deg,
+      #1a1a1a 0%,
+      #2a2a2a 30%,
+      #3a3a3a 70%,
+      #4a4a4a 100%
+    );
+}
+
+/* Module grid - more compact */
+.modules {
+  position: relative;
+  z-index: 1;
+  padding: 12px 0;
+  gap: 4px;
+  --rack-unit-x: 200px;
+  --rack-unit-y: 120px;
+}
+
+/* ============================================
+   MODULE CARDS - Panel style
+   ============================================ */
+
+.module-card {
+  --panel-color: #1a1f2e;
+
+  border-radius: 3px;
+  background:
+    /* Brushed metal texture */
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.015) 0px,
+      rgba(255, 255, 255, 0.015) 1px,
+      transparent 1px,
+      transparent 3px
+    ),
+    /* Edge highlights */
+    linear-gradient(180deg,
+      rgba(255, 255, 255, 0.1) 0%,
+      transparent 3%,
+      transparent 97%,
+      rgba(0, 0, 0, 0.2) 100%
+    ),
+    linear-gradient(90deg,
+      rgba(255, 255, 255, 0.05) 0%,
+      transparent 2%,
+      transparent 98%,
+      rgba(0, 0, 0, 0.1) 100%
+    ),
+    var(--panel-color);
+  border: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+    2px 0 4px rgba(0, 0, 0, 0.3),
+    -2px 0 4px rgba(0, 0, 0, 0.3);
+  padding: 4px 4px 6px;
+  gap: 4px;
+  backdrop-filter: none;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Remove glassmorphism pseudo-elements */
+.module-card::before,
+.module-card::after {
+  display: none;
+}
+
+/* Module type colors */
+.module-card[data-module-type="oscillator"] { --panel-color: #1a1f2e; }
+.module-card[data-module-type="vcf"] { --panel-color: #1e2a1f; }
+.module-card[data-module-type="gain"] { --panel-color: #2a1f1e; }
+.module-card[data-module-type="adsr"] { --panel-color: #2a2a1e; }
+.module-card[data-module-type="lfo"] { --panel-color: #1e1e2a; }
+.module-card[data-module-type="mixer"] { --panel-color: #1f2a2a; }
+.module-card[data-module-type="chorus"] { --panel-color: #251e2a; }
+.module-card[data-module-type="delay"] { --panel-color: #1e2528; }
+.module-card[data-module-type="reverb"] { --panel-color: #1e2025; }
+.module-card[data-module-type="output"] { --panel-color: #2a1e2a; }
+.module-card[data-module-type="control"] { --panel-color: #1a2025; }
+.module-card[data-module-type="scope"] { --panel-color: #1a2320; }
+
+/* Module header - compact */
+.module-header {
+  padding-bottom: 2px;
+  margin-bottom: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  gap: 2px;
+}
+
+/* Extra compact for 1x1 modules */
+.module-size-1x1 .module-header {
+  gap: 2px;
+  padding-bottom: 2px;
+}
+
+.module-size-1x1 .module-name {
+  font-size: 9px;
+}
+
+.module-size-1x1 .module-subtitle {
+  display: none;
+}
+
+.module-size-1x1 .module-badge {
+  font-size: 6px;
+  padding: 2px 4px;
+}
+
+.module-size-1x1 .module-body {
+  gap: 2px;
+}
+
+.module-size-1x1 .ports-side {
+  padding: 2px 2px;
+}
+
+.module-size-1x1 .module-controls .rotary-dial {
+  --dial-size: 28px;
+}
+
+.module-size-1x1 .module-controls .rotary-label {
+  font-size: 5px;
+}
+
+.module-size-1x1 .module-controls .rotary-readout {
+  font-size: 6px;
+  min-height: 10px;
+}
+
+/* Compact for 2x1 modules (horizontal layout like ADSR, Chorus) */
+.module-size-2x1 .module-header {
+  padding-bottom: 2px;
+}
+
+.module-size-2x1 .module-name {
+  font-size: 8px;
+}
+
+.module-size-2x1 .module-subtitle {
+  display: none;
+}
+
+.module-size-2x1 .module-badge {
+  font-size: 5px;
+  padding: 1px 3px;
+}
+
+.module-size-2x1 .module-body {
+  gap: 2px;
+}
+
+.module-size-2x1 .ports-side {
+  padding: 2px 2px;
+}
+
+.module-size-2x1 .module-controls {
+  grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)) !important;
+}
+
+.module-size-2x1 .module-controls .rotary-dial {
+  --dial-size: 28px;
+}
+
+.module-size-2x1 .module-controls .rotary-label {
+  font-size: 5px;
+}
+
+.module-size-2x1 .module-controls .rotary-readout {
+  font-size: 6px;
+  min-height: 10px;
+}
+
+/* ============================================
+   MODULE BODY - Side ports layout
+   ============================================ */
+
+.module-body {
+  display: flex;
+  flex: 1;
+  gap: 4px;
+  min-height: 0;
+  padding-top: 2px;
+}
+
+/* Side ports columns */
+.ports-side {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  justify-content: flex-start;
+  padding: 3px 3px;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.ports-side--left {
+  align-items: flex-start;
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+
+.ports-side--right {
+  align-items: flex-end;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+
+.port-side-item {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.ports-side--left .port-side-item {
+  flex-direction: row;
+}
+
+.ports-side--right .port-side-item {
+  flex-direction: row;
+}
+
+.port-side-label {
+  font-size: 6px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+  white-space: nowrap;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.8);
+}
+
+/* Center controls area - grid layout for compact horizontal display */
+.module-body .module-controls {
+  flex: 1;
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)) !important;
+  grid-auto-rows: min-content;
+  gap: 4px 4px;
+  min-width: 0;
+  overflow: hidden;
+  align-content: start;
+  padding: 2px;
+}
+
+/* Rotary knobs should flow naturally in the grid */
+.module-body .module-controls > .rotary {
+  min-width: 48px;
+  max-width: 80px;
+}
+
+/* Control row for VCO: frequency + waveform side by side */
+.module-controls .control-row {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: flex-start;
+}
+
+.module-controls .control-row > * {
+  flex: 1 1 auto;
+  min-width: 50px;
+}
+
+/* Waveform selector - compact layout */
+.module-controls .waveform {
+  grid-column: 1 / -1;
+  gap: 2px;
+}
+
+.module-controls .waveform-label {
+  font-size: 6px;
+}
+
+.module-controls .waveform-buttons {
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+}
+
+.module-controls .wave-button {
+  padding: 3px 2px;
+  border-radius: 4px;
+  gap: 1px;
+}
+
+.module-controls .wave-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.module-controls .wave-button-label {
+  font-size: 5px;
+  letter-spacing: 0.08em;
+}
+
+/* Filter buttons - compact layout */
+.module-controls .filter-row {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.module-controls .filter-row .filter-group {
+  flex: 1 1 auto;
+  min-width: 60px;
+  gap: 2px;
+}
+
+.module-controls .filter-row .filter-label {
+  font-size: 6px;
+}
+
+.module-controls .filter-row .filter-buttons {
+  gap: 2px;
+}
+
+.module-controls .filter-row .filter-btn {
+  padding: 2px 3px;
+  font-size: 6px;
+  border-radius: 3px;
+}
+
+/* Full-width panels only */
+.module-controls .toggle-group,
+.module-controls .scope-view,
+.module-controls .scope-controls,
+.module-controls .seq-panel,
+.module-controls .midi-panel,
+.module-controls .poly-panel,
+.module-controls .mini-keys,
+.module-controls .control-buttons {
+  grid-column: 1 / -1;
+}
+
+/* Toggle group: compact inline buttons */
+.module-controls .toggle-group {
+  display: flex;
+  gap: 2px;
+  flex-wrap: wrap;
+}
+
+.module-controls .toggle-group .toggle-btn {
+  flex: 1;
+  min-width: 50px;
+  padding: 2px 6px;
+  font-size: 7px;
+}
+
+/* Make rotary knobs more compact */
+.module-controls .rotary {
+  gap: 1px;
+  justify-items: center;
+}
+
+.module-controls .rotary-dial {
+  --dial-size: 34px;
+}
+
+.module-controls .rotary-label {
+  font-size: 6px;
+  letter-spacing: 0.06em;
+}
+
+.module-controls .rotary-readout {
+  font-size: 7px;
+  padding: 0px 2px;
+  min-height: 12px;
+}
+
+/* Make rotary indicator thinner for small dials */
+.module-controls .rotary-indicator::before {
+  width: 2px;
+  height: 8px;
+  transform: translateY(-12px);
+}
+
+.module-controls .rotary-center {
+  inset: 9px;
+}
+
+.module-name {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.module-subtitle {
+  font-size: 7px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.module-badge {
+  font-size: 6px;
+  padding: 2px 4px;
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ============================================
+   PORTS - Jack style
+   ============================================ */
+
+.jack {
+  --jack-color: #42e2b1;
+
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  min-height: 18px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 30%, #555, #2a2a2a 50%, #1a1a1a 100%);
+  border: none;
+  box-shadow:
+    inset 0 1px 3px rgba(255, 255, 255, 0.15),
+    inset 0 -1px 3px rgba(0, 0, 0, 0.5),
+    0 1px 4px rgba(0, 0, 0, 0.4);
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* Jack inner ring */
+.jack::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #2a2a2a, #0a0a0a);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* Jack hole with color glow */
+.jack::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #1a1a1a, #000);
+  box-shadow:
+    inset 0 1px 1px rgba(0, 0, 0, 0.9),
+    0 0 0 1px var(--jack-color),
+    0 0 4px var(--jack-color);
+  opacity: 0.7;
+}
+
+/* Port colors */
+.jack.kind-audio {
+  --jack-color: #5bb6ff;
+}
+
+.jack.kind-cv {
+  --jack-color: #42e2b1;
+}
+
+.jack.kind-gate {
+  --jack-color: #f0b06b;
+}
+
+.jack.kind-sync {
+  --jack-color: #ff6fae;
+}
+
+/* Connected state */
+.jack.connected::after {
+  opacity: 1;
+  background: radial-gradient(circle at 40% 40%, var(--jack-color), #000 70%);
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.6),
+    0 0 8px var(--jack-color);
+}
+
+/* Valid target pulse */
+.jack.valid-target {
+  animation: jack-pulse 1s ease-in-out infinite;
+}
+
+@keyframes jack-pulse {
+  0%, 100% {
+    box-shadow:
+      inset 0 2px 4px rgba(255, 255, 255, 0.15),
+      inset 0 -2px 4px rgba(0, 0, 0, 0.5),
+      0 0 0 1px rgba(255, 255, 255, 0.2),
+      0 0 8px rgba(255, 255, 255, 0.1);
+  }
+  50% {
+    box-shadow:
+      inset 0 2px 4px rgba(255, 255, 255, 0.15),
+      inset 0 -2px 4px rgba(0, 0, 0, 0.5),
+      0 0 0 3px rgba(255, 255, 255, 0.4),
+      0 0 16px rgba(255, 255, 255, 0.3);
+  }
+}
+
+/* Hover target */
+.jack.hover-target {
+  transform: scale(1.15);
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.2),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.5),
+    0 0 0 3px var(--jack-color),
+    0 0 20px var(--jack-color);
+}
+
+.jack.hover-target::after {
+  opacity: 1;
+  background: radial-gradient(circle at 40% 40%, var(--jack-color), #000 50%);
+}
+
+/* Port labels */
+.port-label {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.port-kind {
+  font-size: 8px;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+/* Hide old ports section (now using side layout) */
+.module-ports {
+  display: none;
+}
+
+.ports-group,
+.ports-title,
+.ports-column,
+.port-group,
+.port-label,
+.port-kind {
+  display: none;
+}
+
+/* ============================================
+   KNOBS - Rotary potentiometer style
+   ============================================ */
+
+.rotary-dial {
+  --dial-size: 48px;
+  --knob-color: #42e2b1;
+
+  width: var(--dial-size);
+  height: var(--dial-size);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 28%, #4a4a4a, #2a2a2a 50%, #1a1a1a 100%);
+  border: none;
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.15),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.6),
+    0 4px 12px rgba(0, 0, 0, 0.5);
+  position: relative;
+}
+
+/* Inner ring */
+.rotary-dial::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 40% 30%, #3a3a3a, #2a2a2a 60%, #1a1a1a 100%);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Center cap */
+.rotary-center {
+  position: absolute;
+  inset: 14px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 40% 35%, #3a3a3a, #1a1a1a 70%);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+/* Indicator line */
+.rotary-indicator::before {
+  content: '';
+  width: 3px;
+  height: 12px;
+  transform: translateY(-18px);
+  border-radius: 2px;
+  background: linear-gradient(180deg, var(--knob-color), rgba(255, 255, 255, 0.9));
+  box-shadow: 0 0 8px var(--knob-color);
+}
+
+/* Knob labels */
+.rotary-label {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.rotary-readout {
+  font-size: 10px;
+  font-weight: 500;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  padding: 2px 6px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* ============================================
+   PATCH CABLES - Improved style
+   ============================================ */
+
+.patch-cable {
+  stroke-width: 5px;
+  stroke-linecap: round;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
+  opacity: 0.95;
+}
+
+.patch-cable.ghost {
+  opacity: 0.5;
+  stroke-dasharray: 10 8;
+  animation: cable-flow 0.4s linear infinite;
+}
+
+@keyframes cable-flow {
+  0% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: -18; }
+}
+
+/* Cable colors - more saturated */
+.patch-cable.kind-audio { stroke: #5bb6ff; }
+.patch-cable.kind-cv { stroke: #42e2b1; }
+.patch-cable.kind-gate { stroke: #f0b06b; }
+.patch-cable.kind-sync { stroke: #ff6fae; }
+
+/* ============================================
+   BUTTONS & SWITCHES
+   ============================================ */
+
+.ui-btn {
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 5px 8px;
+  transition: all 0.15s ease;
+}
+
+.ui-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.ui-btn.active {
+  background: linear-gradient(180deg, #42e2b1, #2eb88d);
+  border-color: #42e2b1;
+  color: #0a0a0a;
+  box-shadow: 0 2px 8px rgba(66, 226, 177, 0.4);
+}
+
+/* Waveform buttons */
+.wave-button {
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 6px 4px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.wave-button.active {
+  background: linear-gradient(180deg, #42e2b1, #2eb88d);
+  border-color: #42e2b1;
+  color: #0a0a0a;
+  box-shadow: 0 4px 12px rgba(66, 226, 177, 0.4);
+}
+
+/* ============================================
+   SCOPE
+   ============================================ */
+
+.scope-view {
+  background:
+    radial-gradient(circle at 30% 30%, #0a1210, #050808);
+  border: 1px solid rgba(66, 226, 177, 0.2);
+  box-shadow:
+    inset 0 0 20px rgba(0, 0, 0, 0.8),
+    0 0 0 1px rgba(0, 0, 0, 0.3);
+}
+
+/* ============================================
+   TOPBAR & SIDE PANEL
+   ============================================ */
+
+.topbar {
+  background:
+    linear-gradient(180deg, #1a1a1a 0%, #0f0f0f 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.topbar::before {
+  display: none;
+}
+
+.panel-section {
+  background:
+    linear-gradient(180deg, #1a1a1a 0%, #0f0f0f 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.preset-card {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+}
+
+/* ============================================
+   GLOBAL REFINEMENTS
+   ============================================ */
+
+/* Remove remaining glassmorphism */
+.topbar::before,
+.panel-section::before {
+  display: none;
+}
+
+/* Better text rendering */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

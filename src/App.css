@@ -334,6 +334,11 @@
   grid-row: span 5;
 }
 
+.module-size-2x6 {
+  grid-column: span 2;
+  grid-row: span 6;
+}
+
 .module-size-3x2 {
   grid-column: span 3;
   grid-row: span 2;

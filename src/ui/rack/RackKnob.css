@@ -1,0 +1,133 @@
+/* RackKnob - VCV Rack style potentiometer */
+
+.rack-knob {
+  --knob-size: 44px;
+  --knob-color: #42e2b1;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  user-select: none;
+}
+
+.rack-knob--small {
+  --knob-size: 32px;
+}
+
+.rack-knob--large {
+  --knob-size: 56px;
+}
+
+.rack-knob__label {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.rack-knob__dial {
+  position: relative;
+  width: var(--knob-size);
+  height: var(--knob-size);
+  cursor: grab;
+  touch-action: none;
+}
+
+.rack-knob__dial--dragging {
+  cursor: grabbing;
+}
+
+.rack-knob__track {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 225deg,
+    transparent 0deg,
+    rgba(255, 255, 255, 0.08) 0deg,
+    rgba(255, 255, 255, 0.08) 270deg,
+    transparent 270deg
+  );
+}
+
+.rack-knob__track::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 225deg,
+    transparent 0deg,
+    var(--knob-color) 0deg,
+    var(--knob-color) calc((var(--knob-angle) - 135deg)),
+    transparent calc((var(--knob-angle) - 135deg))
+  );
+  opacity: 0.6;
+  filter: blur(1px);
+}
+
+.rack-knob__cap {
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 25%, #5a5a5a, #2a2a2a 50%, #1a1a1a 100%);
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.15),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.5),
+    0 4px 12px rgba(0, 0, 0, 0.5);
+  transform: rotate(var(--knob-angle));
+  transition: transform 0.05s ease-out;
+}
+
+.rack-knob__dial--dragging .rack-knob__cap {
+  transition: none;
+}
+
+.rack-knob__cap::before {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 40% 30%, #4a4a4a, #2a2a2a 60%, #1a1a1a 100%);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.rack-knob__indicator {
+  position: absolute;
+  top: 4px;
+  left: 50%;
+  width: 3px;
+  height: 10px;
+  margin-left: -1.5px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, var(--knob-color), rgba(255, 255, 255, 0.9));
+  box-shadow: 0 0 8px var(--knob-color);
+}
+
+.rack-knob__value {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.85);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  min-width: 36px;
+  text-align: center;
+}
+
+/* Focus state for accessibility */
+.rack-knob__dial:focus-visible {
+  outline: none;
+}
+
+.rack-knob__dial:focus-visible .rack-knob__cap {
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.15),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.5),
+    0 0 0 2px var(--knob-color),
+    0 4px 12px rgba(0, 0, 0, 0.5);
+}

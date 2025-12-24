@@ -1,0 +1,31 @@
+/* VCA Module layout */
+
+.vca-module {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 12px;
+  align-items: center;
+}
+
+.vca-module__knob {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vca-module__ports {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  width: 100%;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.vca-module__port-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
