@@ -442,6 +442,145 @@
   inset: 9px;
 }
 
+/* ============================================
+   SCOPE / DATA MODULE - CRT style
+   ============================================ */
+
+.scope-view {
+  position: relative;
+  background: #0a0e0c;
+  border-radius: 4px;
+  border: 2px solid #1a1a1a;
+  box-shadow:
+    inset 0 0 20px rgba(0, 0, 0, 0.8),
+    inset 0 0 4px rgba(80, 255, 160, 0.05),
+    0 2px 8px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  /* Take all available height */
+  flex: 1;
+  min-height: 80px;
+  height: auto !important;
+}
+
+.scope-view::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 0%,
+    transparent 60%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+
+.scope-view::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.02) 0%,
+    transparent 5%,
+    transparent 95%,
+    rgba(0, 0, 0, 0.1) 100%
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+
+.scope-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.scope-view .scope-label {
+  position: absolute;
+  bottom: 4px;
+  right: 6px;
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: rgba(100, 255, 180, 0.4);
+  text-shadow: 0 0 4px rgba(100, 255, 180, 0.3);
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* Scope controls styling */
+.module-controls .scope-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.module-controls .scope-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.module-controls .scope-group .scope-label {
+  font-size: 7px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(200, 220, 210, 0.6);
+}
+
+.module-controls .scope-buttons {
+  display: flex;
+  gap: 3px;
+}
+
+.module-controls .scope-btn {
+  padding: 4px 8px !important;
+  font-size: 8px !important;
+  min-width: 28px;
+  border-radius: 4px;
+}
+
+.module-controls .scope-toggle {
+  padding: 4px 10px !important;
+}
+
+.scope-mode-label {
+  position: absolute;
+  bottom: 4px;
+  right: 6px;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: rgba(100, 255, 180, 0.5);
+  text-shadow: 0 0 4px rgba(100, 255, 180, 0.3);
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* Channel toggle buttons with colors */
+.scope-ch {
+  --ch-color: #64ffb4;
+  border-color: color-mix(in srgb, var(--ch-color) 40%, transparent) !important;
+  color: color-mix(in srgb, var(--ch-color) 70%, white) !important;
+}
+
+.scope-ch.active {
+  background: color-mix(in srgb, var(--ch-color) 80%, #000) !important;
+  border-color: var(--ch-color) !important;
+  color: #000 !important;
+  box-shadow: 0 0 8px color-mix(in srgb, var(--ch-color) 50%, transparent);
+}
+
+/* Scope module: use flex column layout for controls */
+.module-card[data-module-type="scope"] .module-controls {
+  display: flex !important;
+  flex-direction: column;
+  gap: 6px;
+}
+
 .module-name {
   font-size: 9px;
   font-weight: 700;

@@ -4,7 +4,8 @@ This file is meant to be reread by the coding assistant to keep context, decisio
 
 ## Snapshot
 
-- UI: React + TS + Vite.
+- UI: React + TS + Vite with **VCV Rack-inspired styling** (Eurorack rails, brushed metal panels).
+- **Compact grid layout**: Configurable module sizes (1x1, 2x1, 1x2, 2x2, 1x3, 2x3, 2x6).
 - Audio: AudioWorklet graph in `src/engine`.
 - Patching: drag-to-connect, double-click cable to remove.
 - Default demo: Jupiter Pad style patch with chorus and sequencer.
@@ -26,7 +27,7 @@ This file is meant to be reread by the coding assistant to keep context, decisio
 - Chorus (stereo)
 - Delay (stereo)
 - Reverb (stereo)
-- Scope
+- Scope (DATA-style: oscilloscope/FFT/spectrogram, 4 inputs A/B/C/D, 2 thru outputs, gain 0.5-10x, freeze)
 - Control IO (CV/Gate/Sync + mini sequencer + glide)
 - Lab Panel (test module, not in audio chain)
 
@@ -56,6 +57,8 @@ Presets live in `src/state/presets.ts` and are loaded from the Presets panel. So
 - Chorus sits after VCA in the default chain.
 - Mini sequencer is enabled by default in presets.
 - Lab Panel is kept out of the signal chain (for testing only).
+- VCV Rack-style UI with compact spacing and eurorack aesthetic.
+- Scope module uses efficient canvas rendering with mode-specific visualization (only active mode runs).
 
 ## TODO (short list)
 
@@ -64,6 +67,17 @@ Presets live in `src/state/presets.ts` and are loaded from the Presets panel. So
 - Consider drag-and-drop add for modules.
 - Optional: expand sequencer (8 steps, per-step toggles).
 - MIDI enhancements (pitch bend, CC mapping).
+
+## Recent changes (Dec 2025)
+
+- **VCV Rack-style UI overhaul**: New vcv-style.css with eurorack rails, brushed metal panels, compact spacing.
+- **Module sizing system**: Grid-based layout with configurable sizes per module type.
+- **Scope module rewrite**:
+  - 3 visualization modes: oscilloscope, FFT analyzer, spectrogram.
+  - 4 input channels (A/B for audio, C/D for CV) with color-coded toggle buttons.
+  - 2 thru outputs for non-destructive signal monitoring.
+  - Expanded gain range (0.5x, 1x, 2x, 5x, 10x).
+  - Efficient rendering (only active mode draws).
 
 ## How to update
 

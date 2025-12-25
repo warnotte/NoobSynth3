@@ -268,11 +268,11 @@ export const defaultGraph: GraphState = {
     },
     {
       from: { moduleId: 'reverb-1', portId: 'out' },
-      to: { moduleId: 'scope-1', portId: 'in' },
+      to: { moduleId: 'scope-1', portId: 'in-a' },
       kind: 'audio',
     },
     {
-      from: { moduleId: 'scope-1', portId: 'out' },
+      from: { moduleId: 'scope-1', portId: 'out-a' },
       to: { moduleId: 'out-1', portId: 'in' },
       kind: 'audio',
     },

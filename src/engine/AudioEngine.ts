@@ -64,10 +64,22 @@ export class AudioEngine {
     this.context = null
   }
 
-  getAnalyserNode(moduleId: string): AnalyserNode | null {
+  getAnalyserNode(moduleId: string, inputId?: string): AnalyserNode | null {
     const module = this.modules.get(moduleId)
     if (!module || module.type !== 'scope') {
       return null
+    }
+    // Support multiple analysers per input
+    if (inputId && module.inputs[inputId]) {
+      const input = module.inputs[inputId]
+      if (input.node instanceof AnalyserNode) {
+        return input.node
+      }
+    }
+    // Fallback to first analyser (in-a)
+    const firstInput = module.inputs['in-a']
+    if (firstInput?.node instanceof AnalyserNode) {
+      return firstInput.node
     }
     return module.node instanceof AnalyserNode ? module.node : null
   }
@@ -1134,16 +1146,37 @@ export class AudioEngine {
     }
 
     if (module.type === 'scope') {
-      const scope = new AnalyserNode(this.context, {
+      // Create 4 analysers for inputs A, B, C, D
+      const analyserA = new AnalyserNode(this.context, {
+        fftSize: 2048,
+        smoothingTimeConstant: 0.2,
+      })
+      const analyserB = new AnalyserNode(this.context, {
+        fftSize: 2048,
+        smoothingTimeConstant: 0.2,
+      })
+      const analyserC = new AnalyserNode(this.context, {
+        fftSize: 2048,
+        smoothingTimeConstant: 0.2,
+      })
+      const analyserD = new AnalyserNode(this.context, {
         fftSize: 2048,
         smoothingTimeConstant: 0.2,
       })
       return {
         id: module.id,
         type: module.type,
-        node: scope,
-        inputs: { in: { node: scope } },
-        outputs: { out: { node: scope } },
+        node: analyserA, // Primary node for compatibility
+        inputs: {
+          'in-a': { node: analyserA },
+          'in-b': { node: analyserB },
+          'in-c': { node: analyserC },
+          'in-d': { node: analyserD },
+        },
+        outputs: {
+          'out-a': { node: analyserA },
+          'out-b': { node: analyserB },
+        },
       }
     }
 

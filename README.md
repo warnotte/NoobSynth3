@@ -4,6 +4,7 @@ Modular synth workbench built with React + AudioWorklet. Goal: a powerful, patch
 
 ## Features
 
+- **VCV Rack-inspired UI**: Eurorack-style rails, brushed metal panels, compact module layout with configurable grid sizes (1x1, 2x1, 1x2, 2x2, 1x3, 2x3, 2x6).
 - Modular patching with drag-to-connect cables (double-click near a cable to remove it).
 - Module library lets you add/remove modules and start a new empty rack.
 - AudioWorklet engine (VCO, LFO, VCF, ADSR, Mixer, VCA, Mod VCA, Chorus, Delay, Reverb, Scope, Control IO).
@@ -12,6 +13,12 @@ Modular synth workbench built with React + AudioWorklet. Goal: a powerful, patch
 - MIDI velocity CV output with optional slew to avoid clicks.
 - Preset loader with curated demo patches (Jupiter Pad, Jupiter Brass, PWM Strings).
 - Stereo chorus to add width and character.
+- **Advanced Scope module (DATA-style)**:
+  - 3 visualization modes: Oscilloscope, FFT analyzer, Spectrogram
+  - 4 input channels (A, B, C, D) with color-coded toggle buttons
+  - 2 thru outputs for signal monitoring without breaking the chain
+  - Adjustable gain (0.5x, 1x, 2x, 5x, 10x) and time scale
+  - Freeze function for waveform analysis
 
 ## Quick start
 

@@ -1130,7 +1130,7 @@ function App() {
     oscillator: '2x2',
     vcf: '2x2',
     control: '2x6',
-    scope: '2x2',
+    scope: '2x3',
     adsr: '1x3',
     lfo: '2x2',
     chorus: '2x2',
@@ -1779,6 +1779,8 @@ function App() {
                 ))}
               </div>
             </div>
+          </div>
+          <div className="filter-row">
             <div className="filter-group">
               <span className="filter-label">Slope</span>
               <div className="filter-buttons">
@@ -2116,6 +2118,17 @@ function App() {
       const timeScale = Number(module.params.time ?? 1)
       const gainScale = Number(module.params.gain ?? 1)
       const frozen = Boolean(module.params.freeze ?? false)
+      const viewMode = String(module.params.mode ?? 'scope') as 'scope' | 'fft' | 'spectrogram'
+      const channelA = module.params.chA !== false
+      const channelB = module.params.chB !== false
+      const channelC = module.params.chC !== false
+      const channelD = module.params.chD !== false
+      const channels = [
+        { id: 'in-a', color: 'rgba(100, 255, 180, 0.9)', enabled: channelA },
+        { id: 'in-b', color: 'rgba(255, 150, 100, 0.9)', enabled: channelB },
+        { id: 'in-c', color: 'rgba(150, 180, 255, 0.9)', enabled: channelC },
+        { id: 'in-d', color: 'rgba(255, 100, 255, 0.9)', enabled: channelD },
+      ]
       return (
         <>
           <Oscilloscope
@@ -2125,7 +2138,52 @@ function App() {
             timeScale={timeScale}
             gain={gainScale}
             frozen={frozen}
+            mode={viewMode}
+            channels={channels}
           />
+          <div className="scope-controls">
+            <div className="scope-group">
+              <span className="scope-label">Ch</span>
+              <div className="scope-buttons">
+                {(['A', 'B', 'C', 'D'] as const).map((ch) => {
+                  const paramKey = `ch${ch}` as 'chA' | 'chB' | 'chC' | 'chD'
+                  const isEnabled = module.params[paramKey] !== false
+                  const colors: Record<string, string> = {
+                    A: '#64ffb4',
+                    B: '#ff9664',
+                    C: '#96b4ff',
+                    D: '#ff64ff',
+                  }
+                  return (
+                    <button
+                      key={ch}
+                      type="button"
+                      className={`ui-btn scope-btn scope-ch ${isEnabled ? 'active' : ''}`}
+                      style={{ '--ch-color': colors[ch] } as React.CSSProperties}
+                      onClick={() => updateParam(module.id, paramKey, !isEnabled)}
+                    >
+                      {ch}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+            <div className="scope-group">
+              <span className="scope-label">Mode</span>
+              <div className="scope-buttons">
+                {(['scope', 'fft', 'spectrogram'] as const).map((m) => (
+                  <button
+                    key={m}
+                    type="button"
+                    className={`ui-btn scope-btn ${viewMode === m ? 'active' : ''}`}
+                    onClick={() => updateParam(module.id, 'mode', m)}
+                  >
+                    {m === 'spectrogram' ? 'SPEC' : m.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
           <div className="scope-controls">
             <div className="scope-group">
               <span className="scope-label">Time</span>
@@ -2145,7 +2203,7 @@ function App() {
             <div className="scope-group">
               <span className="scope-label">Gain</span>
               <div className="scope-buttons">
-                {[0.5, 1, 2].map((scale) => (
+                {[1, 2, 5, 10].map((scale) => (
                   <button
                     key={scale}
                     type="button"

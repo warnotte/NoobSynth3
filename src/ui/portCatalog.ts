@@ -92,8 +92,16 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
     outputs: [{ id: 'env', label: 'Env', kind: 'cv', direction: 'out' }],
   },
   scope: {
-    inputs: [{ id: 'in', label: 'In', kind: 'audio', direction: 'in' }],
-    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
+    inputs: [
+      { id: 'in-a', label: 'A', kind: 'audio', direction: 'in' },
+      { id: 'in-b', label: 'B', kind: 'audio', direction: 'in' },
+      { id: 'in-c', label: 'C', kind: 'cv', direction: 'in' },
+      { id: 'in-d', label: 'D', kind: 'cv', direction: 'in' },
+    ],
+    outputs: [
+      { id: 'out-a', label: 'A', kind: 'audio', direction: 'out' },
+      { id: 'out-b', label: 'B', kind: 'audio', direction: 'out' },
+    ],
   },
   lab: {
     inputs: [
