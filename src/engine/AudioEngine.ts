@@ -425,6 +425,34 @@ export class AudioEngine {
     syncSource.offset.setValueAtTime(0, time + 0.02)
   }
 
+  // Mario module channel control (1-5)
+  setMarioChannelCv(moduleId: string, channel: 1 | 2 | 3 | 4 | 5, value: number): void {
+    const module = this.modules.get(moduleId)
+    const context = this.context
+    if (!module || module.type !== 'mario' || !context) {
+      return
+    }
+    const cvSource = module.outputs[`cv-${channel}`]?.node
+    if (!(cvSource instanceof ConstantSourceNode)) {
+      return
+    }
+    cvSource.offset.setValueAtTime(value, context.currentTime)
+  }
+
+  setMarioChannelGate(moduleId: string, channel: 1 | 2 | 3 | 4 | 5, value: number | boolean): void {
+    const module = this.modules.get(moduleId)
+    const context = this.context
+    if (!module || module.type !== 'mario' || !context) {
+      return
+    }
+    const gateSource = module.outputs[`gate-${channel}`]?.node
+    if (!(gateSource instanceof ConstantSourceNode)) {
+      return
+    }
+    const numeric = typeof value === 'boolean' ? (value ? 1 : 0) : value
+    gateSource.offset.setValueAtTime(numeric, context.currentTime)
+  }
+
   private getRuntimeModules(moduleId: string): RuntimeModule[] | null {
     const voices = this.voiceModules.get(moduleId)
     if (voices && voices.length > 0) {
@@ -1176,6 +1204,60 @@ export class AudioEngine {
         outputs: {
           'out-a': { node: analyserA },
           'out-b': { node: analyserB },
+        },
+      }
+    }
+
+    if (module.type === 'mario') {
+      // 5 channels: Lead, Chords, Harmony, Bass, Extra - each with CV and Gate
+      const cv1 = new ConstantSourceNode(this.context, { offset: 0 })
+      const gate1 = new ConstantSourceNode(this.context, { offset: 0 })
+      const cv2 = new ConstantSourceNode(this.context, { offset: 0 })
+      const gate2 = new ConstantSourceNode(this.context, { offset: 0 })
+      const cv3 = new ConstantSourceNode(this.context, { offset: 0 })
+      const gate3 = new ConstantSourceNode(this.context, { offset: 0 })
+      const cv4 = new ConstantSourceNode(this.context, { offset: 0 })
+      const gate4 = new ConstantSourceNode(this.context, { offset: 0 })
+      const cv5 = new ConstantSourceNode(this.context, { offset: 0 })
+      const gate5 = new ConstantSourceNode(this.context, { offset: 0 })
+      cv1.start()
+      gate1.start()
+      cv2.start()
+      gate2.start()
+      cv3.start()
+      gate3.start()
+      cv4.start()
+      gate4.start()
+      cv5.start()
+      gate5.start()
+      return {
+        id: module.id,
+        type: module.type,
+        node: cv1,
+        inputs: {},
+        outputs: {
+          'cv-1': { node: cv1 },
+          'gate-1': { node: gate1 },
+          'cv-2': { node: cv2 },
+          'gate-2': { node: gate2 },
+          'cv-3': { node: cv3 },
+          'gate-3': { node: gate3 },
+          'cv-4': { node: cv4 },
+          'gate-4': { node: gate4 },
+          'cv-5': { node: cv5 },
+          'gate-5': { node: gate5 },
+        },
+        dispose: () => {
+          cv1.stop()
+          gate1.stop()
+          cv2.stop()
+          gate2.stop()
+          cv3.stop()
+          gate3.stop()
+          cv4.stop()
+          gate4.stop()
+          cv5.stop()
+          gate5.stop()
         },
       }
     }

@@ -54,6 +54,12 @@
       "name": "Showcase Stack",
       "description": "Big modern stack with wide FX.",
       "file": "showcase-stack.json"
+    },
+    {
+      "id": "8bit-mario",
+      "name": "8-Bit Mario",
+      "description": "NES-style square wave setup for Mario IO.",
+      "file": "8bit-mario.json"
     }
   ]
 }

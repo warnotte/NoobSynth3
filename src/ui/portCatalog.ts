@@ -119,4 +119,24 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
       { id: 'sync-out', label: 'Sync', kind: 'sync', direction: 'out' },
     ],
   },
+  mario: {
+    inputs: [],
+    outputs: [
+      // Channel 1: Lead melody
+      { id: 'cv-1', label: 'CV1', kind: 'cv', direction: 'out' },
+      { id: 'gate-1', label: 'G1', kind: 'gate', direction: 'out' },
+      // Channel 2: Chords/rhythm (ching chigga)
+      { id: 'cv-2', label: 'CV2', kind: 'cv', direction: 'out' },
+      { id: 'gate-2', label: 'G2', kind: 'gate', direction: 'out' },
+      // Channel 3: Counter-melody/harmony
+      { id: 'cv-3', label: 'CV3', kind: 'cv', direction: 'out' },
+      { id: 'gate-3', label: 'G3', kind: 'gate', direction: 'out' },
+      // Channel 4: Bass (bum bum)
+      { id: 'cv-4', label: 'CV4', kind: 'cv', direction: 'out' },
+      { id: 'gate-4', label: 'G4', kind: 'gate', direction: 'out' },
+      // Channel 5: Extra/percussion hints
+      { id: 'cv-5', label: 'CV5', kind: 'cv', direction: 'out' },
+      { id: 'gate-5', label: 'G5', kind: 'gate', direction: 'out' },
+    ],
+  },
 }

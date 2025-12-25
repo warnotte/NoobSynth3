@@ -1,0 +1,244 @@
+{
+  "version": 1,
+  "id": "8bit-mario",
+  "name": "8-Bit Mario",
+  "description": "Complete NES/SNES-style setup with 5-channel Mario IO sequencer.",
+  "graph": {
+    "modules": [
+      {
+        "id": "mario-1",
+        "type": "mario",
+        "name": "Mario IO",
+        "position": { "x": 120, "y": 140 },
+        "params": { "running": false, "tempo": 180, "song": "smb" }
+      },
+      {
+        "id": "osc-lead",
+        "type": "oscillator",
+        "name": "Lead VCO",
+        "position": { "x": 320, "y": 80 },
+        "params": {
+          "frequency": 440,
+          "type": "square",
+          "pwm": 0.5,
+          "unison": 1,
+          "detune": 0,
+          "fmLin": 0,
+          "fmExp": 0
+        }
+      },
+      {
+        "id": "osc-chords",
+        "type": "oscillator",
+        "name": "Chords VCO",
+        "position": { "x": 520, "y": 80 },
+        "params": {
+          "frequency": 440,
+          "type": "square",
+          "pwm": 0.4,
+          "unison": 1,
+          "detune": 0,
+          "fmLin": 0,
+          "fmExp": 0
+        }
+      },
+      {
+        "id": "osc-harm",
+        "type": "oscillator",
+        "name": "Harmony VCO",
+        "position": { "x": 720, "y": 80 },
+        "params": {
+          "frequency": 440,
+          "type": "square",
+          "pwm": 0.5,
+          "unison": 1,
+          "detune": 0,
+          "fmLin": 0,
+          "fmExp": 0
+        }
+      },
+      {
+        "id": "osc-bass",
+        "type": "oscillator",
+        "name": "Bass VCO",
+        "position": { "x": 920, "y": 80 },
+        "params": {
+          "frequency": 110,
+          "type": "triangle",
+          "pwm": 0.5,
+          "unison": 1,
+          "detune": 0,
+          "fmLin": 0,
+          "fmExp": 0
+        }
+      },
+      {
+        "id": "osc-extra",
+        "type": "oscillator",
+        "name": "Extra VCO",
+        "position": { "x": 1120, "y": 80 },
+        "params": {
+          "frequency": 440,
+          "type": "sawtooth",
+          "pwm": 0.5,
+          "unison": 1,
+          "detune": 0,
+          "fmLin": 0,
+          "fmExp": 0
+        }
+      },
+      {
+        "id": "adsr-lead",
+        "type": "adsr",
+        "name": "Lead ENV",
+        "position": { "x": 320, "y": 320 },
+        "params": { "attack": 0.001, "decay": 0.1, "sustain": 0.8, "release": 0.05 }
+      },
+      {
+        "id": "adsr-chords",
+        "type": "adsr",
+        "name": "Chords ENV",
+        "position": { "x": 520, "y": 320 },
+        "params": { "attack": 0.001, "decay": 0.08, "sustain": 0.7, "release": 0.05 }
+      },
+      {
+        "id": "adsr-harm",
+        "type": "adsr",
+        "name": "Harm ENV",
+        "position": { "x": 720, "y": 320 },
+        "params": { "attack": 0.001, "decay": 0.1, "sustain": 0.8, "release": 0.05 }
+      },
+      {
+        "id": "adsr-bass",
+        "type": "adsr",
+        "name": "Bass ENV",
+        "position": { "x": 920, "y": 320 },
+        "params": { "attack": 0.001, "decay": 0.15, "sustain": 0.9, "release": 0.1 }
+      },
+      {
+        "id": "adsr-extra",
+        "type": "adsr",
+        "name": "Extra ENV",
+        "position": { "x": 1120, "y": 320 },
+        "params": { "attack": 0.01, "decay": 0.2, "sustain": 0.5, "release": 0.15 }
+      },
+      {
+        "id": "vca-lead",
+        "type": "gain",
+        "name": "Lead VCA",
+        "position": { "x": 320, "y": 200 },
+        "params": { "gain": 0.8 }
+      },
+      {
+        "id": "vca-chords",
+        "type": "gain",
+        "name": "Chords VCA",
+        "position": { "x": 520, "y": 200 },
+        "params": { "gain": 0.5 }
+      },
+      {
+        "id": "vca-harm",
+        "type": "gain",
+        "name": "Harm VCA",
+        "position": { "x": 720, "y": 200 },
+        "params": { "gain": 0.6 }
+      },
+      {
+        "id": "vca-bass",
+        "type": "gain",
+        "name": "Bass VCA",
+        "position": { "x": 920, "y": 200 },
+        "params": { "gain": 0.7 }
+      },
+      {
+        "id": "vca-extra",
+        "type": "gain",
+        "name": "Extra VCA",
+        "position": { "x": 1120, "y": 200 },
+        "params": { "gain": 0.4 }
+      },
+      {
+        "id": "mix-1",
+        "type": "mixer",
+        "name": "Mix 1-2",
+        "position": { "x": 420, "y": 440 },
+        "params": { "levelA": 0.7, "levelB": 0.5 }
+      },
+      {
+        "id": "mix-2",
+        "type": "mixer",
+        "name": "Mix 3-4",
+        "position": { "x": 620, "y": 440 },
+        "params": { "levelA": 0.6, "levelB": 0.7 }
+      },
+      {
+        "id": "mix-3",
+        "type": "mixer",
+        "name": "Mix A+B",
+        "position": { "x": 820, "y": 440 },
+        "params": { "levelA": 0.8, "levelB": 0.8 }
+      },
+      {
+        "id": "mix-4",
+        "type": "mixer",
+        "name": "Mix +5",
+        "position": { "x": 1020, "y": 440 },
+        "params": { "levelA": 0.9, "levelB": 0.4 }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "x": 1220, "y": 440 },
+        "params": { "time": 0.3, "damp": 0.7, "preDelay": 10, "mix": 0.15 }
+      },
+      {
+        "id": "scope-1",
+        "type": "scope",
+        "name": "Scope",
+        "position": { "x": 1420, "y": 200 },
+        "params": { "time": 1, "gain": 1, "freeze": false, "mode": "scope" }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Main Out",
+        "position": { "x": 1420, "y": 440 },
+        "params": { "level": 0.8 }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "mario-1", "portId": "cv-1" }, "to": { "moduleId": "osc-lead", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "mario-1", "portId": "gate-1" }, "to": { "moduleId": "adsr-lead", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "mario-1", "portId": "cv-2" }, "to": { "moduleId": "osc-chords", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "mario-1", "portId": "gate-2" }, "to": { "moduleId": "adsr-chords", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "mario-1", "portId": "cv-3" }, "to": { "moduleId": "osc-harm", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "mario-1", "portId": "gate-3" }, "to": { "moduleId": "adsr-harm", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "mario-1", "portId": "cv-4" }, "to": { "moduleId": "osc-bass", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "mario-1", "portId": "gate-4" }, "to": { "moduleId": "adsr-bass", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "mario-1", "portId": "cv-5" }, "to": { "moduleId": "osc-extra", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "mario-1", "portId": "gate-5" }, "to": { "moduleId": "adsr-extra", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "osc-lead", "portId": "out" }, "to": { "moduleId": "vca-lead", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-lead", "portId": "env" }, "to": { "moduleId": "vca-lead", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "osc-chords", "portId": "out" }, "to": { "moduleId": "vca-chords", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-chords", "portId": "env" }, "to": { "moduleId": "vca-chords", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "osc-harm", "portId": "out" }, "to": { "moduleId": "vca-harm", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-harm", "portId": "env" }, "to": { "moduleId": "vca-harm", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "osc-bass", "portId": "out" }, "to": { "moduleId": "vca-bass", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-bass", "portId": "env" }, "to": { "moduleId": "vca-bass", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "osc-extra", "portId": "out" }, "to": { "moduleId": "vca-extra", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-extra", "portId": "env" }, "to": { "moduleId": "vca-extra", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "vca-lead", "portId": "out" }, "to": { "moduleId": "mix-1", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "vca-chords", "portId": "out" }, "to": { "moduleId": "mix-1", "portId": "in-b" }, "kind": "audio" },
+      { "from": { "moduleId": "vca-harm", "portId": "out" }, "to": { "moduleId": "mix-2", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "vca-bass", "portId": "out" }, "to": { "moduleId": "mix-2", "portId": "in-b" }, "kind": "audio" },
+      { "from": { "moduleId": "mix-1", "portId": "out" }, "to": { "moduleId": "mix-3", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "mix-2", "portId": "out" }, "to": { "moduleId": "mix-3", "portId": "in-b" }, "kind": "audio" },
+      { "from": { "moduleId": "mix-3", "portId": "out" }, "to": { "moduleId": "mix-4", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "vca-extra", "portId": "out" }, "to": { "moduleId": "mix-4", "portId": "in-b" }, "kind": "audio" },
+      { "from": { "moduleId": "mix-4", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "scope-1", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "scope-1", "portId": "out-a" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}

@@ -118,6 +118,16 @@ function App() {
     gateTimer: null,
     step: 0,
   })
+  const marioSeqRef = useRef<{
+    timer: number | null
+    step: number
+    gateTimers: (number | null)[]
+  }>({
+    timer: null,
+    step: 0,
+    gateTimers: [null, null, null, null, null],
+  })
+  const [marioStep, setMarioStep] = useState<number | null>(null)
 
   useEffect(() => () => engine.dispose(), [engine])
 
@@ -452,6 +462,256 @@ function App() {
     releaseVoiceNote,
     triggerVoiceNote,
   ])
+
+  // Mario module sequencer
+  const marioModule = useMemo(
+    () => graph.modules.find((module) => module.type === 'mario'),
+    [graph.modules],
+  )
+  const marioModuleId = marioModule?.id ?? null
+  const marioRunning = Boolean(marioModule?.params.running)
+  const marioTempo = Math.max(60, Math.min(300, Number(marioModule?.params.tempo ?? 180)))
+  const marioSong = String(marioModule?.params.song ?? 'smb')
+
+  // Song library - each song has up to 5 channels
+  // Each step is a 16th note. null = rest, number = MIDI note
+  // ch1=Lead, ch2=Chords, ch3=Harmony, ch4=Bass, ch5=Extra
+  const marioSongs = useMemo(() => ({
+    // Super Mario Bros - Main Theme (NES)
+    smb: {
+      name: 'Super Mario Bros',
+      tempo: 180,
+      ch1: [
+        76, 76, null, 76, null, 72, 76, null, 79, null, null, null, 67, null, null, null,
+        72, null, null, 67, null, null, 64, null, null, 69, null, 71, null, 70, 69, null,
+        67, 76, 79, 81, null, 77, 79, null, 76, null, 72, 74, 71, null, null, null,
+        72, null, null, 67, null, null, 64, null, null, 69, null, 71, null, 70, 69, null,
+        67, 76, 79, 81, null, 77, 79, null, 76, null, 72, 74, 71, null, null, null,
+      ],
+      ch2: [
+        64, 64, null, 64, null, 60, 64, null, 67, null, null, null, 55, null, null, null,
+        60, null, null, 55, null, null, 52, null, null, 57, null, 59, null, 58, 57, null,
+        55, 64, 67, 69, null, 65, 67, null, 64, null, 60, 62, 59, null, null, null,
+        60, null, null, 55, null, null, 52, null, null, 57, null, 59, null, 58, 57, null,
+        55, 64, 67, 69, null, 65, 67, null, 64, null, 60, 62, 59, null, null, null,
+      ],
+      ch3: [
+        52, 52, null, 52, null, 48, 52, null, 55, null, null, null, 43, null, null, null,
+        48, null, null, 43, null, null, 40, null, null, 45, null, 47, null, 46, 45, null,
+        43, 52, 55, 57, null, 53, 55, null, 52, null, 48, 50, 47, null, null, null,
+        48, null, null, 43, null, null, 40, null, null, 45, null, 47, null, 46, 45, null,
+        43, 52, 55, 57, null, 53, 55, null, 52, null, 48, 50, 47, null, null, null,
+      ],
+      ch4: [
+        36, null, null, null, 36, null, null, null, 43, null, null, null, 43, null, null, null,
+        36, null, null, 43, null, null, 48, null, null, 45, null, null, null, null, null, null,
+        43, null, null, null, 43, null, null, null, 48, null, null, null, 48, null, null, null,
+        36, null, null, 43, null, null, 48, null, null, 45, null, null, null, null, null, null,
+        43, null, null, null, 43, null, null, null, 48, null, null, null, 48, null, null, null,
+      ],
+      ch5: [
+        null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+        null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+        null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+        null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+        null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+      ],
+    },
+    // Super Mario World - Overworld Theme (SNES) - from MIDI file
+    smw: {
+      name: 'Super Mario World',
+      tempo: 140,
+      // ch1: Lead melody from MIDI "Lead" track (E=69, A=65, C=60, D=62, H=72, G=67, F=70)
+      // Shifted +12 for lead register
+      ch1: [
+        81, 81, null, null, 77, 77, null, null, 72, 72, null, null, 74, 74, null, null,
+        77, 77, null, null, 77, 77, null, null, 74, 74, null, null, 72, 72, null, null,
+        77, 77, null, null, 77, 77, null, null, 84, 72, null, null, 84, null, null, null,
+        81, 81, null, null, 79, 79, null, null, 72, 72, null, null, null, null, null, null,
+        81, 81, null, null, 77, 77, null, null, 72, 72, null, null, 74, 74, null, null,
+        77, 77, null, null, 82, 82, null, null, 81, 81, null, null, 77, 77, null, null,
+      ],
+      // ch2: Rhythm/Chords from MIDI "Ching chigga" track (Q=81, H=72)
+      ch2: [
+        81, null, 72, null, null, null, 81, null, 72, null, null, null, 81, null, 72, null,
+        null, null, 81, null, 72, null, null, null, 81, null, 72, null, null, null, null, null,
+        82, null, 74, null, null, null, 82, null, 74, null, null, null, 82, null, 74, null,
+        null, null, 73, null, 82, null, null, null, 73, null, 82, null, null, null, null, null,
+        81, null, 72, null, null, null, 81, null, 72, null, null, null, 81, null, 72, null,
+        null, null, 80, null, 72, null, null, null, 81, null, 72, null, null, null, null, null,
+      ],
+      // ch3: Harmony/Counter-melody
+      ch3: [
+        77, null, null, null, 72, null, null, null, 67, null, null, null, 69, null, null, null,
+        72, null, null, null, 72, null, null, null, 69, null, null, null, 67, null, null, null,
+        72, null, null, null, 72, null, null, null, 79, null, null, null, 79, null, null, null,
+        77, null, null, null, 74, null, null, null, 67, null, null, null, null, null, null, null,
+        77, null, null, null, 72, null, null, null, 67, null, null, null, 69, null, null, null,
+        72, null, null, null, 78, null, null, null, 77, null, null, null, 72, null, null, null,
+      ],
+      // ch4: Bass from MIDI "Bum bum bum bum" track
+      // Notes: )=41(F2), &=38(D2), +=43(G2), $=36(C2), ,=44, -=45, .=46, /=47, 0=48
+      ch4: [
+        41, null, 38, null, 43, null, 36, null, 41, null, 38, null, 44, null, 43, null,
+        null, null, null, null, 45, null, 46, null, 47, null, 45, null, 44, null, 43, null,
+        36, null, 38, null, 40, null, 41, null, 36, null, 40, null, 43, null, 40, null,
+        36, null, 38, null, 40, null, 41, null, 43, null, 45, null, 46, null, 48, null,
+        41, null, 38, null, 43, null, 36, null, 41, null, 38, null, 44, null, 43, null,
+        41, null, 41, null, 39, null, 39, null, 38, null, 38, null, 37, null, 36, null,
+      ],
+      // ch5: Extra/Breakdown accents
+      ch5: [
+        null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+        62, null, 65, null, null, null, 67, null, 68, null, null, null, 67, null, 65, null,
+        null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+        62, null, 60, null, null, null, 65, null, 57, null, null, null, 58, null, null, null,
+        null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+        null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+      ],
+    },
+    // Underground Theme (NES) - with 5 channels
+    underground: {
+      name: 'Underground',
+      tempo: 140,
+      ch1: [
+        48, null, 60, null, 55, null, 51, null, 52, null, 55, null, null, null, null, null,
+        48, null, 60, null, 55, null, 51, null, 52, null, 55, null, null, null, null, null,
+        51, null, 63, null, 58, null, 54, null, 55, null, 58, null, null, null, null, null,
+        51, null, 63, null, 58, null, 54, null, 55, null, 58, null, null, null, null, null,
+      ],
+      ch2: [
+        36, null, 48, null, 43, null, 39, null, 40, null, 43, null, null, null, null, null,
+        36, null, 48, null, 43, null, 39, null, 40, null, 43, null, null, null, null, null,
+        39, null, 51, null, 46, null, 42, null, 43, null, 46, null, null, null, null, null,
+        39, null, 51, null, 46, null, 42, null, 43, null, 46, null, null, null, null, null,
+      ],
+      ch3: [
+        null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+        null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+        null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+        null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+      ],
+      ch4: [
+        24, null, null, null, 24, null, null, null, 24, null, null, null, 24, null, null, null,
+        24, null, null, null, 24, null, null, null, 24, null, null, null, 24, null, null, null,
+        27, null, null, null, 27, null, null, null, 27, null, null, null, 27, null, null, null,
+        27, null, null, null, 27, null, null, null, 27, null, null, null, 27, null, null, null,
+      ],
+      ch5: [
+        null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+        null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+        null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+        null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+      ],
+    },
+  }), [])
+
+  const currentSong = marioSongs[marioSong as keyof typeof marioSongs] ?? marioSongs.smb
+
+  useEffect(() => {
+    if (!marioModuleId || status !== 'running') {
+      return
+    }
+
+    // Use song's default tempo if not overridden
+    const effectiveTempo = marioTempo
+    const stepMs = (60000 / effectiveTempo) / 4 // 16th notes
+    const gateMs = stepMs * 0.75
+
+    const stopMarioSeq = () => {
+      if (marioSeqRef.current.timer) {
+        window.clearInterval(marioSeqRef.current.timer)
+        marioSeqRef.current.timer = null
+      }
+      marioSeqRef.current.gateTimers.forEach((t) => {
+        if (t) window.clearTimeout(t)
+      })
+      marioSeqRef.current.gateTimers = [null, null, null, null, null]
+      marioSeqRef.current.step = 0
+      setMarioStep(null)
+      // Turn off all gates
+      engine.setMarioChannelGate(marioModuleId, 1, 0)
+      engine.setMarioChannelGate(marioModuleId, 2, 0)
+      engine.setMarioChannelGate(marioModuleId, 3, 0)
+      engine.setMarioChannelGate(marioModuleId, 4, 0)
+      engine.setMarioChannelGate(marioModuleId, 5, 0)
+    }
+
+    if (!marioRunning) {
+      stopMarioSeq()
+      return
+    }
+
+    const seqLength = currentSong.ch1.length
+
+    const tick = () => {
+      const stepIndex = marioSeqRef.current.step % seqLength
+      setMarioStep(stepIndex)
+
+      // Channel 1: Lead
+      const note1 = currentSong.ch1[stepIndex]
+      if (note1 !== null) {
+        const cv1 = (note1 - 60) / 12 // 1V/octave, C4 = 0V
+        engine.setMarioChannelCv(marioModuleId, 1, cv1)
+        engine.setMarioChannelGate(marioModuleId, 1, 1)
+        marioSeqRef.current.gateTimers[0] = window.setTimeout(() => {
+          engine.setMarioChannelGate(marioModuleId, 1, 0)
+        }, gateMs)
+      }
+
+      // Channel 2: Harmony
+      const note2 = currentSong.ch2[stepIndex]
+      if (note2 !== null) {
+        const cv2 = (note2 - 60) / 12
+        engine.setMarioChannelCv(marioModuleId, 2, cv2)
+        engine.setMarioChannelGate(marioModuleId, 2, 1)
+        marioSeqRef.current.gateTimers[1] = window.setTimeout(() => {
+          engine.setMarioChannelGate(marioModuleId, 2, 0)
+        }, gateMs)
+      }
+
+      // Channel 3: Counter-melody/Harmony
+      const note3 = currentSong.ch3[stepIndex]
+      if (note3 !== null) {
+        const cv3 = (note3 - 60) / 12
+        engine.setMarioChannelCv(marioModuleId, 3, cv3)
+        engine.setMarioChannelGate(marioModuleId, 3, 1)
+        marioSeqRef.current.gateTimers[2] = window.setTimeout(() => {
+          engine.setMarioChannelGate(marioModuleId, 3, 0)
+        }, gateMs)
+      }
+
+      // Channel 4: Bass
+      const note4 = currentSong.ch4?.[stepIndex]
+      if (note4 !== null && note4 !== undefined) {
+        const cv4 = (note4 - 60) / 12
+        engine.setMarioChannelCv(marioModuleId, 4, cv4)
+        engine.setMarioChannelGate(marioModuleId, 4, 1)
+        marioSeqRef.current.gateTimers[3] = window.setTimeout(() => {
+          engine.setMarioChannelGate(marioModuleId, 4, 0)
+        }, gateMs)
+      }
+
+      // Channel 5: Extra/Percussion
+      const note5 = currentSong.ch5?.[stepIndex]
+      if (note5 !== null && note5 !== undefined) {
+        const cv5 = (note5 - 60) / 12
+        engine.setMarioChannelCv(marioModuleId, 5, cv5)
+        engine.setMarioChannelGate(marioModuleId, 5, 1)
+        marioSeqRef.current.gateTimers[4] = window.setTimeout(() => {
+          engine.setMarioChannelGate(marioModuleId, 5, 0)
+        }, gateMs)
+      }
+
+      marioSeqRef.current.step = (marioSeqRef.current.step + 1) % seqLength
+    }
+
+    stopMarioSeq()
+    tick()
+    marioSeqRef.current.timer = window.setInterval(tick, stepMs)
+
+    return () => stopMarioSeq()
+  }, [engine, marioModuleId, marioRunning, marioTempo, currentSong, status])
 
   const syncMidiInputs = useCallback(
     (access: MIDIAccess) => {
@@ -986,8 +1246,14 @@ function App() {
   }
 
   const buildCablePath = (start: PortPosition, end: PortPosition) => {
-    const dx = Math.max(60, Math.abs(end.x - start.x) * 0.45)
-    return `M ${start.x} ${start.y} C ${start.x + dx} ${start.y}, ${end.x - dx} ${end.y}, ${end.x} ${end.y}`
+    // Tension based on total distance between ports (not just horizontal)
+    // This handles all directions naturally: left→right, right→left, vertical
+    const dist = Math.hypot(end.x - start.x, end.y - start.y)
+    // Scale with distance, but clamp to reasonable bounds
+    // Min 35px for short cables, max 100px to avoid excessive loops
+    const tension = Math.min(Math.max(35, dist * 0.28), 100)
+    // Output always extends right, input always extends left
+    return `M ${start.x} ${start.y} C ${start.x + tension} ${start.y}, ${end.x - tension} ${end.y}, ${end.x} ${end.y}`
   }
 
   const getBezierPoint = (
@@ -1141,6 +1407,7 @@ function App() {
     'cv-vca': '1x1',
     output: '1x1',
     lab: '2x2',
+    mario: '2x4',
   }
 
   const modulePortLayouts: Record<string, 'stacked' | 'strip'> = {
@@ -1150,6 +1417,7 @@ function App() {
     lab: 'strip',
     adsr: 'strip',
     lfo: 'strip',
+    mario: 'strip',
   }
 
   const moduleCatalog: { type: ModuleType; label: string }[] = [
@@ -1167,6 +1435,7 @@ function App() {
     { type: 'control', label: 'Control IO' },
     { type: 'output', label: 'Main Out' },
     { type: 'lab', label: 'Lab' },
+    { type: 'mario', label: 'Mario IO' },
   ]
 
   const modulePrefixes: Record<ModuleType, string> = {
@@ -1184,6 +1453,7 @@ function App() {
     control: 'ctrl',
     output: 'out',
     lab: 'lab',
+    mario: 'mario',
   }
 
   const moduleLabels: Record<ModuleType, string> = {
@@ -1201,6 +1471,7 @@ function App() {
     control: 'Control IO',
     output: 'Main Out',
     lab: 'Lab Panel',
+    mario: 'Mario IO',
   }
 
   const moduleDefaults: Record<ModuleType, Record<string, number | string | boolean>> = {
@@ -1252,6 +1523,7 @@ function App() {
     },
     output: { level: 0.8 },
     lab: { level: 0.5, drive: 0.3, bias: 0, shape: 'triangle' },
+    mario: { running: false, tempo: 180, song: 'smb' },
   }
 
   const hasControlModule = graph.modules.some((module) => module.type === 'control')
@@ -2262,6 +2534,84 @@ function App() {
             value={String(module.params.shape ?? 'triangle')}
             onChange={(value) => updateParam(module.id, 'shape', value)}
           />
+        </>
+      )
+    }
+
+    if (module.type === 'mario') {
+      const isRunning = Boolean(module.params.running)
+      const tempo = Number(module.params.tempo ?? 180)
+      const songId = String(module.params.song ?? 'smb')
+      const songData = marioSongs[songId as keyof typeof marioSongs] ?? marioSongs.smb
+      const seqLength = songData.ch1.length
+      const currentBar = marioStep !== null ? Math.floor(marioStep / 16) + 1 : 0
+      const currentBeat = marioStep !== null ? Math.floor((marioStep % 16) / 4) + 1 : 0
+
+      const songOptions = [
+        { id: 'smb', label: 'SMB' },
+        { id: 'smw', label: 'SMW' },
+        { id: 'underground', label: 'UND' },
+      ]
+
+      return (
+        <>
+          <div className="mario-display">
+            <div className="mario-title">{songData.name.toUpperCase()}</div>
+            <div className="mario-status">
+              {isRunning ? (
+                <span className="mario-playing">
+                  BAR {currentBar} BEAT {currentBeat}
+                </span>
+              ) : (
+                <span className="mario-stopped">READY</span>
+              )}
+            </div>
+            <div className="mario-progress">
+              <div
+                className="mario-progress-bar"
+                style={{ width: marioStep !== null ? `${(marioStep / seqLength) * 100}%` : '0%' }}
+              />
+            </div>
+          </div>
+          <div className="mario-song-select">
+            {songOptions.map((opt) => (
+              <button
+                key={opt.id}
+                type="button"
+                className={`ui-btn mario-song-btn ${songId === opt.id ? 'active' : ''}`}
+                onClick={() => {
+                  updateParam(module.id, 'song', opt.id)
+                  updateParam(module.id, 'tempo', marioSongs[opt.id as keyof typeof marioSongs].tempo)
+                }}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+          <div className="mario-controls">
+            <button
+              type="button"
+              className={`ui-btn mario-btn ${isRunning ? 'playing' : ''}`}
+              onClick={() => updateParam(module.id, 'running', !isRunning)}
+            >
+              {isRunning ? '⏹ STOP' : '▶ PLAY'}
+            </button>
+            <RotaryKnob
+              label="Tempo"
+              min={80}
+              max={240}
+              step={5}
+              unit="BPM"
+              value={tempo}
+              onChange={(value) => updateParam(module.id, 'tempo', value)}
+              format={(value) => Math.round(value).toString()}
+            />
+          </div>
+          <div className="mario-channels">
+            <div className="mario-ch"><span className="ch-dot ch1" /> Lead</div>
+            <div className="mario-ch"><span className="ch-dot ch2" /> Harmony</div>
+            <div className="mario-ch"><span className="ch-dot ch3" /> Bass</div>
+          </div>
         </>
       )
     }

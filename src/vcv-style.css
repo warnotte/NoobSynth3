@@ -950,3 +950,182 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* ============================================
+   MARIO IO MODULE - Retro 8-bit style
+   ============================================ */
+
+.module-card[data-module-type="mario"] {
+  --panel-color: #1a0a0a;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 100, 100, 0.02) 0px,
+      rgba(255, 100, 100, 0.02) 1px,
+      transparent 1px,
+      transparent 3px
+    ),
+    linear-gradient(180deg, #2a1010 0%, #1a0a0a 100%);
+}
+
+.module-card[data-module-type="mario"] .module-controls {
+  display: flex !important;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mario-display {
+  background: #000;
+  border: 2px solid #c84c0c;
+  border-radius: 4px;
+  padding: 8px;
+  text-align: center;
+  box-shadow:
+    inset 0 0 20px rgba(200, 76, 12, 0.2),
+    0 0 10px rgba(200, 76, 12, 0.3);
+}
+
+.mario-title {
+  font-family: 'Courier New', monospace;
+  font-size: 10px;
+  font-weight: bold;
+  color: #fcbcb0;
+  text-shadow: 0 0 6px #c84c0c;
+  letter-spacing: 2px;
+  margin-bottom: 4px;
+}
+
+.mario-status {
+  font-family: 'Courier New', monospace;
+  font-size: 9px;
+  margin-bottom: 6px;
+}
+
+.mario-playing {
+  color: #7cfc00;
+  text-shadow: 0 0 4px #7cfc00;
+  animation: mario-blink 0.5s ease-in-out infinite;
+}
+
+.mario-stopped {
+  color: #888;
+}
+
+@keyframes mario-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.mario-progress {
+  height: 6px;
+  background: #222;
+  border-radius: 3px;
+  overflow: hidden;
+  border: 1px solid #444;
+}
+
+.mario-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #c84c0c, #fcbcb0, #c84c0c);
+  border-radius: 2px;
+  transition: width 0.05s linear;
+}
+
+.mario-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.mario-btn {
+  font-family: 'Courier New', monospace;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 6px 14px !important;
+  border: 2px solid #c84c0c !important;
+  background: #2a1010 !important;
+  color: #fcbcb0 !important;
+  text-shadow: 0 0 4px #c84c0c;
+  transition: all 0.15s;
+}
+
+.mario-btn:hover {
+  background: #3a1818 !important;
+  box-shadow: 0 0 12px rgba(200, 76, 12, 0.5);
+}
+
+.mario-btn.playing {
+  background: #c84c0c !important;
+  color: #fff !important;
+  box-shadow: 0 0 15px rgba(200, 76, 12, 0.7);
+}
+
+.mario-channels {
+  display: flex;
+  justify-content: space-around;
+  padding: 4px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+}
+
+.mario-ch {
+  font-family: 'Courier New', monospace;
+  font-size: 8px;
+  color: #888;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ch-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.ch-dot.ch1 {
+  background: #ff6666;
+  box-shadow: 0 0 4px #ff6666;
+}
+
+.ch-dot.ch2 {
+  background: #66ff66;
+  box-shadow: 0 0 4px #66ff66;
+}
+
+.ch-dot.ch3 {
+  background: #6666ff;
+  box-shadow: 0 0 4px #6666ff;
+}
+
+.mario-song-select {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+}
+
+.mario-song-btn {
+  font-family: 'Courier New', monospace;
+  font-size: 8px;
+  font-weight: bold;
+  padding: 4px 8px !important;
+  min-width: 36px;
+  border: 1px solid #666 !important;
+  background: #1a0a0a !important;
+  color: #888 !important;
+  transition: all 0.15s;
+}
+
+.mario-song-btn:hover {
+  border-color: #c84c0c !important;
+  color: #fcbcb0 !important;
+}
+
+.mario-song-btn.active {
+  background: #c84c0c !important;
+  border-color: #c84c0c !important;
+  color: #fff !important;
+  box-shadow: 0 0 8px rgba(200, 76, 12, 0.5);
+}

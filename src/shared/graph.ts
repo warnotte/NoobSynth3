@@ -15,6 +15,7 @@ export type ModuleType =
   | 'chorus'
   | 'delay'
   | 'reverb'
+  | 'mario'
 
 export interface ModuleSpec {
   id: string

@@ -34,6 +34,8 @@ type PresetPatchFile = {
   description?: string
   updates?: Record<string, Record<string, number | string | boolean>>
   connectionPatch?: ConnectionPatch
+  // If provided, replaces the entire graph instead of patching defaultGraph
+  graph?: GraphState
 }
 
 export type PresetLoadResult = {
@@ -92,6 +94,13 @@ const buildPresetFromPatch = (
   const name = typeof patch.name === 'string' ? patch.name : entry.name
   const description =
     typeof patch.description === 'string' ? patch.description : entry.description
+
+  // If a complete graph is provided, use it directly
+  if (patch.graph) {
+    return { id, name, description, graph: cloneGraph(patch.graph) }
+  }
+
+  // Otherwise, patch the defaultGraph
   const updates = patch.updates ?? {}
   const graph = applyConnections(applyParams(cloneGraph(defaultGraph), updates), patch.connectionPatch)
   return { id, name, description, graph }
