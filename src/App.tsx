@@ -496,13 +496,15 @@ function App() {
         55, 64, 67, 69, null, 65, 67, null, 64, null, 60, 62, 59, null, null, null,
       ],
       ch3: [
-        52, 52, null, 52, null, 48, 52, null, 55, null, null, null, 43, null, null, null,
-        48, null, null, 43, null, null, 40, null, null, 45, null, 47, null, 46, 45, null,
-        43, 52, 55, 57, null, 53, 55, null, 52, null, 48, 50, 47, null, null, null,
-        48, null, null, 43, null, null, 40, null, null, 45, null, 47, null, 46, 45, null,
-        43, 52, 55, 57, null, 53, 55, null, 52, null, 48, 50, 47, null, null, null,
+        // Empty - NES only had 3 voices (Pulse1, Pulse2, Triangle)
+        null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+        null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+        null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+        null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+        null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
       ],
       ch4: [
+        // Triangle bass - C2, G2, C3 pattern
         36, null, null, null, 36, null, null, null, 43, null, null, null, 43, null, null, null,
         36, null, null, 43, null, null, 48, null, null, 45, null, null, null, null, null, null,
         43, null, null, null, 43, null, null, null, 48, null, null, null, 48, null, null, null,

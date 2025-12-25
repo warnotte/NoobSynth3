@@ -41,10 +41,6 @@ export const PatchCable = memo(({
     // Cable sag increases with distance
     const sag = Math.min(distance * 0.4, 120)
 
-    // Control points create the curve
-    const midX = (fromX + toX) / 2
-    const midY = Math.max(fromY, toY) + sag
-
     // Cubic bezier for smooth curve
     const cp1x = fromX + dx * 0.25
     const cp1y = fromY + sag * 0.8

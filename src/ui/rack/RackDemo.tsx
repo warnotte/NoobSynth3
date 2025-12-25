@@ -122,7 +122,7 @@ export const RackDemo = () => {
   }, [])
 
   // Handle module drag start
-  const handleModuleDragStart = useCallback((moduleId: string, event: React.PointerEvent) => {
+  const handleModuleDragStart = useCallback((_moduleId: string, _event: React.PointerEvent) => {
     // This is handled by the Rack component
   }, [])
 
@@ -137,7 +137,7 @@ export const RackDemo = () => {
   }, [])
 
   // Compute valid targets for a port
-  const computeValidTargets = useCallback((moduleId: string, portId: string, kind: PortKind, direction: 'input' | 'output') => {
+  const computeValidTargets = useCallback((moduleId: string, _portId: string, kind: PortKind, direction: 'input' | 'output') => {
     const targets = new Set<string>()
     const container = rackContainerRef.current
     if (!container) return targets

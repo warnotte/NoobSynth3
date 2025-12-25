@@ -1,6 +1,6 @@
 import { memo, useRef, useCallback } from 'react'
 import type { ReactNode } from 'react'
-import { HP_WIDTH, RACK_HEIGHT, SCREW_MARGIN } from './types'
+import { HP_WIDTH, RACK_HEIGHT } from './types'
 import './ModulePanel.css'
 
 export interface ModulePanelProps {

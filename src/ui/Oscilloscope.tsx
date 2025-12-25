@@ -123,7 +123,7 @@ export const Oscilloscope = ({
             buffersRef.current.set(channel.id, buffer)
           }
           if (!frozen) {
-            analyser.getFloatTimeDomainData(buffer)
+            analyser.getFloatTimeDomainData(buffer as Float32Array<ArrayBuffer>)
           }
 
           const span = Math.max(32, Math.floor(buffer.length / Math.max(1, timeScale)))
@@ -185,7 +185,7 @@ export const Oscilloscope = ({
               peakHoldRef.current = new Float32Array(64)
               peakDecayRef.current = new Float32Array(64)
             }
-            analyser.getFloatFrequencyData(buffer)
+            analyser.getFloatFrequencyData(buffer as Float32Array<ArrayBuffer>)
 
             const barCount = 64
             const barWidth = (width / barCount) - 1
@@ -239,7 +239,7 @@ export const Oscilloscope = ({
               buffer = new Float32Array(fftSize)
               fftBuffersRef.current.set(firstChannel.id, buffer)
             }
-            analyser.getFloatFrequencyData(buffer)
+            analyser.getFloatFrequencyData(buffer as Float32Array<ArrayBuffer>)
 
             const pixelWidth = Math.floor(width * (window.devicePixelRatio || 1))
             const pixelHeight = Math.floor(height * (window.devicePixelRatio || 1))
