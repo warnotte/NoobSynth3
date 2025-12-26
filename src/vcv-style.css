@@ -26,6 +26,8 @@
   box-shadow:
     inset 0 4px 20px rgba(0, 0, 0, 0.8),
     0 10px 40px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+  isolation: isolate;
 }
 
 /* Top and bottom rails */
@@ -71,10 +73,13 @@
 .modules {
   position: relative;
   z-index: 1;
+  display: grid;
   padding: 12px 0;
   gap: 4px;
   --rack-unit-x: 200px;
   --rack-unit-y: 120px;
+  grid-template-columns: repeat(auto-fill, minmax(var(--rack-unit-x), var(--rack-unit-x)));
+  grid-auto-rows: var(--rack-unit-y);
 }
 
 /* ============================================
@@ -84,6 +89,8 @@
 .module-card {
   --panel-color: #1a1f2e;
 
+  position: relative;
+  z-index: 1;
   border-radius: 3px;
   background:
     /* Brushed metal texture */
@@ -119,6 +126,7 @@
   backdrop-filter: none;
   display: flex;
   flex-direction: column;
+  height: 100%;
 }
 
 /* Remove glassmorphism pseudo-elements */
@@ -143,10 +151,19 @@
 
 /* Module header - compact */
 .module-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding-bottom: 2px;
   margin-bottom: 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   gap: 2px;
+}
+
+.module-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 /* Extra compact for 1x1 modules */
@@ -164,8 +181,8 @@
 }
 
 .module-size-1x1 .module-badge {
-  font-size: 6px;
-  padding: 2px 4px;
+  font-size: 7px;
+  padding: 3px 6px;
 }
 
 .module-size-1x1 .module-body {
@@ -203,8 +220,8 @@
 }
 
 .module-size-2x1 .module-badge {
-  font-size: 5px;
-  padding: 1px 3px;
+  font-size: 7px;
+  padding: 3px 6px;
 }
 
 .module-size-2x1 .module-body {
@@ -341,19 +358,21 @@
 }
 
 .module-controls .wave-button {
-  padding: 3px 2px;
+  display: grid;
+  place-items: center;
+  padding: 4px;
   border-radius: 4px;
-  gap: 1px;
+  gap: 0;
+  line-height: 1;
 }
 
 .module-controls .wave-icon {
-  width: 14px;
-  height: 14px;
+  width: 18px;
+  height: 18px;
 }
 
 .module-controls .wave-button-label {
-  font-size: 5px;
-  letter-spacing: 0.08em;
+  display: none;
 }
 
 /* Filter buttons - compact layout */
@@ -579,6 +598,14 @@
   display: flex !important;
   flex-direction: column;
   gap: 6px;
+  flex: 1;
+  min-height: 0;
+}
+
+.module-card[data-module-type="scope"] .scope-view {
+  flex: 1 1 auto;
+  min-height: 160px;
+  width: 100%;
 }
 
 .module-name {
@@ -591,14 +618,13 @@
 }
 
 .module-subtitle {
-  font-size: 7px;
-  color: rgba(255, 255, 255, 0.4);
+  display: none;
 }
 
 .module-badge {
-  font-size: 6px;
-  padding: 2px 4px;
-  border-radius: 2px;
+  font-size: 7px;
+  padding: 3px 6px;
+  border-radius: 3px;
   background: rgba(0, 0, 0, 0.4);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -746,6 +772,13 @@
    KNOBS - Rotary potentiometer style
    ============================================ */
 
+.rotary {
+  display: grid;
+  gap: 6px;
+  justify-items: center;
+  text-align: center;
+}
+
 .rotary-dial {
   --dial-size: 48px;
   --knob-color: #42e2b1;
@@ -761,6 +794,11 @@
     inset 0 -4px 8px rgba(0, 0, 0, 0.6),
     0 4px 12px rgba(0, 0, 0, 0.5);
   position: relative;
+}
+
+.rotary-dial:focus-visible {
+  outline: 2px solid var(--knob-color);
+  outline-offset: 3px;
 }
 
 /* Inner ring */
@@ -793,6 +831,15 @@
   border-radius: 2px;
   background: linear-gradient(180deg, var(--knob-color), rgba(255, 255, 255, 0.9));
   box-shadow: 0 0 8px var(--knob-color);
+}
+
+.rotary-indicator {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(var(--angle));
 }
 
 /* Knob labels */
@@ -848,28 +895,58 @@
    ============================================ */
 
 .ui-btn {
-  border-radius: 4px;
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 9px;
+  --ui-btn-radius: 4px;
+  --ui-btn-padding: 5px 8px;
+  --ui-btn-border: rgba(255, 255, 255, 0.15);
+  --ui-btn-bg: rgba(0, 0, 0, 0.4);
+  --ui-btn-text: rgba(255, 255, 255, 0.7);
+  --ui-btn-font: 9px;
+  --ui-btn-letter: 0.08em;
+  --ui-btn-active-text: #0a0a0a;
+  --ui-btn-active-bg: linear-gradient(180deg, #42e2b1, #2eb88d);
+  --ui-btn-active-border: #42e2b1;
+  --ui-btn-active-shadow: 0 2px 8px rgba(66, 226, 177, 0.4);
+
+  border-radius: var(--ui-btn-radius);
+  padding: var(--ui-btn-padding);
+  border: 1px solid var(--ui-btn-border);
+  background: var(--ui-btn-bg);
+  color: var(--ui-btn-text);
+  font-size: var(--ui-btn-font);
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: var(--ui-btn-letter);
   text-transform: uppercase;
-  padding: 5px 8px;
-  transition: all 0.15s ease;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease,
+    color 0.15s ease;
 }
 
 .ui-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.25);
+  background: color-mix(in srgb, var(--ui-btn-bg) 80%, #fff 20%);
+  border-color: color-mix(in srgb, var(--ui-btn-border) 60%, #fff 40%);
 }
 
 .ui-btn.active {
-  background: linear-gradient(180deg, #42e2b1, #2eb88d);
-  border-color: #42e2b1;
-  color: #0a0a0a;
-  box-shadow: 0 2px 8px rgba(66, 226, 177, 0.4);
+  color: var(--ui-btn-active-text);
+  background: var(--ui-btn-active-bg);
+  border-color: var(--ui-btn-active-border);
+  box-shadow: var(--ui-btn-active-shadow);
+}
+
+.ui-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.ui-btn--pill {
+  --ui-btn-radius: 999px;
+  --ui-btn-padding: 5px 10px;
+}
+
+.ui-btn--blue {
+  --ui-btn-active-bg: linear-gradient(180deg, #5bb6ff, #3a8dff);
+  --ui-btn-active-border: #5bb6ff;
+  --ui-btn-active-shadow: 0 2px 8px rgba(91, 182, 255, 0.4);
 }
 
 /* Waveform buttons */
@@ -879,6 +956,7 @@
   border: 1px solid rgba(255, 255, 255, 0.12);
   padding: 6px 4px;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .wave-button.active {
@@ -906,6 +984,13 @@
    ============================================ */
 
 .topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 22px;
+  position: relative;
+  overflow: hidden;
   background:
     linear-gradient(180deg, #1a1a1a 0%, #0f0f0f 100%);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -920,6 +1005,7 @@
 }
 
 .panel-section {
+  padding: 16px;
   background:
     linear-gradient(180deg, #1a1a1a 0%, #0f0f0f 100%);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -930,6 +1016,11 @@
 }
 
 .preset-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
   background: rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 6px;
