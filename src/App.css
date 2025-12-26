@@ -685,6 +685,7 @@
 .library-actions {
   display: flex;
   justify-content: flex-end;
+  gap: 8px;
   margin-bottom: 10px;
 }
 
@@ -694,6 +695,14 @@
   --ui-btn-letter: 0.18em;
   --ui-btn-bg: rgba(24, 30, 40, 0.9);
   --ui-btn-border: rgba(120, 140, 170, 0.5);
+}
+
+.library-auto {
+  --ui-btn-padding: 6px 12px;
+  --ui-btn-font: 0.55rem;
+  --ui-btn-letter: 0.18em;
+  --ui-btn-bg: rgba(18, 24, 32, 0.9);
+  --ui-btn-border: rgba(90, 104, 126, 0.8);
 }
 
 .signal-strip {

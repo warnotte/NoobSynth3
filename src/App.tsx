@@ -23,6 +23,34 @@ type DragState = {
   validTargets?: Set<string>
 }
 
+type ModuleDragState = {
+  moduleId: string
+  pointerId: number
+  offsetX: number
+  offsetY: number
+  startCol: number
+  startRow: number
+  lastCol: number
+  lastRow: number
+  span: ModuleSpan
+  occupied: Set<string>
+  columns: number
+  cellX: number
+  cellY: number
+  paddingLeft: number
+  paddingTop: number
+  container: HTMLDivElement
+  raf: number | null
+}
+
+type ModuleDragPreview = {
+  moduleId: string
+  col: number
+  row: number
+  span: ModuleSpan
+  valid: boolean
+}
+
 type VoiceState = {
   note: number | null
   velocity: number
@@ -93,6 +121,14 @@ const parseModuleSpan = (size: string | undefined): ModuleSpan => {
 const normalizeGridCoord = (value: number) =>
   Number.isFinite(value) ? Math.max(0, Math.round(value)) : 0
 
+const snapGridCoord = (value: number) =>
+  Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0
+
+const buildGridStyle = (col: number, row: number, span: ModuleSpan) => ({
+  gridColumn: `${col + 1} / span ${span.cols}`,
+  gridRow: `${row + 1} / span ${span.rows}`,
+})
+
 const isLegacyPosition = (position: { x: number; y: number }, threshold: number) =>
   !Number.isFinite(position.x) ||
   !Number.isFinite(position.y) ||
@@ -136,6 +172,24 @@ const markOccupied = (col: number, row: number, span: ModuleSpan, occupied: Set<
   }
 }
 
+const buildOccupiedGrid = (
+  modules: GraphState['modules'],
+  moduleSizes: Record<string, string>,
+  excludeId?: string,
+) => {
+  const occupied = new Set<string>()
+  modules.forEach((module) => {
+    if (excludeId && module.id === excludeId) {
+      return
+    }
+    const span = parseModuleSpan(moduleSizes[module.type] ?? '1x1')
+    const col = normalizeGridCoord(module.position.x)
+    const row = normalizeGridCoord(module.position.y)
+    markOccupied(col, row, span, occupied)
+  })
+  return occupied
+}
+
 const findPlacement = (
   desired: { col: number; row: number } | null,
   span: ModuleSpan,
@@ -166,9 +220,10 @@ const layoutGraph = (
   graph: GraphState,
   moduleSizes: Record<string, string>,
   metrics: GridMetrics,
+  options?: { force?: boolean },
 ): GraphState => {
   const columns = Math.max(1, metrics.columns)
-  const useStoredPositions = !hasLegacyPositions(graph.modules)
+  const useStoredPositions = !options?.force && !hasLegacyPositions(graph.modules)
   const cellX = metrics.unitX + metrics.gapX
   const cellY = metrics.unitY + metrics.gapY
   const occupied = new Set<string>()
@@ -177,10 +232,12 @@ const layoutGraph = (
     const span = parseModuleSpan(moduleSizes[module.type] ?? '1x1')
     const desired = useStoredPositions
       ? { col: normalizeGridCoord(module.position.x), row: normalizeGridCoord(module.position.y) }
-      : {
-          col: normalizeGridCoord(module.position.x / cellX),
-          row: normalizeGridCoord(module.position.y / cellY),
-        }
+      : options?.force
+        ? null
+        : {
+            col: normalizeGridCoord(module.position.x / cellX),
+            row: normalizeGridCoord(module.position.y / cellY),
+          }
     const placement = findPlacement(desired, span, occupied, columns, maxRow)
     markOccupied(placement.col, placement.row, span, occupied)
     maxRow = Math.max(maxRow, placement.row + span.rows - 1)
@@ -264,9 +321,11 @@ function App() {
   const [importError, setImportError] = useState<string | null>(null)
   const [gridError, setGridError] = useState<string | null>(null)
   const [gridMetrics, setGridMetrics] = useState<GridMetrics>(DEFAULT_GRID_METRICS)
+  const [moduleDragPreview, setModuleDragPreview] = useState<ModuleDragPreview | null>(null)
   const rackRef = useRef<HTMLDivElement | null>(null)
   const modulesRef = useRef<HTMLDivElement | null>(null)
   const dragRef = useRef<DragState | null>(null)
+  const moduleDragRef = useRef<ModuleDragState | null>(null)
   const midiInputRef = useRef<MIDIInput | null>(null)
   const presetFileRef = useRef<HTMLInputElement | null>(null)
   const voiceStateRef = useRef<VoiceState[]>([])
@@ -1721,10 +1780,7 @@ function App() {
     const span = parseModuleSpan(moduleSizes[module.type] ?? '1x1')
     const col = normalizeGridCoord(module.position.x)
     const row = normalizeGridCoord(module.position.y)
-    return {
-      gridColumn: `${col + 1} / span ${span.cols}`,
-      gridRow: `${row + 1} / span ${span.rows}`,
-    }
+    return buildGridStyle(col, row, span)
   }
 
   useEffect(() => {
@@ -1831,6 +1887,197 @@ function App() {
     setGridError(null)
     applyGraphUpdate({ modules: [], connections: [] })
   }
+
+  const handleAutoLayout = () => {
+    if (graphRef.current.modules.length === 0) {
+      return
+    }
+    const nextGraph = layoutGraph(graphRef.current, moduleSizes, gridMetricsRef.current, {
+      force: true,
+    })
+    setGridError(null)
+    applyGraphUpdate(nextGraph)
+  }
+
+  const handleModulePointerDown = useCallback(
+    (moduleId: string, event: React.PointerEvent<HTMLDivElement>) => {
+      if (event.button !== 0) {
+        return
+      }
+      const target = event.target as HTMLElement | null
+      if (target?.closest('button')) {
+        return
+      }
+      const container = modulesRef.current
+      if (!container) {
+        return
+      }
+      const module = graphRef.current.modules.find((entry) => entry.id === moduleId)
+      if (!module) {
+        return
+      }
+      const card = event.currentTarget.closest<HTMLElement>('.module-card')
+      if (!card) {
+        return
+      }
+      const cardRect = card.getBoundingClientRect()
+      const style = window.getComputedStyle(container)
+      const paddingLeft = parseCssNumber(style.paddingLeft)
+      const paddingTop = parseCssNumber(style.paddingTop)
+      const metrics = gridMetricsRef.current
+      const cellX = metrics.unitX + metrics.gapX
+      const cellY = metrics.unitY + metrics.gapY
+      const span = parseModuleSpan(moduleSizes[module.type] ?? '1x1')
+      const occupied = buildOccupiedGrid(graphRef.current.modules, moduleSizes, moduleId)
+      const startCol = normalizeGridCoord(module.position.x)
+      const startRow = normalizeGridCoord(module.position.y)
+
+      moduleDragRef.current = {
+        moduleId,
+        pointerId: event.pointerId,
+        offsetX: event.clientX - cardRect.left,
+        offsetY: event.clientY - cardRect.top,
+        startCol,
+        startRow,
+        lastCol: startCol,
+        lastRow: startRow,
+        span,
+        occupied,
+        columns: metrics.columns,
+        cellX,
+        cellY,
+        paddingLeft,
+        paddingTop,
+        container,
+        raf: null,
+      }
+
+      const origin = event.currentTarget
+      origin.setPointerCapture(event.pointerId)
+      setModuleDragPreview({ moduleId, col: startCol, row: startRow, span, valid: true })
+
+      const handleMove = (moveEvent: PointerEvent) => {
+        const state = moduleDragRef.current
+        if (!state || moveEvent.pointerId !== state.pointerId) {
+          return
+        }
+        if (state.raf !== null) {
+          return
+        }
+        state.raf = window.requestAnimationFrame(() => {
+          state.raf = null
+          const viewportHeight = window.innerHeight
+          const edge = 72
+          let scrollDelta = 0
+          if (moveEvent.clientY < edge) {
+            scrollDelta = -Math.ceil(((edge - moveEvent.clientY) / edge) * 18)
+          } else if (moveEvent.clientY > viewportHeight - edge) {
+            scrollDelta = Math.ceil(((moveEvent.clientY - (viewportHeight - edge)) / edge) * 18)
+          }
+          if (scrollDelta !== 0) {
+            window.scrollBy({ top: scrollDelta })
+          }
+
+          const containerRect = state.container.getBoundingClientRect()
+          const rawCol =
+            (moveEvent.clientX - containerRect.left - state.paddingLeft - state.offsetX) /
+            state.cellX
+          const rawRow =
+            (moveEvent.clientY - containerRect.top - state.paddingTop - state.offsetY) /
+            state.cellY
+          const nextCol = Math.min(
+            snapGridCoord(rawCol),
+            Math.max(0, state.columns - state.span.cols),
+          )
+          const nextRow = snapGridCoord(rawRow)
+          const isValid = canPlaceModule(
+            nextCol,
+            nextRow,
+            state.span,
+            state.occupied,
+            state.columns,
+          )
+          setModuleDragPreview((prev) =>
+            prev &&
+            prev.moduleId === state.moduleId &&
+            prev.col === nextCol &&
+            prev.row === nextRow &&
+            prev.valid === isValid
+              ? prev
+              : { moduleId: state.moduleId, col: nextCol, row: nextRow, span: state.span, valid: isValid },
+          )
+          if (nextCol === state.lastCol && nextRow === state.lastRow) {
+            return
+          }
+          if (!isValid) {
+            return
+          }
+          state.lastCol = nextCol
+          state.lastRow = nextRow
+          setGraph((prev) => ({
+            ...prev,
+            modules: prev.modules.map((entry) =>
+              entry.id === state.moduleId
+                ? { ...entry, position: { x: nextCol, y: nextRow } }
+                : entry,
+            ),
+          }))
+        })
+      }
+
+      const endDrag = (options?: { restore?: boolean }) => {
+        const state = moduleDragRef.current
+        if (!state) {
+          return
+        }
+        if (origin.hasPointerCapture(state.pointerId)) {
+          origin.releasePointerCapture(state.pointerId)
+        }
+        if (state.raf !== null) {
+          window.cancelAnimationFrame(state.raf)
+        }
+        if (options?.restore) {
+          setGraph((prev) => ({
+            ...prev,
+            modules: prev.modules.map((entry) =>
+              entry.id === state.moduleId
+                ? { ...entry, position: { x: state.startCol, y: state.startRow } }
+                : entry,
+            ),
+          }))
+        }
+        moduleDragRef.current = null
+        setModuleDragPreview(null)
+        window.removeEventListener('pointermove', handleMove)
+        window.removeEventListener('pointerup', handleUp)
+        window.removeEventListener('pointercancel', handleUp)
+        window.removeEventListener('keydown', handleKeyDown)
+      }
+
+      const handleUp = (upEvent: PointerEvent) => {
+        const state = moduleDragRef.current
+        if (!state || upEvent.pointerId !== state.pointerId) {
+          return
+        }
+        endDrag()
+      }
+
+      const handleKeyDown = (keyEvent: KeyboardEvent) => {
+        if (keyEvent.key !== 'Escape') {
+          return
+        }
+        keyEvent.preventDefault()
+        endDrag({ restore: true })
+      }
+
+      window.addEventListener('pointermove', handleMove)
+      window.addEventListener('pointerup', handleUp)
+      window.addEventListener('pointercancel', handleUp)
+      window.addEventListener('keydown', handleKeyDown)
+      event.preventDefault()
+    },
+    [moduleSizes],
+  )
 
   const renderModuleControls = (module: ModuleSpec) => {
     if (module.type === 'oscillator') {
@@ -2882,6 +3129,7 @@ function App() {
                 portLayout={modulePortLayouts[module.type] ?? 'stacked'}
                 style={getModuleGridStyle(module)}
                 onRemove={handleRemoveModule}
+                onHeaderPointerDown={handleModulePointerDown}
                 selectedPortKey={selectedPortKey}
                 connectedInputs={connectedInputs}
                 validTargets={dragTargets}
@@ -2891,6 +3139,17 @@ function App() {
                 {renderModuleControls(module)}
               </ModuleCard>
             ))}
+            {moduleDragPreview && (
+              <div
+                className={`module-drag-ghost${moduleDragPreview.valid ? '' : ' invalid'}`}
+                style={buildGridStyle(
+                  moduleDragPreview.col,
+                  moduleDragPreview.row,
+                  moduleDragPreview.span,
+                )}
+                aria-hidden="true"
+              />
+            )}
           </div>
         </section>
 
@@ -2907,6 +3166,13 @@ function App() {
                 onClick={handleClearRack}
               >
                 New Rack
+              </button>
+              <button
+                type="button"
+                className="ui-btn ui-btn--pill library-auto"
+                onClick={handleAutoLayout}
+              >
+                Auto Layout
               </button>
             </div>
             {gridError && <div className="preset-error">{gridError}</div>}

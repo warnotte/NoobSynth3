@@ -75,6 +75,9 @@ Presets live in `src/state/presets.ts` and are loaded from the Presets panel. So
 - **Grid auto-placement**: Modules snap to the first available grid slot, with width checks and warnings when the rack is too narrow.
 - **VCV CSS cleanup**: Consolidated duplicate styling so VCV-specific selectors live in `src/vcv-style.css` only.
 - **VCV UI tweaks**: Waveform buttons are icon-only/white, scope fills its panel, and module badges are consistent across sizes.
+- **Module drag**: Drag modules by the header to reposition them on the grid without pushing other modules.
+- **Drag helpers**: Ghost preview with invalid highlight, auto-scroll while dragging, and ESC to cancel.
+- **Auto layout**: Button in Module Library to repack modules into the first available slots.
 - **Scope module rewrite**:
   - 3 visualization modes: oscilloscope, FFT analyzer, spectrogram.
   - 4 input channels (A/B for audio, C/D for CV) with color-coded toggle buttons.

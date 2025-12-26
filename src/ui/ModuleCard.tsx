@@ -11,6 +11,10 @@ type ModuleCardProps = {
   portLayout?: 'stacked' | 'strip'
   removable?: boolean
   onRemove?: (moduleId: string) => void
+  onHeaderPointerDown?: (
+    moduleId: string,
+    event: React.PointerEvent<HTMLDivElement>,
+  ) => void
   selectedPortKey?: string | null
   connectedInputs?: Set<string>
   validTargets?: Set<string> | null
@@ -32,6 +36,7 @@ export const ModuleCard = ({
   portLayout = 'stacked',
   removable = true,
   onRemove,
+  onHeaderPointerDown,
   selectedPortKey,
   connectedInputs,
   validTargets,
@@ -44,7 +49,7 @@ export const ModuleCard = ({
     data-module-type={module.type}
     style={style}
   >
-    <div className="module-header">
+    <div className="module-header" onPointerDown={(event) => onHeaderPointerDown?.(module.id, event)}>
       <div>
         <div className="module-name">{module.name}</div>
         <div className="module-subtitle">{module.id}</div>

@@ -43,6 +43,8 @@ Open the app, click Power On, then hit Run in Control IO or play the mini keyboa
   - Sequencer can Run/Stop and is useful for live tweaking.
 - Module Library:
   - Click a module chip to add it.
+  - Drag a module by its header to reposition it on the grid (no auto-push).
+  - Use Auto Layout to repack modules into the first available slots.
   - Use New Rack to clear all modules.
   - Remove modules from their header.
   - Control IO and Main Out are limited to one instance.
