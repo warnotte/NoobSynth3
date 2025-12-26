@@ -29,6 +29,166 @@ type VoiceState = {
   age: number
 }
 
+type GridMetrics = {
+  unitX: number
+  unitY: number
+  gapX: number
+  gapY: number
+  columns: number
+}
+
+type ModuleSpan = {
+  cols: number
+  rows: number
+}
+
+const DEFAULT_GRID_METRICS: GridMetrics = {
+  unitX: 200,
+  unitY: 120,
+  gapX: 4,
+  gapY: 4,
+  columns: 6,
+}
+
+const parseCssNumber = (value: string) => {
+  const parsed = Number.parseFloat(value)
+  return Number.isFinite(parsed) ? parsed : 0
+}
+
+const isSameGridMetrics = (left: GridMetrics, right: GridMetrics) =>
+  left.unitX === right.unitX &&
+  left.unitY === right.unitY &&
+  left.gapX === right.gapX &&
+  left.gapY === right.gapY &&
+  left.columns === right.columns
+
+const readGridMetrics = (element: HTMLElement | null): GridMetrics => {
+  if (!element) {
+    return DEFAULT_GRID_METRICS
+  }
+  const style = window.getComputedStyle(element)
+  const unitX = parseCssNumber(style.getPropertyValue('--rack-unit-x')) || DEFAULT_GRID_METRICS.unitX
+  const unitY = parseCssNumber(style.getPropertyValue('--rack-unit-y')) || DEFAULT_GRID_METRICS.unitY
+  const gapX = parseCssNumber(style.columnGap || style.gap) || DEFAULT_GRID_METRICS.gapX
+  const gapY = parseCssNumber(style.rowGap || style.gap) || DEFAULT_GRID_METRICS.gapY
+  const width = element.clientWidth || element.getBoundingClientRect().width || 0
+  const columns = Math.max(1, Math.floor((width + gapX) / (unitX + gapX)))
+  return { unitX, unitY, gapX, gapY, columns }
+}
+
+const parseModuleSpan = (size: string | undefined): ModuleSpan => {
+  if (!size) {
+    return { cols: 1, rows: 1 }
+  }
+  const match = /^(\d+)x(\d+)$/.exec(size)
+  if (!match) {
+    return { cols: 1, rows: 1 }
+  }
+  return {
+    cols: Math.max(1, Number(match[1])),
+    rows: Math.max(1, Number(match[2])),
+  }
+}
+
+const normalizeGridCoord = (value: number) =>
+  Number.isFinite(value) ? Math.max(0, Math.round(value)) : 0
+
+const isLegacyPosition = (position: { x: number; y: number }, threshold: number) =>
+  !Number.isFinite(position.x) ||
+  !Number.isFinite(position.y) ||
+  !Number.isInteger(position.x) ||
+  !Number.isInteger(position.y) ||
+  Math.abs(position.x) > threshold
+
+const hasLegacyPositions = (modules: GraphState['modules']) => {
+  const threshold = 80
+  return modules.some((module) => isLegacyPosition(module.position, threshold))
+}
+
+const cellKey = (col: number, row: number) => `${col},${row}`
+
+const canPlaceModule = (
+  col: number,
+  row: number,
+  span: ModuleSpan,
+  occupied: Set<string>,
+  columns: number,
+) => {
+  const availableColumns = Math.max(columns, span.cols)
+  if (col < 0 || row < 0 || col + span.cols > availableColumns) {
+    return false
+  }
+  for (let y = 0; y < span.rows; y += 1) {
+    for (let x = 0; x < span.cols; x += 1) {
+      if (occupied.has(cellKey(col + x, row + y))) {
+        return false
+      }
+    }
+  }
+  return true
+}
+
+const markOccupied = (col: number, row: number, span: ModuleSpan, occupied: Set<string>) => {
+  for (let y = 0; y < span.rows; y += 1) {
+    for (let x = 0; x < span.cols; x += 1) {
+      occupied.add(cellKey(col + x, row + y))
+    }
+  }
+}
+
+const findPlacement = (
+  desired: { col: number; row: number } | null,
+  span: ModuleSpan,
+  occupied: Set<string>,
+  columns: number,
+  maxRow: number,
+) => {
+  const availableColumns = Math.max(columns, span.cols)
+  const maxCol = Math.max(0, availableColumns - span.cols)
+  if (desired) {
+    const desiredCol = Math.min(Math.max(0, desired.col), maxCol)
+    const desiredRow = Math.max(0, desired.row)
+    if (canPlaceModule(desiredCol, desiredRow, span, occupied, columns)) {
+      return { col: desiredCol, row: desiredRow }
+    }
+  }
+  for (let row = 0; row <= maxRow; row += 1) {
+    for (let col = 0; col <= maxCol; col += 1) {
+      if (canPlaceModule(col, row, span, occupied, columns)) {
+        return { col, row }
+      }
+    }
+  }
+  return { col: 0, row: maxRow + 1 }
+}
+
+const layoutGraph = (
+  graph: GraphState,
+  moduleSizes: Record<string, string>,
+  metrics: GridMetrics,
+): GraphState => {
+  const columns = Math.max(1, metrics.columns)
+  const useStoredPositions = !hasLegacyPositions(graph.modules)
+  const cellX = metrics.unitX + metrics.gapX
+  const cellY = metrics.unitY + metrics.gapY
+  const occupied = new Set<string>()
+  let maxRow = 0
+  const nextModules = graph.modules.map((module) => {
+    const span = parseModuleSpan(moduleSizes[module.type] ?? '1x1')
+    const desired = useStoredPositions
+      ? { col: normalizeGridCoord(module.position.x), row: normalizeGridCoord(module.position.y) }
+      : {
+          col: normalizeGridCoord(module.position.x / cellX),
+          row: normalizeGridCoord(module.position.y / cellY),
+        }
+    const placement = findPlacement(desired, span, occupied, columns, maxRow)
+    markOccupied(placement.col, placement.row, span, occupied)
+    maxRow = Math.max(maxRow, placement.row + span.rows - 1)
+    return { ...module, position: { x: placement.col, y: placement.row } }
+  })
+  return { ...graph, modules: nextModules }
+}
+
 const MIDI_NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -102,7 +262,10 @@ function App() {
   const [presetStatus, setPresetStatus] = useState<'loading' | 'ready' | 'error'>('loading')
   const [presetError, setPresetError] = useState<string | null>(null)
   const [importError, setImportError] = useState<string | null>(null)
+  const [gridError, setGridError] = useState<string | null>(null)
+  const [gridMetrics, setGridMetrics] = useState<GridMetrics>(DEFAULT_GRID_METRICS)
   const rackRef = useRef<HTMLDivElement | null>(null)
+  const modulesRef = useRef<HTMLDivElement | null>(null)
   const dragRef = useRef<DragState | null>(null)
   const midiInputRef = useRef<MIDIInput | null>(null)
   const presetFileRef = useRef<HTMLInputElement | null>(null)
@@ -113,6 +276,7 @@ function App() {
   const statusRef = useRef(status)
   const pendingRestartRef = useRef<GraphState | null>(null)
   const restartInFlightRef = useRef(false)
+  const gridMetricsRef = useRef<GridMetrics>(DEFAULT_GRID_METRICS)
   const sequencerRef = useRef<{ timer: number | null; gateTimer: number | null; step: number }>({
     timer: null,
     gateTimer: null,
@@ -254,7 +418,7 @@ function App() {
     }
     const mutationObserver = rack ? new MutationObserver(scheduleUpdate) : null
     if (rack && mutationObserver) {
-      mutationObserver.observe(rack, { childList: true, subtree: true })
+      mutationObserver.observe(rack, { childList: true, subtree: true, attributes: true })
     }
 
     window.addEventListener('resize', scheduleUpdate)
@@ -273,6 +437,26 @@ function App() {
       window.removeEventListener('scroll', scheduleUpdate, true)
     }
   }, [graph.modules.length])
+
+  useLayoutEffect(() => {
+    const updateMetrics = () => {
+      const next = readGridMetrics(modulesRef.current)
+      gridMetricsRef.current = next
+      setGridMetrics((prev) => (isSameGridMetrics(prev, next) ? prev : next))
+    }
+    updateMetrics()
+    const target = modulesRef.current
+    if (!target) {
+      return
+    }
+    const resizeObserver = new ResizeObserver(updateMetrics)
+    resizeObserver.observe(target)
+    window.addEventListener('resize', updateMetrics)
+    return () => {
+      resizeObserver.disconnect()
+      window.removeEventListener('resize', updateMetrics)
+    }
+  }, [])
 
   const updateParam = useCallback(
     (
@@ -911,20 +1095,22 @@ function App() {
 
   const applyPreset = (nextGraph: GraphState) => {
     const cloned = cloneGraph(nextGraph)
+    const layouted = layoutGraph(cloned, moduleSizes, gridMetricsRef.current)
     setSelectedPort(null)
     setGhostCable(null)
     setDragTargets(null)
     setHoverTargetKey(null)
-    setGraph(cloned)
+    setGridError(null)
+    setGraph(layouted)
     const shouldRestart =
       statusRef.current === 'running' &&
-      (!hasSameModuleShape(graphRef.current, cloned) ||
-        getVoiceCountFromGraph(graphRef.current) !== getVoiceCountFromGraph(cloned))
+      (!hasSameModuleShape(graphRef.current, layouted) ||
+        getVoiceCountFromGraph(graphRef.current) !== getVoiceCountFromGraph(layouted))
     if (shouldRestart) {
-      queueEngineRestart(cloned)
+      queueEngineRestart(layouted)
       return
     }
-    applyGraphParams(cloned)
+    applyGraphParams(layouted)
   }
 
   const handleExportPreset = useCallback(() => {
@@ -1531,6 +1717,28 @@ function App() {
   const hasControlModule = graph.modules.some((module) => module.type === 'control')
   const hasOutputModule = graph.modules.some((module) => module.type === 'output')
 
+  const getModuleGridStyle = (module: ModuleSpec) => {
+    const span = parseModuleSpan(moduleSizes[module.type] ?? '1x1')
+    const col = normalizeGridCoord(module.position.x)
+    const row = normalizeGridCoord(module.position.y)
+    return {
+      gridColumn: `${col + 1} / span ${span.cols}`,
+      gridRow: `${row + 1} / span ${span.rows}`,
+    }
+  }
+
+  useEffect(() => {
+    if (graphRef.current.modules.length === 0) {
+      return
+    }
+    const metrics = gridMetricsRef.current
+    if (!hasLegacyPositions(graphRef.current.modules)) {
+      return
+    }
+    const normalized = layoutGraph(graphRef.current, moduleSizes, metrics)
+    applyGraphUpdate(normalized)
+  }, [gridMetrics.columns])
+
   const getNextModuleIndex = (type: ModuleType, modules: ModuleSpec[]) => {
     const prefix = `${modulePrefixes[type]}-`
     let maxIndex = 0
@@ -1580,12 +1788,26 @@ function App() {
     if (type === 'output' && hasOutputModule) {
       return
     }
+    const columns = Math.max(1, gridMetricsRef.current.columns)
+    const span = parseModuleSpan(moduleSizes[type] ?? '1x1')
+    if (span.cols > columns) {
+      const message = 'Module too wide for current rack width.'
+      console.warn(message)
+      setGridError(message)
+      return
+    }
     const current = graphRef.current
     const nextModule = buildModuleSpec(type, current.modules)
-    applyGraphUpdate({
-      ...current,
-      modules: [...current.modules, nextModule],
-    })
+    const nextGraph = layoutGraph(
+      {
+        ...current,
+        modules: [...current.modules, nextModule],
+      },
+      moduleSizes,
+      gridMetricsRef.current,
+    )
+    setGridError(null)
+    applyGraphUpdate(nextGraph)
   }
 
   const handleRemoveModule = (moduleId: string) => {
@@ -1606,6 +1828,7 @@ function App() {
   }
 
   const handleClearRack = () => {
+    setGridError(null)
     applyGraphUpdate({ modules: [], connections: [] })
   }
 
@@ -2648,7 +2871,7 @@ function App() {
             <h2>Patch Rack</h2>
             <div className="rack-meta">Audio graph: {graph.modules.length} modules</div>
           </div>
-          <div className="modules">
+          <div className="modules" ref={modulesRef}>
             {graph.modules.map((module) => (
               <ModuleCard
                 key={module.id}
@@ -2657,6 +2880,7 @@ function App() {
                 outputs={modulePorts[module.type].outputs}
                 size={moduleSizes[module.type] ?? '1x1'}
                 portLayout={modulePortLayouts[module.type] ?? 'stacked'}
+                style={getModuleGridStyle(module)}
                 onRemove={handleRemoveModule}
                 selectedPortKey={selectedPortKey}
                 connectedInputs={connectedInputs}
@@ -2685,6 +2909,7 @@ function App() {
                 New Rack
               </button>
             </div>
+            {gridError && <div className="preset-error">{gridError}</div>}
             <div className="chip-row">
               {moduleCatalog.map((entry) => {
                 const isSingleton = entry.type === 'control' || entry.type === 'output'

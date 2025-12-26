@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import type { ModuleSpec } from '../shared/graph'
 import type { PortDefinition } from './portCatalog'
 
@@ -6,6 +6,7 @@ type ModuleCardProps = {
   module: ModuleSpec
   inputs: PortDefinition[]
   outputs: PortDefinition[]
+  style?: CSSProperties
   size?: string
   portLayout?: 'stacked' | 'strip'
   removable?: boolean
@@ -26,6 +27,7 @@ export const ModuleCard = ({
   module,
   inputs,
   outputs,
+  style,
   size = '1x1',
   portLayout = 'stacked',
   removable = true,
@@ -37,7 +39,11 @@ export const ModuleCard = ({
   onPortPointerDown,
   children,
 }: ModuleCardProps) => (
-  <div className={`module-card module-size-${size} layout-${portLayout}`} data-module-type={module.type}>
+  <div
+    className={`module-card module-size-${size} layout-${portLayout}`}
+    data-module-type={module.type}
+    style={style}
+  >
     <div className="module-header">
       <div>
         <div className="module-name">{module.name}</div>
