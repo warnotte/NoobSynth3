@@ -689,38 +689,6 @@
   margin-bottom: 10px;
 }
 
-.library-backend {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 6px 8px;
-  margin-bottom: 10px;
-  border-radius: 8px;
-  border: 1px solid rgba(80, 96, 118, 0.4);
-  background: rgba(12, 16, 22, 0.6);
-}
-
-.library-label {
-  font-size: 0.6rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: rgba(214, 226, 242, 0.75);
-}
-
-.library-toggle {
-  display: flex;
-  gap: 6px;
-}
-
-.library-toggle-btn {
-  --ui-btn-padding: 5px 10px;
-  --ui-btn-font: 0.55rem;
-  --ui-btn-letter: 0.14em;
-  --ui-btn-bg: rgba(16, 22, 30, 0.9);
-  --ui-btn-border: rgba(90, 104, 126, 0.8);
-}
-
 .library-clear {
   --ui-btn-padding: 6px 12px;
   --ui-btn-font: 0.55rem;

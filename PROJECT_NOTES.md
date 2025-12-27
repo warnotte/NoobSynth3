@@ -85,15 +85,8 @@ Presets live in `src/state/presets.ts` and are loaded from the Presets panel. So
   - Expanded gain range (0.5x, 1x, 2x, 5x, 10x).
   - Efficient rendering (only active mode draws).
 - **Rust workspace scaffold**: `crates/dsp-core`, `crates/dsp-wasm`, `crates/dsp-standalone`, `crates/dsp-plugin`.
-- **WASM DSP prototype**: `wasm-osc-processor` worklet + `WASM OSC` module using `npm run build:wasm`.
-- **WASM VCO parity work**: experimental VCO backend switch in Module Library (JS vs WASM).
-- **WASM VCA parity work**: experimental VCA backend switch + wasm gain worklet (JS vs WASM).
-- **WASM LFO/ADSR parity work**: experimental backend switches + wasm worklets (JS vs WASM).
-- **WASM VCF parity work**: experimental backend switch + wasm worklet (JS vs WASM).
-- **WASM Mixer parity work**: experimental backend switch + wasm worklet (JS vs WASM).
-- **WASM Delay parity work**: experimental backend switch + wasm worklet (JS vs WASM).
-- **WASM Chorus/Reverb parity work**: experimental backend switches + wasm worklets (JS vs WASM).
 - **WASM graph engine**: single worklet now runs the full DSP graph in Rust, including Control IO + Mod VCA; scope inputs are tapped via worklet outputs.
+- **WASM cleanup**: removed per-module WASM worklets/toggles; the graph engine is the only DSP path.
 
 ## How to update
 
