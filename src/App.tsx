@@ -322,6 +322,8 @@ function App() {
   const [gridError, setGridError] = useState<string | null>(null)
   const [gridMetrics, setGridMetrics] = useState<GridMetrics>(DEFAULT_GRID_METRICS)
   const [moduleDragPreview, setModuleDragPreview] = useState<ModuleDragPreview | null>(null)
+  const [useWasmVco, setUseWasmVco] = useState(false)
+  const [useWasmVca, setUseWasmVca] = useState(false)
   const rackRef = useRef<HTMLDivElement | null>(null)
   const modulesRef = useRef<HTMLDivElement | null>(null)
   const dragRef = useRef<DragState | null>(null)
@@ -1099,6 +1101,47 @@ function App() {
     return clampVoiceCount(Number(control?.params.voices ?? 1))
   }
 
+  const normalizeVcoBackend = (nextGraph: GraphState, useWasm: boolean): GraphState => {
+    const modules = nextGraph.modules.map((module) => {
+      if (useWasm && module.type === 'oscillator') {
+        return { ...module, type: 'wasm-osc' as ModuleType }
+      }
+      if (!useWasm && module.type === 'wasm-osc') {
+        return { ...module, type: 'oscillator' as ModuleType }
+      }
+      return module
+    })
+    return { ...nextGraph, modules }
+  }
+
+  const normalizeVcaBackend = (nextGraph: GraphState, useWasm: boolean): GraphState => {
+    const modules = nextGraph.modules.map((module) => {
+      if (useWasm && module.type === 'gain') {
+        return { ...module, type: 'wasm-gain' as ModuleType }
+      }
+      if (useWasm && module.type === 'cv-vca') {
+        return { ...module, type: 'wasm-cv-vca' as ModuleType }
+      }
+      if (!useWasm && module.type === 'wasm-gain') {
+        return { ...module, type: 'gain' as ModuleType }
+      }
+      if (!useWasm && module.type === 'wasm-cv-vca') {
+        return { ...module, type: 'cv-vca' as ModuleType }
+      }
+      return module
+    })
+    return { ...nextGraph, modules }
+  }
+
+  const normalizeBackends = (
+    nextGraph: GraphState,
+    nextUseWasmVco: boolean,
+    nextUseWasmVca: boolean,
+  ): GraphState => {
+    const vcaNormalized = normalizeVcaBackend(nextGraph, nextUseWasmVca)
+    return normalizeVcoBackend(vcaNormalized, nextUseWasmVco)
+  }
+
   const hasSameModuleShape = (currentGraph: GraphState, nextGraph: GraphState) => {
     if (currentGraph.modules.length !== nextGraph.modules.length) {
       return false
@@ -1154,7 +1197,8 @@ function App() {
 
   const applyPreset = (nextGraph: GraphState) => {
     const cloned = cloneGraph(nextGraph)
-    const layouted = layoutGraph(cloned, moduleSizes, gridMetricsRef.current)
+    const normalized = normalizeBackends(cloned, useWasmVco, useWasmVca)
+    const layouted = layoutGraph(normalized, moduleSizes, gridMetricsRef.current)
     setSelectedPort(null)
     setGhostCable(null)
     setDragTargets(null)
@@ -1214,6 +1258,7 @@ function App() {
     },
     [applyPreset],
   )
+
 
   const getCenterFromElement = (element: HTMLElement): PortPosition => {
     const rect = element.getBoundingClientRect()
@@ -1633,6 +1678,85 @@ function App() {
     restartInFlightRef.current = false
   }
 
+  const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
+  const recordOutput = useCallback(
+    async (durationMs: number) => {
+      const destination = engine.getRecordingDestination()
+      if (!destination) {
+        throw new Error('Audio output is not ready.')
+      }
+      if (typeof MediaRecorder === 'undefined') {
+        throw new Error('MediaRecorder unavailable in this browser.')
+      }
+      const chunks: Blob[] = []
+      return await new Promise<Blob>((resolve, reject) => {
+        const recorder = new MediaRecorder(destination.stream, { mimeType: 'audio/webm' })
+        recorder.ondataavailable = (event) => {
+          if (event.data && event.data.size > 0) {
+            chunks.push(event.data)
+          }
+        }
+        recorder.onerror = () => {
+          reject(new Error('Recording failed.'))
+        }
+        recorder.onstop = () => {
+          resolve(new Blob(chunks, { type: 'audio/webm' }))
+        }
+        recorder.start()
+        setTimeout(() => recorder.stop(), durationMs)
+      })
+    },
+    [engine],
+  )
+
+  const runPresetBatchExport = useCallback(
+    async (options?: { durationMs?: number; settleMs?: number; prefix?: string }) => {
+      const durationMs = options?.durationMs ?? 5000
+      const settleMs = options?.settleMs ?? 1200
+      const prefix = options?.prefix ?? 'preset'
+      if (statusRef.current !== 'running') {
+        await handleStart()
+        await wait(300)
+      }
+      const session = new Date().toISOString().replace(/[:.]/g, '-')
+      for (const preset of presets) {
+        applyPreset(preset.graph)
+        await wait(settleMs)
+        const blob = await recordOutput(durationMs)
+        const safeId = preset.id.replace(/[^a-z0-9_-]+/gi, '-')
+        const filename = `${prefix}-${safeId}-${session}.webm`
+        const url = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = filename
+        document.body.appendChild(link)
+        link.click()
+        link.remove()
+        URL.revokeObjectURL(url)
+        await wait(200)
+      }
+    },
+    [applyPreset, handleStart, presets, recordOutput],
+  )
+
+  useEffect(() => {
+    if (!import.meta.env.DEV) {
+      return
+    }
+    const globalScope = window as typeof window & {
+      noobSynthExportPresets?: (options?: {
+        durationMs?: number
+        settleMs?: number
+        prefix?: string
+      }) => Promise<void>
+    }
+    globalScope.noobSynthExportPresets = runPresetBatchExport
+    return () => {
+      delete globalScope.noobSynthExportPresets
+    }
+  }, [runPresetBatchExport])
+
   const statusLabel = status === 'running' ? 'Live' : status === 'error' ? 'Error' : 'Standby'
   const statusDetail =
     status === 'error'
@@ -1641,6 +1765,7 @@ function App() {
 
   const moduleSizes: Record<string, string> = {
     oscillator: '2x2',
+    'wasm-osc': '2x2',
     vcf: '2x2',
     control: '2x6',
     scope: '2x3',
@@ -1651,7 +1776,9 @@ function App() {
     reverb: '2x1',
     mixer: '1x1',
     gain: '1x1',
+    'wasm-gain': '1x1',
     'cv-vca': '1x1',
+    'wasm-cv-vca': '1x1',
     output: '1x1',
     lab: '2x2',
     mario: '2x4',
@@ -1659,6 +1786,7 @@ function App() {
 
   const modulePortLayouts: Record<string, 'stacked' | 'strip'> = {
     oscillator: 'strip',
+    'wasm-osc': 'strip',
     vcf: 'strip',
     control: 'strip',
     lab: 'strip',
@@ -1687,9 +1815,12 @@ function App() {
 
   const modulePrefixes: Record<ModuleType, string> = {
     oscillator: 'osc',
+    'wasm-osc': 'osc',
     vcf: 'vcf',
     gain: 'gain',
+    'wasm-gain': 'gain',
     'cv-vca': 'mod',
+    'wasm-cv-vca': 'mod',
     mixer: 'mix',
     chorus: 'chorus',
     delay: 'delay',
@@ -1705,9 +1836,12 @@ function App() {
 
   const moduleLabels: Record<ModuleType, string> = {
     oscillator: 'VCO',
+    'wasm-osc': 'VCO',
     vcf: 'VCF',
     gain: 'VCA',
+    'wasm-gain': 'VCA',
     'cv-vca': 'Mod VCA',
+    'wasm-cv-vca': 'Mod VCA',
     mixer: 'Mixer',
     chorus: 'Chorus',
     delay: 'Delay',
@@ -1731,6 +1865,19 @@ function App() {
       fmLin: 0,
       fmExp: 0,
     },
+    'wasm-osc': {
+      frequency: 220,
+      type: 'sawtooth',
+      pwm: 0.5,
+      unison: 1,
+      detune: 0,
+      fmLin: 0,
+      fmExp: 0,
+    },
+    gain: { gain: 0.7 },
+    'wasm-gain': { gain: 0.7 },
+    'cv-vca': { gain: 1 },
+    'wasm-cv-vca': { gain: 1 },
     vcf: {
       cutoff: 800,
       resonance: 0.2,
@@ -1742,8 +1889,6 @@ function App() {
       mode: 'lp',
       slope: 12,
     },
-    gain: { gain: 0.7 },
-    'cv-vca': { gain: 1 },
     mixer: { levelA: 0.6, levelB: 0.6 },
     chorus: { rate: 0.3, depth: 8, delay: 18, mix: 0.4, spread: 0.6, feedback: 0.1 },
     delay: { time: 360, feedback: 0.25, mix: 0.2, tone: 0.6, pingPong: false },
@@ -1837,15 +1982,44 @@ function App() {
     queueEngineRestart(nextGraph)
   }
 
-  const handleAddModule = (type: ModuleType) => {
-    if (type === 'control' && hasControlModule) {
+  const handleVcoBackendChange = (nextUseWasm: boolean) => {
+    if (nextUseWasm === useWasmVco) {
       return
     }
-    if (type === 'output' && hasOutputModule) {
+    setUseWasmVco(nextUseWasm)
+    const nextGraph = normalizeBackends(graphRef.current, nextUseWasm, useWasmVca)
+    applyGraphUpdate(nextGraph)
+  }
+
+  const handleVcaBackendChange = (nextUseWasm: boolean) => {
+    if (nextUseWasm === useWasmVca) {
+      return
+    }
+    setUseWasmVca(nextUseWasm)
+    const nextGraph = normalizeBackends(graphRef.current, useWasmVco, nextUseWasm)
+    applyGraphUpdate(nextGraph)
+  }
+
+  const handleAddModule = (type: ModuleType) => {
+    let resolvedType = type
+    if (type === 'oscillator' && useWasmVco) {
+      resolvedType = 'wasm-osc'
+    }
+    if (type === 'gain' && useWasmVca) {
+      resolvedType = 'wasm-gain'
+    }
+    if (type === 'cv-vca' && useWasmVca) {
+      resolvedType = 'wasm-cv-vca'
+    }
+
+    if (resolvedType === 'control' && hasControlModule) {
+      return
+    }
+    if (resolvedType === 'output' && hasOutputModule) {
       return
     }
     const columns = Math.max(1, gridMetricsRef.current.columns)
-    const span = parseModuleSpan(moduleSizes[type] ?? '1x1')
+    const span = parseModuleSpan(moduleSizes[resolvedType] ?? '1x1')
     if (span.cols > columns) {
       const message = 'Module too wide for current rack width.'
       console.warn(message)
@@ -1853,7 +2027,7 @@ function App() {
       return
     }
     const current = graphRef.current
-    const nextModule = buildModuleSpec(type, current.modules)
+    const nextModule = buildModuleSpec(resolvedType, current.modules)
     const nextGraph = layoutGraph(
       {
         ...current,
@@ -2080,7 +2254,7 @@ function App() {
   )
 
   const renderModuleControls = (module: ModuleSpec) => {
-    if (module.type === 'oscillator') {
+    if (module.type === 'oscillator' || module.type === 'wasm-osc') {
       return (
         <>
           <RotaryKnob
@@ -2160,7 +2334,7 @@ function App() {
       )
     }
 
-    if (module.type === 'gain') {
+    if (module.type === 'gain' || module.type === 'wasm-gain') {
       return (
         <RotaryKnob
           label="Gain"
@@ -2174,7 +2348,7 @@ function App() {
       )
     }
 
-    if (module.type === 'cv-vca') {
+    if (module.type === 'cv-vca' || module.type === 'wasm-cv-vca') {
       return (
         <RotaryKnob
           label="Depth"
@@ -3175,6 +3349,44 @@ function App() {
                 Auto Layout
               </button>
             </div>
+              <div className="library-backend">
+                <span className="library-label">VCO Backend</span>
+                <div className="library-toggle">
+                  <button
+                    type="button"
+                    className={`ui-btn library-toggle-btn ${useWasmVco ? '' : 'active'}`}
+                    onClick={() => handleVcoBackendChange(false)}
+                  >
+                    JS
+                  </button>
+                  <button
+                    type="button"
+                    className={`ui-btn library-toggle-btn ${useWasmVco ? 'active' : ''}`}
+                    onClick={() => handleVcoBackendChange(true)}
+                  >
+                    WASM
+                  </button>
+                </div>
+              </div>
+              <div className="library-backend">
+                <span className="library-label">VCA Backend</span>
+                <div className="library-toggle">
+                  <button
+                    type="button"
+                    className={`ui-btn library-toggle-btn ${useWasmVca ? '' : 'active'}`}
+                    onClick={() => handleVcaBackendChange(false)}
+                  >
+                    JS
+                  </button>
+                  <button
+                    type="button"
+                    className={`ui-btn library-toggle-btn ${useWasmVca ? 'active' : ''}`}
+                    onClick={() => handleVcaBackendChange(true)}
+                  >
+                    WASM
+                  </button>
+                </div>
+              </div>
             {gridError && <div className="preset-error">{gridError}</div>}
             <div className="chip-row">
               {moduleCatalog.map((entry) => {

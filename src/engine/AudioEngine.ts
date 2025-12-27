@@ -8,6 +8,8 @@ import mixerProcessorUrl from './worklets/mixer-processor.ts?worker&url'
 import chorusProcessorUrl from './worklets/chorus-processor.ts?worker&url'
 import delayProcessorUrl from './worklets/delay-processor.ts?worker&url'
 import reverbProcessorUrl from './worklets/reverb-processor.ts?worker&url'
+import wasmOscProcessorUrl from './worklets/wasm-osc-processor.ts?worker&url'
+import wasmGainProcessorUrl from './worklets/wasm-gain-processor.ts?worker&url'
 
 type PortNode = {
   node: AudioNode
@@ -37,10 +39,14 @@ export class AudioEngine {
   private workletsLoaded = false
   private controlGlide = new Map<string, number>()
   private voiceCount = 1
+  private recordingDestination: MediaStreamAudioDestinationNode | null = null
   private polyTypes = new Set<ModuleType>([
     'oscillator',
+    'wasm-osc',
     'gain',
+    'wasm-gain',
     'cv-vca',
+    'wasm-cv-vca',
     'lfo',
     'adsr',
     'mixer',
@@ -62,6 +68,27 @@ export class AudioEngine {
     this.clearGraph()
     this.context?.close()
     this.context = null
+    this.recordingDestination = null
+  }
+
+  getRecordingDestination(): MediaStreamAudioDestinationNode | null {
+    if (!this.context) {
+      return null
+    }
+    if (!this.recordingDestination) {
+      this.recordingDestination = this.context.createMediaStreamDestination()
+      const destination = this.recordingDestination
+      this.modules.forEach((module) => {
+        if (module.type === 'output') {
+          try {
+            module.node.connect(destination)
+          } catch {
+            // Ignore if already connected.
+          }
+        }
+      })
+    }
+    return this.recordingDestination
   }
 
   getAnalyserNode(moduleId: string, inputId?: string): AnalyserNode | null {
@@ -98,7 +125,10 @@ export class AudioEngine {
     }
 
     runtimeModules.forEach((module) => {
-      if (module.type === 'oscillator' && module.node instanceof AudioWorkletNode) {
+      if (
+        (module.type === 'oscillator' || module.type === 'wasm-osc') &&
+        module.node instanceof AudioWorkletNode
+      ) {
         if (paramId === 'frequency' && typeof value === 'number') {
           module.node.parameters.get('baseFrequency')?.setValueAtTime(value, context.currentTime)
         }
@@ -123,13 +153,19 @@ export class AudioEngine {
         }
       }
 
-      if (module.type === 'gain' && module.node instanceof AudioWorkletNode) {
+      if (
+        (module.type === 'gain' || module.type === 'wasm-gain') &&
+        module.node instanceof AudioWorkletNode
+      ) {
         if (paramId === 'gain' && typeof value === 'number') {
           module.node.parameters.get('gain')?.setValueAtTime(value, context.currentTime)
         }
       }
 
-      if (module.type === 'cv-vca' && module.node instanceof AudioWorkletNode) {
+      if (
+        (module.type === 'cv-vca' || module.type === 'wasm-cv-vca') &&
+        module.node instanceof AudioWorkletNode
+      ) {
         if (paramId === 'gain' && typeof value === 'number') {
           module.node.parameters.get('gain')?.setValueAtTime(value, context.currentTime)
         }
@@ -510,6 +546,8 @@ export class AudioEngine {
     await this.context.audioWorklet.addModule(chorusProcessorUrl)
     await this.context.audioWorklet.addModule(delayProcessorUrl)
     await this.context.audioWorklet.addModule(reverbProcessorUrl)
+    await this.context.audioWorklet.addModule(wasmOscProcessorUrl)
+    await this.context.audioWorklet.addModule(wasmGainProcessorUrl)
     this.workletsLoaded = true
   }
 
@@ -827,8 +865,77 @@ export class AudioEngine {
       }
     }
 
+    if (module.type === 'wasm-osc') {
+      const osc = new AudioWorkletNode(this.context, 'wasm-osc-processor', {
+        numberOfInputs: 5,
+        numberOfOutputs: 1,
+        channelCountMode: 'explicit',
+        outputChannelCount: [1],
+      })
+      osc.parameters
+        .get('baseFrequency')
+        ?.setValueAtTime(Number(module.params.frequency ?? 220), this.context.currentTime)
+      osc.parameters
+        .get('waveform')
+        ?.setValueAtTime(
+          this.waveformIndex(String(module.params.type ?? 'sawtooth')),
+          this.context.currentTime,
+        )
+      osc.parameters
+        .get('pwm')
+        ?.setValueAtTime(Number(module.params.pwm ?? 0.5), this.context.currentTime)
+      osc.parameters
+        .get('unison')
+        ?.setValueAtTime(Number(module.params.unison ?? 1), this.context.currentTime)
+      osc.parameters
+        .get('detune')
+        ?.setValueAtTime(Number(module.params.detune ?? 0), this.context.currentTime)
+      osc.parameters
+        .get('fmLinDepth')
+        ?.setValueAtTime(Number(module.params.fmLin ?? 0), this.context.currentTime)
+      osc.parameters
+        .get('fmExpDepth')
+        ?.setValueAtTime(Number(module.params.fmExp ?? 0), this.context.currentTime)
+      return {
+        id: module.id,
+        type: module.type,
+        node: osc,
+        inputs: {
+          pitch: { node: osc, inputIndex: 0 },
+          'fm-lin': { node: osc, inputIndex: 1 },
+          'fm-exp': { node: osc, inputIndex: 2 },
+          pwm: { node: osc, inputIndex: 3 },
+          sync: { node: osc, inputIndex: 4 },
+        },
+        outputs: { out: { node: osc } },
+      }
+    }
+
     if (module.type === 'gain') {
       const gain = new AudioWorkletNode(this.context, 'gain-processor', {
+        numberOfInputs: 2,
+        numberOfOutputs: 1,
+        channelCountMode: 'explicit',
+        outputChannelCount: [2],
+      })
+      const gainParam = gain.parameters.get('gain')
+      if (gainParam) {
+        gainParam.setValueAtTime(Number(module.params.gain ?? 0.2), this.context.currentTime)
+      }
+      return {
+        id: module.id,
+        type: module.type,
+        node: gain,
+        inputs: {
+          in: { node: gain, inputIndex: 0 },
+          cv: { node: gain, inputIndex: 1 },
+        },
+        outputs: { out: { node: gain } },
+      }
+    }
+
+    if (module.type === 'wasm-gain') {
+      const gain = new AudioWorkletNode(this.context, 'wasm-gain-processor', {
         numberOfInputs: 2,
         numberOfOutputs: 1,
         channelCountMode: 'explicit',
@@ -873,11 +980,37 @@ export class AudioEngine {
       }
     }
 
+    if (module.type === 'wasm-cv-vca') {
+      const cvVca = new AudioWorkletNode(this.context, 'wasm-gain-processor', {
+        numberOfInputs: 2,
+        numberOfOutputs: 1,
+        channelCountMode: 'explicit',
+        outputChannelCount: [1],
+      })
+      const gainParam = cvVca.parameters.get('gain')
+      if (gainParam) {
+        gainParam.setValueAtTime(Number(module.params.gain ?? 1), this.context.currentTime)
+      }
+      return {
+        id: module.id,
+        type: module.type,
+        node: cvVca,
+        inputs: {
+          in: { node: cvVca, inputIndex: 0 },
+          cv: { node: cvVca, inputIndex: 1 },
+        },
+        outputs: { out: { node: cvVca } },
+      }
+    }
+
     if (module.type === 'output') {
       const output = new GainNode(this.context, {
         gain: Number(module.params.level ?? 0.8),
       })
       output.connect(this.context.destination)
+      if (this.recordingDestination) {
+        output.connect(this.recordingDestination)
+      }
       return {
         id: module.id,
         type: module.type,

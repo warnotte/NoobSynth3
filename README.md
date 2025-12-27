@@ -69,6 +69,39 @@ change patch routing.
 npx tsc -p tsconfig.app.json --noEmit
 ```
 
+## WASM DSP (experimental)
+
+This repo now includes a Rust DSP workspace and an experimental WASM-backed
+oscillator worklet.
+
+Build the WASM artifacts:
+
+```bash
+npm run build:wasm
+```
+
+This generates `src/engine/worklets/wasm/dsp_wasm.js` and `dsp_wasm_bg.wasm`.
+Use the backend toggles (below) to swap modules between JS and WASM.
+
+### Backend switches (dev)
+
+In the Module Library, use the **VCO Backend** and **VCA Backend** toggles to
+swap between JS AudioWorklet modules and their WASM equivalents. This keeps
+presets intact while switching implementations.
+
+For quick parity checks, load the **VCO A/B** preset (single VCO -> Output)
+and flip the VCO backend switch.
+
+### Preset batch export (dev)
+
+With the dev server running, open the browser console and run:
+
+```js
+window.noobSynthExportPresets({ durationMs: 5000 })
+```
+
+This records each preset for 5 seconds and downloads `.webm` files locally.
+
 ## Roadmap
 
 - MIDI enhancements (pitch bend, CC mapping).

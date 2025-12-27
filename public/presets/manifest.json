@@ -56,6 +56,12 @@
       "file": "showcase-stack.json"
     },
     {
+      "id": "ab-vco",
+      "name": "VCO A/B",
+      "description": "Single VCO -> Output for backend parity checks.",
+      "file": "ab-vco.json"
+    },
+    {
       "id": "8bit-mario",
       "name": "8-Bit Mario",
       "description": "NES-style square wave setup for Mario IO.",

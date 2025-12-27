@@ -84,6 +84,10 @@ Presets live in `src/state/presets.ts` and are loaded from the Presets panel. So
   - 2 thru outputs for non-destructive signal monitoring.
   - Expanded gain range (0.5x, 1x, 2x, 5x, 10x).
   - Efficient rendering (only active mode draws).
+- **Rust workspace scaffold**: `crates/dsp-core`, `crates/dsp-wasm`, `crates/dsp-standalone`, `crates/dsp-plugin`.
+- **WASM DSP prototype**: `wasm-osc-processor` worklet + `WASM OSC` module using `npm run build:wasm`.
+- **WASM VCO parity work**: experimental VCO backend switch in Module Library (JS vs WASM).
+- **WASM VCA parity work**: experimental VCA backend switch + wasm gain worklet (JS vs WASM).
 
 ## How to update
 

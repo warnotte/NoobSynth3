@@ -1,0 +1,8 @@
+[workspace]
+members = [
+  "crates/dsp-core",
+  "crates/dsp-wasm",
+  "crates/dsp-standalone",
+  "crates/dsp-plugin",
+]
+resolver = "2"

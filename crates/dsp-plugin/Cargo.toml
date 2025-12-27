@@ -1,0 +1,7 @@
+[package]
+name = "dsp-plugin"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+dsp-core = { path = "../dsp-core" }

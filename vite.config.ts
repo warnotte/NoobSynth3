@@ -8,4 +8,5 @@ export default defineConfig({
   worker: {
     format: "es",
   },
+  assetsInclude: ['**/*.wasm', '**/*.wasm?inline'],
 })

@@ -2,8 +2,11 @@ export type PortKind = 'audio' | 'cv' | 'gate' | 'sync'
 
 export type ModuleType =
   | 'oscillator'
+  | 'wasm-osc'
   | 'gain'
+  | 'wasm-gain'
   | 'cv-vca'
+  | 'wasm-cv-vca'
   | 'output'
   | 'lab'
   | 'lfo'

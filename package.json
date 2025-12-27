@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:wasm": "powershell -ExecutionPolicy Bypass -File scripts/build-wasm.ps1",
     "lint": "eslint .",
     "preview": "vite preview"
   },

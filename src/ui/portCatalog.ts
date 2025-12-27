@@ -25,6 +25,16 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
     ],
     outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
   },
+  'wasm-osc': {
+    inputs: [
+      { id: 'pitch', label: 'Pitch', kind: 'cv', direction: 'in' },
+      { id: 'fm-lin', label: 'FM Lin', kind: 'cv', direction: 'in' },
+      { id: 'fm-exp', label: 'FM Exp', kind: 'cv', direction: 'in' },
+      { id: 'pwm', label: 'PWM', kind: 'cv', direction: 'in' },
+      { id: 'sync', label: 'Sync', kind: 'sync', direction: 'in' },
+    ],
+    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
+  },
   gain: {
     inputs: [
       { id: 'in', label: 'In', kind: 'audio', direction: 'in' },
@@ -32,7 +42,21 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
     ],
     outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
   },
+  'wasm-gain': {
+    inputs: [
+      { id: 'in', label: 'In', kind: 'audio', direction: 'in' },
+      { id: 'cv', label: 'CV', kind: 'cv', direction: 'in' },
+    ],
+    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
+  },
   'cv-vca': {
+    inputs: [
+      { id: 'in', label: 'In', kind: 'cv', direction: 'in' },
+      { id: 'cv', label: 'CV', kind: 'cv', direction: 'in' },
+    ],
+    outputs: [{ id: 'out', label: 'Out', kind: 'cv', direction: 'out' }],
+  },
+  'wasm-cv-vca': {
     inputs: [
       { id: 'in', label: 'In', kind: 'cv', direction: 'in' },
       { id: 'cv', label: 'CV', kind: 'cv', direction: 'in' },
