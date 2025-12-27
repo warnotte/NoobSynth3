@@ -57,11 +57,81 @@ change patch routing.
 
 ## Architecture
 
+Les 3 cibles possibles
 ```
-UI (React) ──► WasmGraphEngine ──► wasm-graph-processor ──► Rust DSP graph ──► Audio Out
-                     │
-                     └──────────── tap outputs (Scope A/B/C/D)
+                          ┌─────────────────────┐
+                          │    dsp-core (Rust)  │
+                          │   Code DSP partagé  │
+                          └──────────┬──────────┘
+                                     │
+            ┌────────────────────────┼────────────────────────┐
+            │                        │                        │
+            ▼                        ▼                        ▼
+     ┌─────────────┐         ┌─────────────┐         ┌─────────────┐
+     │  dsp-wasm   │         │dsp-standalone│        │  dsp-plugin │
+     │ (crate)     │         │   (crate)    │        │   (crate)   │
+     └──────┬──────┘         └──────┬───────┘        └──────┬──────┘
+            │                       │                       │
+            ▼                       ▼                       ▼
+     ┌─────────────┐         ┌─────────────┐         ┌─────────────┐
+     │    WEB      │         │  STANDALONE │        │   VST/AU    │
+     └─────────────┘         └─────────────┘         └─────────────┘
 ```
+
+1. Version Web (actuelle)
+
+```
+│                      NAVIGATEUR                          │
+├────────────────────────┬─────────────────────────────────┤
+│      Main Thread       │        Audio Thread             │
+│                        │                                 │
+│   ┌──────────────┐     │     ┌─────────────────┐        │
+│   │  React UI    │     │     │  AudioWorklet   │        │
+│   │  (HTML/CSS)  │     │     │  + WASM         │        │
+│   └──────────────┘     │     └─────────────────┘        │
+│                        │                                 │
+└────────────────────────┴─────────────────────────────────┘
+```
+
+2. Version Standalone (Tauri)
+
+```
+┌──────────────────────────────────────────────────────────┐
+│                    NoobSynth.exe                         │
+│                    (15-20 MB)                            │
+├────────────────────────┬─────────────────────────────────┤
+│       WEBVIEW          │         RUST NATIF              │
+│    (UI identique)      │      (Audio natif)              │
+│                        │                                 │
+│   ┌──────────────┐     │     ┌─────────────────┐        │
+│   │  React UI    │ ◄───┼───► │  dsp-core       │        │
+│   │  (HTML/CSS)  │  IPC│     │  + cpal         │        │
+│   └──────────────┘     │     └────────┬────────┘        │
+│                        │              │                 │
+│                        │              ▼                 │
+│                        │     ┌─────────────────┐        │
+│                        │     │ WASAPI / ALSA   │        │
+│                        │     │ (driver audio)  │        │
+│                        │     └─────────────────┘        │
+└────────────────────────┴─────────────────────────────────┘
+```
+
+3. Version VST/AU (plugin)
+
+```
+┌──────────────────────────────────────────────────────────┐
+│                       DAW HOST                           │
+├──────────────────────────────────────────────────────────┤
+│   ┌──────────────────────────────────────────────────┐   │
+│   │               NoobSynth Plugin                   │   │
+│   │                                                  │   │
+│   │  UI (webview/egui)   │   DSP (dsp-core native)    │   │
+│   │                      │   + plugin wrapper         │   │
+│   └──────────────────────────────────────────────────┘   │
+└──────────────────────────────────────────────────────────┘
+```
+
+
 
 - Graph schema + defaults: `src/shared/graph.ts`, `src/state/defaultGraph.ts`
 - Presets: `public/presets/manifest.json`, `public/presets/*.json` (export/import lives in the UI)
