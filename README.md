@@ -57,11 +57,19 @@ change patch routing.
 
 ## Architecture
 
-- Audio graph: `src/state/defaultGraph.ts`
-- Presets: `src/state/presets.ts`, `public/presets/manifest.json`
-- Audio engine: `src/engine/WasmGraphEngine.ts`
-- Worklets: `src/engine/worklets/*`
-- UI: `src/App.tsx`, `src/ui/*`
+```
+UI (React) ──► WasmGraphEngine ──► wasm-graph-processor ──► Rust DSP graph ──► Audio Out
+                     │
+                     └──────────── tap outputs (Scope A/B/C/D)
+```
+
+- Graph schema + defaults: `src/shared/graph.ts`, `src/state/defaultGraph.ts`
+- Presets: `public/presets/manifest.json`, `public/presets/*.json` (export/import lives in the UI)
+- UI + state: `src/App.tsx`, `src/ui/*`
+- Main-thread engine wrapper: `src/engine/WasmGraphEngine.ts` (loads the worklet, sends graph/params, manages tap outputs)
+- Audio worklet: `src/engine/worklets/wasm-graph-processor.ts`
+- Rust DSP: `crates/dsp-core` (DSP building blocks), `crates/dsp-wasm` (WASM bindings + graph engine)
+- WASM build: `scripts/build-wasm.ps1` generates `src/engine/worklets/wasm/dsp_wasm.js` + `dsp_wasm_bg.wasm`
 
 ## Testing
 
@@ -69,10 +77,11 @@ change patch routing.
 npx tsc -p tsconfig.app.json --noEmit
 ```
 
-## WASM DSP (experimental)
+## WASM DSP (primary engine)
 
-This repo now includes a Rust DSP workspace and a single **WASM graph**
-AudioWorklet that runs the full DSP graph in Rust for better performance.
+This repo includes a Rust DSP workspace and a single **WASM graph**
+AudioWorklet that runs the full DSP graph in Rust. The app uses this
+engine by default.
 
 Build the WASM artifacts:
 
@@ -82,6 +91,9 @@ npm run build:wasm
 
 This generates `src/engine/worklets/wasm/dsp_wasm.js` and `dsp_wasm_bg.wasm`,
 used by `wasm-graph-processor` for the full graph.
+
+If you only change UI code, you do not need to rebuild WASM. Rebuild only
+after changing Rust DSP code.
 
 ### Preset batch export (dev)
 
