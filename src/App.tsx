@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { AudioEngine } from './engine/AudioEngine'
+import { AudioEngine } from './engine/WasmGraphEngine'
 import { defaultGraph } from './state/defaultGraph'
 import { loadPresets, type PresetSpec } from './state/presets'
 import type { GraphState, ModuleSpec, ModuleType, PortKind } from './shared/graph'
@@ -326,6 +326,11 @@ function App() {
   const [useWasmVca, setUseWasmVca] = useState(false)
   const [useWasmLfo, setUseWasmLfo] = useState(false)
   const [useWasmAdsr, setUseWasmAdsr] = useState(false)
+  const [useWasmVcf, setUseWasmVcf] = useState(false)
+  const [useWasmMixer, setUseWasmMixer] = useState(false)
+  const [useWasmDelay, setUseWasmDelay] = useState(false)
+  const [useWasmChorus, setUseWasmChorus] = useState(false)
+  const [useWasmReverb, setUseWasmReverb] = useState(false)
   const rackRef = useRef<HTMLDivElement | null>(null)
   const modulesRef = useRef<HTMLDivElement | null>(null)
   const dragRef = useRef<DragState | null>(null)
@@ -1161,17 +1166,92 @@ function App() {
     return { ...nextGraph, modules }
   }
 
+  const normalizeVcfBackend = (nextGraph: GraphState, useWasm: boolean): GraphState => {
+    const modules = nextGraph.modules.map((module) => {
+      if (useWasm && module.type === 'vcf') {
+        return { ...module, type: 'wasm-vcf' as ModuleType }
+      }
+      if (!useWasm && module.type === 'wasm-vcf') {
+        return { ...module, type: 'vcf' as ModuleType }
+      }
+      return module
+    })
+    return { ...nextGraph, modules }
+  }
+
+  const normalizeMixerBackend = (nextGraph: GraphState, useWasm: boolean): GraphState => {
+    const modules = nextGraph.modules.map((module) => {
+      if (useWasm && module.type === 'mixer') {
+        return { ...module, type: 'wasm-mixer' as ModuleType }
+      }
+      if (!useWasm && module.type === 'wasm-mixer') {
+        return { ...module, type: 'mixer' as ModuleType }
+      }
+      return module
+    })
+    return { ...nextGraph, modules }
+  }
+
+  const normalizeDelayBackend = (nextGraph: GraphState, useWasm: boolean): GraphState => {
+    const modules = nextGraph.modules.map((module) => {
+      if (useWasm && module.type === 'delay') {
+        return { ...module, type: 'wasm-delay' as ModuleType }
+      }
+      if (!useWasm && module.type === 'wasm-delay') {
+        return { ...module, type: 'delay' as ModuleType }
+      }
+      return module
+    })
+    return { ...nextGraph, modules }
+  }
+
+  const normalizeChorusBackend = (nextGraph: GraphState, useWasm: boolean): GraphState => {
+    const modules = nextGraph.modules.map((module) => {
+      if (useWasm && module.type === 'chorus') {
+        return { ...module, type: 'wasm-chorus' as ModuleType }
+      }
+      if (!useWasm && module.type === 'wasm-chorus') {
+        return { ...module, type: 'chorus' as ModuleType }
+      }
+      return module
+    })
+    return { ...nextGraph, modules }
+  }
+
+  const normalizeReverbBackend = (nextGraph: GraphState, useWasm: boolean): GraphState => {
+    const modules = nextGraph.modules.map((module) => {
+      if (useWasm && module.type === 'reverb') {
+        return { ...module, type: 'wasm-reverb' as ModuleType }
+      }
+      if (!useWasm && module.type === 'wasm-reverb') {
+        return { ...module, type: 'reverb' as ModuleType }
+      }
+      return module
+    })
+    return { ...nextGraph, modules }
+  }
+
   const normalizeBackends = (
     nextGraph: GraphState,
     nextUseWasmVco: boolean,
     nextUseWasmVca: boolean,
     nextUseWasmLfo: boolean,
     nextUseWasmAdsr: boolean,
+    nextUseWasmVcf: boolean,
+    nextUseWasmMixer: boolean,
+    nextUseWasmDelay: boolean,
+    nextUseWasmChorus: boolean,
+    nextUseWasmReverb: boolean,
   ): GraphState => {
     const vcaNormalized = normalizeVcaBackend(nextGraph, nextUseWasmVca)
     const lfoNormalized = normalizeLfoBackend(vcaNormalized, nextUseWasmLfo)
     const adsrNormalized = normalizeAdsrBackend(lfoNormalized, nextUseWasmAdsr)
-    return normalizeVcoBackend(adsrNormalized, nextUseWasmVco)
+    const vcfNormalized = normalizeVcfBackend(adsrNormalized, nextUseWasmVcf)
+    const mixerNormalized = normalizeMixerBackend(vcfNormalized, nextUseWasmMixer)
+    const delayNormalized = normalizeDelayBackend(mixerNormalized, nextUseWasmDelay)
+    const chorusNormalized = normalizeChorusBackend(delayNormalized, nextUseWasmChorus)
+    const reverbNormalized = normalizeReverbBackend(chorusNormalized, nextUseWasmReverb)
+    return normalizeVcoBackend(reverbNormalized, nextUseWasmVco)
   }
 
   const hasSameModuleShape = (currentGraph: GraphState, nextGraph: GraphState) => {
@@ -1229,7 +1309,18 @@ function App() {
 
   const applyPreset = (nextGraph: GraphState) => {
     const cloned = cloneGraph(nextGraph)
-    const normalized = normalizeBackends(cloned, useWasmVco, useWasmVca, useWasmLfo, useWasmAdsr)
+    const normalized = normalizeBackends(
+      cloned,
+      useWasmVco,
+      useWasmVca,
+      useWasmLfo,
+      useWasmAdsr,
+      useWasmVcf,
+      useWasmMixer,
+      useWasmDelay,
+      useWasmChorus,
+      useWasmReverb,
+    )
     const layouted = layoutGraph(normalized, moduleSizes, gridMetricsRef.current)
     setSelectedPort(null)
     setGhostCable(null)
@@ -1799,6 +1890,7 @@ function App() {
     oscillator: '2x2',
     'wasm-osc': '2x2',
     vcf: '2x2',
+    'wasm-vcf': '2x2',
     control: '2x6',
     scope: '2x3',
     adsr: '1x3',
@@ -1806,9 +1898,13 @@ function App() {
     lfo: '2x2',
     'wasm-lfo': '2x2',
     chorus: '2x2',
+    'wasm-chorus': '2x2',
     delay: '2x2',
+    'wasm-delay': '2x2',
     reverb: '2x1',
+    'wasm-reverb': '2x1',
     mixer: '1x1',
+    'wasm-mixer': '1x1',
     gain: '1x1',
     'wasm-gain': '1x1',
     'cv-vca': '1x1',
@@ -1822,6 +1918,7 @@ function App() {
     oscillator: 'strip',
     'wasm-osc': 'strip',
     vcf: 'strip',
+    'wasm-vcf': 'strip',
     control: 'strip',
     lab: 'strip',
     adsr: 'strip',
@@ -1853,14 +1950,19 @@ function App() {
     oscillator: 'osc',
     'wasm-osc': 'osc',
     vcf: 'vcf',
+    'wasm-vcf': 'vcf',
     gain: 'gain',
     'wasm-gain': 'gain',
     'cv-vca': 'mod',
     'wasm-cv-vca': 'mod',
     mixer: 'mix',
+    'wasm-mixer': 'mix',
     chorus: 'chorus',
+    'wasm-chorus': 'chorus',
     delay: 'delay',
+    'wasm-delay': 'delay',
     reverb: 'reverb',
+    'wasm-reverb': 'reverb',
     adsr: 'adsr',
     'wasm-adsr': 'adsr',
     lfo: 'lfo',
@@ -1876,14 +1978,19 @@ function App() {
     oscillator: 'VCO',
     'wasm-osc': 'VCO',
     vcf: 'VCF',
+    'wasm-vcf': 'VCF',
     gain: 'VCA',
     'wasm-gain': 'VCA',
     'cv-vca': 'Mod VCA',
     'wasm-cv-vca': 'Mod VCA',
     mixer: 'Mixer',
+    'wasm-mixer': 'Mixer',
     chorus: 'Chorus',
+    'wasm-chorus': 'Chorus',
     delay: 'Delay',
+    'wasm-delay': 'Delay',
     reverb: 'Reverb',
+    'wasm-reverb': 'Reverb',
     adsr: 'ADSR',
     'wasm-adsr': 'ADSR',
     lfo: 'LFO',
@@ -1929,10 +2036,25 @@ function App() {
       mode: 'lp',
       slope: 12,
     },
+    'wasm-vcf': {
+      cutoff: 800,
+      resonance: 0.2,
+      drive: 0.1,
+      envAmount: 0,
+      modAmount: 0,
+      keyTrack: 0.5,
+      model: 'svf',
+      mode: 'lp',
+      slope: 12,
+    },
     mixer: { levelA: 0.6, levelB: 0.6 },
+    'wasm-mixer': { levelA: 0.6, levelB: 0.6 },
     chorus: { rate: 0.3, depth: 8, delay: 18, mix: 0.4, spread: 0.6, feedback: 0.1 },
+    'wasm-chorus': { rate: 0.3, depth: 8, delay: 18, mix: 0.4, spread: 0.6, feedback: 0.1 },
     delay: { time: 360, feedback: 0.25, mix: 0.2, tone: 0.6, pingPong: false },
+    'wasm-delay': { time: 360, feedback: 0.25, mix: 0.2, tone: 0.6, pingPong: false },
     reverb: { time: 0.6, damp: 0.4, preDelay: 18, mix: 0.2 },
+    'wasm-reverb': { time: 0.6, damp: 0.4, preDelay: 18, mix: 0.2 },
     adsr: { attack: 0.02, decay: 0.2, sustain: 0.65, release: 0.5 },
     'wasm-adsr': { attack: 0.02, decay: 0.2, sustain: 0.65, release: 0.5 },
     lfo: { rate: 0.5, depth: 0.6, offset: 0, shape: 'sine', bipolar: true },
@@ -2035,6 +2157,11 @@ function App() {
       useWasmVca,
       useWasmLfo,
       useWasmAdsr,
+      useWasmVcf,
+      useWasmMixer,
+      useWasmDelay,
+      useWasmChorus,
+      useWasmReverb,
     )
     applyGraphUpdate(nextGraph)
   }
@@ -2050,6 +2177,11 @@ function App() {
       nextUseWasm,
       useWasmLfo,
       useWasmAdsr,
+      useWasmVcf,
+      useWasmMixer,
+      useWasmDelay,
+      useWasmChorus,
+      useWasmReverb,
     )
     applyGraphUpdate(nextGraph)
   }
@@ -2065,6 +2197,11 @@ function App() {
       useWasmVca,
       nextUseWasm,
       useWasmAdsr,
+      useWasmVcf,
+      useWasmMixer,
+      useWasmDelay,
+      useWasmChorus,
+      useWasmReverb,
     )
     applyGraphUpdate(nextGraph)
   }
@@ -2079,6 +2216,111 @@ function App() {
       useWasmVco,
       useWasmVca,
       useWasmLfo,
+      nextUseWasm,
+      useWasmVcf,
+      useWasmMixer,
+      useWasmDelay,
+      useWasmChorus,
+      useWasmReverb,
+    )
+    applyGraphUpdate(nextGraph)
+  }
+
+  const handleVcfBackendChange = (nextUseWasm: boolean) => {
+    if (nextUseWasm === useWasmVcf) {
+      return
+    }
+    setUseWasmVcf(nextUseWasm)
+    const nextGraph = normalizeBackends(
+      graphRef.current,
+      useWasmVco,
+      useWasmVca,
+      useWasmLfo,
+      useWasmAdsr,
+      nextUseWasm,
+      useWasmMixer,
+      useWasmDelay,
+      useWasmChorus,
+      useWasmReverb,
+    )
+    applyGraphUpdate(nextGraph)
+  }
+
+  const handleMixerBackendChange = (nextUseWasm: boolean) => {
+    if (nextUseWasm === useWasmMixer) {
+      return
+    }
+    setUseWasmMixer(nextUseWasm)
+    const nextGraph = normalizeBackends(
+      graphRef.current,
+      useWasmVco,
+      useWasmVca,
+      useWasmLfo,
+      useWasmAdsr,
+      useWasmVcf,
+      nextUseWasm,
+      useWasmDelay,
+      useWasmChorus,
+      useWasmReverb,
+    )
+    applyGraphUpdate(nextGraph)
+  }
+
+  const handleDelayBackendChange = (nextUseWasm: boolean) => {
+    if (nextUseWasm === useWasmDelay) {
+      return
+    }
+    setUseWasmDelay(nextUseWasm)
+    const nextGraph = normalizeBackends(
+      graphRef.current,
+      useWasmVco,
+      useWasmVca,
+      useWasmLfo,
+      useWasmAdsr,
+      useWasmVcf,
+      useWasmMixer,
+      nextUseWasm,
+      useWasmChorus,
+      useWasmReverb,
+    )
+    applyGraphUpdate(nextGraph)
+  }
+
+  const handleChorusBackendChange = (nextUseWasm: boolean) => {
+    if (nextUseWasm === useWasmChorus) {
+      return
+    }
+    setUseWasmChorus(nextUseWasm)
+    const nextGraph = normalizeBackends(
+      graphRef.current,
+      useWasmVco,
+      useWasmVca,
+      useWasmLfo,
+      useWasmAdsr,
+      useWasmVcf,
+      useWasmMixer,
+      useWasmDelay,
+      nextUseWasm,
+      useWasmReverb,
+    )
+    applyGraphUpdate(nextGraph)
+  }
+
+  const handleReverbBackendChange = (nextUseWasm: boolean) => {
+    if (nextUseWasm === useWasmReverb) {
+      return
+    }
+    setUseWasmReverb(nextUseWasm)
+    const nextGraph = normalizeBackends(
+      graphRef.current,
+      useWasmVco,
+      useWasmVca,
+      useWasmLfo,
+      useWasmAdsr,
+      useWasmVcf,
+      useWasmMixer,
+      useWasmDelay,
+      useWasmChorus,
       nextUseWasm,
     )
     applyGraphUpdate(nextGraph)
@@ -2100,6 +2342,21 @@ function App() {
     }
     if (type === 'adsr' && useWasmAdsr) {
       resolvedType = 'wasm-adsr'
+    }
+    if (type === 'vcf' && useWasmVcf) {
+      resolvedType = 'wasm-vcf'
+    }
+    if (type === 'mixer' && useWasmMixer) {
+      resolvedType = 'wasm-mixer'
+    }
+    if (type === 'delay' && useWasmDelay) {
+      resolvedType = 'wasm-delay'
+    }
+    if (type === 'chorus' && useWasmChorus) {
+      resolvedType = 'wasm-chorus'
+    }
+    if (type === 'reverb' && useWasmReverb) {
+      resolvedType = 'wasm-reverb'
     }
 
     if (resolvedType === 'control' && hasControlModule) {
@@ -2523,7 +2780,7 @@ function App() {
       )
     }
 
-    if (module.type === 'mixer') {
+    if (module.type === 'mixer' || module.type === 'wasm-mixer') {
       return (
         <>
           <RotaryKnob
@@ -2548,7 +2805,7 @@ function App() {
       )
     }
 
-    if (module.type === 'chorus') {
+    if (module.type === 'chorus' || module.type === 'wasm-chorus') {
       return (
         <>
           <RotaryKnob
@@ -2612,7 +2869,7 @@ function App() {
       )
     }
 
-    if (module.type === 'delay') {
+    if (module.type === 'delay' || module.type === 'wasm-delay') {
       const pingPong = Boolean(module.params.pingPong)
       return (
         <>
@@ -2666,7 +2923,7 @@ function App() {
       )
     }
 
-    if (module.type === 'reverb') {
+    if (module.type === 'reverb' || module.type === 'wasm-reverb') {
       return (
         <>
           <RotaryKnob
@@ -2710,7 +2967,7 @@ function App() {
       )
     }
 
-    if (module.type === 'vcf') {
+    if (module.type === 'vcf' || module.type === 'wasm-vcf') {
       const mode = String(module.params.mode ?? 'lp')
       const slope = Number(module.params.slope ?? 24)
       return (
@@ -3510,6 +3767,101 @@ function App() {
                     type="button"
                     className={`ui-btn library-toggle-btn ${useWasmAdsr ? 'active' : ''}`}
                     onClick={() => handleAdsrBackendChange(true)}
+                  >
+                    WASM
+                  </button>
+                </div>
+              </div>
+              <div className="library-backend">
+                <span className="library-label">VCF Backend</span>
+                <div className="library-toggle">
+                  <button
+                    type="button"
+                    className={`ui-btn library-toggle-btn ${useWasmVcf ? '' : 'active'}`}
+                    onClick={() => handleVcfBackendChange(false)}
+                  >
+                    JS
+                  </button>
+                  <button
+                    type="button"
+                    className={`ui-btn library-toggle-btn ${useWasmVcf ? 'active' : ''}`}
+                    onClick={() => handleVcfBackendChange(true)}
+                  >
+                    WASM
+                  </button>
+                </div>
+              </div>
+              <div className="library-backend">
+                <span className="library-label">Mixer Backend</span>
+                <div className="library-toggle">
+                  <button
+                    type="button"
+                    className={`ui-btn library-toggle-btn ${useWasmMixer ? '' : 'active'}`}
+                    onClick={() => handleMixerBackendChange(false)}
+                  >
+                    JS
+                  </button>
+                  <button
+                    type="button"
+                    className={`ui-btn library-toggle-btn ${useWasmMixer ? 'active' : ''}`}
+                    onClick={() => handleMixerBackendChange(true)}
+                  >
+                    WASM
+                  </button>
+                </div>
+              </div>
+              <div className="library-backend">
+                <span className="library-label">Delay Backend</span>
+                <div className="library-toggle">
+                  <button
+                    type="button"
+                    className={`ui-btn library-toggle-btn ${useWasmDelay ? '' : 'active'}`}
+                    onClick={() => handleDelayBackendChange(false)}
+                  >
+                    JS
+                  </button>
+                  <button
+                    type="button"
+                    className={`ui-btn library-toggle-btn ${useWasmDelay ? 'active' : ''}`}
+                    onClick={() => handleDelayBackendChange(true)}
+                  >
+                    WASM
+                  </button>
+                </div>
+              </div>
+              <div className="library-backend">
+                <span className="library-label">Chorus Backend</span>
+                <div className="library-toggle">
+                  <button
+                    type="button"
+                    className={`ui-btn library-toggle-btn ${useWasmChorus ? '' : 'active'}`}
+                    onClick={() => handleChorusBackendChange(false)}
+                  >
+                    JS
+                  </button>
+                  <button
+                    type="button"
+                    className={`ui-btn library-toggle-btn ${useWasmChorus ? 'active' : ''}`}
+                    onClick={() => handleChorusBackendChange(true)}
+                  >
+                    WASM
+                  </button>
+                </div>
+              </div>
+              <div className="library-backend">
+                <span className="library-label">Reverb Backend</span>
+                <div className="library-toggle">
+                  <button
+                    type="button"
+                    className={`ui-btn library-toggle-btn ${useWasmReverb ? '' : 'active'}`}
+                    onClick={() => handleReverbBackendChange(false)}
+                  >
+                    JS
+                  </button>
+                  <button
+                    type="button"
+                    className={`ui-btn library-toggle-btn ${useWasmReverb ? 'active' : ''}`}
+                    onClick={() => handleReverbBackendChange(true)}
                   >
                     WASM
                   </button>

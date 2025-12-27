@@ -1,4 +1,4 @@
-import init, { WasmLfo } from './wasm/dsp_wasm_wrapper'
+import init, { WasmMixer } from './wasm/dsp_wasm_wrapper'
 import wasmDataUrl from './wasm/dsp_wasm_bg.wasm?inline'
 
 const decodeBase64 = (base64: string) => {
@@ -42,48 +42,27 @@ const decodeWasmDataUrl = (dataUrl: string) => {
 
 const EMPTY_INPUT = new Float32Array()
 
-class WasmLfoProcessor extends AudioWorkletProcessor {
+class WasmMixerProcessor extends AudioWorkletProcessor {
   static get parameterDescriptors(): AudioParamDescriptor[] {
     return [
       {
-        name: 'rate',
-        defaultValue: 2,
-        minValue: 0.01,
-        maxValue: 40,
-        automationRate: 'a-rate',
-      },
-      {
-        name: 'shape',
-        defaultValue: 0,
-        minValue: 0,
-        maxValue: 3,
-        automationRate: 'k-rate',
-      },
-      {
-        name: 'depth',
-        defaultValue: 0.7,
+        name: 'levelA',
+        defaultValue: 0.6,
         minValue: 0,
         maxValue: 1,
         automationRate: 'a-rate',
       },
       {
-        name: 'offset',
-        defaultValue: 0,
-        minValue: -1,
-        maxValue: 1,
-        automationRate: 'a-rate',
-      },
-      {
-        name: 'bipolar',
-        defaultValue: 1,
+        name: 'levelB',
+        defaultValue: 0.6,
         minValue: 0,
         maxValue: 1,
-        automationRate: 'k-rate',
+        automationRate: 'a-rate',
       },
     ]
   }
 
-  private lfo: InstanceType<NonNullable<typeof WasmLfo>> | null = null
+  private mixer: InstanceType<NonNullable<typeof WasmMixer>> | null = null
   private ready = false
   private fallbackWarned = false
 
@@ -96,15 +75,15 @@ class WasmLfoProcessor extends AudioWorkletProcessor {
     try {
       const bytes = decodeWasmDataUrl(wasmDataUrl)
       await init({ module_or_path: bytes })
-      if (WasmLfo) {
-        this.lfo = new WasmLfo(sampleRate)
+      if (WasmMixer) {
+        this.mixer = new WasmMixer(sampleRate)
         this.ready = true
       } else {
         this.ready = false
-        console.warn('WASM LFO missing; falling back to JS.')
+        console.warn('WASM Mixer missing; falling back to JS.')
       }
     } catch (error) {
-      console.error('WASM LFO init failed', error)
+      console.error('WASM Mixer init failed', error)
       this.ready = false
     }
   }
@@ -119,54 +98,67 @@ class WasmLfoProcessor extends AudioWorkletProcessor {
       return true
     }
 
+    const inputA = inputs[0]?.[0]
+    const inputB = inputs[1]?.[0]
+    const levelsA = parameters.levelA ?? EMPTY_INPUT
+    const levelsB = parameters.levelB ?? EMPTY_INPUT
+    const channelCount = output.length
     const sampleCount = output[0].length
-    if (!this.ready || !this.lfo) {
+
+    if (!this.ready || !this.mixer) {
       if (!this.fallbackWarned) {
-        console.warn('WASM LFO not ready; outputting silence (fallback).')
+        console.warn('WASM Mixer not ready; using JS fallback.')
         this.fallbackWarned = true
       }
-      for (let channel = 0; channel < output.length; channel += 1) {
-        output[channel].fill(0)
-      }
+      this.processFallback(output, inputA, inputB, levelsA, levelsB, channelCount, sampleCount)
       return true
     }
 
-    const rateInput = inputs[0]?.[0] ?? EMPTY_INPUT
-    const syncInput = inputs[1]?.[0] ?? EMPTY_INPUT
-    const rateParam = parameters.rate ?? EMPTY_INPUT
-    const shapeParam = parameters.shape ?? EMPTY_INPUT
-    const depthParam = parameters.depth ?? EMPTY_INPUT
-    const offsetParam = parameters.offset ?? EMPTY_INPUT
-    const bipolarParam = parameters.bipolar ?? EMPTY_INPUT
-
-    const block = this.lfo.render(
-      rateInput,
-      syncInput,
-      rateParam,
-      shapeParam,
-      depthParam,
-      offsetParam,
-      bipolarParam,
+    const block = this.mixer.render(
+      inputA ?? EMPTY_INPUT,
+      inputB ?? EMPTY_INPUT,
+      levelsA,
+      levelsB,
       sampleCount,
     )
 
     if (!block || block.length < sampleCount) {
       if (!this.fallbackWarned) {
-        console.warn('WASM LFO returned invalid data; outputting silence (fallback).')
+        console.warn('WASM Mixer returned invalid data; using JS fallback.')
         this.fallbackWarned = true
       }
-      for (let channel = 0; channel < output.length; channel += 1) {
-        output[channel].fill(0)
-      }
+      this.processFallback(output, inputA, inputB, levelsA, levelsB, channelCount, sampleCount)
       return true
     }
 
-    for (let channel = 0; channel < output.length; channel += 1) {
+    for (let channel = 0; channel < channelCount; channel += 1) {
       output[channel].set(block)
     }
 
     return true
   }
+
+  private processFallback(
+    output: Float32Array[],
+    inputA: Float32Array | undefined,
+    inputB: Float32Array | undefined,
+    levelsA: Float32Array,
+    levelsB: Float32Array,
+    channelCount: number,
+    sampleCount: number,
+  ) {
+    const normalizer = 0.5
+    for (let i = 0; i < sampleCount; i += 1) {
+      const levelA = levelsA.length > 1 ? levelsA[i] : levelsA[0]
+      const levelB = levelsB.length > 1 ? levelsB[i] : levelsB[0]
+      const a = inputA ? inputA[i] * levelA : 0
+      const b = inputB ? inputB[i] * levelB : 0
+      const mixed = (a + b) * normalizer
+      for (let channel = 0; channel < channelCount; channel += 1) {
+        output[channel][i] = mixed
+      }
+    }
+  }
 }
 
-registerProcessor('wasm-lfo-processor', WasmLfoProcessor)
+registerProcessor('wasm-mixer-processor', WasmMixerProcessor)

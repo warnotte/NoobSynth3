@@ -102,6 +102,7 @@ class WasmOscProcessor extends AudioWorkletProcessor {
   private vco: InstanceType<typeof WasmVco> | null = null
   private baseFreqScratch = new Float32Array()
   private ready = false
+  private fallbackWarned = false
   constructor() {
     super()
     void this.initWasm()
@@ -146,13 +147,18 @@ class WasmOscProcessor extends AudioWorkletProcessor {
     const detuneParam = parameters.detune ?? empty
 
     if (!this.ready || !this.vco) {
+      if (!this.fallbackWarned) {
+        console.warn('WASM VCO not ready; outputting silence (fallback).')
+        this.fallbackWarned = true
+      }
       for (let channelIndex = 0; channelIndex < output.length; channelIndex += 1) {
         output[channelIndex].fill(0)
       }
       return true
     }
 
-    const adjustedBaseFreq = this.applyBaseFreqOffset(baseFreq, channel.length)
+    const sampleCount = channel.length
+    const adjustedBaseFreq = this.applyBaseFreqOffset(baseFreq, sampleCount)
     const block = this.vco.render(
       pitchInput,
       fmLinInput,
@@ -166,8 +172,18 @@ class WasmOscProcessor extends AudioWorkletProcessor {
       fmExpDepth,
       unisonParam,
       detuneParam,
-      channel.length,
+      sampleCount,
     )
+    if (!block || block.length < sampleCount) {
+      if (!this.fallbackWarned) {
+        console.warn('WASM VCO returned invalid data; outputting silence (fallback).')
+        this.fallbackWarned = true
+      }
+      for (let channelIndex = 0; channelIndex < output.length; channelIndex += 1) {
+        output[channelIndex].fill(0)
+      }
+      return true
+    }
     for (let channelIndex = 0; channelIndex < output.length; channelIndex += 1) {
       output[channelIndex].set(block)
     }

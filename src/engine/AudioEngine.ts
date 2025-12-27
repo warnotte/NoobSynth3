@@ -12,6 +12,11 @@ import wasmOscProcessorUrl from './worklets/wasm-osc-processor.ts?worker&url'
 import wasmGainProcessorUrl from './worklets/wasm-gain-processor.ts?worker&url'
 import wasmLfoProcessorUrl from './worklets/wasm-lfo-processor.ts?worker&url'
 import wasmAdsrProcessorUrl from './worklets/wasm-adsr-processor.ts?worker&url'
+import wasmVcfProcessorUrl from './worklets/wasm-vcf-processor.ts?worker&url'
+import wasmMixerProcessorUrl from './worklets/wasm-mixer-processor.ts?worker&url'
+import wasmDelayProcessorUrl from './worklets/wasm-delay-processor.ts?worker&url'
+import wasmChorusProcessorUrl from './worklets/wasm-chorus-processor.ts?worker&url'
+import wasmReverbProcessorUrl from './worklets/wasm-reverb-processor.ts?worker&url'
 
 type PortNode = {
   node: AudioNode
@@ -54,7 +59,9 @@ export class AudioEngine {
     'adsr',
     'wasm-adsr',
     'mixer',
+    'wasm-mixer',
     'vcf',
+    'wasm-vcf',
     'control',
   ])
 
@@ -204,7 +211,10 @@ export class AudioEngine {
         }
       }
 
-      if (module.type === 'vcf' && module.node instanceof AudioWorkletNode) {
+      if (
+        (module.type === 'vcf' || module.type === 'wasm-vcf') &&
+        module.node instanceof AudioWorkletNode
+      ) {
         if (paramId === 'cutoff' && typeof value === 'number') {
           module.node.parameters.get('cutoff')?.setValueAtTime(value, context.currentTime)
         }
@@ -241,7 +251,10 @@ export class AudioEngine {
         }
       }
 
-      if (module.type === 'mixer' && module.node instanceof AudioWorkletNode) {
+      if (
+        (module.type === 'mixer' || module.type === 'wasm-mixer') &&
+        module.node instanceof AudioWorkletNode
+      ) {
         if (paramId === 'levelA' && typeof value === 'number') {
           module.node.parameters.get('levelA')?.setValueAtTime(value, context.currentTime)
         }
@@ -250,7 +263,10 @@ export class AudioEngine {
         }
       }
 
-      if (module.type === 'chorus' && module.node instanceof AudioWorkletNode) {
+      if (
+        (module.type === 'chorus' || module.type === 'wasm-chorus') &&
+        module.node instanceof AudioWorkletNode
+      ) {
         if (paramId === 'rate' && typeof value === 'number') {
           module.node.parameters.get('rate')?.setValueAtTime(value, context.currentTime)
         }
@@ -271,7 +287,10 @@ export class AudioEngine {
         }
       }
 
-      if (module.type === 'delay' && module.node instanceof AudioWorkletNode) {
+      if (
+        (module.type === 'delay' || module.type === 'wasm-delay') &&
+        module.node instanceof AudioWorkletNode
+      ) {
         if (paramId === 'time' && typeof value === 'number') {
           module.node.parameters.get('time')?.setValueAtTime(value, context.currentTime)
         }
@@ -290,7 +309,10 @@ export class AudioEngine {
         }
       }
 
-      if (module.type === 'reverb' && module.node instanceof AudioWorkletNode) {
+      if (
+        (module.type === 'reverb' || module.type === 'wasm-reverb') &&
+        module.node instanceof AudioWorkletNode
+      ) {
         if (paramId === 'time' && typeof value === 'number') {
           module.node.parameters.get('time')?.setValueAtTime(value, context.currentTime)
         }
@@ -560,6 +582,11 @@ export class AudioEngine {
     await this.context.audioWorklet.addModule(wasmGainProcessorUrl)
     await this.context.audioWorklet.addModule(wasmLfoProcessorUrl)
     await this.context.audioWorklet.addModule(wasmAdsrProcessorUrl)
+    await this.context.audioWorklet.addModule(wasmVcfProcessorUrl)
+    await this.context.audioWorklet.addModule(wasmMixerProcessorUrl)
+    await this.context.audioWorklet.addModule(wasmDelayProcessorUrl)
+    await this.context.audioWorklet.addModule(wasmChorusProcessorUrl)
+    await this.context.audioWorklet.addModule(wasmReverbProcessorUrl)
     this.workletsLoaded = true
   }
 
@@ -1173,6 +1200,63 @@ export class AudioEngine {
       }
     }
 
+    if (module.type === 'wasm-vcf') {
+      const vcf = new AudioWorkletNode(this.context, 'wasm-vcf-processor', {
+        numberOfInputs: 4,
+        numberOfOutputs: 1,
+        channelCountMode: 'explicit',
+        outputChannelCount: [1],
+      })
+      vcf.parameters
+        .get('cutoff')
+        ?.setValueAtTime(Number(module.params.cutoff ?? 800), this.context.currentTime)
+      vcf.parameters
+        .get('resonance')
+        ?.setValueAtTime(Number(module.params.resonance ?? 0.4), this.context.currentTime)
+      vcf.parameters
+        .get('drive')
+        ?.setValueAtTime(Number(module.params.drive ?? 0.2), this.context.currentTime)
+      vcf.parameters
+        .get('envAmount')
+        ?.setValueAtTime(Number(module.params.envAmount ?? 0), this.context.currentTime)
+      vcf.parameters
+        .get('modAmount')
+        ?.setValueAtTime(Number(module.params.modAmount ?? 0), this.context.currentTime)
+      vcf.parameters
+        .get('keyTrack')
+        ?.setValueAtTime(Number(module.params.keyTrack ?? 0), this.context.currentTime)
+      vcf.parameters
+        .get('mode')
+        ?.setValueAtTime(
+          this.filterModeIndex(String(module.params.mode ?? 'lp')),
+          this.context.currentTime,
+        )
+      vcf.parameters
+        .get('model')
+        ?.setValueAtTime(
+          this.filterModelIndex(String(module.params.model ?? 'svf')),
+          this.context.currentTime,
+        )
+      vcf.parameters
+        .get('slope')
+        ?.setValueAtTime(
+          this.filterSlopeIndex(Number(module.params.slope ?? 24)),
+          this.context.currentTime,
+        )
+      return {
+        id: module.id,
+        type: module.type,
+        node: vcf,
+        inputs: {
+          in: { node: vcf, inputIndex: 0 },
+          mod: { node: vcf, inputIndex: 1 },
+          env: { node: vcf, inputIndex: 2 },
+          key: { node: vcf, inputIndex: 3 },
+        },
+        outputs: { out: { node: vcf } },
+      }
+    }
+
     if (module.type === 'mixer') {
       const mixer = new AudioWorkletNode(this.context, 'mixer-processor', {
         numberOfInputs: 2,
@@ -1198,8 +1282,67 @@ export class AudioEngine {
       }
     }
 
+    if (module.type === 'wasm-mixer') {
+      const mixer = new AudioWorkletNode(this.context, 'wasm-mixer-processor', {
+        numberOfInputs: 2,
+        numberOfOutputs: 1,
+        channelCountMode: 'explicit',
+        outputChannelCount: [1],
+      })
+      mixer.parameters
+        .get('levelA')
+        ?.setValueAtTime(Number(module.params.levelA ?? 0.6), this.context.currentTime)
+      mixer.parameters
+        .get('levelB')
+        ?.setValueAtTime(Number(module.params.levelB ?? 0.6), this.context.currentTime)
+      return {
+        id: module.id,
+        type: module.type,
+        node: mixer,
+        inputs: {
+          'in-a': { node: mixer, inputIndex: 0 },
+          'in-b': { node: mixer, inputIndex: 1 },
+        },
+        outputs: { out: { node: mixer } },
+      }
+    }
+
     if (module.type === 'chorus') {
       const chorus = new AudioWorkletNode(this.context, 'chorus-processor', {
+        numberOfInputs: 1,
+        numberOfOutputs: 1,
+        channelCountMode: 'explicit',
+        outputChannelCount: [2],
+      })
+      chorus.parameters
+        .get('rate')
+        ?.setValueAtTime(Number(module.params.rate ?? 0.3), this.context.currentTime)
+      chorus.parameters
+        .get('depth')
+        ?.setValueAtTime(Number(module.params.depth ?? 8), this.context.currentTime)
+      chorus.parameters
+        .get('delay')
+        ?.setValueAtTime(Number(module.params.delay ?? 18), this.context.currentTime)
+      chorus.parameters
+        .get('mix')
+        ?.setValueAtTime(Number(module.params.mix ?? 0.45), this.context.currentTime)
+      chorus.parameters
+        .get('feedback')
+        ?.setValueAtTime(Number(module.params.feedback ?? 0.15), this.context.currentTime)
+      chorus.parameters
+        .get('spread')
+        ?.setValueAtTime(Number(module.params.spread ?? 0.6), this.context.currentTime)
+      return {
+        id: module.id,
+        type: module.type,
+        node: chorus,
+        inputs: { in: { node: chorus, inputIndex: 0 } },
+        outputs: { out: { node: chorus } },
+      }
+    }
+
+    if (module.type === 'wasm-chorus') {
+      const chorus = new AudioWorkletNode(this.context, 'wasm-chorus-processor', {
         numberOfInputs: 1,
         numberOfOutputs: 1,
         channelCountMode: 'explicit',
@@ -1263,8 +1406,67 @@ export class AudioEngine {
       }
     }
 
+    if (module.type === 'wasm-delay') {
+      const delay = new AudioWorkletNode(this.context, 'wasm-delay-processor', {
+        numberOfInputs: 1,
+        numberOfOutputs: 1,
+        channelCountMode: 'explicit',
+        outputChannelCount: [2],
+      })
+      delay.parameters
+        .get('time')
+        ?.setValueAtTime(Number(module.params.time ?? 360), this.context.currentTime)
+      delay.parameters
+        .get('feedback')
+        ?.setValueAtTime(Number(module.params.feedback ?? 0.35), this.context.currentTime)
+      delay.parameters
+        .get('mix')
+        ?.setValueAtTime(Number(module.params.mix ?? 0.25), this.context.currentTime)
+      delay.parameters
+        .get('tone')
+        ?.setValueAtTime(Number(module.params.tone ?? 0.55), this.context.currentTime)
+      delay.parameters
+        .get('pingPong')
+        ?.setValueAtTime(module.params.pingPong ? 1 : 0, this.context.currentTime)
+      return {
+        id: module.id,
+        type: module.type,
+        node: delay,
+        inputs: { in: { node: delay, inputIndex: 0 } },
+        outputs: { out: { node: delay } },
+      }
+    }
+
     if (module.type === 'reverb') {
       const reverb = new AudioWorkletNode(this.context, 'reverb-processor', {
+        numberOfInputs: 1,
+        numberOfOutputs: 1,
+        channelCountMode: 'explicit',
+        outputChannelCount: [2],
+      })
+      reverb.parameters
+        .get('time')
+        ?.setValueAtTime(Number(module.params.time ?? 0.62), this.context.currentTime)
+      reverb.parameters
+        .get('damp')
+        ?.setValueAtTime(Number(module.params.damp ?? 0.4), this.context.currentTime)
+      reverb.parameters
+        .get('preDelay')
+        ?.setValueAtTime(Number(module.params.preDelay ?? 18), this.context.currentTime)
+      reverb.parameters
+        .get('mix')
+        ?.setValueAtTime(Number(module.params.mix ?? 0.25), this.context.currentTime)
+      return {
+        id: module.id,
+        type: module.type,
+        node: reverb,
+        inputs: { in: { node: reverb, inputIndex: 0 } },
+        outputs: { out: { node: reverb } },
+      }
+    }
+
+    if (module.type === 'wasm-reverb') {
+      const reverb = new AudioWorkletNode(this.context, 'wasm-reverb-processor', {
         numberOfInputs: 1,
         numberOfOutputs: 1,
         channelCountMode: 'explicit',

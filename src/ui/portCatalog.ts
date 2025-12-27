@@ -76,7 +76,23 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
     ],
     outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
   },
+  'wasm-vcf': {
+    inputs: [
+      { id: 'in', label: 'In', kind: 'audio', direction: 'in' },
+      { id: 'mod', label: 'Mod', kind: 'cv', direction: 'in' },
+      { id: 'env', label: 'Env', kind: 'cv', direction: 'in' },
+      { id: 'key', label: 'Key', kind: 'cv', direction: 'in' },
+    ],
+    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
+  },
   mixer: {
+    inputs: [
+      { id: 'in-a', label: 'In A', kind: 'audio', direction: 'in' },
+      { id: 'in-b', label: 'In B', kind: 'audio', direction: 'in' },
+    ],
+    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
+  },
+  'wasm-mixer': {
     inputs: [
       { id: 'in-a', label: 'In A', kind: 'audio', direction: 'in' },
       { id: 'in-b', label: 'In B', kind: 'audio', direction: 'in' },
@@ -87,11 +103,23 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
     inputs: [{ id: 'in', label: 'In', kind: 'audio', direction: 'in' }],
     outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
   },
+  'wasm-chorus': {
+    inputs: [{ id: 'in', label: 'In', kind: 'audio', direction: 'in' }],
+    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
+  },
   delay: {
     inputs: [{ id: 'in', label: 'In', kind: 'audio', direction: 'in' }],
     outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
   },
+  'wasm-delay': {
+    inputs: [{ id: 'in', label: 'In', kind: 'audio', direction: 'in' }],
+    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
+  },
   reverb: {
+    inputs: [{ id: 'in', label: 'In', kind: 'audio', direction: 'in' }],
+    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
+  },
+  'wasm-reverb': {
     inputs: [{ id: 'in', label: 'In', kind: 'audio', direction: 'in' }],
     outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
   },

@@ -89,6 +89,11 @@ Presets live in `src/state/presets.ts` and are loaded from the Presets panel. So
 - **WASM VCO parity work**: experimental VCO backend switch in Module Library (JS vs WASM).
 - **WASM VCA parity work**: experimental VCA backend switch + wasm gain worklet (JS vs WASM).
 - **WASM LFO/ADSR parity work**: experimental backend switches + wasm worklets (JS vs WASM).
+- **WASM VCF parity work**: experimental backend switch + wasm worklet (JS vs WASM).
+- **WASM Mixer parity work**: experimental backend switch + wasm worklet (JS vs WASM).
+- **WASM Delay parity work**: experimental backend switch + wasm worklet (JS vs WASM).
+- **WASM Chorus/Reverb parity work**: experimental backend switches + wasm worklets (JS vs WASM).
+- **WASM graph engine**: single worklet now runs the full DSP graph in Rust, including Control IO + Mod VCA; scope inputs are tapped via worklet outputs.
 
 ## How to update
 

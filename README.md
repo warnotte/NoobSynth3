@@ -59,7 +59,7 @@ change patch routing.
 
 - Audio graph: `src/state/defaultGraph.ts`
 - Presets: `src/state/presets.ts`, `public/presets/manifest.json`
-- Audio engine: `src/engine/AudioEngine.ts`
+- Audio engine: `src/engine/WasmGraphEngine.ts`
 - Worklets: `src/engine/worklets/*`
 - UI: `src/App.tsx`, `src/ui/*`
 
@@ -71,8 +71,8 @@ npx tsc -p tsconfig.app.json --noEmit
 
 ## WASM DSP (experimental)
 
-This repo now includes a Rust DSP workspace and an experimental WASM-backed
-oscillator worklet.
+This repo now includes a Rust DSP workspace and a single **WASM graph**
+AudioWorklet that runs the full DSP graph in Rust for better performance.
 
 Build the WASM artifacts:
 
@@ -80,17 +80,8 @@ Build the WASM artifacts:
 npm run build:wasm
 ```
 
-This generates `src/engine/worklets/wasm/dsp_wasm.js` and `dsp_wasm_bg.wasm`.
-Use the backend toggles (below) to swap modules between JS and WASM.
-
-### Backend switches (dev)
-
-In the Module Library, use the **VCO Backend**, **VCA Backend**, **LFO Backend**,
-and **ADSR Backend** toggles to swap between JS AudioWorklet modules and their
-WASM equivalents. This keeps presets intact while switching implementations.
-
-For quick parity checks, load the **VCO A/B** preset (single VCO -> Output)
-or **VCA A/B** (VCO -> VCA -> Output) and flip the related backend switch.
+This generates `src/engine/worklets/wasm/dsp_wasm.js` and `dsp_wasm_bg.wasm`,
+used by `wasm-graph-processor` for the full graph.
 
 ### Preset batch export (dev)
 

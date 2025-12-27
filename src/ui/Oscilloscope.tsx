@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import type { AudioEngine } from '../engine/AudioEngine'
+import type { AudioEngine } from '../engine/WasmGraphEngine'
 
 type ViewMode = 'scope' | 'fft' | 'spectrogram'
 

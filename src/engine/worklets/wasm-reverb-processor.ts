@@ -1,4 +1,4 @@
-import init, { WasmLfo } from './wasm/dsp_wasm_wrapper'
+import init, { WasmReverb } from './wasm/dsp_wasm_wrapper'
 import wasmDataUrl from './wasm/dsp_wasm_bg.wasm?inline'
 
 const decodeBase64 = (base64: string) => {
@@ -42,48 +42,41 @@ const decodeWasmDataUrl = (dataUrl: string) => {
 
 const EMPTY_INPUT = new Float32Array()
 
-class WasmLfoProcessor extends AudioWorkletProcessor {
+class WasmReverbProcessor extends AudioWorkletProcessor {
   static get parameterDescriptors(): AudioParamDescriptor[] {
     return [
       {
-        name: 'rate',
-        defaultValue: 2,
-        minValue: 0.01,
-        maxValue: 40,
-        automationRate: 'a-rate',
-      },
-      {
-        name: 'shape',
-        defaultValue: 0,
-        minValue: 0,
-        maxValue: 3,
+        name: 'time',
+        defaultValue: 0.62,
+        minValue: 0.1,
+        maxValue: 0.98,
         automationRate: 'k-rate',
       },
       {
-        name: 'depth',
-        defaultValue: 0.7,
-        minValue: 0,
-        maxValue: 1,
-        automationRate: 'a-rate',
-      },
-      {
-        name: 'offset',
-        defaultValue: 0,
-        minValue: -1,
-        maxValue: 1,
-        automationRate: 'a-rate',
-      },
-      {
-        name: 'bipolar',
-        defaultValue: 1,
+        name: 'damp',
+        defaultValue: 0.4,
         minValue: 0,
         maxValue: 1,
         automationRate: 'k-rate',
+      },
+      {
+        name: 'preDelay',
+        defaultValue: 18,
+        minValue: 0,
+        maxValue: 80,
+        automationRate: 'k-rate',
+      },
+      {
+        name: 'mix',
+        defaultValue: 0.25,
+        minValue: 0,
+        maxValue: 1,
+        automationRate: 'a-rate',
       },
     ]
   }
 
-  private lfo: InstanceType<NonNullable<typeof WasmLfo>> | null = null
+  private reverb: InstanceType<NonNullable<typeof WasmReverb>> | null = null
   private ready = false
   private fallbackWarned = false
 
@@ -96,15 +89,15 @@ class WasmLfoProcessor extends AudioWorkletProcessor {
     try {
       const bytes = decodeWasmDataUrl(wasmDataUrl)
       await init({ module_or_path: bytes })
-      if (WasmLfo) {
-        this.lfo = new WasmLfo(sampleRate)
+      if (WasmReverb) {
+        this.reverb = new WasmReverb(sampleRate)
         this.ready = true
       } else {
         this.ready = false
-        console.warn('WASM LFO missing; falling back to JS.')
+        console.warn('WASM Reverb missing; falling back to JS.')
       }
     } catch (error) {
-      console.error('WASM LFO init failed', error)
+      console.error('WASM Reverb init failed', error)
       this.ready = false
     }
   }
@@ -119,54 +112,61 @@ class WasmLfoProcessor extends AudioWorkletProcessor {
       return true
     }
 
-    const sampleCount = output[0].length
-    if (!this.ready || !this.lfo) {
+    const input = inputs[0]
+    const inputL = input?.[0] ?? EMPTY_INPUT
+    const inputR = input?.[1] ?? input?.[0] ?? EMPTY_INPUT
+    const outL = output[0]
+    const outR = output[1] ?? output[0]
+
+    const timeParam = parameters.time ?? EMPTY_INPUT
+    const dampParam = parameters.damp ?? EMPTY_INPUT
+    const preDelayParam = parameters.preDelay ?? EMPTY_INPUT
+    const mixParam = parameters.mix ?? EMPTY_INPUT
+
+    const sampleCount = outL.length
+
+    if (!this.ready || !this.reverb) {
       if (!this.fallbackWarned) {
-        console.warn('WASM LFO not ready; outputting silence (fallback).')
+        console.warn('WASM Reverb not ready; outputting silence (fallback).')
         this.fallbackWarned = true
       }
-      for (let channel = 0; channel < output.length; channel += 1) {
-        output[channel].fill(0)
+      for (let i = 0; i < sampleCount; i += 1) {
+        outL[i] = 0
+        outR[i] = 0
       }
       return true
     }
 
-    const rateInput = inputs[0]?.[0] ?? EMPTY_INPUT
-    const syncInput = inputs[1]?.[0] ?? EMPTY_INPUT
-    const rateParam = parameters.rate ?? EMPTY_INPUT
-    const shapeParam = parameters.shape ?? EMPTY_INPUT
-    const depthParam = parameters.depth ?? EMPTY_INPUT
-    const offsetParam = parameters.offset ?? EMPTY_INPUT
-    const bipolarParam = parameters.bipolar ?? EMPTY_INPUT
-
-    const block = this.lfo.render(
-      rateInput,
-      syncInput,
-      rateParam,
-      shapeParam,
-      depthParam,
-      offsetParam,
-      bipolarParam,
+    const block = this.reverb.render(
+      inputL,
+      inputR,
+      timeParam,
+      dampParam,
+      preDelayParam,
+      mixParam,
       sampleCount,
     )
 
-    if (!block || block.length < sampleCount) {
+    if (!block || block.length < sampleCount * 2) {
       if (!this.fallbackWarned) {
-        console.warn('WASM LFO returned invalid data; outputting silence (fallback).')
+        console.warn('WASM Reverb returned invalid data; outputting silence (fallback).')
         this.fallbackWarned = true
       }
-      for (let channel = 0; channel < output.length; channel += 1) {
-        output[channel].fill(0)
+      for (let i = 0; i < sampleCount; i += 1) {
+        outL[i] = 0
+        outR[i] = 0
       }
       return true
     }
 
-    for (let channel = 0; channel < output.length; channel += 1) {
-      output[channel].set(block)
+    for (let i = 0; i < sampleCount; i += 1) {
+      const idx = i * 2
+      outL[i] = block[idx] ?? 0
+      outR[i] = block[idx + 1] ?? 0
     }
 
     return true
   }
 }
 
-registerProcessor('wasm-lfo-processor', WasmLfoProcessor)
+registerProcessor('wasm-reverb-processor', WasmReverbProcessor)

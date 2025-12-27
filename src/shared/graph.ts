@@ -16,10 +16,15 @@ export type ModuleType =
   | 'wasm-adsr'
   | 'scope'
   | 'vcf'
+  | 'wasm-vcf'
   | 'mixer'
+  | 'wasm-mixer'
   | 'chorus'
+  | 'wasm-chorus'
   | 'delay'
+  | 'wasm-delay'
   | 'reverb'
+  | 'wasm-reverb'
   | 'mario'
 
 export interface ModuleSpec {

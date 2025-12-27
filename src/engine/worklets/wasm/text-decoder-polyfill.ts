@@ -1,4 +1,7 @@
-type DecoderGlobal = typeof globalThis & { TextDecoder?: typeof TextDecoder }
+type DecoderGlobal = typeof globalThis & {
+  TextDecoder?: typeof TextDecoder
+  TextEncoder?: typeof TextEncoder
+}
 
 const scope = globalThis as DecoderGlobal
 
@@ -59,4 +62,36 @@ if (typeof scope.TextDecoder === 'undefined') {
   }
 
   scope.TextDecoder = SimpleTextDecoder as unknown as typeof TextDecoder
+}
+
+if (typeof scope.TextEncoder === 'undefined') {
+  class SimpleTextEncoder {
+    encode(input = ''): Uint8Array {
+      const bytes: number[] = []
+      for (let i = 0; i < input.length; i += 1) {
+        const codePoint = input.codePointAt(i) ?? 0
+        if (codePoint > 0xffff) {
+          i += 1
+        }
+        if (codePoint <= 0x7f) {
+          bytes.push(codePoint)
+        } else if (codePoint <= 0x7ff) {
+          bytes.push(0xc0 | (codePoint >> 6))
+          bytes.push(0x80 | (codePoint & 0x3f))
+        } else if (codePoint <= 0xffff) {
+          bytes.push(0xe0 | (codePoint >> 12))
+          bytes.push(0x80 | ((codePoint >> 6) & 0x3f))
+          bytes.push(0x80 | (codePoint & 0x3f))
+        } else {
+          bytes.push(0xf0 | (codePoint >> 18))
+          bytes.push(0x80 | ((codePoint >> 12) & 0x3f))
+          bytes.push(0x80 | ((codePoint >> 6) & 0x3f))
+          bytes.push(0x80 | (codePoint & 0x3f))
+        }
+      }
+      return new Uint8Array(bytes)
+    }
+  }
+
+  scope.TextEncoder = SimpleTextEncoder as unknown as typeof TextEncoder
 }

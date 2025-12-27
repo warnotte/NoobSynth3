@@ -1,9 +1,11 @@
 use dsp_core::{
-  Adsr, AdsrInputs, AdsrParams, Lfo, LfoInputs, LfoParams, Node, Sample, SineOsc, Vca, Vco,
-  VcoInputs, VcoParams,
+  Adsr, AdsrInputs, AdsrParams, Chorus, ChorusInputs, ChorusParams, Delay, DelayInputs, DelayParams,
+  Lfo, LfoInputs, LfoParams, Mixer, Node, Reverb, ReverbInputs, ReverbParams, Sample, SineOsc,
+  Vca, Vcf, VcfInputs, VcfParams, Vco, VcoInputs, VcoParams,
 };
 use js_sys::Float32Array;
 use wasm_bindgen::prelude::*;
+mod graph;
 
 #[wasm_bindgen]
 pub struct WasmOsc {
@@ -273,5 +275,448 @@ impl WasmAdsr {
 
     self.adsr.process_block(&mut self.buffer, inputs, params);
     Float32Array::from(self.buffer.as_slice())
+  }
+}
+
+#[wasm_bindgen]
+pub struct WasmVcf {
+  vcf: Vcf,
+  buffer: Vec<Sample>,
+}
+
+#[wasm_bindgen]
+impl WasmVcf {
+  #[wasm_bindgen(constructor)]
+  pub fn new(sample_rate: f32) -> WasmVcf {
+    WasmVcf {
+      vcf: Vcf::new(sample_rate),
+      buffer: Vec::new(),
+    }
+  }
+
+  pub fn set_sample_rate(&mut self, sample_rate: f32) {
+    self.vcf.set_sample_rate(sample_rate);
+  }
+
+  #[allow(clippy::too_many_arguments)]
+  pub fn render(
+    &mut self,
+    audio: Float32Array,
+    mod_in: Float32Array,
+    env: Float32Array,
+    key: Float32Array,
+    cutoff: Float32Array,
+    resonance: Float32Array,
+    drive: Float32Array,
+    env_amount: Float32Array,
+    mod_amount: Float32Array,
+    key_track: Float32Array,
+    mode: Float32Array,
+    slope: Float32Array,
+    frames: usize,
+  ) -> Float32Array {
+    if self.buffer.len() != frames {
+      self.buffer.resize(frames, 0.0);
+    }
+
+    let audio_vec = audio.to_vec();
+    let mod_vec = mod_in.to_vec();
+    let env_vec = env.to_vec();
+    let key_vec = key.to_vec();
+    let cutoff_vec = cutoff.to_vec();
+    let resonance_vec = resonance.to_vec();
+    let drive_vec = drive.to_vec();
+    let env_amount_vec = env_amount.to_vec();
+    let mod_amount_vec = mod_amount.to_vec();
+    let key_track_vec = key_track.to_vec();
+    let mode_vec = mode.to_vec();
+    let slope_vec = slope.to_vec();
+
+    let inputs = VcfInputs {
+      audio: if audio_vec.is_empty() { None } else { Some(audio_vec.as_slice()) },
+      mod_in: if mod_vec.is_empty() { None } else { Some(mod_vec.as_slice()) },
+      env: if env_vec.is_empty() { None } else { Some(env_vec.as_slice()) },
+      key: if key_vec.is_empty() { None } else { Some(key_vec.as_slice()) },
+    };
+
+    let params = VcfParams {
+      cutoff: &cutoff_vec,
+      resonance: &resonance_vec,
+      drive: &drive_vec,
+      env_amount: &env_amount_vec,
+      mod_amount: &mod_amount_vec,
+      key_track: &key_track_vec,
+      mode: &mode_vec,
+      slope: &slope_vec,
+    };
+
+    self.vcf.process_block(&mut self.buffer, inputs, params);
+    Float32Array::from(self.buffer.as_slice())
+  }
+}
+
+#[wasm_bindgen]
+pub struct WasmMixer {
+  buffer: Vec<Sample>,
+}
+
+#[wasm_bindgen]
+impl WasmMixer {
+  #[wasm_bindgen(constructor)]
+  pub fn new(_sample_rate: f32) -> WasmMixer {
+    WasmMixer { buffer: Vec::new() }
+  }
+
+  pub fn render(
+    &mut self,
+    input_a: Float32Array,
+    input_b: Float32Array,
+    level_a: Float32Array,
+    level_b: Float32Array,
+    frames: usize,
+  ) -> Float32Array {
+    if self.buffer.len() != frames {
+      self.buffer.resize(frames, 0.0);
+    }
+
+    let input_a_vec = input_a.to_vec();
+    let input_b_vec = input_b.to_vec();
+    let level_a_vec = level_a.to_vec();
+    let level_b_vec = level_b.to_vec();
+
+    let input_a_ref = if input_a_vec.is_empty() {
+      None
+    } else {
+      Some(input_a_vec.as_slice())
+    };
+    let input_b_ref = if input_b_vec.is_empty() {
+      None
+    } else {
+      Some(input_b_vec.as_slice())
+    };
+
+    Mixer::process_block(&mut self.buffer, input_a_ref, input_b_ref, &level_a_vec, &level_b_vec);
+    Float32Array::from(self.buffer.as_slice())
+  }
+}
+
+#[wasm_bindgen]
+pub struct WasmDelay {
+  delay: Delay,
+  buffer: Vec<Sample>,
+  temp_l: Vec<Sample>,
+  temp_r: Vec<Sample>,
+}
+
+#[wasm_bindgen]
+impl WasmDelay {
+  #[wasm_bindgen(constructor)]
+  pub fn new(sample_rate: f32) -> WasmDelay {
+    WasmDelay {
+      delay: Delay::new(sample_rate),
+      buffer: Vec::new(),
+      temp_l: Vec::new(),
+      temp_r: Vec::new(),
+    }
+  }
+
+  pub fn set_sample_rate(&mut self, sample_rate: f32) {
+    self.delay.set_sample_rate(sample_rate);
+  }
+
+  #[allow(clippy::too_many_arguments)]
+  pub fn render(
+    &mut self,
+    input_l: Float32Array,
+    input_r: Float32Array,
+    time_ms: Float32Array,
+    feedback: Float32Array,
+    mix: Float32Array,
+    tone: Float32Array,
+    ping_pong: Float32Array,
+    frames: usize,
+  ) -> Float32Array {
+    if self.temp_l.len() != frames {
+      self.temp_l.resize(frames, 0.0);
+      self.temp_r.resize(frames, 0.0);
+    }
+    if self.buffer.len() != frames * 2 {
+      self.buffer.resize(frames * 2, 0.0);
+    }
+
+    let input_l_vec = input_l.to_vec();
+    let input_r_vec = input_r.to_vec();
+    let time_vec = time_ms.to_vec();
+    let feedback_vec = feedback.to_vec();
+    let mix_vec = mix.to_vec();
+    let tone_vec = tone.to_vec();
+    let ping_vec = ping_pong.to_vec();
+
+    let inputs = DelayInputs {
+      input_l: if input_l_vec.is_empty() {
+        None
+      } else {
+        Some(input_l_vec.as_slice())
+      },
+      input_r: if input_r_vec.is_empty() {
+        None
+      } else {
+        Some(input_r_vec.as_slice())
+      },
+    };
+
+    let params = DelayParams {
+      time_ms: &time_vec,
+      feedback: &feedback_vec,
+      mix: &mix_vec,
+      tone: &tone_vec,
+      ping_pong: &ping_vec,
+    };
+
+    self.delay
+      .process_block(&mut self.temp_l, &mut self.temp_r, inputs, params);
+
+    for i in 0..frames {
+      let idx = i * 2;
+      self.buffer[idx] = self.temp_l[i];
+      self.buffer[idx + 1] = self.temp_r[i];
+    }
+
+    Float32Array::from(self.buffer.as_slice())
+  }
+}
+
+#[wasm_bindgen]
+pub struct WasmChorus {
+  chorus: Chorus,
+  buffer: Vec<Sample>,
+  temp_l: Vec<Sample>,
+  temp_r: Vec<Sample>,
+}
+
+#[wasm_bindgen]
+impl WasmChorus {
+  #[wasm_bindgen(constructor)]
+  pub fn new(sample_rate: f32) -> WasmChorus {
+    WasmChorus {
+      chorus: Chorus::new(sample_rate),
+      buffer: Vec::new(),
+      temp_l: Vec::new(),
+      temp_r: Vec::new(),
+    }
+  }
+
+  pub fn set_sample_rate(&mut self, sample_rate: f32) {
+    self.chorus.set_sample_rate(sample_rate);
+  }
+
+  #[allow(clippy::too_many_arguments)]
+  pub fn render(
+    &mut self,
+    input_l: Float32Array,
+    input_r: Float32Array,
+    rate: Float32Array,
+    depth_ms: Float32Array,
+    delay_ms: Float32Array,
+    mix: Float32Array,
+    feedback: Float32Array,
+    spread: Float32Array,
+    frames: usize,
+  ) -> Float32Array {
+    if self.temp_l.len() != frames {
+      self.temp_l.resize(frames, 0.0);
+      self.temp_r.resize(frames, 0.0);
+    }
+    if self.buffer.len() != frames * 2 {
+      self.buffer.resize(frames * 2, 0.0);
+    }
+
+    let input_l_vec = input_l.to_vec();
+    let input_r_vec = input_r.to_vec();
+    let rate_vec = rate.to_vec();
+    let depth_vec = depth_ms.to_vec();
+    let delay_vec = delay_ms.to_vec();
+    let mix_vec = mix.to_vec();
+    let feedback_vec = feedback.to_vec();
+    let spread_vec = spread.to_vec();
+
+    let inputs = ChorusInputs {
+      input_l: if input_l_vec.is_empty() {
+        None
+      } else {
+        Some(input_l_vec.as_slice())
+      },
+      input_r: if input_r_vec.is_empty() {
+        None
+      } else {
+        Some(input_r_vec.as_slice())
+      },
+    };
+
+    let params = ChorusParams {
+      rate: &rate_vec,
+      depth_ms: &depth_vec,
+      delay_ms: &delay_vec,
+      mix: &mix_vec,
+      feedback: &feedback_vec,
+      spread: &spread_vec,
+    };
+
+    self.chorus
+      .process_block(&mut self.temp_l, &mut self.temp_r, inputs, params);
+
+    for i in 0..frames {
+      let idx = i * 2;
+      self.buffer[idx] = self.temp_l[i];
+      self.buffer[idx + 1] = self.temp_r[i];
+    }
+
+    Float32Array::from(self.buffer.as_slice())
+  }
+}
+
+#[wasm_bindgen]
+pub struct WasmReverb {
+  reverb: Reverb,
+  buffer: Vec<Sample>,
+  temp_l: Vec<Sample>,
+  temp_r: Vec<Sample>,
+}
+
+#[wasm_bindgen]
+impl WasmReverb {
+  #[wasm_bindgen(constructor)]
+  pub fn new(sample_rate: f32) -> WasmReverb {
+    WasmReverb {
+      reverb: Reverb::new(sample_rate),
+      buffer: Vec::new(),
+      temp_l: Vec::new(),
+      temp_r: Vec::new(),
+    }
+  }
+
+  pub fn set_sample_rate(&mut self, sample_rate: f32) {
+    self.reverb.set_sample_rate(sample_rate);
+  }
+
+  #[allow(clippy::too_many_arguments)]
+  pub fn render(
+    &mut self,
+    input_l: Float32Array,
+    input_r: Float32Array,
+    time: Float32Array,
+    damp: Float32Array,
+    pre_delay: Float32Array,
+    mix: Float32Array,
+    frames: usize,
+  ) -> Float32Array {
+    if self.temp_l.len() != frames {
+      self.temp_l.resize(frames, 0.0);
+      self.temp_r.resize(frames, 0.0);
+    }
+    if self.buffer.len() != frames * 2 {
+      self.buffer.resize(frames * 2, 0.0);
+    }
+
+    let input_l_vec = input_l.to_vec();
+    let input_r_vec = input_r.to_vec();
+    let time_vec = time.to_vec();
+    let damp_vec = damp.to_vec();
+    let pre_vec = pre_delay.to_vec();
+    let mix_vec = mix.to_vec();
+
+    let inputs = ReverbInputs {
+      input_l: if input_l_vec.is_empty() {
+        None
+      } else {
+        Some(input_l_vec.as_slice())
+      },
+      input_r: if input_r_vec.is_empty() {
+        None
+      } else {
+        Some(input_r_vec.as_slice())
+      },
+    };
+
+    let params = ReverbParams {
+      time: &time_vec,
+      damp: &damp_vec,
+      pre_delay: &pre_vec,
+      mix: &mix_vec,
+    };
+
+    self.reverb
+      .process_block(&mut self.temp_l, &mut self.temp_r, inputs, params);
+
+    for i in 0..frames {
+      let idx = i * 2;
+      self.buffer[idx] = self.temp_l[i];
+      self.buffer[idx + 1] = self.temp_r[i];
+    }
+
+    Float32Array::from(self.buffer.as_slice())
+  }
+}
+
+#[wasm_bindgen]
+pub struct WasmGraphEngine {
+  engine: graph::GraphEngine,
+}
+
+#[wasm_bindgen]
+impl WasmGraphEngine {
+  #[wasm_bindgen(constructor)]
+  pub fn new(sample_rate: f32) -> WasmGraphEngine {
+    WasmGraphEngine {
+      engine: graph::GraphEngine::new(sample_rate),
+    }
+  }
+
+  pub fn set_graph(&mut self, graph_json: &str) -> Result<(), JsValue> {
+    self.engine.set_graph_json(graph_json).map_err(|err| JsValue::from_str(&err))
+  }
+
+  pub fn set_param(&mut self, module_id: &str, param_id: &str, value: f32) {
+    self.engine.set_param(module_id, param_id, value);
+  }
+
+  pub fn set_control_voice_cv(&mut self, module_id: &str, voice: usize, value: f32) {
+    self.engine.set_control_voice_cv(module_id, voice, value);
+  }
+
+  pub fn set_control_voice_gate(&mut self, module_id: &str, voice: usize, value: f32) {
+    self.engine.set_control_voice_gate(module_id, voice, value);
+  }
+
+  pub fn trigger_control_voice_gate(&mut self, module_id: &str, voice: usize) {
+    self.engine.trigger_control_voice_gate(module_id, voice);
+  }
+
+  pub fn trigger_control_voice_sync(&mut self, module_id: &str, voice: usize) {
+    self.engine.trigger_control_voice_sync(module_id, voice);
+  }
+
+  pub fn set_control_voice_velocity(
+    &mut self,
+    module_id: &str,
+    voice: usize,
+    value: f32,
+    slew_seconds: f32,
+  ) {
+    self.engine
+      .set_control_voice_velocity(module_id, voice, value, slew_seconds);
+  }
+
+  pub fn set_mario_channel_cv(&mut self, module_id: &str, channel: usize, value: f32) {
+    self.engine.set_mario_channel_cv(module_id, channel, value);
+  }
+
+  pub fn set_mario_channel_gate(&mut self, module_id: &str, channel: usize, value: f32) {
+    self.engine.set_mario_channel_gate(module_id, channel, value);
+  }
+
+  pub fn render(&mut self, frames: usize) -> Float32Array {
+    let data = self.engine.render(frames);
+    unsafe { Float32Array::view(data) }
   }
 }

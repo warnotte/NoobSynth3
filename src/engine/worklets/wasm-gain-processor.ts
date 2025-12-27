@@ -57,6 +57,7 @@ class WasmGainProcessor extends AudioWorkletProcessor {
 
   private gain: InstanceType<NonNullable<typeof WasmGain>> | null = null
   private ready = false
+  private fallbackWarned = false
 
   constructor() {
     super()
@@ -98,28 +99,19 @@ class WasmGainProcessor extends AudioWorkletProcessor {
     const sampleCount = output[0].length
 
     if (!this.ready || !this.gain) {
-      for (let channel = 0; channel < outputChannelCount; channel += 1) {
-        const inputChannel =
-          inputChannelCount > 0 ? input?.[Math.min(channel, inputChannelCount - 1)] : null
-        const outputChannel = output[channel]
-        if (!outputChannel) {
-          continue
-        }
-        if (gains.length === 1) {
-          const gainValue = gains[0]
-          for (let i = 0; i < sampleCount; i += 1) {
-            const cv = cvInput ? Math.max(0, cvInput[i]) : 1
-            const source = inputChannel ? inputChannel[i] : 0
-            outputChannel[i] = source * gainValue * cv
-          }
-        } else {
-          for (let i = 0; i < sampleCount; i += 1) {
-            const cv = cvInput ? Math.max(0, cvInput[i]) : 1
-            const source = inputChannel ? inputChannel[i] : 0
-            outputChannel[i] = source * gains[i] * cv
-          }
-        }
+      if (!this.fallbackWarned) {
+        console.warn('WASM gain not ready; using JS fallback.')
+        this.fallbackWarned = true
       }
+      this.processFallback(
+        output,
+        input,
+        cvInput,
+        gains,
+        inputChannelCount,
+        outputChannelCount,
+        sampleCount,
+      )
       return true
     }
 
@@ -136,10 +128,59 @@ class WasmGainProcessor extends AudioWorkletProcessor {
         gains,
         sampleCount,
       )
+      if (!rendered || rendered.length < sampleCount) {
+        if (!this.fallbackWarned) {
+          console.warn('WASM gain returned invalid data; using JS fallback.')
+          this.fallbackWarned = true
+        }
+        this.processFallback(
+          output,
+          input,
+          cvInput,
+          gains,
+          inputChannelCount,
+          outputChannelCount,
+          sampleCount,
+        )
+        return true
+      }
       outputChannel.set(rendered)
     }
 
     return true
+  }
+
+  private processFallback(
+    output: Float32Array[],
+    input: Float32Array[] | undefined,
+    cvInput: Float32Array | undefined,
+    gains: Float32Array,
+    inputChannelCount: number,
+    outputChannelCount: number,
+    sampleCount: number,
+  ) {
+    for (let channel = 0; channel < outputChannelCount; channel += 1) {
+      const inputChannel =
+        inputChannelCount > 0 ? input?.[Math.min(channel, inputChannelCount - 1)] : null
+      const outputChannel = output[channel]
+      if (!outputChannel) {
+        continue
+      }
+      if (gains.length === 1) {
+        const gainValue = gains[0]
+        for (let i = 0; i < sampleCount; i += 1) {
+          const cv = cvInput ? Math.max(0, cvInput[i]) : 1
+          const source = inputChannel ? inputChannel[i] : 0
+          outputChannel[i] = source * gainValue * cv
+        }
+      } else {
+        for (let i = 0; i < sampleCount; i += 1) {
+          const cv = cvInput ? Math.max(0, cvInput[i]) : 1
+          const source = inputChannel ? inputChannel[i] : 0
+          outputChannel[i] = source * gains[i] * cv
+        }
+      }
+    }
   }
 }
 

@@ -1,4 +1,4 @@
-import init, { WasmLfo } from './wasm/dsp_wasm_wrapper'
+import init, { WasmVcf } from './wasm/dsp_wasm_wrapper'
 import wasmDataUrl from './wasm/dsp_wasm_bg.wasm?inline'
 
 const decodeBase64 = (base64: string) => {
@@ -42,39 +42,67 @@ const decodeWasmDataUrl = (dataUrl: string) => {
 
 const EMPTY_INPUT = new Float32Array()
 
-class WasmLfoProcessor extends AudioWorkletProcessor {
+class WasmVcfProcessor extends AudioWorkletProcessor {
   static get parameterDescriptors(): AudioParamDescriptor[] {
     return [
       {
-        name: 'rate',
-        defaultValue: 2,
-        minValue: 0.01,
-        maxValue: 40,
+        name: 'cutoff',
+        defaultValue: 800,
+        minValue: 20,
+        maxValue: 20000,
         automationRate: 'a-rate',
       },
       {
-        name: 'shape',
-        defaultValue: 0,
-        minValue: 0,
-        maxValue: 3,
-        automationRate: 'k-rate',
-      },
-      {
-        name: 'depth',
-        defaultValue: 0.7,
+        name: 'resonance',
+        defaultValue: 0.4,
         minValue: 0,
         maxValue: 1,
         automationRate: 'a-rate',
       },
       {
-        name: 'offset',
+        name: 'drive',
+        defaultValue: 0.2,
+        minValue: 0,
+        maxValue: 1,
+        automationRate: 'a-rate',
+      },
+      {
+        name: 'envAmount',
         defaultValue: 0,
         minValue: -1,
         maxValue: 1,
         automationRate: 'a-rate',
       },
       {
-        name: 'bipolar',
+        name: 'modAmount',
+        defaultValue: 0,
+        minValue: -1,
+        maxValue: 1,
+        automationRate: 'a-rate',
+      },
+      {
+        name: 'keyTrack',
+        defaultValue: 0,
+        minValue: 0,
+        maxValue: 1,
+        automationRate: 'a-rate',
+      },
+      {
+        name: 'mode',
+        defaultValue: 0,
+        minValue: 0,
+        maxValue: 3,
+        automationRate: 'k-rate',
+      },
+      {
+        name: 'model',
+        defaultValue: 0,
+        minValue: 0,
+        maxValue: 1,
+        automationRate: 'k-rate',
+      },
+      {
+        name: 'slope',
         defaultValue: 1,
         minValue: 0,
         maxValue: 1,
@@ -83,7 +111,7 @@ class WasmLfoProcessor extends AudioWorkletProcessor {
     ]
   }
 
-  private lfo: InstanceType<NonNullable<typeof WasmLfo>> | null = null
+  private vcf: InstanceType<NonNullable<typeof WasmVcf>> | null = null
   private ready = false
   private fallbackWarned = false
 
@@ -96,15 +124,15 @@ class WasmLfoProcessor extends AudioWorkletProcessor {
     try {
       const bytes = decodeWasmDataUrl(wasmDataUrl)
       await init({ module_or_path: bytes })
-      if (WasmLfo) {
-        this.lfo = new WasmLfo(sampleRate)
+      if (WasmVcf) {
+        this.vcf = new WasmVcf(sampleRate)
         this.ready = true
       } else {
         this.ready = false
-        console.warn('WASM LFO missing; falling back to JS.')
+        console.warn('WASM VCF missing; falling back to JS.')
       }
     } catch (error) {
-      console.error('WASM LFO init failed', error)
+      console.error('WASM VCF init failed', error)
       this.ready = false
     }
   }
@@ -120,9 +148,9 @@ class WasmLfoProcessor extends AudioWorkletProcessor {
     }
 
     const sampleCount = output[0].length
-    if (!this.ready || !this.lfo) {
+    if (!this.ready || !this.vcf) {
       if (!this.fallbackWarned) {
-        console.warn('WASM LFO not ready; outputting silence (fallback).')
+        console.warn('WASM VCF not ready; outputting silence (fallback).')
         this.fallbackWarned = true
       }
       for (let channel = 0; channel < output.length; channel += 1) {
@@ -131,28 +159,39 @@ class WasmLfoProcessor extends AudioWorkletProcessor {
       return true
     }
 
-    const rateInput = inputs[0]?.[0] ?? EMPTY_INPUT
-    const syncInput = inputs[1]?.[0] ?? EMPTY_INPUT
-    const rateParam = parameters.rate ?? EMPTY_INPUT
-    const shapeParam = parameters.shape ?? EMPTY_INPUT
-    const depthParam = parameters.depth ?? EMPTY_INPUT
-    const offsetParam = parameters.offset ?? EMPTY_INPUT
-    const bipolarParam = parameters.bipolar ?? EMPTY_INPUT
+    const audioInput = inputs[0]?.[0] ?? EMPTY_INPUT
+    const modInput = inputs[1]?.[0] ?? EMPTY_INPUT
+    const envInput = inputs[2]?.[0] ?? EMPTY_INPUT
+    const keyInput = inputs[3]?.[0] ?? EMPTY_INPUT
 
-    const block = this.lfo.render(
-      rateInput,
-      syncInput,
-      rateParam,
-      shapeParam,
-      depthParam,
-      offsetParam,
-      bipolarParam,
+    const cutoffParam = parameters.cutoff ?? EMPTY_INPUT
+    const resParam = parameters.resonance ?? EMPTY_INPUT
+    const driveParam = parameters.drive ?? EMPTY_INPUT
+    const envAmountParam = parameters.envAmount ?? EMPTY_INPUT
+    const modAmountParam = parameters.modAmount ?? EMPTY_INPUT
+    const keyTrackParam = parameters.keyTrack ?? EMPTY_INPUT
+    const modeParam = parameters.mode ?? EMPTY_INPUT
+    const slopeParam = parameters.slope ?? EMPTY_INPUT
+
+    const block = this.vcf.render(
+      audioInput,
+      modInput,
+      envInput,
+      keyInput,
+      cutoffParam,
+      resParam,
+      driveParam,
+      envAmountParam,
+      modAmountParam,
+      keyTrackParam,
+      modeParam,
+      slopeParam,
       sampleCount,
     )
 
     if (!block || block.length < sampleCount) {
       if (!this.fallbackWarned) {
-        console.warn('WASM LFO returned invalid data; outputting silence (fallback).')
+        console.warn('WASM VCF returned invalid data; outputting silence (fallback).')
         this.fallbackWarned = true
       }
       for (let channel = 0; channel < output.length; channel += 1) {
@@ -169,4 +208,4 @@ class WasmLfoProcessor extends AudioWorkletProcessor {
   }
 }
 
-registerProcessor('wasm-lfo-processor', WasmLfoProcessor)
+registerProcessor('wasm-vcf-processor', WasmVcfProcessor)

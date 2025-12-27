@@ -41,6 +41,7 @@ const decodeWasmDataUrl = (dataUrl: string) => {
 }
 
 const EMPTY_INPUT = new Float32Array()
+const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
 
 class WasmAdsrProcessor extends AudioWorkletProcessor {
   static get parameterDescriptors(): AudioParamDescriptor[] {
@@ -78,6 +79,11 @@ class WasmAdsrProcessor extends AudioWorkletProcessor {
 
   private adsr: InstanceType<NonNullable<typeof WasmAdsr>> | null = null
   private ready = false
+  private stage = 0
+  private env = 0
+  private lastGate = 0
+  private releaseStep = 0
+  private fallbackWarned = false
 
   constructor() {
     super()
@@ -112,18 +118,20 @@ class WasmAdsrProcessor extends AudioWorkletProcessor {
     }
 
     const sampleCount = output[0].length
-    if (!this.ready || !this.adsr) {
-      for (let channel = 0; channel < output.length; channel += 1) {
-        output[channel].fill(0)
-      }
-      return true
-    }
-
     const gateInput = inputs[0]?.[0] ?? EMPTY_INPUT
     const attackParam = parameters.attack ?? EMPTY_INPUT
     const decayParam = parameters.decay ?? EMPTY_INPUT
     const sustainParam = parameters.sustain ?? EMPTY_INPUT
     const releaseParam = parameters.release ?? EMPTY_INPUT
+
+    if (!this.ready || !this.adsr) {
+      if (!this.fallbackWarned) {
+        console.warn('WASM ADSR not ready; using JS fallback.')
+        this.fallbackWarned = true
+      }
+      this.processFallback(output, gateInput, attackParam, decayParam, sustainParam, releaseParam)
+      return true
+    }
 
     const block = this.adsr.render(
       gateInput,
@@ -134,11 +142,93 @@ class WasmAdsrProcessor extends AudioWorkletProcessor {
       sampleCount,
     )
 
+    if (!block || block.length !== sampleCount) {
+      if (!this.fallbackWarned) {
+        console.warn('WASM ADSR returned invalid data; falling back to JS.')
+        this.fallbackWarned = true
+      }
+      this.processFallback(output, gateInput, attackParam, decayParam, sustainParam, releaseParam)
+      return true
+    }
+
     for (let channel = 0; channel < output.length; channel += 1) {
       output[channel].set(block)
     }
 
     return true
+  }
+
+  private processFallback(
+    output: Float32Array[],
+    gateInput: Float32Array,
+    attackParam: Float32Array,
+    decayParam: Float32Array,
+    sustainParam: Float32Array,
+    releaseParam: Float32Array,
+  ) {
+    const sampleCount = output[0]?.length ?? 0
+    const channelCount = output.length
+
+    for (let i = 0; i < sampleCount; i += 1) {
+      const gate = gateInput[i] ?? 0
+      const attack = attackParam.length > 1 ? attackParam[i] : attackParam[0]
+      const decay = decayParam.length > 1 ? decayParam[i] : decayParam[0]
+      const sustain = sustainParam.length > 1 ? sustainParam[i] : sustainParam[0]
+      const release = releaseParam.length > 1 ? releaseParam[i] : releaseParam[0]
+
+      const sustainLevel = clamp(sustain, 0, 1)
+
+      if (gate > 0.5 && this.lastGate <= 0.5) {
+        this.stage = 1
+        this.releaseStep = 0
+      } else if (gate <= 0.5 && this.lastGate > 0.5) {
+        if (this.env > 0) {
+          const releaseTime = Math.max(0.001, release)
+          this.releaseStep = this.env / (releaseTime * sampleRate)
+          this.stage = 4
+        } else {
+          this.stage = 0
+        }
+      }
+      this.lastGate = gate
+
+      if (this.stage === 1) {
+        const attackTime = Math.max(0.001, attack)
+        const attackStep = (1 - this.env) / (attackTime * sampleRate)
+        this.env += attackStep
+        if (this.env >= 1) {
+          this.env = 1
+          this.stage = 2
+        }
+      } else if (this.stage === 2) {
+        const decayTime = Math.max(0.001, decay)
+        const decayStep = (1 - sustainLevel) / (decayTime * sampleRate)
+        this.env -= decayStep
+        if (this.env <= sustainLevel) {
+          this.env = sustainLevel
+          this.stage = 3
+        }
+      } else if (this.stage === 3) {
+        this.env = sustainLevel
+      } else if (this.stage === 4) {
+        if (this.releaseStep <= 0) {
+          this.env = 0
+          this.stage = 0
+        } else {
+          this.env -= this.releaseStep
+          if (this.env <= 0) {
+            this.env = 0
+            this.stage = 0
+          }
+        }
+      } else {
+        this.env = 0
+      }
+
+      for (let channel = 0; channel < channelCount; channel += 1) {
+        output[channel][i] = this.env
+      }
+    }
   }
 }
 

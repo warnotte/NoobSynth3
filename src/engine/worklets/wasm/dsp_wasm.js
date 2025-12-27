@@ -26,6 +26,49 @@ function getUint8ArrayMemory0() {
     return cachedUint8ArrayMemory0;
 }
 
+function passStringToWasm0(arg, malloc, realloc) {
+    if (realloc === undefined) {
+        const buf = cachedTextEncoder.encode(arg);
+        const ptr = malloc(buf.length, 1) >>> 0;
+        getUint8ArrayMemory0().subarray(ptr, ptr + buf.length).set(buf);
+        WASM_VECTOR_LEN = buf.length;
+        return ptr;
+    }
+
+    let len = arg.length;
+    let ptr = malloc(len, 1) >>> 0;
+
+    const mem = getUint8ArrayMemory0();
+
+    let offset = 0;
+
+    for (; offset < len; offset++) {
+        const code = arg.charCodeAt(offset);
+        if (code > 0x7F) break;
+        mem[ptr + offset] = code;
+    }
+    if (offset !== len) {
+        if (offset !== 0) {
+            arg = arg.slice(offset);
+        }
+        ptr = realloc(ptr, len, len = offset + arg.length * 3, 1) >>> 0;
+        const view = getUint8ArrayMemory0().subarray(ptr + offset, ptr + len);
+        const ret = cachedTextEncoder.encodeInto(arg, view);
+
+        offset += ret.written;
+        ptr = realloc(ptr, len, offset, 1) >>> 0;
+    }
+
+    WASM_VECTOR_LEN = offset;
+    return ptr;
+}
+
+function takeFromExternrefTable0(idx) {
+    const value = wasm.__wbindgen_externrefs.get(idx);
+    wasm.__externref_table_dealloc(idx);
+    return value;
+}
+
 let cachedTextDecoder = new TextDecoder('utf-8', { ignoreBOM: true, fatal: true });
 cachedTextDecoder.decode();
 const MAX_SAFARI_DECODE_BYTES = 2146435072;
@@ -40,21 +83,60 @@ function decodeText(ptr, len) {
     return cachedTextDecoder.decode(getUint8ArrayMemory0().subarray(ptr, ptr + len));
 }
 
+const cachedTextEncoder = new TextEncoder();
+
+if (!('encodeInto' in cachedTextEncoder)) {
+    cachedTextEncoder.encodeInto = function (arg, view) {
+        const buf = cachedTextEncoder.encode(arg);
+        view.set(buf);
+        return {
+            read: arg.length,
+            written: buf.length
+        };
+    }
+}
+
+let WASM_VECTOR_LEN = 0;
+
 const WasmAdsrFinalization = (typeof FinalizationRegistry === 'undefined')
     ? { register: () => {}, unregister: () => {} }
     : new FinalizationRegistry(ptr => wasm.__wbg_wasmadsr_free(ptr >>> 0, 1));
+
+const WasmChorusFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_wasmchorus_free(ptr >>> 0, 1));
+
+const WasmDelayFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_wasmdelay_free(ptr >>> 0, 1));
 
 const WasmGainFinalization = (typeof FinalizationRegistry === 'undefined')
     ? { register: () => {}, unregister: () => {} }
     : new FinalizationRegistry(ptr => wasm.__wbg_wasmgain_free(ptr >>> 0, 1));
 
+const WasmGraphEngineFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_wasmgraphengine_free(ptr >>> 0, 1));
+
 const WasmLfoFinalization = (typeof FinalizationRegistry === 'undefined')
     ? { register: () => {}, unregister: () => {} }
     : new FinalizationRegistry(ptr => wasm.__wbg_wasmlfo_free(ptr >>> 0, 1));
 
+const WasmMixerFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_wasmmixer_free(ptr >>> 0, 1));
+
 const WasmOscFinalization = (typeof FinalizationRegistry === 'undefined')
     ? { register: () => {}, unregister: () => {} }
     : new FinalizationRegistry(ptr => wasm.__wbg_wasmosc_free(ptr >>> 0, 1));
+
+const WasmReverbFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_wasmreverb_free(ptr >>> 0, 1));
+
+const WasmVcfFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_wasmvcf_free(ptr >>> 0, 1));
 
 const WasmVcoFinalization = (typeof FinalizationRegistry === 'undefined')
     ? { register: () => {}, unregister: () => {} }
@@ -102,6 +184,95 @@ export class WasmAdsr {
 }
 if (Symbol.dispose) WasmAdsr.prototype[Symbol.dispose] = WasmAdsr.prototype.free;
 
+export class WasmChorus {
+    __destroy_into_raw() {
+        const ptr = this.__wbg_ptr;
+        this.__wbg_ptr = 0;
+        WasmChorusFinalization.unregister(this);
+        return ptr;
+    }
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_wasmchorus_free(ptr, 0);
+    }
+    /**
+     * @param {number} sample_rate
+     */
+    set_sample_rate(sample_rate) {
+        wasm.wasmchorus_set_sample_rate(this.__wbg_ptr, sample_rate);
+    }
+    /**
+     * @param {number} sample_rate
+     */
+    constructor(sample_rate) {
+        const ret = wasm.wasmchorus_new(sample_rate);
+        this.__wbg_ptr = ret >>> 0;
+        WasmChorusFinalization.register(this, this.__wbg_ptr, this);
+        return this;
+    }
+    /**
+     * @param {Float32Array} input_l
+     * @param {Float32Array} input_r
+     * @param {Float32Array} rate
+     * @param {Float32Array} depth_ms
+     * @param {Float32Array} delay_ms
+     * @param {Float32Array} mix
+     * @param {Float32Array} feedback
+     * @param {Float32Array} spread
+     * @param {number} frames
+     * @returns {Float32Array}
+     */
+    render(input_l, input_r, rate, depth_ms, delay_ms, mix, feedback, spread, frames) {
+        const ret = wasm.wasmchorus_render(this.__wbg_ptr, input_l, input_r, rate, depth_ms, delay_ms, mix, feedback, spread, frames);
+        return ret;
+    }
+}
+if (Symbol.dispose) WasmChorus.prototype[Symbol.dispose] = WasmChorus.prototype.free;
+
+export class WasmDelay {
+    __destroy_into_raw() {
+        const ptr = this.__wbg_ptr;
+        this.__wbg_ptr = 0;
+        WasmDelayFinalization.unregister(this);
+        return ptr;
+    }
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_wasmdelay_free(ptr, 0);
+    }
+    /**
+     * @param {number} sample_rate
+     */
+    set_sample_rate(sample_rate) {
+        wasm.wasmdelay_set_sample_rate(this.__wbg_ptr, sample_rate);
+    }
+    /**
+     * @param {number} sample_rate
+     */
+    constructor(sample_rate) {
+        const ret = wasm.wasmdelay_new(sample_rate);
+        this.__wbg_ptr = ret >>> 0;
+        WasmDelayFinalization.register(this, this.__wbg_ptr, this);
+        return this;
+    }
+    /**
+     * @param {Float32Array} input_l
+     * @param {Float32Array} input_r
+     * @param {Float32Array} time_ms
+     * @param {Float32Array} feedback
+     * @param {Float32Array} mix
+     * @param {Float32Array} tone
+     * @param {Float32Array} ping_pong
+     * @param {number} frames
+     * @returns {Float32Array}
+     */
+    render(input_l, input_r, time_ms, feedback, mix, tone, ping_pong, frames) {
+        const ret = wasm.wasmdelay_render(this.__wbg_ptr, input_l, input_r, time_ms, feedback, mix, tone, ping_pong, frames);
+        return ret;
+    }
+}
+if (Symbol.dispose) WasmDelay.prototype[Symbol.dispose] = WasmDelay.prototype.free;
+
 export class WasmGain {
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
@@ -135,6 +306,129 @@ export class WasmGain {
     }
 }
 if (Symbol.dispose) WasmGain.prototype[Symbol.dispose] = WasmGain.prototype.free;
+
+export class WasmGraphEngine {
+    __destroy_into_raw() {
+        const ptr = this.__wbg_ptr;
+        this.__wbg_ptr = 0;
+        WasmGraphEngineFinalization.unregister(this);
+        return ptr;
+    }
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_wasmgraphengine_free(ptr, 0);
+    }
+    /**
+     * @param {string} module_id
+     * @param {number} voice
+     * @param {number} value
+     */
+    set_control_voice_cv(module_id, voice, value) {
+        const ptr0 = passStringToWasm0(module_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        wasm.wasmgraphengine_set_control_voice_cv(this.__wbg_ptr, ptr0, len0, voice, value);
+    }
+    /**
+     * @param {string} module_id
+     * @param {number} channel
+     * @param {number} value
+     */
+    set_mario_channel_cv(module_id, channel, value) {
+        const ptr0 = passStringToWasm0(module_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        wasm.wasmgraphengine_set_mario_channel_cv(this.__wbg_ptr, ptr0, len0, channel, value);
+    }
+    /**
+     * @param {string} module_id
+     * @param {number} voice
+     * @param {number} value
+     */
+    set_control_voice_gate(module_id, voice, value) {
+        const ptr0 = passStringToWasm0(module_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        wasm.wasmgraphengine_set_control_voice_gate(this.__wbg_ptr, ptr0, len0, voice, value);
+    }
+    /**
+     * @param {string} module_id
+     * @param {number} channel
+     * @param {number} value
+     */
+    set_mario_channel_gate(module_id, channel, value) {
+        const ptr0 = passStringToWasm0(module_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        wasm.wasmgraphengine_set_mario_channel_gate(this.__wbg_ptr, ptr0, len0, channel, value);
+    }
+    /**
+     * @param {string} module_id
+     * @param {number} voice
+     * @param {number} value
+     * @param {number} slew_seconds
+     */
+    set_control_voice_velocity(module_id, voice, value, slew_seconds) {
+        const ptr0 = passStringToWasm0(module_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        wasm.wasmgraphengine_set_control_voice_velocity(this.__wbg_ptr, ptr0, len0, voice, value, slew_seconds);
+    }
+    /**
+     * @param {string} module_id
+     * @param {number} voice
+     */
+    trigger_control_voice_gate(module_id, voice) {
+        const ptr0 = passStringToWasm0(module_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        wasm.wasmgraphengine_trigger_control_voice_gate(this.__wbg_ptr, ptr0, len0, voice);
+    }
+    /**
+     * @param {string} module_id
+     * @param {number} voice
+     */
+    trigger_control_voice_sync(module_id, voice) {
+        const ptr0 = passStringToWasm0(module_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        wasm.wasmgraphengine_trigger_control_voice_sync(this.__wbg_ptr, ptr0, len0, voice);
+    }
+    /**
+     * @param {number} sample_rate
+     */
+    constructor(sample_rate) {
+        const ret = wasm.wasmgraphengine_new(sample_rate);
+        this.__wbg_ptr = ret >>> 0;
+        WasmGraphEngineFinalization.register(this, this.__wbg_ptr, this);
+        return this;
+    }
+    /**
+     * @param {number} frames
+     * @returns {Float32Array}
+     */
+    render(frames) {
+        const ret = wasm.wasmgraphengine_render(this.__wbg_ptr, frames);
+        return ret;
+    }
+    /**
+     * @param {string} graph_json
+     */
+    set_graph(graph_json) {
+        const ptr0 = passStringToWasm0(graph_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.wasmgraphengine_set_graph(this.__wbg_ptr, ptr0, len0);
+        if (ret[1]) {
+            throw takeFromExternrefTable0(ret[0]);
+        }
+    }
+    /**
+     * @param {string} module_id
+     * @param {string} param_id
+     * @param {number} value
+     */
+    set_param(module_id, param_id, value) {
+        const ptr0 = passStringToWasm0(module_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passStringToWasm0(param_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        wasm.wasmgraphengine_set_param(this.__wbg_ptr, ptr0, len0, ptr1, len1, value);
+    }
+}
+if (Symbol.dispose) WasmGraphEngine.prototype[Symbol.dispose] = WasmGraphEngine.prototype.free;
 
 export class WasmLfo {
     __destroy_into_raw() {
@@ -180,6 +474,41 @@ export class WasmLfo {
 }
 if (Symbol.dispose) WasmLfo.prototype[Symbol.dispose] = WasmLfo.prototype.free;
 
+export class WasmMixer {
+    __destroy_into_raw() {
+        const ptr = this.__wbg_ptr;
+        this.__wbg_ptr = 0;
+        WasmMixerFinalization.unregister(this);
+        return ptr;
+    }
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_wasmmixer_free(ptr, 0);
+    }
+    /**
+     * @param {number} _sample_rate
+     */
+    constructor(_sample_rate) {
+        const ret = wasm.wasmgain_new(_sample_rate);
+        this.__wbg_ptr = ret >>> 0;
+        WasmMixerFinalization.register(this, this.__wbg_ptr, this);
+        return this;
+    }
+    /**
+     * @param {Float32Array} input_a
+     * @param {Float32Array} input_b
+     * @param {Float32Array} level_a
+     * @param {Float32Array} level_b
+     * @param {number} frames
+     * @returns {Float32Array}
+     */
+    render(input_a, input_b, level_a, level_b, frames) {
+        const ret = wasm.wasmmixer_render(this.__wbg_ptr, input_a, input_b, level_a, level_b, frames);
+        return ret;
+    }
+}
+if (Symbol.dispose) WasmMixer.prototype[Symbol.dispose] = WasmMixer.prototype.free;
+
 export class WasmOsc {
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
@@ -222,6 +551,98 @@ export class WasmOsc {
     }
 }
 if (Symbol.dispose) WasmOsc.prototype[Symbol.dispose] = WasmOsc.prototype.free;
+
+export class WasmReverb {
+    __destroy_into_raw() {
+        const ptr = this.__wbg_ptr;
+        this.__wbg_ptr = 0;
+        WasmReverbFinalization.unregister(this);
+        return ptr;
+    }
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_wasmreverb_free(ptr, 0);
+    }
+    /**
+     * @param {number} sample_rate
+     */
+    set_sample_rate(sample_rate) {
+        wasm.wasmreverb_set_sample_rate(this.__wbg_ptr, sample_rate);
+    }
+    /**
+     * @param {number} sample_rate
+     */
+    constructor(sample_rate) {
+        const ret = wasm.wasmreverb_new(sample_rate);
+        this.__wbg_ptr = ret >>> 0;
+        WasmReverbFinalization.register(this, this.__wbg_ptr, this);
+        return this;
+    }
+    /**
+     * @param {Float32Array} input_l
+     * @param {Float32Array} input_r
+     * @param {Float32Array} time
+     * @param {Float32Array} damp
+     * @param {Float32Array} pre_delay
+     * @param {Float32Array} mix
+     * @param {number} frames
+     * @returns {Float32Array}
+     */
+    render(input_l, input_r, time, damp, pre_delay, mix, frames) {
+        const ret = wasm.wasmreverb_render(this.__wbg_ptr, input_l, input_r, time, damp, pre_delay, mix, frames);
+        return ret;
+    }
+}
+if (Symbol.dispose) WasmReverb.prototype[Symbol.dispose] = WasmReverb.prototype.free;
+
+export class WasmVcf {
+    __destroy_into_raw() {
+        const ptr = this.__wbg_ptr;
+        this.__wbg_ptr = 0;
+        WasmVcfFinalization.unregister(this);
+        return ptr;
+    }
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_wasmvcf_free(ptr, 0);
+    }
+    /**
+     * @param {number} sample_rate
+     */
+    set_sample_rate(sample_rate) {
+        wasm.wasmvcf_set_sample_rate(this.__wbg_ptr, sample_rate);
+    }
+    /**
+     * @param {number} sample_rate
+     */
+    constructor(sample_rate) {
+        const ret = wasm.wasmvcf_new(sample_rate);
+        this.__wbg_ptr = ret >>> 0;
+        WasmVcfFinalization.register(this, this.__wbg_ptr, this);
+        return this;
+    }
+    /**
+     * @param {Float32Array} audio
+     * @param {Float32Array} mod_in
+     * @param {Float32Array} env
+     * @param {Float32Array} key
+     * @param {Float32Array} cutoff
+     * @param {Float32Array} resonance
+     * @param {Float32Array} drive
+     * @param {Float32Array} env_amount
+     * @param {Float32Array} mod_amount
+     * @param {Float32Array} key_track
+     * @param {Float32Array} mode
+     * @param {Float32Array} slope
+     * @param {number} frames
+     * @returns {Float32Array}
+     */
+    render(audio, mod_in, env, key, cutoff, resonance, drive, env_amount, mod_amount, key_track, mode, slope, frames) {
+        const ret = wasm.wasmvcf_render(this.__wbg_ptr, audio, mod_in, env, key, cutoff, resonance, drive, env_amount, mod_amount, key_track, mode, slope, frames);
+        return ret;
+    }
+}
+if (Symbol.dispose) WasmVcf.prototype[Symbol.dispose] = WasmVcf.prototype.free;
 
 export class WasmVco {
     __destroy_into_raw() {
@@ -320,6 +741,16 @@ function __wbg_get_imports() {
     };
     imports.wbg.__wbg_prototypesetcall_96cc7097487b926d = function(arg0, arg1, arg2) {
         Float32Array.prototype.set.call(getArrayF32FromWasm0(arg0, arg1), arg2);
+    };
+    imports.wbg.__wbindgen_cast_2241b6af4c4b2941 = function(arg0, arg1) {
+        // Cast intrinsic for `Ref(String) -> Externref`.
+        const ret = getStringFromWasm0(arg0, arg1);
+        return ret;
+    };
+    imports.wbg.__wbindgen_cast_cd07b1914aa3d62c = function(arg0, arg1) {
+        // Cast intrinsic for `Ref(Slice(F32)) -> NamedExternref("Float32Array")`.
+        const ret = getArrayF32FromWasm0(arg0, arg1);
+        return ret;
     };
     imports.wbg.__wbindgen_init_externref_table = function() {
         const table = wasm.__wbindgen_externrefs;
