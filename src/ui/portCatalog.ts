@@ -102,6 +102,13 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
     ],
     outputs: [{ id: 'cv-out', label: 'CV', kind: 'cv', direction: 'out' }],
   },
+  'wasm-lfo': {
+    inputs: [
+      { id: 'rate', label: 'Rate', kind: 'cv', direction: 'in' },
+      { id: 'sync', label: 'Sync', kind: 'sync', direction: 'in' },
+    ],
+    outputs: [{ id: 'cv-out', label: 'CV', kind: 'cv', direction: 'out' }],
+  },
   control: {
     inputs: [],
     outputs: [
@@ -112,6 +119,10 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
     ],
   },
   adsr: {
+    inputs: [{ id: 'gate', label: 'Gate', kind: 'gate', direction: 'in' }],
+    outputs: [{ id: 'env', label: 'Env', kind: 'cv', direction: 'out' }],
+  },
+  'wasm-adsr': {
     inputs: [{ id: 'gate', label: 'Gate', kind: 'gate', direction: 'in' }],
     outputs: [{ id: 'env', label: 'Env', kind: 'cv', direction: 'out' }],
   },

@@ -324,6 +324,8 @@ function App() {
   const [moduleDragPreview, setModuleDragPreview] = useState<ModuleDragPreview | null>(null)
   const [useWasmVco, setUseWasmVco] = useState(false)
   const [useWasmVca, setUseWasmVca] = useState(false)
+  const [useWasmLfo, setUseWasmLfo] = useState(false)
+  const [useWasmAdsr, setUseWasmAdsr] = useState(false)
   const rackRef = useRef<HTMLDivElement | null>(null)
   const modulesRef = useRef<HTMLDivElement | null>(null)
   const dragRef = useRef<DragState | null>(null)
@@ -1133,13 +1135,43 @@ function App() {
     return { ...nextGraph, modules }
   }
 
+  const normalizeLfoBackend = (nextGraph: GraphState, useWasm: boolean): GraphState => {
+    const modules = nextGraph.modules.map((module) => {
+      if (useWasm && module.type === 'lfo') {
+        return { ...module, type: 'wasm-lfo' as ModuleType }
+      }
+      if (!useWasm && module.type === 'wasm-lfo') {
+        return { ...module, type: 'lfo' as ModuleType }
+      }
+      return module
+    })
+    return { ...nextGraph, modules }
+  }
+
+  const normalizeAdsrBackend = (nextGraph: GraphState, useWasm: boolean): GraphState => {
+    const modules = nextGraph.modules.map((module) => {
+      if (useWasm && module.type === 'adsr') {
+        return { ...module, type: 'wasm-adsr' as ModuleType }
+      }
+      if (!useWasm && module.type === 'wasm-adsr') {
+        return { ...module, type: 'adsr' as ModuleType }
+      }
+      return module
+    })
+    return { ...nextGraph, modules }
+  }
+
   const normalizeBackends = (
     nextGraph: GraphState,
     nextUseWasmVco: boolean,
     nextUseWasmVca: boolean,
+    nextUseWasmLfo: boolean,
+    nextUseWasmAdsr: boolean,
   ): GraphState => {
     const vcaNormalized = normalizeVcaBackend(nextGraph, nextUseWasmVca)
-    return normalizeVcoBackend(vcaNormalized, nextUseWasmVco)
+    const lfoNormalized = normalizeLfoBackend(vcaNormalized, nextUseWasmLfo)
+    const adsrNormalized = normalizeAdsrBackend(lfoNormalized, nextUseWasmAdsr)
+    return normalizeVcoBackend(adsrNormalized, nextUseWasmVco)
   }
 
   const hasSameModuleShape = (currentGraph: GraphState, nextGraph: GraphState) => {
@@ -1197,7 +1229,7 @@ function App() {
 
   const applyPreset = (nextGraph: GraphState) => {
     const cloned = cloneGraph(nextGraph)
-    const normalized = normalizeBackends(cloned, useWasmVco, useWasmVca)
+    const normalized = normalizeBackends(cloned, useWasmVco, useWasmVca, useWasmLfo, useWasmAdsr)
     const layouted = layoutGraph(normalized, moduleSizes, gridMetricsRef.current)
     setSelectedPort(null)
     setGhostCable(null)
@@ -1770,7 +1802,9 @@ function App() {
     control: '2x6',
     scope: '2x3',
     adsr: '1x3',
+    'wasm-adsr': '1x3',
     lfo: '2x2',
+    'wasm-lfo': '2x2',
     chorus: '2x2',
     delay: '2x2',
     reverb: '2x1',
@@ -1791,7 +1825,9 @@ function App() {
     control: 'strip',
     lab: 'strip',
     adsr: 'strip',
+    'wasm-adsr': 'strip',
     lfo: 'strip',
+    'wasm-lfo': 'strip',
     mario: 'strip',
   }
 
@@ -1826,7 +1862,9 @@ function App() {
     delay: 'delay',
     reverb: 'reverb',
     adsr: 'adsr',
+    'wasm-adsr': 'adsr',
     lfo: 'lfo',
+    'wasm-lfo': 'lfo',
     scope: 'scope',
     control: 'ctrl',
     output: 'out',
@@ -1847,7 +1885,9 @@ function App() {
     delay: 'Delay',
     reverb: 'Reverb',
     adsr: 'ADSR',
+    'wasm-adsr': 'ADSR',
     lfo: 'LFO',
+    'wasm-lfo': 'LFO',
     scope: 'Scope',
     control: 'Control IO',
     output: 'Main Out',
@@ -1894,7 +1934,9 @@ function App() {
     delay: { time: 360, feedback: 0.25, mix: 0.2, tone: 0.6, pingPong: false },
     reverb: { time: 0.6, damp: 0.4, preDelay: 18, mix: 0.2 },
     adsr: { attack: 0.02, decay: 0.2, sustain: 0.65, release: 0.5 },
+    'wasm-adsr': { attack: 0.02, decay: 0.2, sustain: 0.65, release: 0.5 },
     lfo: { rate: 0.5, depth: 0.6, offset: 0, shape: 'sine', bipolar: true },
+    'wasm-lfo': { rate: 0.5, depth: 0.6, offset: 0, shape: 'sine', bipolar: true },
     scope: { time: 1, gain: 1, freeze: false },
     control: {
       cv: 0,
@@ -1987,7 +2029,13 @@ function App() {
       return
     }
     setUseWasmVco(nextUseWasm)
-    const nextGraph = normalizeBackends(graphRef.current, nextUseWasm, useWasmVca)
+    const nextGraph = normalizeBackends(
+      graphRef.current,
+      nextUseWasm,
+      useWasmVca,
+      useWasmLfo,
+      useWasmAdsr,
+    )
     applyGraphUpdate(nextGraph)
   }
 
@@ -1996,7 +2044,43 @@ function App() {
       return
     }
     setUseWasmVca(nextUseWasm)
-    const nextGraph = normalizeBackends(graphRef.current, useWasmVco, nextUseWasm)
+    const nextGraph = normalizeBackends(
+      graphRef.current,
+      useWasmVco,
+      nextUseWasm,
+      useWasmLfo,
+      useWasmAdsr,
+    )
+    applyGraphUpdate(nextGraph)
+  }
+
+  const handleLfoBackendChange = (nextUseWasm: boolean) => {
+    if (nextUseWasm === useWasmLfo) {
+      return
+    }
+    setUseWasmLfo(nextUseWasm)
+    const nextGraph = normalizeBackends(
+      graphRef.current,
+      useWasmVco,
+      useWasmVca,
+      nextUseWasm,
+      useWasmAdsr,
+    )
+    applyGraphUpdate(nextGraph)
+  }
+
+  const handleAdsrBackendChange = (nextUseWasm: boolean) => {
+    if (nextUseWasm === useWasmAdsr) {
+      return
+    }
+    setUseWasmAdsr(nextUseWasm)
+    const nextGraph = normalizeBackends(
+      graphRef.current,
+      useWasmVco,
+      useWasmVca,
+      useWasmLfo,
+      nextUseWasm,
+    )
     applyGraphUpdate(nextGraph)
   }
 
@@ -2010,6 +2094,12 @@ function App() {
     }
     if (type === 'cv-vca' && useWasmVca) {
       resolvedType = 'wasm-cv-vca'
+    }
+    if (type === 'lfo' && useWasmLfo) {
+      resolvedType = 'wasm-lfo'
+    }
+    if (type === 'adsr' && useWasmAdsr) {
+      resolvedType = 'wasm-adsr'
     }
 
     if (resolvedType === 'control' && hasControlModule) {
@@ -2376,7 +2466,7 @@ function App() {
       )
     }
 
-    if (module.type === 'lfo') {
+    if (module.type === 'lfo' || module.type === 'wasm-lfo') {
       const bipolar = module.params.bipolar !== false
       return (
         <>
@@ -2986,7 +3076,7 @@ function App() {
       )
     }
 
-    if (module.type === 'adsr') {
+    if (module.type === 'adsr' || module.type === 'wasm-adsr') {
       return (
         <>
           <RotaryKnob
@@ -3382,6 +3472,44 @@ function App() {
                     type="button"
                     className={`ui-btn library-toggle-btn ${useWasmVca ? 'active' : ''}`}
                     onClick={() => handleVcaBackendChange(true)}
+                  >
+                    WASM
+                  </button>
+                </div>
+              </div>
+              <div className="library-backend">
+                <span className="library-label">LFO Backend</span>
+                <div className="library-toggle">
+                  <button
+                    type="button"
+                    className={`ui-btn library-toggle-btn ${useWasmLfo ? '' : 'active'}`}
+                    onClick={() => handleLfoBackendChange(false)}
+                  >
+                    JS
+                  </button>
+                  <button
+                    type="button"
+                    className={`ui-btn library-toggle-btn ${useWasmLfo ? 'active' : ''}`}
+                    onClick={() => handleLfoBackendChange(true)}
+                  >
+                    WASM
+                  </button>
+                </div>
+              </div>
+              <div className="library-backend">
+                <span className="library-label">ADSR Backend</span>
+                <div className="library-toggle">
+                  <button
+                    type="button"
+                    className={`ui-btn library-toggle-btn ${useWasmAdsr ? '' : 'active'}`}
+                    onClick={() => handleAdsrBackendChange(false)}
+                  >
+                    JS
+                  </button>
+                  <button
+                    type="button"
+                    className={`ui-btn library-toggle-btn ${useWasmAdsr ? 'active' : ''}`}
+                    onClick={() => handleAdsrBackendChange(true)}
                   >
                     WASM
                   </button>

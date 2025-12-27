@@ -62,6 +62,12 @@
       "file": "ab-vco.json"
     },
     {
+      "id": "ab-vca",
+      "name": "VCA A/B",
+      "description": "VCO -> VCA -> Output for backend parity checks.",
+      "file": "ab-vca.json"
+    },
+    {
       "id": "8bit-mario",
       "name": "8-Bit Mario",
       "description": "NES-style square wave setup for Mario IO.",

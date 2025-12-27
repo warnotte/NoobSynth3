@@ -40,9 +40,17 @@ function decodeText(ptr, len) {
     return cachedTextDecoder.decode(getUint8ArrayMemory0().subarray(ptr, ptr + len));
 }
 
+const WasmAdsrFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_wasmadsr_free(ptr >>> 0, 1));
+
 const WasmGainFinalization = (typeof FinalizationRegistry === 'undefined')
     ? { register: () => {}, unregister: () => {} }
     : new FinalizationRegistry(ptr => wasm.__wbg_wasmgain_free(ptr >>> 0, 1));
+
+const WasmLfoFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_wasmlfo_free(ptr >>> 0, 1));
 
 const WasmOscFinalization = (typeof FinalizationRegistry === 'undefined')
     ? { register: () => {}, unregister: () => {} }
@@ -51,6 +59,48 @@ const WasmOscFinalization = (typeof FinalizationRegistry === 'undefined')
 const WasmVcoFinalization = (typeof FinalizationRegistry === 'undefined')
     ? { register: () => {}, unregister: () => {} }
     : new FinalizationRegistry(ptr => wasm.__wbg_wasmvco_free(ptr >>> 0, 1));
+
+export class WasmAdsr {
+    __destroy_into_raw() {
+        const ptr = this.__wbg_ptr;
+        this.__wbg_ptr = 0;
+        WasmAdsrFinalization.unregister(this);
+        return ptr;
+    }
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_wasmadsr_free(ptr, 0);
+    }
+    /**
+     * @param {number} sample_rate
+     */
+    set_sample_rate(sample_rate) {
+        wasm.wasmadsr_set_sample_rate(this.__wbg_ptr, sample_rate);
+    }
+    /**
+     * @param {number} sample_rate
+     */
+    constructor(sample_rate) {
+        const ret = wasm.wasmadsr_new(sample_rate);
+        this.__wbg_ptr = ret >>> 0;
+        WasmAdsrFinalization.register(this, this.__wbg_ptr, this);
+        return this;
+    }
+    /**
+     * @param {Float32Array} gate
+     * @param {Float32Array} attack
+     * @param {Float32Array} decay
+     * @param {Float32Array} sustain
+     * @param {Float32Array} release
+     * @param {number} frames
+     * @returns {Float32Array}
+     */
+    render(gate, attack, decay, sustain, release, frames) {
+        const ret = wasm.wasmadsr_render(this.__wbg_ptr, gate, attack, decay, sustain, release, frames);
+        return ret;
+    }
+}
+if (Symbol.dispose) WasmAdsr.prototype[Symbol.dispose] = WasmAdsr.prototype.free;
 
 export class WasmGain {
     __destroy_into_raw() {
@@ -85,6 +135,50 @@ export class WasmGain {
     }
 }
 if (Symbol.dispose) WasmGain.prototype[Symbol.dispose] = WasmGain.prototype.free;
+
+export class WasmLfo {
+    __destroy_into_raw() {
+        const ptr = this.__wbg_ptr;
+        this.__wbg_ptr = 0;
+        WasmLfoFinalization.unregister(this);
+        return ptr;
+    }
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_wasmlfo_free(ptr, 0);
+    }
+    /**
+     * @param {number} sample_rate
+     */
+    set_sample_rate(sample_rate) {
+        wasm.wasmadsr_set_sample_rate(this.__wbg_ptr, sample_rate);
+    }
+    /**
+     * @param {number} sample_rate
+     */
+    constructor(sample_rate) {
+        const ret = wasm.wasmlfo_new(sample_rate);
+        this.__wbg_ptr = ret >>> 0;
+        WasmLfoFinalization.register(this, this.__wbg_ptr, this);
+        return this;
+    }
+    /**
+     * @param {Float32Array} rate_cv
+     * @param {Float32Array} sync
+     * @param {Float32Array} rate
+     * @param {Float32Array} shape
+     * @param {Float32Array} depth
+     * @param {Float32Array} offset
+     * @param {Float32Array} bipolar
+     * @param {number} frames
+     * @returns {Float32Array}
+     */
+    render(rate_cv, sync, rate, shape, depth, offset, bipolar, frames) {
+        const ret = wasm.wasmlfo_render(this.__wbg_ptr, rate_cv, sync, rate, shape, depth, offset, bipolar, frames);
+        return ret;
+    }
+}
+if (Symbol.dispose) WasmLfo.prototype[Symbol.dispose] = WasmLfo.prototype.free;
 
 export class WasmOsc {
     __destroy_into_raw() {

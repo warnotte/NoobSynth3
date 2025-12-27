@@ -183,6 +183,196 @@ impl Vca {
   }
 }
 
+pub struct Lfo {
+  sample_rate: f32,
+  phase: f32,
+  last_sync: f32,
+}
+
+pub struct LfoInputs<'a> {
+  pub rate_cv: Option<&'a [Sample]>,
+  pub sync: Option<&'a [Sample]>,
+}
+
+pub struct LfoParams<'a> {
+  pub rate: &'a [Sample],
+  pub shape: &'a [Sample],
+  pub depth: &'a [Sample],
+  pub offset: &'a [Sample],
+  pub bipolar: &'a [Sample],
+}
+
+impl Lfo {
+  pub fn new(sample_rate: f32) -> Self {
+    Self {
+      sample_rate: sample_rate.max(1.0),
+      phase: 0.0,
+      last_sync: 0.0,
+    }
+  }
+
+  pub fn set_sample_rate(&mut self, sample_rate: f32) {
+    self.sample_rate = sample_rate.max(1.0);
+  }
+
+  pub fn process_block(&mut self, output: &mut [Sample], inputs: LfoInputs<'_>, params: LfoParams<'_>) {
+    if output.is_empty() {
+      return;
+    }
+
+    let shape_index = params.shape.get(0).copied().unwrap_or(0.0);
+    let bipolar = params.bipolar.get(0).copied().unwrap_or(1.0) >= 0.5;
+    let tau = std::f32::consts::TAU;
+
+    for i in 0..output.len() {
+      let rate_base = sample_at(params.rate, i, 2.0);
+      let rate_cv = input_at(inputs.rate_cv, i);
+      let sync = input_at(inputs.sync, i);
+      let depth = sample_at(params.depth, i, 0.7);
+      let offset = sample_at(params.offset, i, 0.0);
+
+      if sync > 0.5 && self.last_sync <= 0.5 {
+        self.phase = 0.0;
+      }
+      self.last_sync = sync;
+
+      let mut rate = rate_base * 2.0_f32.powf(rate_cv);
+      if !rate.is_finite() || rate < 0.0 {
+        rate = 0.0;
+      }
+      self.phase += rate / self.sample_rate;
+      if self.phase >= 1.0 {
+        self.phase -= self.phase.floor();
+      }
+
+      let wave = if shape_index < 0.5 {
+        (tau * self.phase).sin()
+      } else if shape_index < 1.5 {
+        2.0 * (2.0 * (self.phase - (self.phase + 0.5).floor())).abs() - 1.0
+      } else if shape_index < 2.5 {
+        2.0 * (self.phase - 0.5)
+      } else if self.phase < 0.5 {
+        1.0
+      } else {
+        -1.0
+      };
+
+      let mut sample = if bipolar {
+        wave * depth + offset
+      } else {
+        (wave * 0.5 + 0.5) * depth + offset
+      };
+      sample = sample.clamp(-1.0, 1.0);
+      output[i] = sample;
+    }
+  }
+}
+
+pub struct Adsr {
+  sample_rate: f32,
+  stage: u8,
+  env: f32,
+  last_gate: f32,
+  release_step: f32,
+}
+
+pub struct AdsrInputs<'a> {
+  pub gate: Option<&'a [Sample]>,
+}
+
+pub struct AdsrParams<'a> {
+  pub attack: &'a [Sample],
+  pub decay: &'a [Sample],
+  pub sustain: &'a [Sample],
+  pub release: &'a [Sample],
+}
+
+impl Adsr {
+  pub fn new(sample_rate: f32) -> Self {
+    Self {
+      sample_rate: sample_rate.max(1.0),
+      stage: 0,
+      env: 0.0,
+      last_gate: 0.0,
+      release_step: 0.0,
+    }
+  }
+
+  pub fn set_sample_rate(&mut self, sample_rate: f32) {
+    self.sample_rate = sample_rate.max(1.0);
+  }
+
+  pub fn process_block(
+    &mut self,
+    output: &mut [Sample],
+    inputs: AdsrInputs<'_>,
+    params: AdsrParams<'_>,
+  ) {
+    if output.is_empty() {
+      return;
+    }
+
+    for i in 0..output.len() {
+      let gate = input_at(inputs.gate, i);
+      let attack = sample_at(params.attack, i, 0.02);
+      let decay = sample_at(params.decay, i, 0.2);
+      let sustain = sample_at(params.sustain, i, 0.65);
+      let release = sample_at(params.release, i, 0.4);
+
+      let sustain_level = sustain.clamp(0.0, 1.0);
+
+      if gate > 0.5 && self.last_gate <= 0.5 {
+        self.stage = 1;
+        self.release_step = 0.0;
+      } else if gate <= 0.5 && self.last_gate > 0.5 {
+        if self.env > 0.0 {
+          let release_time = release.max(0.001);
+          self.release_step = self.env / (release_time * self.sample_rate);
+          self.stage = 4;
+        } else {
+          self.stage = 0;
+        }
+      }
+      self.last_gate = gate;
+
+      if self.stage == 1 {
+        let attack_time = attack.max(0.001);
+        let attack_step = (1.0 - self.env) / (attack_time * self.sample_rate);
+        self.env += attack_step;
+        if self.env >= 1.0 {
+          self.env = 1.0;
+          self.stage = 2;
+        }
+      } else if self.stage == 2 {
+        let decay_time = decay.max(0.001);
+        let decay_step = (1.0 - sustain_level) / (decay_time * self.sample_rate);
+        self.env -= decay_step;
+        if self.env <= sustain_level {
+          self.env = sustain_level;
+          self.stage = 3;
+        }
+      } else if self.stage == 3 {
+        self.env = sustain_level;
+      } else if self.stage == 4 {
+        if self.release_step <= 0.0 {
+          self.env = 0.0;
+          self.stage = 0;
+        } else {
+          self.env -= self.release_step;
+          if self.env <= 0.0 {
+            self.env = 0.0;
+            self.stage = 0;
+          }
+        }
+      } else {
+        self.env = 0.0;
+      }
+
+      output[i] = self.env;
+    }
+  }
+}
+
 fn sample_at(values: &[Sample], index: usize, fallback: Sample) -> Sample {
   if values.is_empty() {
     return fallback;
@@ -301,5 +491,40 @@ mod tests {
     assert!((output[1] + 0.8).abs() < 0.001);
     assert!((output[2] - 0.0).abs() < 0.001);
     assert!((output[3] + 0.8).abs() < 0.001);
+  }
+
+  #[test]
+  fn lfo_outputs_signal() {
+    let mut lfo = Lfo::new(48_000.0);
+    let mut output = [0.0_f32; 64];
+    let params = LfoParams {
+      rate: &[2.0],
+      shape: &[0.0],
+      depth: &[1.0],
+      offset: &[0.0],
+      bipolar: &[1.0],
+    };
+    let inputs = LfoInputs {
+      rate_cv: None,
+      sync: None,
+    };
+    lfo.process_block(&mut output, inputs, params);
+    assert!(output.iter().any(|sample| sample.abs() > 0.0));
+  }
+
+  #[test]
+  fn adsr_rises_on_gate() {
+    let mut adsr = Adsr::new(48_000.0);
+    let mut output = [0.0_f32; 64];
+    let gate = [1.0_f32; 64];
+    let params = AdsrParams {
+      attack: &[0.01],
+      decay: &[0.1],
+      sustain: &[0.7],
+      release: &[0.2],
+    };
+    let inputs = AdsrInputs { gate: Some(&gate) };
+    adsr.process_block(&mut output, inputs, params);
+    assert!(output.iter().any(|sample| sample.abs() > 0.0));
   }
 }

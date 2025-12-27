@@ -10,6 +10,8 @@ import delayProcessorUrl from './worklets/delay-processor.ts?worker&url'
 import reverbProcessorUrl from './worklets/reverb-processor.ts?worker&url'
 import wasmOscProcessorUrl from './worklets/wasm-osc-processor.ts?worker&url'
 import wasmGainProcessorUrl from './worklets/wasm-gain-processor.ts?worker&url'
+import wasmLfoProcessorUrl from './worklets/wasm-lfo-processor.ts?worker&url'
+import wasmAdsrProcessorUrl from './worklets/wasm-adsr-processor.ts?worker&url'
 
 type PortNode = {
   node: AudioNode
@@ -48,7 +50,9 @@ export class AudioEngine {
     'cv-vca',
     'wasm-cv-vca',
     'lfo',
+    'wasm-lfo',
     'adsr',
+    'wasm-adsr',
     'mixer',
     'vcf',
     'control',
@@ -177,7 +181,10 @@ export class AudioEngine {
         }
       }
 
-      if (module.type === 'lfo' && module.node instanceof AudioWorkletNode) {
+      if (
+        (module.type === 'lfo' || module.type === 'wasm-lfo') &&
+        module.node instanceof AudioWorkletNode
+      ) {
         if (paramId === 'rate' && typeof value === 'number') {
           module.node.parameters.get('rate')?.setValueAtTime(value, context.currentTime)
         }
@@ -298,7 +305,10 @@ export class AudioEngine {
         }
       }
 
-      if (module.type === 'adsr' && module.node instanceof AudioWorkletNode) {
+      if (
+        (module.type === 'adsr' || module.type === 'wasm-adsr') &&
+        module.node instanceof AudioWorkletNode
+      ) {
         if (paramId === 'attack' && typeof value === 'number') {
           module.node.parameters.get('attack')?.setValueAtTime(value, context.currentTime)
         }
@@ -548,6 +558,8 @@ export class AudioEngine {
     await this.context.audioWorklet.addModule(reverbProcessorUrl)
     await this.context.audioWorklet.addModule(wasmOscProcessorUrl)
     await this.context.audioWorklet.addModule(wasmGainProcessorUrl)
+    await this.context.audioWorklet.addModule(wasmLfoProcessorUrl)
+    await this.context.audioWorklet.addModule(wasmAdsrProcessorUrl)
     this.workletsLoaded = true
   }
 
@@ -1067,6 +1079,43 @@ export class AudioEngine {
       }
     }
 
+    if (module.type === 'wasm-lfo') {
+      const lfo = new AudioWorkletNode(this.context, 'wasm-lfo-processor', {
+        numberOfInputs: 2,
+        numberOfOutputs: 1,
+        channelCountMode: 'explicit',
+        outputChannelCount: [1],
+      })
+      lfo.parameters
+        .get('rate')
+        ?.setValueAtTime(Number(module.params.rate ?? 2), this.context.currentTime)
+      lfo.parameters
+        .get('shape')
+        ?.setValueAtTime(
+          this.waveformIndex(String(module.params.shape ?? 'sine')),
+          this.context.currentTime,
+        )
+      lfo.parameters
+        .get('depth')
+        ?.setValueAtTime(Number(module.params.depth ?? 0.7), this.context.currentTime)
+      lfo.parameters
+        .get('offset')
+        ?.setValueAtTime(Number(module.params.offset ?? 0), this.context.currentTime)
+      lfo.parameters
+        .get('bipolar')
+        ?.setValueAtTime(module.params.bipolar === false ? 0 : 1, this.context.currentTime)
+      return {
+        id: module.id,
+        type: module.type,
+        node: lfo,
+        inputs: {
+          rate: { node: lfo, inputIndex: 0 },
+          sync: { node: lfo, inputIndex: 1 },
+        },
+        outputs: { 'cv-out': { node: lfo } },
+      }
+    }
+
     if (module.type === 'vcf') {
       const vcf = new AudioWorkletNode(this.context, 'vcf-processor', {
         numberOfInputs: 4,
@@ -1244,6 +1293,34 @@ export class AudioEngine {
 
     if (module.type === 'adsr') {
       const adsr = new AudioWorkletNode(this.context, 'adsr-processor', {
+        numberOfInputs: 1,
+        numberOfOutputs: 1,
+        channelCountMode: 'explicit',
+        outputChannelCount: [1],
+      })
+      adsr.parameters
+        .get('attack')
+        ?.setValueAtTime(Number(module.params.attack ?? 0.02), this.context.currentTime)
+      adsr.parameters
+        .get('decay')
+        ?.setValueAtTime(Number(module.params.decay ?? 0.2), this.context.currentTime)
+      adsr.parameters
+        .get('sustain')
+        ?.setValueAtTime(Number(module.params.sustain ?? 0.65), this.context.currentTime)
+      adsr.parameters
+        .get('release')
+        ?.setValueAtTime(Number(module.params.release ?? 0.4), this.context.currentTime)
+      return {
+        id: module.id,
+        type: module.type,
+        node: adsr,
+        inputs: { gate: { node: adsr, inputIndex: 0 } },
+        outputs: { env: { node: adsr } },
+      }
+    }
+
+    if (module.type === 'wasm-adsr') {
+      const adsr = new AudioWorkletNode(this.context, 'wasm-adsr-processor', {
         numberOfInputs: 1,
         numberOfOutputs: 1,
         channelCountMode: 'explicit',

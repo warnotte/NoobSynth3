@@ -88,6 +88,7 @@ Presets live in `src/state/presets.ts` and are loaded from the Presets panel. So
 - **WASM DSP prototype**: `wasm-osc-processor` worklet + `WASM OSC` module using `npm run build:wasm`.
 - **WASM VCO parity work**: experimental VCO backend switch in Module Library (JS vs WASM).
 - **WASM VCA parity work**: experimental VCA backend switch + wasm gain worklet (JS vs WASM).
+- **WASM LFO/ADSR parity work**: experimental backend switches + wasm worklets (JS vs WASM).
 
 ## How to update
 

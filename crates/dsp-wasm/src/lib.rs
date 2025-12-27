@@ -1,4 +1,7 @@
-use dsp_core::{Node, Sample, SineOsc, Vca, Vco, VcoInputs, VcoParams};
+use dsp_core::{
+  Adsr, AdsrInputs, AdsrParams, Lfo, LfoInputs, LfoParams, Node, Sample, SineOsc, Vca, Vco,
+  VcoInputs, VcoParams,
+};
 use js_sys::Float32Array;
 use wasm_bindgen::prelude::*;
 
@@ -149,6 +152,126 @@ impl WasmGain {
     let cv_ref = if cv_vec.is_empty() { None } else { Some(cv_vec.as_slice()) };
 
     Vca::process_block(&mut self.buffer, input_ref, cv_ref, &gain_vec);
+    Float32Array::from(self.buffer.as_slice())
+  }
+}
+
+#[wasm_bindgen]
+pub struct WasmLfo {
+  lfo: Lfo,
+  buffer: Vec<Sample>,
+}
+
+#[wasm_bindgen]
+impl WasmLfo {
+  #[wasm_bindgen(constructor)]
+  pub fn new(sample_rate: f32) -> WasmLfo {
+    WasmLfo {
+      lfo: Lfo::new(sample_rate),
+      buffer: Vec::new(),
+    }
+  }
+
+  pub fn set_sample_rate(&mut self, sample_rate: f32) {
+    self.lfo.set_sample_rate(sample_rate);
+  }
+
+  pub fn render(
+    &mut self,
+    rate_cv: Float32Array,
+    sync: Float32Array,
+    rate: Float32Array,
+    shape: Float32Array,
+    depth: Float32Array,
+    offset: Float32Array,
+    bipolar: Float32Array,
+    frames: usize,
+  ) -> Float32Array {
+    if self.buffer.len() != frames {
+      self.buffer.resize(frames, 0.0);
+    }
+
+    let rate_cv_vec = rate_cv.to_vec();
+    let sync_vec = sync.to_vec();
+    let rate_vec = rate.to_vec();
+    let shape_vec = shape.to_vec();
+    let depth_vec = depth.to_vec();
+    let offset_vec = offset.to_vec();
+    let bipolar_vec = bipolar.to_vec();
+
+    let inputs = LfoInputs {
+      rate_cv: if rate_cv_vec.is_empty() {
+        None
+      } else {
+        Some(rate_cv_vec.as_slice())
+      },
+      sync: if sync_vec.is_empty() { None } else { Some(sync_vec.as_slice()) },
+    };
+
+    let params = LfoParams {
+      rate: &rate_vec,
+      shape: &shape_vec,
+      depth: &depth_vec,
+      offset: &offset_vec,
+      bipolar: &bipolar_vec,
+    };
+
+    self.lfo.process_block(&mut self.buffer, inputs, params);
+    Float32Array::from(self.buffer.as_slice())
+  }
+}
+
+#[wasm_bindgen]
+pub struct WasmAdsr {
+  adsr: Adsr,
+  buffer: Vec<Sample>,
+}
+
+#[wasm_bindgen]
+impl WasmAdsr {
+  #[wasm_bindgen(constructor)]
+  pub fn new(sample_rate: f32) -> WasmAdsr {
+    WasmAdsr {
+      adsr: Adsr::new(sample_rate),
+      buffer: Vec::new(),
+    }
+  }
+
+  pub fn set_sample_rate(&mut self, sample_rate: f32) {
+    self.adsr.set_sample_rate(sample_rate);
+  }
+
+  pub fn render(
+    &mut self,
+    gate: Float32Array,
+    attack: Float32Array,
+    decay: Float32Array,
+    sustain: Float32Array,
+    release: Float32Array,
+    frames: usize,
+  ) -> Float32Array {
+    if self.buffer.len() != frames {
+      self.buffer.resize(frames, 0.0);
+    }
+
+    let gate_vec = gate.to_vec();
+    let attack_vec = attack.to_vec();
+    let decay_vec = decay.to_vec();
+    let sustain_vec = sustain.to_vec();
+    let release_vec = release.to_vec();
+
+    let inputs = AdsrInputs {
+      gate: if gate_vec.is_empty() { None } else { Some(gate_vec.as_slice()) },
+    };
+
+    let params = AdsrParams {
+      attack: &attack_vec,
+      decay: &decay_vec,
+      sustain: &sustain_vec,
+      release: &release_vec,
+    };
+
+    self.adsr.process_block(&mut self.buffer, inputs, params);
     Float32Array::from(self.buffer.as_slice())
   }
 }

@@ -85,12 +85,12 @@ Use the backend toggles (below) to swap modules between JS and WASM.
 
 ### Backend switches (dev)
 
-In the Module Library, use the **VCO Backend** and **VCA Backend** toggles to
-swap between JS AudioWorklet modules and their WASM equivalents. This keeps
-presets intact while switching implementations.
+In the Module Library, use the **VCO Backend**, **VCA Backend**, **LFO Backend**,
+and **ADSR Backend** toggles to swap between JS AudioWorklet modules and their
+WASM equivalents. This keeps presets intact while switching implementations.
 
 For quick parity checks, load the **VCO A/B** preset (single VCO -> Output)
-and flip the VCO backend switch.
+or **VCA A/B** (VCO -> VCA -> Output) and flip the related backend switch.
 
 ### Preset batch export (dev)
 
