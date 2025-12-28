@@ -8,7 +8,10 @@
     "build": "tsc -b && vite build",
     "build:wasm": "powershell -ExecutionPolicy Bypass -File scripts/build-wasm.ps1",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.9.1",

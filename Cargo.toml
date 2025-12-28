@@ -4,5 +4,6 @@ members = [
   "crates/dsp-wasm",
   "crates/dsp-standalone",
   "crates/dsp-plugin",
+  "src-tauri",
 ]
 resolver = "2"

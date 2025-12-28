@@ -29,6 +29,20 @@ npm run dev
 
 Open the app, click Power On, then hit Run in Control IO or play the mini keyboard.
 
+## Standalone (Tauri)
+
+Prereqs: Rust toolchain + Tauri system deps installed and `rustc` on PATH.
+
+```bash
+npm run tauri:dev
+```
+
+For a release build:
+
+```bash
+npm run tauri:build
+```
+
 ## How to use
 
 - Patch by dragging from a jack to another matching jack.

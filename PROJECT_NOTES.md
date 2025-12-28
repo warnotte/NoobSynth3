@@ -79,6 +79,7 @@ Presets live in `src/state/presets.ts` and are loaded from the Presets panel. So
 - **Module drag**: Drag modules by the header to reposition them on the grid without pushing other modules.
 - **Drag helpers**: Ghost preview with invalid highlight, auto-scroll while dragging, and ESC to cancel.
 - **UI refactor**: Split `App.tsx` UI into focused components and hooks (`ModuleControls`, `TopBar`, `RackView`, `SidePanel`, `PatchLayer`, `usePatching`, `useModuleDrag`, `useControlVoices`, `useMidi`, `useMarioSequencer`).
+- **Tauri wiring**: Updated `src-tauri/tauri.conf.json` to use Vite defaults and added npm `tauri:*` scripts.
 - **Auto layout**: Button in Module Library to repack modules into the first available slots.
 - **Scope module rewrite**:
   - 3 visualization modes: oscilloscope, FFT analyzer, spectrogram.
