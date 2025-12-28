@@ -43,6 +43,8 @@ For a release build:
 npm run tauri:build
 ```
 
+Release builds use a size-optimized Rust profile (LTO + strip) from the workspace `Cargo.toml`.
+
 ## How to use
 
 - Patch by dragging from a jack to another matching jack.
