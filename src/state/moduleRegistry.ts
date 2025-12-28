@@ -1,0 +1,163 @@
+import type { ModuleSpec, ModuleType } from '../shared/graph'
+
+export const moduleSizes: Record<ModuleType, string> = {
+  oscillator: '2x2',
+  vcf: '2x2',
+  control: '2x6',
+  scope: '2x3',
+  adsr: '1x3',
+  lfo: '2x2',
+  chorus: '2x2',
+  delay: '2x2',
+  reverb: '2x1',
+  mixer: '1x1',
+  gain: '1x1',
+  'cv-vca': '1x1',
+  output: '1x1',
+  lab: '2x2',
+  mario: '2x4',
+}
+
+export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>> = {
+  oscillator: 'strip',
+  vcf: 'strip',
+  control: 'strip',
+  lab: 'strip',
+  adsr: 'strip',
+  lfo: 'strip',
+  mario: 'strip',
+}
+
+export const moduleCatalog: { type: ModuleType; label: string }[] = [
+  { type: 'oscillator', label: 'VCO' },
+  { type: 'vcf', label: 'VCF' },
+  { type: 'gain', label: 'VCA' },
+  { type: 'cv-vca', label: 'Mod VCA' },
+  { type: 'mixer', label: 'Mixer' },
+  { type: 'chorus', label: 'Chorus' },
+  { type: 'delay', label: 'Delay' },
+  { type: 'reverb', label: 'Reverb' },
+  { type: 'adsr', label: 'ADSR' },
+  { type: 'lfo', label: 'LFO' },
+  { type: 'scope', label: 'Scope' },
+  { type: 'control', label: 'Control IO' },
+  { type: 'output', label: 'Main Out' },
+  { type: 'lab', label: 'Lab' },
+  { type: 'mario', label: 'Mario IO' },
+]
+
+export const modulePrefixes: Record<ModuleType, string> = {
+  oscillator: 'osc',
+  vcf: 'vcf',
+  gain: 'gain',
+  'cv-vca': 'mod',
+  mixer: 'mix',
+  chorus: 'chorus',
+  delay: 'delay',
+  reverb: 'reverb',
+  adsr: 'adsr',
+  lfo: 'lfo',
+  scope: 'scope',
+  control: 'ctrl',
+  output: 'out',
+  lab: 'lab',
+  mario: 'mario',
+}
+
+export const moduleLabels: Record<ModuleType, string> = {
+  oscillator: 'VCO',
+  vcf: 'VCF',
+  gain: 'VCA',
+  'cv-vca': 'Mod VCA',
+  mixer: 'Mixer',
+  chorus: 'Chorus',
+  delay: 'Delay',
+  reverb: 'Reverb',
+  adsr: 'ADSR',
+  lfo: 'LFO',
+  scope: 'Scope',
+  control: 'Control IO',
+  output: 'Main Out',
+  lab: 'Lab Panel',
+  mario: 'Mario IO',
+}
+
+export const moduleDefaults: Record<ModuleType, Record<string, number | string | boolean>> = {
+  oscillator: {
+    frequency: 220,
+    type: 'sawtooth',
+    pwm: 0.5,
+    unison: 1,
+    detune: 0,
+    fmLin: 0,
+    fmExp: 0,
+  },
+  gain: { gain: 0.7 },
+  'cv-vca': { gain: 1 },
+  vcf: {
+    cutoff: 800,
+    resonance: 0.2,
+    drive: 0.1,
+    envAmount: 0,
+    modAmount: 0,
+    keyTrack: 0.5,
+    model: 'svf',
+    mode: 'lp',
+    slope: 12,
+  },
+  mixer: { levelA: 0.6, levelB: 0.6 },
+  chorus: { rate: 0.3, depth: 8, delay: 18, mix: 0.4, spread: 0.6, feedback: 0.1 },
+  delay: { time: 360, feedback: 0.25, mix: 0.2, tone: 0.6, pingPong: false },
+  reverb: { time: 0.6, damp: 0.4, preDelay: 18, mix: 0.2 },
+  adsr: { attack: 0.02, decay: 0.2, sustain: 0.65, release: 0.5 },
+  lfo: { rate: 0.5, depth: 0.6, offset: 0, shape: 'sine', bipolar: true },
+  scope: { time: 1, gain: 1, freeze: false },
+  control: {
+    cv: 0,
+    cvMode: 'unipolar',
+    velocity: 1,
+    midiVelocity: true,
+    gate: 0,
+    glide: 0.02,
+    midiEnabled: false,
+    midiChannel: 0,
+    midiRoot: 60,
+    midiInputId: '',
+    midiVelSlew: 0.008,
+    voices: 4,
+    seqOn: false,
+    seqTempo: 90,
+    seqGate: 0.6,
+  },
+  output: { level: 0.8 },
+  lab: { level: 0.5, drive: 0.3, bias: 0, shape: 'triangle' },
+  mario: { running: false, tempo: 180, song: 'smb' },
+}
+
+export const getNextModuleIndex = (type: ModuleType, modules: ModuleSpec[]) => {
+  const prefix = `${modulePrefixes[type]}-`
+  let maxIndex = 0
+  modules.forEach((module) => {
+    if (!module.id.startsWith(prefix)) {
+      return
+    }
+    const suffix = Number(module.id.slice(prefix.length))
+    if (Number.isFinite(suffix)) {
+      maxIndex = Math.max(maxIndex, suffix)
+    }
+  })
+  return maxIndex + 1
+}
+
+export const buildModuleSpec = (type: ModuleType, modules: ModuleSpec[]): ModuleSpec => {
+  const index = getNextModuleIndex(type, modules)
+  const label = moduleLabels[type]
+  const name = index === 1 ? label : `${label} ${index}`
+  return {
+    id: `${modulePrefixes[type]}-${index}`,
+    type,
+    name,
+    position: { x: 0, y: 0 },
+    params: { ...moduleDefaults[type] },
+  }
+}
