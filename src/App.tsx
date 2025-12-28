@@ -35,6 +35,75 @@ import { SidePanel } from './ui/SidePanel'
 import { TopBar } from './ui/TopBar'
 import './styles.css'
 
+type NativeTap = {
+  moduleId: string
+  portId: string
+}
+
+type NativeScopePacket = {
+  sampleRate: number
+  frames: number
+  tapCount: number
+  data: number[][]
+}
+
+type NativeScopeSnapshot = {
+  sampleRate: number
+  frames: number
+  buffers: Map<string, Float32Array>
+}
+
+const invokeTauri = async <T,>(command: string, payload?: Record<string, unknown>) => {
+  const { invoke } = await import('@tauri-apps/api/core')
+  return invoke<T>(command, payload)
+}
+
+const buildScopeTaps = (modules: ModuleSpec[]): NativeTap[] => {
+  const taps: NativeTap[] = []
+  modules.forEach((module) => {
+    if (module.type !== 'scope') {
+      return
+    }
+    taps.push({ moduleId: module.id, portId: 'in-a' })
+    taps.push({ moduleId: module.id, portId: 'in-b' })
+    taps.push({ moduleId: module.id, portId: 'in-c' })
+    taps.push({ moduleId: module.id, portId: 'in-d' })
+  })
+  return taps
+}
+
+const normalizeNativeParamValue = (paramId: string, value: number | string | boolean): number => {
+  if (typeof value === 'number') {
+    if (paramId === 'slope') {
+      if (value <= 1) {
+        return value
+      }
+      return value >= 24 ? 1 : 0
+    }
+    return value
+  }
+  if (typeof value === 'boolean') {
+    return value ? 1 : 0
+  }
+  const text = value.toLowerCase()
+  if (paramId === 'type' || paramId === 'shape') {
+    if (text === 'triangle') return 1
+    if (text === 'saw' || text === 'sawtooth') return 2
+    if (text === 'square') return 3
+    return 0
+  }
+  if (paramId === 'mode') {
+    if (text === 'hp') return 1
+    if (text === 'bp') return 2
+    if (text === 'notch') return 3
+    return 0
+  }
+  if (paramId === 'model') {
+    return text === 'ladder' ? 1 : 0
+  }
+  return Number.NaN
+}
+
 function App() {
   const engine = useMemo(() => new AudioEngine(), [])
   const [graph, setGraph] = useState<GraphState>(defaultGraph)
@@ -45,6 +114,18 @@ function App() {
   const [presetError, setPresetError] = useState<string | null>(null)
   const [importError, setImportError] = useState<string | null>(null)
   const [gridError, setGridError] = useState<string | null>(null)
+  const [tauriStatus, setTauriStatus] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle')
+  const [tauriError, setTauriError] = useState<string | null>(null)
+  const [tauriPing, setTauriPing] = useState<string | null>(null)
+  const [tauriAudioOutputs, setTauriAudioOutputs] = useState<string[]>([])
+  const [tauriMidiInputs, setTauriMidiInputs] = useState<string[]>([])
+  const [tauriNativeRunning, setTauriNativeRunning] = useState(false)
+  const [tauriNativeError, setTauriNativeError] = useState<string | null>(null)
+  const [tauriNativeSampleRate, setTauriNativeSampleRate] = useState<number | null>(null)
+  const [tauriNativeChannels, setTauriNativeChannels] = useState<number | null>(null)
+  const [tauriNativeDeviceName, setTauriNativeDeviceName] = useState<string | null>(null)
+  const [tauriNativeBooting, setTauriNativeBooting] = useState(false)
+  const [tauriSelectedOutput, setTauriSelectedOutput] = useState<string>('')
   const [gridMetrics, setGridMetrics] = useState<GridMetrics>(DEFAULT_GRID_METRICS)
   const rackRef = useRef<HTMLDivElement | null>(null)
   const modulesRef = useRef<HTMLDivElement | null>(null)
@@ -55,6 +136,8 @@ function App() {
   const pendingRestartRef = useRef<GraphState | null>(null)
   const restartInFlightRef = useRef(false)
   const gridMetricsRef = useRef<GridMetrics>(DEFAULT_GRID_METRICS)
+  const nativeScopeRef = useRef<NativeScopeSnapshot | null>(null)
+  const nativeScopeTapsRef = useRef<NativeTap[]>([])
   const {
     connectedInputs,
     dragTargets,
@@ -66,6 +149,13 @@ function App() {
     resetPatching,
     selectedPortKey,
   } = usePatching({ graph, rackRef, setGraph })
+  const isTauri = useMemo(() => {
+    if (typeof window === 'undefined') {
+      return false
+    }
+    const scopedWindow = window as typeof window & { isTauri?: boolean }
+    return scopedWindow.isTauri === true
+  }, [])
   const { handleModulePointerDown, moduleDragPreview } = useModuleDrag({
     graphRef,
     gridMetricsRef,
@@ -185,9 +275,146 @@ function App() {
       if (status === 'running' && !options?.skipEngine) {
         engine.setParam(moduleId, paramId, value)
       }
+      if (isTauri && tauriNativeRunning && !options?.skipEngine) {
+        const numeric = normalizeNativeParamValue(paramId, value)
+        if (!Number.isNaN(numeric)) {
+          void invokeTauri('native_set_param', { moduleId, paramId, value: numeric })
+        }
+      }
     },
-    [engine, status],
+    [engine, isTauri, status, tauriNativeRunning],
   )
+
+  const getNativeScopeBuffer = useCallback((moduleId: string, portId: string) => {
+    const snapshot = nativeScopeRef.current
+    if (!snapshot) {
+      return null
+    }
+    return snapshot.buffers.get(`${moduleId}:${portId}`) ?? null
+  }, [])
+
+  const nativeScopeBridge = useMemo(() => {
+    return {
+      isActive: isTauri && tauriNativeRunning,
+      getSampleRate: () => nativeScopeRef.current?.sampleRate ?? null,
+      getFrames: () => nativeScopeRef.current?.frames ?? null,
+      getBuffer: getNativeScopeBuffer,
+    }
+  }, [getNativeScopeBuffer, isTauri, tauriNativeRunning])
+
+  useEffect(() => {
+    if (!isTauri || !tauriNativeRunning) {
+      nativeScopeRef.current = null
+      return
+    }
+    let active = true
+    const poll = async () => {
+      try {
+        const packet = await invokeTauri<NativeScopePacket>('native_get_scope')
+        if (!active) {
+          return
+        }
+        const taps = nativeScopeTapsRef.current
+        if (!taps.length || packet.tapCount === 0) {
+          return
+        }
+        const snapshot = nativeScopeRef.current
+        const buffers = snapshot?.buffers ?? new Map<string, Float32Array>()
+        const limit = Math.min(packet.tapCount, taps.length, packet.data.length)
+        for (let i = 0; i < limit; i += 1) {
+          const tap = taps[i]
+          const key = `${tap.moduleId}:${tap.portId}`
+          const samples = packet.data[i] ?? []
+          let buffer = buffers.get(key)
+          if (!buffer || buffer.length !== samples.length) {
+            buffer = new Float32Array(samples.length)
+            buffers.set(key, buffer)
+          }
+          buffer.set(samples)
+        }
+        nativeScopeRef.current = {
+          sampleRate: packet.sampleRate,
+          frames: packet.frames,
+          buffers,
+        }
+      } catch {
+        if (active) {
+          nativeScopeRef.current = null
+        }
+      }
+    }
+    void poll()
+    const interval = window.setInterval(poll, 33)
+    return () => {
+      active = false
+      window.clearInterval(interval)
+    }
+  }, [isTauri, tauriNativeRunning])
+
+  const nativeControlBridge = useMemo(() => {
+    if (!isTauri) {
+      return null
+    }
+    const shouldSend = () => tauriNativeRunning
+    return {
+      setControlVoiceCv: (moduleId: string, voiceIndex: number, value: number) => {
+        if (!shouldSend()) return
+        void invokeTauri('native_set_control_voice_cv', {
+          moduleId,
+          voice: voiceIndex,
+          value,
+        })
+      },
+      setControlVoiceGate: (
+        moduleId: string,
+        voiceIndex: number,
+        value: number | boolean,
+      ) => {
+        if (!shouldSend()) return
+        const numeric = typeof value === 'boolean' ? (value ? 1 : 0) : value
+        void invokeTauri('native_set_control_voice_gate', {
+          moduleId,
+          voice: voiceIndex,
+          value: numeric,
+        })
+      },
+      triggerControlVoiceGate: (moduleId: string, voiceIndex: number) => {
+        if (!shouldSend()) return
+        void invokeTauri('native_trigger_control_voice_gate', { moduleId, voice: voiceIndex })
+      },
+      triggerControlVoiceSync: (moduleId: string, voiceIndex: number) => {
+        if (!shouldSend()) return
+        void invokeTauri('native_trigger_control_voice_sync', { moduleId, voice: voiceIndex })
+      },
+      setControlVoiceVelocity: (
+        moduleId: string,
+        voiceIndex: number,
+        value: number,
+        slewSeconds = 0,
+      ) => {
+        if (!shouldSend()) return
+        void invokeTauri('native_set_control_voice_velocity', {
+          moduleId,
+          voice: voiceIndex,
+          value,
+          slew: slewSeconds,
+        })
+      },
+      setMarioChannelCv: (moduleId: string, channel: 1 | 2 | 3 | 4 | 5, value: number) => {
+        if (!shouldSend()) return
+        void invokeTauri('native_set_mario_channel_cv', { moduleId, channel, value })
+      },
+      setMarioChannelGate: (
+        moduleId: string,
+        channel: 1 | 2 | 3 | 4 | 5,
+        value: number | boolean,
+      ) => {
+        if (!shouldSend()) return
+        const numeric = typeof value === 'boolean' ? (value ? 1 : 0) : value
+        void invokeTauri('native_set_mario_channel_gate', { moduleId, channel, value: numeric })
+      },
+    }
+  }, [isTauri, tauriNativeRunning])
 
 
   const {
@@ -199,6 +426,7 @@ function App() {
     triggerVoiceNote,
   } = useControlVoices({
     engine,
+    nativeControl: nativeControlBridge,
     controlModuleId,
     manualVelocity,
     midiRoot,
@@ -221,6 +449,7 @@ function App() {
 
   const { marioStep } = useMarioSequencer({
     engine,
+    nativeControl: nativeControlBridge,
     status,
     marioModuleId,
     marioRunning,
@@ -345,6 +574,133 @@ function App() {
     [applyPreset],
   )
 
+  const refreshTauriStatus = useCallback(async () => {
+    if (!isTauri) {
+      setTauriStatus('idle')
+      setTauriError('Tauri not detected (web mode).')
+      return
+    }
+    setTauriStatus('loading')
+    setTauriError(null)
+    try {
+      const [ping, outputs, midi, nativeStatus] = await Promise.all([
+        invokeTauri<string>('dsp_ping'),
+        invokeTauri<string[]>('list_audio_outputs'),
+        invokeTauri<string[]>('list_midi_inputs'),
+        invokeTauri<{
+          running: boolean
+          deviceName?: string | null
+          sampleRate?: number
+          channels?: number
+        }>('native_status'),
+      ])
+      setTauriPing(typeof ping === 'string' ? ping : String(ping))
+      const outputList = Array.isArray(outputs) ? outputs : []
+      setTauriAudioOutputs(outputList)
+      setTauriMidiInputs(Array.isArray(midi) ? midi : [])
+      setTauriNativeRunning(Boolean(nativeStatus?.running))
+      setTauriNativeDeviceName(
+        typeof nativeStatus?.deviceName === 'string' ? nativeStatus.deviceName : null,
+      )
+      setTauriNativeSampleRate(
+        typeof nativeStatus?.sampleRate === 'number' ? nativeStatus.sampleRate : null,
+      )
+      setTauriNativeChannels(
+        typeof nativeStatus?.channels === 'number' ? nativeStatus.channels : null,
+      )
+      if (nativeStatus?.deviceName) {
+        setTauriSelectedOutput((prev) =>
+          prev && outputList.includes(prev) ? prev : nativeStatus.deviceName ?? '',
+        )
+      } else if (outputList.length > 0) {
+        setTauriSelectedOutput((prev) => (prev && outputList.includes(prev) ? prev : outputList[0]))
+      } else {
+        setTauriSelectedOutput('')
+      }
+      setTauriStatus('ready')
+    } catch (error) {
+      console.error(error)
+      setTauriStatus('error')
+      setTauriError('Failed to reach Tauri bridge.')
+    }
+  }, [isTauri])
+
+  useEffect(() => {
+    if (!isTauri) {
+      return
+    }
+    void refreshTauriStatus()
+  }, [isTauri, refreshTauriStatus])
+
+  const handleTauriOutputChange = useCallback((value: string) => {
+    setTauriSelectedOutput(value)
+  }, [])
+
+  const handleTauriSyncGraph = useCallback(async () => {
+    if (!isTauri) {
+      return
+    }
+    setTauriNativeError(null)
+    try {
+      const taps = buildScopeTaps(graphRef.current.modules)
+      nativeScopeTapsRef.current = taps
+      const graphJson = JSON.stringify({
+        modules: graphRef.current.modules,
+        connections: graphRef.current.connections,
+        taps,
+      })
+      await invokeTauri('native_set_graph', { graphJson })
+      await refreshTauriStatus()
+    } catch (error) {
+      console.error(error)
+      setTauriNativeError('Failed to sync graph.')
+    }
+  }, [isTauri, refreshTauriStatus])
+
+  const handleTauriStart = useCallback(async () => {
+    if (!isTauri) {
+      return
+    }
+    setTauriNativeError(null)
+    setTauriNativeBooting(true)
+    try {
+      const taps = buildScopeTaps(graphRef.current.modules)
+      nativeScopeTapsRef.current = taps
+      const graphJson = JSON.stringify({
+        modules: graphRef.current.modules,
+        connections: graphRef.current.connections,
+        taps,
+      })
+      await invokeTauri('native_start_graph', {
+        graphJson,
+        deviceName: tauriSelectedOutput || null,
+      })
+      await refreshTauriStatus()
+    } catch (error) {
+      console.error(error)
+      setTauriNativeError('Failed to start native audio.')
+    } finally {
+      setTauriNativeBooting(false)
+    }
+  }, [isTauri, refreshTauriStatus, tauriSelectedOutput])
+
+  const handleTauriStop = useCallback(async () => {
+    if (!isTauri) {
+      return
+    }
+    setTauriNativeError(null)
+    setTauriNativeBooting(true)
+    try {
+      await invokeTauri('native_stop_graph')
+      await refreshTauriStatus()
+    } catch (error) {
+      console.error(error)
+      setTauriNativeError('Failed to stop native audio.')
+    } finally {
+      setTauriNativeBooting(false)
+    }
+  }, [isTauri, refreshTauriStatus])
+
 
   const handleStart = async () => {
     setIsBooting(true)
@@ -449,11 +805,42 @@ function App() {
     }
   }, [runPresetBatchExport])
 
-  const statusLabel = status === 'running' ? 'Live' : status === 'error' ? 'Error' : 'Standby'
+  const audioMode = isTauri ? 'native' : 'web'
+  const audioRunning = audioMode === 'native' ? tauriNativeRunning : status === 'running'
+  const audioError = audioMode === 'native' ? Boolean(tauriNativeError) : status === 'error'
+  const audioStatus: 'idle' | 'running' | 'error' = audioError
+    ? 'error'
+    : audioRunning
+      ? 'running'
+      : 'idle'
+  const statusLabel = audioStatus === 'running' ? 'Live' : audioStatus === 'error' ? 'Error' : 'Standby'
   const statusDetail =
-    status === 'error'
-      ? 'Audio init failed. Check console.'
-      : 'AudioWorklet graph ready for patching.'
+    audioMode === 'native'
+      ? tauriNativeError ?? (audioRunning ? 'Native DSP graph running.' : 'Native DSP ready.')
+      : status === 'error'
+        ? 'Audio init failed. Check console.'
+        : 'AudioWorklet graph ready for patching.'
+  const modeLabel = audioMode === 'native' ? 'Native Audio' : 'Web Audio'
+  const unifiedBooting = audioMode === 'native' ? tauriNativeBooting : isBooting
+
+  const handleUnifiedStart = async () => {
+    if (audioMode === 'native') {
+      if (status === 'running') {
+        await handleStop()
+      }
+      await handleTauriStart()
+      return
+    }
+    await handleStart()
+  }
+
+  const handleUnifiedStop = async () => {
+    if (audioMode === 'native') {
+      await handleTauriStop()
+      return
+    }
+    await handleStop()
+  }
 
 
   const hasControlModule = graph.modules.some((module) => module.type === 'control')
@@ -550,6 +937,7 @@ function App() {
   const moduleControls = {
     engine,
     status,
+    nativeScope: nativeScopeBridge,
     updateParam,
     setManualGate,
     triggerManualSync,
@@ -570,12 +958,14 @@ function App() {
   return (
     <div className="app">
       <TopBar
-        status={status}
+        status={audioStatus}
         statusLabel={statusLabel}
         statusDetail={statusDetail}
-        isBooting={isBooting}
-        onStart={handleStart}
-        onStop={handleStop}
+        modeLabel={modeLabel}
+        isBooting={unifiedBooting}
+        isRunning={audioRunning}
+        onStart={handleUnifiedStart}
+        onStop={handleUnifiedStop}
       />
       <main className="workbench">
         <RackView
@@ -610,6 +1000,21 @@ function App() {
           presetStatus={presetStatus}
           presets={presets}
           onApplyPreset={applyPreset}
+          tauriAvailable={isTauri}
+          tauriStatus={tauriStatus}
+          tauriError={tauriError}
+          tauriPing={tauriPing}
+          tauriAudioOutputs={tauriAudioOutputs}
+          tauriMidiInputs={tauriMidiInputs}
+          tauriNativeRunning={tauriNativeRunning}
+          tauriNativeError={tauriNativeError}
+          tauriNativeSampleRate={tauriNativeSampleRate}
+          tauriNativeChannels={tauriNativeChannels}
+          tauriNativeDeviceName={tauriNativeDeviceName}
+          tauriSelectedOutput={tauriSelectedOutput}
+          onRefreshTauri={refreshTauriStatus}
+          onTauriOutputChange={handleTauriOutputChange}
+          onTauriSyncGraph={handleTauriSyncGraph}
         />
       </main>
       <PatchLayer

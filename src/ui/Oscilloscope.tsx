@@ -11,6 +11,12 @@ type InputChannel = {
 
 type OscilloscopeProps = {
   engine: AudioEngine
+  nativeScope?: {
+    isActive: boolean
+    getSampleRate: () => number | null
+    getFrames: () => number | null
+    getBuffer: (moduleId: string, portId: string) => Float32Array | null
+  } | null
   moduleId: string
   running: boolean
   timeScale: number
@@ -34,8 +40,107 @@ const CHANNEL_GLOW_COLORS = [
   'rgba(255, 100, 255, 0.4)',
 ]
 
+const isPowerOfTwo = (value: number) => value > 0 && (value & (value - 1)) === 0
+
+const ensureFftState = (
+  fftStateRef: { current: { size: number; window: Float32Array; real: Float32Array; imag: Float32Array } | null },
+  size: number,
+) => {
+  if (fftStateRef.current && fftStateRef.current.size === size) {
+    return fftStateRef.current
+  }
+  const window = new Float32Array(size)
+  for (let i = 0; i < size; i += 1) {
+    window[i] = 0.5 - 0.5 * Math.cos((2 * Math.PI * i) / (size - 1))
+  }
+  const state = {
+    size,
+    window,
+    real: new Float32Array(size),
+    imag: new Float32Array(size),
+  }
+  fftStateRef.current = state
+  return state
+}
+
+const fftInPlace = (real: Float32Array, imag: Float32Array) => {
+  const n = real.length
+  for (let i = 1, j = 0; i < n; i += 1) {
+    let bit = n >> 1
+    for (; j & bit; bit >>= 1) {
+      j ^= bit
+    }
+    j ^= bit
+    if (i < j) {
+      const tmpRe = real[i]
+      real[i] = real[j]
+      real[j] = tmpRe
+      const tmpIm = imag[i]
+      imag[i] = imag[j]
+      imag[j] = tmpIm
+    }
+  }
+  for (let len = 2; len <= n; len <<= 1) {
+    const angle = (-2 * Math.PI) / len
+    const wlenCos = Math.cos(angle)
+    const wlenSin = Math.sin(angle)
+    for (let i = 0; i < n; i += len) {
+      let wCos = 1
+      let wSin = 0
+      for (let j = 0; j < len / 2; j += 1) {
+        const uRe = real[i + j]
+        const uIm = imag[i + j]
+        const vRe = real[i + j + len / 2] * wCos - imag[i + j + len / 2] * wSin
+        const vIm = real[i + j + len / 2] * wSin + imag[i + j + len / 2] * wCos
+        real[i + j] = uRe + vRe
+        imag[i + j] = uIm + vIm
+        real[i + j + len / 2] = uRe - vRe
+        imag[i + j + len / 2] = uIm - vIm
+        const nextCos = wCos * wlenCos - wSin * wlenSin
+        const nextSin = wCos * wlenSin + wSin * wlenCos
+        wCos = nextCos
+        wSin = nextSin
+      }
+    }
+  }
+}
+
+const fillNativeFrequency = (
+  output: Float32Array,
+  input: Float32Array,
+  fftStateRef: {
+    current: {
+      size: number
+      window: Float32Array
+      real: Float32Array
+      imag: Float32Array
+    } | null
+  },
+) => {
+  const size = output.length * 2
+  if (!isPowerOfTwo(size) || input.length < size) {
+    output.fill(-120)
+    return
+  }
+  const state = ensureFftState(fftStateRef, size)
+  const offset = input.length - size
+  for (let i = 0; i < size; i += 1) {
+    state.real[i] = input[offset + i] * state.window[i]
+    state.imag[i] = 0
+  }
+  fftInPlace(state.real, state.imag)
+  const scale = 1 / (size / 2)
+  for (let i = 0; i < output.length; i += 1) {
+    const re = state.real[i]
+    const im = state.imag[i]
+    const mag = Math.sqrt(re * re + im * im) * scale
+    output[i] = 20 * Math.log10(mag + 1e-12)
+  }
+}
+
 export const Oscilloscope = ({
   engine,
+  nativeScope,
   moduleId,
   running,
   timeScale,
@@ -48,6 +153,12 @@ export const Oscilloscope = ({
   const frameRef = useRef<number | null>(null)
   const buffersRef = useRef<Map<string, Float32Array>>(new Map())
   const fftBuffersRef = useRef<Map<string, Float32Array>>(new Map())
+  const fftStateRef = useRef<{
+    size: number
+    window: Float32Array
+    real: Float32Array
+    imag: Float32Array
+  } | null>(null)
   const peakHoldRef = useRef<Float32Array | null>(null)
   const peakDecayRef = useRef<Float32Array | null>(null)
   const spectrogramRef = useRef<ImageData | null>(null)
@@ -114,15 +225,22 @@ export const Oscilloscope = ({
 
         // Draw each enabled channel
         enabledChannels.forEach((channel, idx) => {
-          const analyser = running ? engine.getAnalyserNode(moduleId, channel.id) : null
-          if (!analyser) return
+          const nativeBuffer =
+            nativeScope?.isActive ? nativeScope.getBuffer(moduleId, channel.id) : null
+          const analyser = !nativeBuffer && running
+            ? engine.getAnalyserNode(moduleId, channel.id)
+            : null
+          if (!nativeBuffer && !analyser) return
 
           let buffer = buffersRef.current.get(channel.id)
-          if (!buffer || buffer.length !== analyser.fftSize) {
-            buffer = new Float32Array(analyser.fftSize)
+          const sourceLength = nativeBuffer?.length ?? analyser?.fftSize ?? 0
+          if (!buffer || buffer.length !== sourceLength) {
+            buffer = new Float32Array(sourceLength)
             buffersRef.current.set(channel.id, buffer)
           }
-          if (!frozen) {
+          if (!frozen && nativeBuffer) {
+            buffer.set(nativeBuffer)
+          } else if (!frozen && analyser) {
             analyser.getFloatTimeDomainData(buffer as Float32Array<ArrayBuffer>)
           }
 
@@ -175,9 +293,15 @@ export const Oscilloscope = ({
         // Use first enabled channel for FFT
         const firstChannel = enabledChannels[0]
         if (firstChannel) {
-          const analyser = running ? engine.getAnalyserNode(moduleId, firstChannel.id) : null
-          if (analyser && !frozen) {
-            const fftSize = analyser.frequencyBinCount
+          const nativeBuffer =
+            nativeScope?.isActive ? nativeScope.getBuffer(moduleId, firstChannel.id) : null
+          const analyser = !nativeBuffer && running
+            ? engine.getAnalyserNode(moduleId, firstChannel.id)
+            : null
+
+          if ((nativeBuffer || analyser) && !frozen) {
+            const fftSize = nativeBuffer ? nativeBuffer.length / 2 : analyser?.frequencyBinCount ?? 0
+            if (!fftSize) return
             let buffer = fftBuffersRef.current.get(firstChannel.id)
             if (!buffer || buffer.length !== fftSize) {
               buffer = new Float32Array(fftSize)
@@ -185,7 +309,11 @@ export const Oscilloscope = ({
               peakHoldRef.current = new Float32Array(64)
               peakDecayRef.current = new Float32Array(64)
             }
-            analyser.getFloatFrequencyData(buffer as Float32Array<ArrayBuffer>)
+            if (nativeBuffer) {
+              fillNativeFrequency(buffer, nativeBuffer, fftStateRef)
+            } else if (analyser) {
+              analyser.getFloatFrequencyData(buffer as Float32Array<ArrayBuffer>)
+            }
 
             const barCount = 64
             const barWidth = (width / barCount) - 1
@@ -231,15 +359,24 @@ export const Oscilloscope = ({
         // === SPECTROGRAM MODE ===
         const firstChannel = enabledChannels[0]
         if (firstChannel) {
-          const analyser = running ? engine.getAnalyserNode(moduleId, firstChannel.id) : null
-          if (analyser && !frozen) {
-            const fftSize = analyser.frequencyBinCount
+          const nativeBuffer =
+            nativeScope?.isActive ? nativeScope.getBuffer(moduleId, firstChannel.id) : null
+          const analyser = !nativeBuffer && running
+            ? engine.getAnalyserNode(moduleId, firstChannel.id)
+            : null
+          if ((nativeBuffer || analyser) && !frozen) {
+            const fftSize = nativeBuffer ? nativeBuffer.length / 2 : analyser?.frequencyBinCount ?? 0
+            if (!fftSize) return
             let buffer = fftBuffersRef.current.get(firstChannel.id)
             if (!buffer || buffer.length !== fftSize) {
               buffer = new Float32Array(fftSize)
               fftBuffersRef.current.set(firstChannel.id, buffer)
             }
-            analyser.getFloatFrequencyData(buffer as Float32Array<ArrayBuffer>)
+            if (nativeBuffer) {
+              fillNativeFrequency(buffer, nativeBuffer, fftStateRef)
+            } else if (analyser) {
+              analyser.getFloatFrequencyData(buffer as Float32Array<ArrayBuffer>)
+            }
 
             const pixelWidth = Math.floor(width * (window.devicePixelRatio || 1))
             const pixelHeight = Math.floor(height * (window.devicePixelRatio || 1))
@@ -333,7 +470,7 @@ export const Oscilloscope = ({
       }
       resizeObserver.disconnect()
     }
-  }, [engine, moduleId, running, timeScale, gain, frozen, mode, channels])
+  }, [engine, moduleId, nativeScope, running, timeScale, gain, frozen, mode, channels])
 
   const modeLabels: Record<ViewMode, string> = {
     scope: 'SCOPE',

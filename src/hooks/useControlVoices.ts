@@ -1,6 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { AudioEngine } from '../engine/WasmGraphEngine'
 
+type ControlBridge = Pick<
+  AudioEngine,
+  | 'setControlVoiceCv'
+  | 'setControlVoiceGate'
+  | 'triggerControlVoiceGate'
+  | 'triggerControlVoiceSync'
+  | 'setControlVoiceVelocity'
+>
+
 type VoiceState = {
   note: number | null
   velocity: number
@@ -9,6 +18,7 @@ type VoiceState = {
 
 type UseControlVoicesParams = {
   engine: AudioEngine
+  nativeControl?: ControlBridge | null
   controlModuleId: string | null
   voiceCount: number
   midiRoot: number
@@ -26,6 +36,7 @@ type UseControlVoicesParams = {
 
 export const useControlVoices = ({
   engine,
+  nativeControl,
   controlModuleId,
   voiceCount,
   midiRoot,
@@ -104,6 +115,7 @@ export const useControlVoices = ({
       voiceStateRef.current.forEach((state, index) => {
         if (state.note !== null) {
           engine.setControlVoiceGate(controlModuleId, index, 0)
+          nativeControl?.setControlVoiceGate(controlModuleId, index, 0)
         }
       })
     }
@@ -133,8 +145,15 @@ export const useControlVoices = ({
         updateParam(controlModuleId, 'velocity', clampedVelocity, { skipEngine: true })
       }
       engine.setControlVoiceCv(controlModuleId, voiceIndex, cv)
+      nativeControl?.setControlVoiceCv(controlModuleId, voiceIndex, cv)
       if (useVelocity) {
         engine.setControlVoiceVelocity(
+          controlModuleId,
+          voiceIndex,
+          clampedVelocity,
+          options?.velocitySlew ?? 0,
+        )
+        nativeControl?.setControlVoiceVelocity(
           controlModuleId,
           voiceIndex,
           clampedVelocity,
@@ -143,8 +162,10 @@ export const useControlVoices = ({
       }
       engine.triggerControlVoiceGate(controlModuleId, voiceIndex)
       engine.triggerControlVoiceSync(controlModuleId, voiceIndex)
+      nativeControl?.triggerControlVoiceGate(controlModuleId, voiceIndex)
+      nativeControl?.triggerControlVoiceSync(controlModuleId, voiceIndex)
     },
-    [allocateVoice, controlModuleId, engine, midiRoot, updateParam],
+    [allocateVoice, controlModuleId, engine, midiRoot, nativeControl, updateParam],
   )
 
   const releaseVoiceNote = useCallback(
@@ -157,24 +178,27 @@ export const useControlVoices = ({
         return
       }
       engine.setControlVoiceGate(controlModuleId, voiceIndex, 0)
+      nativeControl?.setControlVoiceGate(controlModuleId, voiceIndex, 0)
     },
-    [controlModuleId, engine, releaseVoice],
+    [controlModuleId, engine, nativeControl, releaseVoice],
   )
 
   const setManualGate = useCallback(
     (moduleId: string, isOn: boolean) => {
       updateParam(moduleId, 'gate', isOn ? 1 : 0, { skipEngine: true })
       engine.setControlVoiceGate(moduleId, 0, isOn ? 1 : 0)
+      nativeControl?.setControlVoiceGate(moduleId, 0, isOn ? 1 : 0)
     },
-    [engine, updateParam],
+    [engine, nativeControl, updateParam],
   )
 
   const triggerManualSync = useCallback(
     (moduleId: string) => {
       updateParam(moduleId, 'sync', 1, { skipEngine: true })
       engine.triggerControlVoiceSync(moduleId, 0)
+      nativeControl?.triggerControlVoiceSync(moduleId, 0)
     },
-    [engine, updateParam],
+    [engine, nativeControl, updateParam],
   )
 
   useEffect(() => {

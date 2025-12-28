@@ -7,10 +7,18 @@ import { Oscilloscope } from './Oscilloscope'
 import { RotaryKnob } from './RotaryKnob'
 import { WaveformSelector } from './WaveformSelector'
 
+type NativeScopeBridge = {
+  isActive: boolean
+  getSampleRate: () => number | null
+  getFrames: () => number | null
+  getBuffer: (moduleId: string, portId: string) => Float32Array | null
+}
+
 export type ModuleControlsProps = {
   module: ModuleSpec
   engine: AudioEngine
   status: 'idle' | 'running' | 'error'
+  nativeScope?: NativeScopeBridge | null
   updateParam: (
     moduleId: string,
     paramId: string,
@@ -41,6 +49,7 @@ export const ModuleControls = ({
   module,
   engine,
   status,
+  nativeScope,
   updateParam,
   setManualGate,
   triggerManualSync,
@@ -255,6 +264,67 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.levelB ?? 0.6)}
           onChange={(value) => updateParam(module.id, 'levelB', value)}
+          format={(value) => value.toFixed(2)}
+        />
+      </>
+    )
+  }
+
+  if (module.type === 'mixer-1x2') {
+    return (
+      <>
+        <RotaryKnob
+          label="Level A"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.levelA ?? 0.6)}
+          onChange={(value) => updateParam(module.id, 'levelA', value)}
+          format={(value) => value.toFixed(2)}
+        />
+        <RotaryKnob
+          label="Level B"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.levelB ?? 0.6)}
+          onChange={(value) => updateParam(module.id, 'levelB', value)}
+          format={(value) => value.toFixed(2)}
+        />
+        <RotaryKnob
+          label="Level C"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.levelC ?? 0.6)}
+          onChange={(value) => updateParam(module.id, 'levelC', value)}
+          format={(value) => value.toFixed(2)}
+        />
+        <RotaryKnob
+          label="Level D"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.levelD ?? 0.6)}
+          onChange={(value) => updateParam(module.id, 'levelD', value)}
+          format={(value) => value.toFixed(2)}
+        />
+        <RotaryKnob
+          label="Level E"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.levelE ?? 0.6)}
+          onChange={(value) => updateParam(module.id, 'levelE', value)}
+          format={(value) => value.toFixed(2)}
+        />
+        <RotaryKnob
+          label="Level F"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.levelF ?? 0.6)}
+          onChange={(value) => updateParam(module.id, 'levelF', value)}
           format={(value) => value.toFixed(2)}
         />
       </>
@@ -856,8 +926,9 @@ export const ModuleControls = ({
       <>
         <Oscilloscope
           engine={engine}
+          nativeScope={nativeScope}
           moduleId={module.id}
-          running={status === 'running'}
+          running={status === 'running' || Boolean(nativeScope?.isActive)}
           timeScale={timeScale}
           gain={gainScale}
           frozen={frozen}

@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import type { AudioEngine } from '../engine/WasmGraphEngine'
 
+type MarioBridge = Pick<AudioEngine, 'setMarioChannelCv' | 'setMarioChannelGate'>
+
 type MarioSong = {
   name: string
   tempo: number
@@ -13,6 +15,7 @@ type MarioSong = {
 
 type UseMarioSequencerParams = {
   engine: AudioEngine
+  nativeControl?: MarioBridge | null
   status: 'idle' | 'running' | 'error'
   marioModuleId: string | null
   marioRunning: boolean
@@ -22,6 +25,7 @@ type UseMarioSequencerParams = {
 
 export const useMarioSequencer = ({
   engine,
+  nativeControl,
   status,
   marioModuleId,
   marioRunning,
@@ -63,6 +67,11 @@ export const useMarioSequencer = ({
       engine.setMarioChannelGate(marioModuleId, 3, 0)
       engine.setMarioChannelGate(marioModuleId, 4, 0)
       engine.setMarioChannelGate(marioModuleId, 5, 0)
+      nativeControl?.setMarioChannelGate(marioModuleId, 1, 0)
+      nativeControl?.setMarioChannelGate(marioModuleId, 2, 0)
+      nativeControl?.setMarioChannelGate(marioModuleId, 3, 0)
+      nativeControl?.setMarioChannelGate(marioModuleId, 4, 0)
+      nativeControl?.setMarioChannelGate(marioModuleId, 5, 0)
     }
 
     if (!marioRunning) {
@@ -81,8 +90,11 @@ export const useMarioSequencer = ({
         const cv1 = (note1 - 60) / 12
         engine.setMarioChannelCv(marioModuleId, 1, cv1)
         engine.setMarioChannelGate(marioModuleId, 1, 1)
+        nativeControl?.setMarioChannelCv(marioModuleId, 1, cv1)
+        nativeControl?.setMarioChannelGate(marioModuleId, 1, 1)
         marioSeqRef.current.gateTimers[0] = window.setTimeout(() => {
           engine.setMarioChannelGate(marioModuleId, 1, 0)
+          nativeControl?.setMarioChannelGate(marioModuleId, 1, 0)
         }, gateMs)
       }
 
@@ -91,8 +103,11 @@ export const useMarioSequencer = ({
         const cv2 = (note2 - 60) / 12
         engine.setMarioChannelCv(marioModuleId, 2, cv2)
         engine.setMarioChannelGate(marioModuleId, 2, 1)
+        nativeControl?.setMarioChannelCv(marioModuleId, 2, cv2)
+        nativeControl?.setMarioChannelGate(marioModuleId, 2, 1)
         marioSeqRef.current.gateTimers[1] = window.setTimeout(() => {
           engine.setMarioChannelGate(marioModuleId, 2, 0)
+          nativeControl?.setMarioChannelGate(marioModuleId, 2, 0)
         }, gateMs)
       }
 
@@ -101,8 +116,11 @@ export const useMarioSequencer = ({
         const cv3 = (note3 - 60) / 12
         engine.setMarioChannelCv(marioModuleId, 3, cv3)
         engine.setMarioChannelGate(marioModuleId, 3, 1)
+        nativeControl?.setMarioChannelCv(marioModuleId, 3, cv3)
+        nativeControl?.setMarioChannelGate(marioModuleId, 3, 1)
         marioSeqRef.current.gateTimers[2] = window.setTimeout(() => {
           engine.setMarioChannelGate(marioModuleId, 3, 0)
+          nativeControl?.setMarioChannelGate(marioModuleId, 3, 0)
         }, gateMs)
       }
 
@@ -111,8 +129,11 @@ export const useMarioSequencer = ({
         const cv4 = (note4 - 60) / 12
         engine.setMarioChannelCv(marioModuleId, 4, cv4)
         engine.setMarioChannelGate(marioModuleId, 4, 1)
+        nativeControl?.setMarioChannelCv(marioModuleId, 4, cv4)
+        nativeControl?.setMarioChannelGate(marioModuleId, 4, 1)
         marioSeqRef.current.gateTimers[3] = window.setTimeout(() => {
           engine.setMarioChannelGate(marioModuleId, 4, 0)
+          nativeControl?.setMarioChannelGate(marioModuleId, 4, 0)
         }, gateMs)
       }
 
@@ -121,8 +142,11 @@ export const useMarioSequencer = ({
         const cv5 = (note5 - 60) / 12
         engine.setMarioChannelCv(marioModuleId, 5, cv5)
         engine.setMarioChannelGate(marioModuleId, 5, 1)
+        nativeControl?.setMarioChannelCv(marioModuleId, 5, cv5)
+        nativeControl?.setMarioChannelGate(marioModuleId, 5, 1)
         marioSeqRef.current.gateTimers[4] = window.setTimeout(() => {
           engine.setMarioChannelGate(marioModuleId, 5, 0)
+          nativeControl?.setMarioChannelGate(marioModuleId, 5, 0)
         }, gateMs)
       }
 
@@ -134,7 +158,7 @@ export const useMarioSequencer = ({
     marioSeqRef.current.timer = window.setInterval(tick, stepMs)
 
     return () => stopMarioSeq()
-  }, [engine, marioModuleId, marioRunning, marioTempo, currentSong, status])
+  }, [engine, marioModuleId, marioRunning, marioTempo, currentSong, nativeControl, status])
 
   return { marioStep }
 }

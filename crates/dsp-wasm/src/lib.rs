@@ -1,11 +1,10 @@
+use dsp_graph::GraphEngine;
 use js_sys::Float32Array;
 use wasm_bindgen::prelude::*;
 
-mod graph;
-
 #[wasm_bindgen]
 pub struct WasmGraphEngine {
-  engine: graph::GraphEngine,
+  engine: GraphEngine,
 }
 
 #[wasm_bindgen]
@@ -13,7 +12,7 @@ impl WasmGraphEngine {
   #[wasm_bindgen(constructor)]
   pub fn new(sample_rate: f32) -> WasmGraphEngine {
     WasmGraphEngine {
-      engine: graph::GraphEngine::new(sample_rate),
+      engine: GraphEngine::new(sample_rate),
     }
   }
 

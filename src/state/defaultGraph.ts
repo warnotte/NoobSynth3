@@ -42,7 +42,7 @@ export const defaultGraph: GraphState = {
     {
       id: 'mix-1',
       type: 'mixer',
-      name: 'Mixer',
+      name: 'Mixer 1x1',
       position: { x: 520, y: 140 },
       params: { levelA: 0.7, levelB: 0.65 },
     },

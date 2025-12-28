@@ -1,6 +1,771 @@
+use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
+use cpal::{FromSample, Sample, SampleFormat, StreamConfig};
+use dsp_core::{Node, SineOsc};
+use dsp_graph::GraphEngine;
+use midir::MidiInput;
+use serde::Serialize;
+use std::sync::{mpsc, Arc, Mutex};
+use std::thread;
+use tauri::State;
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct NativeStatus {
+  running: bool,
+  device_name: Option<String>,
+  sample_rate: u32,
+  channels: u16,
+}
+
+enum AudioCommand {
+  Start {
+    graph_json: Option<String>,
+    device_name: Option<String>,
+    reply: mpsc::Sender<Result<NativeStatus, String>>,
+  },
+  Stop {
+    reply: mpsc::Sender<Result<NativeStatus, String>>,
+  },
+  SetGraph {
+    graph_json: String,
+    reply: mpsc::Sender<Result<NativeStatus, String>>,
+  },
+  SetParam {
+    module_id: String,
+    param_id: String,
+    value: f32,
+    reply: mpsc::Sender<Result<NativeStatus, String>>,
+  },
+  SetControlVoiceCv {
+    module_id: String,
+    voice: usize,
+    value: f32,
+    reply: mpsc::Sender<Result<NativeStatus, String>>,
+  },
+  SetControlVoiceGate {
+    module_id: String,
+    voice: usize,
+    value: f32,
+    reply: mpsc::Sender<Result<NativeStatus, String>>,
+  },
+  TriggerControlVoiceGate {
+    module_id: String,
+    voice: usize,
+    reply: mpsc::Sender<Result<NativeStatus, String>>,
+  },
+  TriggerControlVoiceSync {
+    module_id: String,
+    voice: usize,
+    reply: mpsc::Sender<Result<NativeStatus, String>>,
+  },
+  SetControlVoiceVelocity {
+    module_id: String,
+    voice: usize,
+    value: f32,
+    slew: f32,
+    reply: mpsc::Sender<Result<NativeStatus, String>>,
+  },
+  SetMarioChannelCv {
+    module_id: String,
+    channel: usize,
+    value: f32,
+    reply: mpsc::Sender<Result<NativeStatus, String>>,
+  },
+  SetMarioChannelGate {
+    module_id: String,
+    channel: usize,
+    value: f32,
+    reply: mpsc::Sender<Result<NativeStatus, String>>,
+  },
+  Status {
+    reply: mpsc::Sender<Result<NativeStatus, String>>,
+  },
+}
+
+const SCOPE_FRAMES: usize = 2048;
+
+#[derive(Default)]
+struct ScopeSnapshot {
+  frames: usize,
+  tap_count: usize,
+  sample_rate: u32,
+  data: Vec<Vec<f32>>,
+  write_index: usize,
+  filled: bool,
+}
+
+impl ScopeSnapshot {
+  fn new(frames: usize) -> Self {
+    Self {
+      frames,
+      tap_count: 0,
+      sample_rate: 0,
+      data: Vec::new(),
+      write_index: 0,
+      filled: false,
+    }
+  }
+
+  fn reset(&mut self) {
+    self.tap_count = 0;
+    self.data.clear();
+    self.write_index = 0;
+    self.filled = false;
+  }
+
+  fn ensure_taps(&mut self, tap_count: usize) {
+    if self.tap_count == tap_count && !self.data.is_empty() {
+      return;
+    }
+    self.tap_count = tap_count;
+    self.data = (0..tap_count)
+      .map(|_| vec![0.0; self.frames])
+      .collect();
+    self.write_index = 0;
+    self.filled = false;
+  }
+
+  fn push(&mut self, tap_slices: &[&[f32]], sample_rate: u32) {
+    let tap_count = tap_slices.len();
+    if tap_count == 0 {
+      return;
+    }
+    self.sample_rate = sample_rate;
+    self.ensure_taps(tap_count);
+    let block_frames = tap_slices[0].len();
+    if block_frames == 0 {
+      return;
+    }
+
+    if block_frames >= self.frames {
+      let start = block_frames - self.frames;
+      for (tap_index, slice) in tap_slices.iter().enumerate() {
+        self.data[tap_index].copy_from_slice(&slice[start..start + self.frames]);
+      }
+      self.write_index = 0;
+      self.filled = true;
+      return;
+    }
+
+    for i in 0..block_frames {
+      let idx = (self.write_index + i) % self.frames;
+      for (tap_index, slice) in tap_slices.iter().enumerate() {
+        self.data[tap_index][idx] = slice[i];
+      }
+    }
+
+    let end_index = self.write_index + block_frames;
+    if !self.filled && end_index >= self.frames {
+      self.filled = true;
+    }
+    self.write_index = end_index % self.frames;
+  }
+
+  fn export(&self) -> Option<ScopePacket> {
+    if self.tap_count == 0 {
+      return None;
+    }
+    let mut data = Vec::with_capacity(self.tap_count);
+    for tap in 0..self.tap_count {
+      let mut ordered = vec![0.0; self.frames];
+      if self.filled {
+        let head = &self.data[tap][self.write_index..];
+        let tail = &self.data[tap][..self.write_index];
+        ordered[..head.len()].copy_from_slice(head);
+        ordered[head.len()..].copy_from_slice(tail);
+      } else {
+        ordered.copy_from_slice(&self.data[tap]);
+      }
+      data.push(ordered);
+    }
+    Some(ScopePacket {
+      sample_rate: self.sample_rate,
+      frames: self.frames,
+      tap_count: self.tap_count,
+      data,
+    })
+  }
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct ScopePacket {
+  sample_rate: u32,
+  frames: usize,
+  tap_count: usize,
+  data: Vec<Vec<f32>>,
+}
+
+struct AudioThreadState {
+  stream: Option<cpal::Stream>,
+  graph: Option<Arc<Mutex<GraphEngine>>>,
+  graph_json: Option<String>,
+  device_name: Option<String>,
+  sample_rate: u32,
+  channels: u16,
+  scope: Arc<Mutex<ScopeSnapshot>>,
+}
+
+impl AudioThreadState {
+  fn new(scope: Arc<Mutex<ScopeSnapshot>>) -> Self {
+    Self {
+      stream: None,
+      graph: None,
+      graph_json: None,
+      device_name: None,
+      sample_rate: 0,
+      channels: 0,
+      scope,
+    }
+  }
+}
+
+impl AudioThreadState {
+  fn status(&self) -> NativeStatus {
+    NativeStatus {
+      running: self.stream.is_some(),
+      device_name: self.device_name.clone(),
+      sample_rate: self.sample_rate,
+      channels: self.channels,
+    }
+  }
+}
+
+struct NativeAudioState {
+  tx: mpsc::Sender<AudioCommand>,
+  scope: Arc<Mutex<ScopeSnapshot>>,
+}
+
+impl NativeAudioState {
+  fn new() -> Self {
+    let (tx, rx) = mpsc::channel();
+    let scope = Arc::new(Mutex::new(ScopeSnapshot::new(SCOPE_FRAMES)));
+    let thread_scope = Arc::clone(&scope);
+    thread::spawn(move || audio_thread(rx, thread_scope));
+    Self { tx, scope }
+  }
+}
+
+fn send_audio_command<F>(
+  state: &State<NativeAudioState>,
+  builder: F,
+) -> Result<NativeStatus, String>
+where
+  F: FnOnce(mpsc::Sender<Result<NativeStatus, String>>) -> AudioCommand,
+{
+  let (reply_tx, reply_rx) = mpsc::channel();
+  let command = builder(reply_tx);
+  state
+    .tx
+    .send(command)
+    .map_err(|_| "native audio thread unavailable".to_string())?;
+  reply_rx
+    .recv()
+    .map_err(|_| "native audio thread unavailable".to_string())?
+}
+
+fn audio_thread(rx: mpsc::Receiver<AudioCommand>, scope: Arc<Mutex<ScopeSnapshot>>) {
+  let mut state = AudioThreadState::new(scope);
+  while let Ok(command) = rx.recv() {
+    match command {
+      AudioCommand::Start {
+        graph_json,
+        device_name,
+        reply,
+      } => {
+        let result = start_audio(&mut state, graph_json, device_name);
+        let _ = reply.send(result);
+      }
+      AudioCommand::Stop { reply } => {
+        let result = stop_audio(&mut state);
+        let _ = reply.send(result);
+      }
+      AudioCommand::SetGraph { graph_json, reply } => {
+        let result = set_graph(&mut state, graph_json);
+        let _ = reply.send(result);
+      }
+      AudioCommand::SetParam {
+        module_id,
+        param_id,
+        value,
+        reply,
+      } => {
+        let result = with_graph_mut(&mut state, |engine| {
+          engine.set_param(&module_id, &param_id, value);
+        });
+        let _ = reply.send(result.map(|_| state.status()));
+      }
+      AudioCommand::SetControlVoiceCv {
+        module_id,
+        voice,
+        value,
+        reply,
+      } => {
+        let result = with_graph_mut(&mut state, |engine| {
+          engine.set_control_voice_cv(&module_id, voice, value);
+        });
+        let _ = reply.send(result.map(|_| state.status()));
+      }
+      AudioCommand::SetControlVoiceGate {
+        module_id,
+        voice,
+        value,
+        reply,
+      } => {
+        let result = with_graph_mut(&mut state, |engine| {
+          engine.set_control_voice_gate(&module_id, voice, value);
+        });
+        let _ = reply.send(result.map(|_| state.status()));
+      }
+      AudioCommand::TriggerControlVoiceGate {
+        module_id,
+        voice,
+        reply,
+      } => {
+        let result = with_graph_mut(&mut state, |engine| {
+          engine.trigger_control_voice_gate(&module_id, voice);
+        });
+        let _ = reply.send(result.map(|_| state.status()));
+      }
+      AudioCommand::TriggerControlVoiceSync {
+        module_id,
+        voice,
+        reply,
+      } => {
+        let result = with_graph_mut(&mut state, |engine| {
+          engine.trigger_control_voice_sync(&module_id, voice);
+        });
+        let _ = reply.send(result.map(|_| state.status()));
+      }
+      AudioCommand::SetControlVoiceVelocity {
+        module_id,
+        voice,
+        value,
+        slew,
+        reply,
+      } => {
+        let result = with_graph_mut(&mut state, |engine| {
+          engine.set_control_voice_velocity(&module_id, voice, value, slew);
+        });
+        let _ = reply.send(result.map(|_| state.status()));
+      }
+      AudioCommand::SetMarioChannelCv {
+        module_id,
+        channel,
+        value,
+        reply,
+      } => {
+        let result = with_graph_mut(&mut state, |engine| {
+          engine.set_mario_channel_cv(&module_id, channel, value);
+        });
+        let _ = reply.send(result.map(|_| state.status()));
+      }
+      AudioCommand::SetMarioChannelGate {
+        module_id,
+        channel,
+        value,
+        reply,
+      } => {
+        let result = with_graph_mut(&mut state, |engine| {
+          engine.set_mario_channel_gate(&module_id, channel, value);
+        });
+        let _ = reply.send(result.map(|_| state.status()));
+      }
+      AudioCommand::Status { reply } => {
+        let _ = reply.send(Ok(state.status()));
+      }
+    }
+  }
+}
+
+fn start_audio(
+  state: &mut AudioThreadState,
+  graph_json: Option<String>,
+  device_name: Option<String>,
+) -> Result<NativeStatus, String> {
+  if state.stream.is_some() {
+    return Ok(state.status());
+  }
+
+  if let Some(payload) = graph_json {
+    state.graph_json = Some(payload);
+  }
+  let graph_payload = state
+    .graph_json
+    .clone()
+    .ok_or_else(|| "graph JSON required".to_string())?;
+
+  let device = find_output_device(device_name.as_deref())?;
+  let config = device
+    .default_output_config()
+    .map_err(|err| err.to_string())?;
+  let sample_rate = config.sample_rate().0;
+  let channels = config.channels();
+  let stream_config = config.clone().into();
+
+  let mut engine = GraphEngine::new(sample_rate as f32);
+  engine.set_graph_json(&graph_payload)?;
+  let graph = Arc::new(Mutex::new(engine));
+  let scope = Arc::clone(&state.scope);
+  let stream = match config.sample_format() {
+    SampleFormat::F32 => {
+      build_graph_stream::<f32>(&device, &stream_config, graph.clone(), scope, sample_rate)?
+    }
+    SampleFormat::I16 => {
+      build_graph_stream::<i16>(&device, &stream_config, graph.clone(), scope, sample_rate)?
+    }
+    SampleFormat::U16 => {
+      build_graph_stream::<u16>(&device, &stream_config, graph.clone(), scope, sample_rate)?
+    }
+    sample_format => {
+      return Err(format!("Unsupported sample format '{sample_format:?}'"))
+    }
+  };
+
+  stream.play().map_err(|err| err.to_string())?;
+
+  state.stream = Some(stream);
+  state.graph = Some(graph);
+  state.device_name = device.name().ok().or(device_name);
+  state.sample_rate = sample_rate;
+  state.channels = channels;
+
+  Ok(state.status())
+}
+
+fn stop_audio(state: &mut AudioThreadState) -> Result<NativeStatus, String> {
+  state.stream = None;
+  state.graph = None;
+  if let Ok(mut scope) = state.scope.lock() {
+    scope.reset();
+  }
+  Ok(state.status())
+}
+
+fn with_graph_mut<F>(state: &mut AudioThreadState, f: F) -> Result<(), String>
+where
+  F: FnOnce(&mut GraphEngine),
+{
+  if let Some(graph) = &state.graph {
+    let mut engine = graph.lock().map_err(|_| "graph engine unavailable")?;
+    f(&mut engine);
+  }
+  Ok(())
+}
+
+fn set_graph(state: &mut AudioThreadState, graph_json: String) -> Result<NativeStatus, String> {
+  state.graph_json = Some(graph_json.clone());
+  if let Some(graph) = &state.graph {
+    let mut engine = graph.lock().map_err(|_| "graph engine unavailable")?;
+    engine.set_graph_json(&graph_json)?;
+  }
+  Ok(state.status())
+}
+
+fn find_output_device(name: Option<&str>) -> Result<cpal::Device, String> {
+  let host = cpal::default_host();
+  if let Some(name) = name {
+    let devices = host.output_devices().map_err(|err| err.to_string())?;
+    for device in devices {
+      let device_name = device.name().unwrap_or_default();
+      if device_name == name {
+        return Ok(device);
+      }
+    }
+  }
+  host
+    .default_output_device()
+    .ok_or_else(|| "no default output device".to_string())
+}
+
+fn write_graph_output<T>(
+  output: &mut [T],
+  channels: usize,
+  graph: &Arc<Mutex<GraphEngine>>,
+  scope: &Arc<Mutex<ScopeSnapshot>>,
+  sample_rate: u32,
+) where
+  T: Sample + FromSample<f32>,
+{
+  if channels == 0 {
+    return;
+  }
+  let frames = output.len() / channels;
+  if frames == 0 {
+    return;
+  }
+
+  if let Ok(mut engine) = graph.try_lock() {
+    let data = engine.render(frames);
+    let left = &data[0..frames];
+    let right = if data.len() >= frames * 2 {
+      &data[frames..frames * 2]
+    } else {
+      left
+    };
+
+    for (frame_index, frame) in output.chunks_mut(channels).enumerate() {
+      let l = left[frame_index];
+      let r = right[frame_index];
+      for (channel_index, sample) in frame.iter_mut().enumerate() {
+        let value = if channel_index == 0 { l } else if channel_index == 1 { r } else { l };
+        *sample = T::from_sample(value);
+      }
+    }
+
+    let tap_count = data.len() / frames;
+    if tap_count > 2 {
+      let taps = tap_count - 2;
+      let mut tap_slices = Vec::with_capacity(taps);
+      for tap_index in 0..taps {
+        let start = (2 + tap_index) * frames;
+        let end = start + frames;
+        tap_slices.push(&data[start..end]);
+      }
+      if let Ok(mut snapshot) = scope.try_lock() {
+        snapshot.push(&tap_slices, sample_rate);
+      }
+    }
+  } else {
+    for sample in output.iter_mut() {
+      *sample = T::EQUILIBRIUM;
+    }
+  }
+}
+
+fn build_graph_stream<T: Sample + FromSample<f32> + cpal::SizedSample>(
+  device: &cpal::Device,
+  config: &StreamConfig,
+  graph: Arc<Mutex<GraphEngine>>,
+  scope: Arc<Mutex<ScopeSnapshot>>,
+  sample_rate: u32,
+) -> Result<cpal::Stream, String> {
+  let channels = config.channels as usize;
+  let err_fn = |err| eprintln!("audio stream error: {err}");
+  device
+    .build_output_stream(
+      config,
+      move |data: &mut [T], _| write_graph_output(data, channels, &graph, &scope, sample_rate),
+      err_fn,
+      None,
+    )
+    .map_err(|err| err.to_string())
+}
+
+#[tauri::command]
+fn dsp_ping() -> String {
+  let mut osc = SineOsc::new(220.0);
+  osc.reset(48_000.0);
+  let mut buffer = [0.0_f32; 8];
+  osc.process(&mut buffer);
+  format!("dsp-core ok: {:.3}", buffer[0])
+}
+
+#[tauri::command]
+fn list_audio_outputs() -> Result<Vec<String>, String> {
+  let host = cpal::default_host();
+  let devices = host.output_devices().map_err(|err| err.to_string())?;
+  let mut names = Vec::new();
+  for device in devices {
+    let name = device.name().unwrap_or_else(|_| "Unknown Output".to_string());
+    names.push(name);
+  }
+  Ok(names)
+}
+
+#[tauri::command]
+fn list_midi_inputs() -> Result<Vec<String>, String> {
+  let midi_in = MidiInput::new("noobsynth3-tauri").map_err(|err| err.to_string())?;
+  let mut names = Vec::new();
+  for port in midi_in.ports() {
+    let name = midi_in.port_name(&port).unwrap_or_else(|_| "Unknown Input".to_string());
+    names.push(name);
+  }
+  Ok(names)
+}
+
+#[tauri::command]
+fn native_set_graph(state: State<NativeAudioState>, graph_json: String) -> Result<(), String> {
+  send_audio_command(&state, |reply| AudioCommand::SetGraph { graph_json, reply }).map(|_| ())
+}
+
+#[tauri::command]
+fn native_set_param(
+  state: State<NativeAudioState>,
+  module_id: String,
+  param_id: String,
+  value: f32,
+) -> Result<(), String> {
+  send_audio_command(&state, |reply| AudioCommand::SetParam {
+    module_id,
+    param_id,
+    value,
+    reply,
+  })
+  .map(|_| ())
+}
+
+#[tauri::command]
+fn native_set_control_voice_cv(
+  state: State<NativeAudioState>,
+  module_id: String,
+  voice: usize,
+  value: f32,
+) -> Result<(), String> {
+  send_audio_command(&state, |reply| AudioCommand::SetControlVoiceCv {
+    module_id,
+    voice,
+    value,
+    reply,
+  })
+  .map(|_| ())
+}
+
+#[tauri::command]
+fn native_set_control_voice_gate(
+  state: State<NativeAudioState>,
+  module_id: String,
+  voice: usize,
+  value: f32,
+) -> Result<(), String> {
+  send_audio_command(&state, |reply| AudioCommand::SetControlVoiceGate {
+    module_id,
+    voice,
+    value,
+    reply,
+  })
+  .map(|_| ())
+}
+
+#[tauri::command]
+fn native_trigger_control_voice_gate(
+  state: State<NativeAudioState>,
+  module_id: String,
+  voice: usize,
+) -> Result<(), String> {
+  send_audio_command(&state, |reply| AudioCommand::TriggerControlVoiceGate {
+    module_id,
+    voice,
+    reply,
+  })
+  .map(|_| ())
+}
+
+#[tauri::command]
+fn native_trigger_control_voice_sync(
+  state: State<NativeAudioState>,
+  module_id: String,
+  voice: usize,
+) -> Result<(), String> {
+  send_audio_command(&state, |reply| AudioCommand::TriggerControlVoiceSync {
+    module_id,
+    voice,
+    reply,
+  })
+  .map(|_| ())
+}
+
+#[tauri::command]
+fn native_set_control_voice_velocity(
+  state: State<NativeAudioState>,
+  module_id: String,
+  voice: usize,
+  value: f32,
+  slew: f32,
+) -> Result<(), String> {
+  send_audio_command(&state, |reply| AudioCommand::SetControlVoiceVelocity {
+    module_id,
+    voice,
+    value,
+    slew,
+    reply,
+  })
+  .map(|_| ())
+}
+
+#[tauri::command]
+fn native_set_mario_channel_cv(
+  state: State<NativeAudioState>,
+  module_id: String,
+  channel: usize,
+  value: f32,
+) -> Result<(), String> {
+  send_audio_command(&state, |reply| AudioCommand::SetMarioChannelCv {
+    module_id,
+    channel,
+    value,
+    reply,
+  })
+  .map(|_| ())
+}
+
+#[tauri::command]
+fn native_set_mario_channel_gate(
+  state: State<NativeAudioState>,
+  module_id: String,
+  channel: usize,
+  value: f32,
+) -> Result<(), String> {
+  send_audio_command(&state, |reply| AudioCommand::SetMarioChannelGate {
+    module_id,
+    channel,
+    value,
+    reply,
+  })
+  .map(|_| ())
+}
+
+#[tauri::command]
+fn native_start_graph(
+  state: State<NativeAudioState>,
+  graph_json: Option<String>,
+  device_name: Option<String>,
+) -> Result<NativeStatus, String> {
+  send_audio_command(&state, |reply| AudioCommand::Start {
+    graph_json,
+    device_name,
+    reply,
+  })
+}
+
+#[tauri::command]
+fn native_stop_graph(state: State<NativeAudioState>) -> Result<NativeStatus, String> {
+  send_audio_command(&state, |reply| AudioCommand::Stop { reply })
+}
+
+#[tauri::command]
+fn native_status(state: State<NativeAudioState>) -> Result<NativeStatus, String> {
+  send_audio_command(&state, |reply| AudioCommand::Status { reply })
+}
+
+#[tauri::command]
+fn native_get_scope(state: State<NativeAudioState>) -> Result<ScopePacket, String> {
+  let scope = state.scope.lock().map_err(|_| "scope unavailable")?;
+  scope.export().ok_or_else(|| "scope not ready".to_string())
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
   tauri::Builder::default()
+    .manage(NativeAudioState::new())
+    .invoke_handler(tauri::generate_handler![
+      dsp_ping,
+      list_audio_outputs,
+      list_midi_inputs,
+      native_set_graph,
+      native_set_param,
+      native_set_control_voice_cv,
+      native_set_control_voice_gate,
+      native_trigger_control_voice_gate,
+      native_trigger_control_voice_sync,
+      native_set_control_voice_velocity,
+      native_set_mario_channel_cv,
+      native_set_mario_channel_gate,
+      native_start_graph,
+      native_stop_graph,
+      native_status,
+      native_get_scope
+    ])
     .setup(|app| {
       if cfg!(debug_assertions) {
         app.handle().plugin(

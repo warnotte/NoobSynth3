@@ -23,7 +23,8 @@ This file is meant to be reread by the coding assistant to keep context, decisio
 - ADSR
 - VCA (CV input)
 - Mod VCA (CV multiplier)
-- Mixer (A/B)
+- Mixer 1x1 (A/B)
+- Mixer 1x2 (A-F)
 - Chorus (stereo)
 - Delay (stereo)
 - Reverb (stereo)
@@ -68,6 +69,7 @@ Presets live in `src/state/presets.ts` and are loaded from the Presets panel. So
 - Consider drag-and-drop add for modules.
 - Optional: expand sequencer (8 steps, per-step toggles).
 - MIDI enhancements (pitch bend, CC mapping).
+- Optional: add native MIDI input via `midir` for Tauri (lower latency, more reliable than Web MIDI).
 
 ## Recent changes (Dec 2025)
 
@@ -88,6 +90,11 @@ Presets live in `src/state/presets.ts` and are loaded from the Presets panel. So
   - Expanded gain range (0.5x, 1x, 2x, 5x, 10x).
   - Efficient rendering (only active mode draws).
 - **Rust workspace scaffold**: `crates/dsp-core`, `crates/dsp-wasm`, `crates/dsp-standalone`, `crates/dsp-plugin`.
+- **Standalone/Tauri bridge scaffolds**: `dsp-standalone` now lists audio/MIDI devices (cpal/midir) with an optional test tone; Tauri exposes `dsp_ping`, `list_audio_outputs`, and `list_midi_inputs` commands.
+- **DSP graph shared crate**: `dsp-graph` now hosts the Rust graph engine (shared by WASM and Tauri).
+- **Tauri native audio controls**: UI panel can sync the current graph and start/stop native playback on a selected output device.
+- **Native scope bridge**: Tauri can stream scope taps to the UI for oscilloscope/FFT/spectrogram when running native audio.
+- **Unified transport**: Top bar Power On/Off now controls native audio in Tauri and Web Audio in browser mode.
 - **WASM graph engine**: single worklet now runs the full DSP graph in Rust, including Control IO + Mod VCA; scope inputs are tapped via worklet outputs.
 - **WASM cleanup**: removed per-module WASM worklets/toggles; the graph engine is the only DSP path.
 

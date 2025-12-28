@@ -12,6 +12,7 @@ export type ModuleType =
   | 'scope'
   | 'vcf'
   | 'mixer'
+  | 'mixer-1x2'
   | 'chorus'
   | 'delay'
   | 'reverb'

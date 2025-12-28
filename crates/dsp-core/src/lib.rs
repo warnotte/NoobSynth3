@@ -395,6 +395,40 @@ impl Mixer {
       output[i] = (a + b) * 0.5;
     }
   }
+
+  pub fn process_block_multi(
+    output: &mut [Sample],
+    inputs: &[Option<&[Sample]>],
+    levels: &[&[Sample]],
+  ) {
+    if output.is_empty() {
+      return;
+    }
+    if inputs.len() != levels.len() {
+      return;
+    }
+
+    let mut active_count = 0;
+    for input in inputs {
+      if input.is_some() {
+        active_count += 1;
+      }
+    }
+    let scale = if active_count > 0 {
+      1.0 / active_count as Sample
+    } else {
+      0.0
+    };
+
+    for i in 0..output.len() {
+      let mut sum = 0.0;
+      for (index, input) in inputs.iter().enumerate() {
+        let level = sample_at(levels[index], i, 0.6);
+        sum += input_at(*input, i) * level;
+      }
+      output[i] = sum * scale;
+    }
+  }
 }
 
 pub struct Delay {

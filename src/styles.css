@@ -69,6 +69,13 @@
   color: var(--text-dim);
 }
 
+.status-mode {
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(178, 200, 218, 0.7);
+}
+
 .actions {
   display: flex;
   align-items: center;
@@ -697,6 +704,30 @@
 .module-body .module-controls > .rotary {
   min-width: 48px;
   max-width: 80px;
+}
+
+.module-card[data-module-type="mixer-1x2"] .module-controls {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 2px;
+}
+
+.module-card[data-module-type="mixer-1x2"] .module-controls > .rotary {
+  min-width: 0;
+  max-width: 52px;
+  width: 100%;
+}
+
+.module-card[data-module-type="mixer-1x2"] .module-controls .rotary-dial {
+  --dial-size: 24px;
+}
+
+.module-card[data-module-type="mixer-1x2"] .module-controls .rotary-label {
+  font-size: 5px;
+}
+
+.module-card[data-module-type="mixer-1x2"] .module-controls .rotary-readout {
+  font-size: 6px;
+  min-height: 10px;
 }
 
 .control-row {
@@ -1427,6 +1458,73 @@
   margin-bottom: 8px;
   font-size: 0.7rem;
   color: rgba(230, 134, 134, 0.9);
+}
+
+.tauri-list {
+  display: grid;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.tauri-select-row {
+  display: grid;
+  grid-template-columns: 60px 1fr;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.tauri-select {
+  appearance: none;
+  background: rgba(12, 16, 22, 0.9);
+  border: 1px solid rgba(90, 104, 126, 0.6);
+  border-radius: 6px;
+  color: rgba(216, 230, 246, 0.9);
+  font-size: 0.65rem;
+  padding: 6px 8px;
+}
+
+.tauri-select:disabled {
+  opacity: 0.6;
+}
+
+.tauri-item {
+  display: grid;
+  grid-template-columns: 60px 1fr;
+  gap: 8px;
+  font-size: 0.7rem;
+  color: rgba(198, 214, 232, 0.85);
+}
+
+.tauri-label {
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(198, 214, 232, 0.6);
+}
+
+.tauri-value {
+  color: rgba(216, 230, 246, 0.9);
+}
+
+.tauri-device-list {
+  display: grid;
+  gap: 4px;
+  margin: 0 0 6px 4px;
+  font-size: 0.65rem;
+  color: rgba(198, 214, 232, 0.7);
+}
+
+.tauri-device {
+  position: relative;
+  padding-left: 10px;
+}
+
+.tauri-device::before {
+  content: '-';
+  position: absolute;
+  left: 0;
+  color: rgba(138, 156, 180, 0.7);
 }
 
 .preset-name {

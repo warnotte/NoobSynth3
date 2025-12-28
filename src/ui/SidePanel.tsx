@@ -19,6 +19,21 @@ type SidePanelProps = {
   presetStatus: 'loading' | 'ready' | 'error'
   presets: PresetSpec[]
   onApplyPreset: (graph: GraphState) => void
+  tauriAvailable: boolean
+  tauriStatus: 'idle' | 'loading' | 'ready' | 'error'
+  tauriError: string | null
+  tauriPing: string | null
+  tauriAudioOutputs: string[]
+  tauriMidiInputs: string[]
+  tauriNativeRunning: boolean
+  tauriNativeError: string | null
+  tauriNativeSampleRate: number | null
+  tauriNativeChannels: number | null
+  tauriNativeDeviceName: string | null
+  tauriSelectedOutput: string
+  onRefreshTauri: () => void
+  onTauriOutputChange: (value: string) => void
+  onTauriSyncGraph: () => void
 }
 
 export const SidePanel = ({
@@ -37,6 +52,21 @@ export const SidePanel = ({
   presetStatus,
   presets,
   onApplyPreset,
+  tauriAvailable,
+  tauriStatus,
+  tauriError,
+  tauriPing,
+  tauriAudioOutputs,
+  tauriMidiInputs,
+  tauriNativeRunning,
+  tauriNativeError,
+  tauriNativeSampleRate,
+  tauriNativeChannels,
+  tauriNativeDeviceName,
+  tauriSelectedOutput,
+  onRefreshTauri,
+  onTauriOutputChange,
+  onTauriSyncGraph,
 }: SidePanelProps) => (
   <aside className="side-panel">
     <div className="panel-section">
@@ -124,6 +154,114 @@ export const SidePanel = ({
           </div>
         ))}
       </div>
+    </div>
+    <div className="panel-section">
+      <h3>Tauri Bridge</h3>
+      <p className="muted">Check native audio/MIDI when running the desktop app.</p>
+      {!tauriAvailable && <div className="preset-status">Web mode detected.</div>}
+      {tauriAvailable && (
+        <>
+          <div className="preset-actions">
+            <button
+              type="button"
+              className="ui-btn ui-btn--pill preset-action"
+              onClick={onRefreshTauri}
+            >
+              Refresh
+            </button>
+            <button
+              type="button"
+              className="ui-btn ui-btn--pill preset-action"
+              onClick={onTauriSyncGraph}
+            >
+              Sync Graph
+            </button>
+          </div>
+          {tauriStatus === 'loading' && (
+            <div className="preset-status">Querying native devices...</div>
+          )}
+          {tauriNativeError && <div className="preset-error">{tauriNativeError}</div>}
+          {tauriError && <div className="preset-error">{tauriError}</div>}
+          {tauriStatus === 'ready' && (
+            <div className="tauri-select-row">
+              <label className="tauri-label" htmlFor="tauri-output-select">
+                Output
+              </label>
+              <select
+                id="tauri-output-select"
+                className="tauri-select"
+                value={tauriSelectedOutput}
+                onChange={(event) => onTauriOutputChange(event.target.value)}
+                disabled={tauriAudioOutputs.length === 0}
+              >
+                {tauriAudioOutputs.length === 0 && <option value="">No outputs</option>}
+                {tauriAudioOutputs.map((name) => (
+                  <option key={name} value={name}>
+                    {name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+          <div className="preset-status">Start/Stop from the top bar. Output changes apply on the next Start.</div>
+          {tauriStatus === 'ready' && (
+            <div className="tauri-list">
+              <div className="tauri-item">
+                <span className="tauri-label">Ping</span>
+                <span className="tauri-value">{tauriPing ?? 'n/a'}</span>
+              </div>
+              <div className="tauri-item">
+                <span className="tauri-label">Device</span>
+                <span className="tauri-value">{tauriNativeDeviceName ?? 'default'}</span>
+              </div>
+              <div className="tauri-item">
+                <span className="tauri-label">Native</span>
+                <span className="tauri-value">
+                  {tauriNativeRunning ? 'running' : 'stopped'}
+                  {tauriNativeSampleRate
+                    ? ` · ${tauriNativeSampleRate} Hz`
+                    : ''}
+                  {tauriNativeChannels ? ` · ${tauriNativeChannels} ch` : ''}
+                </span>
+              </div>
+              <div className="tauri-item">
+                <span className="tauri-label">Audio</span>
+                <span className="tauri-value">
+                  {tauriAudioOutputs.length === 0
+                    ? 'no outputs'
+                    : `${tauriAudioOutputs.length} outputs`}
+                </span>
+              </div>
+              {tauriAudioOutputs.length > 0 && (
+                <div className="tauri-device-list">
+                  {tauriAudioOutputs.map((name, index) => (
+                    <div key={`${name}-${index}`} className="tauri-device">
+                      {name}
+                    </div>
+                  ))}
+                </div>
+              )}
+              <div className="tauri-item">
+                <span className="tauri-label">MIDI</span>
+                <span className="tauri-value">
+                  {tauriMidiInputs.length === 0
+                    ? 'no inputs'
+                    : `${tauriMidiInputs.length} inputs`}
+                </span>
+              </div>
+              {tauriMidiInputs.length > 0 && (
+                <div className="tauri-device-list">
+                  {tauriMidiInputs.map((name, index) => (
+                    <div key={`${name}-${index}`} className="tauri-device">
+                      {name}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </>
+      )}
     </div>
   </aside>
 )

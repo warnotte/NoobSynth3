@@ -1,6 +1,7 @@
 [workspace]
 members = [
   "crates/dsp-core",
+  "crates/dsp-graph",
   "crates/dsp-wasm",
   "crates/dsp-standalone",
   "crates/dsp-plugin",

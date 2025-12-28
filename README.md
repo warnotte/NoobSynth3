@@ -7,12 +7,13 @@ Modular synth workbench built with React + AudioWorklet. Goal: a powerful, patch
 - **VCV Rack-inspired UI**: Eurorack-style rails, brushed metal panels, compact module layout with configurable grid sizes (1x1, 2x1, 1x2, 2x2, 1x3, 2x3, 2x6) and auto-placement.
 - Modular patching with drag-to-connect cables (double-click near a cable to remove it).
 - Module library lets you add/remove modules and start a new empty rack.
-- AudioWorklet engine (VCO, LFO, VCF, ADSR, Mixer, VCA, Mod VCA, Chorus, Delay, Reverb, Scope, Control IO).
+- AudioWorklet engine (VCO, LFO, VCF, ADSR, Mixer 1x1/1x2, VCA, Mod VCA, Chorus, Delay, Reverb, Scope, Control IO).
 - Polyphony (1/2/4/8 voices) with voice stealing and per-voice modulation.
 - Control IO with mini keyboard, MIDI input (poly), and a simple sequencer for hands-free auditioning.
 - MIDI velocity CV output with optional slew to avoid clicks.
 - Preset loader with curated demo patches (plus export/import).
 - Stereo chorus to add width and character.
+- Native audio mode (Tauri) with output device selection and scope taps (FFT/spectrogram computed in UI).
 - **Advanced Scope module (DATA-style)**:
   - 3 visualization modes: Oscilloscope, FFT analyzer, Spectrogram
   - 4 input channels (A, B, C, D) with color-coded toggle buttons
@@ -36,6 +37,10 @@ Prereqs: Rust toolchain + Tauri system deps installed and `rustc` on PATH.
 ```bash
 npm run tauri:dev
 ```
+
+In Tauri mode, use the TopBar Power On/Off to start/stop native audio. Use the
+Tauri Bridge panel to select the output device and Sync Graph after changes.
+MIDI is currently driven by Web MIDI (native MIDI via midir is a TODO).
 
 For a release build:
 
@@ -155,7 +160,7 @@ Les 3 cibles possibles
 - UI hooks: `src/hooks/usePatching.tsx`, `src/hooks/useModuleDrag.ts`, `src/hooks/useControlVoices.ts`, `src/hooks/useMidi.ts`, `src/hooks/useMarioSequencer.ts`
 - Main-thread engine wrapper: `src/engine/WasmGraphEngine.ts` (loads the worklet, sends graph/params, manages tap outputs)
 - Audio worklet: `src/engine/worklets/wasm-graph-processor.ts`
-- Rust DSP: `crates/dsp-core` (DSP building blocks), `crates/dsp-wasm` (WASM bindings + graph engine)
+- Rust DSP: `crates/dsp-core` (DSP building blocks), `crates/dsp-graph` (shared graph engine), `crates/dsp-wasm` (WASM bindings)
 - WASM build: `scripts/build-wasm.ps1` generates `src/engine/worklets/wasm/dsp_wasm.js` + `dsp_wasm_bg.wasm`
 
 ## Testing

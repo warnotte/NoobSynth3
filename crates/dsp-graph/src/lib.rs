@@ -54,6 +54,7 @@ enum ModuleType {
   Adsr,
   Vcf,
   Mixer,
+  MixerWide,
   Chorus,
   Delay,
   Reverb,
@@ -268,6 +269,15 @@ struct MixerState {
   level_b: ParamBuffer,
 }
 
+struct MixerWideState {
+  level_a: ParamBuffer,
+  level_b: ParamBuffer,
+  level_c: ParamBuffer,
+  level_d: ParamBuffer,
+  level_e: ParamBuffer,
+  level_f: ParamBuffer,
+}
+
 struct ChorusState {
   chorus: Chorus,
   rate: ParamBuffer,
@@ -331,6 +341,7 @@ enum ModuleState {
   Adsr(AdsrState),
   Vcf(VcfState),
   Mixer(MixerState),
+  MixerWide(MixerWideState),
   Chorus(ChorusState),
   Delay(DelayState),
   Reverb(ReverbState),
@@ -761,6 +772,14 @@ impl ModuleNode {
         level_a: ParamBuffer::new(param_number(params, "levelA", 0.6)),
         level_b: ParamBuffer::new(param_number(params, "levelB", 0.6)),
       }),
+      ModuleType::MixerWide => ModuleState::MixerWide(MixerWideState {
+        level_a: ParamBuffer::new(param_number(params, "levelA", 0.6)),
+        level_b: ParamBuffer::new(param_number(params, "levelB", 0.6)),
+        level_c: ParamBuffer::new(param_number(params, "levelC", 0.6)),
+        level_d: ParamBuffer::new(param_number(params, "levelD", 0.6)),
+        level_e: ParamBuffer::new(param_number(params, "levelE", 0.6)),
+        level_f: ParamBuffer::new(param_number(params, "levelF", 0.6)),
+      }),
       ModuleType::Chorus => ModuleState::Chorus(ChorusState {
         chorus: Chorus::new(sample_rate),
         rate: ParamBuffer::new(param_number(params, "rate", 0.3)),
@@ -872,6 +891,15 @@ impl ModuleNode {
       ModuleState::Mixer(state) => match param {
         "levelA" => state.level_a.set(value),
         "levelB" => state.level_b.set(value),
+        _ => {}
+      },
+      ModuleState::MixerWide(state) => match param {
+        "levelA" => state.level_a.set(value),
+        "levelB" => state.level_b.set(value),
+        "levelC" => state.level_c.set(value),
+        "levelD" => state.level_d.set(value),
+        "levelE" => state.level_e.set(value),
+        "levelF" => state.level_f.set(value),
         _ => {}
       },
       ModuleState::Chorus(state) => match param {
@@ -1154,6 +1182,49 @@ impl ModuleNode {
           state.level_b.slice(frames),
         );
       }
+      ModuleState::MixerWide(state) => {
+        let input_a = if self.connections[0].is_empty() {
+          None
+        } else {
+          Some(inputs[0].channel(0))
+        };
+        let input_b = if self.connections[1].is_empty() {
+          None
+        } else {
+          Some(inputs[1].channel(0))
+        };
+        let input_c = if self.connections[2].is_empty() {
+          None
+        } else {
+          Some(inputs[2].channel(0))
+        };
+        let input_d = if self.connections[3].is_empty() {
+          None
+        } else {
+          Some(inputs[3].channel(0))
+        };
+        let input_e = if self.connections[4].is_empty() {
+          None
+        } else {
+          Some(inputs[4].channel(0))
+        };
+        let input_f = if self.connections[5].is_empty() {
+          None
+        } else {
+          Some(inputs[5].channel(0))
+        };
+        let output = outputs[0].channel_mut(0);
+        let inputs = [input_a, input_b, input_c, input_d, input_e, input_f];
+        let levels = [
+          state.level_a.slice(frames),
+          state.level_b.slice(frames),
+          state.level_c.slice(frames),
+          state.level_d.slice(frames),
+          state.level_e.slice(frames),
+          state.level_f.slice(frames),
+        ];
+        Mixer::process_block_multi(output, &inputs, &levels);
+      }
       ModuleState::Chorus(state) => {
         let input_connected = !self.connections[0].is_empty();
         let input_l = if input_connected {
@@ -1312,6 +1383,7 @@ fn normalize_module_type(raw: &str) -> ModuleType {
     "adsr" => ModuleType::Adsr,
     "vcf" => ModuleType::Vcf,
     "mixer" => ModuleType::Mixer,
+    "mixer-1x2" => ModuleType::MixerWide,
     "chorus" => ModuleType::Chorus,
     "delay" => ModuleType::Delay,
     "reverb" => ModuleType::Reverb,
@@ -1332,6 +1404,7 @@ fn is_poly_type(module_type: ModuleType) -> bool {
       | ModuleType::Adsr
       | ModuleType::Vcf
       | ModuleType::Mixer
+      | ModuleType::MixerWide
       | ModuleType::Control
   )
 }
@@ -1358,6 +1431,14 @@ fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },
     ],
     ModuleType::Mixer => vec![PortInfo { channels: 1 }, PortInfo { channels: 1 }],
+    ModuleType::MixerWide => vec![
+      PortInfo { channels: 1 },
+      PortInfo { channels: 1 },
+      PortInfo { channels: 1 },
+      PortInfo { channels: 1 },
+      PortInfo { channels: 1 },
+      PortInfo { channels: 1 },
+    ],
     ModuleType::Chorus | ModuleType::Delay | ModuleType::Reverb => vec![PortInfo { channels: 2 }],
     ModuleType::Control => vec![],
     ModuleType::Scope => vec![
@@ -1381,6 +1462,7 @@ fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
     ModuleType::Adsr => vec![PortInfo { channels: 1 }],
     ModuleType::Vcf => vec![PortInfo { channels: 1 }],
     ModuleType::Mixer => vec![PortInfo { channels: 1 }],
+    ModuleType::MixerWide => vec![PortInfo { channels: 1 }],
     ModuleType::Chorus | ModuleType::Delay | ModuleType::Reverb => vec![PortInfo { channels: 2 }],
     ModuleType::Control => vec![
       PortInfo { channels: 1 },
@@ -1450,6 +1532,15 @@ fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize> {
       "in-b" => Some(1),
       _ => None,
     },
+    ModuleType::MixerWide => match port_id {
+      "in-a" => Some(0),
+      "in-b" => Some(1),
+      "in-c" => Some(2),
+      "in-d" => Some(3),
+      "in-e" => Some(4),
+      "in-f" => Some(5),
+      _ => None,
+    },
     ModuleType::Chorus | ModuleType::Delay | ModuleType::Reverb => match port_id {
       "in" => Some(0),
       _ => None,
@@ -1501,6 +1592,10 @@ fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize> {
       _ => None,
     },
     ModuleType::Mixer => match port_id {
+      "out" => Some(0),
+      _ => None,
+    },
+    ModuleType::MixerWide => match port_id {
       "out" => Some(0),
       _ => None,
     },

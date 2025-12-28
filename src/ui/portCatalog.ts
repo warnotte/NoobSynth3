@@ -59,6 +59,17 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
     ],
     outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
   },
+  'mixer-1x2': {
+    inputs: [
+      { id: 'in-a', label: 'In A', kind: 'audio', direction: 'in' },
+      { id: 'in-b', label: 'In B', kind: 'audio', direction: 'in' },
+      { id: 'in-c', label: 'In C', kind: 'audio', direction: 'in' },
+      { id: 'in-d', label: 'In D', kind: 'audio', direction: 'in' },
+      { id: 'in-e', label: 'In E', kind: 'audio', direction: 'in' },
+      { id: 'in-f', label: 'In F', kind: 'audio', direction: 'in' },
+    ],
+    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
+  },
   chorus: {
     inputs: [{ id: 'in', label: 'In', kind: 'audio', direction: 'in' }],
     outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
