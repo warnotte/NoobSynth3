@@ -136,7 +136,7 @@ Les 3 cibles possibles
 - Graph schema + defaults: `src/shared/graph.ts`, `src/state/defaultGraph.ts`
 - Presets: `public/presets/manifest.json`, `public/presets/*.json` (export/import lives in the UI)
 - UI layout + controls: `src/App.tsx`, `src/ui/*`
-- UI hooks: `src/hooks/usePatching.tsx`, `src/hooks/useModuleDrag.ts`
+- UI hooks: `src/hooks/usePatching.tsx`, `src/hooks/useModuleDrag.ts`, `src/hooks/useControlVoices.ts`, `src/hooks/useMidi.ts`, `src/hooks/useMarioSequencer.ts`
 - Main-thread engine wrapper: `src/engine/WasmGraphEngine.ts` (loads the worklet, sends graph/params, manages tap outputs)
 - Audio worklet: `src/engine/worklets/wasm-graph-processor.ts`
 - Rust DSP: `crates/dsp-core` (DSP building blocks), `crates/dsp-wasm` (WASM bindings + graph engine)
