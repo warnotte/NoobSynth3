@@ -9,8 +9,7 @@ import { WaveformSelector } from './ui/WaveformSelector'
 import { Oscilloscope } from './ui/Oscilloscope'
 import { modulePorts } from './ui/portCatalog'
 import type { PortDefinition, PortDirection } from './ui/portCatalog'
-import './App.css'
-import './vcv-style.css'
+import './styles.css'
 
 type PortHandle = PortDefinition & { moduleId: string }
 type PortPosition = { x: number; y: number }

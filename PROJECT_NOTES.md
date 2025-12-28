@@ -58,6 +58,7 @@ Presets live in `src/state/presets.ts` and are loaded from the Presets panel. So
 - Mini sequencer is enabled by default in presets.
 - Lab Panel is kept out of the signal chain (for testing only).
 - VCV Rack-style UI with compact spacing and eurorack aesthetic.
+- Unified CSS in `src/styles.css` (single source of truth for all styling).
 - Scope module uses efficient canvas rendering with mode-specific visualization (only active mode runs).
 
 ## TODO (short list)
@@ -70,10 +71,10 @@ Presets live in `src/state/presets.ts` and are loaded from the Presets panel. So
 
 ## Recent changes (Dec 2025)
 
-- **VCV Rack-style UI overhaul**: New vcv-style.css with eurorack rails, brushed metal panels, compact spacing.
+- **VCV Rack-style UI overhaul**: Eurorack rails, brushed metal panels, compact spacing.
 - **Module sizing system**: Grid-based layout with configurable sizes per module type.
 - **Grid auto-placement**: Modules snap to the first available grid slot, with width checks and warnings when the rack is too narrow.
-- **VCV CSS cleanup**: Consolidated duplicate styling so VCV-specific selectors live in `src/vcv-style.css` only.
+- **CSS unification**: Merged `App.css` and `vcv-style.css` into single `src/styles.css` (~12% reduction, 25 organized sections).
 - **VCV UI tweaks**: Waveform buttons are icon-only/white, scope fills its panel, and module badges are consistent across sizes.
 - **Module drag**: Drag modules by the header to reposition them on the grid without pushing other modules.
 - **Drag helpers**: Ghost preview with invalid highlight, auto-scroll while dragging, and ESC to cancel.

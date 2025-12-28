@@ -1,0 +1,1768 @@
+/**
+ * NoobSynth3 - Unified Stylesheet
+ *
+ * This file combines App.css (layout) and vcv-style.css (VCV Rack visuals)
+ * into a single unified stylesheet.
+ *
+ * Created: 2024-12-28
+ */
+
+/* ============================================
+   SECTION 1: LAYOUT & STRUCTURE
+   ============================================ */
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 28px 36px 40px;
+}
+
+.brand {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.subtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.status {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-start;
+}
+
+.status-pill {
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(12, 16, 22, 0.72);
+}
+
+.status-idle {
+  color: rgba(196, 212, 232, 0.85);
+  background: rgba(28, 36, 46, 0.75);
+}
+
+.status-running {
+  color: #d8ffec;
+  background: rgba(24, 92, 68, 0.7);
+}
+
+.status-error {
+  color: #ffe1dc;
+  background: rgba(136, 48, 58, 0.7);
+}
+
+.status-detail {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.button {
+  font: inherit;
+  border-radius: 999px;
+  padding: 10px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(18, 24, 32, 0.7);
+  color: var(--text-strong);
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.button.primary {
+  background: linear-gradient(135deg, #f8d087, #e8a35a);
+  color: var(--accent-ink);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 14px 26px rgba(30, 18, 8, 0.4);
+}
+
+.button.primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 18px 36px rgba(30, 18, 8, 0.5);
+}
+
+.button.ghost {
+  background: rgba(12, 18, 24, 0.35);
+  color: var(--text-strong);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+.button.outline {
+  background: transparent;
+  color: var(--text-strong);
+  border: 1px solid var(--border-strong);
+  width: 100%;
+}
+
+.workbench {
+  display: grid;
+  grid-template-columns: minmax(0, 3.2fr) minmax(220px, 1fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.rack-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  position: relative;
+  z-index: 1;
+}
+
+.rack h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.rack-meta {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+
+.patch-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.patch-canvas {
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  display: block;
+  overflow: visible;
+}
+
+/* ============================================
+   SECTION 2: MODULE GRID SIZES
+   ============================================ */
+
+.module-size-1x1 { grid-column: span 1; grid-row: span 1; }
+.module-size-1x2 { grid-column: span 1; grid-row: span 2; }
+.module-size-1x3 { grid-column: span 1; grid-row: span 3; }
+.module-size-2x1 { grid-column: span 2; grid-row: span 1; }
+.module-size-2x2 { grid-column: span 2; grid-row: span 2; }
+.module-size-2x3 { grid-column: span 2; grid-row: span 3; }
+.module-size-2x4 { grid-column: span 2; grid-row: span 4; }
+.module-size-2x5 { grid-column: span 2; grid-row: span 5; }
+.module-size-2x6 { grid-column: span 2; grid-row: span 6; }
+.module-size-3x2 { grid-column: span 3; grid-row: span 2; }
+.module-size-3x3 { grid-column: span 3; grid-row: span 3; }
+.module-size-3x4 { grid-column: span 3; grid-row: span 4; }
+
+.module-remove {
+  padding: 4px 6px;
+  font-size: 0.5rem;
+  letter-spacing: 0.18em;
+}
+
+.module-remove:hover {
+  --ui-btn-border: rgba(232, 120, 110, 0.8);
+  --ui-btn-text: rgba(255, 220, 210, 0.95);
+}
+
+/* ============================================
+   SECTION 3: VCV RACK CONTAINER
+   ============================================ */
+
+.rack {
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.03) 0px,
+      rgba(255, 255, 255, 0.03) 1px,
+      transparent 1px,
+      transparent 15px
+    ),
+    linear-gradient(180deg, #0c0c0c 0%, #1a1a1a 50%, #0c0c0c 100%);
+  border-radius: 8px;
+  position: relative;
+  padding: 16px 24px;
+  box-shadow:
+    inset 0 4px 20px rgba(0, 0, 0, 0.8),
+    0 10px 40px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.rack::before,
+.rack::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 14px;
+  background:
+    linear-gradient(180deg,
+      #4a4a4a 0%,
+      #3a3a3a 30%,
+      #2a2a2a 70%,
+      #1a1a1a 100%
+    );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+    0 2px 8px rgba(0, 0, 0, 0.5);
+  z-index: 10;
+}
+
+.rack::before {
+  top: 0;
+  border-radius: 8px 8px 0 0;
+}
+
+.rack::after {
+  bottom: 0;
+  border-radius: 0 0 8px 8px;
+  background:
+    linear-gradient(180deg,
+      #1a1a1a 0%,
+      #2a2a2a 30%,
+      #3a3a3a 70%,
+      #4a4a4a 100%
+    );
+}
+
+.modules {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  padding: 12px 0;
+  gap: 4px;
+  --rack-unit-x: 200px;
+  --rack-unit-y: 120px;
+  grid-template-columns: repeat(auto-fill, minmax(var(--rack-unit-x), var(--rack-unit-x)));
+  grid-auto-rows: var(--rack-unit-y);
+}
+
+/* ============================================
+   SECTION 4: MODULE CARDS
+   ============================================ */
+
+.module-card {
+  --panel-color: #1a1f2e;
+  position: relative;
+  z-index: 1;
+  border-radius: 3px;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.015) 0px,
+      rgba(255, 255, 255, 0.015) 1px,
+      transparent 1px,
+      transparent 3px
+    ),
+    linear-gradient(180deg,
+      rgba(255, 255, 255, 0.1) 0%,
+      transparent 3%,
+      transparent 97%,
+      rgba(0, 0, 0, 0.2) 100%
+    ),
+    linear-gradient(90deg,
+      rgba(255, 255, 255, 0.05) 0%,
+      transparent 2%,
+      transparent 98%,
+      rgba(0, 0, 0, 0.1) 100%
+    ),
+    var(--panel-color);
+  border: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+    2px 0 4px rgba(0, 0, 0, 0.3),
+    -2px 0 4px rgba(0, 0, 0, 0.3);
+  padding: 4px 4px 6px;
+  gap: 4px;
+  backdrop-filter: none;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.module-card::before,
+.module-card::after {
+  display: none;
+}
+
+.module-drag-ghost {
+  pointer-events: none;
+  border-radius: 3px;
+  border: 1px dashed rgba(66, 226, 177, 0.7);
+  background: rgba(66, 226, 177, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(66, 226, 177, 0.25);
+  z-index: 3;
+}
+
+.module-drag-ghost.invalid {
+  border-color: rgba(255, 120, 120, 0.85);
+  background: rgba(255, 120, 120, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(255, 120, 120, 0.35);
+}
+
+/* Module type colors */
+.module-card[data-module-type="oscillator"] { --panel-color: #1a1f2e; }
+.module-card[data-module-type="vcf"] { --panel-color: #1e2a1f; }
+.module-card[data-module-type="gain"] { --panel-color: #2a1f1e; }
+.module-card[data-module-type="adsr"] { --panel-color: #2a2a1e; }
+.module-card[data-module-type="lfo"] { --panel-color: #1e1e2a; }
+.module-card[data-module-type="mixer"] { --panel-color: #1f2a2a; }
+.module-card[data-module-type="chorus"] { --panel-color: #251e2a; }
+.module-card[data-module-type="delay"] { --panel-color: #1e2528; }
+.module-card[data-module-type="reverb"] { --panel-color: #1e2025; }
+.module-card[data-module-type="output"] { --panel-color: #2a1e2a; }
+.module-card[data-module-type="control"] { --panel-color: #1a2025; }
+.module-card[data-module-type="scope"] { --panel-color: #1a2320; }
+
+/* ============================================
+   SECTION 5: MODULE HEADER & BODY
+   ============================================ */
+
+.module-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 2px;
+  margin-bottom: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  gap: 2px;
+  cursor: grab;
+}
+
+.module-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.module-name {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.module-subtitle {
+  display: none;
+}
+
+.module-badge {
+  font-size: 7px;
+  padding: 3px 6px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.module-body {
+  display: flex;
+  flex: 1;
+  gap: 4px;
+  min-height: 0;
+  padding-top: 2px;
+}
+
+/* ============================================
+   SECTION 6: COMPACT MODULE SIZES
+   ============================================ */
+
+/* 1x1 modules */
+.module-size-1x1 .module-header { gap: 2px; padding-bottom: 2px; }
+.module-size-1x1 .module-name { font-size: 9px; }
+.module-size-1x1 .module-subtitle { display: none; }
+.module-size-1x1 .module-badge { font-size: 7px; padding: 3px 6px; }
+.module-size-1x1 .module-body { gap: 2px; }
+.module-size-1x1 .ports-side { padding: 2px 2px; }
+.module-size-1x1 .module-controls .rotary-dial { --dial-size: 28px; }
+.module-size-1x1 .module-controls .rotary-label { font-size: 5px; }
+.module-size-1x1 .module-controls .rotary-readout { font-size: 6px; min-height: 10px; }
+
+/* 2x1 modules */
+.module-size-2x1 .module-header { padding-bottom: 2px; }
+.module-size-2x1 .module-name { font-size: 8px; }
+.module-size-2x1 .module-subtitle { display: none; }
+.module-size-2x1 .module-badge { font-size: 7px; padding: 3px 6px; }
+.module-size-2x1 .module-body { gap: 2px; }
+.module-size-2x1 .ports-side { padding: 2px 2px; }
+.module-size-2x1 .module-controls { grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)) !important; }
+.module-size-2x1 .module-controls .rotary-dial { --dial-size: 28px; }
+.module-size-2x1 .module-controls .rotary-label { font-size: 5px; }
+.module-size-2x1 .module-controls .rotary-readout { font-size: 6px; min-height: 10px; }
+
+/* ============================================
+   SECTION 7: PORTS - Side Layout
+   ============================================ */
+
+.ports-side {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  justify-content: flex-start;
+  padding: 3px 3px;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.ports-side--left {
+  align-items: flex-start;
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+
+.ports-side--right {
+  align-items: flex-end;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+
+.port-side-item {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.ports-side--left .port-side-item { flex-direction: row; }
+.ports-side--right .port-side-item { flex-direction: row; }
+
+.port-side-label {
+  font-size: 6px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+  white-space: nowrap;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.8);
+}
+
+/* Hide old ports section */
+.module-ports,
+.ports-group,
+.ports-title,
+.ports-column,
+.port-group,
+.port-label,
+.port-kind {
+  display: none;
+}
+
+/* ============================================
+   SECTION 8: JACKS
+   ============================================ */
+
+.jack {
+  --jack-color: #42e2b1;
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  min-height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #555, #2a2a2a 50%, #1a1a1a 100%);
+  border: none;
+  box-shadow:
+    inset 0 1px 3px rgba(255, 255, 255, 0.15),
+    inset 0 -1px 3px rgba(0, 0, 0, 0.5),
+    0 1px 4px rgba(0, 0, 0, 0.4);
+  position: relative;
+  flex-shrink: 0;
+}
+
+.jack::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #2a2a2a, #0a0a0a);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.jack::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #1a1a1a, #000);
+  box-shadow:
+    inset 0 1px 1px rgba(0, 0, 0, 0.9),
+    0 0 0 1px var(--jack-color),
+    0 0 4px var(--jack-color);
+  opacity: 0.7;
+}
+
+.jack.kind-audio { --jack-color: #5bb6ff; }
+.jack.kind-cv { --jack-color: #42e2b1; }
+.jack.kind-gate { --jack-color: #f0b06b; }
+.jack.kind-sync { --jack-color: #ff6fae; }
+
+.jack.connected::after {
+  opacity: 1;
+  background: radial-gradient(circle at 40% 40%, var(--jack-color), #000 70%);
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.6),
+    0 0 8px var(--jack-color);
+}
+
+.jack.valid-target {
+  animation: jack-pulse 1s ease-in-out infinite;
+}
+
+@keyframes jack-pulse {
+  0%, 100% {
+    box-shadow:
+      inset 0 2px 4px rgba(255, 255, 255, 0.15),
+      inset 0 -2px 4px rgba(0, 0, 0, 0.5),
+      0 0 0 1px rgba(255, 255, 255, 0.2),
+      0 0 8px rgba(255, 255, 255, 0.1);
+  }
+  50% {
+    box-shadow:
+      inset 0 2px 4px rgba(255, 255, 255, 0.15),
+      inset 0 -2px 4px rgba(0, 0, 0, 0.5),
+      0 0 0 3px rgba(255, 255, 255, 0.4),
+      0 0 16px rgba(255, 255, 255, 0.3);
+  }
+}
+
+.jack.hover-target {
+  transform: scale(1.15);
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.2),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.5),
+    0 0 0 3px var(--jack-color),
+    0 0 20px var(--jack-color);
+}
+
+.jack.hover-target::after {
+  opacity: 1;
+  background: radial-gradient(circle at 40% 40%, var(--jack-color), #000 50%);
+}
+
+/* ============================================
+   SECTION 9: ROTARY KNOBS
+   ============================================ */
+
+.rotary {
+  display: grid;
+  gap: 6px;
+  justify-items: center;
+  text-align: center;
+}
+
+.rotary-dial {
+  --dial-size: 48px;
+  --knob-color: #42e2b1;
+  width: var(--dial-size);
+  height: var(--dial-size);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 28%, #4a4a4a, #2a2a2a 50%, #1a1a1a 100%);
+  border: none;
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.15),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.6),
+    0 4px 12px rgba(0, 0, 0, 0.5);
+  position: relative;
+}
+
+.rotary-dial:focus-visible {
+  outline: 2px solid var(--knob-color);
+  outline-offset: 3px;
+}
+
+.rotary-dial::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 30%, #3a3a3a, #2a2a2a 60%, #1a1a1a 100%);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.rotary-center {
+  position: absolute;
+  inset: 14px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #3a3a3a, #1a1a1a 70%);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+.rotary-indicator {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(var(--angle));
+}
+
+.rotary-indicator::before {
+  content: '';
+  width: 3px;
+  height: 12px;
+  transform: translateY(-18px);
+  border-radius: 2px;
+  background: linear-gradient(180deg, var(--knob-color), rgba(255, 255, 255, 0.9));
+  box-shadow: 0 0 8px var(--knob-color);
+}
+
+.rotary-label {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.rotary-readout {
+  font-size: 10px;
+  font-weight: 500;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  padding: 2px 6px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.rotary-input {
+  width: 64px;
+  padding: 4px 6px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(12, 16, 22, 0.9);
+  color: var(--text-strong);
+  font: inherit;
+  text-align: center;
+}
+
+/* Compact rotary in module controls */
+.module-controls .rotary { gap: 1px; justify-items: center; }
+.module-controls .rotary-dial { --dial-size: 34px; }
+.module-controls .rotary-label { font-size: 6px; letter-spacing: 0.06em; }
+.module-controls .rotary-readout { font-size: 7px; padding: 0px 2px; min-height: 12px; }
+.module-controls .rotary-indicator::before { width: 2px; height: 8px; transform: translateY(-12px); }
+.module-controls .rotary-center { inset: 9px; }
+
+/* ============================================
+   SECTION 10: MODULE CONTROLS GRID
+   ============================================ */
+
+.module-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+
+.module-body .module-controls {
+  flex: 1;
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)) !important;
+  grid-auto-rows: min-content;
+  gap: 4px 4px;
+  min-width: 0;
+  overflow: hidden;
+  align-content: start;
+  padding: 2px;
+}
+
+.module-body .module-controls > .rotary {
+  min-width: 48px;
+  max-width: 80px;
+}
+
+.control-row {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) minmax(220px, 2fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.control-row .waveform {
+  grid-column: auto;
+}
+
+.module-controls .control-row {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: flex-start;
+}
+
+.module-controls .control-row > * {
+  flex: 1 1 auto;
+  min-width: 50px;
+}
+
+/* ============================================
+   SECTION 11: WAVEFORM SELECTOR
+   ============================================ */
+
+.waveform {
+  display: grid;
+  gap: 8px;
+  text-align: center;
+  grid-column: 1 / -1;
+}
+
+.waveform-label {
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(198, 212, 228, 0.62);
+}
+
+.waveform-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.wave-icon {
+  width: 22px;
+  height: 22px;
+}
+
+.wave-button-label {
+  font-size: 0.55rem;
+  letter-spacing: 0.18em;
+}
+
+.wave-button {
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 6px 4px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.wave-button.active {
+  background: linear-gradient(180deg, #42e2b1, #2eb88d);
+  border-color: #42e2b1;
+  color: #0a0a0a;
+  box-shadow: 0 4px 12px rgba(66, 226, 177, 0.4);
+}
+
+/* Compact waveform in module controls */
+.module-controls .waveform { grid-column: 1 / -1; gap: 2px; }
+.module-controls .waveform-label { font-size: 6px; }
+.module-controls .waveform-buttons { grid-template-columns: repeat(4, 1fr); gap: 2px; }
+.module-controls .wave-button { display: grid; place-items: center; padding: 4px; border-radius: 4px; gap: 0; line-height: 1; }
+.module-controls .wave-icon { width: 18px; height: 18px; }
+.module-controls .wave-button-label { display: none; }
+
+/* ============================================
+   SECTION 12: FILTER CONTROLS
+   ============================================ */
+
+.filter-row {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 12px;
+}
+
+.filter-group {
+  display: grid;
+  gap: 6px;
+}
+
+.filter-label {
+  font-size: 0.55rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(198, 212, 228, 0.68);
+}
+
+.filter-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.filter-buttons.filter-wide {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+/* Compact filter in module controls */
+.module-controls .filter-row { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 4px; }
+.module-controls .filter-row .filter-group { flex: 1 1 auto; min-width: 60px; gap: 2px; }
+.module-controls .filter-row .filter-label { font-size: 6px; }
+.module-controls .filter-row .filter-buttons { gap: 2px; }
+.module-controls .filter-row .filter-btn { padding: 2px 3px; font-size: 6px; border-radius: 3px; }
+
+/* ============================================
+   SECTION 13: TOGGLE & CONTROL BUTTONS
+   ============================================ */
+
+.toggle-group {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  grid-column: 1 / -1;
+}
+
+.toggle-btn {
+  --ui-btn-padding: 6px 8px;
+  --ui-btn-letter: 0.18em;
+  --ui-btn-text: rgba(198, 212, 228, 0.85);
+  --ui-btn-bg: rgba(18, 24, 32, 0.88);
+}
+
+.control-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  grid-column: 1 / -1;
+}
+
+.control-button {
+  --ui-btn-radius: 12px;
+  --ui-btn-padding: 8px 10px;
+  --ui-btn-font: 0.65rem;
+  --ui-btn-letter: 0.14em;
+  --ui-btn-bg: rgba(18, 24, 32, 0.9);
+  --ui-btn-text: rgba(214, 226, 242, 0.92);
+}
+
+.control-button:active {
+  border-color: rgba(66, 226, 177, 0.9);
+  box-shadow: 0 0 12px rgba(66, 226, 177, 0.6);
+}
+
+/* Compact toggle in module controls */
+.module-controls .toggle-group { display: flex; gap: 2px; flex-wrap: wrap; }
+.module-controls .toggle-group .toggle-btn { flex: 1; min-width: 50px; padding: 2px 6px; font-size: 7px; }
+
+/* Full-width panels in module controls */
+.module-controls .toggle-group,
+.module-controls .scope-view,
+.module-controls .scope-controls,
+.module-controls .seq-panel,
+.module-controls .midi-panel,
+.module-controls .poly-panel,
+.module-controls .mini-keys,
+.module-controls .control-buttons {
+  grid-column: 1 / -1;
+}
+
+/* ============================================
+   SECTION 14: SCOPE / DATA MODULE
+   ============================================ */
+
+.scope-view {
+  position: relative;
+  background: radial-gradient(circle at 30% 30%, #0a1210, #050808);
+  border-radius: 4px;
+  border: 2px solid #1a1a1a;
+  box-shadow:
+    inset 0 0 20px rgba(0, 0, 0, 0.8),
+    inset 0 0 4px rgba(80, 255, 160, 0.05),
+    0 2px 8px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  flex: 1;
+  min-height: 80px;
+  height: auto !important;
+}
+
+.scope-view::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 0%,
+    transparent 60%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+
+.scope-view::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.02) 0%,
+    transparent 5%,
+    transparent 95%,
+    rgba(0, 0, 0, 0.1) 100%
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+
+.scope-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.scope-view .scope-label {
+  position: absolute;
+  bottom: 4px;
+  right: 6px;
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: rgba(100, 255, 180, 0.4);
+  text-shadow: 0 0 4px rgba(100, 255, 180, 0.3);
+  z-index: 3;
+  pointer-events: none;
+}
+
+.scope-mode-label {
+  position: absolute;
+  bottom: 4px;
+  right: 6px;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: rgba(100, 255, 180, 0.5);
+  text-shadow: 0 0 4px rgba(100, 255, 180, 0.3);
+  z-index: 3;
+  pointer-events: none;
+}
+
+.scope-controls {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  align-items: center;
+}
+
+.scope-group {
+  display: grid;
+  gap: 6px;
+}
+
+.scope-label {
+  font-size: 0.55rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(198, 212, 228, 0.68);
+}
+
+.scope-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.scope-toggle {
+  align-self: end;
+}
+
+/* Compact scope in module controls */
+.module-controls .scope-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.module-controls .scope-group { display: flex; align-items: center; gap: 4px; }
+.module-controls .scope-group .scope-label { font-size: 7px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(200, 220, 210, 0.6); }
+.module-controls .scope-buttons { display: flex; gap: 3px; }
+.module-controls .scope-btn { padding: 4px 8px !important; font-size: 8px !important; min-width: 28px; border-radius: 4px; }
+.module-controls .scope-toggle { padding: 4px 10px !important; }
+
+/* Scope channel buttons */
+.scope-ch {
+  --ch-color: #64ffb4;
+  border-color: color-mix(in srgb, var(--ch-color) 40%, transparent) !important;
+  color: color-mix(in srgb, var(--ch-color) 70%, white) !important;
+}
+
+.scope-ch.active {
+  background: color-mix(in srgb, var(--ch-color) 80%, #000) !important;
+  border-color: var(--ch-color) !important;
+  color: #000 !important;
+  box-shadow: 0 0 8px color-mix(in srgb, var(--ch-color) 50%, transparent);
+}
+
+/* Scope module layout */
+.module-card[data-module-type="scope"] .module-controls {
+  display: flex !important;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-height: 0;
+}
+
+.module-card[data-module-type="scope"] .scope-view {
+  flex: 1 1 auto;
+  min-height: 160px;
+  width: 100%;
+}
+
+/* ============================================
+   SECTION 15: PATCH CABLES
+   ============================================ */
+
+.patch-cable {
+  stroke-width: 5px;
+  stroke-linecap: round;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
+  opacity: 0.95;
+}
+
+.patch-cable.ghost {
+  opacity: 0.5;
+  stroke-dasharray: 10 8;
+  animation: cable-flow 0.4s linear infinite;
+}
+
+@keyframes cable-flow {
+  0% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: -18; }
+}
+
+.patch-cable.kind-audio { stroke: #5bb6ff; }
+.patch-cable.kind-cv { stroke: #42e2b1; }
+.patch-cable.kind-gate { stroke: #f0b06b; }
+.patch-cable.kind-sync { stroke: #ff6fae; }
+
+/* ============================================
+   SECTION 16: UI BUTTONS
+   ============================================ */
+
+.ui-btn {
+  --ui-btn-radius: 4px;
+  --ui-btn-padding: 5px 8px;
+  --ui-btn-border: rgba(255, 255, 255, 0.15);
+  --ui-btn-bg: rgba(0, 0, 0, 0.4);
+  --ui-btn-text: rgba(255, 255, 255, 0.7);
+  --ui-btn-font: 9px;
+  --ui-btn-letter: 0.08em;
+  --ui-btn-active-text: #0a0a0a;
+  --ui-btn-active-bg: linear-gradient(180deg, #42e2b1, #2eb88d);
+  --ui-btn-active-border: #42e2b1;
+  --ui-btn-active-shadow: 0 2px 8px rgba(66, 226, 177, 0.4);
+
+  border-radius: var(--ui-btn-radius);
+  padding: var(--ui-btn-padding);
+  border: 1px solid var(--ui-btn-border);
+  background: var(--ui-btn-bg);
+  color: var(--ui-btn-text);
+  font-size: var(--ui-btn-font);
+  font-weight: 600;
+  letter-spacing: var(--ui-btn-letter);
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.ui-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--ui-btn-bg) 80%, #fff 20%);
+  border-color: color-mix(in srgb, var(--ui-btn-border) 60%, #fff 40%);
+}
+
+.ui-btn.active {
+  color: var(--ui-btn-active-text);
+  background: var(--ui-btn-active-bg);
+  border-color: var(--ui-btn-active-border);
+  box-shadow: var(--ui-btn-active-shadow);
+}
+
+.ui-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.ui-btn--pill {
+  --ui-btn-radius: 999px;
+  --ui-btn-padding: 5px 10px;
+}
+
+.ui-btn--blue {
+  --ui-btn-active-bg: linear-gradient(180deg, #5bb6ff, #3a8dff);
+  --ui-btn-active-border: #5bb6ff;
+  --ui-btn-active-shadow: 0 2px 8px rgba(91, 182, 255, 0.4);
+}
+
+/* ============================================
+   SECTION 17: MINI KEYS
+   ============================================ */
+
+.mini-keys {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  grid-column: 1 / -1;
+}
+
+.mini-key {
+  border-radius: 10px;
+  padding: 8px 6px;
+  border: 1px solid rgba(100, 118, 140, 0.9);
+  background: linear-gradient(160deg, rgba(34, 42, 56, 0.95), rgba(16, 20, 28, 0.95));
+  color: rgba(228, 238, 250, 0.9);
+  font-size: 0.6rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.mini-key:active {
+  border-color: rgba(91, 182, 255, 0.9);
+  box-shadow: 0 0 10px rgba(91, 182, 255, 0.6);
+}
+
+/* ============================================
+   SECTION 18: SEQUENCER PANEL
+   ============================================ */
+
+.seq-panel {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 14px;
+  background: rgba(16, 22, 30, 0.75);
+  border: 1px solid rgba(90, 104, 126, 0.6);
+}
+
+.seq-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.seq-title {
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(198, 212, 228, 0.7);
+}
+
+.seq-toggle {
+  --ui-btn-bg: rgba(18, 24, 32, 0.9);
+}
+
+.seq-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+}
+
+.seq-steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.seq-step {
+  border-radius: 10px;
+  padding: 6px 8px;
+  border: 1px solid rgba(90, 104, 126, 0.8);
+  background: rgba(12, 16, 22, 0.9);
+  color: rgba(214, 226, 242, 0.85);
+  font-size: 0.55rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.seq-step.active {
+  color: #0b1115;
+  background: linear-gradient(160deg, rgba(91, 182, 255, 0.92), rgba(54, 142, 255, 0.88));
+  border-color: rgba(91, 182, 255, 0.9);
+  box-shadow: 0 8px 14px rgba(10, 22, 40, 0.45);
+}
+
+/* ============================================
+   SECTION 19: MIDI PANEL
+   ============================================ */
+
+.midi-panel {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 14px;
+  background: rgba(14, 20, 28, 0.78);
+  border: 1px solid rgba(90, 104, 126, 0.6);
+}
+
+.midi-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.midi-title {
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(198, 212, 228, 0.7);
+}
+
+.midi-toggle {
+  --ui-btn-bg: rgba(18, 24, 32, 0.9);
+}
+
+.midi-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  align-items: start;
+}
+
+.midi-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.midi-option {
+  --ui-btn-bg: rgba(20, 26, 34, 0.9);
+}
+
+.midi-field {
+  display: grid;
+  gap: 6px;
+}
+
+.midi-label {
+  font-size: 0.55rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(198, 212, 228, 0.68);
+}
+
+.midi-select {
+  border-radius: 10px;
+  padding: 6px 8px;
+  border: 1px solid rgba(90, 104, 126, 0.8);
+  background: rgba(12, 16, 22, 0.9);
+  color: rgba(214, 226, 242, 0.9);
+  font: inherit;
+}
+
+.midi-select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.midi-knobs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 10px;
+}
+
+.midi-status {
+  min-height: 14px;
+  font-size: 0.55rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(198, 212, 228, 0.55);
+}
+
+.midi-status.error {
+  color: rgba(255, 170, 160, 0.9);
+}
+
+/* ============================================
+   SECTION 20: POLYPHONY PANEL
+   ============================================ */
+
+.poly-panel {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border-radius: 14px;
+  background: rgba(16, 22, 30, 0.75);
+  border: 1px solid rgba(90, 104, 126, 0.6);
+}
+
+.poly-label {
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(198, 212, 228, 0.7);
+}
+
+.poly-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.poly-btn {
+  --ui-btn-bg: rgba(20, 26, 34, 0.9);
+}
+
+/* ============================================
+   SECTION 21: SIDE PANEL & PRESETS
+   ============================================ */
+
+.side-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 22px;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, #1a1a1a 0%, #0f0f0f 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.topbar::before {
+  display: none;
+}
+
+.panel-section {
+  padding: 16px;
+  background: linear-gradient(180deg, #1a1a1a 0%, #0f0f0f 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.panel-section::before {
+  display: none;
+}
+
+.panel-section h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.muted {
+  margin-top: 0;
+  margin-bottom: 12px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.preset-list {
+  display: grid;
+  gap: 10px;
+}
+
+.preset-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+}
+
+.preset-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.preset-action {
+  --ui-btn-padding: 7px 12px;
+  --ui-btn-font: 0.6rem;
+  --ui-btn-letter: 0.12em;
+  --ui-btn-bg: rgba(16, 22, 30, 0.9);
+  --ui-btn-border: rgba(90, 104, 126, 0.8);
+}
+
+.preset-file {
+  display: none;
+}
+
+.preset-status {
+  margin-bottom: 8px;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.preset-error {
+  margin-bottom: 8px;
+  font-size: 0.7rem;
+  color: rgba(230, 134, 134, 0.9);
+}
+
+.preset-name {
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(216, 230, 246, 0.92);
+}
+
+.preset-desc {
+  font-size: 0.7rem;
+  color: rgba(198, 214, 232, 0.65);
+  margin-top: 4px;
+}
+
+.preset-load {
+  --ui-btn-padding: 8px 14px;
+  --ui-btn-font: 0.6rem;
+  --ui-btn-letter: 0.14em;
+  --ui-btn-bg: rgba(16, 22, 30, 0.9);
+  --ui-btn-border: rgba(90, 104, 126, 0.8);
+}
+
+/* ============================================
+   SECTION 22: CHIPS & LIBRARY
+   ============================================ */
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  background: rgba(91, 182, 255, 0.12);
+  border: 1px solid rgba(91, 182, 255, 0.3);
+  color: rgba(210, 226, 246, 0.88);
+  cursor: pointer;
+  appearance: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.chip:hover:not(:disabled) {
+  border-color: rgba(130, 150, 190, 0.9);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.35);
+}
+
+.chip:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.library-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.library-clear {
+  --ui-btn-padding: 6px 12px;
+  --ui-btn-font: 0.55rem;
+  --ui-btn-letter: 0.18em;
+  --ui-btn-bg: rgba(24, 30, 40, 0.9);
+  --ui-btn-border: rgba(120, 140, 170, 0.5);
+}
+
+.library-auto {
+  --ui-btn-padding: 6px 12px;
+  --ui-btn-font: 0.55rem;
+  --ui-btn-letter: 0.18em;
+  --ui-btn-bg: rgba(18, 24, 32, 0.9);
+  --ui-btn-border: rgba(90, 104, 126, 0.8);
+}
+
+/* ============================================
+   SECTION 23: MISC CONTROLS
+   ============================================ */
+
+.signal-strip {
+  display: grid;
+  gap: 8px;
+}
+
+.signal-strip span {
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: rgba(91, 182, 255, 0.12);
+  border: 1px solid rgba(91, 182, 255, 0.25);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.knob {
+  display: grid;
+  gap: 6px;
+  font-size: 0.75rem;
+}
+
+.knob span {
+  color: rgba(206, 220, 236, 0.78);
+}
+
+.knob input[type='range'] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 18px;
+  background: linear-gradient(90deg, rgba(91, 182, 255, 0.7), rgba(91, 182, 255, 0.2));
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.55);
+}
+
+.knob input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #f8fbff, #9aa6b7 55%, #2b3442 100%);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.knob input[type='range']::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #f8fbff, #9aa6b7 55%, #2b3442 100%);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.knob-value {
+  font-size: 0.7rem;
+  color: rgba(200, 214, 232, 0.6);
+}
+
+.select-field {
+  display: grid;
+  gap: 6px;
+  font-size: 0.75rem;
+}
+
+.select-field select {
+  padding: 6px 8px;
+  border-radius: 10px;
+  background: rgba(12, 16, 22, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(214, 226, 242, 0.9);
+  font: inherit;
+}
+
+/* ============================================
+   SECTION 24: MARIO IO MODULE
+   ============================================ */
+
+.module-card[data-module-type="mario"] {
+  --panel-color: #1a0a0a;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 100, 100, 0.02) 0px,
+      rgba(255, 100, 100, 0.02) 1px,
+      transparent 1px,
+      transparent 3px
+    ),
+    linear-gradient(180deg, #2a1010 0%, #1a0a0a 100%);
+}
+
+.module-card[data-module-type="mario"] .module-controls {
+  display: flex !important;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mario-display {
+  background: #000;
+  border: 2px solid #c84c0c;
+  border-radius: 4px;
+  padding: 8px;
+  text-align: center;
+  box-shadow:
+    inset 0 0 20px rgba(200, 76, 12, 0.2),
+    0 0 10px rgba(200, 76, 12, 0.3);
+}
+
+.mario-title {
+  font-family: 'Courier New', monospace;
+  font-size: 10px;
+  font-weight: bold;
+  color: #fcbcb0;
+  text-shadow: 0 0 6px #c84c0c;
+  letter-spacing: 2px;
+  margin-bottom: 4px;
+}
+
+.mario-status {
+  font-family: 'Courier New', monospace;
+  font-size: 9px;
+  margin-bottom: 6px;
+}
+
+.mario-playing {
+  color: #7cfc00;
+  text-shadow: 0 0 4px #7cfc00;
+  animation: mario-blink 0.5s ease-in-out infinite;
+}
+
+.mario-stopped {
+  color: #888;
+}
+
+@keyframes mario-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.mario-progress {
+  height: 6px;
+  background: #222;
+  border-radius: 3px;
+  overflow: hidden;
+  border: 1px solid #444;
+}
+
+.mario-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #c84c0c, #fcbcb0, #c84c0c);
+  border-radius: 2px;
+  transition: width 0.05s linear;
+}
+
+.mario-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.mario-btn {
+  font-family: 'Courier New', monospace;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 6px 14px !important;
+  border: 2px solid #c84c0c !important;
+  background: #2a1010 !important;
+  color: #fcbcb0 !important;
+  text-shadow: 0 0 4px #c84c0c;
+  transition: all 0.15s;
+}
+
+.mario-btn:hover {
+  background: #3a1818 !important;
+  box-shadow: 0 0 12px rgba(200, 76, 12, 0.5);
+}
+
+.mario-btn.playing {
+  background: #c84c0c !important;
+  color: #fff !important;
+  box-shadow: 0 0 15px rgba(200, 76, 12, 0.7);
+}
+
+.mario-channels {
+  display: flex;
+  justify-content: space-around;
+  padding: 4px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+}
+
+.mario-ch {
+  font-family: 'Courier New', monospace;
+  font-size: 8px;
+  color: #888;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ch-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.ch-dot.ch1 { background: #ff6666; box-shadow: 0 0 4px #ff6666; }
+.ch-dot.ch2 { background: #66ff66; box-shadow: 0 0 4px #66ff66; }
+.ch-dot.ch3 { background: #6666ff; box-shadow: 0 0 4px #6666ff; }
+
+.mario-song-select {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+}
+
+.mario-song-btn {
+  font-family: 'Courier New', monospace;
+  font-size: 8px;
+  font-weight: bold;
+  padding: 4px 8px !important;
+  min-width: 36px;
+  border: 1px solid #666 !important;
+  background: #1a0a0a !important;
+  color: #888 !important;
+  transition: all 0.15s;
+}
+
+.mario-song-btn:hover {
+  border-color: #c84c0c !important;
+  color: #fcbcb0 !important;
+}
+
+.mario-song-btn.active {
+  background: #c84c0c !important;
+  border-color: #c84c0c !important;
+  color: #fff !important;
+  box-shadow: 0 0 8px rgba(200, 76, 12, 0.5);
+}
+
+/* ============================================
+   SECTION 25: GLOBAL & RESPONSIVE
+   ============================================ */
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@media (max-width: 960px) {
+  .workbench {
+    grid-template-columns: 1fr;
+  }
+}
