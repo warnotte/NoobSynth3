@@ -76,12 +76,13 @@ Use the Presets panel to load curated demo patches. Presets are listed in
 `public/presets/manifest.json` and loaded from `public/presets/*.json`. Some presets also
 change patch routing (full graph replacement).
 
-**23 presets available:**
+**24 presets available:**
 - Classic emulations: Juno-106 Strings, Minimoog Lead, Prophet-5 Brass, OB-Xa Pad, CS-80 Vangelis, Moog Taurus, SH-101 Bass, ARP Odyssey Sync
 - New modules showcase: **Trance Supersaw** (7-voice), **Phaser Pad** (stereo phaser), **Dirty Bass** (foldback distortion)
 - Notables: Jupiter-8 Demo (sub/noise/HPF), Hard Sync Lead (VCO sync), Ladder Lead (LP ladder drive)
+- Fun: **8-Bit Mario** (NES-style 5-channel with 8 classic tunes)
 
-Dev/test presets (Mod Router Demo, Ring Mod Demo, VCO A/B, VCA A/B, 8-Bit Mario) live in `public/presets/manifest-dev.json`.
+Dev/test presets (Mod Router Demo, Ring Mod Demo, VCO A/B, VCA A/B) live in `public/presets/manifest-dev.json`.
 
 ## Architecture
 

@@ -138,6 +138,12 @@
       "name": "Dirty Bass",
       "description": "Aggressive distorted bass with foldback.",
       "file": "dirty-bass.json"
+    },
+    {
+      "id": "8bit-mario",
+      "name": "8-Bit Mario",
+      "description": "NES-authentic 5-channel setup with 8 classic Mario tunes.",
+      "file": "8bit-mario.json"
     }
   ]
 }

@@ -2,7 +2,7 @@
   "version": 1,
   "id": "8bit-mario",
   "name": "8-Bit Mario",
-  "description": "Complete NES/SNES-style setup with 5-channel Mario IO sequencer.",
+  "description": "NES-authentic 5-channel setup with Mario IO sequencer.",
   "graph": {
     "modules": [
       {
@@ -10,187 +10,184 @@
         "type": "mario",
         "name": "Mario IO",
         "position": { "x": 120, "y": 140 },
-        "params": { "running": false, "tempo": 180, "song": "smb" }
+        "params": { "running": false, "tempo": 200, "song": "smb" }
       },
       {
         "id": "osc-lead",
         "type": "oscillator",
-        "name": "Lead VCO",
+        "name": "Pulse 1",
         "position": { "x": 320, "y": 80 },
         "params": {
           "frequency": 440,
           "type": "square",
           "pwm": 0.5,
           "unison": 1,
-          "detune": 0,
-          "fmLin": 0,
-          "fmExp": 0
+          "detune": 0
         }
       },
       {
         "id": "osc-chords",
         "type": "oscillator",
-        "name": "Chords VCO",
+        "name": "Pulse 2",
         "position": { "x": 520, "y": 80 },
         "params": {
           "frequency": 440,
           "type": "square",
-          "pwm": 0.4,
+          "pwm": 0.25,
           "unison": 1,
-          "detune": 0,
-          "fmLin": 0,
-          "fmExp": 0
+          "detune": 0
         }
       },
       {
         "id": "osc-harm",
         "type": "oscillator",
-        "name": "Harmony VCO",
+        "name": "Pulse 3",
         "position": { "x": 720, "y": 80 },
         "params": {
           "frequency": 440,
           "type": "square",
-          "pwm": 0.5,
+          "pwm": 0.125,
           "unison": 1,
-          "detune": 0,
-          "fmLin": 0,
-          "fmExp": 0
+          "detune": 0
         }
       },
       {
         "id": "osc-bass",
         "type": "oscillator",
-        "name": "Bass VCO",
+        "name": "Triangle",
         "position": { "x": 920, "y": 80 },
         "params": {
           "frequency": 110,
           "type": "triangle",
           "pwm": 0.5,
           "unison": 1,
-          "detune": 0,
-          "fmLin": 0,
-          "fmExp": 0
+          "detune": 0
         }
       },
       {
         "id": "osc-extra",
         "type": "oscillator",
-        "name": "Extra VCO",
+        "name": "Extra",
         "position": { "x": 1120, "y": 80 },
         "params": {
-          "frequency": 440,
-          "type": "sawtooth",
+          "frequency": 880,
+          "type": "square",
           "pwm": 0.5,
           "unison": 1,
-          "detune": 0,
-          "fmLin": 0,
-          "fmExp": 0
+          "detune": 0
         }
       },
       {
         "id": "adsr-lead",
         "type": "adsr",
-        "name": "Lead ENV",
+        "name": "ENV 1",
         "position": { "x": 320, "y": 320 },
-        "params": { "attack": 0.001, "decay": 0.1, "sustain": 0.8, "release": 0.05 }
+        "params": { "attack": 0.001, "decay": 0.08, "sustain": 0.9, "release": 0.02 }
       },
       {
         "id": "adsr-chords",
         "type": "adsr",
-        "name": "Chords ENV",
+        "name": "ENV 2",
         "position": { "x": 520, "y": 320 },
-        "params": { "attack": 0.001, "decay": 0.08, "sustain": 0.7, "release": 0.05 }
+        "params": { "attack": 0.001, "decay": 0.06, "sustain": 0.85, "release": 0.02 }
       },
       {
         "id": "adsr-harm",
         "type": "adsr",
-        "name": "Harm ENV",
+        "name": "ENV 3",
         "position": { "x": 720, "y": 320 },
-        "params": { "attack": 0.001, "decay": 0.1, "sustain": 0.8, "release": 0.05 }
+        "params": { "attack": 0.001, "decay": 0.08, "sustain": 0.9, "release": 0.02 }
       },
       {
         "id": "adsr-bass",
         "type": "adsr",
-        "name": "Bass ENV",
+        "name": "ENV 4",
         "position": { "x": 920, "y": 320 },
-        "params": { "attack": 0.001, "decay": 0.15, "sustain": 0.9, "release": 0.1 }
+        "params": { "attack": 0.001, "decay": 0.12, "sustain": 0.95, "release": 0.05 }
       },
       {
         "id": "adsr-extra",
         "type": "adsr",
-        "name": "Extra ENV",
+        "name": "ENV 5",
         "position": { "x": 1120, "y": 320 },
-        "params": { "attack": 0.01, "decay": 0.2, "sustain": 0.5, "release": 0.15 }
+        "params": { "attack": 0.001, "decay": 0.05, "sustain": 0.7, "release": 0.02 }
       },
       {
         "id": "vca-lead",
         "type": "gain",
-        "name": "Lead VCA",
+        "name": "VCA 1",
         "position": { "x": 320, "y": 200 },
-        "params": { "gain": 0.8 }
+        "params": { "gain": 0.85 }
       },
       {
         "id": "vca-chords",
         "type": "gain",
-        "name": "Chords VCA",
+        "name": "VCA 2",
         "position": { "x": 520, "y": 200 },
-        "params": { "gain": 0.5 }
+        "params": { "gain": 0.6 }
       },
       {
         "id": "vca-harm",
         "type": "gain",
-        "name": "Harm VCA",
+        "name": "VCA 3",
         "position": { "x": 720, "y": 200 },
-        "params": { "gain": 0.6 }
+        "params": { "gain": 0.5 }
       },
       {
         "id": "vca-bass",
         "type": "gain",
-        "name": "Bass VCA",
+        "name": "VCA 4",
         "position": { "x": 920, "y": 200 },
-        "params": { "gain": 0.7 }
+        "params": { "gain": 0.75 }
       },
       {
         "id": "vca-extra",
         "type": "gain",
-        "name": "Extra VCA",
+        "name": "VCA 5",
         "position": { "x": 1120, "y": 200 },
         "params": { "gain": 0.4 }
       },
       {
         "id": "mix-1",
         "type": "mixer",
-        "name": "Mix 1-2",
+        "name": "Mix 1+2",
         "position": { "x": 420, "y": 440 },
-        "params": { "levelA": 0.7, "levelB": 0.5 }
+        "params": { "levelA": 0.8, "levelB": 0.6 }
       },
       {
         "id": "mix-2",
         "type": "mixer",
-        "name": "Mix 3-4",
+        "name": "Mix 3+4",
         "position": { "x": 620, "y": 440 },
-        "params": { "levelA": 0.6, "levelB": 0.7 }
+        "params": { "levelA": 0.5, "levelB": 0.8 }
       },
       {
         "id": "mix-3",
         "type": "mixer",
         "name": "Mix A+B",
         "position": { "x": 820, "y": 440 },
-        "params": { "levelA": 0.8, "levelB": 0.8 }
+        "params": { "levelA": 0.9, "levelB": 0.9 }
       },
       {
         "id": "mix-4",
         "type": "mixer",
         "name": "Mix +5",
         "position": { "x": 1020, "y": 440 },
-        "params": { "levelA": 0.9, "levelB": 0.4 }
+        "params": { "levelA": 0.95, "levelB": 0.35 }
+      },
+      {
+        "id": "hpf-1",
+        "type": "hpf",
+        "name": "HPF",
+        "position": { "x": 1220, "y": 380 },
+        "params": { "cutoff": 80 }
       },
       {
         "id": "reverb-1",
         "type": "reverb",
         "name": "Reverb",
         "position": { "x": 1220, "y": 440 },
-        "params": { "time": 0.3, "damp": 0.7, "preDelay": 10, "mix": 0.15 }
+        "params": { "time": 0.2, "damp": 0.8, "preDelay": 5, "mix": 0.08 }
       },
       {
         "id": "scope-1",
@@ -204,7 +201,7 @@
         "type": "output",
         "name": "Main Out",
         "position": { "x": 1420, "y": 440 },
-        "params": { "level": 0.8 }
+        "params": { "level": 0.75 }
       }
     ],
     "connections": [
@@ -236,7 +233,8 @@
       { "from": { "moduleId": "mix-2", "portId": "out" }, "to": { "moduleId": "mix-3", "portId": "in-b" }, "kind": "audio" },
       { "from": { "moduleId": "mix-3", "portId": "out" }, "to": { "moduleId": "mix-4", "portId": "in-a" }, "kind": "audio" },
       { "from": { "moduleId": "vca-extra", "portId": "out" }, "to": { "moduleId": "mix-4", "portId": "in-b" }, "kind": "audio" },
-      { "from": { "moduleId": "mix-4", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "mix-4", "portId": "out" }, "to": { "moduleId": "hpf-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "hpf-1", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
       { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "scope-1", "portId": "in-a" }, "kind": "audio" },
       { "from": { "moduleId": "scope-1", "portId": "out-a" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
     ]

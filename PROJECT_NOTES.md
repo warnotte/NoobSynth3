@@ -49,7 +49,7 @@ This file is meant to be reread by the coding assistant to keep context, decisio
 - Mario IO (seasonal/fun)
 - Lab Panel (test module)
 
-## Presets (23 total)
+## Presets (24 total)
 
 **Classic emulations (updates format):**
 - Jupiter Pad, Jupiter Brass, Jupiter-8 Demo
@@ -63,6 +63,7 @@ This file is meant to be reread by the coding assistant to keep context, decisio
 - Trance Supersaw (Supersaw oscillator)
 - Phaser Pad (Phaser effect)
 - Dirty Bass (Distortion foldback)
+- 8-Bit Mario (NES-style 5-channel with 8 classic tunes)
 
 Dev/test presets live in `public/presets/manifest-dev.json`.
 
@@ -133,6 +134,7 @@ Presets support two formats:
 - **Hard sync**: VCO now exposes sync output for oscillator hard sync patching.
 - **Sequencer pattern**: Control IO uses an 8-step DO-SOL-SIb-SOL-DO-SIb-SOL-FA loop for the demo arp.
 - **VCF 24 dB tuning**: reduced resonance/drive gain to improve stability.
+- **8-Bit Mario preset**: NES-authentic 5-channel setup with 8 complete Mario songs (Overworld, Underground, Underwater, Castle, Starman, Game Over, Coin, 1-Up).
 
 ## How to update
 
