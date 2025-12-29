@@ -3,6 +3,8 @@ export type PortKind = 'audio' | 'cv' | 'gate' | 'sync'
 export type ModuleType =
   | 'oscillator'
   | 'noise'
+  | 'mod-router'
+  | 'ring-mod'
   | 'gain'
   | 'cv-vca'
   | 'output'

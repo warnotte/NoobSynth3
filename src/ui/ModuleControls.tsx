@@ -1,8 +1,9 @@
-import type { CSSProperties } from 'react'
+import { useEffect, type CSSProperties } from 'react'
 import type { AudioEngine } from '../engine/WasmGraphEngine'
 import type { ModuleSpec } from '../shared/graph'
 import { clampMidiNote, clampVoiceCount, formatMidiNote } from '../state/midiUtils'
 import { marioSongs } from '../state/marioSongs'
+import { DEFAULT_SEQUENCER_PATTERN } from '../state/sequencerPattern'
 import { Oscilloscope } from './Oscilloscope'
 import { RotaryKnob } from './RotaryKnob'
 import { WaveformSelector } from './WaveformSelector'
@@ -66,6 +67,18 @@ export const ModuleControls = ({
   activeStep,
   marioStep,
 }: ModuleControlsProps) => {
+  const vcfModel = module.type === 'vcf' ? String(module.params.model ?? 'svf') : null
+  const vcfMode = module.type === 'vcf' ? String(module.params.mode ?? 'lp') : null
+
+  useEffect(() => {
+    if (module.type !== 'vcf') {
+      return
+    }
+    if (vcfModel === 'ladder' && vcfMode !== 'lp') {
+      updateParam(module.id, 'mode', 'lp')
+    }
+  }, [module.type, module.id, updateParam, vcfModel, vcfMode])
+
   if (module.type === 'oscillator') {
     const subOct = Number(module.params.subOct ?? 1)
     return (
@@ -223,6 +236,63 @@ export const ModuleControls = ({
           </div>
         </div>
       </>
+    )
+  }
+
+  if (module.type === 'mod-router') {
+    return (
+      <>
+        <RotaryKnob
+          label="Pitch"
+          min={-1}
+          max={1}
+          step={0.01}
+          value={Number(module.params.depthPitch ?? 0)}
+          onChange={(value) => updateParam(module.id, 'depthPitch', value)}
+          format={(value) => value.toFixed(2)}
+        />
+        <RotaryKnob
+          label="PWM"
+          min={-1}
+          max={1}
+          step={0.01}
+          value={Number(module.params.depthPwm ?? 0)}
+          onChange={(value) => updateParam(module.id, 'depthPwm', value)}
+          format={(value) => value.toFixed(2)}
+        />
+        <RotaryKnob
+          label="VCF"
+          min={-1}
+          max={1}
+          step={0.01}
+          value={Number(module.params.depthVcf ?? 0)}
+          onChange={(value) => updateParam(module.id, 'depthVcf', value)}
+          format={(value) => value.toFixed(2)}
+        />
+        <RotaryKnob
+          label="VCA"
+          min={-1}
+          max={1}
+          step={0.01}
+          value={Number(module.params.depthVca ?? 0)}
+          onChange={(value) => updateParam(module.id, 'depthVca', value)}
+          format={(value) => value.toFixed(2)}
+        />
+      </>
+    )
+  }
+
+  if (module.type === 'ring-mod') {
+    return (
+      <RotaryKnob
+        label="Level"
+        min={0}
+        max={1}
+        step={0.01}
+        value={Number(module.params.level ?? 0.9)}
+        onChange={(value) => updateParam(module.id, 'level', value)}
+        format={(value) => value.toFixed(2)}
+      />
     )
   }
 
@@ -562,6 +632,19 @@ export const ModuleControls = ({
   if (module.type === 'vcf') {
     const mode = String(module.params.mode ?? 'lp')
     const slope = Number(module.params.slope ?? 24)
+    const model = String(module.params.model ?? 'svf')
+    const handleModelChange = (next: string) => {
+      updateParam(module.id, 'model', next)
+      if (next === 'ladder' && mode !== 'lp') {
+        updateParam(module.id, 'mode', 'lp')
+      }
+    }
+    const handleModeChange = (next: string) => {
+      if (model === 'ladder' && next !== 'lp') {
+        updateParam(module.id, 'model', 'svf')
+      }
+      updateParam(module.id, 'mode', next)
+    }
     return (
       <>
         <RotaryKnob
@@ -622,6 +705,26 @@ export const ModuleControls = ({
         />
         <div className="filter-row">
           <div className="filter-group">
+            <span className="filter-label">Model</span>
+            <div className="filter-buttons">
+              {[
+                { id: 'svf', label: 'SVF' },
+                { id: 'ladder', label: 'LAD' },
+              ].map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  className={`ui-btn filter-btn ${model === option.id ? 'active' : ''}`}
+                  onClick={() => handleModelChange(option.id)}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div className="filter-row">
+          <div className="filter-group">
             <span className="filter-label">Mode</span>
             <div className="filter-buttons filter-wide">
               {['lp', 'hp', 'bp', 'notch'].map((option) => (
@@ -629,7 +732,7 @@ export const ModuleControls = ({
                   key={option}
                   type="button"
                   className={`ui-btn filter-btn ${mode === option ? 'active' : ''}`}
-                  onClick={() => updateParam(module.id, 'mode', option)}
+                  onClick={() => handleModeChange(option)}
                 >
                   {option.toUpperCase()}
                 </button>
@@ -926,17 +1029,17 @@ export const ModuleControls = ({
               onChange={(value) => updateParam(module.id, 'seqGate', value)}
               format={(value) => `${Math.round(value * 100)}%`}
             />
-          </div>
-          <div className="seq-steps">
-            {['DO', 'RE', 'MI', 'FA'].map((label, index) => (
-              <div
-                key={label}
-                className={`seq-step ${activeStep === index ? 'active' : ''}`}
-              >
-                {label}
-              </div>
-            ))}
-          </div>
+        </div>
+        <div className="seq-steps">
+          {DEFAULT_SEQUENCER_PATTERN.map((step, index) => (
+            <div
+              key={step.label}
+              className={`seq-step ${activeStep === index ? 'active' : ''}`}
+            >
+              {step.label}
+            </div>
+          ))}
+        </div>
         </div>
       </>
     )

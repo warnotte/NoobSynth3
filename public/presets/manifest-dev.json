@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "presets": [
+    {
+      "id": "mod-router-demo",
+      "name": "Mod Router Demo",
+      "description": "LFO routed to PWM + VCF via Mod Router.",
+      "file": "mod-router-demo.json"
+    },
+    {
+      "id": "ring-mod-demo",
+      "name": "Ring Mod Demo",
+      "description": "Two VCOs into Ring Mod for metallic tones.",
+      "file": "ring-mod-demo.json"
+    },
+    {
+      "id": "ab-vco",
+      "name": "VCO A/B",
+      "description": "Single VCO -> Output for backend parity checks.",
+      "file": "ab-vco.json"
+    },
+    {
+      "id": "ab-vca",
+      "name": "VCA A/B",
+      "description": "VCO -> VCA -> Output for backend parity checks.",
+      "file": "ab-vca.json"
+    },
+    {
+      "id": "8bit-mario",
+      "name": "8-Bit Mario",
+      "description": "NES-style square wave setup for Mario IO.",
+      "file": "8bit-mario.json"
+    }
+  ]
+}

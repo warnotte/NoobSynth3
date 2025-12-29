@@ -1,0 +1,139 @@
+{
+  "version": 1,
+  "id": "hard-sync-lead",
+  "name": "Hard Sync Lead",
+  "description": "VCO hard sync demo with pitch sweep.",
+  "graph": {
+    "modules": [
+      {
+        "id": "osc-master",
+        "type": "oscillator",
+        "name": "VCO Master",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "frequency": 110,
+          "type": "sawtooth",
+          "pwm": 0.5,
+          "unison": 1,
+          "detune": 0,
+          "fmLin": 0,
+          "fmExp": 0,
+          "subMix": 0,
+          "subOct": 1
+        }
+      },
+      {
+        "id": "osc-slave",
+        "type": "oscillator",
+        "name": "VCO Slave",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "frequency": 220,
+          "type": "sawtooth",
+          "pwm": 0.4,
+          "unison": 1,
+          "detune": 0,
+          "fmLin": 0,
+          "fmExp": 0,
+          "subMix": 0,
+          "subOct": 1
+        }
+      },
+      {
+        "id": "lfo-1",
+        "type": "lfo",
+        "name": "LFO 1",
+        "position": { "x": 0, "y": 0 },
+        "params": { "rate": 0.6, "depth": 0.4, "offset": 0, "shape": "sine", "bipolar": true }
+      },
+      {
+        "id": "mod-1",
+        "type": "cv-vca",
+        "name": "Mod VCA",
+        "position": { "x": 0, "y": 0 },
+        "params": { "gain": 0.18 }
+      },
+      {
+        "id": "adsr-1",
+        "type": "adsr",
+        "name": "Amp ADSR",
+        "position": { "x": 0, "y": 0 },
+        "params": { "attack": 0.01, "decay": 0.2, "sustain": 0.7, "release": 0.25 }
+      },
+      {
+        "id": "gain-1",
+        "type": "gain",
+        "name": "VCA",
+        "position": { "x": 0, "y": 0 },
+        "params": { "gain": 0.85 }
+      },
+      {
+        "id": "vcf-1",
+        "type": "vcf",
+        "name": "VCF",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "cutoff": 1200,
+          "resonance": 0.25,
+          "drive": 0.15,
+          "envAmount": 0.2,
+          "modAmount": 0,
+          "keyTrack": 0.4,
+          "model": "svf",
+          "mode": "lp",
+          "slope": 12
+        }
+      },
+      {
+        "id": "ctrl-1",
+        "type": "control",
+        "name": "Control IO",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "cv": 0,
+          "cvMode": "unipolar",
+          "velocity": 1,
+          "midiVelocity": true,
+          "gate": 0,
+          "glide": 0.02,
+          "midiEnabled": false,
+          "midiChannel": 0,
+          "midiRoot": 60,
+          "midiInputId": "",
+          "midiVelSlew": 0.008,
+          "voices": 1,
+          "seqOn": true,
+          "seqTempo": 96,
+          "seqGate": 0.6
+        }
+      },
+      {
+        "id": "scope-1",
+        "type": "scope",
+        "name": "Scope",
+        "position": { "x": 0, "y": 0 },
+        "params": { "time": 1, "gain": 1, "freeze": false }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Main Out",
+        "position": { "x": 0, "y": 0 },
+        "params": { "level": 0.8 }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "ctrl-1", "portId": "cv-out" }, "to": { "moduleId": "osc-master", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "ctrl-1", "portId": "cv-out" }, "to": { "moduleId": "osc-slave", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "osc-master", "portId": "sync-out" }, "to": { "moduleId": "osc-slave", "portId": "sync" }, "kind": "sync" },
+      { "from": { "moduleId": "lfo-1", "portId": "cv-out" }, "to": { "moduleId": "mod-1", "portId": "in" }, "kind": "cv" },
+      { "from": { "moduleId": "mod-1", "portId": "out" }, "to": { "moduleId": "osc-slave", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "ctrl-1", "portId": "gate-out" }, "to": { "moduleId": "adsr-1", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "osc-slave", "portId": "out" }, "to": { "moduleId": "vcf-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-1", "portId": "env" }, "to": { "moduleId": "gain-1", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "vcf-1", "portId": "out" }, "to": { "moduleId": "gain-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "gain-1", "portId": "out" }, "to": { "moduleId": "scope-1", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "scope-1", "portId": "out-a" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}

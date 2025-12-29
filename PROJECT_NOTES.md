@@ -19,8 +19,10 @@ This file is meant to be reread by the coding assistant to keep context, decisio
 
 - VCO (unison + detune + PWM + sub + sync out)
 - Noise (white/pink/brown)
+- Mod Router (CV in, 4 CV outs with depth)
+- Ring Mod (audio A x audio B)
 - LFO
-- VCF (SVF only, 12/24 dB)
+- VCF (SVF + ladder, 12/24 dB)
 - HPF (simple high-pass)
 - ADSR
 - VCA (CV input)
@@ -39,6 +41,9 @@ This file is meant to be reread by the coding assistant to keep context, decisio
 
 - Jupiter Pad
 - Jupiter-8 Demo
+- Hard Sync Lead
+- Mod Router Demo
+- Ring Mod Demo
 - Jupiter Brass
 - PWM Strings
 - Dream Pad
@@ -48,11 +53,14 @@ This file is meant to be reread by the coding assistant to keep context, decisio
 - 80s Pluck
 - Showcase Stack
 
+Dev/test presets live in `public/presets/manifest-dev.json`.
+
 Presets live in `src/state/presets.ts` and are loaded from the Presets panel. Some presets also adjust routing.
 
 ## Known issues / risks
 
-- VCF 24 dB can distort at high resonance. 12 dB sounds more stable.
+- VCF 24 dB is tuned but can still distort at extreme resonance.
+- VCF ladder model is LP-focused; HP/BP/Notch auto-switch back to SVF.
 - Polyphony is implemented; unison remains per-voice.
 - MIDI disables the mini sequencer when enabled. Velocity can be toggled in Control IO.
 - Rapidly changing voice count while running can cause instability; adjust slowly.
@@ -102,10 +110,13 @@ Presets live in `src/state/presets.ts` and are loaded from the Presets panel. So
 - **WASM graph engine**: single worklet now runs the full DSP graph in Rust, including Control IO + Mod VCA; scope inputs are tapped via worklet outputs.
 - **WASM cleanup**: removed per-module WASM worklets/toggles; the graph engine is the only DSP path.
 - **Jupiter essentials**: added Noise + HPF modules, plus VCO sub output with sub mix, and band-limited VCO waveforms.
+- **VCF ladder model**: added ladder option for the VCF (LP-focused) alongside SVF.
 - **Preset sync (native)**: loading presets now syncs the native DSP graph in Tauri mode.
 - **Mario IO (native)**: sequencer now runs when native audio is active.
 - **VCO layout**: VCO module resized to 2x3 for extra controls.
 - **Hard sync**: VCO now exposes sync output for oscillator hard sync patching.
+- **Sequencer pattern**: Control IO uses an 8-step DO-SOL-SIb-SOL-DO-SIb-SOL-FA loop for the demo arp.
+- **VCF 24 dB tuning**: reduced resonance/drive gain to improve stability.
 
 ## How to update
 

@@ -1,0 +1,133 @@
+{
+  "version": 1,
+  "id": "ring-mod-demo",
+  "name": "Ring Mod Demo",
+  "description": "Two VCOs into Ring Mod for metallic tones.",
+  "graph": {
+    "modules": [
+      {
+        "id": "osc-a",
+        "type": "oscillator",
+        "name": "VCO A",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "frequency": 110,
+          "type": "sawtooth",
+          "pwm": 0.5,
+          "unison": 1,
+          "detune": 0,
+          "fmLin": 0,
+          "fmExp": 0,
+          "subMix": 0,
+          "subOct": 1
+        }
+      },
+      {
+        "id": "osc-b",
+        "type": "oscillator",
+        "name": "VCO B",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "frequency": 220,
+          "type": "square",
+          "pwm": 0.45,
+          "unison": 1,
+          "detune": 0,
+          "fmLin": 0,
+          "fmExp": 0,
+          "subMix": 0,
+          "subOct": 1
+        }
+      },
+      {
+        "id": "ring-1",
+        "type": "ring-mod",
+        "name": "Ring Mod",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "level": 0.9
+        }
+      },
+      {
+        "id": "vcf-1",
+        "type": "vcf",
+        "name": "VCF",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "cutoff": 1200,
+          "resonance": 0.2,
+          "drive": 0.1,
+          "envAmount": 0,
+          "modAmount": 0,
+          "keyTrack": 0.3,
+          "model": "svf",
+          "mode": "lp",
+          "slope": 12
+        }
+      },
+      {
+        "id": "gain-1",
+        "type": "gain",
+        "name": "VCA",
+        "position": { "x": 0, "y": 0 },
+        "params": { "gain": 0.85 }
+      },
+      {
+        "id": "adsr-1",
+        "type": "adsr",
+        "name": "Amp ADSR",
+        "position": { "x": 0, "y": 0 },
+        "params": { "attack": 0.01, "decay": 0.2, "sustain": 0.7, "release": 0.3 }
+      },
+      {
+        "id": "ctrl-1",
+        "type": "control",
+        "name": "Control IO",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "cv": 0,
+          "cvMode": "unipolar",
+          "velocity": 1,
+          "midiVelocity": true,
+          "gate": 0,
+          "glide": 0.02,
+          "midiEnabled": false,
+          "midiChannel": 0,
+          "midiRoot": 60,
+          "midiInputId": "",
+          "midiVelSlew": 0.008,
+          "voices": 1,
+          "seqOn": false,
+          "seqTempo": 90,
+          "seqGate": 0.7
+        }
+      },
+      {
+        "id": "scope-1",
+        "type": "scope",
+        "name": "Scope",
+        "position": { "x": 0, "y": 0 },
+        "params": { "time": 1, "gain": 1, "freeze": false }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Main Out",
+        "position": { "x": 0, "y": 0 },
+        "params": { "level": 0.8 }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "ctrl-1", "portId": "cv-out" }, "to": { "moduleId": "osc-a", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "ctrl-1", "portId": "cv-out" }, "to": { "moduleId": "osc-b", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "ctrl-1", "portId": "gate-out" }, "to": { "moduleId": "adsr-1", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "osc-a", "portId": "out" }, "to": { "moduleId": "ring-1", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "osc-b", "portId": "out" }, "to": { "moduleId": "ring-1", "portId": "in-b" }, "kind": "audio" },
+      { "from": { "moduleId": "ring-1", "portId": "out" }, "to": { "moduleId": "vcf-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "vcf-1", "portId": "out" }, "to": { "moduleId": "gain-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-1", "portId": "env" }, "to": { "moduleId": "gain-1", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "gain-1", "portId": "out" }, "to": { "moduleId": "scope-1", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "scope-1", "portId": "out-a" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}

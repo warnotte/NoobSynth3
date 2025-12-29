@@ -1,7 +1,7 @@
 use dsp_core::{
   Adsr, AdsrInputs, AdsrParams, Chorus, ChorusInputs, ChorusParams, Delay, DelayInputs, DelayParams,
-  Lfo, LfoInputs, LfoParams, Mixer, Noise, NoiseParams, Reverb, ReverbInputs, ReverbParams, Sample,
-  Vca, Vcf, VcfInputs, VcfParams, Vco, VcoInputs, VcoParams,
+  Lfo, LfoInputs, LfoParams, Mixer, Noise, NoiseParams, Reverb, ReverbInputs, ReverbParams,
+  RingMod, RingModParams, Sample, Vca, Vcf, VcfInputs, VcfParams, Vco, VcoInputs, VcoParams,
 };
 use serde::Deserialize;
 use std::collections::{HashMap, VecDeque};
@@ -47,6 +47,8 @@ struct TapJson {
 enum ModuleType {
   Oscillator,
   Noise,
+  ModRouter,
+  RingMod,
   Gain,
   CvVca,
   Output,
@@ -241,6 +243,17 @@ struct NoiseState {
   noise_type: ParamBuffer,
 }
 
+struct ModRouterState {
+  depth_pitch: ParamBuffer,
+  depth_pwm: ParamBuffer,
+  depth_vcf: ParamBuffer,
+  depth_vca: ParamBuffer,
+}
+
+struct RingModState {
+  level: ParamBuffer,
+}
+
 struct GainState {
   gain: ParamBuffer,
 }
@@ -270,6 +283,7 @@ struct VcfState {
   env_amount: ParamBuffer,
   mod_amount: ParamBuffer,
   key_track: ParamBuffer,
+  model: ParamBuffer,
   mode: ParamBuffer,
   slope: ParamBuffer,
 }
@@ -351,6 +365,8 @@ struct MarioState {
 enum ModuleState {
   Vco(VcoState),
   Noise(NoiseState),
+  ModRouter(ModRouterState),
+  RingMod(RingModState),
   Gain(GainState),
   CvVca(GainState),
   Lfo(LfoState),
@@ -754,6 +770,15 @@ impl ModuleNode {
         level: ParamBuffer::new(param_number(params, "level", 0.4)),
         noise_type: ParamBuffer::new(param_number(params, "noiseType", 0.0)),
       }),
+      ModuleType::ModRouter => ModuleState::ModRouter(ModRouterState {
+        depth_pitch: ParamBuffer::new(param_number(params, "depthPitch", 0.0)),
+        depth_pwm: ParamBuffer::new(param_number(params, "depthPwm", 0.0)),
+        depth_vcf: ParamBuffer::new(param_number(params, "depthVcf", 0.0)),
+        depth_vca: ParamBuffer::new(param_number(params, "depthVca", 0.0)),
+      }),
+      ModuleType::RingMod => ModuleState::RingMod(RingModState {
+        level: ParamBuffer::new(param_number(params, "level", 0.9)),
+      }),
       ModuleType::Gain => ModuleState::Gain(GainState {
         gain: ParamBuffer::new(param_number(params, "gain", 0.2)),
       }),
@@ -789,6 +814,7 @@ impl ModuleNode {
         env_amount: ParamBuffer::new(param_number(params, "envAmount", 0.0)),
         mod_amount: ParamBuffer::new(param_number(params, "modAmount", 0.0)),
         key_track: ParamBuffer::new(param_number(params, "keyTrack", 0.0)),
+        model: ParamBuffer::new(param_number(params, "model", 0.0)),
         mode: ParamBuffer::new(param_number(params, "mode", 0.0)),
         slope: ParamBuffer::new(param_number(params, "slope", 1.0)),
       }),
@@ -882,6 +908,18 @@ impl ModuleNode {
         "noiseType" => state.noise_type.set(value),
         _ => {}
       },
+      ModuleState::ModRouter(state) => match param {
+        "depthPitch" => state.depth_pitch.set(value),
+        "depthPwm" => state.depth_pwm.set(value),
+        "depthVcf" => state.depth_vcf.set(value),
+        "depthVca" => state.depth_vca.set(value),
+        _ => {}
+      },
+      ModuleState::RingMod(state) => {
+        if param == "level" {
+          state.level.set(value);
+        }
+      }
       ModuleState::Gain(state) | ModuleState::CvVca(state) => {
         if param == "gain" {
           state.gain.set(value);
@@ -919,6 +957,7 @@ impl ModuleNode {
         "envAmount" => state.env_amount.set(value),
         "modAmount" => state.mod_amount.set(value),
         "keyTrack" => state.key_track.set(value),
+        "model" => state.model.set(value),
         "mode" => state.mode.set(value),
         "slope" => state.slope.set(value),
         _ => {}
@@ -1007,6 +1046,7 @@ impl ModuleNode {
         let fm_exp = inputs[2].channel(0);
         let pwm_in = inputs[3].channel(0);
         let sync = inputs[4].channel(0);
+        let fm_audio = inputs[5].channel(0);
         let (main_group, rest) = outputs.split_at_mut(1);
         let out = main_group[0].channel_mut(0);
         let (sub_group, sync_group) = rest.split_at_mut(1);
@@ -1026,6 +1066,7 @@ impl ModuleNode {
         let inputs = VcoInputs {
           pitch: Some(pitch),
           fm_lin: Some(fm_lin),
+          fm_audio: Some(fm_audio),
           fm_exp: Some(fm_exp),
           pwm: Some(pwm_in),
           sync: Some(sync),
@@ -1039,6 +1080,57 @@ impl ModuleNode {
           noise_type: state.noise_type.slice(frames),
         };
         state.noise.process_block(out, params);
+      }
+      ModuleState::ModRouter(state) => {
+        let input = if self.connections[0].is_empty() {
+          None
+        } else {
+          Some(inputs[0].channel(0))
+        };
+        let (pitch_group, rest) = outputs.split_at_mut(1);
+        let (pwm_group, rest) = rest.split_at_mut(1);
+        let (vcf_group, vca_group) = rest.split_at_mut(1);
+        let out_pitch = pitch_group[0].channel_mut(0);
+        let out_pwm = pwm_group[0].channel_mut(0);
+        let out_vcf = vcf_group[0].channel_mut(0);
+        let out_vca = vca_group[0].channel_mut(0);
+        let depth_pitch = state.depth_pitch.slice(frames);
+        let depth_pwm = state.depth_pwm.slice(frames);
+        let depth_vcf = state.depth_vcf.slice(frames);
+        let depth_vca = state.depth_vca.slice(frames);
+        for i in 0..frames {
+          let source = match input {
+            Some(values) => {
+              if values.len() > 1 {
+                values[i]
+              } else {
+                values[0]
+              }
+            }
+            None => 0.0,
+          };
+          out_pitch[i] = source * depth_pitch[i];
+          out_pwm[i] = source * depth_pwm[i];
+          out_vcf[i] = source * depth_vcf[i];
+          out_vca[i] = source * depth_vca[i];
+        }
+      }
+      ModuleState::RingMod(state) => {
+        let input_a = if self.connections[0].is_empty() {
+          None
+        } else {
+          Some(inputs[0].channel(0))
+        };
+        let input_b = if self.connections[1].is_empty() {
+          None
+        } else {
+          Some(inputs[1].channel(0))
+        };
+        let output = outputs[0].channel_mut(0);
+        let params = RingModParams {
+          level: state.level.slice(frames),
+        };
+        RingMod::process_block(output, input_a, input_b, params);
       }
       ModuleState::Gain(state) => {
         let input_connected = !self.connections[0].is_empty();
@@ -1204,6 +1296,7 @@ impl ModuleNode {
           env_amount: state.env_amount.slice(frames),
           mod_amount: state.mod_amount.slice(frames),
           key_track: state.key_track.slice(frames),
+          model: state.model.slice(frames),
           mode: state.mode.slice(frames),
           slope: state.slope.slice(frames),
         };
@@ -1231,6 +1324,7 @@ impl ModuleNode {
           env_amount: &zero,
           mod_amount: &zero,
           key_track: &zero,
+          model: &zero,
           mode: &one,
           slope: &zero,
         };
@@ -1457,6 +1551,8 @@ fn normalize_module_type(raw: &str) -> ModuleType {
   match raw {
     "oscillator" => ModuleType::Oscillator,
     "noise" => ModuleType::Noise,
+    "mod-router" => ModuleType::ModRouter,
+    "ring-mod" => ModuleType::RingMod,
     "gain" => ModuleType::Gain,
     "cv-vca" => ModuleType::CvVca,
     "output" => ModuleType::Output,
@@ -1482,6 +1578,8 @@ fn is_poly_type(module_type: ModuleType) -> bool {
     module_type,
     ModuleType::Oscillator
       | ModuleType::Noise
+      | ModuleType::ModRouter
+      | ModuleType::RingMod
       | ModuleType::Gain
       | ModuleType::CvVca
       | ModuleType::Lfo
@@ -1502,8 +1600,11 @@ fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },
       PortInfo { channels: 1 },
       PortInfo { channels: 1 },
+      PortInfo { channels: 1 },
     ],
     ModuleType::Noise => vec![],
+    ModuleType::ModRouter => vec![PortInfo { channels: 1 }],
+    ModuleType::RingMod => vec![PortInfo { channels: 1 }, PortInfo { channels: 1 }],
     ModuleType::Gain => vec![PortInfo { channels: 2 }, PortInfo { channels: 1 }],
     ModuleType::CvVca => vec![PortInfo { channels: 1 }, PortInfo { channels: 1 }],
     ModuleType::Output => vec![PortInfo { channels: 2 }],
@@ -1546,6 +1647,13 @@ fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },
     ],
     ModuleType::Noise => vec![PortInfo { channels: 1 }],
+    ModuleType::ModRouter => vec![
+      PortInfo { channels: 1 },
+      PortInfo { channels: 1 },
+      PortInfo { channels: 1 },
+      PortInfo { channels: 1 },
+    ],
+    ModuleType::RingMod => vec![PortInfo { channels: 1 }],
     ModuleType::Gain => vec![PortInfo { channels: 2 }],
     ModuleType::CvVca => vec![PortInfo { channels: 1 }],
     ModuleType::Output => vec![PortInfo { channels: 2 }],
@@ -1583,6 +1691,16 @@ fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize> {
       "fm-exp" | "fmExp" => Some(2),
       "pwm" => Some(3),
       "sync" => Some(4),
+      "fm-audio" => Some(5),
+      _ => None,
+    },
+    ModuleType::ModRouter => match port_id {
+      "in" => Some(0),
+      _ => None,
+    },
+    ModuleType::RingMod => match port_id {
+      "in-a" => Some(0),
+      "in-b" => Some(1),
       _ => None,
     },
     ModuleType::Hpf => match port_id {
@@ -1662,6 +1780,17 @@ fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize> {
       _ => None,
     },
     ModuleType::Noise => match port_id {
+      "out" => Some(0),
+      _ => None,
+    },
+    ModuleType::ModRouter => match port_id {
+      "pitch" => Some(0),
+      "pwm" => Some(1),
+      "vcf" => Some(2),
+      "vca" => Some(3),
+      _ => None,
+    },
+    ModuleType::RingMod => match port_id {
       "out" => Some(0),
       _ => None,
     },

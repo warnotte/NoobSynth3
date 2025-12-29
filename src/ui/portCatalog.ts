@@ -20,17 +20,34 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
       { id: 'pitch', label: 'Pitch', kind: 'cv', direction: 'in' },
       { id: 'fm-lin', label: 'FM Lin', kind: 'cv', direction: 'in' },
       { id: 'fm-exp', label: 'FM Exp', kind: 'cv', direction: 'in' },
+      { id: 'fm-audio', label: 'FM Aud', kind: 'audio', direction: 'in' },
       { id: 'pwm', label: 'PWM', kind: 'cv', direction: 'in' },
       { id: 'sync', label: 'Sync', kind: 'sync', direction: 'in' },
     ],
     outputs: [
       { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
       { id: 'sub', label: 'Sub', kind: 'audio', direction: 'out' },
-      { id: 'sync', label: 'Sync', kind: 'sync', direction: 'out' },
+      { id: 'sync-out', label: 'Sync', kind: 'sync', direction: 'out' },
     ],
   },
   noise: {
     inputs: [],
+    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
+  },
+  'mod-router': {
+    inputs: [{ id: 'in', label: 'In', kind: 'cv', direction: 'in' }],
+    outputs: [
+      { id: 'pitch', label: 'PIT', kind: 'cv', direction: 'out' },
+      { id: 'pwm', label: 'PWM', kind: 'cv', direction: 'out' },
+      { id: 'vcf', label: 'VCF', kind: 'cv', direction: 'out' },
+      { id: 'vca', label: 'VCA', kind: 'cv', direction: 'out' },
+    ],
+  },
+  'ring-mod': {
+    inputs: [
+      { id: 'in-a', label: 'In A', kind: 'audio', direction: 'in' },
+      { id: 'in-b', label: 'In B', kind: 'audio', direction: 'in' },
+    ],
     outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
   },
   gain: {

@@ -1,0 +1,92 @@
+{
+  "version": 1,
+  "id": "ladder-lead",
+  "name": "Ladder Lead",
+  "description": "Moog-ish lead with ladder LP bite.",
+  "updates": {
+    "osc-1": {
+      "frequency": 110,
+      "type": "sawtooth",
+      "pwm": 0.5,
+      "unison": 1,
+      "detune": 0.5,
+      "subMix": 0.3,
+      "subOct": 1
+    },
+    "osc-2": {
+      "frequency": 110,
+      "type": "square",
+      "pwm": 0.46,
+      "unison": 1,
+      "detune": 0.2
+    },
+    "mix-1": {
+      "levelA": 0.75,
+      "levelB": 0.45
+    },
+    "vcf-1": {
+      "cutoff": 260,
+      "resonance": 0.32,
+      "drive": 0.48,
+      "envAmount": 0.65,
+      "modAmount": 0,
+      "keyTrack": 0.2,
+      "model": "ladder",
+      "mode": "lp",
+      "slope": 24
+    },
+    "chorus-1": {
+      "rate": 0.18,
+      "depth": 5,
+      "delay": 12,
+      "mix": 0.08,
+      "spread": 0.4,
+      "feedback": 0.05
+    },
+    "delay-1": {
+      "time": 160,
+      "feedback": 0.15,
+      "mix": 0.1,
+      "tone": 0.55,
+      "pingPong": false
+    },
+    "reverb-1": {
+      "time": 0.25,
+      "damp": 0.3,
+      "preDelay": 6,
+      "mix": 0.08
+    },
+    "adsr-1": {
+      "attack": 0.008,
+      "decay": 0.22,
+      "sustain": 0.42,
+      "release": 0.2
+    },
+    "adsr-2": {
+      "attack": 0.004,
+      "decay": 0.2,
+      "sustain": 0.12,
+      "release": 0.2
+    },
+    "lfo-1": {
+      "rate": 0.2,
+      "depth": 0.02
+    },
+    "ctrl-1": {
+      "glide": 0.03,
+      "seqOn": true,
+      "seqTempo": 96,
+      "seqGate": 0.45,
+      "voices": 1
+    }
+  },
+  "connectionPatch": {
+    "remove": [
+      {
+        "from": { "moduleId": "lfo-1", "portId": "cv-out" },
+        "to": { "moduleId": "vcf-1", "portId": "mod" },
+        "kind": "cv"
+      }
+    ]
+  }
+}

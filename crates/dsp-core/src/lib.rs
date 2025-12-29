@@ -46,6 +46,7 @@ pub struct VcoParams<'a> {
 pub struct VcoInputs<'a> {
   pub pitch: Option<&'a [Sample]>,
   pub fm_lin: Option<&'a [Sample]>,
+  pub fm_audio: Option<&'a [Sample]>,
   pub fm_exp: Option<&'a [Sample]>,
   pub pwm: Option<&'a [Sample]>,
   pub sync: Option<&'a [Sample]>,
@@ -131,7 +132,7 @@ impl Vco {
     for i in 0..output.len() {
       let base = sample_at(params.base_freq, i, 220.0);
       let pitch = input_at(inputs.pitch, i);
-      let fm_lin = input_at(inputs.fm_lin, i);
+      let fm_lin = input_at(inputs.fm_lin, i) + input_at(inputs.fm_audio, i);
       let fm_exp = input_at(inputs.fm_exp, i);
       let pwm_mod = input_at(inputs.pwm, i);
       let sync = input_at(inputs.sync, i);
@@ -242,6 +243,12 @@ pub struct NoiseParams<'a> {
   pub noise_type: &'a [Sample],
 }
 
+pub struct RingMod;
+
+pub struct RingModParams<'a> {
+  pub level: &'a [Sample],
+}
+
 impl Noise {
   pub fn new() -> Self {
     Self {
@@ -302,6 +309,25 @@ impl Noise {
         self.next_brown()
       };
       output[i] = noise * level;
+    }
+  }
+}
+
+impl RingMod {
+  pub fn process_block(
+    output: &mut [Sample],
+    input_a: Option<&[Sample]>,
+    input_b: Option<&[Sample]>,
+    params: RingModParams<'_>,
+  ) {
+    if output.is_empty() {
+      return;
+    }
+    for i in 0..output.len() {
+      let a = input_at(input_a, i);
+      let b = input_at(input_b, i);
+      let level = sample_at(params.level, i, 1.0);
+      output[i] = a * b * level;
     }
   }
 }
@@ -1056,10 +1082,19 @@ pub struct SvfState {
   ic2: f32,
 }
 
+#[derive(Clone, Copy, Debug)]
+pub struct LadderState {
+  stage1: f32,
+  stage2: f32,
+  stage3: f32,
+  stage4: f32,
+}
+
 pub struct Vcf {
   sample_rate: f32,
   stage_a: SvfState,
   stage_b: SvfState,
+  ladder: LadderState,
   cutoff_smooth: f32,
   res_smooth: f32,
 }
@@ -1078,6 +1113,7 @@ pub struct VcfParams<'a> {
   pub env_amount: &'a [Sample],
   pub mod_amount: &'a [Sample],
   pub key_track: &'a [Sample],
+  pub model: &'a [Sample],
   pub mode: &'a [Sample],
   pub slope: &'a [Sample],
 }
@@ -1088,6 +1124,12 @@ impl Vcf {
       sample_rate: sample_rate.max(1.0),
       stage_a: SvfState { ic1: 0.0, ic2: 0.0 },
       stage_b: SvfState { ic1: 0.0, ic2: 0.0 },
+      ladder: LadderState {
+        stage1: 0.0,
+        stage2: 0.0,
+        stage3: 0.0,
+        stage4: 0.0,
+      },
       cutoff_smooth: 800.0,
       res_smooth: 0.4,
     }
@@ -1128,24 +1170,47 @@ impl Vcf {
     let clamped_cutoff = cutoff.min(self.sample_rate * 0.45);
     let g = (std::f32::consts::PI * clamped_cutoff / self.sample_rate).tan();
     let slope24 = slope >= 0.5;
-    let resonance_scaled = resonance * if slope24 { 0.45 } else { 1.0 };
-    let q = 0.7 + resonance_scaled * if slope24 { 4.5 } else { 8.0 };
+    let resonance_scaled = resonance * if slope24 { 0.38 } else { 1.0 };
+    let q = 0.7 + resonance_scaled * if slope24 { 3.8 } else { 8.0 };
     let k = 1.0 / q;
 
-    let drive_gain = 1.0 + drive * if slope24 { 1.2 } else { 2.6 };
+    let drive_gain = 1.0 + drive * if slope24 { 1.0 } else { 2.6 };
     let shaped_input = saturate(input * drive_gain);
 
     let stage1 = Self::process_svf_stage(shaped_input, g, k, &mut self.stage_a);
     if slope24 {
-      let stage1_out = saturate(stage1.0 * (1.0 + drive * 0.25));
+      let stage1_out = saturate(stage1.0 * (1.0 + drive * 0.2));
       let stage2 = Self::process_svf_stage(stage1_out, g, k, &mut self.stage_b);
       let out = Self::select_mode(stage2, mode);
-      let res_comp = 1.0 / (1.0 + resonance_scaled * 1.2);
-      return saturate(out * 0.55 * res_comp);
+      let res_comp = 1.0 / (1.0 + resonance_scaled * 1.5);
+      return saturate(out * 0.52 * res_comp);
     }
     let out = Self::select_mode(stage1, mode);
     let res_comp = 1.0 / (1.0 + resonance_scaled * 0.6);
     saturate(out * 0.85 * res_comp)
+  }
+
+  fn process_ladder(&mut self, input: f32, cutoff: f32, resonance: f32, slope: f32, drive: f32) -> f32 {
+    let f = (cutoff / self.sample_rate).min(0.49);
+    let p = f * (1.8 - 0.8 * f);
+    let t1 = (1.0 - p) * 1.386249;
+    let t2 = 12.0 + t1 * t1;
+    let r = resonance * (t2 + 6.0 * t1) / (t2 - 6.0 * t1);
+
+    let drive_gain = 1.0 + drive * 1.7;
+    let input_drive = saturate(input * drive_gain - r * self.ladder.stage4);
+    self.ladder.stage1 = input_drive * p + self.ladder.stage1 * (1.0 - p);
+    self.ladder.stage2 = self.ladder.stage1 * p + self.ladder.stage2 * (1.0 - p);
+    self.ladder.stage3 = self.ladder.stage2 * p + self.ladder.stage3 * (1.0 - p);
+    self.ladder.stage4 = self.ladder.stage3 * p + self.ladder.stage4 * (1.0 - p);
+
+    let output = if slope >= 0.5 {
+      self.ladder.stage4
+    } else {
+      self.ladder.stage2
+    };
+    let res_comp = 1.0 / (1.0 + resonance * 0.85);
+    saturate(output * 0.9 * res_comp)
   }
 
   pub fn process_block(&mut self, output: &mut [Sample], inputs: VcfInputs<'_>, params: VcfParams<'_>) {
@@ -1155,6 +1220,7 @@ impl Vcf {
 
     let mode = params.mode.get(0).copied().unwrap_or(0.0);
     let slope = params.slope.get(0).copied().unwrap_or(1.0);
+    let model = params.model.get(0).copied().unwrap_or(0.0);
     let smooth_coeff = 1.0 - (-1.0 / (0.01 * self.sample_rate)).exp();
 
     for i in 0..output.len() {
@@ -1177,7 +1243,12 @@ impl Vcf {
       let cutoff_hz = self.cutoff_smooth.clamp(20.0, 20000.0);
       let resonance = self.res_smooth.clamp(0.0, 1.0);
 
-      output[i] = self.process_svf(input_sample, cutoff_hz, resonance, mode, slope, drive);
+      let use_ladder = model >= 0.5 && mode < 0.5;
+      output[i] = if use_ladder {
+        self.process_ladder(input_sample, cutoff_hz, resonance, slope, drive)
+      } else {
+        self.process_svf(input_sample, cutoff_hz, resonance, mode, slope, drive)
+      };
     }
   }
 }
@@ -1298,6 +1369,7 @@ mod tests {
     let inputs = VcoInputs {
       pitch: None,
       fm_lin: None,
+      fm_audio: None,
       fm_exp: None,
       pwm: None,
       sync: None,
@@ -1330,6 +1402,19 @@ mod tests {
     };
     noise.process_block(&mut output, params);
     assert!(output.iter().any(|sample| sample.abs() > 0.0));
+  }
+
+  #[test]
+  fn ring_mod_multiplies_inputs() {
+    let mut output = [0.0_f32; 4];
+    let a = [0.5_f32, -0.5, 0.25, -0.25];
+    let b = [0.5_f32, 0.5, -0.5, -0.5];
+    let params = RingModParams { level: &[1.0] };
+    RingMod::process_block(&mut output, Some(&a), Some(&b), params);
+    assert!((output[0] - 0.25).abs() < 0.001);
+    assert!((output[1] + 0.25).abs() < 0.001);
+    assert!((output[2] + 0.125).abs() < 0.001);
+    assert!((output[3] - 0.125).abs() < 0.001);
   }
 
   #[test]

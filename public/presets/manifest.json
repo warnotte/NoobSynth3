@@ -14,6 +14,18 @@
       "file": "jupiter-8-demo.json"
     },
     {
+      "id": "hard-sync-lead",
+      "name": "Hard Sync Lead",
+      "description": "VCO hard sync demo with pitch sweep.",
+      "file": "hard-sync-lead.json"
+    },
+    {
+      "id": "ladder-lead",
+      "name": "Ladder Lead",
+      "description": "Moog-ish lead with ladder LP bite.",
+      "file": "ladder-lead.json"
+    },
+    {
       "id": "jupiter-brass",
       "name": "Jupiter Brass",
       "description": "Bright, snappy brass hit.",
@@ -60,24 +72,6 @@
       "name": "Showcase Stack",
       "description": "Big modern stack with wide FX.",
       "file": "showcase-stack.json"
-    },
-    {
-      "id": "ab-vco",
-      "name": "VCO A/B",
-      "description": "Single VCO -> Output for backend parity checks.",
-      "file": "ab-vco.json"
-    },
-    {
-      "id": "ab-vca",
-      "name": "VCA A/B",
-      "description": "VCO -> VCA -> Output for backend parity checks.",
-      "file": "ab-vca.json"
-    },
-    {
-      "id": "8bit-mario",
-      "name": "8-Bit Mario",
-      "description": "NES-style square wave setup for Mario IO.",
-      "file": "8bit-mario.json"
     }
   ]
 }

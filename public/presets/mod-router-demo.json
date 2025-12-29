@@ -1,0 +1,137 @@
+{
+  "version": 1,
+  "id": "mod-router-demo",
+  "name": "Mod Router Demo",
+  "description": "LFO routed to PWM + VCF via Mod Router.",
+  "graph": {
+    "modules": [
+      {
+        "id": "osc-1",
+        "type": "oscillator",
+        "name": "VCO",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "frequency": 110,
+          "type": "sawtooth",
+          "pwm": 0.5,
+          "unison": 1,
+          "detune": 0,
+          "fmLin": 0,
+          "fmExp": 0,
+          "subMix": 0,
+          "subOct": 1
+        }
+      },
+      {
+        "id": "modr-1",
+        "type": "mod-router",
+        "name": "Mod Router",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "depthPitch": 0,
+          "depthPwm": 0.4,
+          "depthVcf": 0.25,
+          "depthVca": 0
+        }
+      },
+      {
+        "id": "lfo-1",
+        "type": "lfo",
+        "name": "LFO 1",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "rate": 0.25,
+          "depth": 0.8,
+          "offset": 0,
+          "shape": "sine",
+          "bipolar": true
+        }
+      },
+      {
+        "id": "vcf-1",
+        "type": "vcf",
+        "name": "VCF",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "cutoff": 900,
+          "resonance": 0.2,
+          "drive": 0.1,
+          "envAmount": 0,
+          "modAmount": 0.2,
+          "keyTrack": 0.4,
+          "model": "svf",
+          "mode": "lp",
+          "slope": 12
+        }
+      },
+      {
+        "id": "adsr-1",
+        "type": "adsr",
+        "name": "Amp ADSR",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "attack": 0.02,
+          "decay": 0.25,
+          "sustain": 0.7,
+          "release": 0.4
+        }
+      },
+      {
+        "id": "gain-1",
+        "type": "gain",
+        "name": "VCA",
+        "position": { "x": 0, "y": 0 },
+        "params": { "gain": 0.85 }
+      },
+      {
+        "id": "ctrl-1",
+        "type": "control",
+        "name": "Control IO",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "cv": 0,
+          "cvMode": "unipolar",
+          "velocity": 1,
+          "midiVelocity": true,
+          "gate": 0,
+          "glide": 0.02,
+          "midiEnabled": false,
+          "midiChannel": 0,
+          "midiRoot": 60,
+          "midiInputId": "",
+          "midiVelSlew": 0.008,
+          "voices": 1,
+          "seqOn": false,
+          "seqTempo": 90,
+          "seqGate": 0.7
+        }
+      },
+      {
+        "id": "scope-1",
+        "type": "scope",
+        "name": "Scope",
+        "position": { "x": 0, "y": 0 },
+        "params": { "time": 1, "gain": 1, "freeze": false }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Main Out",
+        "position": { "x": 0, "y": 0 },
+        "params": { "level": 0.8 }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "ctrl-1", "portId": "cv-out" }, "to": { "moduleId": "osc-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "ctrl-1", "portId": "gate-out" }, "to": { "moduleId": "adsr-1", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "osc-1", "portId": "out" }, "to": { "moduleId": "vcf-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "vcf-1", "portId": "out" }, "to": { "moduleId": "gain-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-1", "portId": "env" }, "to": { "moduleId": "gain-1", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "gain-1", "portId": "out" }, "to": { "moduleId": "scope-1", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "scope-1", "portId": "out-a" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "lfo-1", "portId": "cv-out" }, "to": { "moduleId": "modr-1", "portId": "in" }, "kind": "cv" },
+      { "from": { "moduleId": "modr-1", "portId": "pwm" }, "to": { "moduleId": "osc-1", "portId": "pwm" }, "kind": "cv" },
+      { "from": { "moduleId": "modr-1", "portId": "vcf" }, "to": { "moduleId": "vcf-1", "portId": "mod" }, "kind": "cv" }
+    ]
+  }
+}

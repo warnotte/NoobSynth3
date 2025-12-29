@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { AudioEngine } from '../engine/WasmGraphEngine'
+import { DEFAULT_SEQUENCER_PATTERN } from '../state/sequencerPattern'
 
 type ControlBridge = Pick<
   AudioEngine,
@@ -205,7 +206,7 @@ export const useControlVoices = ({
     if (!controlModuleId) {
       return
     }
-    const steps = [0, 2, 4, 5]
+    const steps = DEFAULT_SEQUENCER_PATTERN.map((step) => step.semitone)
     const stepMs = 60000 / seqTempo
 
     const stopSequencer = () => {

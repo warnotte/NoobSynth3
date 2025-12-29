@@ -3,6 +3,8 @@ import type { ModuleSpec, ModuleType } from '../shared/graph'
 export const moduleSizes: Record<ModuleType, string> = {
   oscillator: '2x3',
   noise: '2x1',
+  'mod-router': '2x2',
+  'ring-mod': '1x1',
   vcf: '2x2',
   hpf: '1x1',
   control: '2x6',
@@ -28,6 +30,8 @@ export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>>
   lab: 'strip',
   adsr: 'strip',
   lfo: 'strip',
+  'mod-router': 'strip',
+  'ring-mod': 'strip',
   mario: 'strip',
   'mixer-1x2': 'strip',
 }
@@ -35,6 +39,8 @@ export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>>
 export const moduleCatalog: { type: ModuleType; label: string }[] = [
   { type: 'oscillator', label: 'VCO' },
   { type: 'noise', label: 'Noise' },
+  { type: 'mod-router', label: 'Mod Router' },
+  { type: 'ring-mod', label: 'Ring Mod' },
   { type: 'vcf', label: 'VCF' },
   { type: 'hpf', label: 'HPF' },
   { type: 'gain', label: 'VCA' },
@@ -56,6 +62,8 @@ export const moduleCatalog: { type: ModuleType; label: string }[] = [
 export const modulePrefixes: Record<ModuleType, string> = {
   oscillator: 'osc',
   noise: 'noise',
+  'mod-router': 'modr',
+  'ring-mod': 'ring',
   vcf: 'vcf',
   hpf: 'hpf',
   gain: 'gain',
@@ -77,6 +85,8 @@ export const modulePrefixes: Record<ModuleType, string> = {
 export const moduleLabels: Record<ModuleType, string> = {
   oscillator: 'VCO',
   noise: 'Noise',
+  'mod-router': 'Mod Router',
+  'ring-mod': 'Ring Mod',
   vcf: 'VCF',
   hpf: 'HPF',
   gain: 'VCA',
@@ -108,6 +118,8 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     subOct: 1,
   },
   noise: { level: 0.4, noiseType: 'white' },
+  'mod-router': { depthPitch: 0, depthPwm: 0, depthVcf: 0, depthVca: 0 },
+  'ring-mod': { level: 0.9 },
   gain: { gain: 0.7 },
   'cv-vca': { gain: 1 },
   vcf: {
