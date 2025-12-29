@@ -1244,6 +1244,143 @@ export const ModuleControls = ({
     )
   }
 
+  if (module.type === 'supersaw') {
+    return (
+      <>
+        <RotaryKnob
+          label="Freq"
+          min={40}
+          max={1200}
+          step={1}
+          unit="Hz"
+          value={Number(module.params.frequency ?? 220)}
+          onChange={(value) => updateParam(module.id, 'frequency', value)}
+          format={(value) => Math.round(value).toString()}
+        />
+        <RotaryKnob
+          label="Detune"
+          min={0}
+          max={100}
+          step={1}
+          unit="ct"
+          value={Number(module.params.detune ?? 25)}
+          onChange={(value) => updateParam(module.id, 'detune', value)}
+          format={(value) => Math.round(value).toString()}
+        />
+        <RotaryKnob
+          label="Mix"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.mix ?? 1)}
+          onChange={(value) => updateParam(module.id, 'mix', value)}
+          format={(value) => value.toFixed(2)}
+        />
+      </>
+    )
+  }
+
+  if (module.type === 'phaser') {
+    return (
+      <>
+        <RotaryKnob
+          label="Rate"
+          min={0.05}
+          max={5}
+          step={0.01}
+          unit="Hz"
+          value={Number(module.params.rate ?? 0.5)}
+          onChange={(value) => updateParam(module.id, 'rate', value)}
+          format={(value) => value.toFixed(2)}
+        />
+        <RotaryKnob
+          label="Depth"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.depth ?? 0.7)}
+          onChange={(value) => updateParam(module.id, 'depth', value)}
+          format={(value) => value.toFixed(2)}
+        />
+        <RotaryKnob
+          label="Feedback"
+          min={0}
+          max={0.9}
+          step={0.01}
+          value={Number(module.params.feedback ?? 0.3)}
+          onChange={(value) => updateParam(module.id, 'feedback', value)}
+          format={(value) => value.toFixed(2)}
+        />
+        <RotaryKnob
+          label="Mix"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.mix ?? 0.5)}
+          onChange={(value) => updateParam(module.id, 'mix', value)}
+          format={(value) => value.toFixed(2)}
+        />
+      </>
+    )
+  }
+
+  if (module.type === 'distortion') {
+    const mode = String(module.params.mode ?? 'soft')
+    const modes = [
+      { id: 'soft', label: 'SOFT' },
+      { id: 'hard', label: 'HARD' },
+      { id: 'fold', label: 'FOLD' },
+    ]
+    return (
+      <>
+        <RotaryKnob
+          label="Drive"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.drive ?? 0.5)}
+          onChange={(value) => updateParam(module.id, 'drive', value)}
+          format={(value) => value.toFixed(2)}
+        />
+        <RotaryKnob
+          label="Tone"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.tone ?? 0.5)}
+          onChange={(value) => updateParam(module.id, 'tone', value)}
+          format={(value) => value.toFixed(2)}
+        />
+        <RotaryKnob
+          label="Mix"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.mix ?? 1)}
+          onChange={(value) => updateParam(module.id, 'mix', value)}
+          format={(value) => value.toFixed(2)}
+        />
+        <div className="filter-row">
+          <div className="filter-group">
+            <span className="filter-label">Mode</span>
+            <div className="filter-buttons filter-wide">
+              {modes.map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  className={`ui-btn filter-btn ${mode === option.id ? 'active' : ''}`}
+                  onClick={() => updateParam(module.id, 'mode', option.id)}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </>
+    )
+  }
+
   if (module.type === 'mario') {
     const isRunning = Boolean(module.params.running)
     const tempo = Number(module.params.tempo ?? 180)

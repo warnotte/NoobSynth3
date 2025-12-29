@@ -111,6 +111,18 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
     inputs: [{ id: 'in', label: 'In', kind: 'audio', direction: 'in' }],
     outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
   },
+  phaser: {
+    inputs: [{ id: 'in', label: 'In', kind: 'audio', direction: 'in' }],
+    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
+  },
+  distortion: {
+    inputs: [{ id: 'in', label: 'In', kind: 'audio', direction: 'in' }],
+    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
+  },
+  supersaw: {
+    inputs: [{ id: 'pitch', label: 'Pitch', kind: 'cv', direction: 'in' }],
+    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
+  },
   lfo: {
     inputs: [
       { id: 'rate', label: 'Rate', kind: 'cv', direction: 'in' },

@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "id": "juno-strings",
+  "name": "Juno-106 Strings",
+  "description": "Classic PWM strings with lush Juno chorus.",
+  "updates": {
+    "osc-1": {
+      "frequency": 110,
+      "type": "square",
+      "pwm": 0.48,
+      "unison": 1,
+      "detune": 0,
+      "subMix": 0.15,
+      "subOct": 1
+    },
+    "osc-2": {
+      "frequency": 110,
+      "type": "square",
+      "pwm": 0.52,
+      "unison": 1,
+      "detune": 8
+    },
+    "mix-1": {
+      "levelA": 0.6,
+      "levelB": 0.55
+    },
+    "vcf-1": {
+      "cutoff": 1800,
+      "resonance": 0.08,
+      "drive": 0.05,
+      "envAmount": 0.15,
+      "modAmount": 0.22,
+      "keyTrack": 0.6,
+      "model": "svf",
+      "mode": "lp",
+      "slope": 24
+    },
+    "chorus-1": {
+      "rate": 0.55,
+      "depth": 12,
+      "delay": 16,
+      "mix": 0.65,
+      "spread": 0.85,
+      "feedback": 0.12
+    },
+    "delay-1": {
+      "time": 320,
+      "feedback": 0.22,
+      "mix": 0.15,
+      "tone": 0.55,
+      "pingPong": true
+    },
+    "reverb-1": {
+      "time": 0.58,
+      "damp": 0.45,
+      "preDelay": 25,
+      "mix": 0.28
+    },
+    "adsr-1": {
+      "attack": 0.35,
+      "decay": 0.5,
+      "sustain": 0.85,
+      "release": 0.7
+    },
+    "adsr-2": {
+      "attack": 0.4,
+      "decay": 0.6,
+      "sustain": 0.4,
+      "release": 0.65
+    },
+    "lfo-1": {
+      "rate": 0.18,
+      "depth": 0.35,
+      "shape": "triangle",
+      "bipolar": true
+    },
+    "ctrl-1": {
+      "glide": 0.04,
+      "seqOn": true,
+      "seqTempo": 72,
+      "seqGate": 0.85,
+      "voices": 4
+    }
+  }
+}

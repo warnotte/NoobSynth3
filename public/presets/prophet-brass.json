@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "id": "prophet-brass",
+  "name": "Prophet-5 Brass",
+  "description": "Punchy poly brass with filter snap.",
+  "updates": {
+    "osc-1": {
+      "frequency": 110,
+      "type": "sawtooth",
+      "pwm": 0.5,
+      "unison": 2,
+      "detune": 4,
+      "subMix": 0,
+      "subOct": 1
+    },
+    "osc-2": {
+      "frequency": 110,
+      "type": "sawtooth",
+      "pwm": 0.5,
+      "unison": 2,
+      "detune": 6
+    },
+    "mix-1": {
+      "levelA": 0.65,
+      "levelB": 0.6
+    },
+    "vcf-1": {
+      "cutoff": 380,
+      "resonance": 0.15,
+      "drive": 0.2,
+      "envAmount": 0.75,
+      "modAmount": 0,
+      "keyTrack": 0.45,
+      "model": "svf",
+      "mode": "lp",
+      "slope": 24
+    },
+    "chorus-1": {
+      "rate": 0.35,
+      "depth": 6,
+      "delay": 14,
+      "mix": 0.25,
+      "spread": 0.55,
+      "feedback": 0.08
+    },
+    "delay-1": {
+      "time": 220,
+      "feedback": 0.18,
+      "mix": 0.12,
+      "tone": 0.5,
+      "pingPong": false
+    },
+    "reverb-1": {
+      "time": 0.45,
+      "damp": 0.4,
+      "preDelay": 15,
+      "mix": 0.2
+    },
+    "adsr-1": {
+      "attack": 0.015,
+      "decay": 0.18,
+      "sustain": 0.72,
+      "release": 0.32
+    },
+    "adsr-2": {
+      "attack": 0.002,
+      "decay": 0.22,
+      "sustain": 0.15,
+      "release": 0.28
+    },
+    "lfo-1": {
+      "rate": 0.15,
+      "depth": 0.04,
+      "shape": "sine",
+      "bipolar": true
+    },
+    "ctrl-1": {
+      "glide": 0.02,
+      "seqOn": true,
+      "seqTempo": 95,
+      "seqGate": 0.7,
+      "voices": 4
+    }
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "id": "minimoog-lead",
+  "name": "Minimoog Lead",
+  "description": "Classic mono lead with ladder filter bite.",
+  "updates": {
+    "osc-1": {
+      "frequency": 220,
+      "type": "sawtooth",
+      "pwm": 0.5,
+      "unison": 1,
+      "detune": 0,
+      "subMix": 0.35,
+      "subOct": 1
+    },
+    "osc-2": {
+      "frequency": 220.8,
+      "type": "square",
+      "pwm": 0.5,
+      "unison": 1,
+      "detune": 0
+    },
+    "mix-1": {
+      "levelA": 0.7,
+      "levelB": 0.5
+    },
+    "vcf-1": {
+      "cutoff": 520,
+      "resonance": 0.42,
+      "drive": 0.55,
+      "envAmount": 0.6,
+      "modAmount": 0.08,
+      "keyTrack": 0.35,
+      "model": "ladder",
+      "mode": "lp",
+      "slope": 24
+    },
+    "chorus-1": {
+      "rate": 0.2,
+      "depth": 4,
+      "delay": 10,
+      "mix": 0.12,
+      "spread": 0.3,
+      "feedback": 0.05
+    },
+    "delay-1": {
+      "time": 280,
+      "feedback": 0.28,
+      "mix": 0.18,
+      "tone": 0.48,
+      "pingPong": false
+    },
+    "reverb-1": {
+      "time": 0.42,
+      "damp": 0.55,
+      "preDelay": 12,
+      "mix": 0.18
+    },
+    "adsr-1": {
+      "attack": 0.008,
+      "decay": 0.25,
+      "sustain": 0.7,
+      "release": 0.25
+    },
+    "adsr-2": {
+      "attack": 0.005,
+      "decay": 0.35,
+      "sustain": 0.2,
+      "release": 0.22
+    },
+    "lfo-1": {
+      "rate": 5.5,
+      "depth": 0.06,
+      "shape": "sine",
+      "bipolar": true
+    },
+    "ctrl-1": {
+      "glide": 0.08,
+      "seqOn": true,
+      "seqTempo": 110,
+      "seqGate": 0.6,
+      "voices": 1
+    }
+  }
+}

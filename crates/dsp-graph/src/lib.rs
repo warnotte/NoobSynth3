@@ -1,7 +1,9 @@
 use dsp_core::{
   Adsr, AdsrInputs, AdsrParams, Chorus, ChorusInputs, ChorusParams, Delay, DelayInputs, DelayParams,
-  Lfo, LfoInputs, LfoParams, Mixer, Noise, NoiseParams, Reverb, ReverbInputs, ReverbParams,
-  RingMod, RingModParams, Sample, Vca, Vcf, VcfInputs, VcfParams, Vco, VcoInputs, VcoParams,
+  Distortion, DistortionParams, Lfo, LfoInputs, LfoParams, Mixer, Noise, NoiseParams,
+  Phaser, PhaserInputs, PhaserParams, Reverb, ReverbInputs, ReverbParams,
+  RingMod, RingModParams, Sample, Supersaw, SupersawInputs, SupersawParams,
+  Vca, Vcf, VcfInputs, VcfParams, Vco, VcoInputs, VcoParams,
 };
 use serde::Deserialize;
 use std::collections::{HashMap, VecDeque};
@@ -46,6 +48,7 @@ struct TapJson {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum ModuleType {
   Oscillator,
+  Supersaw,
   Noise,
   ModRouter,
   RingMod,
@@ -62,6 +65,8 @@ enum ModuleType {
   Chorus,
   Delay,
   Reverb,
+  Phaser,
+  Distortion,
   Control,
   Scope,
   Mario,
@@ -334,6 +339,28 @@ struct ReverbState {
   mix: ParamBuffer,
 }
 
+struct PhaserState {
+  phaser: Phaser,
+  rate: ParamBuffer,
+  depth: ParamBuffer,
+  feedback: ParamBuffer,
+  mix: ParamBuffer,
+}
+
+struct DistortionState {
+  drive: ParamBuffer,
+  tone: ParamBuffer,
+  mix: ParamBuffer,
+  mode: ParamBuffer,
+}
+
+struct SupersawState {
+  supersaw: Supersaw,
+  base_freq: ParamBuffer,
+  detune: ParamBuffer,
+  mix: ParamBuffer,
+}
+
 struct OutputState {
   level: ParamBuffer,
 }
@@ -364,6 +391,7 @@ struct MarioState {
 
 enum ModuleState {
   Vco(VcoState),
+  Supersaw(SupersawState),
   Noise(NoiseState),
   ModRouter(ModRouterState),
   RingMod(RingModState),
@@ -378,6 +406,8 @@ enum ModuleState {
   Chorus(ChorusState),
   Delay(DelayState),
   Reverb(ReverbState),
+  Phaser(PhaserState),
+  Distortion(DistortionState),
   Output(OutputState),
   Lab(LabState),
   Control(ControlState),
@@ -858,6 +888,25 @@ impl ModuleNode {
         pre_delay: ParamBuffer::new(param_number(params, "preDelay", 18.0)),
         mix: ParamBuffer::new(param_number(params, "mix", 0.25)),
       }),
+      ModuleType::Phaser => ModuleState::Phaser(PhaserState {
+        phaser: Phaser::new(sample_rate),
+        rate: ParamBuffer::new(param_number(params, "rate", 0.5)),
+        depth: ParamBuffer::new(param_number(params, "depth", 0.7)),
+        feedback: ParamBuffer::new(param_number(params, "feedback", 0.3)),
+        mix: ParamBuffer::new(param_number(params, "mix", 0.5)),
+      }),
+      ModuleType::Distortion => ModuleState::Distortion(DistortionState {
+        drive: ParamBuffer::new(param_number(params, "drive", 0.5)),
+        tone: ParamBuffer::new(param_number(params, "tone", 0.5)),
+        mix: ParamBuffer::new(param_number(params, "mix", 1.0)),
+        mode: ParamBuffer::new(param_number(params, "mode", 0.0)),
+      }),
+      ModuleType::Supersaw => ModuleState::Supersaw(SupersawState {
+        supersaw: Supersaw::new(sample_rate),
+        base_freq: ParamBuffer::new(param_number(params, "frequency", 220.0)),
+        detune: ParamBuffer::new(param_number(params, "detune", 25.0)),
+        mix: ParamBuffer::new(param_number(params, "mix", 1.0)),
+      }),
       ModuleType::Control => ModuleState::Control(ControlState {
         cv: param_number(params, "cv", 0.0),
         cv_target: param_number(params, "cv", 0.0),
@@ -1002,6 +1051,26 @@ impl ModuleNode {
         "time" => state.time.set(value),
         "damp" => state.damp.set(value),
         "preDelay" => state.pre_delay.set(value),
+        "mix" => state.mix.set(value),
+        _ => {}
+      },
+      ModuleState::Phaser(state) => match param {
+        "rate" => state.rate.set(value),
+        "depth" => state.depth.set(value),
+        "feedback" => state.feedback.set(value),
+        "mix" => state.mix.set(value),
+        _ => {}
+      },
+      ModuleState::Distortion(state) => match param {
+        "drive" => state.drive.set(value),
+        "tone" => state.tone.set(value),
+        "mix" => state.mix.set(value),
+        "mode" => state.mode.set(value),
+        _ => {}
+      },
+      ModuleState::Supersaw(state) => match param {
+        "frequency" => state.base_freq.set(value),
+        "detune" => state.detune.set(value),
         "mix" => state.mix.set(value),
         _ => {}
       },
@@ -1487,6 +1556,65 @@ impl ModuleNode {
         let out_r = &mut right[0];
         state.reverb.process_block(out_l, out_r, inputs, params);
       }
+      ModuleState::Phaser(state) => {
+        let input_connected = !self.connections[0].is_empty();
+        let input_l = if input_connected {
+          Some(inputs[0].channel(0))
+        } else {
+          None
+        };
+        let input_r = if input_connected {
+          Some(if inputs[0].channel_count() == 1 {
+            inputs[0].channel(0)
+          } else {
+            inputs[0].channel(1)
+          })
+        } else {
+          None
+        };
+        let params = PhaserParams {
+          rate: state.rate.slice(frames),
+          depth: state.depth.slice(frames),
+          feedback: state.feedback.slice(frames),
+          mix: state.mix.slice(frames),
+        };
+        let inputs = PhaserInputs { input_l, input_r };
+        let (left, right) = outputs[0].channels.split_at_mut(1);
+        let out_l = &mut left[0];
+        let out_r = &mut right[0];
+        state.phaser.process_block(out_l, out_r, inputs, params);
+      }
+      ModuleState::Distortion(state) => {
+        let input_connected = !self.connections[0].is_empty();
+        let input = if input_connected {
+          Some(inputs[0].channel(0))
+        } else {
+          None
+        };
+        let params = DistortionParams {
+          drive: state.drive.slice(frames),
+          tone: state.tone.slice(frames),
+          mix: state.mix.slice(frames),
+          mode: state.mode.slice(frames),
+        };
+        let output = outputs[0].channel_mut(0);
+        Distortion::process_block(output, input, params);
+      }
+      ModuleState::Supersaw(state) => {
+        let pitch = if self.connections[0].is_empty() {
+          None
+        } else {
+          Some(inputs[0].channel(0))
+        };
+        let params = SupersawParams {
+          base_freq: state.base_freq.slice(frames),
+          detune: state.detune.slice(frames),
+          mix: state.mix.slice(frames),
+        };
+        let inputs = SupersawInputs { pitch };
+        let output = outputs[0].channel_mut(0);
+        state.supersaw.process_block(output, inputs, params);
+      }
       ModuleState::Control(state) => {
         let (cv_group, rest) = outputs.split_at_mut(1);
         let (vel_group, rest) = rest.split_at_mut(1);
@@ -1550,6 +1678,7 @@ impl ModuleNode {
 fn normalize_module_type(raw: &str) -> ModuleType {
   match raw {
     "oscillator" => ModuleType::Oscillator,
+    "supersaw" => ModuleType::Supersaw,
     "noise" => ModuleType::Noise,
     "mod-router" => ModuleType::ModRouter,
     "ring-mod" => ModuleType::RingMod,
@@ -1566,6 +1695,8 @@ fn normalize_module_type(raw: &str) -> ModuleType {
     "chorus" => ModuleType::Chorus,
     "delay" => ModuleType::Delay,
     "reverb" => ModuleType::Reverb,
+    "phaser" => ModuleType::Phaser,
+    "distortion" => ModuleType::Distortion,
     "control" => ModuleType::Control,
     "scope" => ModuleType::Scope,
     "mario" => ModuleType::Mario,
@@ -1577,6 +1708,7 @@ fn is_poly_type(module_type: ModuleType) -> bool {
   matches!(
     module_type,
     ModuleType::Oscillator
+      | ModuleType::Supersaw
       | ModuleType::Noise
       | ModuleType::ModRouter
       | ModuleType::RingMod
@@ -1588,6 +1720,7 @@ fn is_poly_type(module_type: ModuleType) -> bool {
       | ModuleType::Hpf
       | ModuleType::Mixer
       | ModuleType::MixerWide
+      | ModuleType::Distortion
       | ModuleType::Control
   )
 }
@@ -1627,7 +1760,9 @@ fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },
       PortInfo { channels: 1 },
     ],
-    ModuleType::Chorus | ModuleType::Delay | ModuleType::Reverb => vec![PortInfo { channels: 2 }],
+    ModuleType::Chorus | ModuleType::Delay | ModuleType::Reverb | ModuleType::Phaser => vec![PortInfo { channels: 2 }],
+    ModuleType::Distortion => vec![PortInfo { channels: 1 }],
+    ModuleType::Supersaw => vec![PortInfo { channels: 1 }],
     ModuleType::Control => vec![],
     ModuleType::Scope => vec![
       PortInfo { channels: 2 },
@@ -1664,7 +1799,9 @@ fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
     ModuleType::Hpf => vec![PortInfo { channels: 1 }],
     ModuleType::Mixer => vec![PortInfo { channels: 1 }],
     ModuleType::MixerWide => vec![PortInfo { channels: 1 }],
-    ModuleType::Chorus | ModuleType::Delay | ModuleType::Reverb => vec![PortInfo { channels: 2 }],
+    ModuleType::Chorus | ModuleType::Delay | ModuleType::Reverb | ModuleType::Phaser => vec![PortInfo { channels: 2 }],
+    ModuleType::Distortion => vec![PortInfo { channels: 1 }],
+    ModuleType::Supersaw => vec![PortInfo { channels: 1 }],
     ModuleType::Control => vec![
       PortInfo { channels: 1 },
       PortInfo { channels: 1 },
@@ -1756,8 +1893,16 @@ fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize> {
       "in-f" => Some(5),
       _ => None,
     },
-    ModuleType::Chorus | ModuleType::Delay | ModuleType::Reverb => match port_id {
+    ModuleType::Chorus | ModuleType::Delay | ModuleType::Reverb | ModuleType::Phaser => match port_id {
       "in" => Some(0),
+      _ => None,
+    },
+    ModuleType::Distortion => match port_id {
+      "in" => Some(0),
+      _ => None,
+    },
+    ModuleType::Supersaw => match port_id {
+      "pitch" => Some(0),
       _ => None,
     },
     ModuleType::Scope => match port_id {
@@ -1835,7 +1980,15 @@ fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize> {
       "out" => Some(0),
       _ => None,
     },
-    ModuleType::Chorus | ModuleType::Delay | ModuleType::Reverb => match port_id {
+    ModuleType::Chorus | ModuleType::Delay | ModuleType::Reverb | ModuleType::Phaser => match port_id {
+      "out" => Some(0),
+      _ => None,
+    },
+    ModuleType::Distortion => match port_id {
+      "out" => Some(0),
+      _ => None,
+    },
+    ModuleType::Supersaw => match port_id {
       "out" => Some(0),
       _ => None,
     },

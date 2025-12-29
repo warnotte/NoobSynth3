@@ -17,45 +17,58 @@ This file is meant to be reread by the coding assistant to keep context, decisio
 
 ## Current modules
 
-- VCO (unison + detune + PWM + sub + sync out)
+**Oscillators:**
+- VCO (unison + detune + PWM + sub + sync out + FM lin/exp)
+- Supersaw (7 detuned voices, polyBLEP anti-aliasing)
 - Noise (white/pink/brown)
+
+**Modulation:**
+- LFO (sine/triangle/saw/square, bipolar/unipolar)
+- ADSR (amp/filter envelopes)
 - Mod Router (CV in, 4 CV outs with depth)
-- Ring Mod (audio A x audio B)
-- LFO
-- VCF (SVF + ladder, 12/24 dB)
-- HPF (simple high-pass)
-- ADSR
-- VCA (CV input)
 - Mod VCA (CV multiplier)
+
+**Filters:**
+- VCF (SVF + ladder models, LP/HP/BP/Notch, 12/24 dB)
+- HPF (simple high-pass)
+
+**Effects:**
+- Chorus (stereo, Juno-style)
+- Delay (stereo, ping-pong option)
+- Reverb (stereo, Freeverb-style)
+- Phaser (4-stage stereo allpass with LFO)
+- Distortion (soft clip / hard clip / foldback modes)
+
+**Utilities:**
+- Ring Mod (audio A x audio B)
+- VCA (CV input)
 - Mixer 1x1 (A/B)
 - Mixer 1x2 (A-F)
-- Chorus (stereo)
-- Delay (stereo)
-- Reverb (stereo)
-- Scope (DATA-style: oscilloscope/FFT/spectrogram, 4 inputs A/B/C/D, 2 thru outputs, gain 0.5-10x, freeze)
-- Control IO (CV/Gate/Sync + mini sequencer + glide)
-- Mario IO (seasonal/fun; melodies are approximate)
-- Lab Panel (test module, not in audio chain)
+- Scope (DATA-style: oscilloscope/FFT/spectrogram, 4 inputs, 2 thru outputs)
+- Control IO (CV/Gate/Sync + mini sequencer + glide + MIDI)
+- Mario IO (seasonal/fun)
+- Lab Panel (test module)
 
-## Presets
+## Presets (23 total)
 
-- Jupiter Pad
-- Jupiter-8 Demo
-- Hard Sync Lead
-- Mod Router Demo
-- Ring Mod Demo
-- Jupiter Brass
-- PWM Strings
-- Dream Pad
-- Glass Bell
-- Moog Bass
-- Edge Lead
-- 80s Pluck
-- Showcase Stack
+**Classic emulations (updates format):**
+- Jupiter Pad, Jupiter Brass, Jupiter-8 Demo
+- Juno-106 Strings, Minimoog Lead, Prophet-5 Brass
+- OB-Xa Pad, CS-80 Vangelis, Moog Taurus
+- SH-101 Bass, Moog Bass, ARP Odyssey Sync
+- Hard Sync Lead, Ladder Lead, PWM Strings
+- Dream Pad, Glass Bell, Edge Lead, 80s Pluck, Showcase Stack
+
+**New modules (full graph format):**
+- Trance Supersaw (Supersaw oscillator)
+- Phaser Pad (Phaser effect)
+- Dirty Bass (Distortion foldback)
 
 Dev/test presets live in `public/presets/manifest-dev.json`.
 
-Presets live in `src/state/presets.ts` and are loaded from the Presets panel. Some presets also adjust routing.
+Presets support two formats:
+- `updates`: patches defaultGraph parameters (existing presets)
+- `graph`: full graph replacement (new modules presets)
 
 ## Known issues / risks
 
@@ -85,6 +98,9 @@ Presets live in `src/state/presets.ts` and are loaded from the Presets panel. So
 
 ## Recent changes (Dec 2025)
 
+- **New DSP modules**: Supersaw (7 detuned voices), Phaser (4-stage stereo), Distortion (soft/hard/fold).
+- **Preset format extended**: Full graph replacement via `graph` property (alongside existing `updates` format).
+- **23 presets**: Added classic synth emulations (Juno, Minimoog, Prophet, Oberheim, CS-80, etc.) and new module showcases.
 - **VCV Rack-style UI overhaul**: Eurorack rails, brushed metal panels, compact spacing.
 - **Module sizing system**: Grid-based layout with configurable sizes per module type.
 - **Grid auto-placement**: Modules snap to the first available grid slot, with width checks and warnings when the rack is too narrow.

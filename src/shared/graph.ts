@@ -2,6 +2,7 @@ export type PortKind = 'audio' | 'cv' | 'gate' | 'sync'
 
 export type ModuleType =
   | 'oscillator'
+  | 'supersaw'
   | 'noise'
   | 'mod-router'
   | 'ring-mod'
@@ -20,6 +21,8 @@ export type ModuleType =
   | 'chorus'
   | 'delay'
   | 'reverb'
+  | 'phaser'
+  | 'distortion'
   | 'mario'
 
 export interface ModuleSpec {

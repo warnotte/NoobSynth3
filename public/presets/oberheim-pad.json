@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "id": "oberheim-pad",
+  "name": "OB-Xa Pad",
+  "description": "Thick Oberheim-style warm pad.",
+  "updates": {
+    "osc-1": {
+      "frequency": 110,
+      "type": "sawtooth",
+      "pwm": 0.5,
+      "unison": 3,
+      "detune": 10,
+      "subMix": 0.2,
+      "subOct": 2
+    },
+    "osc-2": {
+      "frequency": 110.2,
+      "type": "square",
+      "pwm": 0.45,
+      "unison": 3,
+      "detune": 8
+    },
+    "mix-1": {
+      "levelA": 0.6,
+      "levelB": 0.55
+    },
+    "vcf-1": {
+      "cutoff": 720,
+      "resonance": 0.12,
+      "drive": 0.18,
+      "envAmount": 0.28,
+      "modAmount": 0.15,
+      "keyTrack": 0.5,
+      "model": "svf",
+      "mode": "lp",
+      "slope": 12
+    },
+    "chorus-1": {
+      "rate": 0.28,
+      "depth": 15,
+      "delay": 20,
+      "mix": 0.55,
+      "spread": 0.9,
+      "feedback": 0.15
+    },
+    "delay-1": {
+      "time": 380,
+      "feedback": 0.32,
+      "mix": 0.22,
+      "tone": 0.58,
+      "pingPong": true
+    },
+    "reverb-1": {
+      "time": 0.72,
+      "damp": 0.48,
+      "preDelay": 30,
+      "mix": 0.35
+    },
+    "adsr-1": {
+      "attack": 0.45,
+      "decay": 0.8,
+      "sustain": 0.82,
+      "release": 1.2
+    },
+    "adsr-2": {
+      "attack": 0.5,
+      "decay": 1.0,
+      "sustain": 0.35,
+      "release": 1.0
+    },
+    "lfo-1": {
+      "rate": 0.1,
+      "depth": 0.18,
+      "shape": "sine",
+      "bipolar": true
+    },
+    "ctrl-1": {
+      "glide": 0.1,
+      "seqOn": true,
+      "seqTempo": 58,
+      "seqGate": 0.9,
+      "voices": 4
+    }
+  }
+}

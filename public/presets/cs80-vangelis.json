@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "id": "cs80-vangelis",
+  "name": "CS-80 Vangelis",
+  "description": "Blade Runner inspired evolving pad.",
+  "updates": {
+    "osc-1": {
+      "frequency": 110,
+      "type": "sawtooth",
+      "pwm": 0.5,
+      "unison": 2,
+      "detune": 12,
+      "subMix": 0.1,
+      "subOct": 2
+    },
+    "osc-2": {
+      "frequency": 110.5,
+      "type": "sawtooth",
+      "pwm": 0.5,
+      "unison": 2,
+      "detune": 15
+    },
+    "mix-1": {
+      "levelA": 0.55,
+      "levelB": 0.5
+    },
+    "vcf-1": {
+      "cutoff": 580,
+      "resonance": 0.22,
+      "drive": 0.12,
+      "envAmount": 0.45,
+      "modAmount": 0.25,
+      "keyTrack": 0.65,
+      "model": "svf",
+      "mode": "lp",
+      "slope": 12
+    },
+    "chorus-1": {
+      "rate": 0.15,
+      "depth": 16,
+      "delay": 22,
+      "mix": 0.58,
+      "spread": 0.92,
+      "feedback": 0.18
+    },
+    "delay-1": {
+      "time": 520,
+      "feedback": 0.42,
+      "mix": 0.28,
+      "tone": 0.52,
+      "pingPong": true
+    },
+    "reverb-1": {
+      "time": 0.85,
+      "damp": 0.38,
+      "preDelay": 45,
+      "mix": 0.42
+    },
+    "adsr-1": {
+      "attack": 0.6,
+      "decay": 1.2,
+      "sustain": 0.75,
+      "release": 1.8
+    },
+    "adsr-2": {
+      "attack": 0.8,
+      "decay": 1.5,
+      "sustain": 0.25,
+      "release": 1.5
+    },
+    "lfo-1": {
+      "rate": 0.08,
+      "depth": 0.28,
+      "shape": "sine",
+      "bipolar": true
+    },
+    "ctrl-1": {
+      "glide": 0.15,
+      "seqOn": true,
+      "seqTempo": 48,
+      "seqGate": 0.95,
+      "voices": 4
+    }
+  }
+}

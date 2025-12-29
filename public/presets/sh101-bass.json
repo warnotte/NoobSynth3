@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "id": "sh101-bass",
+  "name": "SH-101 Bass",
+  "description": "Punchy mono bass with sub weight.",
+  "updates": {
+    "osc-1": {
+      "frequency": 55,
+      "type": "sawtooth",
+      "pwm": 0.5,
+      "unison": 1,
+      "detune": 0,
+      "subMix": 0.45,
+      "subOct": 1
+    },
+    "osc-2": {
+      "frequency": 55,
+      "type": "square",
+      "pwm": 0.5,
+      "unison": 1,
+      "detune": 0
+    },
+    "mix-1": {
+      "levelA": 0.75,
+      "levelB": 0.35
+    },
+    "vcf-1": {
+      "cutoff": 280,
+      "resonance": 0.32,
+      "drive": 0.42,
+      "envAmount": 0.55,
+      "modAmount": 0,
+      "keyTrack": 0.25,
+      "model": "svf",
+      "mode": "lp",
+      "slope": 24
+    },
+    "chorus-1": {
+      "rate": 0.25,
+      "depth": 3,
+      "delay": 8,
+      "mix": 0.08,
+      "spread": 0.2,
+      "feedback": 0.02
+    },
+    "delay-1": {
+      "time": 150,
+      "feedback": 0.1,
+      "mix": 0.08,
+      "tone": 0.4,
+      "pingPong": false
+    },
+    "reverb-1": {
+      "time": 0.28,
+      "damp": 0.6,
+      "preDelay": 5,
+      "mix": 0.1
+    },
+    "adsr-1": {
+      "attack": 0.003,
+      "decay": 0.15,
+      "sustain": 0.6,
+      "release": 0.12
+    },
+    "adsr-2": {
+      "attack": 0.001,
+      "decay": 0.18,
+      "sustain": 0.08,
+      "release": 0.1
+    },
+    "lfo-1": {
+      "rate": 0.2,
+      "depth": 0.02,
+      "shape": "sine",
+      "bipolar": true
+    },
+    "ctrl-1": {
+      "glide": 0.025,
+      "seqOn": true,
+      "seqTempo": 125,
+      "seqGate": 0.45,
+      "voices": 1
+    }
+  }
+}

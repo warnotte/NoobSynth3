@@ -1,0 +1,142 @@
+{
+  "version": 1,
+  "id": "dirty-bass",
+  "name": "Dirty Bass",
+  "description": "Aggressive distorted bass with foldback.",
+  "graph": {
+    "modules": [
+      {
+        "id": "osc-1",
+        "type": "oscillator",
+        "name": "VCO",
+        "position": { "x": 120, "y": 140 },
+        "params": {
+          "frequency": 55,
+          "type": "sawtooth",
+          "pwm": 0.5,
+          "unison": 2,
+          "detune": 3,
+          "subMix": 0.6,
+          "subOct": 1
+        }
+      },
+      {
+        "id": "vcf-1",
+        "type": "vcf",
+        "name": "VCF",
+        "position": { "x": 320, "y": 140 },
+        "params": {
+          "cutoff": 450,
+          "resonance": 0.35,
+          "drive": 0.4,
+          "envAmount": 0.65,
+          "modAmount": 0,
+          "keyTrack": 0.3,
+          "model": "ladder",
+          "mode": "lp",
+          "slope": 24
+        }
+      },
+      {
+        "id": "dist-1",
+        "type": "distortion",
+        "name": "Distortion",
+        "position": { "x": 520, "y": 140 },
+        "params": {
+          "drive": 0.6,
+          "tone": 0.4,
+          "mix": 0.7,
+          "mode": "fold"
+        }
+      },
+      {
+        "id": "gain-1",
+        "type": "gain",
+        "name": "VCA",
+        "position": { "x": 720, "y": 140 },
+        "params": { "gain": 0.75 }
+      },
+      {
+        "id": "delay-1",
+        "type": "delay",
+        "name": "Delay",
+        "position": { "x": 920, "y": 140 },
+        "params": {
+          "time": 180,
+          "feedback": 0.2,
+          "mix": 0.1,
+          "tone": 0.35,
+          "pingPong": false
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "x": 1120, "y": 140 },
+        "params": {
+          "time": 0.25,
+          "damp": 0.7,
+          "preDelay": 5,
+          "mix": 0.1
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Main Out",
+        "position": { "x": 1120, "y": 280 },
+        "params": { "level": 0.7 }
+      },
+      {
+        "id": "adsr-1",
+        "type": "adsr",
+        "name": "Amp ADSR",
+        "position": { "x": 120, "y": 320 },
+        "params": { "attack": 0.005, "decay": 0.2, "sustain": 0.5, "release": 0.15 }
+      },
+      {
+        "id": "adsr-2",
+        "type": "adsr",
+        "name": "Filter ADSR",
+        "position": { "x": 320, "y": 320 },
+        "params": { "attack": 0.002, "decay": 0.25, "sustain": 0.1, "release": 0.12 }
+      },
+      {
+        "id": "ctrl-1",
+        "type": "control",
+        "name": "Control IO",
+        "position": { "x": 520, "y": 320 },
+        "params": {
+          "cv": 0,
+          "cvMode": "unipolar",
+          "velocity": 1,
+          "midiVelocity": true,
+          "gate": 0,
+          "glide": 0.04,
+          "midiEnabled": false,
+          "midiChannel": 0,
+          "midiRoot": 36,
+          "voices": 1,
+          "seqOn": true,
+          "seqTempo": 120,
+          "seqGate": 0.5
+        }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "ctrl-1", "portId": "cv-out" }, "to": { "moduleId": "osc-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "ctrl-1", "portId": "cv-out" }, "to": { "moduleId": "vcf-1", "portId": "key" }, "kind": "cv" },
+      { "from": { "moduleId": "ctrl-1", "portId": "gate-out" }, "to": { "moduleId": "adsr-1", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "ctrl-1", "portId": "gate-out" }, "to": { "moduleId": "adsr-2", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "osc-1", "portId": "out" }, "to": { "moduleId": "vcf-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-2", "portId": "env" }, "to": { "moduleId": "vcf-1", "portId": "env" }, "kind": "cv" },
+      { "from": { "moduleId": "vcf-1", "portId": "out" }, "to": { "moduleId": "dist-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "dist-1", "portId": "out" }, "to": { "moduleId": "gain-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-1", "portId": "env" }, "to": { "moduleId": "gain-1", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "gain-1", "portId": "out" }, "to": { "moduleId": "delay-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "delay-1", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}

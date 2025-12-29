@@ -1337,6 +1337,247 @@ impl Node for SineOsc {
   }
 }
 
+// ============================================================================
+// Supersaw Oscillator (7 detuned sawtooth voices)
+// ============================================================================
+
+pub struct Supersaw {
+  sample_rate: f32,
+  phases: [f32; 7],
+}
+
+pub struct SupersawParams<'a> {
+  pub base_freq: &'a [Sample],
+  pub detune: &'a [Sample],
+  pub mix: &'a [Sample],
+}
+
+pub struct SupersawInputs<'a> {
+  pub pitch: Option<&'a [Sample]>,
+}
+
+impl Supersaw {
+  pub fn new(sample_rate: f32) -> Self {
+    let mut phases = [0.0; 7];
+    for (i, phase) in phases.iter_mut().enumerate() {
+      *phase = i as f32 / 7.0;
+    }
+    Self {
+      sample_rate: sample_rate.max(1.0),
+      phases,
+    }
+  }
+
+  pub fn set_sample_rate(&mut self, sample_rate: f32) {
+    self.sample_rate = sample_rate.max(1.0);
+  }
+
+  pub fn process_block(
+    &mut self,
+    output: &mut [Sample],
+    inputs: SupersawInputs<'_>,
+    params: SupersawParams<'_>,
+  ) {
+    if output.is_empty() {
+      return;
+    }
+
+    // Voice detune offsets (symmetric around center)
+    const OFFSETS: [f32; 7] = [-1.0, -0.666, -0.333, 0.0, 0.333, 0.666, 1.0];
+    // Voice mix levels (center louder)
+    const LEVELS: [f32; 7] = [0.7, 0.8, 0.9, 1.0, 0.9, 0.8, 0.7];
+
+    for i in 0..output.len() {
+      let base = sample_at(params.base_freq, i, 220.0);
+      let pitch = input_at(inputs.pitch, i);
+      let detune_cents = sample_at(params.detune, i, 25.0).clamp(0.0, 100.0);
+      let mix = sample_at(params.mix, i, 1.0).clamp(0.0, 1.0);
+
+      let frequency = base * 2.0_f32.powf(pitch);
+      let mut sample = 0.0;
+      let mut total_level = 0.0;
+
+      for v in 0..7 {
+        let offset = OFFSETS[v];
+        let level = LEVELS[v];
+        let detune_factor = 2.0_f32.powf((detune_cents * offset) / 1200.0);
+        let voice_freq = frequency * detune_factor;
+        let dt = (voice_freq / self.sample_rate).min(1.0);
+
+        self.phases[v] += voice_freq / self.sample_rate;
+        if self.phases[v] >= 1.0 {
+          self.phases[v] -= self.phases[v].floor();
+        }
+
+        let phase = self.phases[v];
+        let mut saw = 2.0 * phase - 1.0;
+        saw -= poly_blep(phase, dt);
+        sample += saw * level;
+        total_level += level;
+      }
+
+      output[i] = (sample / total_level) * mix;
+    }
+  }
+}
+
+// ============================================================================
+// Phaser Effect (4-stage allpass with LFO)
+// ============================================================================
+
+pub struct Phaser {
+  sample_rate: f32,
+  allpass_l: [f32; 4],
+  allpass_r: [f32; 4],
+  lfo_phase: f32,
+}
+
+pub struct PhaserInputs<'a> {
+  pub input_l: Option<&'a [Sample]>,
+  pub input_r: Option<&'a [Sample]>,
+}
+
+pub struct PhaserParams<'a> {
+  pub rate: &'a [Sample],
+  pub depth: &'a [Sample],
+  pub feedback: &'a [Sample],
+  pub mix: &'a [Sample],
+}
+
+impl Phaser {
+  pub fn new(sample_rate: f32) -> Self {
+    Self {
+      sample_rate: sample_rate.max(1.0),
+      allpass_l: [0.0; 4],
+      allpass_r: [0.0; 4],
+      lfo_phase: 0.0,
+    }
+  }
+
+  pub fn set_sample_rate(&mut self, sample_rate: f32) {
+    self.sample_rate = sample_rate.max(1.0);
+  }
+
+  fn allpass(input: f32, coeff: f32, state: &mut f32) -> f32 {
+    let output = *state - input * coeff;
+    *state = input + output * coeff;
+    output
+  }
+
+  pub fn process_block(
+    &mut self,
+    out_l: &mut [Sample],
+    out_r: &mut [Sample],
+    inputs: PhaserInputs<'_>,
+    params: PhaserParams<'_>,
+  ) {
+    if out_l.is_empty() || out_r.is_empty() {
+      return;
+    }
+
+    let base_freqs: [f32; 4] = [200.0, 400.0, 800.0, 1600.0];
+
+    for i in 0..out_l.len() {
+      let rate = sample_at(params.rate, i, 0.5).clamp(0.05, 5.0);
+      let depth = sample_at(params.depth, i, 0.7).clamp(0.0, 1.0);
+      let feedback = sample_at(params.feedback, i, 0.3).clamp(0.0, 0.9);
+      let mix = sample_at(params.mix, i, 0.5).clamp(0.0, 1.0);
+
+      // LFO
+      self.lfo_phase += rate / self.sample_rate;
+      if self.lfo_phase >= 1.0 {
+        self.lfo_phase -= 1.0;
+      }
+      let lfo = (self.lfo_phase * std::f32::consts::TAU).sin();
+      let mod_amount = 0.5 + lfo * 0.5 * depth;
+
+      let in_l = input_at(inputs.input_l, i);
+      let in_r = match inputs.input_r {
+        Some(values) => input_at(Some(values), i),
+        None => in_l,
+      };
+
+      // Process allpass chain
+      let mut proc_l = in_l + self.allpass_l[3] * feedback;
+      let mut proc_r = in_r + self.allpass_r[3] * feedback;
+
+      for stage in 0..4 {
+        let freq = base_freqs[stage] * mod_amount;
+        let coeff = (1.0 - freq / self.sample_rate).clamp(-0.99, 0.99);
+        proc_l = Self::allpass(proc_l, coeff, &mut self.allpass_l[stage]);
+        proc_r = Self::allpass(proc_r, coeff, &mut self.allpass_r[stage]);
+      }
+
+      let dry = 1.0 - mix;
+      out_l[i] = in_l * dry + proc_l * mix;
+      out_r[i] = in_r * dry + proc_r * mix;
+    }
+  }
+}
+
+// ============================================================================
+// Distortion / Waveshaper
+// ============================================================================
+
+pub struct Distortion;
+
+pub struct DistortionParams<'a> {
+  pub drive: &'a [Sample],
+  pub tone: &'a [Sample],
+  pub mix: &'a [Sample],
+  pub mode: &'a [Sample],
+}
+
+impl Distortion {
+  pub fn process_block(
+    output: &mut [Sample],
+    input: Option<&[Sample]>,
+    params: DistortionParams<'_>,
+  ) {
+    if output.is_empty() {
+      return;
+    }
+
+    for i in 0..output.len() {
+      let drive = sample_at(params.drive, i, 0.5).clamp(0.0, 1.0);
+      let tone = sample_at(params.tone, i, 0.5).clamp(0.0, 1.0);
+      let mix = sample_at(params.mix, i, 1.0).clamp(0.0, 1.0);
+      let mode = sample_at(params.mode, i, 0.0);
+
+      let in_sample = input_at(input, i);
+      let gain = 1.0 + drive * 20.0;
+      let driven = in_sample * gain;
+
+      // Mode: 0 = soft clip (tanh), 1 = hard clip, 2 = foldback
+      let shaped = if mode < 0.5 {
+        // Soft clip (tanh approximation)
+        let x = driven.clamp(-3.0, 3.0);
+        x * (27.0 + x * x) / (27.0 + 9.0 * x * x)
+      } else if mode < 1.5 {
+        // Hard clip
+        driven.clamp(-1.0, 1.0)
+      } else {
+        // Foldback
+        let mut x = driven;
+        while x > 1.0 || x < -1.0 {
+          if x > 1.0 {
+            x = 2.0 - x;
+          }
+          if x < -1.0 {
+            x = -2.0 - x;
+          }
+        }
+        x
+      };
+
+      // Simple tone control (lowpass)
+      let output_sample = shaped * tone + shaped * (1.0 - tone) * 0.7;
+      let dry = 1.0 - mix;
+      output[i] = in_sample * dry + output_sample * mix;
+    }
+  }
+}
+
 #[cfg(test)]
 mod tests {
   use super::*;

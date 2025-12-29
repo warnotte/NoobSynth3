@@ -2,6 +2,7 @@ import type { ModuleSpec, ModuleType } from '../shared/graph'
 
 export const moduleSizes: Record<ModuleType, string> = {
   oscillator: '2x3',
+  supersaw: '2x2',
   noise: '2x1',
   'mod-router': '2x2',
   'ring-mod': '1x1',
@@ -14,6 +15,8 @@ export const moduleSizes: Record<ModuleType, string> = {
   chorus: '2x2',
   delay: '2x2',
   reverb: '2x1',
+  phaser: '2x2',
+  distortion: '2x2',
   mixer: '1x1',
   'mixer-1x2': '1x2',
   gain: '1x1',
@@ -38,6 +41,7 @@ export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>>
 
 export const moduleCatalog: { type: ModuleType; label: string }[] = [
   { type: 'oscillator', label: 'VCO' },
+  { type: 'supersaw', label: 'Supersaw' },
   { type: 'noise', label: 'Noise' },
   { type: 'mod-router', label: 'Mod Router' },
   { type: 'ring-mod', label: 'Ring Mod' },
@@ -50,6 +54,8 @@ export const moduleCatalog: { type: ModuleType; label: string }[] = [
   { type: 'chorus', label: 'Chorus' },
   { type: 'delay', label: 'Delay' },
   { type: 'reverb', label: 'Reverb' },
+  { type: 'phaser', label: 'Phaser' },
+  { type: 'distortion', label: 'Distortion' },
   { type: 'adsr', label: 'ADSR' },
   { type: 'lfo', label: 'LFO' },
   { type: 'scope', label: 'Scope' },
@@ -61,6 +67,7 @@ export const moduleCatalog: { type: ModuleType; label: string }[] = [
 
 export const modulePrefixes: Record<ModuleType, string> = {
   oscillator: 'osc',
+  supersaw: 'ssaw',
   noise: 'noise',
   'mod-router': 'modr',
   'ring-mod': 'ring',
@@ -73,6 +80,8 @@ export const modulePrefixes: Record<ModuleType, string> = {
   chorus: 'chorus',
   delay: 'delay',
   reverb: 'reverb',
+  phaser: 'phaser',
+  distortion: 'dist',
   adsr: 'adsr',
   lfo: 'lfo',
   scope: 'scope',
@@ -84,6 +93,7 @@ export const modulePrefixes: Record<ModuleType, string> = {
 
 export const moduleLabels: Record<ModuleType, string> = {
   oscillator: 'VCO',
+  supersaw: 'Supersaw',
   noise: 'Noise',
   'mod-router': 'Mod Router',
   'ring-mod': 'Ring Mod',
@@ -96,6 +106,8 @@ export const moduleLabels: Record<ModuleType, string> = {
   chorus: 'Chorus',
   delay: 'Delay',
   reverb: 'Reverb',
+  phaser: 'Phaser',
+  distortion: 'Distortion',
   adsr: 'ADSR',
   lfo: 'LFO',
   scope: 'Scope',
@@ -148,6 +160,9 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
   chorus: { rate: 0.3, depth: 8, delay: 18, mix: 0.4, spread: 0.6, feedback: 0.1 },
   delay: { time: 360, feedback: 0.25, mix: 0.2, tone: 0.6, pingPong: false },
   reverb: { time: 0.6, damp: 0.4, preDelay: 18, mix: 0.2 },
+  phaser: { rate: 0.5, depth: 0.7, feedback: 0.3, mix: 0.5 },
+  distortion: { drive: 0.5, tone: 0.5, mix: 1.0, mode: 'soft' },
+  supersaw: { frequency: 220, detune: 25, mix: 1.0 },
   adsr: { attack: 0.02, decay: 0.2, sustain: 0.65, release: 0.5 },
   lfo: { rate: 0.5, depth: 0.6, offset: 0, shape: 'sine', bipolar: true },
   scope: { time: 1, gain: 1, freeze: false },

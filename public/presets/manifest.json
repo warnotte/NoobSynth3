@@ -14,16 +14,52 @@
       "file": "jupiter-8-demo.json"
     },
     {
-      "id": "hard-sync-lead",
-      "name": "Hard Sync Lead",
-      "description": "VCO hard sync demo with pitch sweep.",
-      "file": "hard-sync-lead.json"
+      "id": "juno-strings",
+      "name": "Juno-106 Strings",
+      "description": "Classic PWM strings with lush Juno chorus.",
+      "file": "juno-strings.json"
+    },
+    {
+      "id": "cs80-vangelis",
+      "name": "CS-80 Vangelis",
+      "description": "Blade Runner inspired evolving pad.",
+      "file": "cs80-vangelis.json"
+    },
+    {
+      "id": "oberheim-pad",
+      "name": "OB-Xa Pad",
+      "description": "Thick Oberheim-style warm pad.",
+      "file": "oberheim-pad.json"
+    },
+    {
+      "id": "prophet-brass",
+      "name": "Prophet-5 Brass",
+      "description": "Punchy poly brass with filter snap.",
+      "file": "prophet-brass.json"
+    },
+    {
+      "id": "minimoog-lead",
+      "name": "Minimoog Lead",
+      "description": "Classic mono lead with ladder filter bite.",
+      "file": "minimoog-lead.json"
     },
     {
       "id": "ladder-lead",
       "name": "Ladder Lead",
       "description": "Moog-ish lead with ladder LP bite.",
       "file": "ladder-lead.json"
+    },
+    {
+      "id": "arp-sync-lead",
+      "name": "ARP Odyssey Sync",
+      "description": "Aggressive sync lead with pitch sweep.",
+      "file": "arp-sync-lead.json"
+    },
+    {
+      "id": "hard-sync-lead",
+      "name": "Hard Sync Lead",
+      "description": "VCO hard sync demo with pitch sweep.",
+      "file": "hard-sync-lead.json"
     },
     {
       "id": "jupiter-brass",
@@ -44,16 +80,28 @@
       "file": "dream-pad.json"
     },
     {
-      "id": "glass-bell",
-      "name": "Glass Bell",
-      "description": "Bright bell with airy tails.",
-      "file": "glass-bell.json"
+      "id": "taurus-pedal",
+      "name": "Moog Taurus",
+      "description": "Deep bass pedal with massive sub.",
+      "file": "taurus-pedal.json"
+    },
+    {
+      "id": "sh101-bass",
+      "name": "SH-101 Bass",
+      "description": "Punchy mono bass with sub weight.",
+      "file": "sh101-bass.json"
     },
     {
       "id": "moog-bass",
       "name": "Moog Bass",
       "description": "Round, punchy mono bass.",
       "file": "moog-bass.json"
+    },
+    {
+      "id": "glass-bell",
+      "name": "Glass Bell",
+      "description": "Bright bell with airy tails.",
+      "file": "glass-bell.json"
     },
     {
       "id": "edge-lead",
@@ -72,6 +120,24 @@
       "name": "Showcase Stack",
       "description": "Big modern stack with wide FX.",
       "file": "showcase-stack.json"
+    },
+    {
+      "id": "trance-supersaw",
+      "name": "Trance Supersaw",
+      "description": "Classic trance lead with 7-voice supersaw.",
+      "file": "trance-supersaw.json"
+    },
+    {
+      "id": "phaser-pad",
+      "name": "Phaser Pad",
+      "description": "Lush evolving pad with stereo phaser.",
+      "file": "phaser-pad.json"
+    },
+    {
+      "id": "dirty-bass",
+      "name": "Dirty Bass",
+      "description": "Aggressive distorted bass with foldback.",
+      "file": "dirty-bass.json"
     }
   ]
 }

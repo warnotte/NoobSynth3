@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "id": "arp-sync-lead",
+  "name": "ARP Odyssey Sync",
+  "description": "Aggressive sync lead with pitch sweep.",
+  "updates": {
+    "osc-1": {
+      "frequency": 220,
+      "type": "sawtooth",
+      "pwm": 0.5,
+      "unison": 1,
+      "detune": 0,
+      "subMix": 0,
+      "subOct": 1
+    },
+    "osc-2": {
+      "frequency": 440,
+      "type": "sawtooth",
+      "pwm": 0.5,
+      "unison": 1,
+      "detune": 0
+    },
+    "mix-1": {
+      "levelA": 0.8,
+      "levelB": 0.55
+    },
+    "vcf-1": {
+      "cutoff": 1200,
+      "resonance": 0.28,
+      "drive": 0.35,
+      "envAmount": 0.5,
+      "modAmount": 0.12,
+      "keyTrack": 0.4,
+      "model": "svf",
+      "mode": "lp",
+      "slope": 24
+    },
+    "chorus-1": {
+      "rate": 0.3,
+      "depth": 5,
+      "delay": 12,
+      "mix": 0.18,
+      "spread": 0.4,
+      "feedback": 0.06
+    },
+    "delay-1": {
+      "time": 240,
+      "feedback": 0.32,
+      "mix": 0.2,
+      "tone": 0.55,
+      "pingPong": true
+    },
+    "reverb-1": {
+      "time": 0.38,
+      "damp": 0.5,
+      "preDelay": 10,
+      "mix": 0.15
+    },
+    "adsr-1": {
+      "attack": 0.005,
+      "decay": 0.2,
+      "sustain": 0.68,
+      "release": 0.22
+    },
+    "adsr-2": {
+      "attack": 0.002,
+      "decay": 0.28,
+      "sustain": 0.18,
+      "release": 0.2
+    },
+    "lfo-1": {
+      "rate": 6.0,
+      "depth": 0.08,
+      "shape": "sine",
+      "bipolar": true
+    },
+    "ctrl-1": {
+      "glide": 0.05,
+      "seqOn": true,
+      "seqTempo": 130,
+      "seqGate": 0.55,
+      "voices": 1
+    }
+  }
+}
