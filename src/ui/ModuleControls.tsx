@@ -1391,9 +1391,14 @@ export const ModuleControls = ({
     const currentBeat = marioStep !== null ? Math.floor((marioStep % 16) / 4) + 1 : 0
 
     const songOptions = [
-      { id: 'smb', label: 'SMB' },
-      { id: 'smw', label: 'SMW' },
-      { id: 'underground', label: 'UND' },
+      { id: 'smb', label: 'Overworld' },
+      { id: 'underground', label: 'Underground' },
+      { id: 'underwater', label: 'Underwater' },
+      { id: 'castle', label: 'Castle' },
+      { id: 'starman', label: 'Starman' },
+      { id: 'gameover', label: 'Game Over' },
+      { id: 'coin', label: 'Coin' },
+      { id: 'oneup', label: '1-Up' },
     ]
 
     return (
@@ -1417,19 +1422,21 @@ export const ModuleControls = ({
           </div>
         </div>
         <div className="mario-song-select">
-          {songOptions.map((opt) => (
-            <button
-              key={opt.id}
-              type="button"
-              className={`ui-btn mario-song-btn ${songId === opt.id ? 'active' : ''}`}
-              onClick={() => {
-                updateParam(module.id, 'song', opt.id)
-                updateParam(module.id, 'tempo', marioSongs[opt.id as keyof typeof marioSongs].tempo)
-              }}
-            >
-              {opt.label}
-            </button>
-          ))}
+          <select
+            className="mario-song-dropdown"
+            value={songId}
+            onChange={(e) => {
+              const newSongId = e.target.value
+              updateParam(module.id, 'song', newSongId)
+              updateParam(module.id, 'tempo', marioSongs[newSongId as keyof typeof marioSongs].tempo)
+            }}
+          >
+            {songOptions.map((opt) => (
+              <option key={opt.id} value={opt.id}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
         </div>
         <div className="mario-controls">
           <button
@@ -1442,7 +1449,7 @@ export const ModuleControls = ({
           <RotaryKnob
             label="Tempo"
             min={80}
-            max={240}
+            max={300}
             step={5}
             unit="BPM"
             value={tempo}
@@ -1451,9 +1458,11 @@ export const ModuleControls = ({
           />
         </div>
         <div className="mario-channels">
-          <div className="mario-ch"><span className="ch-dot ch1" /> Lead</div>
-          <div className="mario-ch"><span className="ch-dot ch2" /> Harmony</div>
-          <div className="mario-ch"><span className="ch-dot ch3" /> Bass</div>
+          <div className="mario-ch"><span className="ch-dot ch1" /> Pulse 1</div>
+          <div className="mario-ch"><span className="ch-dot ch2" /> Pulse 2</div>
+          <div className="mario-ch"><span className="ch-dot ch3" /> Chords</div>
+          <div className="mario-ch"><span className="ch-dot ch4" /> Triangle</div>
+          <div className="mario-ch"><span className="ch-dot ch5" /> Extra</div>
         </div>
       </>
     )
