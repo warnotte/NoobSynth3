@@ -1033,7 +1033,7 @@ export const ModuleControls = ({
         <div className="seq-steps">
           {DEFAULT_SEQUENCER_PATTERN.map((step, index) => (
             <div
-              key={step.label}
+              key={index}
               className={`seq-step ${activeStep === index ? 'active' : ''}`}
             >
               {step.label}
