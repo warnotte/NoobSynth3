@@ -7,7 +7,7 @@ Modular synth workbench built with React + AudioWorklet. Goal: a powerful, patch
 - **VCV Rack-inspired UI**: Eurorack-style rails, brushed metal panels, compact module layout with configurable grid sizes (1x1, 2x1, 1x2, 2x2, 1x3, 2x3, 2x6) and auto-placement.
 - Modular patching with drag-to-connect cables (double-click near a cable to remove it).
 - Module library lets you add/remove modules and start a new empty rack.
-- AudioWorklet engine (VCO with sub osc + PWM, Noise, HPF/VCF, LFO, ADSR, Mixer 1x1/1x2, VCA, Mod VCA, Chorus, Delay, Reverb, Scope, Control IO).
+- AudioWorklet engine (VCO with sub osc + PWM + sync out, Noise, HPF/VCF, LFO, ADSR, Mixer 1x1/1x2, VCA, Mod VCA, Chorus, Delay, Reverb, Scope, Control IO).
 - Polyphony (1/2/4/8 voices) with voice stealing and per-voice modulation.
 - Control IO with mini keyboard, MIDI input (poly), and a simple sequencer for hands-free auditioning.
 - MIDI velocity CV output with optional slew to avoid clicks.

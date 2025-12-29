@@ -17,7 +17,7 @@ This file is meant to be reread by the coding assistant to keep context, decisio
 
 ## Current modules
 
-- VCO (unison + detune + PWM + sub output)
+- VCO (unison + detune + PWM + sub + sync out)
 - Noise (white/pink/brown)
 - LFO
 - VCF (SVF only, 12/24 dB)
@@ -105,6 +105,7 @@ Presets live in `src/state/presets.ts` and are loaded from the Presets panel. So
 - **Preset sync (native)**: loading presets now syncs the native DSP graph in Tauri mode.
 - **Mario IO (native)**: sequencer now runs when native audio is active.
 - **VCO layout**: VCO module resized to 2x3 for extra controls.
+- **Hard sync**: VCO now exposes sync output for oscillator hard sync patching.
 
 ## How to update
 

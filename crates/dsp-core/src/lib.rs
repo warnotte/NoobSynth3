@@ -110,6 +110,7 @@ impl Vco {
     &mut self,
     output: &mut [Sample],
     mut sub_output: Option<&mut [Sample]>,
+    mut sync_output: Option<&mut [Sample]>,
     inputs: VcoInputs<'_>,
     params: VcoParams<'_>,
   ) {
@@ -126,6 +127,7 @@ impl Vco {
     let pwm_coeff = 1.0 - (-1.0 / (0.004 * self.sample_rate)).exp();
 
     let mut sub_buffer = sub_output.as_deref_mut();
+    let mut sync_buffer = sync_output.as_deref_mut();
     for i in 0..output.len() {
       let base = sample_at(params.base_freq, i, 220.0);
       let pitch = input_at(inputs.pitch, i);
@@ -165,6 +167,7 @@ impl Vco {
       let sub_div = if sub_oct >= 1.5 { 4.0 } else { 2.0 };
       let mut sample = 0.0;
       let mut sub_sample = 0.0;
+      let mut sync_pulse = 0.0;
 
       for v in 0..self.voice_count {
         let offset = self.voice_offsets[v];
@@ -172,11 +175,13 @@ impl Vco {
         let voice_freq = frequency * detune_factor;
         let dt = (voice_freq / self.sample_rate).min(1.0);
 
-        self.phases[v] += voice_freq / self.sample_rate;
-        if self.phases[v] >= 1.0 {
-          self.phases[v] -= self.phases[v].floor();
+        let mut next_phase = self.phases[v] + voice_freq / self.sample_rate;
+        if next_phase >= 1.0 {
+          next_phase -= next_phase.floor();
+          sync_pulse = 1.0;
         }
-        let phase = self.phases[v];
+        self.phases[v] = next_phase;
+        let phase = next_phase;
 
         let voice_sample = if wave_index < 0.5 {
           (std::f32::consts::TAU * phase).sin()
@@ -218,6 +223,9 @@ impl Vco {
       output[i] = sample + sub_sample * sub_mix;
       if let Some(ref mut sub_buf) = sub_buffer {
         sub_buf[i] = sub_sample;
+      }
+      if let Some(ref mut sync_buf) = sync_buffer {
+        sync_buf[i] = sync_pulse;
       }
     }
   }
@@ -1294,7 +1302,8 @@ mod tests {
       pwm: None,
       sync: None,
     };
-    vco.process_block(&mut output, Some(&mut sub_output), inputs, params);
+    let mut sync_output = [0.0_f32; 64];
+    vco.process_block(&mut output, Some(&mut sub_output), Some(&mut sync_output), inputs, params);
     assert!(output.iter().any(|sample| sample.abs() > 0.0));
   }
 

@@ -1009,7 +1009,9 @@ impl ModuleNode {
         let sync = inputs[4].channel(0);
         let (main_group, rest) = outputs.split_at_mut(1);
         let out = main_group[0].channel_mut(0);
-        let sub_out = rest.get_mut(0).map(|buffer| buffer.channel_mut(0));
+        let (sub_group, sync_group) = rest.split_at_mut(1);
+        let sub_out = sub_group.get_mut(0).map(|buffer| buffer.channel_mut(0));
+        let sync_out = sync_group.get_mut(0).map(|buffer| buffer.channel_mut(0));
         let params = VcoParams {
           base_freq: state.base_freq.slice(frames),
           waveform: state.waveform.slice(frames),
@@ -1028,7 +1030,7 @@ impl ModuleNode {
           pwm: Some(pwm_in),
           sync: Some(sync),
         };
-        state.vco.process_block(out, sub_out, inputs, params);
+        state.vco.process_block(out, sub_out, sync_out, inputs, params);
       }
       ModuleState::Noise(state) => {
         let out = outputs[0].channel_mut(0);
@@ -1538,7 +1540,11 @@ fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
 
 fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
   match module_type {
-    ModuleType::Oscillator => vec![PortInfo { channels: 1 }, PortInfo { channels: 1 }],
+    ModuleType::Oscillator => vec![
+      PortInfo { channels: 1 },
+      PortInfo { channels: 1 },
+      PortInfo { channels: 1 },
+    ],
     ModuleType::Noise => vec![PortInfo { channels: 1 }],
     ModuleType::Gain => vec![PortInfo { channels: 2 }],
     ModuleType::CvVca => vec![PortInfo { channels: 1 }],
@@ -1652,6 +1658,7 @@ fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize> {
     ModuleType::Oscillator => match port_id {
       "out" => Some(0),
       "sub" => Some(1),
+      "sync" | "sync-out" => Some(2),
       _ => None,
     },
     ModuleType::Noise => match port_id {

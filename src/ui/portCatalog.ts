@@ -26,6 +26,7 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
     outputs: [
       { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
       { id: 'sub', label: 'Sub', kind: 'audio', direction: 'out' },
+      { id: 'sync', label: 'Sync', kind: 'sync', direction: 'out' },
     ],
   },
   noise: {
