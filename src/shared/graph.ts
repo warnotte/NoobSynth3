@@ -2,6 +2,7 @@ export type PortKind = 'audio' | 'cv' | 'gate' | 'sync'
 
 export type ModuleType =
   | 'oscillator'
+  | 'noise'
   | 'gain'
   | 'cv-vca'
   | 'output'
@@ -11,6 +12,7 @@ export type ModuleType =
   | 'adsr'
   | 'scope'
   | 'vcf'
+  | 'hpf'
   | 'mixer'
   | 'mixer-1x2'
   | 'chorus'

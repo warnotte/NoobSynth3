@@ -67,6 +67,7 @@ export const ModuleControls = ({
   marioStep,
 }: ModuleControlsProps) => {
   if (module.type === 'oscillator') {
+    const subOct = Number(module.params.subOct ?? 1)
     return (
       <>
         <RotaryKnob
@@ -99,6 +100,15 @@ export const ModuleControls = ({
           format={(value) => value.toFixed(2)}
         />
         <RotaryKnob
+          label="Sub Mix"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.subMix ?? 0)}
+          onChange={(value) => updateParam(module.id, 'subMix', value)}
+          format={(value) => value.toFixed(2)}
+        />
+        <RotaryKnob
           label="FM Lin"
           min={0}
           max={2000}
@@ -123,6 +133,23 @@ export const ModuleControls = ({
           value={String(module.params.type ?? 'sawtooth')}
           onChange={(value) => updateParam(module.id, 'type', value)}
         />
+        <div className="filter-row">
+          <div className="filter-group">
+            <span className="filter-label">Sub Oct</span>
+            <div className="filter-buttons">
+              {[1, 2].map((octave) => (
+                <button
+                  key={octave}
+                  type="button"
+                  className={`ui-btn filter-btn ${subOct === octave ? 'active' : ''}`}
+                  onClick={() => updateParam(module.id, 'subOct', octave)}
+                >
+                  -{octave}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
         <div className="filter-row">
           <div className="filter-group">
             <span className="filter-label">Unison</span>
@@ -157,6 +184,45 @@ export const ModuleControls = ({
         onChange={(value) => updateParam(module.id, 'gain', value)}
         format={(value) => value.toFixed(2)}
       />
+    )
+  }
+
+  if (module.type === 'noise') {
+    const noiseType = String(module.params.noiseType ?? 'white')
+    const noiseTypes: Array<{ id: string; label: string }> = [
+      { id: 'white', label: 'WHT' },
+      { id: 'pink', label: 'PNK' },
+      { id: 'brown', label: 'BRN' },
+    ]
+    return (
+      <>
+        <RotaryKnob
+          label="Level"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.level ?? 0.4)}
+          onChange={(value) => updateParam(module.id, 'level', value)}
+          format={(value) => value.toFixed(2)}
+        />
+        <div className="filter-row">
+          <div className="filter-group">
+            <span className="filter-label">Type</span>
+            <div className="filter-buttons filter-wide">
+              {noiseTypes.map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  className={`ui-btn filter-btn ${noiseType === option.id ? 'active' : ''}`}
+                  onClick={() => updateParam(module.id, 'noiseType', option.id)}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </>
     )
   }
 
@@ -589,6 +655,21 @@ export const ModuleControls = ({
           </div>
         </div>
       </>
+    )
+  }
+
+  if (module.type === 'hpf') {
+    return (
+      <RotaryKnob
+        label="Cutoff"
+        min={40}
+        max={12000}
+        step={5}
+        unit="Hz"
+        value={Number(module.params.cutoff ?? 280)}
+        onChange={(value) => updateParam(module.id, 'cutoff', value)}
+        format={(value) => Math.round(value).toString()}
+      />
     )
   }
 

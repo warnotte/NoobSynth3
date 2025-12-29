@@ -23,6 +23,13 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
       { id: 'pwm', label: 'PWM', kind: 'cv', direction: 'in' },
       { id: 'sync', label: 'Sync', kind: 'sync', direction: 'in' },
     ],
+    outputs: [
+      { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
+      { id: 'sub', label: 'Sub', kind: 'audio', direction: 'out' },
+    ],
+  },
+  noise: {
+    inputs: [],
     outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
   },
   gain: {
@@ -50,6 +57,10 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
       { id: 'env', label: 'Env', kind: 'cv', direction: 'in' },
       { id: 'key', label: 'Key', kind: 'cv', direction: 'in' },
     ],
+    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
+  },
+  hpf: {
+    inputs: [{ id: 'in', label: 'In', kind: 'audio', direction: 'in' }],
     outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
   },
   mixer: {

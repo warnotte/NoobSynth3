@@ -302,6 +302,11 @@ export class AudioEngine {
       if (text === 'square') return 3
       return 0
     }
+    if (paramId === 'noiseType') {
+      if (text === 'pink') return 1
+      if (text === 'brown') return 2
+      return 0
+    }
     if (paramId === 'mode') {
       if (text === 'hp') return 1
       if (text === 'bp') return 2

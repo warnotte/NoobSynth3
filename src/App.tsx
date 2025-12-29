@@ -92,6 +92,11 @@ const normalizeNativeParamValue = (paramId: string, value: number | string | boo
     if (text === 'square') return 3
     return 0
   }
+  if (paramId === 'noiseType') {
+    if (text === 'pink') return 1
+    if (text === 'brown') return 2
+    return 0
+  }
   if (paramId === 'mode') {
     if (text === 'hp') return 1
     if (text === 'bp') return 2
@@ -446,11 +451,18 @@ function App() {
   const marioTempo = Math.max(60, Math.min(300, Number(marioModule?.params.tempo ?? 180)))
   const marioSong = String(marioModule?.params.song ?? 'smb')
   const currentSong = marioSongs[marioSong as keyof typeof marioSongs] ?? marioSongs.smb
+  const unifiedStatus: 'idle' | 'running' | 'error' = isTauri
+    ? tauriNativeError
+      ? 'error'
+      : tauriNativeRunning
+        ? 'running'
+        : 'idle'
+    : status
 
   const { marioStep } = useMarioSequencer({
     engine,
     nativeControl: nativeControlBridge,
-    status,
+    status: unifiedStatus,
     marioModuleId,
     marioRunning,
     marioTempo,
@@ -526,9 +538,22 @@ function App() {
         getVoiceCountFromGraph(graphRef.current) !== getVoiceCountFromGraph(layouted))
     if (shouldRestart) {
       queueEngineRestart(layouted)
-      return
+    } else {
+      applyGraphParams(layouted)
     }
-    applyGraphParams(layouted)
+    if (isTauri && tauriNativeRunning) {
+      const taps = buildScopeTaps(layouted.modules)
+      nativeScopeTapsRef.current = taps
+      const graphJson = JSON.stringify({
+        modules: layouted.modules,
+        connections: layouted.connections,
+        taps,
+      })
+      void invokeTauri('native_set_graph', { graphJson }).catch((error) => {
+        console.error(error)
+        setTauriNativeError('Failed to sync graph.')
+      })
+    }
   }
 
   const handleExportPreset = useCallback(() => {

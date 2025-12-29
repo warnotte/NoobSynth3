@@ -15,6 +15,8 @@ export const defaultGraph: GraphState = {
         detune: 7,
         fmLin: 0,
         fmExp: 0,
+        subMix: 0,
+        subOct: 1,
       },
     },
     {
@@ -30,6 +32,8 @@ export const defaultGraph: GraphState = {
         detune: 5,
         fmLin: 0,
         fmExp: 0,
+        subMix: 0,
+        subOct: 1,
       },
     },
     {

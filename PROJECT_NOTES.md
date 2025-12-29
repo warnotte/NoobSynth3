@@ -17,9 +17,11 @@ This file is meant to be reread by the coding assistant to keep context, decisio
 
 ## Current modules
 
-- VCO (with unison + detune)
+- VCO (unison + detune + PWM + sub output)
+- Noise (white/pink/brown)
 - LFO
 - VCF (SVF only, 12/24 dB)
+- HPF (simple high-pass)
 - ADSR
 - VCA (CV input)
 - Mod VCA (CV multiplier)
@@ -30,11 +32,13 @@ This file is meant to be reread by the coding assistant to keep context, decisio
 - Reverb (stereo)
 - Scope (DATA-style: oscilloscope/FFT/spectrogram, 4 inputs A/B/C/D, 2 thru outputs, gain 0.5-10x, freeze)
 - Control IO (CV/Gate/Sync + mini sequencer + glide)
+- Mario IO (seasonal/fun; melodies are approximate)
 - Lab Panel (test module, not in audio chain)
 
 ## Presets
 
 - Jupiter Pad
+- Jupiter-8 Demo
 - Jupiter Brass
 - PWM Strings
 - Dream Pad
@@ -97,6 +101,10 @@ Presets live in `src/state/presets.ts` and are loaded from the Presets panel. So
 - **Unified transport**: Top bar Power On/Off now controls native audio in Tauri and Web Audio in browser mode.
 - **WASM graph engine**: single worklet now runs the full DSP graph in Rust, including Control IO + Mod VCA; scope inputs are tapped via worklet outputs.
 - **WASM cleanup**: removed per-module WASM worklets/toggles; the graph engine is the only DSP path.
+- **Jupiter essentials**: added Noise + HPF modules, plus VCO sub output with sub mix, and band-limited VCO waveforms.
+- **Preset sync (native)**: loading presets now syncs the native DSP graph in Tauri mode.
+- **Mario IO (native)**: sequencer now runs when native audio is active.
+- **VCO layout**: VCO module resized to 2x3 for extra controls.
 
 ## How to update
 

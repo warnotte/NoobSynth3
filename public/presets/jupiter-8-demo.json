@@ -1,0 +1,257 @@
+{
+  "version": 1,
+  "id": "jupiter-8-demo",
+  "name": "Jupiter-8 Demo",
+  "description": "Dual VCO with sub, noise, HPF, and chorus.",
+  "graph": {
+    "modules": [
+      {
+        "id": "osc-1",
+        "type": "oscillator",
+        "name": "VCO A",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "frequency": 110,
+          "type": "sawtooth",
+          "pwm": 0.5,
+          "unison": 2,
+          "detune": 6,
+          "fmLin": 0,
+          "fmExp": 0,
+          "subMix": 0,
+          "subOct": 1
+        }
+      },
+      {
+        "id": "osc-2",
+        "type": "oscillator",
+        "name": "VCO B",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "frequency": 110.3,
+          "type": "square",
+          "pwm": 0.42,
+          "unison": 2,
+          "detune": 5,
+          "fmLin": 0,
+          "fmExp": 0,
+          "subMix": 0,
+          "subOct": 1
+        }
+      },
+      {
+        "id": "noise-1",
+        "type": "noise",
+        "name": "Noise",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "level": 0.08,
+          "noiseType": "white"
+        }
+      },
+      {
+        "id": "mix2-1",
+        "type": "mixer-1x2",
+        "name": "Mixer 1x2",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "levelA": 0.68,
+          "levelB": 0.58,
+          "levelC": 0.1,
+          "levelD": 0.28,
+          "levelE": 0.26,
+          "levelF": 0
+        }
+      },
+      {
+        "id": "hpf-1",
+        "type": "hpf",
+        "name": "HPF",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "cutoff": 120
+        }
+      },
+      {
+        "id": "vcf-1",
+        "type": "vcf",
+        "name": "VCF Pro",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "cutoff": 900,
+          "resonance": 0.2,
+          "drive": 0.12,
+          "envAmount": 0.32,
+          "modAmount": 0.12,
+          "keyTrack": 0.55,
+          "model": "svf",
+          "mode": "lp",
+          "slope": 12
+        }
+      },
+      {
+        "id": "gain-1",
+        "type": "gain",
+        "name": "VCA 1",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "gain": 0.85
+        }
+      },
+      {
+        "id": "mod-1",
+        "type": "cv-vca",
+        "name": "Mod VCA",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "gain": 1
+        }
+      },
+      {
+        "id": "chorus-1",
+        "type": "chorus",
+        "name": "Chorus",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "rate": 0.22,
+          "depth": 12,
+          "delay": 18,
+          "mix": 0.55,
+          "spread": 0.8,
+          "feedback": 0.14
+        }
+      },
+      {
+        "id": "delay-1",
+        "type": "delay",
+        "name": "Delay",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "time": 380,
+          "feedback": 0.2,
+          "mix": 0.12,
+          "tone": 0.6,
+          "pingPong": false
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "time": 0.5,
+          "damp": 0.45,
+          "preDelay": 18,
+          "mix": 0.18
+        }
+      },
+      {
+        "id": "scope-1",
+        "type": "scope",
+        "name": "Scope",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "time": 1,
+          "gain": 1,
+          "freeze": false
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Main Out",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "level": 0.8
+        }
+      },
+      {
+        "id": "adsr-1",
+        "type": "adsr",
+        "name": "Amp ADSR",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "attack": 0.3,
+          "decay": 0.6,
+          "sustain": 0.75,
+          "release": 0.85
+        }
+      },
+      {
+        "id": "adsr-2",
+        "type": "adsr",
+        "name": "Filter ADSR",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "attack": 0.2,
+          "decay": 0.8,
+          "sustain": 0.25,
+          "release": 0.7
+        }
+      },
+      {
+        "id": "lfo-1",
+        "type": "lfo",
+        "name": "LFO 1",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "rate": 0.18,
+          "depth": 0.15,
+          "offset": 0,
+          "shape": "sine",
+          "bipolar": true
+        }
+      },
+      {
+        "id": "ctrl-1",
+        "type": "control",
+        "name": "Control IO",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "cv": 0,
+          "cvMode": "unipolar",
+          "velocity": 1,
+          "midiVelocity": true,
+          "gate": 0,
+          "glide": 0.06,
+          "midiEnabled": false,
+          "midiChannel": 0,
+          "midiRoot": 60,
+          "midiInputId": "",
+          "midiVelSlew": 0.008,
+          "voices": 4,
+          "seqOn": true,
+          "seqTempo": 70,
+          "seqGate": 0.85
+        }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "ctrl-1", "portId": "cv-out" }, "to": { "moduleId": "osc-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "ctrl-1", "portId": "cv-out" }, "to": { "moduleId": "osc-2", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "ctrl-1", "portId": "cv-out" }, "to": { "moduleId": "vcf-1", "portId": "key" }, "kind": "cv" },
+      { "from": { "moduleId": "ctrl-1", "portId": "gate-out" }, "to": { "moduleId": "adsr-1", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "ctrl-1", "portId": "gate-out" }, "to": { "moduleId": "adsr-2", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "osc-1", "portId": "out" }, "to": { "moduleId": "mix2-1", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "osc-2", "portId": "out" }, "to": { "moduleId": "mix2-1", "portId": "in-b" }, "kind": "audio" },
+      { "from": { "moduleId": "noise-1", "portId": "out" }, "to": { "moduleId": "mix2-1", "portId": "in-c" }, "kind": "audio" },
+      { "from": { "moduleId": "osc-1", "portId": "sub" }, "to": { "moduleId": "mix2-1", "portId": "in-d" }, "kind": "audio" },
+      { "from": { "moduleId": "osc-2", "portId": "sub" }, "to": { "moduleId": "mix2-1", "portId": "in-e" }, "kind": "audio" },
+      { "from": { "moduleId": "mix2-1", "portId": "out" }, "to": { "moduleId": "hpf-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "hpf-1", "portId": "out" }, "to": { "moduleId": "vcf-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-2", "portId": "env" }, "to": { "moduleId": "vcf-1", "portId": "env" }, "kind": "cv" },
+      { "from": { "moduleId": "lfo-1", "portId": "cv-out" }, "to": { "moduleId": "vcf-1", "portId": "mod" }, "kind": "cv" },
+      { "from": { "moduleId": "lfo-1", "portId": "cv-out" }, "to": { "moduleId": "osc-2", "portId": "pwm" }, "kind": "cv" },
+      { "from": { "moduleId": "vcf-1", "portId": "out" }, "to": { "moduleId": "gain-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-1", "portId": "env" }, "to": { "moduleId": "mod-1", "portId": "in" }, "kind": "cv" },
+      { "from": { "moduleId": "ctrl-1", "portId": "vel-out" }, "to": { "moduleId": "mod-1", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "mod-1", "portId": "out" }, "to": { "moduleId": "gain-1", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "gain-1", "portId": "out" }, "to": { "moduleId": "chorus-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "chorus-1", "portId": "out" }, "to": { "moduleId": "delay-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "delay-1", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "scope-1", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "scope-1", "portId": "out-a" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}

@@ -1,7 +1,7 @@
 use dsp_core::{
   Adsr, AdsrInputs, AdsrParams, Chorus, ChorusInputs, ChorusParams, Delay, DelayInputs, DelayParams,
-  Lfo, LfoInputs, LfoParams, Mixer, Reverb, ReverbInputs, ReverbParams, Sample, Vca, Vcf, VcfInputs,
-  VcfParams, Vco, VcoInputs, VcoParams,
+  Lfo, LfoInputs, LfoParams, Mixer, Noise, NoiseParams, Reverb, ReverbInputs, ReverbParams, Sample,
+  Vca, Vcf, VcfInputs, VcfParams, Vco, VcoInputs, VcoParams,
 };
 use serde::Deserialize;
 use std::collections::{HashMap, VecDeque};
@@ -46,6 +46,7 @@ struct TapJson {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum ModuleType {
   Oscillator,
+  Noise,
   Gain,
   CvVca,
   Output,
@@ -53,6 +54,7 @@ enum ModuleType {
   Lfo,
   Adsr,
   Vcf,
+  Hpf,
   Mixer,
   MixerWide,
   Chorus,
@@ -229,6 +231,14 @@ struct VcoState {
   fm_exp_depth: ParamBuffer,
   unison: ParamBuffer,
   detune: ParamBuffer,
+  sub_mix: ParamBuffer,
+  sub_oct: ParamBuffer,
+}
+
+struct NoiseState {
+  noise: Noise,
+  level: ParamBuffer,
+  noise_type: ParamBuffer,
 }
 
 struct GainState {
@@ -262,6 +272,11 @@ struct VcfState {
   key_track: ParamBuffer,
   mode: ParamBuffer,
   slope: ParamBuffer,
+}
+
+struct HpfState {
+  hpf: Vcf,
+  cutoff: ParamBuffer,
 }
 
 struct MixerState {
@@ -335,11 +350,13 @@ struct MarioState {
 
 enum ModuleState {
   Vco(VcoState),
+  Noise(NoiseState),
   Gain(GainState),
   CvVca(GainState),
   Lfo(LfoState),
   Adsr(AdsrState),
   Vcf(VcfState),
+  Hpf(HpfState),
   Mixer(MixerState),
   MixerWide(MixerWideState),
   Chorus(ChorusState),
@@ -729,6 +746,13 @@ impl ModuleNode {
         fm_exp_depth: ParamBuffer::new(param_number(params, "fmExp", 0.0)),
         unison: ParamBuffer::new(param_number(params, "unison", 1.0)),
         detune: ParamBuffer::new(param_number(params, "detune", 0.0)),
+        sub_mix: ParamBuffer::new(param_number(params, "subMix", 0.0)),
+        sub_oct: ParamBuffer::new(param_number(params, "subOct", 1.0)),
+      }),
+      ModuleType::Noise => ModuleState::Noise(NoiseState {
+        noise: Noise::new(),
+        level: ParamBuffer::new(param_number(params, "level", 0.4)),
+        noise_type: ParamBuffer::new(param_number(params, "noiseType", 0.0)),
       }),
       ModuleType::Gain => ModuleState::Gain(GainState {
         gain: ParamBuffer::new(param_number(params, "gain", 0.2)),
@@ -767,6 +791,10 @@ impl ModuleNode {
         key_track: ParamBuffer::new(param_number(params, "keyTrack", 0.0)),
         mode: ParamBuffer::new(param_number(params, "mode", 0.0)),
         slope: ParamBuffer::new(param_number(params, "slope", 1.0)),
+      }),
+      ModuleType::Hpf => ModuleState::Hpf(HpfState {
+        hpf: Vcf::new(sample_rate),
+        cutoff: ParamBuffer::new(param_number(params, "cutoff", 280.0)),
       }),
       ModuleType::Mixer => ModuleState::Mixer(MixerState {
         level_a: ParamBuffer::new(param_number(params, "levelA", 0.6)),
@@ -845,6 +873,13 @@ impl ModuleNode {
         "fmExp" => state.fm_exp_depth.set(value),
         "unison" => state.unison.set(value),
         "detune" => state.detune.set(value),
+        "subMix" => state.sub_mix.set(value),
+        "subOct" => state.sub_oct.set(value),
+        _ => {}
+      },
+      ModuleState::Noise(state) => match param {
+        "level" => state.level.set(value),
+        "noiseType" => state.noise_type.set(value),
         _ => {}
       },
       ModuleState::Gain(state) | ModuleState::CvVca(state) => {
@@ -888,6 +923,11 @@ impl ModuleNode {
         "slope" => state.slope.set(value),
         _ => {}
       },
+      ModuleState::Hpf(state) => {
+        if param == "cutoff" {
+          state.cutoff.set(value);
+        }
+      }
       ModuleState::Mixer(state) => match param {
         "levelA" => state.level_a.set(value),
         "levelB" => state.level_b.set(value),
@@ -967,7 +1007,9 @@ impl ModuleNode {
         let fm_exp = inputs[2].channel(0);
         let pwm_in = inputs[3].channel(0);
         let sync = inputs[4].channel(0);
-        let out = outputs[0].channel_mut(0);
+        let (main_group, rest) = outputs.split_at_mut(1);
+        let out = main_group[0].channel_mut(0);
+        let sub_out = rest.get_mut(0).map(|buffer| buffer.channel_mut(0));
         let params = VcoParams {
           base_freq: state.base_freq.slice(frames),
           waveform: state.waveform.slice(frames),
@@ -976,6 +1018,8 @@ impl ModuleNode {
           fm_exp_depth: state.fm_exp_depth.slice(frames),
           unison: state.unison.slice(frames),
           detune: state.detune.slice(frames),
+          sub_mix: state.sub_mix.slice(frames),
+          sub_oct: state.sub_oct.slice(frames),
         };
         let inputs = VcoInputs {
           pitch: Some(pitch),
@@ -984,7 +1028,15 @@ impl ModuleNode {
           pwm: Some(pwm_in),
           sync: Some(sync),
         };
-        state.vco.process_block(out, inputs, params);
+        state.vco.process_block(out, sub_out, inputs, params);
+      }
+      ModuleState::Noise(state) => {
+        let out = outputs[0].channel_mut(0);
+        let params = NoiseParams {
+          level: state.level.slice(frames),
+          noise_type: state.noise_type.slice(frames),
+        };
+        state.noise.process_block(out, params);
       }
       ModuleState::Gain(state) => {
         let input_connected = !self.connections[0].is_empty();
@@ -1161,6 +1213,33 @@ impl ModuleNode {
         };
         let output = outputs[0].channel_mut(0);
         state.vcf.process_block(output, inputs, params);
+      }
+      ModuleState::Hpf(state) => {
+        let audio = if self.connections[0].is_empty() {
+          None
+        } else {
+          Some(inputs[0].channel(0))
+        };
+        let zero = [0.0_f32];
+        let one = [1.0_f32];
+        let params = VcfParams {
+          cutoff: state.cutoff.slice(frames),
+          resonance: &zero,
+          drive: &zero,
+          env_amount: &zero,
+          mod_amount: &zero,
+          key_track: &zero,
+          mode: &one,
+          slope: &zero,
+        };
+        let inputs = VcfInputs {
+          audio,
+          mod_in: None,
+          env: None,
+          key: None,
+        };
+        let output = outputs[0].channel_mut(0);
+        state.hpf.process_block(output, inputs, params);
       }
       ModuleState::Mixer(state) => {
         let input_a = if self.connections[0].is_empty() {
@@ -1375,6 +1454,7 @@ impl ModuleNode {
 fn normalize_module_type(raw: &str) -> ModuleType {
   match raw {
     "oscillator" => ModuleType::Oscillator,
+    "noise" => ModuleType::Noise,
     "gain" => ModuleType::Gain,
     "cv-vca" => ModuleType::CvVca,
     "output" => ModuleType::Output,
@@ -1382,6 +1462,7 @@ fn normalize_module_type(raw: &str) -> ModuleType {
     "lfo" => ModuleType::Lfo,
     "adsr" => ModuleType::Adsr,
     "vcf" => ModuleType::Vcf,
+    "hpf" => ModuleType::Hpf,
     "mixer" => ModuleType::Mixer,
     "mixer-1x2" => ModuleType::MixerWide,
     "chorus" => ModuleType::Chorus,
@@ -1398,11 +1479,13 @@ fn is_poly_type(module_type: ModuleType) -> bool {
   matches!(
     module_type,
     ModuleType::Oscillator
+      | ModuleType::Noise
       | ModuleType::Gain
       | ModuleType::CvVca
       | ModuleType::Lfo
       | ModuleType::Adsr
       | ModuleType::Vcf
+      | ModuleType::Hpf
       | ModuleType::Mixer
       | ModuleType::MixerWide
       | ModuleType::Control
@@ -1418,6 +1501,7 @@ fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },
       PortInfo { channels: 1 },
     ],
+    ModuleType::Noise => vec![],
     ModuleType::Gain => vec![PortInfo { channels: 2 }, PortInfo { channels: 1 }],
     ModuleType::CvVca => vec![PortInfo { channels: 1 }, PortInfo { channels: 1 }],
     ModuleType::Output => vec![PortInfo { channels: 2 }],
@@ -1430,6 +1514,7 @@ fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },
       PortInfo { channels: 1 },
     ],
+    ModuleType::Hpf => vec![PortInfo { channels: 1 }],
     ModuleType::Mixer => vec![PortInfo { channels: 1 }, PortInfo { channels: 1 }],
     ModuleType::MixerWide => vec![
       PortInfo { channels: 1 },
@@ -1453,7 +1538,8 @@ fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
 
 fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
   match module_type {
-    ModuleType::Oscillator => vec![PortInfo { channels: 1 }],
+    ModuleType::Oscillator => vec![PortInfo { channels: 1 }, PortInfo { channels: 1 }],
+    ModuleType::Noise => vec![PortInfo { channels: 1 }],
     ModuleType::Gain => vec![PortInfo { channels: 2 }],
     ModuleType::CvVca => vec![PortInfo { channels: 1 }],
     ModuleType::Output => vec![PortInfo { channels: 2 }],
@@ -1461,6 +1547,7 @@ fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
     ModuleType::Lfo => vec![PortInfo { channels: 1 }],
     ModuleType::Adsr => vec![PortInfo { channels: 1 }],
     ModuleType::Vcf => vec![PortInfo { channels: 1 }],
+    ModuleType::Hpf => vec![PortInfo { channels: 1 }],
     ModuleType::Mixer => vec![PortInfo { channels: 1 }],
     ModuleType::MixerWide => vec![PortInfo { channels: 1 }],
     ModuleType::Chorus | ModuleType::Delay | ModuleType::Reverb => vec![PortInfo { channels: 2 }],
@@ -1490,6 +1577,10 @@ fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize> {
       "fm-exp" | "fmExp" => Some(2),
       "pwm" => Some(3),
       "sync" => Some(4),
+      _ => None,
+    },
+    ModuleType::Hpf => match port_id {
+      "in" => Some(0),
       _ => None,
     },
     ModuleType::Gain => match port_id {
@@ -1560,6 +1651,11 @@ fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize> {
   match module_type {
     ModuleType::Oscillator => match port_id {
       "out" => Some(0),
+      "sub" => Some(1),
+      _ => None,
+    },
+    ModuleType::Noise => match port_id {
+      "out" => Some(0),
       _ => None,
     },
     ModuleType::Gain => match port_id {
@@ -1588,6 +1684,10 @@ fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize> {
       _ => None,
     },
     ModuleType::Vcf => match port_id {
+      "out" => Some(0),
+      _ => None,
+    },
+    ModuleType::Hpf => match port_id {
       "out" => Some(0),
       _ => None,
     },
@@ -1691,6 +1791,12 @@ fn map_string_param(key: &str, text: &str, default: f32) -> f32 {
     "model" => match text {
       "svf" => 0.0,
       "ladder" => 1.0,
+      _ => default,
+    },
+    "noiseType" => match text {
+      "white" => 0.0,
+      "pink" => 1.0,
+      "brown" | "red" => 2.0,
       _ => default,
     },
     _ => default,

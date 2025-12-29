@@ -8,6 +8,12 @@
       "file": "jupiter-pad.json"
     },
     {
+      "id": "jupiter-8-demo",
+      "name": "Jupiter-8 Demo",
+      "description": "Dual VCO with sub, noise, HPF, and chorus.",
+      "file": "jupiter-8-demo.json"
+    },
+    {
       "id": "jupiter-brass",
       "name": "Jupiter Brass",
       "description": "Bright, snappy brass hit.",

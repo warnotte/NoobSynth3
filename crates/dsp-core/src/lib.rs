@@ -25,6 +25,8 @@ pub struct Vco {
   last_sync: f32,
   pwm_smooth: f32,
   phases: [f32; 4],
+  sub_phases: [f32; 4],
+  tri_states: [f32; 4],
   voice_count: usize,
   voice_offsets: [f32; 4],
 }
@@ -37,6 +39,8 @@ pub struct VcoParams<'a> {
   pub fm_exp_depth: &'a [Sample],
   pub unison: &'a [Sample],
   pub detune: &'a [Sample],
+  pub sub_mix: &'a [Sample],
+  pub sub_oct: &'a [Sample],
 }
 
 pub struct VcoInputs<'a> {
@@ -47,18 +51,37 @@ pub struct VcoInputs<'a> {
   pub sync: Option<&'a [Sample]>,
 }
 
+fn poly_blep(phase: f32, dt: f32) -> f32 {
+  if dt <= 0.0 {
+    return 0.0;
+  }
+  if phase < dt {
+    let x = phase / dt;
+    return x + x - x * x - 1.0;
+  }
+  if phase > 1.0 - dt {
+    let x = (phase - 1.0) / dt;
+    return x * x + x + 1.0;
+  }
+  0.0
+}
+
 impl Vco {
   pub fn new(sample_rate: f32) -> Self {
     let mut phases = [0.0; 4];
+    let mut sub_phases = [0.0; 4];
     let len = phases.len() as f32;
     for (index, phase) in phases.iter_mut().enumerate() {
       *phase = index as f32 / len;
+      sub_phases[index] = *phase;
     }
     let mut vco = Self {
       sample_rate: sample_rate.max(1.0),
       last_sync: 0.0,
       pwm_smooth: 0.5,
       phases,
+      sub_phases,
+      tri_states: [0.0; 4],
       voice_count: 1,
       voice_offsets: [0.0; 4],
     };
@@ -86,6 +109,7 @@ impl Vco {
   pub fn process_block(
     &mut self,
     output: &mut [Sample],
+    mut sub_output: Option<&mut [Sample]>,
     inputs: VcoInputs<'_>,
     params: VcoParams<'_>,
   ) {
@@ -101,6 +125,7 @@ impl Vco {
 
     let pwm_coeff = 1.0 - (-1.0 / (0.004 * self.sample_rate)).exp();
 
+    let mut sub_buffer = sub_output.as_deref_mut();
     for i in 0..output.len() {
       let base = sample_at(params.base_freq, i, 220.0);
       let pitch = input_at(inputs.pitch, i);
@@ -112,10 +137,18 @@ impl Vco {
       let lin_depth = sample_at(params.fm_lin_depth, i, 0.0);
       let exp_depth = sample_at(params.fm_exp_depth, i, 0.0);
       let detune_cents = sample_at(params.detune, i, 0.0);
+      let sub_mix = sample_at(params.sub_mix, i, 0.0).clamp(0.0, 1.0);
+      let sub_oct = sample_at(params.sub_oct, i, 1.0).clamp(1.0, 2.0);
 
       if sync > 0.5 && self.last_sync <= 0.5 {
         for phase in self.phases.iter_mut().take(self.voice_count) {
           *phase = 0.0;
+        }
+        for phase in self.sub_phases.iter_mut().take(self.voice_count) {
+          *phase = 0.0;
+        }
+        for state in self.tri_states.iter_mut().take(self.voice_count) {
+          *state = 0.0;
         }
       }
       self.last_sync = sync;
@@ -129,31 +162,138 @@ impl Vco {
       let pwm_target = (pwm_base + pwm_mod * 0.5).clamp(0.05, 0.95);
       self.pwm_smooth += (pwm_target - self.pwm_smooth) * pwm_coeff;
 
+      let sub_div = if sub_oct >= 1.5 { 4.0 } else { 2.0 };
       let mut sample = 0.0;
+      let mut sub_sample = 0.0;
+
       for v in 0..self.voice_count {
         let offset = self.voice_offsets[v];
         let detune_factor = 2.0_f32.powf((detune_cents * offset) / 1200.0);
         let voice_freq = frequency * detune_factor;
+        let dt = (voice_freq / self.sample_rate).min(1.0);
+
         self.phases[v] += voice_freq / self.sample_rate;
         if self.phases[v] >= 1.0 {
           self.phases[v] -= self.phases[v].floor();
         }
         let phase = self.phases[v];
+
         let voice_sample = if wave_index < 0.5 {
           (std::f32::consts::TAU * phase).sin()
         } else if wave_index < 1.5 {
-          2.0 * (2.0 * (phase - (phase + 0.5).floor())).abs() - 1.0
+          let mut square = if phase < 0.5 { 1.0 } else { -1.0 };
+          square += poly_blep(phase, dt);
+          square -= poly_blep((phase - 0.5).rem_euclid(1.0), dt);
+          let tri = &mut self.tri_states[v];
+          *tri += square * (2.0 * voice_freq / self.sample_rate);
+          *tri = tri.clamp(-1.0, 1.0);
+          *tri
         } else if wave_index < 2.5 {
-          2.0 * (phase - 0.5)
-        } else if phase < self.pwm_smooth {
-          1.0
+          let mut saw = 2.0 * phase - 1.0;
+          saw -= poly_blep(phase, dt);
+          saw
         } else {
-          -1.0
+          let mut pulse = if phase < self.pwm_smooth { 1.0 } else { -1.0 };
+          pulse += poly_blep(phase, dt);
+          pulse -= poly_blep((phase - self.pwm_smooth).rem_euclid(1.0), dt);
+          pulse
         };
         sample += voice_sample;
+
+        let sub_freq = voice_freq / sub_div;
+        let sub_dt = (sub_freq / self.sample_rate).min(1.0);
+        self.sub_phases[v] += sub_freq / self.sample_rate;
+        if self.sub_phases[v] >= 1.0 {
+          self.sub_phases[v] -= self.sub_phases[v].floor();
+        }
+        let sub_phase = self.sub_phases[v];
+        let mut sub_wave = if sub_phase < 0.5 { 1.0 } else { -1.0 };
+        sub_wave += poly_blep(sub_phase, sub_dt);
+        sub_wave -= poly_blep((sub_phase - 0.5).rem_euclid(1.0), sub_dt);
+        sub_sample += sub_wave;
       }
+
       sample /= self.voice_count as f32;
-      output[i] = sample;
+      sub_sample /= self.voice_count as f32;
+      output[i] = sample + sub_sample * sub_mix;
+      if let Some(ref mut sub_buf) = sub_buffer {
+        sub_buf[i] = sub_sample;
+      }
+    }
+  }
+}
+
+pub struct Noise {
+  seed: u32,
+  pink: [f32; 7],
+  brown: f32,
+}
+
+pub struct NoiseParams<'a> {
+  pub level: &'a [Sample],
+  pub noise_type: &'a [Sample],
+}
+
+impl Noise {
+  pub fn new() -> Self {
+    Self {
+      seed: 0x1234_5678,
+      pink: [0.0; 7],
+      brown: 0.0,
+    }
+  }
+
+  fn next_white(&mut self) -> f32 {
+    self.seed = self
+      .seed
+      .wrapping_mul(1664525)
+      .wrapping_add(1013904223);
+    let raw = (self.seed >> 9) as f32 / 8_388_608.0;
+    raw * 2.0 - 1.0
+  }
+
+  fn next_pink(&mut self) -> f32 {
+    let white = self.next_white();
+    self.pink[0] = 0.99886 * self.pink[0] + white * 0.0555179;
+    self.pink[1] = 0.99332 * self.pink[1] + white * 0.0750759;
+    self.pink[2] = 0.96900 * self.pink[2] + white * 0.1538520;
+    self.pink[3] = 0.86650 * self.pink[3] + white * 0.3104856;
+    self.pink[4] = 0.55000 * self.pink[4] + white * 0.5329522;
+    self.pink[5] = -0.7616 * self.pink[5] - white * 0.0168980;
+    let pink =
+      self.pink[0]
+        + self.pink[1]
+        + self.pink[2]
+        + self.pink[3]
+        + self.pink[4]
+        + self.pink[5]
+        + self.pink[6]
+        + white * 0.5362;
+    self.pink[6] = white * 0.115926;
+    pink * 0.11
+  }
+
+  fn next_brown(&mut self) -> f32 {
+    let white = self.next_white();
+    self.brown = (self.brown + white * 0.02).clamp(-1.0, 1.0);
+    self.brown * 3.5
+  }
+
+  pub fn process_block(&mut self, output: &mut [Sample], params: NoiseParams<'_>) {
+    if output.is_empty() {
+      return;
+    }
+    for i in 0..output.len() {
+      let level = sample_at(params.level, i, 0.4).clamp(0.0, 1.0);
+      let color = sample_at(params.noise_type, i, 0.0);
+      let noise = if color < 0.5 {
+        self.next_white()
+      } else if color < 1.5 {
+        self.next_pink()
+      } else {
+        self.next_brown()
+      };
+      output[i] = noise * level;
     }
   }
 }
@@ -1135,6 +1275,7 @@ mod tests {
   fn vco_produces_samples() {
     let mut vco = Vco::new(48_000.0);
     let mut output = [0.0_f32; 64];
+    let mut sub_output = [0.0_f32; 64];
     let params = VcoParams {
       base_freq: &[220.0],
       waveform: &[0.0],
@@ -1143,6 +1284,8 @@ mod tests {
       fm_exp_depth: &[0.0],
       unison: &[1.0],
       detune: &[0.0],
+      sub_mix: &[0.0],
+      sub_oct: &[1.0],
     };
     let inputs = VcoInputs {
       pitch: None,
@@ -1151,7 +1294,7 @@ mod tests {
       pwm: None,
       sync: None,
     };
-    vco.process_block(&mut output, inputs, params);
+    vco.process_block(&mut output, Some(&mut sub_output), inputs, params);
     assert!(output.iter().any(|sample| sample.abs() > 0.0));
   }
 
@@ -1166,6 +1309,18 @@ mod tests {
     assert!((output[1] + 0.8).abs() < 0.001);
     assert!((output[2] - 0.0).abs() < 0.001);
     assert!((output[3] + 0.8).abs() < 0.001);
+  }
+
+  #[test]
+  fn noise_outputs_signal() {
+    let mut noise = Noise::new();
+    let mut output = [0.0_f32; 64];
+    let params = NoiseParams {
+      level: &[0.6],
+      noise_type: &[0.0],
+    };
+    noise.process_block(&mut output, params);
+    assert!(output.iter().any(|sample| sample.abs() > 0.0));
   }
 
   #[test]

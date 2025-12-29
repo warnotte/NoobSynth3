@@ -1,8 +1,10 @@
 import type { ModuleSpec, ModuleType } from '../shared/graph'
 
 export const moduleSizes: Record<ModuleType, string> = {
-  oscillator: '2x2',
+  oscillator: '2x3',
+  noise: '2x1',
   vcf: '2x2',
+  hpf: '1x1',
   control: '2x6',
   scope: '2x3',
   adsr: '1x3',
@@ -32,7 +34,9 @@ export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>>
 
 export const moduleCatalog: { type: ModuleType; label: string }[] = [
   { type: 'oscillator', label: 'VCO' },
+  { type: 'noise', label: 'Noise' },
   { type: 'vcf', label: 'VCF' },
+  { type: 'hpf', label: 'HPF' },
   { type: 'gain', label: 'VCA' },
   { type: 'cv-vca', label: 'Mod VCA' },
   { type: 'mixer', label: 'Mixer 1x1' },
@@ -51,7 +55,9 @@ export const moduleCatalog: { type: ModuleType; label: string }[] = [
 
 export const modulePrefixes: Record<ModuleType, string> = {
   oscillator: 'osc',
+  noise: 'noise',
   vcf: 'vcf',
+  hpf: 'hpf',
   gain: 'gain',
   'cv-vca': 'mod',
   mixer: 'mix',
@@ -70,7 +76,9 @@ export const modulePrefixes: Record<ModuleType, string> = {
 
 export const moduleLabels: Record<ModuleType, string> = {
   oscillator: 'VCO',
+  noise: 'Noise',
   vcf: 'VCF',
+  hpf: 'HPF',
   gain: 'VCA',
   'cv-vca': 'Mod VCA',
   mixer: 'Mixer 1x1',
@@ -96,7 +104,10 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     detune: 0,
     fmLin: 0,
     fmExp: 0,
+    subMix: 0,
+    subOct: 1,
   },
+  noise: { level: 0.4, noiseType: 'white' },
   gain: { gain: 0.7 },
   'cv-vca': { gain: 1 },
   vcf: {
@@ -109,6 +120,9 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     model: 'svf',
     mode: 'lp',
     slope: 12,
+  },
+  hpf: {
+    cutoff: 280,
   },
   mixer: { levelA: 0.6, levelB: 0.6 },
   'mixer-1x2': {
