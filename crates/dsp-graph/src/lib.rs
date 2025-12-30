@@ -1,6 +1,8 @@
 use dsp_core::{
   Adsr, AdsrInputs, AdsrParams, Chorus, ChorusInputs, ChorusParams, Delay, DelayInputs, DelayParams,
   Distortion, DistortionParams, Lfo, LfoInputs, LfoParams, Mixer, Noise, NoiseParams,
+  NesOsc, NesOscInputs, NesOscParams,
+  SnesOsc, SnesOscInputs, SnesOscParams,
   Phaser, PhaserInputs, PhaserParams, Reverb, ReverbInputs, ReverbParams,
   RingMod, RingModParams, Sample, Supersaw, SupersawInputs, SupersawParams,
   Vca, Vcf, VcfInputs, VcfParams, Vco, VcoInputs, VcoParams,
@@ -49,6 +51,8 @@ struct TapJson {
 enum ModuleType {
   Oscillator,
   Supersaw,
+  NesOsc,
+  SnesOsc,
   Noise,
   ModRouter,
   RingMod,
@@ -361,6 +365,28 @@ struct SupersawState {
   mix: ParamBuffer,
 }
 
+struct NesOscState {
+  nes_osc: NesOsc,
+  base_freq: ParamBuffer,
+  fine: ParamBuffer,
+  volume: ParamBuffer,
+  mode: ParamBuffer,
+  duty: ParamBuffer,
+  noise_mode: ParamBuffer,
+  bitcrush: ParamBuffer,
+}
+
+struct SnesOscState {
+  snes_osc: SnesOsc,
+  base_freq: ParamBuffer,
+  fine: ParamBuffer,
+  volume: ParamBuffer,
+  wave: ParamBuffer,
+  gauss: ParamBuffer,
+  color: ParamBuffer,
+  lofi: ParamBuffer,
+}
+
 struct OutputState {
   level: ParamBuffer,
 }
@@ -392,6 +418,8 @@ struct MarioState {
 enum ModuleState {
   Vco(VcoState),
   Supersaw(SupersawState),
+  NesOsc(NesOscState),
+  SnesOsc(SnesOscState),
   Noise(NoiseState),
   ModRouter(ModRouterState),
   RingMod(RingModState),
@@ -907,6 +935,26 @@ impl ModuleNode {
         detune: ParamBuffer::new(param_number(params, "detune", 25.0)),
         mix: ParamBuffer::new(param_number(params, "mix", 1.0)),
       }),
+      ModuleType::NesOsc => ModuleState::NesOsc(NesOscState {
+        nes_osc: NesOsc::new(sample_rate),
+        base_freq: ParamBuffer::new(param_number(params, "frequency", 220.0)),
+        fine: ParamBuffer::new(param_number(params, "fine", 0.0)),
+        volume: ParamBuffer::new(param_number(params, "volume", 1.0)),
+        mode: ParamBuffer::new(param_number(params, "mode", 0.0)),
+        duty: ParamBuffer::new(param_number(params, "duty", 1.0)),
+        noise_mode: ParamBuffer::new(param_number(params, "noiseMode", 0.0)),
+        bitcrush: ParamBuffer::new(param_number(params, "bitcrush", 1.0)),
+      }),
+      ModuleType::SnesOsc => ModuleState::SnesOsc(SnesOscState {
+        snes_osc: SnesOsc::new(sample_rate),
+        base_freq: ParamBuffer::new(param_number(params, "frequency", 220.0)),
+        fine: ParamBuffer::new(param_number(params, "fine", 0.0)),
+        volume: ParamBuffer::new(param_number(params, "volume", 1.0)),
+        wave: ParamBuffer::new(param_number(params, "wave", 0.0)),
+        gauss: ParamBuffer::new(param_number(params, "gauss", 0.7)),
+        color: ParamBuffer::new(param_number(params, "color", 0.5)),
+        lofi: ParamBuffer::new(param_number(params, "lofi", 0.5)),
+      }),
       ModuleType::Control => ModuleState::Control(ControlState {
         cv: param_number(params, "cv", 0.0),
         cv_target: param_number(params, "cv", 0.0),
@@ -1072,6 +1120,26 @@ impl ModuleNode {
         "frequency" => state.base_freq.set(value),
         "detune" => state.detune.set(value),
         "mix" => state.mix.set(value),
+        _ => {}
+      },
+      ModuleState::NesOsc(state) => match param {
+        "frequency" => state.base_freq.set(value),
+        "fine" => state.fine.set(value),
+        "volume" => state.volume.set(value),
+        "mode" => state.mode.set(value),
+        "duty" => state.duty.set(value),
+        "noiseMode" => state.noise_mode.set(value),
+        "bitcrush" => state.bitcrush.set(value),
+        _ => {}
+      },
+      ModuleState::SnesOsc(state) => match param {
+        "frequency" => state.base_freq.set(value),
+        "fine" => state.fine.set(value),
+        "volume" => state.volume.set(value),
+        "wave" => state.wave.set(value),
+        "gauss" => state.gauss.set(value),
+        "color" => state.color.set(value),
+        "lofi" => state.lofi.set(value),
         _ => {}
       },
       ModuleState::Control(state) => {
@@ -1615,6 +1683,44 @@ impl ModuleNode {
         let output = outputs[0].channel_mut(0);
         state.supersaw.process_block(output, inputs, params);
       }
+      ModuleState::NesOsc(state) => {
+        let pitch = if self.connections[0].is_empty() {
+          None
+        } else {
+          Some(inputs[0].channel(0))
+        };
+        let params = NesOscParams {
+          base_freq: state.base_freq.slice(frames),
+          fine: state.fine.slice(frames),
+          volume: state.volume.slice(frames),
+          mode: state.mode.slice(frames),
+          duty: state.duty.slice(frames),
+          noise_mode: state.noise_mode.slice(frames),
+          bitcrush: state.bitcrush.slice(frames),
+        };
+        let inputs = NesOscInputs { pitch };
+        let output = outputs[0].channel_mut(0);
+        state.nes_osc.process_block(output, inputs, params);
+      }
+      ModuleState::SnesOsc(state) => {
+        let pitch = if self.connections[0].is_empty() {
+          None
+        } else {
+          Some(inputs[0].channel(0))
+        };
+        let params = SnesOscParams {
+          base_freq: state.base_freq.slice(frames),
+          fine: state.fine.slice(frames),
+          volume: state.volume.slice(frames),
+          wave: state.wave.slice(frames),
+          gauss: state.gauss.slice(frames),
+          color: state.color.slice(frames),
+          lofi: state.lofi.slice(frames),
+        };
+        let inputs = SnesOscInputs { pitch };
+        let output = outputs[0].channel_mut(0);
+        state.snes_osc.process_block(output, inputs, params);
+      }
       ModuleState::Control(state) => {
         let (cv_group, rest) = outputs.split_at_mut(1);
         let (vel_group, rest) = rest.split_at_mut(1);
@@ -1679,6 +1785,8 @@ fn normalize_module_type(raw: &str) -> ModuleType {
   match raw {
     "oscillator" => ModuleType::Oscillator,
     "supersaw" => ModuleType::Supersaw,
+    "nes-osc" => ModuleType::NesOsc,
+    "snes-osc" => ModuleType::SnesOsc,
     "noise" => ModuleType::Noise,
     "mod-router" => ModuleType::ModRouter,
     "ring-mod" => ModuleType::RingMod,
@@ -1709,6 +1817,8 @@ fn is_poly_type(module_type: ModuleType) -> bool {
     module_type,
     ModuleType::Oscillator
       | ModuleType::Supersaw
+      | ModuleType::NesOsc
+      | ModuleType::SnesOsc
       | ModuleType::Noise
       | ModuleType::ModRouter
       | ModuleType::RingMod
@@ -1763,6 +1873,8 @@ fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
     ModuleType::Chorus | ModuleType::Delay | ModuleType::Reverb | ModuleType::Phaser => vec![PortInfo { channels: 2 }],
     ModuleType::Distortion => vec![PortInfo { channels: 1 }],
     ModuleType::Supersaw => vec![PortInfo { channels: 1 }],
+    ModuleType::NesOsc => vec![PortInfo { channels: 1 }],  // pitch input
+    ModuleType::SnesOsc => vec![PortInfo { channels: 1 }],  // pitch input
     ModuleType::Control => vec![],
     ModuleType::Scope => vec![
       PortInfo { channels: 2 },
@@ -1802,6 +1914,8 @@ fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
     ModuleType::Chorus | ModuleType::Delay | ModuleType::Reverb | ModuleType::Phaser => vec![PortInfo { channels: 2 }],
     ModuleType::Distortion => vec![PortInfo { channels: 1 }],
     ModuleType::Supersaw => vec![PortInfo { channels: 1 }],
+    ModuleType::NesOsc => vec![PortInfo { channels: 1 }],  // audio output
+    ModuleType::SnesOsc => vec![PortInfo { channels: 1 }],  // audio output
     ModuleType::Control => vec![
       PortInfo { channels: 1 },
       PortInfo { channels: 1 },
@@ -1905,6 +2019,14 @@ fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize> {
       "pitch" => Some(0),
       _ => None,
     },
+    ModuleType::NesOsc => match port_id {
+      "pitch" => Some(0),
+      _ => None,
+    },
+    ModuleType::SnesOsc => match port_id {
+      "pitch" => Some(0),
+      _ => None,
+    },
     ModuleType::Scope => match port_id {
       "in-a" => Some(0),
       "in-b" => Some(1),
@@ -1989,6 +2111,14 @@ fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize> {
       _ => None,
     },
     ModuleType::Supersaw => match port_id {
+      "out" => Some(0),
+      _ => None,
+    },
+    ModuleType::NesOsc => match port_id {
+      "out" => Some(0),
+      _ => None,
+    },
+    ModuleType::SnesOsc => match port_id {
       "out" => Some(0),
       _ => None,
     },

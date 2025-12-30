@@ -1,4 +1,4 @@
-// Super Mario Bros - Complete NES-accurate song arrangements
+// Super Mario Bros & Zelda - NES and SNES song arrangements
 // 5 channels: Lead, Harmony, Chords, Bass (triangle), Extra
 // MIDI notes: 60 = C4 (middle C), null = rest
 
@@ -437,6 +437,256 @@ export const marioSongs = {
     ],
     ch5: [
       null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+    ],
+  },
+
+  // ===== SUPER NINTENDO (SNES) SONGS =====
+  // Transcribed from actual MIDI files
+
+  smw: {
+    name: 'SMW Overworld',
+    tempo: 132,
+    // Super Mario World - Overworld Theme (from MIDI: smw_ovr1.mid)
+    // Dense extraction with held notes
+    ch1: [
+      // Lead melody (dense)
+      69, 69, 69, 69, 65, 65, 65, 60, 62, 65, null, 65, 65, 65, 65, 62,
+      60, null, 65, null, 65, null, 72, 72, 69, 69, 69, 67, 67, 67, 67, 60,
+      69, 69, 69, 69, 65, 65, 65, 60, 62, 65, null, 65, 65, 65, 65, 62,
+      60, null, 65, null, 70, 69, 67, 65, 65, 65, 65, 65, 65, 65, 65, null,
+      69, 69, 69, 69, 65, 65, 65, 60, 62, 65, null, 65, 65, 65, 65, 62,
+      60, null, 65, null, 65, null, 72, 72, 69, 69, 69, 67, 67, 67, 67, 60,
+      69, 69, 69, 69, 65, 65, 65, 60, 62, 65, null, 65, 65, 65, 65, 62,
+      60, null, 65, null, 70, 69, 67, 65, 65, 65, 65, 65, 65, 65, 65, null,
+      69, 69, 69, 65, 65, 65, 60, 60, 69, 69, 69, 65, 65, 65, 65, 65,
+      68, 65, 60, null, 68, 68, 68, 67, 67, 67, 67, 67, 67, 67, 67, 67,
+      69, 69, 69, 65, 65, 65, 60, 60, 69, 69, 69, 65, 65, 65, 65, 65,
+      68, 65, 60, 60, 72, 72, 72, 72, 72, 72, 72, 72, 72, 72, 72, 72,
+    ],
+    // Harmony (derived from melody, 4th below)
+    ch2: [
+      65, 65, 65, 65, 62, 62, 62, 57, 59, 62, null, 62, 62, 62, 62, 59,
+      57, null, 62, null, 62, null, 69, 69, 65, 65, 65, 64, 64, 64, 64, 57,
+      65, 65, 65, 65, 62, 62, 62, 57, 59, 62, null, 62, 62, 62, 62, 59,
+      57, null, 62, null, 67, 65, 64, 62, 62, 62, 62, 62, 62, 62, 62, null,
+      65, 65, 65, 65, 62, 62, 62, 57, 59, 62, null, 62, 62, 62, 62, 59,
+      57, null, 62, null, 62, null, 69, 69, 65, 65, 65, 64, 64, 64, 64, 57,
+      65, 65, 65, 65, 62, 62, 62, 57, 59, 62, null, 62, 62, 62, 62, 59,
+      57, null, 62, null, 67, 65, 64, 62, 62, 62, 62, 62, 62, 62, 62, null,
+      65, 65, 65, 62, 62, 62, 57, 57, 65, 65, 65, 62, 62, 62, 62, 62,
+      65, 62, 57, null, 65, 65, 65, 64, 64, 64, 64, 64, 64, 64, 64, 64,
+      65, 65, 65, 62, 62, 62, 57, 57, 65, 65, 65, 62, 62, 62, 62, 62,
+      65, 62, 57, 57, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69,
+    ],
+    // Steel drums rhythm (Ching chigga)
+    ch3: [
+      81, null, 81, 81, 81, null, 81, 81, 82, null, 82, 82, 83, null, 83, 83,
+      81, null, 81, 81, 80, null, 80, 80, 81, null, 81, 81, 81, null, 81, 81,
+      81, null, 81, 81, 81, null, 81, 81, 82, null, 82, 82, 83, null, 83, 83,
+      82, null, 82, 82, 82, null, 82, 82, 81, null, 81, 81, 81, null, 81, 81,
+      81, null, 81, 81, 81, null, 81, 81, 82, null, 82, 82, 83, null, 83, 83,
+      81, null, 81, 81, 80, null, 80, 80, 81, null, 81, 81, 81, null, 81, 81,
+      81, null, 81, 81, 81, null, 81, 81, 82, null, 82, 82, 83, null, 83, 83,
+      82, null, 82, 82, 82, null, 82, 82, 81, null, 81, 81, 81, null, 81, 81,
+      82, null, 82, 82, 82, null, 82, 82, 81, null, 81, 81, 81, 81, 81, 81,
+      80, null, 80, 80, 80, null, 80, 80, 79, null, 79, 79, 79, null, 79, 79,
+      82, null, 82, 82, 82, null, 82, 82, 81, null, 81, 81, 81, 81, 81, 81,
+      80, null, 80, 80, 80, null, 80, 80, 79, null, 79, 79, 79, null, 79, 79,
+    ],
+    // Bass (dense)
+    ch4: [
+      41, 41, null, null, 45, 45, null, null, 46, 46, null, null, 47, 47, null, null,
+      45, 45, null, null, 44, 44, null, null, 43, 43, 36, 36, 38, 38, 40, 40,
+      41, 41, null, null, 45, 45, null, null, 46, 46, null, null, 47, 47, null, null,
+      48, 48, 36, 36, 40, 40, 43, 43, 41, 41, 36, 36, 41, 41, null, null,
+      41, 41, null, null, 45, 45, null, null, 46, 46, null, null, 47, 47, null, null,
+      45, 45, null, null, 44, 44, null, null, 43, 43, 36, 36, 38, 38, 40, 40,
+      41, 41, null, null, 45, 45, null, null, 46, 46, null, null, 47, 47, null, null,
+      48, 48, 36, 36, 40, 40, 43, 43, 41, 41, 36, 36, 41, 41, null, null,
+      45, 45, 46, 46, 48, 48, 50, 50, 48, 48, 45, 45, 41, 41, 43, 43,
+      44, 44, 48, 48, 50, 50, 53, 53, 55, 55, 53, 53, 52, 52, 48, 48,
+      46, 46, 45, 45, 46, 46, 48, 48, 53, 53, 52, 52, 48, 48, 45, 45,
+      47, 47, 48, 48, 53, 53, 48, 48, 46, 46, 50, 50, 48, 48, 52, 52,
+    ],
+    // Lower bass doubling
+    ch5: [
+      41, 41, null, null, 45, 45, null, null, 46, 46, null, null, 47, 47, null, null,
+      45, 45, null, null, 44, 44, null, null, 43, 43, 36, 36, 38, 38, 40, 40,
+      41, 41, null, null, 45, 45, null, null, 46, 46, null, null, 47, 47, null, null,
+      48, 48, 36, 36, 40, 40, 43, 43, 41, 41, 36, 36, 41, 41, null, null,
+      41, 41, null, null, 45, 45, null, null, 46, 46, null, null, 47, 47, null, null,
+      45, 45, null, null, 44, 44, null, null, 43, 43, 36, 36, 38, 38, 40, 40,
+      41, 41, null, null, 45, 45, null, null, 46, 46, null, null, 47, 47, null, null,
+      48, 48, 36, 36, 40, 40, 43, 43, 41, 41, 36, 36, 41, 41, null, null,
+      null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+      null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+      null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+      null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+    ],
+  },
+
+  zelda: {
+    name: 'Zelda LTTP Intro',
+    tempo: 68,
+    // Zelda: A Link to the Past - Title/Intro Theme (from MIDI: Intro-3.mid)
+    // Dense extraction - tempo halved for correct speed
+    ch1: [
+      // Main melody - Strings 1 (chromatic buildup G-G#-A-A#, then B with resolution)
+      null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+      null, null, null, null, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67,
+      null, null, null, null, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68,
+      null, null, null, null, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69,
+      null, null, null, null, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70,
+      null, null, null, null, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67,
+      null, null, null, null, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68,
+      null, null, null, null, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69,
+      null, null, null, null, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, null, null,
+      71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 69, 69, 67, 67,
+      69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, null, null,
+      74, 74, 74, 74, 74, 74, 74, 74, 74, 74, 74, 74, 72, 72, 70, 70,
+    ],
+    // Harmony strings - Strings 2 (parallel 5ths below)
+    ch2: [
+      null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+      null, null, null, null, 62, 62, 62, 62, 62, 62, 62, 62, 62, 62, 62, 62,
+      null, null, null, null, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63,
+      63, null, null, null, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
+      64, null, null, null, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65,
+      65, null, null, null, 62, 62, 62, 62, 62, 62, 62, 62, 62, 62, 62, 62,
+      62, null, null, null, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63,
+      63, null, null, null, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
+      64, null, null, null, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, null,
+      null, null, null, null, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, null,
+      null, null, null, null, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65,
+      null, null, null, null, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70,
+    ],
+    // Bass arpeggios - Strings 3 (C-G-C pattern)
+    ch3: [
+      null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+      36, 36, 43, 43, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, null,
+      36, 36, 43, 43, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, null,
+      36, 36, 43, 43, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, null,
+      36, 36, 43, 43, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, null,
+      36, 36, 43, 43, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48,
+      36, 36, 43, 43, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, null, null,
+      36, 36, 43, 43, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, null,
+      36, 36, 43, 43, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, null, null,
+      41, 41, 48, 48, 53, 53, 53, 53, 53, 53, 53, 53, 53, 53, null, null,
+      46, 46, 53, 53, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, null,
+      39, 39, 46, 46, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, null, null,
+    ],
+    // Upper strings - Strings 5 (enters later, adds richness)
+    ch4: [
+      null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+      null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+      null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+      null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+      null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+      67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67,
+      68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68,
+      69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69,
+      70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70,
+      67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67,
+      65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65,
+      70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70,
+    ],
+    // Lower harmony - Strings 6 (parallel motion)
+    ch5: [
+      null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+      null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+      null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+      null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+      null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+      62, 62, 62, 62, 62, 62, 62, 62, 62, 62, 62, 62, 62, 62, 62, 62,
+      63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63,
+      64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
+      65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65,
+      64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
+      60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60,
+      67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67,
+    ],
+  },
+
+  zeldadark: {
+    name: 'Zelda Dark World',
+    tempo: 96,
+    // The Legend of Zelda: A Link to the Past - Dark World Theme
+    // Transcribed from MIDI: Dark-World-06.mid (dense extraction)
+    // Tempo halved from 192 to 96 for correct playback speed
+    ch1: [
+      // Main melody - Trumpet (dense, with held notes)
+      67, 67, 67, 67, 67, 67, 67, 67, 67, null, 60, null, 67, null, 72, null,
+      72, 70, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, null, 65, null,
+      67, 67, 67, 67, 60, 60, 60, 60, 60, 60, 60, 60, 60, null, 65, null,
+      65, 63, 62, 62, 62, 62, 62, 62, 62, 62, 62, 62, 62, null, 58, 58,
+      60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60,
+      null, null, null, null, null, null, null, null, null, null, null, null, null, null, 60, null,
+      67, 67, 67, 67, 67, 67, 67, 67, 67, null, 60, null, 67, null, 72, null,
+      72, 70, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, null, 65, null,
+      67, 67, 67, 67, 60, 60, 60, 60, 60, 60, 60, 60, 60, null, 65, null,
+      65, 63, 62, 62, 62, 62, 62, 62, 62, 62, 62, 62, 62, null, 58, 58,
+      60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60,
+      null, null, null, null, null, null, null, null, null, null, null, null, null, null, 79, 81,
+    ],
+    // Harmony - Trumpet 2 (parallel harmonies)
+    ch2: [
+      63, 63, 63, 63, 63, 63, 63, 63, 63, null, 55, null, 63, null, 67, null,
+      67, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, null, 62, null,
+      63, 63, 63, 63, 56, 56, 56, 56, 56, 56, 56, 56, 56, null, 62, null,
+      62, 60, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, null, 55, 55,
+      55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
+      null, null, null, null, null, null, null, null, null, null, null, null, null, null, 55, null,
+      63, 63, 63, 63, 63, 63, 63, 63, 63, null, 55, null, 63, null, 67, null,
+      67, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, null, 62, null,
+      63, 63, 63, 63, 56, 56, 56, 56, 56, 56, 56, 56, 56, null, 62, null,
+      62, 60, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 58, null, 55, 55,
+      55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
+      null, null, null, null, null, null, null, null, null, null, null, null, null, null, 67, 69,
+    ],
+    // Synth Brass (reinforces melody)
+    ch3: [
+      67, 67, 67, 67, 67, 67, 67, 67, 67, null, 60, null, 67, null, 72, null,
+      72, 70, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, null, 65, null,
+      67, 67, 67, 67, 60, 60, 60, 60, 60, 60, 60, 60, 60, null, 65, null,
+      65, 63, 62, 62, 62, 62, 62, 62, 62, 62, 62, 62, 62, null, 58, null,
+      60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60,
+      null, null, null, null, null, null, null, null, null, null, null, null, null, null, 60, null,
+      67, 67, 67, 67, 67, 67, 67, 67, 67, null, 60, null, 67, null, 72, null,
+      72, 70, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, null, 65, null,
+      67, 67, 67, 67, 60, 60, 60, 60, 60, 60, 60, 60, 60, null, 65, null,
+      65, 63, 62, 62, 62, 62, 62, 62, 62, 62, 62, 62, 62, null, 58, null,
+      60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60,
+      null, null, null, null, null, null, null, null, null, null, null, null, null, null, 67, 69,
+    ],
+    // Bass - C-F-Ab-Bb progression
+    ch4: [
+      36, 36, null, null, 36, 36, null, null, 36, 36, null, null, null, null, 36, null,
+      41, 41, null, null, 41, 41, null, null, 41, 41, null, null, null, null, 41, null,
+      44, 44, null, null, 44, 44, null, null, 44, 44, null, null, null, null, 44, null,
+      46, 46, null, null, 46, 46, null, null, 46, 46, null, null, null, null, 46, null,
+      36, 36, null, null, 36, 36, null, null, 36, 36, null, null, null, null, 36, null,
+      36, 36, null, null, 36, 36, null, null, 36, 36, null, null, null, null, 36, null,
+      36, 36, null, null, 36, 36, null, null, 36, 36, null, null, null, null, 36, null,
+      41, 41, null, null, 41, 41, null, null, 41, 41, null, null, null, null, 41, null,
+      44, 44, null, null, 44, 44, null, null, 44, 44, null, null, null, null, 44, null,
+      46, 46, null, null, 46, 46, null, null, 46, 46, null, null, null, null, 46, null,
+      36, 36, null, null, 36, 36, null, null, 36, 36, null, null, null, null, 36, null,
+      36, 36, null, null, 36, 36, null, null, 36, 36, null, null, null, null, 36, null,
+    ],
+    // Strings pad (sustained harmonics)
+    ch5: [
+      null, null, 67, null, 67, null, 67, 67, 67, null, 67, null, null, null, 67, null,
+      null, null, 69, null, 69, null, 69, 69, 69, null, 69, null, null, null, 69, null,
+      null, null, 67, null, 67, null, 67, 67, 67, null, 67, null, null, null, 67, null,
+      null, null, 65, null, 65, null, 65, 65, 65, null, 65, null, null, null, 65, null,
+      null, null, 67, null, 67, null, 67, 67, 67, null, 69, null, null, null, null, null,
+      null, null, 70, null, 70, null, 70, 70, 70, null, 72, null, null, null, null, null,
+      null, null, 67, null, 67, null, 67, 67, 67, null, 67, null, null, null, 67, null,
+      null, null, 69, null, 69, null, 69, 69, 69, null, 69, null, null, null, 69, null,
+      null, null, 67, null, 67, null, 67, 67, 67, null, 67, null, null, null, 67, null,
+      null, null, 65, null, 65, null, 65, 65, 65, null, 65, null, null, null, 65, null,
+      null, null, 67, null, 67, null, 67, 67, 67, null, 69, null, null, null, null, null,
+      null, null, 70, null, 70, null, 70, 70, 70, null, 72, null, null, null, null, null,
     ],
   },
 } as const

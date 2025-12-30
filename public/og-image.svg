@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0c1016" />
+      <stop offset="100%" stop-color="#05070b" />
+    </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#151b24" />
+      <stop offset="100%" stop-color="#0f141c" />
+    </linearGradient>
+    <linearGradient id="acid" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#caff00" />
+      <stop offset="100%" stop-color="#5dff00" />
+    </linearGradient>
+    <pattern id="grid" width="26" height="26" patternUnits="userSpaceOnUse">
+      <path d="M26 0H0V26" fill="none" stroke="#10161f" stroke-width="1" />
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)" />
+  <rect width="1200" height="630" fill="url(#grid)" opacity="0.4" />
+
+  <rect x="70" y="70" width="1060" height="490" rx="22" fill="#0c1118" stroke="#ffffff" stroke-opacity="0.06" />
+  <rect x="92" y="92" width="1016" height="446" rx="18" fill="url(#panel)" stroke="#ffffff" stroke-opacity="0.04" />
+
+  <rect x="110" y="120" width="980" height="28" rx="12" fill="#101722" />
+  <rect x="130" y="130" width="160" height="8" rx="4" fill="url(#acid)" />
+  <circle cx="1030" cy="134" r="5" fill="#5dff00" />
+  <circle cx="1050" cy="134" r="5" fill="#caff00" />
+
+  <text x="130" y="230" font-family="Trebuchet MS, Arial, sans-serif" font-size="56" letter-spacing="2" fill="#e6eef8">
+    NoobSynth Workbench
+  </text>
+  <text x="130" y="270" font-family="Trebuchet MS, Arial, sans-serif" font-size="20" letter-spacing="1" fill="#a8b7c8">
+    Patchable acid machine - modular synth for techno.
+  </text>
+
+  <g>
+    <rect x="130" y="310" width="250" height="190" rx="14" fill="#121a24" stroke="#ffffff" stroke-opacity="0.05" />
+    <rect x="400" y="310" width="250" height="190" rx="14" fill="#121a24" stroke="#ffffff" stroke-opacity="0.05" />
+    <rect x="670" y="310" width="250" height="190" rx="14" fill="#121a24" stroke="#ffffff" stroke-opacity="0.05" />
+    <rect x="940" y="310" width="150" height="190" rx="14" fill="#121a24" stroke="#ffffff" stroke-opacity="0.05" />
+  </g>
+
+  <g fill="#0b121b" stroke="#2a3a4a" stroke-width="2">
+    <circle cx="180" cy="360" r="20" />
+    <circle cx="250" cy="360" r="20" />
+    <circle cx="320" cy="360" r="20" />
+    <circle cx="450" cy="360" r="20" />
+    <circle cx="520" cy="360" r="20" />
+    <circle cx="590" cy="360" r="20" />
+    <circle cx="720" cy="360" r="20" />
+    <circle cx="790" cy="360" r="20" />
+    <circle cx="860" cy="360" r="20" />
+    <circle cx="970" cy="360" r="16" />
+    <circle cx="1030" cy="360" r="16" />
+  </g>
+
+  <g fill="#121a24" stroke="#caff00" stroke-opacity="0.7">
+    <circle cx="160" cy="470" r="8" />
+    <circle cx="190" cy="470" r="8" />
+    <circle cx="420" cy="470" r="8" />
+    <circle cx="450" cy="470" r="8" />
+    <circle cx="690" cy="470" r="8" />
+    <circle cx="720" cy="470" r="8" />
+    <circle cx="950" cy="470" r="7" />
+    <circle cx="980" cy="470" r="7" />
+  </g>
+
+  <rect x="410" y="410" width="220" height="48" rx="10" fill="#0b121b" stroke="#5dff00" stroke-opacity="0.3" />
+  <path d="M420 434 C 448 420, 492 448, 520 434 C 548 420, 592 448, 620 434" fill="none" stroke="url(#acid)" stroke-width="3" />
+
+  <path d="M168 470 C 260 430, 330 520, 430 470" fill="none" stroke="#5dff00" stroke-width="4" />
+  <path d="M450 470 C 560 430, 640 520, 720 470" fill="none" stroke="#caff00" stroke-width="4" />
+  <path d="M720 470 C 820 430, 900 520, 980 470" fill="none" stroke="#5dff00" stroke-width="4" />
+  <path d="M190 360 C 320 320, 520 400, 650 360" fill="none" stroke="#caff00" stroke-opacity="0.5" stroke-width="2" />
+  <path d="M650 360 C 760 320, 900 420, 1030 360" fill="none" stroke="#5dff00" stroke-opacity="0.5" stroke-width="2" />
+</svg>

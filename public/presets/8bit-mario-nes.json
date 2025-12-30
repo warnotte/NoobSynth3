@@ -1,0 +1,244 @@
+{
+  "version": 1,
+  "id": "8bit-mario-nes",
+  "name": "8-Bit Mario (NES Authentic)",
+  "description": "Authentic NES 2A03 chip emulation with Mario IO sequencer.",
+  "graph": {
+    "modules": [
+      {
+        "id": "mario-1",
+        "type": "mario",
+        "name": "Mario IO",
+        "position": { "x": 120, "y": 140 },
+        "params": { "running": false, "tempo": 200, "song": "smb" }
+      },
+      {
+        "id": "nes-lead",
+        "type": "nes-osc",
+        "name": "Pulse 1",
+        "position": { "x": 320, "y": 80 },
+        "params": {
+          "frequency": 440,
+          "fine": 0,
+          "volume": 1.0,
+          "mode": 0,
+          "duty": 2,
+          "noiseMode": 0,
+          "bitcrush": 0.8
+        }
+      },
+      {
+        "id": "nes-chords",
+        "type": "nes-osc",
+        "name": "Pulse 2",
+        "position": { "x": 520, "y": 80 },
+        "params": {
+          "frequency": 440,
+          "fine": 0,
+          "volume": 1.0,
+          "mode": 1,
+          "duty": 1,
+          "noiseMode": 0,
+          "bitcrush": 0.8
+        }
+      },
+      {
+        "id": "nes-harm",
+        "type": "nes-osc",
+        "name": "Pulse 3",
+        "position": { "x": 720, "y": 80 },
+        "params": {
+          "frequency": 440,
+          "fine": 0,
+          "volume": 1.0,
+          "mode": 0,
+          "duty": 0,
+          "noiseMode": 0,
+          "bitcrush": 0.8
+        }
+      },
+      {
+        "id": "nes-bass",
+        "type": "nes-osc",
+        "name": "Triangle",
+        "position": { "x": 920, "y": 80 },
+        "params": {
+          "frequency": 110,
+          "fine": 0,
+          "volume": 1.0,
+          "mode": 2,
+          "duty": 0,
+          "noiseMode": 0,
+          "bitcrush": 1.0
+        }
+      },
+      {
+        "id": "nes-extra",
+        "type": "nes-osc",
+        "name": "Noise",
+        "position": { "x": 1120, "y": 80 },
+        "params": {
+          "frequency": 880,
+          "fine": 0,
+          "volume": 0.6,
+          "mode": 3,
+          "duty": 0,
+          "noiseMode": 0,
+          "bitcrush": 1.0
+        }
+      },
+      {
+        "id": "adsr-lead",
+        "type": "adsr",
+        "name": "ENV 1",
+        "position": { "x": 320, "y": 320 },
+        "params": { "attack": 0.001, "decay": 0.08, "sustain": 0.9, "release": 0.02 }
+      },
+      {
+        "id": "adsr-chords",
+        "type": "adsr",
+        "name": "ENV 2",
+        "position": { "x": 520, "y": 320 },
+        "params": { "attack": 0.001, "decay": 0.06, "sustain": 0.85, "release": 0.02 }
+      },
+      {
+        "id": "adsr-harm",
+        "type": "adsr",
+        "name": "ENV 3",
+        "position": { "x": 720, "y": 320 },
+        "params": { "attack": 0.001, "decay": 0.08, "sustain": 0.9, "release": 0.02 }
+      },
+      {
+        "id": "adsr-bass",
+        "type": "adsr",
+        "name": "ENV 4",
+        "position": { "x": 920, "y": 320 },
+        "params": { "attack": 0.001, "decay": 0.12, "sustain": 0.95, "release": 0.05 }
+      },
+      {
+        "id": "adsr-extra",
+        "type": "adsr",
+        "name": "ENV 5",
+        "position": { "x": 1120, "y": 320 },
+        "params": { "attack": 0.001, "decay": 0.03, "sustain": 0.5, "release": 0.01 }
+      },
+      {
+        "id": "vca-lead",
+        "type": "gain",
+        "name": "VCA 1",
+        "position": { "x": 320, "y": 200 },
+        "params": { "gain": 0.85 }
+      },
+      {
+        "id": "vca-chords",
+        "type": "gain",
+        "name": "VCA 2",
+        "position": { "x": 520, "y": 200 },
+        "params": { "gain": 0.6 }
+      },
+      {
+        "id": "vca-harm",
+        "type": "gain",
+        "name": "VCA 3",
+        "position": { "x": 720, "y": 200 },
+        "params": { "gain": 0.5 }
+      },
+      {
+        "id": "vca-bass",
+        "type": "gain",
+        "name": "VCA 4",
+        "position": { "x": 920, "y": 200 },
+        "params": { "gain": 0.75 }
+      },
+      {
+        "id": "vca-extra",
+        "type": "gain",
+        "name": "VCA 5",
+        "position": { "x": 1120, "y": 200 },
+        "params": { "gain": 0.3 }
+      },
+      {
+        "id": "mix-1",
+        "type": "mixer",
+        "name": "Mix 1+2",
+        "position": { "x": 420, "y": 440 },
+        "params": { "levelA": 0.8, "levelB": 0.6 }
+      },
+      {
+        "id": "mix-2",
+        "type": "mixer",
+        "name": "Mix 3+4",
+        "position": { "x": 620, "y": 440 },
+        "params": { "levelA": 0.5, "levelB": 0.8 }
+      },
+      {
+        "id": "mix-3",
+        "type": "mixer",
+        "name": "Mix A+B",
+        "position": { "x": 820, "y": 440 },
+        "params": { "levelA": 0.9, "levelB": 0.9 }
+      },
+      {
+        "id": "mix-4",
+        "type": "mixer",
+        "name": "Mix +5",
+        "position": { "x": 1020, "y": 440 },
+        "params": { "levelA": 0.95, "levelB": 0.25 }
+      },
+      {
+        "id": "hpf-1",
+        "type": "hpf",
+        "name": "HPF",
+        "position": { "x": 1220, "y": 380 },
+        "params": { "cutoff": 60 }
+      },
+      {
+        "id": "scope-1",
+        "type": "scope",
+        "name": "Scope",
+        "position": { "x": 1420, "y": 200 },
+        "params": { "time": 1, "gain": 1, "freeze": false, "mode": "scope" }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Main Out",
+        "position": { "x": 1420, "y": 440 },
+        "params": { "level": 0.75 }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "mario-1", "portId": "cv-1" }, "to": { "moduleId": "nes-lead", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "mario-1", "portId": "gate-1" }, "to": { "moduleId": "adsr-lead", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "mario-1", "portId": "cv-2" }, "to": { "moduleId": "nes-chords", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "mario-1", "portId": "gate-2" }, "to": { "moduleId": "adsr-chords", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "mario-1", "portId": "cv-3" }, "to": { "moduleId": "nes-harm", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "mario-1", "portId": "gate-3" }, "to": { "moduleId": "adsr-harm", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "mario-1", "portId": "cv-4" }, "to": { "moduleId": "nes-bass", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "mario-1", "portId": "gate-4" }, "to": { "moduleId": "adsr-bass", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "mario-1", "portId": "cv-5" }, "to": { "moduleId": "nes-extra", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "mario-1", "portId": "gate-5" }, "to": { "moduleId": "adsr-extra", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "nes-lead", "portId": "out" }, "to": { "moduleId": "vca-lead", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-lead", "portId": "env" }, "to": { "moduleId": "vca-lead", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "nes-chords", "portId": "out" }, "to": { "moduleId": "vca-chords", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-chords", "portId": "env" }, "to": { "moduleId": "vca-chords", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "nes-harm", "portId": "out" }, "to": { "moduleId": "vca-harm", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-harm", "portId": "env" }, "to": { "moduleId": "vca-harm", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "nes-bass", "portId": "out" }, "to": { "moduleId": "vca-bass", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-bass", "portId": "env" }, "to": { "moduleId": "vca-bass", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "nes-extra", "portId": "out" }, "to": { "moduleId": "vca-extra", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-extra", "portId": "env" }, "to": { "moduleId": "vca-extra", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "vca-lead", "portId": "out" }, "to": { "moduleId": "mix-1", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "vca-chords", "portId": "out" }, "to": { "moduleId": "mix-1", "portId": "in-b" }, "kind": "audio" },
+      { "from": { "moduleId": "vca-harm", "portId": "out" }, "to": { "moduleId": "mix-2", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "vca-bass", "portId": "out" }, "to": { "moduleId": "mix-2", "portId": "in-b" }, "kind": "audio" },
+      { "from": { "moduleId": "mix-1", "portId": "out" }, "to": { "moduleId": "mix-3", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "mix-2", "portId": "out" }, "to": { "moduleId": "mix-3", "portId": "in-b" }, "kind": "audio" },
+      { "from": { "moduleId": "mix-3", "portId": "out" }, "to": { "moduleId": "mix-4", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "vca-extra", "portId": "out" }, "to": { "moduleId": "mix-4", "portId": "in-b" }, "kind": "audio" },
+      { "from": { "moduleId": "mix-4", "portId": "out" }, "to": { "moduleId": "hpf-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "hpf-1", "portId": "out" }, "to": { "moduleId": "scope-1", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "scope-1", "portId": "out-a" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}

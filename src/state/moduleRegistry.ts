@@ -3,6 +3,8 @@ import type { ModuleSpec, ModuleType } from '../shared/graph'
 export const moduleSizes: Record<ModuleType, string> = {
   oscillator: '2x3',
   supersaw: '2x2',
+  'nes-osc': '2x3',
+  'snes-osc': '2x3',
   noise: '2x1',
   'mod-router': '2x2',
   'ring-mod': '1x1',
@@ -28,6 +30,8 @@ export const moduleSizes: Record<ModuleType, string> = {
 
 export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>> = {
   oscillator: 'strip',
+  'nes-osc': 'strip',
+  'snes-osc': 'strip',
   vcf: 'strip',
   control: 'strip',
   lab: 'strip',
@@ -42,6 +46,8 @@ export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>>
 export const moduleCatalog: { type: ModuleType; label: string }[] = [
   { type: 'oscillator', label: 'VCO' },
   { type: 'supersaw', label: 'Supersaw' },
+  { type: 'nes-osc', label: 'NES Osc' },
+  { type: 'snes-osc', label: 'SNES Osc' },
   { type: 'noise', label: 'Noise' },
   { type: 'mod-router', label: 'Mod Router' },
   { type: 'ring-mod', label: 'Ring Mod' },
@@ -68,6 +74,8 @@ export const moduleCatalog: { type: ModuleType; label: string }[] = [
 export const modulePrefixes: Record<ModuleType, string> = {
   oscillator: 'osc',
   supersaw: 'ssaw',
+  'nes-osc': 'nes',
+  'snes-osc': 'snes',
   noise: 'noise',
   'mod-router': 'modr',
   'ring-mod': 'ring',
@@ -94,6 +102,8 @@ export const modulePrefixes: Record<ModuleType, string> = {
 export const moduleLabels: Record<ModuleType, string> = {
   oscillator: 'VCO',
   supersaw: 'Supersaw',
+  'nes-osc': 'NES Osc',
+  'snes-osc': 'SNES Osc',
   noise: 'Noise',
   'mod-router': 'Mod Router',
   'ring-mod': 'Ring Mod',
@@ -163,6 +173,24 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
   phaser: { rate: 0.5, depth: 0.7, feedback: 0.3, mix: 0.5 },
   distortion: { drive: 0.5, tone: 0.5, mix: 1.0, mode: 'soft' },
   supersaw: { frequency: 220, detune: 25, mix: 1.0 },
+  'nes-osc': {
+    frequency: 220,
+    fine: 0,
+    volume: 1.0,
+    mode: 0,      // 0=Pulse1, 1=Pulse2, 2=Triangle, 3=Noise
+    duty: 1,      // 0=12.5%, 1=25%, 2=50%, 3=75%
+    noiseMode: 0, // 0=Random, 1=Loop
+    bitcrush: 1.0,
+  },
+  'snes-osc': {
+    frequency: 220,
+    fine: 0,
+    volume: 1.0,
+    wave: 0,      // 0-7 wavetable selection
+    gauss: 0.7,   // Gaussian filter intensity
+    color: 0.5,   // Brightness
+    lofi: 0.5,    // 32kHz decimation effect
+  },
   adsr: { attack: 0.02, decay: 0.2, sustain: 0.65, release: 0.5 },
   lfo: { rate: 0.5, depth: 0.6, offset: 0, shape: 'sine', bipolar: true },
   scope: { time: 1, gain: 1, freeze: false },

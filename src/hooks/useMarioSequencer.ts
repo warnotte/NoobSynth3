@@ -49,7 +49,7 @@ export const useMarioSequencer = ({
     }
 
     const stepMs = (60000 / marioTempo) / 4
-    const gateMs = stepMs * 0.75
+    const gateMs = stepMs * 0.9  // 90% gate for smoother legato
 
     const stopMarioSeq = () => {
       if (marioSeqRef.current.timer) {

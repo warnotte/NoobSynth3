@@ -1578,6 +1578,274 @@ impl Distortion {
   }
 }
 
+
+// =============================================================================
+// NES OSCILLATOR (2A03 chip emulation)
+// =============================================================================
+
+pub struct NesOsc {
+  sample_rate: f32,
+  phases: [f32; 8],
+  lfsrs: [u16; 8],
+  noise_timers: [f32; 8],
+}
+
+pub struct NesOscParams<'a> {
+  pub base_freq: &'a [Sample],
+  pub fine: &'a [Sample],
+  pub volume: &'a [Sample],
+  pub mode: &'a [Sample],
+  pub duty: &'a [Sample],
+  pub noise_mode: &'a [Sample],
+  pub bitcrush: &'a [Sample],
+}
+
+pub struct NesOscInputs<'a> {
+  pub pitch: Option<&'a [Sample]>,
+}
+
+impl NesOsc {
+  pub fn new(sample_rate: f32) -> Self {
+    let mut phases = [0.0; 8];
+    for (i, phase) in phases.iter_mut().enumerate() {
+      *phase = i as f32 / 8.0;
+    }
+    Self {
+      sample_rate: sample_rate.max(1.0),
+      phases,
+      lfsrs: [1; 8],
+      noise_timers: [0.0; 8],
+    }
+  }
+
+  pub fn set_sample_rate(&mut self, sample_rate: f32) {
+    self.sample_rate = sample_rate.max(1.0);
+  }
+
+  fn nes_pulse(phase: f32, duty: u8) -> f32 {
+    let threshold = match duty {
+      0 => 0.125,
+      1 => 0.25,
+      2 => 0.5,
+      3 => 0.75,
+      _ => 0.5,
+    };
+    if phase < threshold { 1.0 } else { -1.0 }
+  }
+
+  fn nes_triangle(step: u8) -> f32 {
+    let level = if step < 16 { step } else { 31 - step };
+    (level as f32 / 7.5) - 1.0
+  }
+
+  fn nes_noise(lfsr: &mut u16, loop_mode: bool) -> f32 {
+    let feedback = if loop_mode {
+      ((*lfsr & 1) ^ ((*lfsr >> 6) & 1)) as u16
+    } else {
+      ((*lfsr & 1) ^ ((*lfsr >> 1) & 1)) as u16
+    };
+    *lfsr = (*lfsr >> 1) | (feedback << 14);
+    if *lfsr & 1 == 1 { 1.0 } else { -1.0 }
+  }
+
+  fn dac_7bit(sample: f32, amount: f32) -> f32 {
+    if amount <= 0.0 { return sample; }
+    let t = 1.0 - amount;
+    let levels = 64.0 + t * (128.0 - 64.0);
+    let quantized = (sample * levels).round() / levels;
+    sample * (1.0 - amount) + quantized * amount
+  }
+
+  pub fn process_block(&mut self, output: &mut [Sample], inputs: NesOscInputs, params: NesOscParams) {
+    for i in 0..output.len() {
+      let base = sample_at(params.base_freq, i, 220.0);
+      let fine_cents = sample_at(params.fine, i, 0.0);
+      let pitch_cv = inputs.pitch.map_or(0.0, |p| sample_at(p, i, 0.0));
+      let freq = base * (2.0_f32).powf(pitch_cv + fine_cents / 1200.0);
+      let freq = freq.clamp(20.0, 20000.0);
+      let vol = sample_at(params.volume, i, 1.0).clamp(0.0, 1.0);
+      let mode_val = sample_at(params.mode, i, 0.0) as u8;
+      let duty_val = sample_at(params.duty, i, 1.0) as u8;
+      let noise_loop = sample_at(params.noise_mode, i, 0.0) >= 0.5;
+      let crush = sample_at(params.bitcrush, i, 1.0).clamp(0.0, 1.0);
+
+      let sample = match mode_val {
+        0 | 1 => {
+          let phase_inc = freq / self.sample_rate;
+          self.phases[0] += phase_inc;
+          if self.phases[0] >= 1.0 { self.phases[0] -= 1.0; }
+          Self::nes_pulse(self.phases[0], duty_val)
+        }
+        2 => {
+          // NES Triangle: 4-bit stepped waveform (32 steps per cycle)
+          let phase_inc = freq / self.sample_rate;
+          self.phases[0] += phase_inc;
+          if self.phases[0] >= 1.0 { self.phases[0] -= 1.0; }
+          // Calculate step directly from phase (0-31)
+          let step = (self.phases[0] * 32.0) as u8;
+          Self::nes_triangle(step)
+        }
+        3 => {
+          let noise_freq = freq * 8.0;
+          let phase_inc = noise_freq / self.sample_rate;
+          self.noise_timers[0] += phase_inc;
+          if self.noise_timers[0] >= 1.0 {
+            self.noise_timers[0] -= 1.0;
+            Self::nes_noise(&mut self.lfsrs[0], noise_loop);
+          }
+          if self.lfsrs[0] & 1 == 1 { 1.0 } else { -1.0 }
+        }
+        _ => 0.0,
+      };
+      output[i] = Self::dac_7bit(sample * vol, crush);
+    }
+  }
+}
+
+// =============================================================================
+// SNES OSCILLATOR (S-DSP emulation with wavetables)
+// =============================================================================
+
+const WAVE_SQUARE: [f32; 32] = [
+  1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+  -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0,
+];
+const WAVE_SAW: [f32; 32] = [
+  -1.0, -0.9375, -0.875, -0.8125, -0.75, -0.6875, -0.625, -0.5625,
+  -0.5, -0.4375, -0.375, -0.3125, -0.25, -0.1875, -0.125, -0.0625,
+  0.0, 0.0625, 0.125, 0.1875, 0.25, 0.3125, 0.375, 0.4375,
+  0.5, 0.5625, 0.625, 0.6875, 0.75, 0.8125, 0.875, 0.9375,
+];
+const WAVE_STRINGS: [f32; 32] = [
+  0.0, 0.4, 0.7, 0.9, 1.0, 0.9, 0.7, 0.4, 0.0, -0.3, -0.5, -0.6, -0.5, -0.3, 0.0, 0.2,
+  0.3, 0.2, 0.0, -0.2, -0.4, -0.5, -0.4, -0.2, 0.0, 0.1, 0.2, 0.1, 0.0, -0.1, -0.2, -0.1,
+];
+const WAVE_BELL: [f32; 32] = [
+  0.0, 0.7, 1.0, 0.7, 0.0, -0.5, -0.7, -0.5, 0.0, 0.3, 0.5, 0.3, 0.0, -0.2, -0.3, -0.2,
+  0.0, 0.15, 0.2, 0.15, 0.0, -0.1, -0.15, -0.1, 0.0, 0.05, 0.1, 0.05, 0.0, -0.05, -0.1, -0.05,
+];
+const WAVE_ORGAN: [f32; 32] = [
+  0.0, 0.5, 0.87, 1.0, 0.87, 0.5, 0.0, -0.5, -0.87, -1.0, -0.87, -0.5, 0.0, 0.25, 0.43, 0.5,
+  0.43, 0.25, 0.0, -0.25, -0.43, -0.5, -0.43, -0.25, 0.0, 0.17, 0.29, 0.33, 0.29, 0.17, 0.0, -0.17,
+];
+const WAVE_PAD: [f32; 32] = [
+  0.0, 0.2, 0.4, 0.55, 0.65, 0.7, 0.72, 0.7, 0.65, 0.55, 0.4, 0.2, 0.0, -0.2, -0.35, -0.45,
+  -0.5, -0.45, -0.35, -0.2, 0.0, 0.15, 0.25, 0.3, 0.25, 0.15, 0.0, -0.1, -0.15, -0.15, -0.1, 0.0,
+];
+const WAVE_BASS: [f32; 32] = [
+  0.0, 0.6, 1.0, 1.0, 0.8, 0.5, 0.2, 0.0, -0.2, -0.4, -0.5, -0.6, -0.6, -0.5, -0.4, -0.3,
+  -0.2, -0.1, 0.0, 0.1, 0.15, 0.2, 0.2, 0.15, 0.1, 0.05, 0.0, -0.05, -0.1, -0.1, -0.05, 0.0,
+];
+const WAVE_SYNTH: [f32; 32] = [
+  1.0, 0.9, 0.6, 0.2, -0.2, -0.5, -0.7, -0.8, -0.8, -0.7, -0.5, -0.2, 0.1, 0.4, 0.6, 0.7,
+  0.7, 0.6, 0.4, 0.1, -0.1, -0.3, -0.4, -0.4, -0.3, -0.2, -0.1, 0.0, 0.1, 0.15, 0.15, 0.1,
+];
+const SNES_WAVETABLES: [&[f32; 32]; 8] = [
+  &WAVE_SQUARE, &WAVE_SAW, &WAVE_STRINGS, &WAVE_BELL,
+  &WAVE_ORGAN, &WAVE_PAD, &WAVE_BASS, &WAVE_SYNTH,
+];
+
+pub struct SnesOsc {
+  sample_rate: f32,
+  phases: [f32; 8],
+  decim_counters: [f32; 8],
+  last_samples: [f32; 8],
+}
+
+pub struct SnesOscParams<'a> {
+  pub base_freq: &'a [Sample],
+  pub fine: &'a [Sample],
+  pub volume: &'a [Sample],
+  pub wave: &'a [Sample],
+  pub gauss: &'a [Sample],
+  pub color: &'a [Sample],
+  pub lofi: &'a [Sample],
+}
+
+pub struct SnesOscInputs<'a> {
+  pub pitch: Option<&'a [Sample]>,
+}
+
+impl SnesOsc {
+  pub fn new(sample_rate: f32) -> Self {
+    let mut phases = [0.0; 8];
+    for (i, phase) in phases.iter_mut().enumerate() {
+      *phase = i as f32 / 8.0;
+    }
+    Self {
+      sample_rate: sample_rate.max(1.0),
+      phases,
+      decim_counters: [0.0; 8],
+      last_samples: [0.0; 8],
+    }
+  }
+
+  pub fn set_sample_rate(&mut self, sample_rate: f32) {
+    self.sample_rate = sample_rate.max(1.0);
+  }
+
+  fn gaussian_interpolate(samples: &[f32; 4], frac: f32) -> f32 {
+    let t = frac;
+    let t2 = t * t;
+    let t3 = t2 * t;
+    let c0 = -0.5 * t3 + t2 - 0.5 * t;
+    let c1 = 1.5 * t3 - 2.5 * t2 + 1.0;
+    let c2 = -1.5 * t3 + 2.0 * t2 + 0.5 * t;
+    let c3 = 0.5 * t3 - 0.5 * t2;
+    samples[0] * c0 + samples[1] * c1 + samples[2] * c2 + samples[3] * c3
+  }
+
+  pub fn process_block(&mut self, output: &mut [Sample], inputs: SnesOscInputs, params: SnesOscParams) {
+    for i in 0..output.len() {
+      let base = sample_at(params.base_freq, i, 220.0);
+      let fine_cents = sample_at(params.fine, i, 0.0);
+      let pitch_cv = inputs.pitch.map_or(0.0, |p| sample_at(p, i, 0.0));
+      let freq = base * (2.0_f32).powf(pitch_cv + fine_cents / 1200.0);
+      let freq = freq.clamp(20.0, 20000.0);
+      let vol = sample_at(params.volume, i, 1.0).clamp(0.0, 1.0);
+      let wave_idx = (sample_at(params.wave, i, 0.0) as usize).min(7);
+      let gauss_amt = sample_at(params.gauss, i, 0.7).clamp(0.0, 1.0);
+      let color_amt = sample_at(params.color, i, 0.5).clamp(0.0, 1.0);
+      let lofi_amt = sample_at(params.lofi, i, 0.5).clamp(0.0, 1.0);
+
+      let wavetable = SNES_WAVETABLES[wave_idx];
+      let phase_inc = freq / self.sample_rate;
+      self.phases[0] += phase_inc;
+      if self.phases[0] >= 1.0 { self.phases[0] -= 1.0; }
+
+      let table_pos = self.phases[0] * 32.0;
+      let idx = table_pos as usize;
+      let frac = table_pos - idx as f32;
+
+      let s0 = wavetable[(idx + 31) % 32];
+      let s1 = wavetable[idx % 32];
+      let s2 = wavetable[(idx + 1) % 32];
+      let s3 = wavetable[(idx + 2) % 32];
+      let samples_arr = [s0, s1, s2, s3];
+      let gauss_sample = Self::gaussian_interpolate(&samples_arr, frac);
+      let linear_sample = s1 + frac * (s2 - s1);
+      let mut sample = linear_sample * (1.0 - gauss_amt) + gauss_sample * gauss_amt;
+
+      if color_amt > 0.5 {
+        let t = (color_amt - 0.5) * 2.0;
+        sample = sample * (1.0 - t) + s1 * t;
+      }
+
+      if lofi_amt > 0.0 {
+        let decim_rate = 32000.0 / self.sample_rate;
+        self.decim_counters[0] += decim_rate * lofi_amt;
+        if self.decim_counters[0] >= 1.0 {
+          self.decim_counters[0] -= 1.0;
+          self.last_samples[0] = sample;
+        }
+        sample = sample * (1.0 - lofi_amt) + self.last_samples[0] * lofi_amt;
+      }
+
+      output[i] = sample * vol;
+    }
+  }
+}
+
 #[cfg(test)]
 mod tests {
   use super::*;

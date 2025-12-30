@@ -5,145 +5,176 @@
       "id": "jupiter-pad",
       "name": "Jupiter Pad",
       "description": "Wide, slow pad with chorus.",
-      "file": "jupiter-pad.json"
+      "file": "jupiter-pad.json",
+      "group": "Pads & Strings"
     },
     {
       "id": "jupiter-8-demo",
       "name": "Jupiter-8 Demo",
       "description": "Dual VCO with sub, noise, HPF, and chorus.",
-      "file": "jupiter-8-demo.json"
+      "file": "jupiter-8-demo.json",
+      "group": "Demos & Fun"
     },
     {
       "id": "juno-strings",
       "name": "Juno-106 Strings",
       "description": "Classic PWM strings with lush Juno chorus.",
-      "file": "juno-strings.json"
+      "file": "juno-strings.json",
+      "group": "Pads & Strings"
     },
     {
       "id": "cs80-vangelis",
       "name": "CS-80 Vangelis",
       "description": "Blade Runner inspired evolving pad.",
-      "file": "cs80-vangelis.json"
+      "file": "cs80-vangelis.json",
+      "group": "Pads & Strings"
     },
     {
       "id": "oberheim-pad",
       "name": "OB-Xa Pad",
       "description": "Thick Oberheim-style warm pad.",
-      "file": "oberheim-pad.json"
+      "file": "oberheim-pad.json",
+      "group": "Pads & Strings"
     },
     {
       "id": "prophet-brass",
       "name": "Prophet-5 Brass",
       "description": "Punchy poly brass with filter snap.",
-      "file": "prophet-brass.json"
+      "file": "prophet-brass.json",
+      "group": "Brass & Leads"
     },
     {
       "id": "minimoog-lead",
       "name": "Minimoog Lead",
       "description": "Classic mono lead with ladder filter bite.",
-      "file": "minimoog-lead.json"
+      "file": "minimoog-lead.json",
+      "group": "Brass & Leads"
     },
     {
       "id": "ladder-lead",
       "name": "Ladder Lead",
       "description": "Moog-ish lead with ladder LP bite.",
-      "file": "ladder-lead.json"
+      "file": "ladder-lead.json",
+      "group": "Brass & Leads"
     },
     {
       "id": "arp-sync-lead",
       "name": "ARP Odyssey Sync",
       "description": "Aggressive sync lead with pitch sweep.",
-      "file": "arp-sync-lead.json"
+      "file": "arp-sync-lead.json",
+      "group": "Brass & Leads"
     },
     {
       "id": "hard-sync-lead",
       "name": "Hard Sync Lead",
       "description": "VCO hard sync demo with pitch sweep.",
-      "file": "hard-sync-lead.json"
+      "file": "hard-sync-lead.json",
+      "group": "Brass & Leads"
     },
     {
       "id": "jupiter-brass",
       "name": "Jupiter Brass",
       "description": "Bright, snappy brass hit.",
-      "file": "jupiter-brass.json"
+      "file": "jupiter-brass.json",
+      "group": "Brass & Leads"
     },
     {
       "id": "pwm-strings",
       "name": "PWM Strings",
       "description": "Glossy PWM string shimmer.",
-      "file": "pwm-strings.json"
+      "file": "pwm-strings.json",
+      "group": "Pads & Strings"
     },
     {
       "id": "dream-pad",
       "name": "Dream Pad",
       "description": "Slow bloom with lush tails.",
-      "file": "dream-pad.json"
+      "file": "dream-pad.json",
+      "group": "Pads & Strings"
     },
     {
       "id": "taurus-pedal",
       "name": "Moog Taurus",
       "description": "Deep bass pedal with massive sub.",
-      "file": "taurus-pedal.json"
+      "file": "taurus-pedal.json",
+      "group": "Bass"
     },
     {
       "id": "sh101-bass",
       "name": "SH-101 Bass",
       "description": "Punchy mono bass with sub weight.",
-      "file": "sh101-bass.json"
+      "file": "sh101-bass.json",
+      "group": "Bass"
     },
     {
       "id": "moog-bass",
       "name": "Moog Bass",
       "description": "Round, punchy mono bass.",
-      "file": "moog-bass.json"
+      "file": "moog-bass.json",
+      "group": "Bass"
     },
     {
       "id": "glass-bell",
       "name": "Glass Bell",
       "description": "Bright bell with airy tails.",
-      "file": "glass-bell.json"
+      "file": "glass-bell.json",
+      "group": "Bells & Plucks"
     },
     {
       "id": "edge-lead",
       "name": "Edge Lead",
       "description": "Cutting lead with short echoes.",
-      "file": "edge-lead.json"
+      "file": "edge-lead.json",
+      "group": "Brass & Leads"
     },
     {
       "id": "pluck-80s",
       "name": "80s Pluck",
       "description": "Short pluck with roomy tail.",
-      "file": "pluck-80s.json"
+      "file": "pluck-80s.json",
+      "group": "Bells & Plucks"
     },
     {
       "id": "showcase-stack",
       "name": "Showcase Stack",
       "description": "Big modern stack with wide FX.",
-      "file": "showcase-stack.json"
+      "file": "showcase-stack.json",
+      "group": "Pads & Strings"
     },
     {
       "id": "trance-supersaw",
       "name": "Trance Supersaw",
       "description": "Classic trance lead with 7-voice supersaw.",
-      "file": "trance-supersaw.json"
+      "file": "trance-supersaw.json",
+      "group": "Brass & Leads"
     },
     {
       "id": "phaser-pad",
       "name": "Phaser Pad",
       "description": "Lush evolving pad with stereo phaser.",
-      "file": "phaser-pad.json"
+      "file": "phaser-pad.json",
+      "group": "Pads & Strings"
     },
     {
       "id": "dirty-bass",
       "name": "Dirty Bass",
       "description": "Aggressive distorted bass with foldback.",
-      "file": "dirty-bass.json"
+      "file": "dirty-bass.json",
+      "group": "Bass"
     },
     {
       "id": "8bit-mario",
       "name": "8-Bit Mario",
       "description": "NES-authentic 5-channel setup with 8 classic Mario tunes.",
-      "file": "8bit-mario.json"
+      "file": "8bit-mario.json",
+      "group": "Demos & Fun"
+    },
+    {
+      "id": "8bit-mario-nes",
+      "name": "8-Bit Mario (NES Chip)",
+      "description": "True 2A03 chip emulation with NES Osc modules.",
+      "file": "8bit-mario-nes.json",
+      "group": "Demos & Fun"
     }
   ]
 }

@@ -7,7 +7,7 @@ Modular synth workbench built with React + AudioWorklet. Goal: a powerful, patch
 - **VCV Rack-inspired UI**: Eurorack-style rails, brushed metal panels, compact module layout with configurable grid sizes (1x1, 2x1, 1x2, 2x2, 1x3, 2x3, 2x6) and auto-placement.
 - Modular patching with drag-to-connect cables (double-click near a cable to remove it).
 - Module library lets you add/remove modules and start a new empty rack.
-- AudioWorklet engine (VCO with sub osc + PWM + sync out + audio FM in, Supersaw (7-voice), Noise, Mod Router, Ring Mod, HPF + VCF with SVF/ladder models; ladder is LP-only, LFO, ADSR, Mixer 1x1/1x2, VCA, Mod VCA, Chorus, Delay, Reverb, Phaser, Distortion, Scope, Control IO).
+- AudioWorklet engine (VCO with sub osc + PWM + sync out + audio FM in, Supersaw (7-voice), NES Osc (2A03), SNES Osc (S-DSP), Noise, Mod Router, Ring Mod, HPF + VCF with SVF/ladder models; ladder is LP-only, LFO, ADSR, Mixer 1x1/1x2, VCA, Mod VCA, Chorus, Delay, Reverb, Phaser, Distortion, Scope, Control IO, Mario IO).
 - Polyphony (1/2/4/8 voices) with voice stealing and per-voice modulation.
 - Control IO with mini keyboard, MIDI input (poly), and a simple sequencer for hands-free auditioning.
 - MIDI velocity CV output with optional slew to avoid clicks.
@@ -80,9 +80,10 @@ change patch routing (full graph replacement).
 - Classic emulations: Juno-106 Strings, Minimoog Lead, Prophet-5 Brass, OB-Xa Pad, CS-80 Vangelis, Moog Taurus, SH-101 Bass, ARP Odyssey Sync
 - New modules showcase: **Trance Supersaw** (7-voice), **Phaser Pad** (stereo phaser), **Dirty Bass** (foldback distortion)
 - Notables: Jupiter-8 Demo (sub/noise/HPF), Hard Sync Lead (VCO sync), Ladder Lead (LP ladder drive)
-- Fun: **8-Bit Mario** (NES-style 5-channel with 8 classic tunes)
+- Fun: **8-Bit Mario** (NES/SNES 5-channel with 11 classic tunes including Zelda)
 
 Dev/test presets (Mod Router Demo, Ring Mod Demo, VCO A/B, VCA A/B) live in `public/presets/manifest-dev.json`.
+The Presets panel groups entries by category with collapsible sections and a compact toggle.
 
 ## Architecture
 

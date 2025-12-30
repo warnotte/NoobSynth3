@@ -5,6 +5,7 @@ export type PresetSpec = {
   id: string
   name: string
   description: string
+  group?: string
   graph: GraphState
 }
 
@@ -13,6 +14,7 @@ type PresetManifestEntry = {
   name: string
   description: string
   file: string
+  group?: string
 }
 
 type PresetManifest = {
@@ -32,6 +34,7 @@ type PresetPatchFile = {
   id?: string
   name?: string
   description?: string
+  group?: string
   updates?: Record<string, Record<string, number | string | boolean>>
   connectionPatch?: ConnectionPatch
   // If provided, replaces the entire graph instead of patching defaultGraph
@@ -94,16 +97,17 @@ const buildPresetFromPatch = (
   const name = typeof patch.name === 'string' ? patch.name : entry.name
   const description =
     typeof patch.description === 'string' ? patch.description : entry.description
+  const group = typeof patch.group === 'string' ? patch.group : entry.group
 
   // If a complete graph is provided, use it directly
   if (patch.graph) {
-    return { id, name, description, graph: cloneGraph(patch.graph) }
+    return { id, name, description, group, graph: cloneGraph(patch.graph) }
   }
 
   // Otherwise, patch the defaultGraph
   const updates = patch.updates ?? {}
   const graph = applyConnections(applyParams(cloneGraph(defaultGraph), updates), patch.connectionPatch)
-  return { id, name, description, graph }
+  return { id, name, description, group, graph }
 }
 
 const resolveManifestUrl = () =>

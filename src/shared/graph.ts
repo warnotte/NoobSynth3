@@ -3,6 +3,8 @@ export type PortKind = 'audio' | 'cv' | 'gate' | 'sync'
 export type ModuleType =
   | 'oscillator'
   | 'supersaw'
+  | 'nes-osc'
+  | 'snes-osc'
   | 'noise'
   | 'mod-router'
   | 'ring-mod'

@@ -1280,6 +1280,211 @@ export const ModuleControls = ({
     )
   }
 
+  if (module.type === 'nes-osc') {
+    const nesMode = Number(module.params.mode ?? 0)
+    const nesDuty = Number(module.params.duty ?? 1)
+    const nesNoiseMode = Number(module.params.noiseMode ?? 0)
+    return (
+      <>
+        <RotaryKnob
+          label="Freq"
+          min={40}
+          max={2000}
+          step={1}
+          unit="Hz"
+          value={Number(module.params.frequency ?? 220)}
+          onChange={(value) => updateParam(module.id, 'frequency', value)}
+          format={(value) => Math.round(value).toString()}
+        />
+        <RotaryKnob
+          label="Fine"
+          min={-100}
+          max={100}
+          step={1}
+          unit="ct"
+          value={Number(module.params.fine ?? 0)}
+          onChange={(value) => updateParam(module.id, 'fine', value)}
+          format={(value) => Math.round(value).toString()}
+        />
+        <RotaryKnob
+          label="Vol"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.volume ?? 1)}
+          onChange={(value) => updateParam(module.id, 'volume', value)}
+          format={(value) => `${Math.round(value * 100)}%`}
+        />
+        <div className="filter-row">
+          <span className="filter-label">Mode</span>
+          <div className="filter-buttons filter-wide">
+            {[
+              { value: 0, label: 'PLS1' },
+              { value: 1, label: 'PLS2' },
+              { value: 2, label: 'TRI' },
+              { value: 3, label: 'NSE' },
+            ].map((m) => (
+              <button
+                key={m.value}
+                type="button"
+                className={`ui-btn filter-btn ${nesMode === m.value ? 'active' : ''}`}
+                onClick={() => updateParam(module.id, 'mode', m.value)}
+              >
+                {m.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        {nesMode < 2 && (
+          <div className="filter-row">
+            <span className="filter-label">Duty</span>
+            <div className="filter-buttons filter-wide">
+              {[
+                { value: 0, label: '12%' },
+                { value: 1, label: '25%' },
+                { value: 2, label: '50%' },
+                { value: 3, label: '75%' },
+              ].map((d) => (
+                <button
+                  key={d.value}
+                  type="button"
+                  className={`ui-btn filter-btn ${nesDuty === d.value ? 'active' : ''}`}
+                  onClick={() => updateParam(module.id, 'duty', d.value)}
+                >
+                  {d.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        {nesMode === 3 && (
+          <div className="filter-row">
+            <span className="filter-label">Noise</span>
+            <div className="filter-buttons">
+              {[
+                { value: 0, label: 'RAND' },
+                { value: 1, label: 'LOOP' },
+              ].map((n) => (
+                <button
+                  key={n.value}
+                  type="button"
+                  className={`ui-btn filter-btn ${nesNoiseMode === n.value ? 'active' : ''}`}
+                  onClick={() => updateParam(module.id, 'noiseMode', n.value)}
+                >
+                  {n.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        <RotaryKnob
+          label="Crush"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.bitcrush ?? 1)}
+          onChange={(value) => updateParam(module.id, 'bitcrush', value)}
+          format={(value) => `${Math.round(value * 100)}%`}
+        />
+      </>
+    )
+  }
+
+  if (module.type === 'snes-osc') {
+    const snesWave = Number(module.params.wave ?? 0)
+    const waveLabels = ['SQR', 'SAW', 'STR', 'BEL', 'ORG', 'PAD', 'BAS', 'SYN']
+    return (
+      <>
+        <RotaryKnob
+          label="Freq"
+          min={40}
+          max={2000}
+          step={1}
+          unit="Hz"
+          value={Number(module.params.frequency ?? 220)}
+          onChange={(value) => updateParam(module.id, 'frequency', value)}
+          format={(value) => Math.round(value).toString()}
+        />
+        <RotaryKnob
+          label="Fine"
+          min={-100}
+          max={100}
+          step={1}
+          unit="ct"
+          value={Number(module.params.fine ?? 0)}
+          onChange={(value) => updateParam(module.id, 'fine', value)}
+          format={(value) => Math.round(value).toString()}
+        />
+        <RotaryKnob
+          label="Vol"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.volume ?? 1)}
+          onChange={(value) => updateParam(module.id, 'volume', value)}
+          format={(value) => `${Math.round(value * 100)}%`}
+        />
+        <div className="filter-row">
+          <span className="filter-label">Wave</span>
+          <div className="filter-buttons filter-wide">
+            {waveLabels.slice(0, 4).map((label, idx) => (
+              <button
+                key={idx}
+                type="button"
+                className={`ui-btn filter-btn ${snesWave === idx ? 'active' : ''}`}
+                onClick={() => updateParam(module.id, 'wave', idx)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="filter-row">
+          <span className="filter-label" />
+          <div className="filter-buttons filter-wide">
+            {waveLabels.slice(4, 8).map((label, idx) => (
+              <button
+                key={idx + 4}
+                type="button"
+                className={`ui-btn filter-btn ${snesWave === idx + 4 ? 'active' : ''}`}
+                onClick={() => updateParam(module.id, 'wave', idx + 4)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <RotaryKnob
+          label="Gauss"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.gauss ?? 0.7)}
+          onChange={(value) => updateParam(module.id, 'gauss', value)}
+          format={(value) => `${Math.round(value * 100)}%`}
+        />
+        <RotaryKnob
+          label="Color"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.color ?? 0.5)}
+          onChange={(value) => updateParam(module.id, 'color', value)}
+          format={(value) => `${Math.round(value * 100)}%`}
+        />
+        <RotaryKnob
+          label="Lo-Fi"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.lofi ?? 0.5)}
+          onChange={(value) => updateParam(module.id, 'lofi', value)}
+          format={(value) => `${Math.round(value * 100)}%`}
+        />
+      </>
+    )
+  }
+
   if (module.type === 'phaser') {
     return (
       <>
@@ -1391,14 +1596,19 @@ export const ModuleControls = ({
     const currentBeat = marioStep !== null ? Math.floor((marioStep % 16) / 4) + 1 : 0
 
     const songOptions = [
-      { id: 'smb', label: 'Overworld' },
-      { id: 'underground', label: 'Underground' },
-      { id: 'underwater', label: 'Underwater' },
-      { id: 'castle', label: 'Castle' },
-      { id: 'starman', label: 'Starman' },
-      { id: 'gameover', label: 'Game Over' },
-      { id: 'coin', label: 'Coin' },
-      { id: 'oneup', label: '1-Up' },
+      // NES - Super Mario Bros
+      { id: 'smb', label: 'SMB Overworld' },
+      { id: 'underground', label: 'SMB Underground' },
+      { id: 'underwater', label: 'SMB Underwater' },
+      { id: 'castle', label: 'SMB Castle' },
+      { id: 'starman', label: 'SMB Starman' },
+      { id: 'gameover', label: 'SMB Game Over' },
+      { id: 'coin', label: 'SMB Coin' },
+      { id: 'oneup', label: 'SMB 1-Up' },
+      // SNES - Super Mario World & Zelda
+      { id: 'smw', label: 'SMW Overworld' },
+      { id: 'zelda', label: 'Zelda Overworld' },
+      { id: 'zeldadark', label: 'Zelda Dark World' },
     ]
 
     return (

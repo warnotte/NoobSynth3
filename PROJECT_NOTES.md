@@ -20,6 +20,8 @@ This file is meant to be reread by the coding assistant to keep context, decisio
 **Oscillators:**
 - VCO (unison + detune + PWM + sub + sync out + FM lin/exp)
 - Supersaw (7 detuned voices, polyBLEP anti-aliasing)
+- NES Osc (2A03 emulation: pulse 12.5/25/50/75%, 4-bit triangle, LFSR noise)
+- SNES Osc (S-DSP style: 8 wavetables, gaussian filter, 32kHz lo-fi)
 - Noise (white/pink/brown)
 
 **Modulation:**
@@ -134,7 +136,11 @@ Presets support two formats:
 - **Hard sync**: VCO now exposes sync output for oscillator hard sync patching.
 - **Sequencer pattern**: Control IO uses an 8-step DO-SOL-SIb-SOL-DO-SIb-SOL-FA loop for the demo arp.
 - **VCF 24 dB tuning**: reduced resonance/drive gain to improve stability.
-- **8-Bit Mario preset**: NES-authentic 5-channel setup with 8 complete Mario songs (Overworld, Underground, Underwater, Castle, Starman, Game Over, Coin, 1-Up).
+- **Preset UX**: Presets are grouped by category with collapsible sections and a compact view toggle.
+- **Top bar layout**: Brand block separated from transport/status with engine indicator.
+- **8-Bit Mario preset**: NES-authentic 5-channel setup with 8 NES Mario songs + 3 SNES songs (SMW Overworld, Zelda LTTP Intro, Zelda Dark World).
+- **NES Osc module**: 2A03 chip emulation with authentic pulse duty cycles (12.5/25/50/75%), 4-bit stepped triangle, 15-bit LFSR noise, and 7-bit DAC quantization.
+- **SNES Osc module**: S-DSP inspired with 8 wavetables, gaussian interpolation filter, and 32kHz lo-fi effect.
 
 ## How to update
 

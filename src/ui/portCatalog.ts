@@ -123,6 +123,14 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
     inputs: [{ id: 'pitch', label: 'Pitch', kind: 'cv', direction: 'in' }],
     outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
   },
+  'nes-osc': {
+    inputs: [{ id: 'pitch', label: 'Pitch', kind: 'cv', direction: 'in' }],
+    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
+  },
+  'snes-osc': {
+    inputs: [{ id: 'pitch', label: 'Pitch', kind: 'cv', direction: 'in' }],
+    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
+  },
   lfo: {
     inputs: [
       { id: 'rate', label: 'Rate', kind: 'cv', direction: 'in' },
