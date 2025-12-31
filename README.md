@@ -30,6 +30,34 @@ npm run dev
 
 Open the app, click Power On, then hit Run in Control IO or play the mini keyboard.
 
+## Building (all targets)
+
+Use the included `build.bat` script to build everything at once:
+
+```batch
+build.bat
+```
+
+This builds:
+1. Frontend (Vite)
+2. Tauri standalone app (`noobsynth3.exe`)
+3. VST3/CLAP plugin (`noobsynth_vst.dll`)
+
+Output files are in `target\release\`:
+- `noobsynth3.exe` - Standalone app with bundled frontend
+- `noobsynth_vst.dll` - VST3/CLAP plugin
+
+**Important:** Always use `build.bat` or `npx tauri build` for release builds. Using `cargo build` alone does NOT bundle the frontend and will result in a broken app.
+
+### Clean rebuild
+
+If you encounter issues, do a clean rebuild:
+
+```batch
+rmdir /s /q target\release
+build.bat
+```
+
 ## Standalone (Tauri)
 
 Prereqs: Rust toolchain + Tauri system deps installed and `rustc` on PATH.
@@ -49,6 +77,51 @@ npm run tauri:build
 ```
 
 Release builds use a size-optimized Rust profile (LTO + strip) from the workspace `Cargo.toml`.
+
+## VST3/CLAP Plugin
+
+NoobSynth is available as a VST3/CLAP plugin for use in any DAW (Ableton, FL Studio, Reaper, etc.).
+
+### How it works
+
+The VST plugin uses a hybrid architecture:
+- **Audio processing**: Runs natively in the DAW via nih-plug
+- **UI**: Uses the Tauri app (launched automatically when the plugin loads)
+- **IPC**: Shared memory bridge between VST and Tauri for real-time parameter/note sync
+
+### Installation
+
+1. Build using `build.bat` (see above)
+2. Copy both files to the same folder:
+   - `noobsynth_vst.dll`
+   - `noobsynth3.exe`
+3. Add the folder to your DAW's VST3 plugin path
+4. Scan for new plugins in your DAW
+
+### Usage
+
+1. Load "NoobSynth" as an instrument in your DAW
+2. The Tauri UI window opens automatically
+3. Play MIDI notes - they're processed by the native VST audio engine
+4. Tweak parameters in the UI - changes sync to the VST in real-time
+5. Close the UI window when done (plugin keeps running)
+
+### Troubleshooting
+
+**"Waiting for VST plugin..."**: The UI can't connect to the VST. Try:
+- Close all instances of NoobSynth and restart your DAW
+- Ensure both `.dll` and `.exe` are in the same folder
+- Check `noobsynth_vst_debug.log` in the plugin folder for details
+
+**Stale shared memory**: If you get connection errors after a crash:
+- Restart your computer to clear the shared memory
+- Or just reload the plugin (the VST now auto-cleans stale memory)
+
+### Limitations (current)
+
+- Oscilloscope not yet working in VST mode
+- UI must be in the same folder as the DLL
+- One instance at a time recommended
 
 ## How to use
 

@@ -173,7 +173,7 @@ export const defaultGraph: GraphState = {
         midiInputId: '',
         midiVelSlew: 0.008,
         voices: 4,
-        seqOn: true,
+        seqOn: false,
         seqTempo: 68,
         seqGate: 0.9,
       },

@@ -1,0 +1,8 @@
+[package]
+name = "dsp-ipc"
+version = "0.1.0"
+edition = "2021"
+description = "IPC bridge between NoobSynth VST and Tauri UI via shared memory"
+
+[dependencies]
+shared_memory = "0.12"

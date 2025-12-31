@@ -2,6 +2,7 @@ use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 use cpal::{FromSample, Sample, SampleFormat, StreamConfig};
 use dsp_core::{Node, SineOsc};
 use dsp_graph::GraphEngine;
+use dsp_ipc::TauriBridge;
 use midir::MidiInput;
 use serde::Serialize;
 use std::sync::{mpsc, Arc, Mutex};
@@ -744,10 +745,238 @@ fn native_get_scope(state: State<NativeAudioState>) -> Result<ScopePacket, Strin
   scope.export().ok_or_else(|| "scope not ready".to_string())
 }
 
+// ============================================================================
+// VST Mode Support
+// ============================================================================
+
+/// State for VST bridge connection
+struct VstBridgeState {
+  bridge: Mutex<Option<TauriBridge>>,
+}
+
+impl VstBridgeState {
+  fn new() -> Self {
+    Self {
+      bridge: Mutex::new(None),
+    }
+  }
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct VstStatus {
+  connected: bool,
+  vst_connected: bool,
+  sample_rate: u32,
+}
+
+/// Try to connect to VST shared memory
+#[tauri::command]
+fn vst_connect(state: State<VstBridgeState>) -> Result<VstStatus, String> {
+  let mut bridge_lock = state.bridge.lock().map_err(|_| "lock error")?;
+
+  // If we already have a bridge, return its status
+  if let Some(bridge) = bridge_lock.as_ref() {
+    return Ok(VstStatus {
+      connected: true,
+      vst_connected: bridge.is_vst_connected(),
+      sample_rate: bridge.sample_rate(),
+    });
+  }
+
+  // Try to open existing shared memory (VST should have created it)
+  match TauriBridge::open() {
+    Ok(bridge) => {
+      eprintln!("[NoobSynth] VST IPC bridge opened successfully");
+      let sample_rate = bridge.sample_rate();
+      let vst_connected = bridge.is_vst_connected();
+      *bridge_lock = Some(bridge);
+      Ok(VstStatus {
+        connected: true,
+        vst_connected,
+        sample_rate,
+      })
+    }
+    Err(open_err) => {
+      eprintln!("[NoobSynth] TauriBridge::open failed: {:?}", open_err);
+      // Try to create it (we might be starting before VST)
+      match TauriBridge::new() {
+        Ok(bridge) => {
+          eprintln!("[NoobSynth] VST IPC bridge created successfully");
+          let sample_rate = bridge.sample_rate();
+          let vst_connected = bridge.is_vst_connected();
+          *bridge_lock = Some(bridge);
+          Ok(VstStatus {
+            connected: true,
+            vst_connected,
+            sample_rate,
+          })
+        }
+        Err(create_err) => {
+          eprintln!("[NoobSynth] TauriBridge::new failed: {:?}", create_err);
+          Err(format!("VST IPC failed - open: {:?}, create: {:?}", open_err, create_err))
+        }
+      }
+    }
+  }
+}
+
+/// Disconnect from VST
+#[tauri::command]
+fn vst_disconnect(state: State<VstBridgeState>) -> Result<(), String> {
+  let mut bridge_lock = state.bridge.lock().map_err(|_| "lock error")?;
+  *bridge_lock = None;
+  Ok(())
+}
+
+/// Get VST connection status
+#[tauri::command]
+fn vst_status(state: State<VstBridgeState>) -> Result<VstStatus, String> {
+  let bridge_lock = state.bridge.lock().map_err(|_| "lock error")?;
+  match &*bridge_lock {
+    Some(bridge) => Ok(VstStatus {
+      connected: true,
+      vst_connected: bridge.is_vst_connected(),
+      sample_rate: bridge.sample_rate(),
+    }),
+    None => Ok(VstStatus {
+      connected: false,
+      vst_connected: false,
+      sample_rate: 0,
+    }),
+  }
+}
+
+/// Set graph via VST
+#[tauri::command]
+fn vst_set_graph(state: State<VstBridgeState>, graph_json: String) -> Result<(), String> {
+  let mut bridge_lock = state.bridge.lock().map_err(|_| "lock error")?;
+  let bridge = bridge_lock.as_mut().ok_or("VST not connected")?;
+  bridge.set_graph(&graph_json);
+  Ok(())
+}
+
+/// Set parameter via VST
+#[tauri::command]
+fn vst_set_param(
+  state: State<VstBridgeState>,
+  module_id: String,
+  param_id: String,
+  value: f32,
+) -> Result<(), String> {
+  let mut bridge_lock = state.bridge.lock().map_err(|_| "lock error")?;
+  let bridge = bridge_lock.as_mut().ok_or("VST not connected")?;
+  bridge.set_param(&module_id, &param_id, value);
+  Ok(())
+}
+
+/// Set control voice CV via VST
+#[tauri::command]
+fn vst_set_control_voice_cv(
+  state: State<VstBridgeState>,
+  _module_id: String,
+  voice: usize,
+  value: f32,
+) -> Result<(), String> {
+  let mut bridge_lock = state.bridge.lock().map_err(|_| "lock error")?;
+  let bridge = bridge_lock.as_mut().ok_or("VST not connected")?;
+  bridge.set_voice_cv(voice as u8, value);
+  Ok(())
+}
+
+/// Trigger gate via VST
+#[tauri::command]
+fn vst_trigger_control_voice_gate(
+  state: State<VstBridgeState>,
+  _module_id: String,
+  voice: usize,
+) -> Result<(), String> {
+  let mut bridge_lock = state.bridge.lock().map_err(|_| "lock error")?;
+  let bridge = bridge_lock.as_mut().ok_or("VST not connected")?;
+  bridge.trigger_gate(voice as u8);
+  Ok(())
+}
+
+/// Release gate via VST
+#[tauri::command]
+fn vst_release_control_voice_gate(
+  state: State<VstBridgeState>,
+  _module_id: String,
+  voice: usize,
+) -> Result<(), String> {
+  let mut bridge_lock = state.bridge.lock().map_err(|_| "lock error")?;
+  let bridge = bridge_lock.as_mut().ok_or("VST not connected")?;
+  bridge.release_gate(voice as u8);
+  Ok(())
+}
+
+/// Set voice velocity via VST
+#[tauri::command]
+fn vst_set_control_voice_velocity(
+  state: State<VstBridgeState>,
+  _module_id: String,
+  voice: usize,
+  value: f32,
+  _slew: f32,
+) -> Result<(), String> {
+  let mut bridge_lock = state.bridge.lock().map_err(|_| "lock error")?;
+  let bridge = bridge_lock.as_mut().ok_or("VST not connected")?;
+  bridge.set_voice_velocity(voice as u8, value);
+  Ok(())
+}
+
+/// Note on via VST
+#[tauri::command]
+fn vst_note_on(
+  state: State<VstBridgeState>,
+  voice: u8,
+  note: u8,
+  velocity: f32,
+) -> Result<(), String> {
+  let mut bridge_lock = state.bridge.lock().map_err(|_| "lock error")?;
+  let bridge = bridge_lock.as_mut().ok_or("VST not connected")?;
+  bridge.note_on(voice, note, velocity);
+  Ok(())
+}
+
+/// Note off via VST
+#[tauri::command]
+fn vst_note_off(
+  state: State<VstBridgeState>,
+  voice: u8,
+  note: u8,
+) -> Result<(), String> {
+  let mut bridge_lock = state.bridge.lock().map_err(|_| "lock error")?;
+  let bridge = bridge_lock.as_mut().ok_or("VST not connected")?;
+  bridge.note_off(voice, note);
+  Ok(())
+}
+
+/// State to track if we're in VST mode
+struct VstModeState {
+  enabled: bool,
+}
+
+/// Check if we're running in VST mode
+#[tauri::command]
+fn is_vst_mode(state: State<VstModeState>) -> bool {
+  state.enabled
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+  // Check for --vst-mode argument
+  let args: Vec<String> = std::env::args().collect();
+  let vst_mode = args.iter().any(|arg| arg == "--vst-mode");
+
+  // Log startup info
+  eprintln!("[NoobSynth] Starting with args: {:?}", args);
+  eprintln!("[NoobSynth] VST mode: {}", vst_mode);
+
   tauri::Builder::default()
     .manage(NativeAudioState::new())
+    .manage(VstBridgeState::new())
+    .manage(VstModeState { enabled: vst_mode })
     .invoke_handler(tauri::generate_handler![
       dsp_ping,
       list_audio_outputs,
@@ -764,9 +993,22 @@ pub fn run() {
       native_start_graph,
       native_stop_graph,
       native_status,
-      native_get_scope
+      native_get_scope,
+      // VST mode commands
+      is_vst_mode,
+      vst_connect,
+      vst_disconnect,
+      vst_status,
+      vst_set_graph,
+      vst_set_param,
+      vst_set_control_voice_cv,
+      vst_trigger_control_voice_gate,
+      vst_release_control_voice_gate,
+      vst_set_control_voice_velocity,
+      vst_note_on,
+      vst_note_off
     ])
-    .setup(|app| {
+    .setup(move |app| {
       if cfg!(debug_assertions) {
         app.handle().plugin(
           tauri_plugin_log::Builder::default()
@@ -774,6 +1016,16 @@ pub fn run() {
             .build(),
         )?;
       }
+
+      // If VST mode, set a global flag that the frontend can check
+      if vst_mode {
+        use tauri::Manager;
+        if let Some(window) = app.get_webview_window("main") {
+          // Set global flag BEFORE the page loads React
+          let _ = window.eval("window.__NOOBSYNTH_VST_MODE__ = true; console.log('VST mode enabled');");
+        }
+      }
+
       Ok(())
     })
     .run(tauri::generate_context!())

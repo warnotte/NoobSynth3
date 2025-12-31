@@ -113,12 +113,11 @@ export const useControlVoices = ({
 
   const releaseAllVoices = useCallback(() => {
     if (controlModuleId) {
-      voiceStateRef.current.forEach((state, index) => {
-        if (state.note !== null) {
-          engine.setControlVoiceGate(controlModuleId, index, 0)
-          nativeControl?.setControlVoiceGate(controlModuleId, index, 0)
-        }
-      })
+      // Force release ALL voices regardless of state (fixes stuck notes)
+      for (let index = 0; index < voiceCount; index++) {
+        engine.setControlVoiceGate(controlModuleId, index, 0)
+        nativeControl?.setControlVoiceGate(controlModuleId, index, 0)
+      }
     }
     voiceStateRef.current = Array.from({ length: voiceCount }, () => ({
       note: null,
@@ -126,7 +125,7 @@ export const useControlVoices = ({
       age: 0,
     }))
     voiceClockRef.current = 0
-  }, [controlModuleId, engine, voiceCount])
+  }, [controlModuleId, engine, nativeControl, voiceCount])
 
   const triggerVoiceNote = useCallback(
     (

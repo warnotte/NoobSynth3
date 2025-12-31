@@ -1,7 +1,22 @@
 [package]
-name = "dsp-plugin"
+name = "noobsynth_vst"
 version = "0.1.0"
-edition = "2024"
+edition = "2021"
+authors = ["NoobSynth"]
+description = "NoobSynth modular synthesizer VST3/CLAP plugin"
+license = "MIT"
+
+[lib]
+crate-type = ["cdylib", "lib"]
 
 [dependencies]
 dsp-core = { path = "../dsp-core" }
+dsp-graph = { path = "../dsp-graph" }
+dsp-ipc = { path = "../dsp-ipc" }
+nih_plug = { git = "https://github.com/robbert-vdh/nih-plug.git", features = ["assert_process_allocs"] }
+serde_json = "1.0"
+
+[features]
+default = []
+# Enable SIMD optimizations if available
+simd = []

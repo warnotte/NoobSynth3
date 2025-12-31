@@ -80,6 +80,8 @@ Presets support two formats:
 - Polyphony is implemented; unison remains per-voice.
 - MIDI disables the mini sequencer when enabled. Velocity can be toggled in Control IO.
 - Rapidly changing voice count while running can cause instability; adjust slowly.
+- **VST mode**: Oscilloscope not working yet (scope taps not wired through IPC).
+- **VST mode**: Only one instance recommended (shared memory is global).
 
 ## Decisions
 
@@ -98,8 +100,23 @@ Presets support two formats:
 - Optional: expand sequencer (8 steps, per-step toggles).
 - MIDI enhancements (pitch bend, CC mapping).
 - Optional: add native MIDI input via `midir` for Tauri (lower latency, more reliable than Web MIDI).
+- **VST**: Wire scope taps through IPC for oscilloscope in VST mode.
+- **VST**: Support multiple plugin instances (instance ID in shared memory name).
 
 ## Recent changes (Dec 2025)
+
+### VST3/CLAP Plugin (major feature)
+
+- **Full VST3/CLAP plugin** using nih-plug framework
+- **Hybrid architecture**: Native audio in DAW + Tauri UI via shared memory IPC
+- **Auto-launch**: Plugin automatically launches Tauri UI when loaded
+- **Real-time sync**: Parameters and MIDI notes sync between VST and UI
+- **IPC bridge** (`dsp-ipc` crate): Shared memory with ring buffer for commands
+- **Robust connection handling**: Auto-cleanup of stale shared memory from crashes
+- **Debug logging**: `noobsynth_vst_debug.log` created in plugin folder for troubleshooting
+- **Build script**: `build.bat` builds frontend + Tauri + VST in one command
+
+### Other changes
 
 - **New DSP modules**: Supersaw (7 detuned voices), Phaser (4-stage stereo), Distortion (soft/hard/fold).
 - **Preset format extended**: Full graph replacement via `graph` property (alongside existing `updates` format).
@@ -120,7 +137,7 @@ Presets support two formats:
   - 2 thru outputs for non-destructive signal monitoring.
   - Expanded gain range (0.5x, 1x, 2x, 5x, 10x).
   - Efficient rendering (only active mode draws).
-- **Rust workspace scaffold**: `crates/dsp-core`, `crates/dsp-wasm`, `crates/dsp-standalone`, `crates/dsp-plugin`.
+- **Rust workspace scaffold**: `crates/dsp-core`, `crates/dsp-wasm`, `crates/dsp-standalone`, `crates/dsp-plugin` (VST), `crates/dsp-ipc` (shared memory bridge), `crates/dsp-graph` (shared graph engine).
 - **Standalone/Tauri bridge scaffolds**: `dsp-standalone` now lists audio/MIDI devices (cpal/midir) with an optional test tone; Tauri exposes `dsp_ping`, `list_audio_outputs`, and `list_midi_inputs` commands.
 - **DSP graph shared crate**: `dsp-graph` now hosts the Rust graph engine (shared by WASM and Tauri).
 - **Tauri native audio controls**: UI panel can sync the current graph and start/stop native playback on a selected output device.
