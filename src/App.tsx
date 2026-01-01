@@ -159,6 +159,7 @@ function App() {
   const gridMetricsRef = useRef<GridMetrics>(DEFAULT_GRID_METRICS)
   const nativeScopeRef = useRef<NativeScopeSnapshot | null>(null)
   const nativeScopeTapsRef = useRef<NativeTap[]>([])
+  const lastVstGraphJsonRef = useRef<string | null>(null)
   const {
     connectedInputs,
     dragTargets,
@@ -475,17 +476,70 @@ function App() {
     vstConnectedRef.current = vstConnected
   }, [vstConnected])
 
-  // Sync initial graph when VST connects
+  // Sync or pull graph when VST connects
   useEffect(() => {
     if (!isVst || !vstConnected) return
-    const graphJson = JSON.stringify({
-      modules: graphRef.current.modules,
-      connections: graphRef.current.connections,
-      macros: graphRef.current.macros ?? [],
-    })
-    void invokeTauri('vst_set_graph', { graphJson }).catch((error) => {
-      console.error('Failed to sync initial graph to VST:', error)
-    })
+    let active = true
+    const sync = async () => {
+      try {
+        const graphJson = await invokeTauri<string | null>('vst_pull_graph')
+        if (!active) return
+        if (graphJson && graphJson.trim().length > 0) {
+          const parsed = JSON.parse(graphJson) as unknown
+          if (isGraphState(parsed)) {
+            lastVstGraphJsonRef.current = graphJson
+            applyPreset(parsed, { skipVstSync: true })
+            return
+          }
+        }
+      } catch (error) {
+        console.error('Failed to pull graph from VST:', error)
+      }
+      const fallbackJson = JSON.stringify({
+        modules: graphRef.current.modules,
+        connections: graphRef.current.connections,
+        macros: graphRef.current.macros ?? [],
+      })
+      lastVstGraphJsonRef.current = fallbackJson
+      void invokeTauri('vst_set_graph', { graphJson: fallbackJson }).catch((error) => {
+        console.error('Failed to sync initial graph to VST:', error)
+      })
+    }
+    void sync()
+    return () => {
+      active = false
+    }
+  }, [isVst, vstConnected])
+
+  useEffect(() => {
+    if (!isVst || !vstConnected) return
+    let active = true
+    const poll = async () => {
+      try {
+        const graphJson = await invokeTauri<string | null>('vst_pull_graph')
+        if (!active || !graphJson || !graphJson.trim()) {
+          return
+        }
+        if (graphJson === lastVstGraphJsonRef.current) {
+          return
+        }
+        const parsed = JSON.parse(graphJson) as unknown
+        if (isGraphState(parsed)) {
+          lastVstGraphJsonRef.current = graphJson
+          applyPreset(parsed, { skipVstSync: true })
+        }
+      } catch (error) {
+        if (active) {
+          console.error('Failed to poll graph from VST:', error)
+        }
+      }
+    }
+    void poll()
+    const interval = window.setInterval(poll, 500)
+    return () => {
+      active = false
+      window.clearInterval(interval)
+    }
   }, [isVst, vstConnected])
 
   const nativeControlBridge = useMemo(() => {
@@ -724,7 +778,7 @@ function App() {
     void run()
   }
 
-  const applyPreset = (nextGraph: GraphState) => {
+  const applyPreset = (nextGraph: GraphState, options?: { skipVstSync?: boolean }) => {
     const cloned = cloneGraph(nextGraph)
     // Force sequencer OFF when loading presets (prevents auto-start from preset data)
     const controlModule = cloned.modules.find((m) => m.type === 'control')
@@ -765,10 +819,13 @@ function App() {
         connections: layouted.connections,
         macros: layouted.macros ?? [],
       })
-      void invokeTauri('vst_set_graph', { graphJson }).catch((error) => {
-        console.error(error)
-        setVstError('Failed to sync graph to VST.')
-      })
+      if (!options?.skipVstSync) {
+        lastVstGraphJsonRef.current = graphJson
+        void invokeTauri('vst_set_graph', { graphJson }).catch((error) => {
+          console.error(error)
+          setVstError('Failed to sync graph to VST.')
+        })
+      }
     }
   }
 
@@ -1099,6 +1156,7 @@ function App() {
           macros: graphRef.current.macros ?? [],
         })
         await invokeTauri('vst_set_graph', { graphJson })
+        lastVstGraphJsonRef.current = graphJson
       }
       return
     }
@@ -1309,6 +1367,3 @@ function App() {
 }
 
 export default App
-
-
-

@@ -3,8 +3,9 @@ use nih_plug_egui::{create_egui_editor, egui, EguiState};
 use dsp_graph::GraphEngine;
 use dsp_ipc::{VstBridge, CommandType, launcher, hash_id};
 use serde::Deserialize;
-use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::Arc;
+use std::collections::HashMap;
+use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
+use std::sync::{Arc, Mutex};
 
 /// Default graph JSON for a simple synth patch
 /// VCO → VCF → VCA → Output with ADSR envelopes
@@ -218,6 +219,17 @@ struct MacroPayload {
     macros: Option<Vec<MacroSpecJson>>,
 }
 
+#[derive(Deserialize)]
+struct GraphIndexPayload {
+    modules: Vec<GraphIndexModule>,
+}
+
+#[derive(Deserialize)]
+struct GraphIndexModule {
+    id: String,
+    params: Option<HashMap<String, serde_json::Value>>,
+}
+
 /// NoobSynth VST3/CLAP Plugin
 pub struct NoobSynth {
     params: Arc<NoobSynthParams>,
@@ -233,6 +245,10 @@ pub struct NoobSynth {
     /// IPC bridge for communication with Tauri UI
     ipc_bridge: Option<VstBridge>,
     ui_connected: Arc<AtomicBool>,
+    ui_requests: Arc<AtomicU32>,
+    ui_sample_rate: Arc<AtomicU32>,
+    module_hash_map: HashMap<u32, String>,
+    param_hash_map: HashMap<u32, String>,
     macro_specs: Vec<MacroSpec>,
     last_macro_values: [f32; 8],
 }
@@ -243,6 +259,9 @@ struct NoobSynthParams {
     /// Editor state
     #[persist = "editor-state"]
     editor_state: Arc<EguiState>,
+
+    #[persist = "graph-json"]
+    graph_json: Mutex<String>,
 
     /// Macro 1
     #[id = "macro_1"]
@@ -281,6 +300,7 @@ impl Default for NoobSynthParams {
     fn default() -> Self {
         Self {
             editor_state: EguiState::from_size(360, 200),
+            graph_json: Mutex::new(DEFAULT_GRAPH_JSON.to_string()),
 
             macro_1: FloatParam::new(
                 "Macro 1",
@@ -362,6 +382,8 @@ impl Default for NoobSynth {
         let macro_specs = parse_macro_specs(DEFAULT_GRAPH_JSON);
         let last_macro_values = params.macro_values();
         let ui_connected = Arc::new(AtomicBool::new(false));
+        let ui_requests = Arc::new(AtomicU32::new(0));
+        let ui_sample_rate = Arc::new(AtomicU32::new(0));
         Self {
             params,
             engine: GraphEngine::new(44100.0),
@@ -371,6 +393,10 @@ impl Default for NoobSynth {
             max_voices: 8,
             ipc_bridge: None,
             ui_connected,
+            ui_requests,
+            ui_sample_rate,
+            module_hash_map: HashMap::new(),
+            param_hash_map: HashMap::new(),
             macro_specs,
             last_macro_values,
         }
@@ -378,6 +404,82 @@ impl Default for NoobSynth {
 }
 
 impl NoobSynth {
+    const UI_REQ_RECONNECT: u32 = 1;
+
+    fn load_graph_from_params(&mut self) {
+        if let Ok(stored) = self.params.graph_json.lock() {
+            if !stored.trim().is_empty() {
+                self.graph_json = stored.clone();
+                return;
+            }
+        }
+        self.graph_json = DEFAULT_GRAPH_JSON.to_string();
+        self.persist_graph_json();
+    }
+
+    fn persist_graph_json(&self) {
+        if let Ok(mut stored) = self.params.graph_json.lock() {
+            if *stored != self.graph_json {
+                *stored = self.graph_json.clone();
+            }
+        }
+    }
+
+    fn set_graph_json(&mut self, graph_json: String) {
+        self.graph_json = graph_json;
+        self.persist_graph_json();
+    }
+
+    fn apply_graph_json(&mut self, graph_json: String) {
+        if let Err(e) = self.engine.set_graph_json(&graph_json) {
+            nih_error!("Failed to load graph: {}", e);
+            return;
+        }
+        self.set_graph_json(graph_json);
+        self.engine.set_param("ctrl-1", "voices", self.max_voices as f32);
+        self.refresh_hash_maps();
+        self.macro_specs = parse_macro_specs(&self.graph_json);
+        self.apply_all_macros();
+        self.publish_graph_to_ui();
+    }
+
+    fn sync_graph_from_params(&mut self) {
+        let stored = match self.params.graph_json.try_lock() {
+            Ok(guard) => guard.clone(),
+            Err(_) => return,
+        };
+        if stored.trim().is_empty() || stored == self.graph_json {
+            return;
+        }
+        self.apply_graph_json(stored);
+    }
+
+    fn refresh_hash_maps(&mut self) {
+        let (module_map, param_map) = build_hash_maps(&self.graph_json);
+        self.module_hash_map = module_map;
+        self.param_hash_map = param_map;
+    }
+
+    fn publish_graph_to_ui(&mut self) {
+        if let Some(bridge) = &mut self.ipc_bridge {
+            bridge.set_vst_graph(&self.graph_json);
+        }
+    }
+
+    fn lookup_module_id(&self, hash: u32) -> Option<&str> {
+        if let Some(value) = self.module_hash_map.get(&hash) {
+            return Some(value.as_str());
+        }
+        hash_to_module_id(hash)
+    }
+
+    fn lookup_param_id(&self, hash: u32) -> Option<&str> {
+        if let Some(value) = self.param_hash_map.get(&hash) {
+            return Some(value.as_str());
+        }
+        hash_to_param_id(hash)
+    }
+
     /// Allocate a voice for a new note (round-robin with voice stealing)
     fn allocate_voice(&mut self, note: u8) -> usize {
         // First, check if this note is already playing
@@ -459,6 +561,7 @@ impl NoobSynth {
                 nih_log!("IPC bridge created successfully (sample rate: {})", sample_rate as u32);
                 self.ui_connected.store(bridge.is_ui_connected(), Ordering::Relaxed);
                 self.ipc_bridge = Some(bridge);
+                self.publish_graph_to_ui();
             }
             Err(e) => {
                 nih_log!("VstBridge::new() failed: {:?}, trying open()...", e);
@@ -469,6 +572,7 @@ impl NoobSynth {
                         nih_log!("IPC bridge opened successfully");
                         self.ui_connected.store(bridge.is_ui_connected(), Ordering::Relaxed);
                         self.ipc_bridge = Some(bridge);
+                        self.publish_graph_to_ui();
                     }
                     Err(e2) => {
                         nih_log!("VstBridge::open() also failed: {:?}", e2);
@@ -480,6 +584,34 @@ impl NoobSynth {
 
         // THEN: Launch Tauri if not already running (after bridge is ready)
         // UI is opened on demand via the host's editor button.
+    }
+
+    fn reconnect_ipc(&mut self) {
+        self.ipc_bridge = None;
+        let sample_rate = self.ui_sample_rate.load(Ordering::Relaxed);
+        match VstBridge::open() {
+            Ok(mut bridge) => {
+                if sample_rate > 0 {
+                    bridge.set_sample_rate(sample_rate);
+                }
+                self.ui_connected.store(bridge.is_ui_connected(), Ordering::Relaxed);
+                self.ipc_bridge = Some(bridge);
+                nih_log!("IPC bridge reconnected (open)");
+            }
+            Err(_) => match VstBridge::new() {
+                Ok(mut bridge) => {
+                    if sample_rate > 0 {
+                        bridge.set_sample_rate(sample_rate);
+                    }
+                    self.ui_connected.store(bridge.is_ui_connected(), Ordering::Relaxed);
+                    self.ipc_bridge = Some(bridge);
+                    nih_log!("IPC bridge reconnected (new)");
+                }
+                Err(err) => {
+                    nih_log!("IPC bridge reconnect failed: {:?}", err);
+                }
+            },
+        }
     }
 
     /// Process IPC commands from Tauri UI
@@ -494,29 +626,35 @@ impl NoobSynth {
         // Check for graph changes
         if let Some(graph_json) = graph_json {
             nih_log!("Received new graph from UI ({} bytes)", graph_json.len());
-            if let Err(e) = self.engine.set_graph_json(&graph_json) {
-                nih_error!("Failed to load graph from UI: {}", e);
-            } else {
-                self.graph_json = graph_json;
-                self.engine.set_param("ctrl-1", "voices", self.max_voices as f32);
-                self.macro_specs = parse_macro_specs(&self.graph_json);
-                self.apply_all_macros();
-            }
+            self.apply_graph_json(graph_json);
         }
 
         // Process commands from ring buffer
-        let Some(bridge) = &mut self.ipc_bridge else {
-            return;
-        };
-        while let Some(cmd) = bridge.pop_command() {
+        let mut commands = Vec::new();
+        if let Some(bridge) = &mut self.ipc_bridge {
+            while let Some(cmd) = bridge.pop_command() {
+                commands.push(cmd);
+            }
+        }
+
+        for cmd in commands {
             let cmd_type = CommandType::from(cmd.cmd_type);
             match cmd_type {
                 CommandType::SetParam => {
                     // Read module and param names from string buffer if needed
                     // For now, we use the hash to identify known modules
-                    if let Some(name) = hash_to_module_id(cmd.module_id) {
-                        if let Some(param) = hash_to_param_id(cmd.param_id) {
-                            self.engine.set_param(name, param, cmd.value);
+                    let module_id = self.lookup_module_id(cmd.module_id).map(str::to_string);
+                    let param_id = self.lookup_param_id(cmd.param_id).map(str::to_string);
+                    if let (Some(module_id), Some(param_id)) = (module_id, param_id) {
+                        self.engine.set_param(&module_id, &param_id, cmd.value);
+                        if let Some(updated) = update_graph_param_json(
+                            &self.graph_json,
+                            &module_id,
+                            &param_id,
+                            cmd.value,
+                        ) {
+                            self.set_graph_json(updated);
+                            self.publish_graph_to_ui();
                         }
                     }
                 }
@@ -676,6 +814,57 @@ fn parse_macro_specs(payload: &str) -> Vec<MacroSpec> {
         .collect()
 }
 
+fn build_hash_maps(payload: &str) -> (HashMap<u32, String>, HashMap<u32, String>) {
+    let parsed: GraphIndexPayload = match serde_json::from_str(payload) {
+        Ok(value) => value,
+        Err(_) => return (HashMap::new(), HashMap::new()),
+    };
+
+    let mut module_map = HashMap::new();
+    let mut param_map = HashMap::new();
+    for module in parsed.modules {
+        let module_hash = hash_id(&module.id);
+        module_map.entry(module_hash).or_insert(module.id);
+
+        if let Some(params) = module.params {
+            for key in params.keys() {
+                let param_hash = hash_id(key);
+                param_map.entry(param_hash).or_insert_with(|| key.clone());
+            }
+        }
+    }
+
+    (module_map, param_map)
+}
+
+fn update_graph_param_json(
+    graph_json: &str,
+    module_id: &str,
+    param_id: &str,
+    value: f32,
+) -> Option<String> {
+    let mut root: serde_json::Value = serde_json::from_str(graph_json).ok()?;
+    let modules = root.get_mut("modules")?.as_array_mut()?;
+    for module in modules.iter_mut() {
+        let module_obj = module.as_object_mut()?;
+        let id = module_obj.get("id")?.as_str()?;
+        if id != module_id {
+            continue;
+        }
+        let params_entry = module_obj
+            .entry("params")
+            .or_insert_with(|| serde_json::Value::Object(serde_json::Map::new()));
+        if !params_entry.is_object() {
+            *params_entry = serde_json::Value::Object(serde_json::Map::new());
+        }
+        let params_obj = params_entry.as_object_mut()?;
+        let number = serde_json::Number::from_f64(value as f64)?;
+        params_obj.insert(param_id.to_string(), serde_json::Value::Number(number));
+        return serde_json::to_string(&root).ok();
+    }
+    None
+}
+
 impl Plugin for NoobSynth {
     const NAME: &'static str = "NoobSynth";
     const VENDOR: &'static str = "NoobSynth";
@@ -704,6 +893,8 @@ impl Plugin for NoobSynth {
 
     fn editor(&mut self, _async_executor: AsyncExecutor<Self>) -> Option<Box<dyn Editor>> {
         let ui_connected = self.ui_connected.clone();
+        let ui_requests = self.ui_requests.clone();
+        let ui_sample_rate = self.ui_sample_rate.clone();
         create_egui_editor(
             self.params.editor_state.clone(),
             (),
@@ -715,10 +906,17 @@ impl Plugin for NoobSynth {
                     if ui.button("Open NoobSynth UI").clicked() {
                         launcher::launch_tauri_if_needed();
                     }
+                    if ui.button("Reconnect IPC").clicked() {
+                        ui_requests.fetch_or(NoobSynth::UI_REQ_RECONNECT, Ordering::Relaxed);
+                    }
                     ui.separator();
                     let connected = ui_connected.load(Ordering::Relaxed);
                     let status = if connected { "connected" } else { "not connected" };
                     ui.label(format!("Tauri UI: {status}"));
+                    let sample_rate = ui_sample_rate.load(Ordering::Relaxed);
+                    if sample_rate > 0 {
+                        ui.label(format!("Sample rate: {sample_rate} Hz"));
+                    }
                 });
             },
         )
@@ -732,12 +930,19 @@ impl Plugin for NoobSynth {
     ) -> bool {
         // Initialize the graph engine with the correct sample rate
         self.engine = GraphEngine::new(buffer_config.sample_rate);
+        self.ui_sample_rate
+            .store(buffer_config.sample_rate as u32, Ordering::Relaxed);
 
-        // Load the default graph
+        self.load_graph_from_params();
+
+        // Load the persisted graph (or fallback default)
         if let Err(e) = self.engine.set_graph_json(&self.graph_json) {
             nih_error!("Failed to load graph: {}", e);
             return false;
         }
+
+        self.refresh_hash_maps();
+        self.macro_specs = parse_macro_specs(&self.graph_json);
 
         // Set initial voice count
         self.engine.set_param("ctrl-1", "voices", self.max_voices as f32);
@@ -762,6 +967,13 @@ impl Plugin for NoobSynth {
         _aux: &mut AuxiliaryBuffers,
         context: &mut impl ProcessContext<Self>,
     ) -> ProcessStatus {
+        let requests = self.ui_requests.swap(0, Ordering::Relaxed);
+        if (requests & Self::UI_REQ_RECONNECT) != 0 {
+            self.reconnect_ipc();
+        }
+
+        self.sync_graph_from_params();
+
         // Process IPC commands from Tauri UI
         self.process_ipc_commands();
 

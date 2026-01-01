@@ -110,8 +110,10 @@ Presets support two formats:
 
 - **Full VST3/CLAP plugin** using nih-plug framework
 - **Hybrid architecture**: Native audio in DAW + Tauri UI via shared memory IPC
-- **Auto-launch**: Plugin automatically launches Tauri UI when loaded
+- **On-demand UI**: Host editor is a launcher panel; Tauri opens when requested
 - **Real-time sync**: Parameters and MIDI notes sync between VST and UI
+- **Preset recall**: Full graph JSON persists in plugin state and restores via DAW
+- **Host -> UI sync**: Tauri refreshes when the host loads a new preset (polling)
 - **IPC bridge** (`dsp-ipc` crate): Shared memory with ring buffer for commands
 - **Robust connection handling**: Auto-cleanup of stale shared memory from crashes
 - **Debug logging**: `noobsynth_vst_debug.log` created in plugin folder for troubleshooting

@@ -16,7 +16,7 @@ pub const SHM_NAME: &str = "noobsynth_ipc_v1";
 pub const MAGIC: u32 = 0x4E4F4F42; // "NOOB"
 
 /// Version of the IPC protocol
-pub const VERSION: u32 = 1;
+pub const VERSION: u32 = 2;
 
 /// Maximum voices supported
 pub const MAX_VOICES: usize = 16;
@@ -43,6 +43,8 @@ pub struct SharedHeader {
     pub param_version: AtomicU64,
     /// Monotonic counter incremented by Tauri when graph changes
     pub graph_version: AtomicU64,
+    /// Monotonic counter incremented by VST when graph changes
+    pub vst_graph_version: AtomicU64,
     /// Sample rate set by VST
     pub sample_rate: AtomicU32,
     pub _pad1: u32,
@@ -188,7 +190,10 @@ impl VstBridge {
         // Initialize if we created it OR if magic is wrong (stale memory)
         unsafe {
             let ptr = shmem.as_ptr() as *mut SharedMemoryLayout;
-            if shmem.is_owner() || (*ptr).header.magic != MAGIC {
+            if shmem.is_owner()
+                || (*ptr).header.magic != MAGIC
+                || (*ptr).header.version != VERSION
+            {
                 std::ptr::write_bytes(ptr, 0, 1);
                 (*ptr).header.magic = MAGIC;
                 (*ptr).header.version = VERSION;
@@ -219,11 +224,18 @@ impl VstBridge {
             .os_id(SHM_NAME)
             .open()?;
 
-        // Verify magic
+        // Verify magic/version, reinitialize if stale
         unsafe {
             let layout = shmem.as_ptr() as *const SharedMemoryLayout;
-            if (*layout).header.magic != MAGIC {
-                return Err(ShmemError::MapCreateFailed(0));
+            if (*layout).header.magic != MAGIC || (*layout).header.version != VERSION {
+                let layout = shmem.as_ptr() as *mut SharedMemoryLayout;
+                std::ptr::write_bytes(layout, 0, 1);
+                (*layout).header.magic = MAGIC;
+                (*layout).header.version = VERSION;
+                (*layout).params = SharedParams {
+                    macros: [0.0; 8],
+                    _padding: [0.0; 8],
+                };
             }
             let layout = shmem.as_ptr() as *mut SharedMemoryLayout;
             // Clear all flags and set only VST connected (removes stale Tauri flag)
@@ -275,6 +287,16 @@ impl VstBridge {
     /// Read current params
     pub fn params(&self) -> SharedParams {
         self.layout().params
+    }
+
+    /// Write graph JSON from VST for the UI to read
+    pub fn set_vst_graph(&mut self, json: &str) {
+        let layout = self.layout_mut();
+        let bytes = json.as_bytes();
+        let len = bytes.len().min(GRAPH_BUFFER_SIZE - 1);
+        layout.graph_buffer[..len].copy_from_slice(&bytes[..len]);
+        layout.graph_buffer[len] = 0;
+        layout.header.vst_graph_version.fetch_add(1, Ordering::Release);
     }
 
     /// Pop next command from ring buffer
@@ -380,7 +402,7 @@ impl TauriBridge {
         // Verify magic, reinitialize if wrong (stale from previous session)
         unsafe {
             let layout = shmem.as_ptr() as *mut SharedMemoryLayout;
-            if (*layout).header.magic != MAGIC {
+            if (*layout).header.magic != MAGIC || (*layout).header.version != VERSION {
                 // Stale shared memory - reinitialize it
                 eprintln!("[NoobSynth IPC] Reinitializing stale shared memory");
                 std::ptr::write_bytes(layout, 0, 1);
@@ -569,6 +591,28 @@ impl TauriBridge {
             param_id: 0,
             extra: len as u32,
         });
+    }
+
+    /// Read graph JSON written by the VST
+    pub fn read_vst_graph(&self) -> Option<String> {
+        let layout = self.layout();
+        let end = layout
+            .graph_buffer
+            .iter()
+            .position(|&b| b == 0)
+            .unwrap_or(GRAPH_BUFFER_SIZE);
+        if end == 0 {
+            return None;
+        }
+        String::from_utf8(layout.graph_buffer[..end].to_vec()).ok()
+    }
+
+    /// Read the current VST graph version
+    pub fn vst_graph_version(&self) -> u64 {
+        self.layout()
+            .header
+            .vst_graph_version
+            .load(Ordering::Acquire)
     }
 
     /// Update shared params
