@@ -81,12 +81,13 @@ Release builds use a size-optimized Rust profile (LTO + strip) from the workspac
 ## VST3/CLAP Plugin
 
 NoobSynth is available as a VST3/CLAP plugin for use in any DAW (Ableton, FL Studio, Reaper, etc.).
+The plugin is currently a **proof of concept** and is still evolving.
 
 ### How it works
 
 The VST plugin uses a hybrid architecture:
 - **Audio processing**: Runs natively in the DAW via nih-plug
-- **UI**: Uses the Tauri app (launched automatically when the plugin loads)
+- **UI**: Uses a small host editor that launches the Tauri app on demand
 - **IPC**: Shared memory bridge between VST and Tauri for real-time parameter/note sync
 
 ### Installation
@@ -101,7 +102,7 @@ The VST plugin uses a hybrid architecture:
 ### Usage
 
 1. Load "NoobSynth" as an instrument in your DAW
-2. The Tauri UI window opens automatically
+2. Open the plugin UI in the host and click **Open NoobSynth UI**
 3. Play MIDI notes - they're processed by the native VST audio engine
 4. Tweak parameters in the UI - changes sync to the VST in real-time
 5. Close the UI window when done (plugin keeps running)
@@ -119,6 +120,8 @@ The VST plugin uses a hybrid architecture:
 
 ### Limitations (current)
 
+- VST support is a proof-of-concept and may evolve rapidly
+- Host editor is a launcher (the full UI is a separate Tauri window)
 - Oscilloscope not yet working in VST mode
 - UI must be in the same folder as the DLL
 - One instance at a time recommended

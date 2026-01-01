@@ -7,7 +7,7 @@ use midir::MidiInput;
 use serde::Serialize;
 use std::sync::{mpsc, Arc, Mutex};
 use std::thread;
-use tauri::State;
+use tauri::{Manager, State};
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -1027,6 +1027,21 @@ pub fn run() {
       }
 
       Ok(())
+    })
+    .on_window_event({
+      let vst_mode_flag = vst_mode;
+      move |window, event| {
+        if !vst_mode_flag {
+          return;
+        }
+        if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+          api.prevent_close();
+          if let Ok(bridge) = TauriBridge::open() {
+            drop(bridge);
+          }
+          let _ = window.app_handle().exit(0);
+        }
+      }
     })
     .run(tauri::generate_context!())
     .expect("error while running tauri application");

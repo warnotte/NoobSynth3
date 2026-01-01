@@ -481,6 +481,7 @@ function App() {
     const graphJson = JSON.stringify({
       modules: graphRef.current.modules,
       connections: graphRef.current.connections,
+      macros: graphRef.current.macros ?? [],
     })
     void invokeTauri('vst_set_graph', { graphJson }).catch((error) => {
       console.error('Failed to sync initial graph to VST:', error)
@@ -750,6 +751,7 @@ function App() {
         modules: layouted.modules,
         connections: layouted.connections,
         taps,
+        macros: layouted.macros ?? [],
       })
       void invokeTauri('native_set_graph', { graphJson }).catch((error) => {
         console.error(error)
@@ -761,6 +763,7 @@ function App() {
       const graphJson = JSON.stringify({
         modules: layouted.modules,
         connections: layouted.connections,
+        macros: layouted.macros ?? [],
       })
       void invokeTauri('vst_set_graph', { graphJson }).catch((error) => {
         console.error(error)
@@ -886,6 +889,7 @@ function App() {
         modules: graphRef.current.modules,
         connections: graphRef.current.connections,
         taps,
+        macros: graphRef.current.macros ?? [],
       })
       await invokeTauri('native_set_graph', { graphJson })
       await refreshTauriStatus()
@@ -908,6 +912,7 @@ function App() {
         modules: graphRef.current.modules,
         connections: graphRef.current.connections,
         taps,
+        macros: graphRef.current.macros ?? [],
       })
       await invokeTauri('native_start_graph', {
         graphJson,
@@ -1091,6 +1096,7 @@ function App() {
         const graphJson = JSON.stringify({
           modules: graphRef.current.modules,
           connections: graphRef.current.connections,
+          macros: graphRef.current.macros ?? [],
         })
         await invokeTauri('vst_set_graph', { graphJson })
       }
@@ -1303,7 +1309,6 @@ function App() {
 }
 
 export default App
-
 
 
 

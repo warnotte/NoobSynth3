@@ -48,20 +48,12 @@ pub struct SharedHeader {
     pub _pad1: u32,
 }
 
-/// Synth parameters (written by Tauri, read by VST)
+/// Synth parameters (shared between VST and Tauri)
 #[derive(Clone, Copy, Default)]
 #[repr(C)]
 pub struct SharedParams {
-    pub master: f32,
-    pub cutoff: f32,
-    pub resonance: f32,
-    pub env_amount: f32,
-    pub attack: f32,
-    pub decay: f32,
-    pub sustain: f32,
-    pub release: f32,
-    pub chorus_mix: f32,
-    pub _padding: [f32; 7], // Align to 64 bytes
+    pub macros: [f32; 8],
+    pub _padding: [f32; 8], // Align to 64 bytes
 }
 
 /// Voice state for a single voice
@@ -201,16 +193,8 @@ impl VstBridge {
                 (*ptr).header.magic = MAGIC;
                 (*ptr).header.version = VERSION;
                 (*ptr).params = SharedParams {
-                    master: 0.7,
-                    cutoff: 1200.0,
-                    resonance: 0.2,
-                    env_amount: 0.4,
-                    attack: 0.01,
-                    decay: 0.3,
-                    sustain: 0.7,
-                    release: 0.5,
-                    chorus_mix: 0.4,
-                    _padding: [0.0; 7],
+                    macros: [0.0; 8],
+                    _padding: [0.0; 8],
                 };
             }
         }
@@ -377,16 +361,8 @@ impl TauriBridge {
             (*ptr).header.magic = MAGIC;
             (*ptr).header.version = VERSION;
             (*ptr).params = SharedParams {
-                master: 0.7,
-                cutoff: 1200.0,
-                resonance: 0.2,
-                env_amount: 0.4,
-                attack: 0.01,
-                decay: 0.3,
-                sustain: 0.7,
-                release: 0.5,
-                chorus_mix: 0.4,
-                _padding: [0.0; 7],
+                macros: [0.0; 8],
+                _padding: [0.0; 8],
             };
             // Mark Tauri as connected
             (*ptr).header.flags.store(2, Ordering::SeqCst);
@@ -411,16 +387,8 @@ impl TauriBridge {
                 (*layout).header.magic = MAGIC;
                 (*layout).header.version = VERSION;
                 (*layout).params = SharedParams {
-                    master: 0.7,
-                    cutoff: 1200.0,
-                    resonance: 0.2,
-                    env_amount: 0.4,
-                    attack: 0.01,
-                    decay: 0.3,
-                    sustain: 0.7,
-                    release: 0.5,
-                    chorus_mix: 0.4,
-                    _padding: [0.0; 7],
+                    macros: [0.0; 8],
+                    _padding: [0.0; 8],
                 };
             }
             (*layout).header.flags.fetch_or(2, Ordering::SeqCst);

@@ -35,6 +35,19 @@ export interface ModuleSpec {
   params: Record<string, number | string | boolean>
 }
 
+export type MacroTarget = {
+  moduleId: string
+  paramId: string
+  min: number
+  max: number
+}
+
+export type MacroSpec = {
+  id: number
+  name?: string
+  targets: MacroTarget[]
+}
+
 export interface PortRef {
   moduleId: string
   portId: string
@@ -49,4 +62,5 @@ export interface Connection {
 export interface GraphState {
   modules: ModuleSpec[]
   connections: Connection[]
+  macros?: MacroSpec[]
 }

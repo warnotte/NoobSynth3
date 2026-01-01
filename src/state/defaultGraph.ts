@@ -179,6 +179,48 @@ export const defaultGraph: GraphState = {
       },
     },
   ],
+  macros: [
+    {
+      id: 1,
+      name: 'Cutoff',
+      targets: [{ moduleId: 'vcf-1', paramId: 'cutoff', min: 200, max: 6000 }],
+    },
+    {
+      id: 2,
+      name: 'Resonance',
+      targets: [{ moduleId: 'vcf-1', paramId: 'resonance', min: 0, max: 0.8 }],
+    },
+    {
+      id: 3,
+      name: 'Env Amount',
+      targets: [{ moduleId: 'vcf-1', paramId: 'envAmount', min: 0, max: 0.9 }],
+    },
+    {
+      id: 4,
+      name: 'Attack',
+      targets: [{ moduleId: 'adsr-1', paramId: 'attack', min: 0.01, max: 2.0 }],
+    },
+    {
+      id: 5,
+      name: 'Decay',
+      targets: [{ moduleId: 'adsr-1', paramId: 'decay', min: 0.05, max: 2.5 }],
+    },
+    {
+      id: 6,
+      name: 'Sustain',
+      targets: [{ moduleId: 'adsr-1', paramId: 'sustain', min: 0.0, max: 1.0 }],
+    },
+    {
+      id: 7,
+      name: 'Release',
+      targets: [{ moduleId: 'adsr-1', paramId: 'release', min: 0.05, max: 3.0 }],
+    },
+    {
+      id: 8,
+      name: 'Chorus',
+      targets: [{ moduleId: 'chorus-1', paramId: 'mix', min: 0.0, max: 1.0 }],
+    },
+  ],
   connections: [
     {
       from: { moduleId: 'ctrl-1', portId: 'cv-out' },

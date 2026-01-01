@@ -1,6 +1,9 @@
 use nih_plug::prelude::*;
+use nih_plug_egui::{create_egui_editor, egui, EguiState};
 use dsp_graph::GraphEngine;
 use dsp_ipc::{VstBridge, CommandType, launcher, hash_id};
+use serde::Deserialize;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 
 /// Default graph JSON for a simple synth patch
@@ -107,6 +110,48 @@ const DEFAULT_GRAPH_JSON: &str = r#"{
       }
     }
   ],
+  "macros": [
+    {
+      "id": 1,
+      "name": "Cutoff",
+      "targets": [{ "moduleId": "vcf-1", "paramId": "cutoff", "min": 200, "max": 6000 }]
+    },
+    {
+      "id": 2,
+      "name": "Resonance",
+      "targets": [{ "moduleId": "vcf-1", "paramId": "resonance", "min": 0, "max": 0.8 }]
+    },
+    {
+      "id": 3,
+      "name": "Env Amount",
+      "targets": [{ "moduleId": "vcf-1", "paramId": "envAmount", "min": 0, "max": 0.9 }]
+    },
+    {
+      "id": 4,
+      "name": "Attack",
+      "targets": [{ "moduleId": "adsr-1", "paramId": "attack", "min": 0.01, "max": 2.0 }]
+    },
+    {
+      "id": 5,
+      "name": "Decay",
+      "targets": [{ "moduleId": "adsr-1", "paramId": "decay", "min": 0.05, "max": 2.5 }]
+    },
+    {
+      "id": 6,
+      "name": "Sustain",
+      "targets": [{ "moduleId": "adsr-1", "paramId": "sustain", "min": 0.0, "max": 1.0 }]
+    },
+    {
+      "id": 7,
+      "name": "Release",
+      "targets": [{ "moduleId": "adsr-1", "paramId": "release", "min": 0.05, "max": 3.0 }]
+    },
+    {
+      "id": 8,
+      "name": "Chorus",
+      "targets": [{ "moduleId": "chorus-1", "paramId": "mix", "min": 0.0, "max": 1.0 }]
+    }
+  ],
   "connections": [
     { "from": { "moduleId": "ctrl-1", "portId": "cv-out" }, "to": { "moduleId": "osc-1", "portId": "pitch" }, "kind": "cv" },
     { "from": { "moduleId": "ctrl-1", "portId": "cv-out" }, "to": { "moduleId": "vcf-1", "portId": "key" }, "kind": "cv" },
@@ -136,6 +181,43 @@ mod hashes {
     pub static GAIN_1: LazyLock<u32> = LazyLock::new(|| hash_id("gain-1"));
 }
 
+#[derive(Clone)]
+struct MacroTarget {
+    module_id: String,
+    param_id: String,
+    min: f32,
+    max: f32,
+}
+
+#[derive(Clone)]
+struct MacroSpec {
+    id: u8,
+    name: Option<String>,
+    targets: Vec<MacroTarget>,
+}
+
+#[derive(Deserialize)]
+struct MacroTargetJson {
+    #[serde(rename = "moduleId")]
+    module_id: String,
+    #[serde(rename = "paramId")]
+    param_id: String,
+    min: Option<f32>,
+    max: Option<f32>,
+}
+
+#[derive(Deserialize)]
+struct MacroSpecJson {
+    id: u8,
+    name: Option<String>,
+    targets: Vec<MacroTargetJson>,
+}
+
+#[derive(Deserialize)]
+struct MacroPayload {
+    macros: Option<Vec<MacroSpecJson>>,
+}
+
 /// NoobSynth VST3/CLAP Plugin
 pub struct NoobSynth {
     params: Arc<NoobSynthParams>,
@@ -150,133 +232,108 @@ pub struct NoobSynth {
     max_voices: usize,
     /// IPC bridge for communication with Tauri UI
     ipc_bridge: Option<VstBridge>,
-    /// Whether we've tried to launch Tauri
-    tauri_launch_attempted: bool,
+    ui_connected: Arc<AtomicBool>,
+    macro_specs: Vec<MacroSpec>,
+    last_macro_values: [f32; 8],
 }
 
 /// Plugin parameters exposed to the DAW
 #[derive(Params)]
 struct NoobSynthParams {
-    /// Master output volume
-    #[id = "master"]
-    pub master: FloatParam,
+    /// Editor state
+    #[persist = "editor-state"]
+    editor_state: Arc<EguiState>,
 
-    /// VCF Cutoff frequency
-    #[id = "cutoff"]
-    pub cutoff: FloatParam,
+    /// Macro 1
+    #[id = "macro_1"]
+    pub macro_1: FloatParam,
 
-    /// VCF Resonance
-    #[id = "resonance"]
-    pub resonance: FloatParam,
+    /// Macro 2
+    #[id = "macro_2"]
+    pub macro_2: FloatParam,
 
-    /// Filter envelope amount
-    #[id = "env_amount"]
-    pub env_amount: FloatParam,
+    /// Macro 3
+    #[id = "macro_3"]
+    pub macro_3: FloatParam,
 
-    /// Attack time
-    #[id = "attack"]
-    pub attack: FloatParam,
+    /// Macro 4
+    #[id = "macro_4"]
+    pub macro_4: FloatParam,
 
-    /// Decay time
-    #[id = "decay"]
-    pub decay: FloatParam,
+    /// Macro 5
+    #[id = "macro_5"]
+    pub macro_5: FloatParam,
 
-    /// Sustain level
-    #[id = "sustain"]
-    pub sustain: FloatParam,
+    /// Macro 6
+    #[id = "macro_6"]
+    pub macro_6: FloatParam,
 
-    /// Release time
-    #[id = "release"]
-    pub release: FloatParam,
+    /// Macro 7
+    #[id = "macro_7"]
+    pub macro_7: FloatParam,
 
-    /// Chorus mix
-    #[id = "chorus_mix"]
-    pub chorus_mix: FloatParam,
+    /// Macro 8
+    #[id = "macro_8"]
+    pub macro_8: FloatParam,
 }
 
 impl Default for NoobSynthParams {
     fn default() -> Self {
         Self {
-            master: FloatParam::new(
-                "Master",
-                0.7,
-                FloatRange::Linear { min: 0.0, max: 1.0 },
-            )
-            .with_unit(" dB")
-            .with_value_to_string(formatters::v2s_f32_rounded(2)),
+            editor_state: EguiState::from_size(360, 200),
 
-            cutoff: FloatParam::new(
-                "Cutoff",
-                1200.0,
-                FloatRange::Skewed {
-                    min: 20.0,
-                    max: 20000.0,
-                    factor: FloatRange::skew_factor(-2.0),
-                },
-            )
-            .with_unit(" Hz")
-            .with_value_to_string(formatters::v2s_f32_rounded(0)),
-
-            resonance: FloatParam::new(
-                "Resonance",
-                0.2,
+            macro_1: FloatParam::new(
+                "Macro 1",
+                0.0,
                 FloatRange::Linear { min: 0.0, max: 1.0 },
             )
             .with_value_to_string(formatters::v2s_f32_percentage(0)),
 
-            env_amount: FloatParam::new(
-                "Env Amount",
-                0.4,
+            macro_2: FloatParam::new(
+                "Macro 2",
+                0.0,
                 FloatRange::Linear { min: 0.0, max: 1.0 },
             )
             .with_value_to_string(formatters::v2s_f32_percentage(0)),
 
-            attack: FloatParam::new(
-                "Attack",
-                0.01,
-                FloatRange::Skewed {
-                    min: 0.001,
-                    max: 5.0,
-                    factor: FloatRange::skew_factor(-2.0),
-                },
-            )
-            .with_unit(" s")
-            .with_value_to_string(formatters::v2s_f32_rounded(3)),
-
-            decay: FloatParam::new(
-                "Decay",
-                0.3,
-                FloatRange::Skewed {
-                    min: 0.001,
-                    max: 5.0,
-                    factor: FloatRange::skew_factor(-2.0),
-                },
-            )
-            .with_unit(" s")
-            .with_value_to_string(formatters::v2s_f32_rounded(3)),
-
-            sustain: FloatParam::new(
-                "Sustain",
-                0.7,
+            macro_3: FloatParam::new(
+                "Macro 3",
+                0.0,
                 FloatRange::Linear { min: 0.0, max: 1.0 },
             )
             .with_value_to_string(formatters::v2s_f32_percentage(0)),
 
-            release: FloatParam::new(
-                "Release",
-                0.5,
-                FloatRange::Skewed {
-                    min: 0.001,
-                    max: 10.0,
-                    factor: FloatRange::skew_factor(-2.0),
-                },
+            macro_4: FloatParam::new(
+                "Macro 4",
+                0.0,
+                FloatRange::Linear { min: 0.0, max: 1.0 },
             )
-            .with_unit(" s")
-            .with_value_to_string(formatters::v2s_f32_rounded(3)),
+            .with_value_to_string(formatters::v2s_f32_percentage(0)),
 
-            chorus_mix: FloatParam::new(
-                "Chorus",
-                0.4,
+            macro_5: FloatParam::new(
+                "Macro 5",
+                0.0,
+                FloatRange::Linear { min: 0.0, max: 1.0 },
+            )
+            .with_value_to_string(formatters::v2s_f32_percentage(0)),
+
+            macro_6: FloatParam::new(
+                "Macro 6",
+                0.0,
+                FloatRange::Linear { min: 0.0, max: 1.0 },
+            )
+            .with_value_to_string(formatters::v2s_f32_percentage(0)),
+
+            macro_7: FloatParam::new(
+                "Macro 7",
+                0.0,
+                FloatRange::Linear { min: 0.0, max: 1.0 },
+            )
+            .with_value_to_string(formatters::v2s_f32_percentage(0)),
+
+            macro_8: FloatParam::new(
+                "Macro 8",
+                0.0,
                 FloatRange::Linear { min: 0.0, max: 1.0 },
             )
             .with_value_to_string(formatters::v2s_f32_percentage(0)),
@@ -284,17 +341,38 @@ impl Default for NoobSynthParams {
     }
 }
 
+impl NoobSynthParams {
+    fn macro_values(&self) -> [f32; 8] {
+        [
+            self.macro_1.value(),
+            self.macro_2.value(),
+            self.macro_3.value(),
+            self.macro_4.value(),
+            self.macro_5.value(),
+            self.macro_6.value(),
+            self.macro_7.value(),
+            self.macro_8.value(),
+        ]
+    }
+}
+
 impl Default for NoobSynth {
     fn default() -> Self {
+        let params = Arc::new(NoobSynthParams::default());
+        let macro_specs = parse_macro_specs(DEFAULT_GRAPH_JSON);
+        let last_macro_values = params.macro_values();
+        let ui_connected = Arc::new(AtomicBool::new(false));
         Self {
-            params: Arc::new(NoobSynthParams::default()),
+            params,
             engine: GraphEngine::new(44100.0),
             graph_json: DEFAULT_GRAPH_JSON.to_string(),
             voice_notes: [None; 16],
             next_voice: 0,
             max_voices: 8,
             ipc_bridge: None,
-            tauri_launch_attempted: false,
+            ui_connected,
+            macro_specs,
+            last_macro_values,
         }
     }
 }
@@ -335,30 +413,38 @@ impl NoobSynth {
         None
     }
 
-    /// Sync DAW parameters to the engine
-    fn sync_params_to_engine(&mut self) {
-        // Master volume
-        self.engine.set_param("out-1", "level", self.params.master.value());
+    fn apply_macro_value(&mut self, macro_index: usize, value: f32) {
+        let macro_id = (macro_index + 1) as u8;
+        for spec in &self.macro_specs {
+            if spec.id != macro_id {
+                continue;
+            }
+            for target in &spec.targets {
+                let scaled = target.min + (target.max - target.min) * value;
+                self.engine
+                    .set_param(&target.module_id, &target.param_id, scaled);
+            }
+        }
+    }
 
-        // VCF
-        self.engine.set_param("vcf-1", "cutoff", self.params.cutoff.value());
-        self.engine.set_param("vcf-1", "resonance", self.params.resonance.value());
-        self.engine.set_param("vcf-1", "envAmount", self.params.env_amount.value());
+    fn apply_all_macros(&mut self) {
+        let values = self.params.macro_values();
+        for (index, value) in values.iter().enumerate() {
+            self.apply_macro_value(index, *value);
+        }
+        self.last_macro_values = values;
+    }
 
-        // Amp ADSR
-        self.engine.set_param("adsr-1", "attack", self.params.attack.value());
-        self.engine.set_param("adsr-1", "decay", self.params.decay.value());
-        self.engine.set_param("adsr-1", "sustain", self.params.sustain.value());
-        self.engine.set_param("adsr-1", "release", self.params.release.value());
-
-        // Filter ADSR (linked to amp for simplicity)
-        self.engine.set_param("adsr-2", "attack", self.params.attack.value());
-        self.engine.set_param("adsr-2", "decay", self.params.decay.value() * 1.5);
-        self.engine.set_param("adsr-2", "sustain", self.params.sustain.value() * 0.5);
-        self.engine.set_param("adsr-2", "release", self.params.release.value());
-
-        // Chorus
-        self.engine.set_param("chorus-1", "mix", self.params.chorus_mix.value());
+    fn sync_macros_to_engine(&mut self) {
+        let values = self.params.macro_values();
+        for (index, value) in values.iter().enumerate() {
+            let previous = self.last_macro_values[index];
+            if (value - previous).abs() <= 1e-6 {
+                continue;
+            }
+            self.last_macro_values[index] = *value;
+            self.apply_macro_value(index, *value);
+        }
     }
 
     /// Initialize IPC bridge and optionally launch Tauri
@@ -371,6 +457,7 @@ impl NoobSynth {
             Ok(mut bridge) => {
                 bridge.set_sample_rate(sample_rate as u32);
                 nih_log!("IPC bridge created successfully (sample rate: {})", sample_rate as u32);
+                self.ui_connected.store(bridge.is_ui_connected(), Ordering::Relaxed);
                 self.ipc_bridge = Some(bridge);
             }
             Err(e) => {
@@ -380,6 +467,7 @@ impl NoobSynth {
                     Ok(mut bridge) => {
                         bridge.set_sample_rate(sample_rate as u32);
                         nih_log!("IPC bridge opened successfully");
+                        self.ui_connected.store(bridge.is_ui_connected(), Ordering::Relaxed);
                         self.ipc_bridge = Some(bridge);
                     }
                     Err(e2) => {
@@ -391,31 +479,35 @@ impl NoobSynth {
         }
 
         // THEN: Launch Tauri if not already running (after bridge is ready)
-        if !self.tauri_launch_attempted {
-            self.tauri_launch_attempted = true;
-            nih_log!("Launching Tauri UI...");
-            launcher::launch_tauri_if_needed();
-        }
+        // UI is opened on demand via the host's editor button.
     }
 
     /// Process IPC commands from Tauri UI
     fn process_ipc_commands(&mut self) {
-        let Some(bridge) = &mut self.ipc_bridge else {
-            return;
+        let graph_json = {
+            let Some(bridge) = &mut self.ipc_bridge else {
+                return;
+            };
+            bridge.graph_changed()
         };
 
         // Check for graph changes
-        if let Some(graph_json) = bridge.graph_changed() {
+        if let Some(graph_json) = graph_json {
             nih_log!("Received new graph from UI ({} bytes)", graph_json.len());
             if let Err(e) = self.engine.set_graph_json(&graph_json) {
                 nih_error!("Failed to load graph from UI: {}", e);
             } else {
                 self.graph_json = graph_json;
                 self.engine.set_param("ctrl-1", "voices", self.max_voices as f32);
+                self.macro_specs = parse_macro_specs(&self.graph_json);
+                self.apply_all_macros();
             }
         }
 
         // Process commands from ring buffer
+        let Some(bridge) = &mut self.ipc_bridge else {
+            return;
+        };
         while let Some(cmd) = bridge.pop_command() {
             let cmd_type = CommandType::from(cmd.cmd_type);
             match cmd_type {
@@ -537,6 +629,53 @@ fn hash_to_param_id(hash: u32) -> Option<&'static str> {
     None
 }
 
+fn parse_macro_specs(payload: &str) -> Vec<MacroSpec> {
+    let parsed: MacroPayload = match serde_json::from_str(payload) {
+        Ok(value) => value,
+        Err(_) => return Vec::new(),
+    };
+
+    parsed
+        .macros
+        .unwrap_or_default()
+        .into_iter()
+        .filter_map(|spec| {
+            if spec.id == 0 || spec.id > 8 {
+                return None;
+            }
+            let targets: Vec<MacroTarget> = spec
+                .targets
+                .into_iter()
+                .filter_map(|target| {
+                    if target.module_id.is_empty() || target.param_id.is_empty() {
+                        return None;
+                    }
+                    let mut min = target.min.unwrap_or(0.0);
+                    let mut max = target.max.unwrap_or(1.0);
+                    if min > max {
+                        std::mem::swap(&mut min, &mut max);
+                    }
+                    Some(MacroTarget {
+                        module_id: target.module_id,
+                        param_id: target.param_id,
+                        min,
+                        max,
+                    })
+                })
+                .collect();
+
+            if targets.is_empty() {
+                return None;
+            }
+            Some(MacroSpec {
+                id: spec.id,
+                name: spec.name,
+                targets,
+            })
+        })
+        .collect()
+}
+
 impl Plugin for NoobSynth {
     const NAME: &'static str = "NoobSynth";
     const VENDOR: &'static str = "NoobSynth";
@@ -563,6 +702,28 @@ impl Plugin for NoobSynth {
         self.params.clone()
     }
 
+    fn editor(&mut self, _async_executor: AsyncExecutor<Self>) -> Option<Box<dyn Editor>> {
+        let ui_connected = self.ui_connected.clone();
+        create_egui_editor(
+            self.params.editor_state.clone(),
+            (),
+            move |_, _| {},
+            move |egui_ctx, _setter, _| {
+                egui::CentralPanel::default().show(egui_ctx, |ui| {
+                    ui.heading("NoobSynth UI");
+                    ui.label("This host window launches the full NoobSynth interface.");
+                    if ui.button("Open NoobSynth UI").clicked() {
+                        launcher::launch_tauri_if_needed();
+                    }
+                    ui.separator();
+                    let connected = ui_connected.load(Ordering::Relaxed);
+                    let status = if connected { "connected" } else { "not connected" };
+                    ui.label(format!("Tauri UI: {status}"));
+                });
+            },
+        )
+    }
+
     fn initialize(
         &mut self,
         _audio_io_layout: &AudioIOLayout,
@@ -580,6 +741,7 @@ impl Plugin for NoobSynth {
 
         // Set initial voice count
         self.engine.set_param("ctrl-1", "voices", self.max_voices as f32);
+        self.apply_all_macros();
 
         // Initialize IPC bridge (will also try to launch Tauri)
         self.init_ipc(buffer_config.sample_rate);
@@ -600,11 +762,18 @@ impl Plugin for NoobSynth {
         _aux: &mut AuxiliaryBuffers,
         context: &mut impl ProcessContext<Self>,
     ) -> ProcessStatus {
-        // Sync parameters from DAW
-        self.sync_params_to_engine();
-
         // Process IPC commands from Tauri UI
         self.process_ipc_commands();
+
+        let connected = self
+            .ipc_bridge
+            .as_ref()
+            .map(|bridge| bridge.is_ui_connected())
+            .unwrap_or(false);
+        self.ui_connected.store(connected, Ordering::Relaxed);
+
+        // Apply macro updates from DAW (only when changed)
+        self.sync_macros_to_engine();
 
         // Process MIDI events from DAW
         while let Some(event) = context.next_event() {

@@ -82,6 +82,7 @@ Presets support two formats:
 - Rapidly changing voice count while running can cause instability; adjust slowly.
 - **VST mode**: Oscilloscope not working yet (scope taps not wired through IPC).
 - **VST mode**: Only one instance recommended (shared memory is global).
+- **VST mode**: Proof of concept; host editor is a launcher for the Tauri UI.
 
 ## Decisions
 
@@ -115,6 +116,7 @@ Presets support two formats:
 - **Robust connection handling**: Auto-cleanup of stale shared memory from crashes
 - **Debug logging**: `noobsynth_vst_debug.log` created in plugin folder for troubleshooting
 - **Build script**: `build.bat` builds frontend + Tauri + VST in one command
+- **Mini editor**: Host UI uses an egui launcher panel to open Tauri on demand (VST PoC).
 
 ### Other changes
 
