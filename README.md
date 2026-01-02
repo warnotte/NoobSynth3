@@ -129,8 +129,9 @@ The VST plugin uses a hybrid architecture:
 - Host editor is a launcher (the full UI is a separate Tauri window)
 - Oscilloscope not yet working in VST mode
 - UI must be in the same folder as the DLL
-- One instance at a time recommended
+- Multi-instance supported (each plugin instance launches its own Tauri UI window)
 - UI macro edits do not write back to DAW automation (host remains source of truth)
+- UI shows the active VST instance ID in the status bar / Tauri Bridge panel
 
 ## How to use
 

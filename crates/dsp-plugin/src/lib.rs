@@ -4,8 +4,16 @@ use dsp_graph::GraphEngine;
 use dsp_ipc::{CommandType, SharedParams, VstBridge, hash_id, launcher};
 use serde::Deserialize;
 use std::collections::HashMap;
-use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU32, AtomicU64, Ordering};
 use std::sync::{Arc, Mutex};
+
+static INSTANCE_COUNTER: AtomicU64 = AtomicU64::new(1);
+
+fn generate_instance_id() -> String {
+    let pid = std::process::id();
+    let seq = INSTANCE_COUNTER.fetch_add(1, Ordering::Relaxed);
+    format!("{pid:x}-{seq:x}")
+}
 
 /// Default graph JSON for a simple synth patch
 /// VCO → VCF → VCA → Output with ADSR envelopes
@@ -242,6 +250,8 @@ pub struct NoobSynth {
     next_voice: usize,
     /// Maximum voices
     max_voices: usize,
+    /// Unique instance identifier for IPC
+    instance_id: String,
     /// IPC bridge for communication with Tauri UI
     ipc_bridge: Option<VstBridge>,
     ui_connected: Arc<AtomicBool>,
@@ -389,6 +399,7 @@ impl Default for NoobSynth {
         let ui_connected = Arc::new(AtomicBool::new(false));
         let ui_requests = Arc::new(AtomicU32::new(0));
         let ui_sample_rate = Arc::new(AtomicU32::new(0));
+        let instance_id = generate_instance_id();
         Self {
             params,
             engine: GraphEngine::new(44100.0),
@@ -396,6 +407,7 @@ impl Default for NoobSynth {
             voice_notes: [None; 16],
             next_voice: 0,
             max_voices: 8,
+            instance_id,
             ipc_bridge: None,
             ui_connected,
             ui_requests,
@@ -616,7 +628,7 @@ impl NoobSynth {
         // This ensures the shared memory exists when Tauri tries to connect
         nih_log!("Initializing IPC bridge...");
 
-        match VstBridge::new() {
+        match VstBridge::new_with_id(Some(self.instance_id.as_str())) {
             Ok(mut bridge) => {
                 bridge.set_sample_rate(sample_rate as u32);
                 nih_log!("IPC bridge created successfully (sample rate: {})", sample_rate as u32);
@@ -628,7 +640,7 @@ impl NoobSynth {
             Err(e) => {
                 nih_log!("VstBridge::new() failed: {:?}, trying open()...", e);
                 // Try to open existing (maybe Tauri created it first)
-                match VstBridge::open() {
+                match VstBridge::open_with_id(Some(self.instance_id.as_str())) {
                     Ok(mut bridge) => {
                         bridge.set_sample_rate(sample_rate as u32);
                         nih_log!("IPC bridge opened successfully");
@@ -652,7 +664,7 @@ impl NoobSynth {
     fn reconnect_ipc(&mut self) {
         self.ipc_bridge = None;
         let sample_rate = self.ui_sample_rate.load(Ordering::Relaxed);
-        match VstBridge::open() {
+        match VstBridge::open_with_id(Some(self.instance_id.as_str())) {
             Ok(mut bridge) => {
                 if sample_rate > 0 {
                     bridge.set_sample_rate(sample_rate);
@@ -662,7 +674,7 @@ impl NoobSynth {
                 self.publish_macros_to_ui();
                 nih_log!("IPC bridge reconnected (open)");
             }
-            Err(_) => match VstBridge::new() {
+            Err(_) => match VstBridge::new_with_id(Some(self.instance_id.as_str())) {
                 Ok(mut bridge) => {
                     if sample_rate > 0 {
                         bridge.set_sample_rate(sample_rate);
@@ -960,6 +972,7 @@ impl Plugin for NoobSynth {
         let ui_connected = self.ui_connected.clone();
         let ui_requests = self.ui_requests.clone();
         let ui_sample_rate = self.ui_sample_rate.clone();
+        let instance_id = self.instance_id.clone();
         create_egui_editor(
             self.params.editor_state.clone(),
             (),
@@ -969,7 +982,7 @@ impl Plugin for NoobSynth {
                     ui.heading("NoobSynth UI");
                     ui.label("This host window launches the full NoobSynth interface.");
                     if ui.button("Open NoobSynth UI").clicked() {
-                        launcher::launch_tauri_if_needed();
+                        launcher::launch_tauri_if_needed(&instance_id);
                     }
                     if ui.button("Reconnect IPC").clicked() {
                         ui_requests.fetch_or(NoobSynth::UI_REQ_RECONNECT, Ordering::Relaxed);

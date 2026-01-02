@@ -12,6 +12,13 @@ use std::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 /// Shared memory identifier
 pub const SHM_NAME: &str = "noobsynth_ipc_v1";
 
+fn shm_name(instance_id: Option<&str>) -> String {
+    match instance_id {
+        Some(id) if !id.is_empty() => format!("{SHM_NAME}_{id}"),
+        _ => SHM_NAME.to_string(),
+    }
+}
+
 /// Magic number to verify shared memory is valid
 pub const MAGIC: u32 = 0x4E4F4F42; // "NOOB"
 
@@ -184,9 +191,15 @@ unsafe impl Sync for VstBridge {}
 impl VstBridge {
     /// Create or open the shared memory segment
     pub fn new() -> Result<Self, ShmemError> {
+        Self::new_with_id(None)
+    }
+
+    /// Create or open the shared memory segment for a specific instance
+    pub fn new_with_id(instance_id: Option<&str>) -> Result<Self, ShmemError> {
+        let os_id = shm_name(instance_id);
         let shmem = ShmemConf::new()
             .size(SHARED_MEM_SIZE)
-            .os_id(SHM_NAME)
+            .os_id(&os_id)
             .create()?;
 
         // Initialize if we created it OR if magic is wrong (stale memory)
@@ -222,8 +235,14 @@ impl VstBridge {
 
     /// Open existing shared memory (created by Tauri)
     pub fn open() -> Result<Self, ShmemError> {
+        Self::open_with_id(None)
+    }
+
+    /// Open existing shared memory (created by Tauri) for a specific instance
+    pub fn open_with_id(instance_id: Option<&str>) -> Result<Self, ShmemError> {
+        let os_id = shm_name(instance_id);
         let shmem = ShmemConf::new()
-            .os_id(SHM_NAME)
+            .os_id(&os_id)
             .open()?;
 
         // Verify magic/version, reinitialize if stale
@@ -383,9 +402,15 @@ unsafe impl Sync for TauriBridge {}
 impl TauriBridge {
     /// Create the shared memory segment
     pub fn new() -> Result<Self, ShmemError> {
+        Self::new_with_id(None)
+    }
+
+    /// Create the shared memory segment for a specific instance
+    pub fn new_with_id(instance_id: Option<&str>) -> Result<Self, ShmemError> {
+        let os_id = shm_name(instance_id);
         let shmem = ShmemConf::new()
             .size(SHARED_MEM_SIZE)
-            .os_id(SHM_NAME)
+            .os_id(&os_id)
             .create()?;
 
         // Initialize
@@ -407,8 +432,14 @@ impl TauriBridge {
 
     /// Open existing shared memory
     pub fn open() -> Result<Self, ShmemError> {
+        Self::open_with_id(None)
+    }
+
+    /// Open existing shared memory for a specific instance
+    pub fn open_with_id(instance_id: Option<&str>) -> Result<Self, ShmemError> {
+        let os_id = shm_name(instance_id);
         let shmem = ShmemConf::new()
-            .os_id(SHM_NAME)
+            .os_id(&os_id)
             .open()?;
 
         // Verify magic, reinitialize if wrong (stale from previous session)
@@ -810,11 +841,12 @@ pub mod launcher {
 
     /// Check if Tauri is connected by peeking at the shared memory flags
     /// This does NOT set any flags, just reads them
-    fn is_tauri_running() -> bool {
+    fn is_tauri_running(instance_id: &str) -> bool {
         use std::sync::atomic::Ordering;
 
+        let os_id = super::shm_name(if instance_id.is_empty() { None } else { Some(instance_id) });
         let shmem = match shared_memory::ShmemConf::new()
-            .os_id(super::SHM_NAME)
+            .os_id(&os_id)
             .open()
         {
             Ok(s) => s,
@@ -832,11 +864,11 @@ pub mod launcher {
     }
 
     /// Launch the Tauri app if not already running
-    pub fn launch_tauri_if_needed() -> bool {
+    pub fn launch_tauri_if_needed(instance_id: &str) -> bool {
         log_debug("[NoobSynth VST] launch_tauri_if_needed() called");
 
         // Check if Tauri is actually connected (peek at flags without modifying)
-        if is_tauri_running() {
+        if is_tauri_running(instance_id) {
             log_debug("[NoobSynth VST] Tauri already connected");
             return true;
         }
@@ -845,10 +877,12 @@ pub mod launcher {
         // Find and launch
         if let Some(exe_path) = find_tauri_exe() {
             log_debug(&format!("[NoobSynth VST] Launching: {:?}", exe_path));
-            match Command::new(&exe_path)
-                .arg("--vst-mode")
-                .spawn()
-            {
+            let mut cmd = Command::new(&exe_path);
+            cmd.arg("--vst-mode");
+            if !instance_id.is_empty() {
+                cmd.arg("--vst-id").arg(instance_id);
+            }
+            match cmd.spawn() {
                 Ok(_) => {
                     log_debug("[NoobSynth VST] Launch successful, waiting...");
                     std::thread::sleep(std::time::Duration::from_millis(500));
@@ -887,17 +921,20 @@ pub mod launcher {
         None
     }
 
-    pub fn launch_tauri_if_needed() -> bool {
+    pub fn launch_tauri_if_needed(instance_id: &str) -> bool {
         use std::process::Command;
 
-        if super::TauriBridge::open().is_ok() {
+        if super::TauriBridge::open_with_id(if instance_id.is_empty() { None } else { Some(instance_id) }).is_ok() {
             return true;
         }
 
         if let Some(exe_path) = find_tauri_exe() {
-            Command::new(&exe_path)
-                .arg("--vst-mode")
-                .spawn()
+            let mut cmd = Command::new(&exe_path);
+            cmd.arg("--vst-mode");
+            if !instance_id.is_empty() {
+                cmd.arg("--vst-id").arg(instance_id);
+            }
+            cmd.spawn()
                 .map(|_| {
                     std::thread::sleep(std::time::Duration::from_millis(500));
                     true

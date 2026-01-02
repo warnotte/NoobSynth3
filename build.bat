@@ -24,7 +24,7 @@ echo.
 
 :: Step 2: Build Tauri app (includes frontend bundling)
 echo [2/3] Building Tauri app (noobsynth3.exe)...
-call npx tauri build 2>nul
+call npx tauri build
 if errorlevel 1 (
     echo ERROR: Tauri build failed
     exit /b 1

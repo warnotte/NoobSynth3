@@ -26,6 +26,7 @@ type SidePanelProps = {
   macroModules: ModuleSpec[]
   isVst: boolean
   vstConnected: boolean
+  vstInstanceId: string | null
   onMacroValueChange: (macroIndex: number, value: number) => void
   onMacroNameChange: (macroId: number, name: string) => void
   onMacroTargetChange: (macroId: number, targetIndex: number, patch: Partial<MacroTarget>) => void
@@ -70,6 +71,7 @@ export const SidePanel = ({
   macroModules,
   isVst,
   vstConnected,
+  vstInstanceId,
   onMacroValueChange,
   onMacroNameChange,
   onMacroTargetChange,
@@ -313,6 +315,12 @@ export const SidePanel = ({
             </div>
             {tauriStatus === 'ready' && (
               <div className="tauri-list">
+                {isVst && (
+                  <div className="tauri-item">
+                    <span className="tauri-label">VST Instance</span>
+                    <span className="tauri-value">{vstInstanceId ?? 'n/a'}</span>
+                  </div>
+                )}
                 <div className="tauri-item">
                   <span className="tauri-label">Ping</span>
                   <span className="tauri-value">{tauriPing ?? 'n/a'}</span>

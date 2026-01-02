@@ -74,6 +74,14 @@ const isVstMode = () => {
   return params.get('vst') === '1' || params.get('vst-mode') === '1'
 }
 
+const getVstInstanceId = () => {
+  if (typeof window === 'undefined') return null
+  const scopedWindow = window as typeof window & {
+    __NOOBSYNTH_VST_INSTANCE_ID__?: string
+  }
+  return scopedWindow.__NOOBSYNTH_VST_INSTANCE_ID__ ?? null
+}
+
 const buildScopeTaps = (modules: ModuleSpec[]): NativeTap[] => {
   const taps: NativeTap[] = []
   modules.forEach((module) => {
@@ -1318,6 +1326,8 @@ function App() {
     }
   }, [runPresetBatchExport])
 
+  const vstInstanceId = isVst ? getVstInstanceId() : null
+  const vstInstanceLabel = vstInstanceId ? ` • instance ${vstInstanceId}` : ''
   const audioMode = isVst ? 'vst' : isTauri ? 'native' : 'web'
   const audioRunning = audioMode === 'vst'
     ? vstConnected
@@ -1346,9 +1356,11 @@ function App() {
 
   const statusDetail =
     audioMode === 'vst'
-      ? vstError ?? (vstConnected
-          ? `VST mode active${vstSampleRate ? ` @ ${vstSampleRate}Hz` : ''}`
-          : 'Connecting to VST...')
+      ? (vstError
+          ? `${vstError}${vstInstanceLabel}`
+          : vstConnected
+            ? `VST mode active${vstSampleRate ? ` @ ${vstSampleRate}Hz` : ''}${vstInstanceLabel}`
+            : `Connecting to VST...${vstInstanceLabel}`)
       : audioMode === 'native'
         ? tauriNativeError ?? (audioRunning ? 'Native DSP graph running.' : 'Native DSP ready.')
         : status === 'error'
@@ -1559,6 +1571,7 @@ function App() {
           macroModules={graph.modules}
           isVst={isVst}
           vstConnected={vstConnected}
+          vstInstanceId={vstInstanceId}
           onMacroValueChange={handleMacroValueChange}
           onMacroNameChange={handleMacroNameChange}
           onMacroTargetChange={handleMacroTargetChange}

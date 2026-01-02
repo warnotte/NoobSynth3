@@ -103,7 +103,6 @@ Presets support two formats:
 - MIDI enhancements (pitch bend, CC mapping).
 - Optional: add native MIDI input via `midir` for Tauri (lower latency, more reliable than Web MIDI).
 - **VST**: Wire scope taps through IPC for oscilloscope in VST mode.
-- **VST**: Support multiple plugin instances (instance ID in shared memory name).
 
 ## Recent changes (Dec 2025)
 
@@ -117,6 +116,8 @@ Presets support two formats:
 - **Host -> UI sync**: Tauri refreshes when the host loads a new preset (polling)
 - **Macro panel**: UI can map 8 DAW macros to module params with bidirectional sync
 - **Macro override state**: UI now shows when macros are driven by DAW vs UI override (no host write-back).
+- **Multi-instance IPC**: Shared memory is now instance-scoped; each plugin instance launches its own Tauri UI window.
+- **UI instance label**: VST instance ID is displayed in the top bar and Tauri Bridge panel.
 - **IPC bridge** (`dsp-ipc` crate): Shared memory with ring buffer for commands
 - **Robust connection handling**: Auto-cleanup of stale shared memory from crashes
 - **Debug logging**: `noobsynth_vst_debug.log` created in plugin folder for troubleshooting

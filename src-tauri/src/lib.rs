@@ -754,14 +754,16 @@ struct VstBridgeState {
   bridge: Mutex<Option<TauriBridge>>,
   last_vst_graph_version: Mutex<u64>,
   last_vst_param_version: Mutex<u64>,
+  instance_id: Option<String>,
 }
 
 impl VstBridgeState {
-  fn new() -> Self {
+  fn new(instance_id: Option<String>) -> Self {
     Self {
       bridge: Mutex::new(None),
       last_vst_graph_version: Mutex::new(0),
       last_vst_param_version: Mutex::new(0),
+      instance_id,
     }
   }
 }
@@ -778,6 +780,7 @@ struct VstStatus {
 #[tauri::command]
 fn vst_connect(state: State<VstBridgeState>) -> Result<VstStatus, String> {
   let mut bridge_lock = state.bridge.lock().map_err(|_| "lock error")?;
+  let instance_id = state.instance_id.as_deref();
 
   // If we already have a bridge, return its status
   if let Some(bridge) = bridge_lock.as_ref() {
@@ -789,7 +792,7 @@ fn vst_connect(state: State<VstBridgeState>) -> Result<VstStatus, String> {
   }
 
   // Try to open existing shared memory (VST should have created it)
-  match TauriBridge::open() {
+  match TauriBridge::open_with_id(instance_id) {
     Ok(bridge) => {
       eprintln!("[NoobSynth] VST IPC bridge opened successfully");
       let sample_rate = bridge.sample_rate();
@@ -810,7 +813,7 @@ fn vst_connect(state: State<VstBridgeState>) -> Result<VstStatus, String> {
     Err(open_err) => {
       eprintln!("[NoobSynth] TauriBridge::open failed: {:?}", open_err);
       // Try to create it (we might be starting before VST)
-      match TauriBridge::new() {
+      match TauriBridge::new_with_id(instance_id) {
         Ok(bridge) => {
           eprintln!("[NoobSynth] VST IPC bridge created successfully");
           let sample_rate = bridge.sample_rate();
@@ -1046,11 +1049,33 @@ fn is_vst_mode(state: State<VstModeState>) -> bool {
   state.enabled
 }
 
+fn parse_vst_instance_id(args: &[String]) -> Option<String> {
+  let mut iter = args.iter().enumerate();
+  while let Some((index, arg)) = iter.next() {
+    if let Some(value) = arg.strip_prefix("--vst-id=") {
+      if !value.is_empty() {
+        return Some(value.to_string());
+      }
+    }
+    if arg == "--vst-id" {
+      if let Some(next) = args.get(index + 1) {
+        if !next.is_empty() && !next.starts_with("--") {
+          return Some(next.to_string());
+        }
+      }
+    }
+  }
+  None
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
   // Check for --vst-mode argument
   let args: Vec<String> = std::env::args().collect();
   let vst_mode = args.iter().any(|arg| arg == "--vst-mode");
+  let vst_instance_id = parse_vst_instance_id(&args);
+  let vst_instance_id_for_setup = vst_instance_id.clone();
+  let vst_instance_id_for_window = vst_instance_id.clone();
 
   // Log startup info
   eprintln!("[NoobSynth] Starting with args: {:?}", args);
@@ -1058,7 +1083,7 @@ pub fn run() {
 
   tauri::Builder::default()
     .manage(NativeAudioState::new())
-    .manage(VstBridgeState::new())
+    .manage(VstBridgeState::new(vst_instance_id.clone()))
     .manage(VstModeState { enabled: vst_mode })
     .invoke_handler(tauri::generate_handler![
       dsp_ping,
@@ -1108,7 +1133,15 @@ pub fn run() {
         use tauri::Manager;
         if let Some(window) = app.get_webview_window("main") {
           // Set global flag BEFORE the page loads React
-          let _ = window.eval("window.__NOOBSYNTH_VST_MODE__ = true; console.log('VST mode enabled');");
+          if let Some(instance_id) = &vst_instance_id_for_setup {
+            let id_js = serde_json::to_string(instance_id).unwrap_or_else(|_| "\"\"".to_string());
+            let script = format!(
+              "window.__NOOBSYNTH_VST_MODE__ = true; window.__NOOBSYNTH_VST_INSTANCE_ID__ = {id_js}; console.log('VST mode enabled');"
+            );
+            let _ = window.eval(&script);
+          } else {
+            let _ = window.eval("window.__NOOBSYNTH_VST_MODE__ = true; console.log('VST mode enabled');");
+          }
         }
       }
 
@@ -1116,13 +1149,14 @@ pub fn run() {
     })
     .on_window_event({
       let vst_mode_flag = vst_mode;
+      let vst_instance_id = vst_instance_id_for_window;
       move |window, event| {
         if !vst_mode_flag {
           return;
         }
         if let tauri::WindowEvent::CloseRequested { api, .. } = event {
           api.prevent_close();
-          if let Ok(bridge) = TauriBridge::open() {
+          if let Ok(bridge) = TauriBridge::open_with_id(vst_instance_id.as_deref()) {
             drop(bridge);
           }
           let _ = window.app_handle().exit(0);
