@@ -14,7 +14,7 @@ type MacroPanelProps = {
   onMacroValueChange: (macroIndex: number, value: number) => void
   onMacroNameChange: (macroId: number, name: string) => void
   onMacroTargetChange: (macroId: number, targetIndex: number, patch: Partial<MacroTarget>) => void
-  onAddMacroTarget: (macroId: number) => void
+  onAddMacroTarget: (macroId: number, target?: Partial<MacroTarget>) => void
   onRemoveMacroTarget: (macroId: number, targetIndex: number) => void
 }
 
@@ -52,8 +52,7 @@ export const MacroPanel = ({
   const resolveParams = (moduleId: string) => moduleParamMap.get(moduleId) ?? []
 
   return (
-    <div className="panel-section">
-      <h3>Macros</h3>
+    <div className="macro-panel">
       <p className="muted">
         Map DAW macros to module parameters. Values only affect audio in VST mode.
       </p>

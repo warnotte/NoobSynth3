@@ -221,6 +221,7 @@ function App() {
   const [tauriSelectedOutput, setTauriSelectedOutput] = useState<string>('')
   const [macroValues, setMacroValues] = useState<number[]>(() => normalizeMacroValues())
   const [macroOverride, setMacroOverride] = useState(false)
+  const [rackCollapsed, setRackCollapsed] = useState(false)
   const [gridMetrics, setGridMetrics] = useState<GridMetrics>(DEFAULT_GRID_METRICS)
   const rackRef = useRef<HTMLDivElement | null>(null)
   const modulesRef = useRef<HTMLDivElement | null>(null)
@@ -507,11 +508,12 @@ function App() {
   )
 
   const handleMacroAddTarget = useCallback(
-    (macroId: number) => {
+    (macroId: number, patch?: Partial<MacroTarget>) => {
       const defaultTarget = createDefaultMacroTarget(graphRef.current.modules)
+      const nextTarget = { ...defaultTarget, ...patch }
       updateMacroSpec(macroId, (macro) => ({
         ...macro,
-        targets: [...macro.targets, defaultTarget],
+        targets: [...macro.targets, nextTarget],
       }))
     },
     [updateMacroSpec],
@@ -1538,6 +1540,8 @@ function App() {
           rackRef={rackRef}
           modulesRef={modulesRef}
           onRackDoubleClick={handleRackDoubleClick}
+          collapsed={rackCollapsed}
+          onToggleCollapsed={() => setRackCollapsed((prev) => !prev)}
           getModuleGridStyle={getModuleGridStyle}
           onRemoveModule={handleRemoveModule}
           onHeaderPointerDown={handleModulePointerDown}

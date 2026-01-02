@@ -26,6 +26,8 @@ type RackViewProps = {
   rackRef: RefObject<HTMLDivElement | null>
   modulesRef: RefObject<HTMLDivElement | null>
   onRackDoubleClick: (event: ReactMouseEvent<HTMLElement>) => void
+  collapsed: boolean
+  onToggleCollapsed: () => void
   getModuleGridStyle: (module: ModuleSpec) => CSSProperties
   onRemoveModule: (moduleId: string) => void
   onHeaderPointerDown: (moduleId: string, event: ReactPointerEvent<HTMLDivElement>) => void
@@ -47,6 +49,8 @@ export const RackView = ({
   rackRef,
   modulesRef,
   onRackDoubleClick,
+  collapsed,
+  onToggleCollapsed,
   getModuleGridStyle,
   onRemoveModule,
   onHeaderPointerDown,
@@ -60,41 +64,57 @@ export const RackView = ({
 }: RackViewProps) => (
   <section className="rack" ref={rackRef} onDoubleClick={onRackDoubleClick}>
     <div className="rack-header">
-      <h2>Patch Rack</h2>
+      <div className="rack-title">
+        <button
+          type="button"
+          className={`panel-section-toggle panel-section-toggle--icon rack-title-toggle ${
+            collapsed ? 'is-collapsed' : ''
+          }`}
+          onClick={onToggleCollapsed}
+          aria-expanded={!collapsed}
+          aria-label={collapsed ? 'Expand Patch Rack' : 'Collapse Patch Rack'}
+          title={collapsed ? 'Expand' : 'Collapse'}
+        >
+          <span className="panel-toggle-glyph" aria-hidden="true" />
+          <span className="panel-title">Patch Rack</span>
+        </button>
+      </div>
       <div className="rack-meta">Audio graph: {graph.modules.length} modules</div>
     </div>
-    <div className="modules" ref={modulesRef}>
-      {graph.modules.map((module) => (
-        <ModuleCard
-          key={module.id}
-          module={module}
-          inputs={modulePorts[module.type].inputs}
-          outputs={modulePorts[module.type].outputs}
-          size={moduleSizes[module.type] ?? '1x1'}
-          portLayout={modulePortLayouts[module.type] ?? 'stacked'}
-          style={getModuleGridStyle(module)}
-          onRemove={onRemoveModule}
-          onHeaderPointerDown={onHeaderPointerDown}
-          selectedPortKey={selectedPortKey}
-          connectedInputs={connectedInputs}
-          validTargets={validTargets}
-          hoverTargetKey={hoverTargetKey}
-          onPortPointerDown={onPortPointerDown}
-        >
-          <ModuleControls module={module} {...moduleControls} />
-        </ModuleCard>
-      ))}
-      {moduleDragPreview && (
-        <div
-          className={`module-drag-ghost${moduleDragPreview.valid ? '' : ' invalid'}`}
-          style={buildGridStyle(
-            moduleDragPreview.col,
-            moduleDragPreview.row,
-            moduleDragPreview.span,
-          )}
-          aria-hidden="true"
-        />
-      )}
-    </div>
+    {!collapsed && (
+      <div className="modules" ref={modulesRef}>
+        {graph.modules.map((module) => (
+          <ModuleCard
+            key={module.id}
+            module={module}
+            inputs={modulePorts[module.type].inputs}
+            outputs={modulePorts[module.type].outputs}
+            size={moduleSizes[module.type] ?? '1x1'}
+            portLayout={modulePortLayouts[module.type] ?? 'stacked'}
+            style={getModuleGridStyle(module)}
+            onRemove={onRemoveModule}
+            onHeaderPointerDown={onHeaderPointerDown}
+            selectedPortKey={selectedPortKey}
+            connectedInputs={connectedInputs}
+            validTargets={validTargets}
+            hoverTargetKey={hoverTargetKey}
+            onPortPointerDown={onPortPointerDown}
+          >
+            <ModuleControls module={module} {...moduleControls} />
+          </ModuleCard>
+        ))}
+        {moduleDragPreview && (
+          <div
+            className={`module-drag-ghost${moduleDragPreview.valid ? '' : ' invalid'}`}
+            style={buildGridStyle(
+              moduleDragPreview.col,
+              moduleDragPreview.row,
+              moduleDragPreview.span,
+            )}
+            aria-hidden="true"
+          />
+        )}
+      </div>
+    )}
   </section>
 )

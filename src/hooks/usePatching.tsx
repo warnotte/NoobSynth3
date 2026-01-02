@@ -392,10 +392,10 @@ export const usePatching = ({ graph, setGraph, rackRef }: UsePatchingParams) => 
   const selectedPortKey = selectedPort ? `${selectedPort.moduleId}:${selectedPort.id}` : null
 
   const strokeByKind: Record<string, string> = {
-    audio: '#56b8ff',
-    cv: '#3df2a6',
-    gate: '#f3a94c',
-    sync: '#be85ff',
+    audio: 'cable-audio',
+    cv: 'cable-cv',
+    gate: 'cable-gate',
+    sync: 'cable-sync',
   }
 
   const buildCablePath = (start: PortPosition, end: PortPosition) => {
@@ -498,7 +498,7 @@ export const usePatching = ({ graph, setGraph, rackRef }: UsePatchingParams) => 
           key={`${outputKey}-${inputKey}`}
           d={buildCablePath(start, end)}
           className={`patch-cable kind-${connection.kind}`}
-          stroke={strokeByKind[connection.kind] ?? '#56b8ff'}
+          stroke={`url(#${strokeByKind[connection.kind] ?? 'cable-audio'})`}
           fill="none"
         />
       )
@@ -514,7 +514,7 @@ export const usePatching = ({ graph, setGraph, rackRef }: UsePatchingParams) => 
       <path
         d={buildCablePath(ghostCable.start, ghostCable.end)}
         className={`patch-cable ghost kind-${ghostCable.kind}`}
-        stroke={strokeByKind[ghostCable.kind] ?? '#56b8ff'}
+        stroke={`url(#${strokeByKind[ghostCable.kind] ?? 'cable-audio'})`}
         fill="none"
       />
     )
