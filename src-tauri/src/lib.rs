@@ -2,7 +2,7 @@ use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 use cpal::{FromSample, Sample, SampleFormat, StreamConfig};
 use dsp_core::{Node, SineOsc};
 use dsp_graph::GraphEngine;
-use dsp_ipc::TauriBridge;
+use dsp_ipc::{SharedParams, TauriBridge};
 use midir::MidiInput;
 use serde::Serialize;
 use std::sync::{mpsc, Arc, Mutex};
@@ -753,6 +753,7 @@ fn native_get_scope(state: State<NativeAudioState>) -> Result<ScopePacket, Strin
 struct VstBridgeState {
   bridge: Mutex<Option<TauriBridge>>,
   last_vst_graph_version: Mutex<u64>,
+  last_vst_param_version: Mutex<u64>,
 }
 
 impl VstBridgeState {
@@ -760,6 +761,7 @@ impl VstBridgeState {
     Self {
       bridge: Mutex::new(None),
       last_vst_graph_version: Mutex::new(0),
+      last_vst_param_version: Mutex::new(0),
     }
   }
 }
@@ -796,6 +798,9 @@ fn vst_connect(state: State<VstBridgeState>) -> Result<VstStatus, String> {
       if let Ok(mut last) = state.last_vst_graph_version.lock() {
         *last = 0;
       }
+      if let Ok(mut last) = state.last_vst_param_version.lock() {
+        *last = 0;
+      }
       Ok(VstStatus {
         connected: true,
         vst_connected,
@@ -812,6 +817,9 @@ fn vst_connect(state: State<VstBridgeState>) -> Result<VstStatus, String> {
           let vst_connected = bridge.is_vst_connected();
           *bridge_lock = Some(bridge);
           if let Ok(mut last) = state.last_vst_graph_version.lock() {
+            *last = 0;
+          }
+          if let Ok(mut last) = state.last_vst_param_version.lock() {
             *last = 0;
           }
           Ok(VstStatus {
@@ -835,6 +843,9 @@ fn vst_disconnect(state: State<VstBridgeState>) -> Result<(), String> {
   let mut bridge_lock = state.bridge.lock().map_err(|_| "lock error")?;
   *bridge_lock = None;
   if let Ok(mut last) = state.last_vst_graph_version.lock() {
+    *last = 0;
+  }
+  if let Ok(mut last) = state.last_vst_param_version.lock() {
     *last = 0;
   }
   Ok(())
@@ -902,6 +913,44 @@ fn vst_pull_graph(state: State<VstBridgeState>) -> Result<Option<String>, String
   }
   *last = current;
   Ok(bridge.read_vst_graph())
+}
+
+#[tauri::command]
+fn vst_set_macros(state: State<VstBridgeState>, macros: Vec<f32>) -> Result<(), String> {
+  let mut bridge_lock = state.bridge.lock().map_err(|_| "lock error")?;
+  let bridge = bridge_lock.as_mut().ok_or("VST not connected")?;
+  let mut values = [0.0_f32; 8];
+  for (index, value) in macros.into_iter().enumerate().take(8) {
+    values[index] = value.clamp(0.0, 1.0);
+  }
+  bridge.set_params(SharedParams {
+    macros: values,
+    _padding: [0.0; 8],
+  });
+  Ok(())
+}
+
+#[tauri::command]
+fn vst_pull_macros(state: State<VstBridgeState>) -> Result<Option<Vec<f32>>, String> {
+  let bridge_lock = state.bridge.lock().map_err(|_| "lock error")?;
+  let bridge = bridge_lock.as_ref().ok_or("VST not connected")?;
+  let current = bridge.vst_param_version();
+  let mut last = state
+    .last_vst_param_version
+    .lock()
+    .map_err(|_| "lock error")?;
+  if current == 0 {
+    return Ok(None);
+  }
+  if current < *last {
+    *last = 0;
+  }
+  if current == *last {
+    return Ok(None);
+  }
+  *last = current;
+  let params = bridge.params();
+  Ok(Some(params.macros.to_vec()))
 }
 
 /// Set control voice CV via VST
@@ -1036,6 +1085,8 @@ pub fn run() {
       vst_set_graph,
       vst_set_param,
       vst_pull_graph,
+      vst_set_macros,
+      vst_pull_macros,
       vst_set_control_voice_cv,
       vst_trigger_control_voice_gate,
       vst_release_control_voice_gate,

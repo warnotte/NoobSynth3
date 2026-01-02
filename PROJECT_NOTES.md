@@ -83,6 +83,7 @@ Presets support two formats:
 - **VST mode**: Oscilloscope not working yet (scope taps not wired through IPC).
 - **VST mode**: Only one instance recommended (shared memory is global).
 - **VST mode**: Proof of concept; host editor is a launcher for the Tauri UI.
+- **VST mode**: UI macro edits do not write back to host automation (DAW remains source of truth).
 
 ## Decisions
 
@@ -114,6 +115,8 @@ Presets support two formats:
 - **Real-time sync**: Parameters and MIDI notes sync between VST and UI
 - **Preset recall**: Full graph JSON persists in plugin state and restores via DAW
 - **Host -> UI sync**: Tauri refreshes when the host loads a new preset (polling)
+- **Macro panel**: UI can map 8 DAW macros to module params with bidirectional sync
+- **Macro override state**: UI now shows when macros are driven by DAW vs UI override (no host write-back).
 - **IPC bridge** (`dsp-ipc` crate): Shared memory with ring buffer for commands
 - **Robust connection handling**: Auto-cleanup of stale shared memory from crashes
 - **Debug logging**: `noobsynth_vst_debug.log` created in plugin folder for troubleshooting

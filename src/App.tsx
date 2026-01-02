@@ -28,7 +28,7 @@ import {
   readGridMetrics,
 } from './state/gridLayout'
 import { buildModuleSpec, moduleSizes } from './state/moduleRegistry'
-import type { GraphState, ModuleSpec, ModuleType } from './shared/graph'
+import type { GraphState, MacroSpec, MacroTarget, ModuleSpec, ModuleType } from './shared/graph'
 import { PatchLayer } from './ui/PatchLayer'
 import { RackView } from './ui/RackView'
 import { SidePanel } from './ui/SidePanel'
@@ -125,6 +125,70 @@ const normalizeNativeParamValue = (paramId: string, value: number | string | boo
   return Number.NaN
 }
 
+const MACRO_COUNT = 8
+
+const clamp01 = (value: number) => Math.min(1, Math.max(0, value))
+
+const buildMacroSpecs = (macros?: MacroSpec[]): MacroSpec[] => {
+  const byId = new Map<number, MacroSpec>()
+  for (const macro of macros ?? []) {
+    if (macro.id < 1 || macro.id > MACRO_COUNT) {
+      continue
+    }
+    byId.set(macro.id, macro)
+  }
+  const result: MacroSpec[] = []
+  for (let id = 1; id <= MACRO_COUNT; id += 1) {
+    const existing = byId.get(id)
+    if (existing) {
+      result.push({
+        ...existing,
+        targets: existing.targets ?? [],
+      })
+    } else {
+      result.push({ id, name: `Macro ${id}`, targets: [] })
+    }
+  }
+  return result
+}
+
+const normalizeMacroValues = (values?: number[] | null) => {
+  const normalized = Array.from({ length: MACRO_COUNT }, (_, index) => clamp01(values?.[index] ?? 0))
+  return normalized
+}
+
+const areMacroValuesEqual = (left: number[] | null, right: number[] | null) => {
+  if (!left || !right) return false
+  if (left.length !== right.length) return false
+  for (let i = 0; i < left.length; i += 1) {
+    if (Math.abs(left[i] - right[i]) > 1e-6) {
+      return false
+    }
+  }
+  return true
+}
+
+const createDefaultMacroTarget = (modules: ModuleSpec[]): MacroTarget => {
+  for (const module of modules) {
+    for (const [paramId, value] of Object.entries(module.params)) {
+      if (typeof value === 'number' && Number.isFinite(value)) {
+        return {
+          moduleId: module.id,
+          paramId,
+          min: 0,
+          max: 1,
+        }
+      }
+    }
+  }
+  return {
+    moduleId: '',
+    paramId: '',
+    min: 0,
+    max: 1,
+  }
+}
+
 function App() {
   const engine = useMemo(() => new AudioEngine(), [])
   const [graph, setGraph] = useState<GraphState>(defaultGraph)
@@ -147,6 +211,8 @@ function App() {
   const [tauriNativeDeviceName, setTauriNativeDeviceName] = useState<string | null>(null)
   const [tauriNativeBooting, setTauriNativeBooting] = useState(false)
   const [tauriSelectedOutput, setTauriSelectedOutput] = useState<string>('')
+  const [macroValues, setMacroValues] = useState<number[]>(() => normalizeMacroValues())
+  const [macroOverride, setMacroOverride] = useState(false)
   const [gridMetrics, setGridMetrics] = useState<GridMetrics>(DEFAULT_GRID_METRICS)
   const rackRef = useRef<HTMLDivElement | null>(null)
   const modulesRef = useRef<HTMLDivElement | null>(null)
@@ -160,6 +226,8 @@ function App() {
   const nativeScopeRef = useRef<NativeScopeSnapshot | null>(null)
   const nativeScopeTapsRef = useRef<NativeTap[]>([])
   const lastVstGraphJsonRef = useRef<string | null>(null)
+  const macroValuesRef = useRef(macroValues)
+  const lastVstMacrosRef = useRef<number[] | null>(null)
   const {
     connectedInputs,
     dragTargets,
@@ -219,6 +287,12 @@ function App() {
     void checkVstMode()
     return () => { active = false }
   }, [isTauri])
+
+  useEffect(() => {
+    if (!isVst || !vstConnected) {
+      setMacroOverride(false)
+    }
+  }, [isVst, vstConnected])
   const { handleModulePointerDown, moduleDragPreview } = useModuleDrag({
     graphRef,
     gridMetricsRef,
@@ -266,6 +340,10 @@ function App() {
   }, [status])
 
   useEffect(() => {
+    macroValuesRef.current = macroValues
+  }, [macroValues])
+
+  useEffect(() => {
     if (status === 'running') {
       engine.setConnections(graph.connections)
     }
@@ -275,6 +353,7 @@ function App() {
     () => graph.modules.find((module) => module.type === 'control'),
     [graph.modules],
   )
+  const macroSpecs = useMemo(() => buildMacroSpecs(graph.macros), [graph.macros])
   const controlModuleId = controlModule?.id ?? null
   const seqOn = Boolean(controlModule?.params.seqOn)
   const seqTempo = Math.max(30, Number(controlModule?.params.seqTempo ?? 120))
@@ -353,6 +432,109 @@ function App() {
       }
     },
     [engine, isTauri, isVst, status, tauriNativeRunning, vstConnected],
+  )
+
+  const applyMacroSpecs = useCallback(
+    (nextMacros: MacroSpec[]) => {
+      const nextGraph = {
+        ...graphRef.current,
+        macros: nextMacros,
+      }
+      graphRef.current = nextGraph
+      setGraph(nextGraph)
+      if (isVst && vstConnected) {
+        const graphJson = JSON.stringify({
+          modules: nextGraph.modules,
+          connections: nextGraph.connections,
+          macros: nextMacros,
+        })
+        lastVstGraphJsonRef.current = graphJson
+        void invokeTauri('vst_set_graph', { graphJson }).catch((error) => {
+          console.error(error)
+          setVstError('Failed to sync macros to VST.')
+        })
+      }
+    },
+    [isVst, vstConnected],
+  )
+
+  const updateMacroSpec = useCallback(
+    (macroId: number, updater: (macro: MacroSpec) => MacroSpec) => {
+      const current = buildMacroSpecs(graphRef.current.macros)
+      const next = current.map((macro) => (macro.id === macroId ? updater(macro) : macro))
+      applyMacroSpecs(next)
+    },
+    [applyMacroSpecs],
+  )
+
+  const handleMacroNameChange = useCallback(
+    (macroId: number, name: string) => {
+      updateMacroSpec(macroId, (macro) => ({
+        ...macro,
+        name: name.trim() ? name : undefined,
+      }))
+    },
+    [updateMacroSpec],
+  )
+
+  const handleMacroTargetChange = useCallback(
+    (macroId: number, targetIndex: number, patch: Partial<MacroTarget>) => {
+      updateMacroSpec(macroId, (macro) => {
+        const targets = macro.targets.map((target, index) => {
+          if (index !== targetIndex) {
+            return target
+          }
+          const next = { ...target, ...patch }
+          if (next.min > next.max) {
+            const swap = next.min
+            next.min = next.max
+            next.max = swap
+          }
+          return next
+        })
+        return { ...macro, targets }
+      })
+    },
+    [updateMacroSpec],
+  )
+
+  const handleMacroAddTarget = useCallback(
+    (macroId: number) => {
+      const defaultTarget = createDefaultMacroTarget(graphRef.current.modules)
+      updateMacroSpec(macroId, (macro) => ({
+        ...macro,
+        targets: [...macro.targets, defaultTarget],
+      }))
+    },
+    [updateMacroSpec],
+  )
+
+  const handleMacroRemoveTarget = useCallback(
+    (macroId: number, targetIndex: number) => {
+      updateMacroSpec(macroId, (macro) => ({
+        ...macro,
+        targets: macro.targets.filter((_, index) => index !== targetIndex),
+      }))
+    },
+    [updateMacroSpec],
+  )
+
+  const handleMacroValueChange = useCallback(
+    (macroIndex: number, value: number) => {
+      const next = normalizeMacroValues(macroValuesRef.current)
+      next[macroIndex] = clamp01(value)
+      macroValuesRef.current = next
+      setMacroValues(next)
+      if (isVst && vstConnected) {
+        setMacroOverride(true)
+        lastVstMacrosRef.current = next
+        void invokeTauri('vst_set_macros', { macros: next }).catch((error) => {
+          console.error(error)
+          setVstError('Failed to sync macros to VST.')
+        })
+      }
+    },
+    [isVst, vstConnected],
   )
 
   const getNativeScopeBuffer = useCallback((moduleId: string, portId: string) => {
@@ -536,6 +718,37 @@ function App() {
     }
     void poll()
     const interval = window.setInterval(poll, 500)
+    return () => {
+      active = false
+      window.clearInterval(interval)
+    }
+  }, [isVst, vstConnected])
+
+  useEffect(() => {
+    if (!isVst || !vstConnected) return
+    let active = true
+    const poll = async () => {
+      try {
+        const macros = await invokeTauri<number[] | null>('vst_pull_macros')
+        if (!active || !macros) {
+          return
+        }
+        const next = normalizeMacroValues(macros)
+        if (areMacroValuesEqual(lastVstMacrosRef.current, next)) {
+          return
+        }
+        lastVstMacrosRef.current = next
+        macroValuesRef.current = next
+        setMacroValues(next)
+        setMacroOverride(false)
+      } catch (error) {
+        if (active) {
+          console.error('Failed to poll macros from VST:', error)
+        }
+      }
+    }
+    void poll()
+    const interval = window.setInterval(poll, 400)
     return () => {
       active = false
       window.clearInterval(interval)
@@ -1340,6 +1553,17 @@ function App() {
           presetStatus={presetStatus}
           presets={presets}
           onApplyPreset={applyPreset}
+          macros={macroSpecs}
+          macroValues={macroValues}
+          macroOverride={macroOverride}
+          macroModules={graph.modules}
+          isVst={isVst}
+          vstConnected={vstConnected}
+          onMacroValueChange={handleMacroValueChange}
+          onMacroNameChange={handleMacroNameChange}
+          onMacroTargetChange={handleMacroTargetChange}
+          onAddMacroTarget={handleMacroAddTarget}
+          onRemoveMacroTarget={handleMacroRemoveTarget}
           tauriAvailable={isTauri}
           tauriStatus={tauriStatus}
           tauriError={tauriError}

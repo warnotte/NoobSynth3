@@ -14,4 +14,5 @@
 - `dsp-wasm`: Web/WASM host glue + single graph engine for AudioWorklet.
 - `dsp-standalone`: Native desktop host (cpal + midir scaffold).
 - `dsp-plugin`: Plugin host (VST3/CLAP proof-of-concept with NIH-plug, graph state persists in DAW presets).
+- `dsp-ipc`: Shared memory IPC bridge between the VST plugin and the Tauri UI.
 - WASM artifacts are built via `npm run build:wasm` (see `scripts/build-wasm.ps1`).

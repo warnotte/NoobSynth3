@@ -1,7 +1,8 @@
 import { useMemo, useState, type ChangeEvent, type RefObject } from 'react'
-import type { GraphState, ModuleType } from '../shared/graph'
+import type { GraphState, MacroSpec, MacroTarget, ModuleSpec, ModuleType } from '../shared/graph'
 import type { PresetSpec } from '../state/presets'
 import { moduleCatalog } from '../state/moduleRegistry'
+import { MacroPanel } from './MacroPanel'
 
 type SidePanelProps = {
   gridError: string | null
@@ -19,6 +20,17 @@ type SidePanelProps = {
   presetStatus: 'loading' | 'ready' | 'error'
   presets: PresetSpec[]
   onApplyPreset: (graph: GraphState) => void
+  macros: MacroSpec[]
+  macroValues: number[]
+  macroOverride: boolean
+  macroModules: ModuleSpec[]
+  isVst: boolean
+  vstConnected: boolean
+  onMacroValueChange: (macroIndex: number, value: number) => void
+  onMacroNameChange: (macroId: number, name: string) => void
+  onMacroTargetChange: (macroId: number, targetIndex: number, patch: Partial<MacroTarget>) => void
+  onAddMacroTarget: (macroId: number) => void
+  onRemoveMacroTarget: (macroId: number, targetIndex: number) => void
   tauriAvailable: boolean
   tauriStatus: 'idle' | 'loading' | 'ready' | 'error'
   tauriError: string | null
@@ -52,6 +64,17 @@ export const SidePanel = ({
   presetStatus,
   presets,
   onApplyPreset,
+  macros,
+  macroValues,
+  macroOverride,
+  macroModules,
+  isVst,
+  vstConnected,
+  onMacroValueChange,
+  onMacroNameChange,
+  onMacroTargetChange,
+  onAddMacroTarget,
+  onRemoveMacroTarget,
   tauriAvailable,
   tauriStatus,
   tauriError,
@@ -224,6 +247,19 @@ export const SidePanel = ({
           })}
         </div>
       </div>
+      <MacroPanel
+        macros={macros}
+        macroValues={macroValues}
+        macroOverride={macroOverride}
+        modules={macroModules}
+        isVst={isVst}
+        vstConnected={vstConnected}
+        onMacroValueChange={onMacroValueChange}
+        onMacroNameChange={onMacroNameChange}
+        onMacroTargetChange={onMacroTargetChange}
+        onAddMacroTarget={onAddMacroTarget}
+        onRemoveMacroTarget={onRemoveMacroTarget}
+      />
       <div className="panel-section">
         <h3>Tauri Bridge</h3>
         <p className="muted">Check native audio/MIDI when running the desktop app.</p>

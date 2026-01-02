@@ -1,7 +1,7 @@
 use nih_plug::prelude::*;
 use nih_plug_egui::{create_egui_editor, egui, EguiState};
 use dsp_graph::GraphEngine;
-use dsp_ipc::{VstBridge, CommandType, launcher, hash_id};
+use dsp_ipc::{CommandType, SharedParams, VstBridge, hash_id, launcher};
 use serde::Deserialize;
 use std::collections::HashMap;
 use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
@@ -251,6 +251,10 @@ pub struct NoobSynth {
     param_hash_map: HashMap<u32, String>,
     macro_specs: Vec<MacroSpec>,
     last_macro_values: [f32; 8],
+    last_daw_macro_values: [f32; 8],
+    last_published_macros: [f32; 8],
+    last_ui_connected: bool,
+    ui_macro_override: bool,
 }
 
 /// Plugin parameters exposed to the DAW
@@ -381,6 +385,7 @@ impl Default for NoobSynth {
         let params = Arc::new(NoobSynthParams::default());
         let macro_specs = parse_macro_specs(DEFAULT_GRAPH_JSON);
         let last_macro_values = params.macro_values();
+        let last_published_macros = [-1.0; 8];
         let ui_connected = Arc::new(AtomicBool::new(false));
         let ui_requests = Arc::new(AtomicU32::new(0));
         let ui_sample_rate = Arc::new(AtomicU32::new(0));
@@ -399,12 +404,59 @@ impl Default for NoobSynth {
             param_hash_map: HashMap::new(),
             macro_specs,
             last_macro_values,
+            last_daw_macro_values: last_macro_values,
+            last_published_macros,
+            last_ui_connected: false,
+            ui_macro_override: false,
         }
     }
 }
 
 impl NoobSynth {
     const UI_REQ_RECONNECT: u32 = 1;
+
+    fn sync_macros_from_ui(&mut self) {
+        let Some(bridge) = &mut self.ipc_bridge else {
+            return;
+        };
+        if !bridge.params_changed() {
+            return;
+        }
+        let mut values = bridge.params().macros;
+        for value in &mut values {
+            *value = value.clamp(0.0, 1.0);
+        }
+        let mut changed = false;
+        for (index, value) in values.iter().enumerate() {
+            if (self.last_macro_values[index] - *value).abs() > 1e-6 {
+                self.apply_macro_value(index, *value);
+                changed = true;
+            }
+        }
+        if changed {
+            self.last_macro_values = values;
+            self.last_published_macros = values;
+            self.ui_macro_override = true;
+        }
+    }
+
+    fn publish_macros_to_ui(&mut self) {
+        let Some(bridge) = &mut self.ipc_bridge else {
+            return;
+        };
+        if self.ui_macro_override {
+            return;
+        }
+        let values = self.params.macro_values();
+        if values == self.last_published_macros {
+            return;
+        }
+        bridge.set_vst_params(SharedParams {
+            macros: values,
+            _padding: [0.0; 8],
+        });
+        self.last_published_macros = values;
+    }
 
     fn load_graph_from_params(&mut self) {
         if let Ok(stored) = self.params.graph_json.lock() {
@@ -539,14 +591,23 @@ impl NoobSynth {
 
     fn sync_macros_to_engine(&mut self) {
         let values = self.params.macro_values();
+        if values == self.last_daw_macro_values {
+            return;
+        }
+        let mut changed = false;
         for (index, value) in values.iter().enumerate() {
             let previous = self.last_macro_values[index];
             if (value - previous).abs() <= 1e-6 {
                 continue;
             }
+            changed = true;
             self.last_macro_values[index] = *value;
             self.apply_macro_value(index, *value);
         }
+        if changed {
+            self.ui_macro_override = false;
+        }
+        self.last_daw_macro_values = values;
     }
 
     /// Initialize IPC bridge and optionally launch Tauri
@@ -562,6 +623,7 @@ impl NoobSynth {
                 self.ui_connected.store(bridge.is_ui_connected(), Ordering::Relaxed);
                 self.ipc_bridge = Some(bridge);
                 self.publish_graph_to_ui();
+                self.publish_macros_to_ui();
             }
             Err(e) => {
                 nih_log!("VstBridge::new() failed: {:?}, trying open()...", e);
@@ -573,6 +635,7 @@ impl NoobSynth {
                         self.ui_connected.store(bridge.is_ui_connected(), Ordering::Relaxed);
                         self.ipc_bridge = Some(bridge);
                         self.publish_graph_to_ui();
+                        self.publish_macros_to_ui();
                     }
                     Err(e2) => {
                         nih_log!("VstBridge::open() also failed: {:?}", e2);
@@ -596,6 +659,7 @@ impl NoobSynth {
                 }
                 self.ui_connected.store(bridge.is_ui_connected(), Ordering::Relaxed);
                 self.ipc_bridge = Some(bridge);
+                self.publish_macros_to_ui();
                 nih_log!("IPC bridge reconnected (open)");
             }
             Err(_) => match VstBridge::new() {
@@ -605,6 +669,7 @@ impl NoobSynth {
                     }
                     self.ui_connected.store(bridge.is_ui_connected(), Ordering::Relaxed);
                     self.ipc_bridge = Some(bridge);
+                    self.publish_macros_to_ui();
                     nih_log!("IPC bridge reconnected (new)");
                 }
                 Err(err) => {
@@ -972,6 +1037,7 @@ impl Plugin for NoobSynth {
             self.reconnect_ipc();
         }
 
+        self.sync_macros_from_ui();
         self.sync_graph_from_params();
 
         // Process IPC commands from Tauri UI
@@ -982,10 +1048,16 @@ impl Plugin for NoobSynth {
             .as_ref()
             .map(|bridge| bridge.is_ui_connected())
             .unwrap_or(false);
+        if connected && !self.last_ui_connected {
+            // Force a macro publish on fresh UI connections.
+            self.last_published_macros = [-1.0; 8];
+        }
+        self.last_ui_connected = connected;
         self.ui_connected.store(connected, Ordering::Relaxed);
 
         // Apply macro updates from DAW (only when changed)
         self.sync_macros_to_engine();
+        self.publish_macros_to_ui();
 
         // Process MIDI events from DAW
         while let Some(event) = context.next_event() {

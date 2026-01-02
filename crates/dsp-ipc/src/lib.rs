@@ -16,7 +16,7 @@ pub const SHM_NAME: &str = "noobsynth_ipc_v1";
 pub const MAGIC: u32 = 0x4E4F4F42; // "NOOB"
 
 /// Version of the IPC protocol
-pub const VERSION: u32 = 2;
+pub const VERSION: u32 = 3;
 
 /// Maximum voices supported
 pub const MAX_VOICES: usize = 16;
@@ -41,6 +41,8 @@ pub struct SharedHeader {
     pub _pad0: u32,
     /// Monotonic counter incremented by Tauri when params change
     pub param_version: AtomicU64,
+    /// Monotonic counter incremented by VST when params change
+    pub vst_param_version: AtomicU64,
     /// Monotonic counter incremented by Tauri when graph changes
     pub graph_version: AtomicU64,
     /// Monotonic counter incremented by VST when graph changes
@@ -289,6 +291,16 @@ impl VstBridge {
         self.layout().params
     }
 
+    /// Write params from VST for the UI to read
+    pub fn set_vst_params(&mut self, params: SharedParams) {
+        let layout = self.layout_mut();
+        layout.params = params;
+        layout
+            .header
+            .vst_param_version
+            .fetch_add(1, Ordering::Release);
+    }
+
     /// Write graph JSON from VST for the UI to read
     pub fn set_vst_graph(&mut self, json: &str) {
         let layout = self.layout_mut();
@@ -473,7 +485,7 @@ impl TauriBridge {
 
         // Also write the strings for debugging/lookup
         let (mod_off, mod_len) = self.write_string(module_id);
-        let (param_off, param_len) = self.write_string(param_id);
+        let (_param_off, _param_len) = self.write_string(param_id);
 
         self.push_command(CommandSlot {
             cmd_type: CommandType::SetParam as u8,
@@ -607,11 +619,24 @@ impl TauriBridge {
         String::from_utf8(layout.graph_buffer[..end].to_vec()).ok()
     }
 
+    /// Read current params
+    pub fn params(&self) -> SharedParams {
+        self.layout().params
+    }
+
     /// Read the current VST graph version
     pub fn vst_graph_version(&self) -> u64 {
         self.layout()
             .header
             .vst_graph_version
+            .load(Ordering::Acquire)
+    }
+
+    /// Read the current VST param version
+    pub fn vst_param_version(&self) -> u64 {
+        self.layout()
+            .header
+            .vst_param_version
             .load(Ordering::Acquire)
     }
 

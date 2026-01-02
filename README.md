@@ -91,6 +91,7 @@ The VST plugin uses a hybrid architecture:
 - **IPC**: Shared memory bridge between VST and Tauri for real-time parameter/note sync
 - **State**: Full graph JSON is persisted in the plugin state for DAW preset recall
 - **UI sync**: Tauri pulls the VST graph on connect and polls for host preset changes
+- **Macros**: 8 fixed DAW parameters mapped in the UI to module targets (DAW → UI sync; UI overrides DSP but does not write back to the host)
 
 ### Installation
 
@@ -108,7 +109,8 @@ The VST plugin uses a hybrid architecture:
 3. Play MIDI notes - they're processed by the native VST audio engine
 4. Tweak parameters in the UI - changes sync to the VST in real-time
    (DAW preset changes will refresh the UI while it is open)
-5. Close the UI window when done (plugin keeps running)
+5. Use the Macros panel to map DAW automation lanes to module parameters (UI changes affect sound but do not update host automation)
+6. Close the UI window when done (plugin keeps running)
 
 ### Troubleshooting
 
@@ -128,6 +130,7 @@ The VST plugin uses a hybrid architecture:
 - Oscilloscope not yet working in VST mode
 - UI must be in the same folder as the DLL
 - One instance at a time recommended
+- UI macro edits do not write back to DAW automation (host remains source of truth)
 
 ## How to use
 
