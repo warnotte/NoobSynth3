@@ -7,10 +7,10 @@ Synthétiseur modulaire inspiré de VCV Rack, construit avec React + Rust/WASM.
 ## Caractéristiques
 
 - **Interface Eurorack** : Rails, panneaux métal brossé, câbles patchables
-- **30+ modules** : VCO, Supersaw, NES/SNES Osc, VCF (SVF/Ladder), LFO, ADSR, Chorus, Delay, Reverb, Phaser, Distortion...
+- **25 modules** : VCO, Supersaw, NES/SNES Osc, VCF (SVF/Ladder), LFO, ADSR, Chorus, Delay, Reverb, Phaser, Distortion...
 - **Polyphonie** : 1/2/4/8 voix avec voice stealing
 - **MIDI** : Entrée Web MIDI avec vélocité
-- **Presets** : 30 patches inclus (Jupiter, Juno, Moog, Prophet, Jarre...)
+- **Presets** : 31 patches inclus (Jupiter, Juno, Moog, Prophet, Jarre...)
 - **3 modes** : Web, Standalone (Tauri), VST3/CLAP plugin
 
 ## Démarrage rapide

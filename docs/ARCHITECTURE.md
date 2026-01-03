@@ -174,20 +174,23 @@ Le graphe est représenté en JSON avec deux parties :
 
 ```typescript
 interface GraphState {
-  modules: Module[];      // Liste des modules instanciés
-  connections: Connection[]; // Câbles entre modules
+  modules: ModuleSpec[];      // Liste des modules instanciés
+  connections: Connection[];  // Câbles entre modules
+  macros?: MacroSpec[];       // Macros DAW (optionnel)
 }
 
-interface Module {
+interface ModuleSpec {
   id: string;             // ex: "vco-1"
-  type: string;           // ex: "vco"
-  params: Record<string, number>; // Paramètres du module
-  position: { x, y };     // Position sur le rack
+  type: ModuleType;       // ex: "oscillator"
+  name: string;           // Nom affiché
+  params: Record<string, number | string | boolean>;
+  position: { x: number, y: number };
 }
 
 interface Connection {
-  from: { module: string, port: string };
-  to: { module: string, port: string };
+  from: { moduleId: string, portId: string };
+  to: { moduleId: string, portId: string };
+  kind: PortKind;         // "audio" | "cv" | "gate" | "sync"
 }
 ```
 

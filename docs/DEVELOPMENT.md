@@ -49,7 +49,7 @@ npm install
 npm run dev
 ```
 
-Ouvre http://localhost:1420. Hot reload actif pour le code TypeScript/CSS.
+Ouvre http://localhost:5173. Hot reload actif pour le code TypeScript/CSS.
 
 ### Mode Tauri (standalone)
 

@@ -1,75 +1,52 @@
 # dsp-standalone
 
-Host audio natif pour l'application Tauri. Gère la sortie audio via `cpal`.
+Scaffold CLI pour tester l'audio natif. Utilisé comme base pour l'intégration Tauri.
+
+## Statut
+
+Ce crate est un **scaffold de test**, pas une API publique. L'audio natif réel est géré dans `src-tauri/`.
+
+## Fonctionnalités
+
+- Énumération des périphériques audio (cpal)
+- Énumération des entrées MIDI (midir)
+- Test tone optionnel (220 Hz pendant 2s)
+
+## Utilisation
+
+```bash
+# Lister les périphériques
+cargo run -p dsp-standalone
+
+# Jouer un test tone
+cargo run -p dsp-standalone -- --tone
+```
+
+## Sortie exemple
+
+```
+dsp-standalone scaffold (cpal + midir ready)
+Audio outputs:
+- Speakers (Realtek Audio)
+- HDMI Output
+MIDI inputs:
+- USB MIDI Controller
+Run with --tone to play a 2s test tone.
+```
 
 ## Dépendances
 
 - `cpal` : Audio cross-platform (WASAPI, ALSA, CoreAudio)
-- `midir` : MIDI cross-platform (scaffold, pas encore utilisé)
-- `dsp-graph` : Moteur de graphe
+- `midir` : MIDI cross-platform
+- `dsp-core` : Oscillateur de test (SineOsc)
 
-## Fonctionnalités
+## Code
 
-- Énumération des périphériques audio
-- Sélection du périphérique de sortie
-- Streaming audio en temps réel
-- Scope taps pour visualisation
+Le code est dans `src/main.rs` :
+- `list_audio_outputs()` : Liste les sorties audio
+- `list_midi_inputs()` : Liste les entrées MIDI
+- `play_test_tone()` : Joue un sine 220 Hz
 
-## API
+## Évolution
 
-```rust
-use dsp_standalone::{AudioHost, list_audio_outputs};
-
-// Lister les périphériques
-let devices = list_audio_outputs()?;
-
-// Créer le host
-let mut host = AudioHost::new()?;
-
-// Configurer le graphe
-host.set_graph_json(json)?;
-
-// Démarrer l'audio
-host.start("Device Name")?;
-
-// Envoyer des notes
-host.note_on(60, 0.8);
-host.note_off(60);
-
-// Arrêter
-host.stop();
-```
-
-## Intégration Tauri
-
-Les commandes Tauri exposent cette API au frontend :
-
-```rust
-#[tauri::command]
-fn list_audio_outputs() -> Vec<String>;
-
-#[tauri::command]
-fn start_audio(device: String) -> Result<(), String>;
-
-#[tauri::command]
-fn stop_audio();
-
-#[tauri::command]
-fn sync_graph(json: String) -> Result<(), String>;
-```
-
-## Thread model
-
-```
-┌─────────────────┐     ┌─────────────────┐
-│   Main Thread   │     │  Audio Thread   │
-│   (Tauri/UI)    │     │    (cpal)       │
-│                 │     │                 │
-│  set_graph() ───┼────►│  GraphEngine    │
-│  note_on()   ───┼────►│  .process()     │
-│  get_scope() ◄──┼─────│                 │
-└─────────────────┘     └─────────────────┘
-        │
-        │ Atomic/Lock-free
-        │ communication
-```
+Pour l'audio natif complet dans Tauri, voir `src-tauri/src/lib.rs` qui utilise `dsp-graph` directement.

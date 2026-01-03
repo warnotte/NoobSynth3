@@ -18,8 +18,8 @@ Oscillateur principal avec anti-aliasing polyBLEP.
 | `subMix` | 0-1 | Volume du sub-oscillateur |
 | `subOct` | 1-2 | Octave du sub (1 = -1 oct, 2 = -2 oct) |
 
-**Entrées** : pitch (CV), fm_lin (audio), fm_audio (audio), fm_exp (CV), pwm (CV), sync (gate)
-**Sorties** : out (audio), sync (gate)
+**Entrées** : pitch (CV), fm-lin (CV), fm-exp (CV), fm-audio (audio), pwm (CV), sync (sync)
+**Sorties** : out (audio), sub (audio), sync-out (sync)
 
 ### Supersaw
 
@@ -108,7 +108,7 @@ Filtre principal avec deux modèles.
 - **SVF** (State Variable Filter) : Polyvalent, tous les modes
 - **Ladder** : Caractère Moog, LP uniquement, auto-oscillation
 
-**Entrées** : in (audio), cutoff (CV), env (CV), mod (CV)
+**Entrées** : in (audio), mod (CV), env (CV), key (CV)
 **Sorties** : out (audio)
 
 ### HPF (High Pass Filter)
@@ -135,7 +135,8 @@ Filtre passe-haut simple.
 | `shape` | 0-3 | Forme (0=sine, 1=tri, 2=saw, 3=square) |
 | `bipolar` | true/false | Bipolaire (-1 à +1) ou unipolaire (0 à +1) |
 
-**Sorties** : out (CV)
+**Entrées** : rate (CV), sync (sync)
+**Sorties** : cv-out (CV)
 
 ### ADSR (Envelope Generator)
 
@@ -147,7 +148,7 @@ Filtre passe-haut simple.
 | `release` | 0.001-10 s | Temps de relâchement |
 
 **Entrées** : gate (gate)
-**Sorties** : out (CV)
+**Sorties** : env (CV)
 
 ### Mod Router
 
@@ -155,10 +156,13 @@ Distribue un CV vers 4 destinations avec profondeur réglable.
 
 | Paramètre | Range | Description |
 |-----------|-------|-------------|
-| `depth1-4` | 0-1 | Profondeur pour chaque sortie |
+| `depthPitch` | 0-1 | Profondeur vers pitch |
+| `depthPwm` | 0-1 | Profondeur vers PWM |
+| `depthVcf` | 0-1 | Profondeur vers VCF |
+| `depthVca` | 0-1 | Profondeur vers VCA |
 
 **Entrées** : in (CV)
-**Sorties** : out1, out2, out3, out4 (CV)
+**Sorties** : pitch (CV), pwm (CV), vcf (CV), vca (CV)
 
 ### Mod VCA
 
@@ -184,8 +188,8 @@ Chorus stéréo style Juno.
 | `spread` | 0-1 | Largeur stéréo |
 | `feedback` | 0-0.9 | Rétroaction |
 
-**Entrées** : inL, inR (audio)
-**Sorties** : outL, outR (audio)
+**Entrées** : in (audio)
+**Sorties** : out (audio)
 
 ### Delay
 
@@ -199,8 +203,8 @@ Délai stéréo avec option ping-pong.
 | `tone` | 0-1 | Filtre (0=sombre, 1=brillant) |
 | `pingPong` | true/false | Mode ping-pong |
 
-**Entrées** : inL, inR (audio)
-**Sorties** : outL, outR (audio)
+**Entrées** : in (audio)
+**Sorties** : out (audio)
 
 ### Reverb
 
@@ -213,8 +217,8 @@ Réverbération algorithmique (Freeverb).
 | `preDelay` | 0-100 ms | Pré-délai |
 | `mix` | 0-1 | Dry/Wet |
 
-**Entrées** : inL, inR (audio)
-**Sorties** : outL, outR (audio)
+**Entrées** : in (audio)
+**Sorties** : out (audio)
 
 ### Phaser
 
@@ -227,8 +231,8 @@ Phaser 4 étages stéréo.
 | `feedback` | 0-0.95 | Rétroaction |
 | `mix` | 0-1 | Dry/Wet |
 
-**Entrées** : inL, inR (audio)
-**Sorties** : outL, outR (audio)
+**Entrées** : in (audio)
+**Sorties** : out (audio)
 
 ### Distortion
 
@@ -245,8 +249,8 @@ Distorsion avec 3 modes.
 - **Hard clip** : Saturation agressive, type transistor
 - **Foldback** : Repliement, son métallique
 
-**Entrées** : inL, inR (audio)
-**Sorties** : outL, outR (audio)
+**Entrées** : in (audio)
+**Sorties** : out (audio)
 
 ---
 
@@ -263,7 +267,7 @@ Contrôle le volume via CV.
 
 Multiplication de deux signaux audio.
 
-**Entrées** : inA (audio), inB (audio)
+**Entrées** : in-a (audio), in-b (audio)
 **Sorties** : out (audio)
 
 ### Mixer 1x1
@@ -275,7 +279,7 @@ Mixe deux sources avec niveaux réglables.
 | `levelA` | 0-1 | Niveau entrée A |
 | `levelB` | 0-1 | Niveau entrée B |
 
-**Entrées** : inA, inB (audio)
+**Entrées** : in-a (audio), in-b (audio)
 **Sorties** : out (audio)
 
 ### Mixer 1x2
@@ -286,7 +290,7 @@ Mixe jusqu'à 6 sources.
 |-----------|-------|-------------|
 | `levelA-F` | 0-1 | Niveau pour chaque entrée |
 
-**Entrées** : inA, inB, inC, inD, inE, inF (audio)
+**Entrées** : in-a, in-b, in-c, in-d, in-e, in-f (audio)
 **Sorties** : out (audio)
 
 ### Scope
@@ -300,8 +304,8 @@ Visualisation multi-mode style DATA.
 | `timeScale` | 0.5-2x | Échelle temporelle (scope) |
 | `freeze` | true/false | Geler l'affichage |
 
-**Entrées** : inA, inB, inC, inD (audio/CV)
-**Sorties** : thruA, thruB (audio) - passthrough pour monitoring
+**Entrées** : in-a (audio), in-b (audio), in-c (CV), in-d (CV)
+**Sorties** : out-a (audio), out-b (audio) - passthrough pour monitoring
 
 **Modes** :
 - **Scope** : Oscilloscope temps réel
@@ -330,7 +334,7 @@ Module central pour le contrôle du synthé.
 - Séquenceur 8 pas
 - Sortie vélocité avec slew
 
-**Sorties** : cv (CV), gate (gate), velocity (CV)
+**Sorties** : cv-out (CV), gate-out (gate), vel-out (CV), sync-out (sync)
 
 ### Mario IO
 
@@ -347,7 +351,7 @@ Séquenceur thématique avec chansons NES/SNES.
 6. SMB3 Athletic  7. SMB3 Sky  8. SMW Overworld
 9. Zelda LTTP Intro  10. Zelda Dark World
 
-**Sorties** : 5 canaux (pulse1, pulse2, triangle, noise, dpcm)
+**Sorties** : 5 canaux CV+Gate (cv-1/gate-1 à cv-5/gate-5)
 
 ### Main Out
 
@@ -357,7 +361,7 @@ Sortie audio principale.
 |-----------|-------|-------------|
 | `level` | 0-1 | Volume master |
 
-**Entrées** : inL, inR (audio)
+**Entrées** : in (audio)
 
 ---
 
@@ -365,10 +369,10 @@ Sortie audio principale.
 
 | Type | Couleur | Description |
 |------|---------|-------------|
-| `audio` | Rouge | Signal audio (-1 à +1) |
-| `cv` | Bleu | Control Voltage (modulation) |
-| `gate` | Vert | Gate/Trigger (on/off) |
-| `sync` | Jaune | Synchronisation oscillateur |
+| `audio` | Bleu (#5bb6ff) | Signal audio (-1 à +1) |
+| `cv` | Teal (#42e2b1) | Control Voltage (modulation) |
+| `gate` | Orange (#f0b06b) | Gate/Trigger (on/off) |
+| `sync` | Rose (#ff6fae) | Synchronisation oscillateur |
 
 ## Polyphonie
 

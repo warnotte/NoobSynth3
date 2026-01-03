@@ -4,10 +4,10 @@ Bibliothèque DSP (Digital Signal Processing) pure Rust, sans dépendances exter
 
 ## Caractéristiques
 
-- **Zero-dependency** : Pas de crate externe, portable partout
-- **no_std compatible** : Peut tourner sur embedded
+- **Minimal dependencies** : Seulement `std` (pas de crates audio externes)
 - **Sample rate agnostic** : Fonctionne à n'importe quelle fréquence
 - **Anti-aliasing** : polyBLEP sur les oscillateurs
+- **Portable** : Utilisé par WASM, Tauri et VST
 
 ## Modules
 

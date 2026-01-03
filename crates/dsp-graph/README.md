@@ -8,7 +8,7 @@ Moteur d'exécution du graphe modulaire. Parse le JSON et exécute les modules D
 - Tri topologique des modules
 - Exécution buffer par buffer
 - Gestion de la polyphonie (1-8 voix)
-- Routage des connexions audio/CV/gate
+- Routage des connexions audio/CV/gate/sync
 
 ## Architecture
 
@@ -44,7 +44,8 @@ JSON Graph → Parser → Topological Sort → Execution
   "connections": [
     {
       "from": { "moduleId": "vco-1", "portId": "out" },
-      "to": { "moduleId": "vcf-1", "portId": "in" }
+      "to": { "moduleId": "vcf-1", "portId": "in" },
+      "kind": "audio"
     }
   ]
 }
@@ -55,15 +56,20 @@ JSON Graph → Parser → Topological Sort → Execution
 ```rust
 use dsp_graph::GraphEngine;
 
-let mut engine = GraphEngine::new(44100.0, 128);
+let mut engine = GraphEngine::new(44100.0);
 
 // Charger le graphe
 engine.set_graph_json(json_string)?;
 
-// Traiter un buffer
-let mut left = [0.0f32; 128];
-let mut right = [0.0f32; 128];
-engine.process(&mut left, &mut right);
+// Modifier un paramètre
+engine.set_param("vco-1", "frequency", 880.0);
+
+// Contrôler les voix
+engine.set_control_voice_cv("ctrl-1", 0, 0.5);
+engine.set_control_voice_gate("ctrl-1", 0, 1.0);
+
+// Rendu audio (retourne buffer interleaved L/R)
+let samples = engine.render(128);
 ```
 
 ## Polyphonie
