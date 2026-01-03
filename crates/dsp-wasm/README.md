@@ -41,7 +41,7 @@ engine.set_control_voice_gate("ctrl-1", 0, 1.0);
 engine.set_control_voice_velocity("ctrl-1", 0, 0.8, 0.01);
 
 // Rendu audio
-const samples = engine.render(128); // Float32Array interleaved L/R
+const samples = engine.render(128); // L, R puis taps mono si présents
 ```
 
 ## Interface exportée

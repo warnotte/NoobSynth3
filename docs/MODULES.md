@@ -10,15 +10,17 @@ Oscillateur principal avec anti-aliasing polyBLEP.
 
 | Paramètre | Range | Description |
 |-----------|-------|-------------|
-| `frequency` | 20-20000 Hz | Fréquence de base |
-| `type` | sine/triangle/sawtooth/square | Forme d'onde |
-| `pwm` | 0-1 | Largeur d'impulsion (square uniquement) |
-| `unison` | 1-4 | Nombre de voix unisson |
-| `detune` | 0-50 cents | Désaccord entre voix unisson |
+| `frequency` | 40-1200 Hz | Fréquence de base |
+| `detune` | 0-15 cents | Désaccord unison |
+| `pwm` | 0.05-0.95 | Largeur d'impulsion |
+| `unison` | 1-4 | Nombre de voix unison |
 | `subMix` | 0-1 | Volume du sub-oscillateur |
-| `subOct` | 1-2 | Octave du sub (1 = -1 oct, 2 = -2 oct) |
+| `subOct` | 1-2 | Octave du sub (-1 / -2) |
+| `fmLin` | 0-2000 Hz | FM linéaire |
+| `fmExp` | 0-2 oct | FM exponentielle |
+| `type` | sine/triangle/sawtooth/square | Forme d'onde |
 
-**Entrées** : pitch (CV), fm-lin (CV), fm-exp (CV), fm-audio (audio), pwm (CV), sync (sync)
+**Entrées** : pitch (CV), fm-lin (CV), fm-exp (CV), fm-audio (audio), pwm (CV), sync (sync)  
 **Sorties** : out (audio), sub (audio), sync-out (sync)
 
 ### Supersaw
@@ -27,11 +29,11 @@ Oscillateur principal avec anti-aliasing polyBLEP.
 
 | Paramètre | Range | Description |
 |-----------|-------|-------------|
-| `frequency` | 20-20000 Hz | Fréquence de base |
+| `frequency` | 40-1200 Hz | Fréquence de base |
 | `detune` | 0-100 cents | Spread entre les 7 voix |
 | `mix` | 0-1 | Balance centre/côtés |
 
-**Entrées** : pitch (CV)
+**Entrées** : pitch (CV)  
 **Sorties** : out (audio)
 
 ### NES Osc (2A03)
@@ -40,17 +42,15 @@ Oscillateur principal avec anti-aliasing polyBLEP.
 
 | Paramètre | Range | Description |
 |-----------|-------|-------------|
-| `frequency` | 20-20000 Hz | Fréquence de base |
-| `mode` | pulse/triangle/noise | Type de canal |
-| `duty` | 12.5/25/50/75 % | Duty cycle (pulse) |
+| `frequency` | 40-2000 Hz | Fréquence de base |
+| `fine` | -100 à 100 cents | Ajustement fin |
+| `volume` | 0-1 | Volume |
+| `mode` | 0-3 | 0=PLS1, 1=PLS2, 2=TRI, 3=NSE |
+| `duty` | 0-3 | 12.5/25/50/75 % (pulse) |
+| `noiseMode` | 0-1 | 0=RAND, 1=LOOP |
+| `bitcrush` | 0-1 | Crushing 7-bit |
 
-**Caractéristiques** :
-- Pulse : 4 duty cycles authentiques
-- Triangle : 4-bit à pas (son "buzzy")
-- Noise : LFSR 15-bit
-- DAC 7-bit pour le caractère lo-fi
-
-**Entrées** : pitch (CV)
+**Entrées** : pitch (CV)  
 **Sorties** : out (audio)
 
 ### SNES Osc (S-DSP)
@@ -59,15 +59,15 @@ Oscillateur principal avec anti-aliasing polyBLEP.
 
 | Paramètre | Range | Description |
 |-----------|-------|-------------|
-| `frequency` | 20-20000 Hz | Fréquence de base |
-| `wavetable` | 0-7 | Sélection de la table (8 disponibles) |
-| `lofi` | on/off | Simulation 32kHz |
+| `frequency` | 40-2000 Hz | Fréquence de base |
+| `fine` | -100 à 100 cents | Ajustement fin |
+| `volume` | 0-1 | Volume |
+| `wave` | 0-7 | SQR, SAW, STR, BEL, ORG, PAD, BAS, SYN |
+| `gauss` | 0-1 | Filtre gaussien |
+| `color` | 0-1 | Brillance |
+| `lofi` | 0-1 | Effet 32kHz |
 
-**Wavetables** :
-0. Sine  1. Triangle  2. Saw  3. Square
-4. Bass  5. Strings  6. Organ  7. Synth
-
-**Entrées** : pitch (CV)
+**Entrées** : pitch (CV)  
 **Sorties** : out (audio)
 
 ### Noise
@@ -76,11 +76,8 @@ Générateur de bruit.
 
 | Paramètre | Range | Description |
 |-----------|-------|-------------|
-| `color` | white/pink/brown | Type de bruit |
-
-- **White** : Énergie égale par fréquence
-- **Pink** : -3dB/octave (naturel)
-- **Brown** : -6dB/octave (graves profonds)
+| `level` | 0-1 | Niveau |
+| `noiseType` | white/pink/brown | Type de bruit |
 
 **Sorties** : out (audio)
 
@@ -94,21 +91,17 @@ Filtre principal avec deux modèles.
 
 | Paramètre | Range | Description |
 |-----------|-------|-------------|
-| `cutoff` | 20-20000 Hz | Fréquence de coupure |
+| `cutoff` | 40-12000 Hz | Fréquence de coupure |
 | `resonance` | 0-1 | Résonance (Q) |
 | `drive` | 0-1 | Saturation d'entrée |
-| `envAmount` | 0-1 | Modulation par enveloppe |
-| `modAmount` | 0-1 | Modulation par LFO |
+| `envAmount` | -1 à 1 | Modulation par enveloppe |
+| `modAmount` | -1 à 1 | Modulation par LFO |
 | `keyTrack` | 0-1 | Suivi du pitch |
 | `model` | svf/ladder | Modèle de filtre |
 | `mode` | lp/hp/bp/notch | Type (ladder = LP uniquement) |
 | `slope` | 12/24 dB | Pente |
 
-**Modèles** :
-- **SVF** (State Variable Filter) : Polyvalent, tous les modes
-- **Ladder** : Caractère Moog, LP uniquement, auto-oscillation
-
-**Entrées** : in (audio), mod (CV), env (CV), key (CV)
+**Entrées** : in (audio), mod (CV), env (CV), key (CV)  
 **Sorties** : out (audio)
 
 ### HPF (High Pass Filter)
@@ -117,9 +110,9 @@ Filtre passe-haut simple.
 
 | Paramètre | Range | Description |
 |-----------|-------|-------------|
-| `cutoff` | 20-2000 Hz | Fréquence de coupure |
+| `cutoff` | 40-12000 Hz | Fréquence de coupure |
 
-**Entrées** : in (audio)
+**Entrées** : in (audio)  
 **Sorties** : out (audio)
 
 ---
@@ -130,24 +123,25 @@ Filtre passe-haut simple.
 
 | Paramètre | Range | Description |
 |-----------|-------|-------------|
-| `rate` | 0.01-50 Hz | Fréquence |
+| `rate` | 0.05-20 Hz | Fréquence |
 | `depth` | 0-1 | Amplitude |
-| `shape` | 0-3 | Forme (0=sine, 1=tri, 2=saw, 3=square) |
-| `bipolar` | true/false | Bipolaire (-1 à +1) ou unipolaire (0 à +1) |
+| `offset` | -1 à 1 | Décalage |
+| `shape` | sine/triangle/sawtooth/square | Forme |
+| `bipolar` | true/false | Bipolaire ou unipolaire |
 
-**Entrées** : rate (CV), sync (sync)
+**Entrées** : rate (CV), sync (sync)  
 **Sorties** : cv-out (CV)
 
 ### ADSR (Envelope Generator)
 
 | Paramètre | Range | Description |
 |-----------|-------|-------------|
-| `attack` | 0.001-10 s | Temps d'attaque |
-| `decay` | 0.001-10 s | Temps de décroissance |
+| `attack` | 0.001-5 s | Temps d'attaque |
+| `decay` | 0.001-5 s | Temps de décroissance |
 | `sustain` | 0-1 | Niveau de maintien |
-| `release` | 0.001-10 s | Temps de relâchement |
+| `release` | 0.001-5 s | Temps de relâchement |
 
-**Entrées** : gate (gate)
+**Entrées** : gate (gate)  
 **Sorties** : env (CV)
 
 ### Mod Router
@@ -156,19 +150,23 @@ Distribue un CV vers 4 destinations avec profondeur réglable.
 
 | Paramètre | Range | Description |
 |-----------|-------|-------------|
-| `depthPitch` | 0-1 | Profondeur vers pitch |
-| `depthPwm` | 0-1 | Profondeur vers PWM |
-| `depthVcf` | 0-1 | Profondeur vers VCF |
-| `depthVca` | 0-1 | Profondeur vers VCA |
+| `depthPitch` | -1 à 1 | Profondeur vers pitch |
+| `depthPwm` | -1 à 1 | Profondeur vers PWM |
+| `depthVcf` | -1 à 1 | Profondeur vers VCF |
+| `depthVca` | -1 à 1 | Profondeur vers VCA |
 
-**Entrées** : in (CV)
+**Entrées** : in (CV)  
 **Sorties** : pitch (CV), pwm (CV), vcf (CV), vca (CV)
 
 ### Mod VCA
 
 Multiplie deux signaux CV ensemble.
 
-**Entrées** : in (CV), cv (CV)
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `gain` | 0-1 | Profondeur |
+
+**Entrées** : in (CV), cv (CV)  
 **Sorties** : out (CV)
 
 ---
@@ -177,33 +175,33 @@ Multiplie deux signaux CV ensemble.
 
 ### Chorus
 
-Chorus stéréo style Juno.
+Chorus stéréo style Juno (entrée/sortie mono dans le rack).
 
 | Paramètre | Range | Description |
 |-----------|-------|-------------|
-| `rate` | 0.1-5 Hz | Vitesse de modulation |
-| `depth` | 0-50 ms | Profondeur de modulation |
-| `delay` | 1-50 ms | Délai de base |
+| `rate` | 0.05-4 Hz | Vitesse de modulation |
+| `depth` | 1-18 ms | Profondeur de modulation |
+| `delay` | 6-25 ms | Délai de base |
 | `mix` | 0-1 | Dry/Wet |
 | `spread` | 0-1 | Largeur stéréo |
-| `feedback` | 0-0.9 | Rétroaction |
+| `feedback` | 0-0.4 | Rétroaction |
 
-**Entrées** : in (audio)
+**Entrées** : in (audio)  
 **Sorties** : out (audio)
 
 ### Delay
 
-Délai stéréo avec option ping-pong.
+Délai stéréo avec option ping-pong (entrée/sortie mono dans le rack).
 
 | Paramètre | Range | Description |
 |-----------|-------|-------------|
-| `time` | 1-2000 ms | Temps de délai |
-| `feedback` | 0-0.95 | Rétroaction |
+| `time` | 20-1200 ms | Temps de délai |
+| `feedback` | 0-0.9 | Rétroaction |
 | `mix` | 0-1 | Dry/Wet |
 | `tone` | 0-1 | Filtre (0=sombre, 1=brillant) |
 | `pingPong` | true/false | Mode ping-pong |
 
-**Entrées** : in (audio)
+**Entrées** : in (audio)  
 **Sorties** : out (audio)
 
 ### Reverb
@@ -212,26 +210,26 @@ Réverbération algorithmique (Freeverb).
 
 | Paramètre | Range | Description |
 |-----------|-------|-------------|
-| `time` | 0-1 | Taille de la pièce |
+| `time` | 0.1-0.98 | Taille de la pièce |
 | `damp` | 0-1 | Amortissement des aigus |
-| `preDelay` | 0-100 ms | Pré-délai |
+| `preDelay` | 0-80 ms | Pré-délai |
 | `mix` | 0-1 | Dry/Wet |
 
-**Entrées** : in (audio)
+**Entrées** : in (audio)  
 **Sorties** : out (audio)
 
 ### Phaser
 
-Phaser 4 étages stéréo.
+Phaser 4 étages stéréo (entrée/sortie mono dans le rack).
 
 | Paramètre | Range | Description |
 |-----------|-------|-------------|
-| `rate` | 0.01-10 Hz | Vitesse du LFO |
+| `rate` | 0.05-5 Hz | Vitesse du LFO |
 | `depth` | 0-1 | Profondeur de modulation |
-| `feedback` | 0-0.95 | Rétroaction |
+| `feedback` | 0-0.9 | Rétroaction |
 | `mix` | 0-1 | Dry/Wet |
 
-**Entrées** : in (audio)
+**Entrées** : in (audio)  
 **Sorties** : out (audio)
 
 ### Distortion
@@ -241,15 +239,11 @@ Distorsion avec 3 modes.
 | Paramètre | Range | Description |
 |-----------|-------|-------------|
 | `drive` | 0-1 | Quantité de distorsion |
-| `mode` | soft/hard/fold | Type de saturation |
+| `tone` | 0-1 | Filtre tonal |
 | `mix` | 0-1 | Dry/Wet |
+| `mode` | soft/hard/fold | Type de saturation |
 
-**Modes** :
-- **Soft clip** : Saturation douce, type tube
-- **Hard clip** : Saturation agressive, type transistor
-- **Foldback** : Repliement, son métallique
-
-**Entrées** : in (audio)
+**Entrées** : in (audio)  
 **Sorties** : out (audio)
 
 ---
@@ -260,14 +254,22 @@ Distorsion avec 3 modes.
 
 Contrôle le volume via CV.
 
-**Entrées** : in (audio), cv (CV)
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `gain` | 0-1 | Gain |
+
+**Entrées** : in (audio), cv (CV)  
 **Sorties** : out (audio)
 
 ### Ring Mod
 
 Multiplication de deux signaux audio.
 
-**Entrées** : in-a (audio), in-b (audio)
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `level` | 0-1 | Niveau |
+
+**Entrées** : in-a (audio), in-b (audio)  
 **Sorties** : out (audio)
 
 ### Mixer 1x1
@@ -279,7 +281,7 @@ Mixe deux sources avec niveaux réglables.
 | `levelA` | 0-1 | Niveau entrée A |
 | `levelB` | 0-1 | Niveau entrée B |
 
-**Entrées** : in-a (audio), in-b (audio)
+**Entrées** : in-a (audio), in-b (audio)  
 **Sorties** : out (audio)
 
 ### Mixer 1x2
@@ -290,7 +292,7 @@ Mixe jusqu'à 6 sources.
 |-----------|-------|-------------|
 | `levelA-F` | 0-1 | Niveau pour chaque entrée |
 
-**Entrées** : in-a, in-b, in-c, in-d, in-e, in-f (audio)
+**Entrées** : in-a, in-b, in-c, in-d, in-e, in-f (audio)  
 **Sorties** : out (audio)
 
 ### Scope
@@ -300,17 +302,27 @@ Visualisation multi-mode style DATA.
 | Paramètre | Range | Description |
 |-----------|-------|-------------|
 | `mode` | scope/fft/spectrogram | Mode de visualisation |
-| `gain` | 0.5-10x | Gain d'affichage |
-| `timeScale` | 0.5-2x | Échelle temporelle (scope) |
+| `time` | 1/2/4 | Échelle temporelle |
+| `gain` | 1/2/5/10 | Gain d'affichage |
 | `freeze` | true/false | Geler l'affichage |
+| `chA-D` | true/false | Activer les canaux |
 
-**Entrées** : in-a (audio), in-b (audio), in-c (CV), in-d (CV)
-**Sorties** : out-a (audio), out-b (audio) - passthrough pour monitoring
+**Entrées** : in-a (audio), in-b (audio), in-c (CV), in-d (CV)  
+**Sorties** : out-a (audio), out-b (audio)
 
-**Modes** :
-- **Scope** : Oscilloscope temps réel
-- **FFT** : Analyseur de spectre
-- **Spectrogram** : Spectrogramme déroulant
+### Lab Panel
+
+Module de test pour expérimenter.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `level` | 0-1 | Niveau |
+| `drive` | 0-1 | Drive |
+| `bias` | -1 à 1 | Décalage |
+| `shape` | sine/triangle/sawtooth/square | Forme |
+
+**Entrées** : in-a (audio), in-b (audio), cv-1 (CV), gate-1 (gate), sync-1 (sync)  
+**Sorties** : out-a (audio), out-b (audio), cv-out (CV), gate-out (gate), sync-out (sync)
 
 ---
 
@@ -322,19 +334,23 @@ Module central pour le contrôle du synthé.
 
 | Paramètre | Range | Description |
 |-----------|-------|-------------|
-| `glide` | 0-1 s | Portamento |
+| `cv` | -1 à 1 | CV manuel (bipolaire) |
+| `cvMode` | bipolar/unipolar | Mode CV |
+| `velocity` | 0-1 | Vélocité manuelle |
+| `glide` | 0-0.5 s | Portamento |
+| `gate` | 0/1 | Gate manuel |
+| `midiEnabled` | true/false | MIDI actif |
+| `midiChannel` | 0-16 | 0=Omni |
+| `midiInputId` | string | Périphérique MIDI |
+| `midiVelocity` | true/false | Utiliser la vélocité |
+| `midiRoot` | 24-84 | Note de base |
+| `midiVelSlew` | 0-0.03 s | Slew vélocité |
 | `voices` | 1/2/4/8 | Polyphonie |
 | `seqOn` | true/false | Séquenceur actif |
-| `seqTempo` | 40-240 BPM | Tempo du séquenceur |
-| `seqGate` | 0-1 | Durée des notes |
+| `seqTempo` | 60-180 BPM | Tempo |
+| `seqGate` | 0.1-0.9 | Durée des notes |
 
-**Fonctionnalités** :
-- Mini clavier (1 octave)
-- Entrée MIDI (Web MIDI)
-- Séquenceur 8 pas
-- Sortie vélocité avec slew
-
-**Sorties** : cv-out (CV), gate-out (gate), vel-out (CV), sync-out (sync)
+**Sorties** : cv-out (CV), vel-out (CV), gate-out (gate), sync-out (sync)
 
 ### Mario IO
 
@@ -342,14 +358,9 @@ Séquenceur thématique avec chansons NES/SNES.
 
 | Paramètre | Range | Description |
 |-----------|-------|-------------|
-| `song` | 0-10 | Chanson sélectionnée |
-| `tempo` | 60-200 BPM | Tempo |
-
-**Chansons** :
-0. SMB Overworld  1. SMB Underground  2. SMB Underwater
-3. SMB Castle  4. SMB2 Overworld  5. SMB3 Overworld
-6. SMB3 Athletic  7. SMB3 Sky  8. SMW Overworld
-9. Zelda LTTP Intro  10. Zelda Dark World
+| `running` | true/false | Lecture |
+| `tempo` | 80-300 BPM | Tempo |
+| `song` | smb/underground/underwater/castle/starman/gameover/coin/oneup/smw/zelda/zeldadark | Chanson |
 
 **Sorties** : 5 canaux CV+Gate (cv-1/gate-1 à cv-5/gate-5)
 
@@ -369,10 +380,10 @@ Sortie audio principale.
 
 | Type | Couleur | Description |
 |------|---------|-------------|
-| `audio` | Bleu (#5bb6ff) | Signal audio (-1 à +1) |
-| `cv` | Teal (#42e2b1) | Control Voltage (modulation) |
-| `gate` | Orange (#f0b06b) | Gate/Trigger (on/off) |
-| `sync` | Rose (#ff6fae) | Synchronisation oscillateur |
+| `audio` | Bleu dégradé (#2f7fbe → #9cd6ff) | Signal audio (-1 à +1) |
+| `cv` | Teal dégradé (#1f9c78 → #7af2c8) | Control Voltage (modulation) |
+| `gate` | Orange dégradé (#c9793a → #ffd2a4) | Gate/Trigger (on/off) |
+| `sync` | Rose dégradé (#ce5b93 → #ffb7d4) | Synchronisation oscillateur |
 
 ## Polyphonie
 

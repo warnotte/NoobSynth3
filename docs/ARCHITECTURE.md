@@ -204,7 +204,7 @@ interface Connection {
 
 | Couche | Technologies |
 |--------|--------------|
-| UI | React 18, TypeScript, Vite |
+| UI | React 19, TypeScript, Vite |
 | Styling | CSS (VCV Rack-inspired) |
 | Audio Web | AudioWorklet, WebAssembly |
 | Audio Natif | cpal (cross-platform audio) |

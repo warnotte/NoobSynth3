@@ -50,7 +50,7 @@ build.bat
 
 Ou manuellement :
 ```bash
-cargo build --release -p dsp-plugin
+cargo build --release -p noobsynth_vst
 ```
 
 ### Fichiers générés

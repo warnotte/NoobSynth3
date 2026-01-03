@@ -65,7 +65,7 @@ Moteur d'exécution du graphe modulaire.
 
 Bindings WebAssembly pour le navigateur.
 
-- Compilé avec `wasm-pack`
+- Compilé avec `wasm-bindgen`
 - Utilisé par l'AudioWorklet
 - Génère `dsp_wasm.js` + `.wasm`
 
@@ -113,7 +113,7 @@ cargo build --release --workspace
 npm run build:wasm
 
 # VST uniquement
-cargo build --release -p dsp-plugin
+cargo build --release -p noobsynth_vst
 ```
 
 ## Tests

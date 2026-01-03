@@ -68,7 +68,7 @@ engine.set_param("vco-1", "frequency", 880.0);
 engine.set_control_voice_cv("ctrl-1", 0, 0.5);
 engine.set_control_voice_gate("ctrl-1", 0, 1.0);
 
-// Rendu audio (retourne buffer interleaved L/R)
+// Rendu audio (L, R puis taps mono si présents)
 let samples = engine.render(128);
 ```
 

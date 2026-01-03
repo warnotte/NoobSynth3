@@ -14,7 +14,7 @@ Plugin VST3/CLAP utilisant le framework `nih-plug`.
 ## Build
 
 ```bash
-cargo build --release -p dsp-plugin
+cargo build --release -p noobsynth_vst
 ```
 
 Génère `target/release/noobsynth_vst.dll` (Windows).

@@ -6,7 +6,7 @@
 |-------|---------|-------|
 | Node.js | 18+ | Pour le frontend React |
 | Rust | stable | `rustup` recommandé |
-| wasm-pack | latest | `cargo install wasm-pack` |
+| wasm-bindgen | latest | `cargo install wasm-bindgen-cli` |
 | Tauri CLI | 2.x | `cargo install tauri-cli` |
 
 ### Windows
@@ -15,8 +15,8 @@
 # Installer Rust
 winget install Rustlang.Rust.GNU
 
-# Installer wasm-pack
-cargo install wasm-pack
+# Installer wasm-bindgen
+cargo install wasm-bindgen-cli
 
 # Installer Tauri CLI
 cargo install tauri-cli
@@ -30,7 +30,7 @@ sudo apt install libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchel
 
 # Rust + outils
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-cargo install wasm-pack tauri-cli
+cargo install wasm-bindgen-cli tauri-cli
 ```
 
 ## Installation
@@ -92,7 +92,7 @@ npm run build
 npm run tauri:build
 
 # VST uniquement
-cargo build --release -p dsp-plugin
+cargo build --release -p noobsynth_vst
 ```
 
 ### Clean rebuild
