@@ -969,16 +969,21 @@ impl Plugin for NoobSynth {
     }
 
     fn editor(&mut self, _async_executor: AsyncExecutor<Self>) -> Option<Box<dyn Editor>> {
+        let ui_auto_launch = Arc::new(AtomicBool::new(false));
         let ui_connected = self.ui_connected.clone();
         let ui_requests = self.ui_requests.clone();
         let ui_sample_rate = self.ui_sample_rate.clone();
         let instance_id = self.instance_id.clone();
+        let ui_auto_launch_flag = ui_auto_launch.clone();
         create_egui_editor(
             self.params.editor_state.clone(),
             (),
             move |_, _| {},
             move |egui_ctx, _setter, _| {
                 egui::CentralPanel::default().show(egui_ctx, |ui| {
+                    if !ui_auto_launch_flag.swap(true, Ordering::Relaxed) {
+                        launcher::launch_tauri_if_needed(&instance_id);
+                    }
                     ui.heading("NoobSynth UI");
                     ui.label("This host window launches the full NoobSynth interface.");
                     if ui.button("Open NoobSynth UI").clicked() {

@@ -133,6 +133,71 @@ const normalizeNativeParamValue = (paramId: string, value: number | string | boo
   return Number.NaN
 }
 
+const BOOLEAN_PARAMS = new Set([
+  'pingPong',
+  'freeze',
+  'bipolar',
+  'midiEnabled',
+  'midiVelocity',
+  'seqOn',
+  'running',
+  'chA',
+  'chB',
+  'chC',
+  'chD',
+])
+
+const denormalizeNativeParamValue = (
+  paramId: string,
+  value: number | string | boolean,
+): number | string | boolean => {
+  if (typeof value === 'number') {
+    if (paramId === 'slope' && value <= 1) {
+      return value >= 1 ? 24 : 12
+    }
+    if (paramId === 'type' || paramId === 'shape') {
+      if (value === 1) return 'triangle'
+      if (value === 2) return 'sawtooth'
+      if (value === 3) return 'square'
+      return 'sine'
+    }
+    if (paramId === 'noiseType') {
+      if (value === 1) return 'pink'
+      if (value === 2) return 'brown'
+      return 'white'
+    }
+    if (paramId === 'mode') {
+      if (value === 1) return 'hp'
+      if (value === 2) return 'bp'
+      if (value === 3) return 'notch'
+      return 'lp'
+    }
+    if (paramId === 'model') {
+      return value >= 1 ? 'ladder' : 'svf'
+    }
+    if (paramId === 'cvMode') {
+      return value >= 1 ? 'unipolar' : 'bipolar'
+    }
+  }
+  if (typeof value === 'number' && BOOLEAN_PARAMS.has(paramId)) {
+    return value >= 0.5
+  }
+  return value
+}
+
+const normalizeGraphFromVst = (graph: GraphState): GraphState => ({
+  ...graph,
+  modules: graph.modules.map((module) => ({
+    ...module,
+    params: Object.fromEntries(
+      Object.entries(module.params).map(([paramId, value]) => [
+        paramId,
+        denormalizeNativeParamValue(paramId, value),
+      ]),
+    ),
+  })),
+})
+
 const MACRO_COUNT = 8
 
 const clamp01 = (value: number) => Math.min(1, Math.max(0, value))
@@ -680,7 +745,7 @@ function App() {
           const parsed = JSON.parse(graphJson) as unknown
           if (isGraphState(parsed)) {
             lastVstGraphJsonRef.current = graphJson
-            applyPreset(parsed, { skipVstSync: true })
+            applyPreset(normalizeGraphFromVst(parsed), { skipVstSync: true })
             return
           }
         }
@@ -718,7 +783,7 @@ function App() {
         const parsed = JSON.parse(graphJson) as unknown
         if (isGraphState(parsed)) {
           lastVstGraphJsonRef.current = graphJson
-          applyPreset(parsed, { skipVstSync: true })
+          applyPreset(normalizeGraphFromVst(parsed), { skipVstSync: true })
         }
       } catch (error) {
         if (active) {
