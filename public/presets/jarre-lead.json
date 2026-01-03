@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "id": "jarre-lead",
+  "name": "Jarre Lead (Ch6)",
+  "description": "Expressive Equinoxe lead with vibrato. MIDI Channel 6.",
+  "updates": {
+    "osc-1": {
+      "frequency": 220,
+      "type": "sawtooth",
+      "pwm": 0.5,
+      "unison": 2,
+      "detune": 5,
+      "subMix": 0.2,
+      "subOct": 1
+    },
+    "osc-2": {
+      "frequency": 220.4,
+      "type": "square",
+      "pwm": 0.4,
+      "unison": 1,
+      "detune": 3
+    },
+    "mix-1": {
+      "levelA": 0.7,
+      "levelB": 0.45
+    },
+    "vcf-1": {
+      "cutoff": 1800,
+      "resonance": 0.22,
+      "drive": 0.25,
+      "envAmount": 0.4,
+      "modAmount": 0.1,
+      "keyTrack": 0.55,
+      "model": "ladder",
+      "mode": "lp",
+      "slope": 24
+    },
+    "chorus-1": {
+      "rate": 0.25,
+      "depth": 8,
+      "delay": 14,
+      "mix": 0.3,
+      "spread": 0.6,
+      "feedback": 0.1
+    },
+    "delay-1": {
+      "time": 320,
+      "feedback": 0.3,
+      "mix": 0.2,
+      "tone": 0.5,
+      "pingPong": true
+    },
+    "reverb-1": {
+      "time": 0.55,
+      "damp": 0.5,
+      "preDelay": 18,
+      "mix": 0.25
+    },
+    "adsr-1": {
+      "attack": 0.02,
+      "decay": 0.35,
+      "sustain": 0.7,
+      "release": 0.35
+    },
+    "adsr-2": {
+      "attack": 0.01,
+      "decay": 0.3,
+      "sustain": 0.3,
+      "release": 0.3
+    },
+    "lfo-1": {
+      "rate": 5.2,
+      "depth": 0.08,
+      "shape": 0,
+      "bipolar": true
+    },
+    "ctrl-1": {
+      "glide": 0.06,
+      "seqOn": false,
+      "seqTempo": 100,
+      "seqGate": 0.7,
+      "voices": 2
+    }
+  }
+}

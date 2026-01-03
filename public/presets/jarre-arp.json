@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "id": "jarre-arp",
+  "name": "Jarre Arp (Ch1)",
+  "description": "Equinoxe-style bright arpeggio sequence. MIDI Channel 1.",
+  "updates": {
+    "osc-1": {
+      "frequency": 220,
+      "type": "sawtooth",
+      "pwm": 0.5,
+      "unison": 2,
+      "detune": 6,
+      "subMix": 0,
+      "subOct": 1
+    },
+    "osc-2": {
+      "frequency": 220.5,
+      "type": "sawtooth",
+      "pwm": 0.5,
+      "unison": 1,
+      "detune": 0
+    },
+    "mix-1": {
+      "levelA": 0.75,
+      "levelB": 0.35
+    },
+    "vcf-1": {
+      "cutoff": 2800,
+      "resonance": 0.25,
+      "drive": 0.15,
+      "envAmount": 0.35,
+      "modAmount": 0.05,
+      "keyTrack": 0.6,
+      "model": "svf",
+      "mode": "lp",
+      "slope": 12
+    },
+    "chorus-1": {
+      "rate": 0.35,
+      "depth": 6,
+      "delay": 12,
+      "mix": 0.25,
+      "spread": 0.5,
+      "feedback": 0.08
+    },
+    "delay-1": {
+      "time": 375,
+      "feedback": 0.32,
+      "mix": 0.22,
+      "tone": 0.55,
+      "pingPong": true
+    },
+    "reverb-1": {
+      "time": 0.45,
+      "damp": 0.6,
+      "preDelay": 15,
+      "mix": 0.18
+    },
+    "adsr-1": {
+      "attack": 0.003,
+      "decay": 0.15,
+      "sustain": 0.45,
+      "release": 0.18
+    },
+    "adsr-2": {
+      "attack": 0.002,
+      "decay": 0.12,
+      "sustain": 0.2,
+      "release": 0.15
+    },
+    "lfo-1": {
+      "rate": 0.1,
+      "depth": 0.03,
+      "shape": 0,
+      "bipolar": true
+    },
+    "ctrl-1": {
+      "glide": 0,
+      "seqOn": false,
+      "seqTempo": 138,
+      "seqGate": 0.5,
+      "voices": 4
+    }
+  }
+}

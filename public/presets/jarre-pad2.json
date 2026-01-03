@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "id": "jarre-pad2",
+  "name": "Jarre Pad 2 (Ch7)",
+  "description": "Ethereal Equinoxe ambient pad. MIDI Channel 7.",
+  "updates": {
+    "osc-1": {
+      "frequency": 110,
+      "type": "triangle",
+      "pwm": 0.5,
+      "unison": 2,
+      "detune": 12,
+      "subMix": 0.1,
+      "subOct": 1
+    },
+    "osc-2": {
+      "frequency": 110.15,
+      "type": "square",
+      "pwm": 0.25,
+      "unison": 2,
+      "detune": 15
+    },
+    "mix-1": {
+      "levelA": 0.55,
+      "levelB": 0.5
+    },
+    "vcf-1": {
+      "cutoff": 750,
+      "resonance": 0.08,
+      "drive": 0.05,
+      "envAmount": 0.2,
+      "modAmount": 0.25,
+      "keyTrack": 0.45,
+      "model": "svf",
+      "mode": "lp",
+      "slope": 12
+    },
+    "chorus-1": {
+      "rate": 0.12,
+      "depth": 20,
+      "delay": 25,
+      "mix": 0.65,
+      "spread": 0.9,
+      "feedback": 0.15
+    },
+    "delay-1": {
+      "time": 550,
+      "feedback": 0.35,
+      "mix": 0.25,
+      "tone": 0.4,
+      "pingPong": true
+    },
+    "reverb-1": {
+      "time": 0.85,
+      "damp": 0.35,
+      "preDelay": 35,
+      "mix": 0.45
+    },
+    "adsr-1": {
+      "attack": 1.2,
+      "decay": 0.6,
+      "sustain": 0.9,
+      "release": 2.0
+    },
+    "adsr-2": {
+      "attack": 0.8,
+      "decay": 0.8,
+      "sustain": 0.4,
+      "release": 1.5
+    },
+    "lfo-1": {
+      "rate": 0.05,
+      "depth": 0.22,
+      "shape": 0,
+      "bipolar": true
+    },
+    "ctrl-1": {
+      "glide": 0.15,
+      "seqOn": false,
+      "seqTempo": 60,
+      "seqGate": 0.95,
+      "voices": 6
+    }
+  }
+}

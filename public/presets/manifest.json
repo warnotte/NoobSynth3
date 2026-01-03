@@ -175,6 +175,48 @@
       "description": "True 2A03 chip emulation with NES Osc modules.",
       "file": "8bit-mario-nes.json",
       "group": "Demos & Fun"
+    },
+    {
+      "id": "jarre-arp",
+      "name": "Jarre Arp (Ch1)",
+      "description": "Equinoxe-style bright arpeggio sequence. MIDI Channel 1.",
+      "file": "jarre-arp.json",
+      "group": "Jarre / Equinoxe"
+    },
+    {
+      "id": "jarre-pad",
+      "name": "Jarre Pad (Ch2)",
+      "description": "Warm Equinoxe strings/pad with slow attack. MIDI Channel 2.",
+      "file": "jarre-pad.json",
+      "group": "Jarre / Equinoxe"
+    },
+    {
+      "id": "jarre-bass",
+      "name": "Jarre Bass (Ch3)",
+      "description": "ARP 2600 style bass - Saw + PWM, no resonance. MIDI Channel 3.",
+      "file": "jarre-bass.json",
+      "group": "Jarre / Equinoxe"
+    },
+    {
+      "id": "jarre-seq2",
+      "name": "Jarre Seq2 (Ch4)",
+      "description": "Eminent 310 style sequence - warm, filtered highs. MIDI Channel 4.",
+      "file": "jarre-seq2.json",
+      "group": "Jarre / Equinoxe"
+    },
+    {
+      "id": "jarre-lead",
+      "name": "Jarre Lead (Ch6)",
+      "description": "Expressive Equinoxe lead with vibrato. MIDI Channel 6.",
+      "file": "jarre-lead.json",
+      "group": "Jarre / Equinoxe"
+    },
+    {
+      "id": "jarre-pad2",
+      "name": "Jarre Pad 2 (Ch7)",
+      "description": "Ethereal Equinoxe ambient pad. MIDI Channel 7.",
+      "file": "jarre-pad2.json",
+      "group": "Jarre / Equinoxe"
     }
   ]
 }

@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "id": "jarre-bass",
+  "name": "Jarre Bass (Ch3)",
+  "description": "ARP 2600 style Equinoxe bass - Saw + PWM, no resonance. MIDI Channel 3.",
+  "updates": {
+    "osc-1": {
+      "frequency": 110,
+      "type": "sawtooth",
+      "pwm": 0.5,
+      "unison": 1,
+      "detune": 0,
+      "subMix": 0.4,
+      "subOct": 1
+    },
+    "osc-2": {
+      "frequency": 55,
+      "type": "square",
+      "pwm": 0.35,
+      "unison": 1,
+      "detune": 0
+    },
+    "mix-1": {
+      "levelA": 0.8,
+      "levelB": 0.7
+    },
+    "vcf-1": {
+      "cutoff": 520,
+      "resonance": 0.02,
+      "drive": 0.25,
+      "envAmount": 0.45,
+      "modAmount": 0,
+      "keyTrack": 0.3,
+      "model": "ladder",
+      "mode": "lp",
+      "slope": 24
+    },
+    "chorus-1": {
+      "rate": 0.2,
+      "depth": 2,
+      "delay": 6,
+      "mix": 0.05,
+      "spread": 0.15,
+      "feedback": 0.01
+    },
+    "delay-1": {
+      "time": 180,
+      "feedback": 0.12,
+      "mix": 0.06,
+      "tone": 0.4,
+      "pingPong": false
+    },
+    "reverb-1": {
+      "time": 0.2,
+      "damp": 0.75,
+      "preDelay": 5,
+      "mix": 0.08
+    },
+    "adsr-1": {
+      "attack": 0.003,
+      "decay": 0.18,
+      "sustain": 0.55,
+      "release": 0.12
+    },
+    "adsr-2": {
+      "attack": 0.002,
+      "decay": 0.15,
+      "sustain": 0.1,
+      "release": 0.1
+    },
+    "lfo-1": {
+      "rate": 0.08,
+      "depth": 0.015,
+      "shape": 0,
+      "bipolar": true
+    },
+    "ctrl-1": {
+      "glide": 0.02,
+      "seqOn": false,
+      "seqTempo": 138,
+      "seqGate": 0.65,
+      "voices": 1
+    }
+  }
+}

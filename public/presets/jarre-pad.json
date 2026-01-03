@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "id": "jarre-pad",
+  "name": "Jarre Pad (Ch2)",
+  "description": "Warm Equinoxe strings/pad with slow attack. MIDI Channel 2.",
+  "updates": {
+    "osc-1": {
+      "frequency": 110,
+      "type": "square",
+      "pwm": 0.35,
+      "unison": 2,
+      "detune": 8,
+      "subMix": 0.15,
+      "subOct": 1
+    },
+    "osc-2": {
+      "frequency": 110.2,
+      "type": "sawtooth",
+      "pwm": 0.5,
+      "unison": 2,
+      "detune": 10
+    },
+    "mix-1": {
+      "levelA": 0.6,
+      "levelB": 0.55
+    },
+    "vcf-1": {
+      "cutoff": 1400,
+      "resonance": 0.05,
+      "drive": 0.05,
+      "envAmount": 0.22,
+      "modAmount": 0.2,
+      "keyTrack": 0.45,
+      "model": "svf",
+      "mode": "lp",
+      "slope": 12
+    },
+    "chorus-1": {
+      "rate": 0.15,
+      "depth": 22,
+      "delay": 24,
+      "mix": 0.7,
+      "spread": 0.95,
+      "feedback": 0.18
+    },
+    "delay-1": {
+      "time": 480,
+      "feedback": 0.25,
+      "mix": 0.15,
+      "tone": 0.45,
+      "pingPong": true
+    },
+    "reverb-1": {
+      "time": 0.75,
+      "damp": 0.4,
+      "preDelay": 25,
+      "mix": 0.35
+    },
+    "adsr-1": {
+      "attack": 0.65,
+      "decay": 0.8,
+      "sustain": 0.85,
+      "release": 1.2
+    },
+    "adsr-2": {
+      "attack": 0.5,
+      "decay": 1.0,
+      "sustain": 0.35,
+      "release": 1.0
+    },
+    "lfo-1": {
+      "rate": 0.08,
+      "depth": 0.18,
+      "shape": 0,
+      "bipolar": true
+    },
+    "ctrl-1": {
+      "glide": 0.12,
+      "seqOn": false,
+      "seqTempo": 70,
+      "seqGate": 0.9,
+      "voices": 6
+    }
+  }
+}
