@@ -26,6 +26,8 @@ export type ModuleType =
   | 'chorus'
   | 'ensemble'
   | 'choir'
+  | 'vocoder'
+  | 'audio-in'
   | 'delay'
   | 'granular-delay'
   | 'tape-delay'

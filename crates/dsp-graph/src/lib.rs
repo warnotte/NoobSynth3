@@ -8,7 +8,7 @@ use dsp_core::{
   SlewInputs, SlewLimiter, SlewParams, SnesOsc, SnesOscInputs, SnesOscParams, SpringReverb,
   SpringReverbInputs, SpringReverbParams, Supersaw, SupersawInputs, SupersawParams, TapeDelay,
   TapeDelayInputs, TapeDelayParams, Vca, Vcf, VcfInputs, VcfParams, Vco, VcoInputs, VcoParams,
-  Wavefolder, WavefolderParams,
+  Vocoder, VocoderInputs, VocoderParams, Wavefolder, WavefolderParams,
 };
 use serde::Deserialize;
 use std::collections::{HashMap, VecDeque};
@@ -75,6 +75,8 @@ enum ModuleType {
   Chorus,
   Ensemble,
   Choir,
+  Vocoder,
+  AudioIn,
   Delay,
   GranularDelay,
   TapeDelay,
@@ -371,6 +373,23 @@ struct ChoirState {
   mix: ParamBuffer,
 }
 
+struct VocoderState {
+  vocoder: Vocoder,
+  attack: ParamBuffer,
+  release: ParamBuffer,
+  low: ParamBuffer,
+  high: ParamBuffer,
+  q: ParamBuffer,
+  formant: ParamBuffer,
+  mix: ParamBuffer,
+  mod_gain: ParamBuffer,
+  car_gain: ParamBuffer,
+}
+
+struct AudioInState {
+  gain: ParamBuffer,
+}
+
 struct DelayState {
   delay: Delay,
   time: ParamBuffer,
@@ -518,6 +537,8 @@ enum ModuleState {
   Chorus(ChorusState),
   Ensemble(EnsembleState),
   Choir(ChoirState),
+  Vocoder(VocoderState),
+  AudioIn(AudioInState),
   Delay(DelayState),
   GranularDelay(GranularDelayState),
   TapeDelay(TapeDelayState),
@@ -555,6 +576,8 @@ pub struct GraphEngine {
   main_buffer: Buffer,
   output_data: Vec<Sample>,
   output_channels: usize,
+  external_input: Vec<Sample>,
+  external_input_frames: usize,
 }
 
 impl GraphEngine {
@@ -572,6 +595,8 @@ impl GraphEngine {
       main_buffer: Buffer::new(2, 0),
       output_data: Vec::new(),
       output_channels: 2,
+      external_input: Vec::new(),
+      external_input_frames: 0,
     }
   }
 
@@ -590,6 +615,17 @@ impl GraphEngine {
         }
       }
     }
+  }
+
+  pub fn set_external_input(&mut self, input: &[Sample]) {
+    self.external_input.clear();
+    self.external_input.extend_from_slice(input);
+    self.external_input_frames = input.len();
+  }
+
+  pub fn clear_external_input(&mut self) {
+    self.external_input.clear();
+    self.external_input_frames = 0;
   }
 
   pub fn set_control_voice_cv(&mut self, module_id: &str, voice: usize, value: f32) {
@@ -712,6 +748,22 @@ impl GraphEngine {
       let inputs = &self.input_buffers[module_index];
       let outputs = &mut self.output_buffers[module_index];
       let module = &mut self.modules[module_index];
+        if let ModuleState::AudioIn(state) = &mut module.state {
+          let output = outputs[0].channel_mut(0);
+          if self.external_input_frames == 0 {
+            output.fill(0.0);
+          } else {
+            let gain = state.gain.slice(frames);
+            let available = self.external_input_frames.min(frames);
+            for i in 0..available {
+              output[i] = self.external_input[i] * gain[i];
+            }
+            if available < frames {
+              output[available..frames].fill(0.0);
+            }
+          }
+          continue;
+        }
       module.process(inputs, outputs, frames, self.sample_rate);
     }
 
@@ -1019,6 +1071,21 @@ impl ModuleNode {
         depth: ParamBuffer::new(param_number(params, "depth", 0.35)),
         mix: ParamBuffer::new(param_number(params, "mix", 0.5)),
       }),
+      ModuleType::Vocoder => ModuleState::Vocoder(VocoderState {
+        vocoder: Vocoder::new(sample_rate),
+        attack: ParamBuffer::new(param_number(params, "attack", 25.0)),
+        release: ParamBuffer::new(param_number(params, "release", 140.0)),
+        low: ParamBuffer::new(param_number(params, "low", 120.0)),
+        high: ParamBuffer::new(param_number(params, "high", 5000.0)),
+        q: ParamBuffer::new(param_number(params, "q", 2.5)),
+        formant: ParamBuffer::new(param_number(params, "formant", 0.0)),
+        mix: ParamBuffer::new(param_number(params, "mix", 0.8)),
+        mod_gain: ParamBuffer::new(param_number(params, "modGain", 1.0)),
+        car_gain: ParamBuffer::new(param_number(params, "carGain", 1.0)),
+      }),
+      ModuleType::AudioIn => ModuleState::AudioIn(AudioInState {
+        gain: ParamBuffer::new(param_number(params, "gain", 1.0)),
+      }),
       ModuleType::Delay => ModuleState::Delay(DelayState {
         delay: Delay::new(sample_rate),
         time: ParamBuffer::new(param_number(params, "time", 360.0)),
@@ -1267,6 +1334,23 @@ impl ModuleNode {
         "mix" => state.mix.set(value),
         _ => {}
       },
+      ModuleState::Vocoder(state) => match param {
+        "attack" => state.attack.set(value),
+        "release" => state.release.set(value),
+        "low" => state.low.set(value),
+        "high" => state.high.set(value),
+        "q" => state.q.set(value),
+        "formant" => state.formant.set(value),
+        "mix" => state.mix.set(value),
+        "modGain" => state.mod_gain.set(value),
+        "carGain" => state.car_gain.set(value),
+        _ => {}
+      },
+      ModuleState::AudioIn(state) => {
+        if param == "gain" {
+          state.gain.set(value);
+        }
+      }
       ModuleState::Delay(state) => match param {
         "time" => state.time.set(value),
         "feedback" => state.feedback.set(value),
@@ -1883,6 +1967,38 @@ impl ModuleNode {
         let out_r = &mut right[0];
         state.choir.process_block(out_l, out_r, inputs, params);
       }
+      ModuleState::AudioIn(_) => {
+        // Handled in GraphEngine::render via external input injection.
+      }
+      ModuleState::Vocoder(state) => {
+        let mod_input = if self.connections[0].is_empty() {
+          None
+        } else {
+          Some(inputs[0].channel(0))
+        };
+        let car_input = if self.connections[1].is_empty() {
+          None
+        } else {
+          Some(inputs[1].channel(0))
+        };
+        let params = VocoderParams {
+          attack: state.attack.slice(frames),
+          release: state.release.slice(frames),
+          low: state.low.slice(frames),
+          high: state.high.slice(frames),
+          q: state.q.slice(frames),
+          formant: state.formant.slice(frames),
+          mix: state.mix.slice(frames),
+          mod_gain: state.mod_gain.slice(frames),
+          car_gain: state.car_gain.slice(frames),
+        };
+        let inputs = VocoderInputs {
+          modulator: mod_input,
+          carrier: car_input,
+        };
+        let output = outputs[0].channel_mut(0);
+        state.vocoder.process_block(output, inputs, params);
+      }
       ModuleState::Delay(state) => {
         let input_connected = !self.connections[0].is_empty();
         let input_l = if input_connected {
@@ -2227,6 +2343,8 @@ fn normalize_module_type(raw: &str) -> ModuleType {
     "chorus" => ModuleType::Chorus,
     "ensemble" => ModuleType::Ensemble,
     "choir" => ModuleType::Choir,
+    "vocoder" => ModuleType::Vocoder,
+    "audio-in" => ModuleType::AudioIn,
     "delay" => ModuleType::Delay,
     "granular-delay" => ModuleType::GranularDelay,
     "tape-delay" => ModuleType::TapeDelay,
@@ -2323,6 +2441,8 @@ fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
     ModuleType::Supersaw => vec![PortInfo { channels: 1 }],
     ModuleType::NesOsc => vec![PortInfo { channels: 1 }],  // pitch input
     ModuleType::SnesOsc => vec![PortInfo { channels: 1 }],  // pitch input
+    ModuleType::AudioIn => vec![],
+    ModuleType::Vocoder => vec![PortInfo { channels: 1 }, PortInfo { channels: 1 }],
     ModuleType::Control => vec![],
     ModuleType::Scope => vec![
       PortInfo { channels: 2 },
@@ -2378,6 +2498,8 @@ fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
     ModuleType::Supersaw => vec![PortInfo { channels: 1 }],
     ModuleType::NesOsc => vec![PortInfo { channels: 1 }],  // audio output
     ModuleType::SnesOsc => vec![PortInfo { channels: 1 }],  // audio output
+    ModuleType::AudioIn => vec![PortInfo { channels: 1 }],
+    ModuleType::Vocoder => vec![PortInfo { channels: 1 }],
     ModuleType::Control => vec![
       PortInfo { channels: 1 },
       PortInfo { channels: 1 },
@@ -2514,6 +2636,11 @@ fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize> {
       "pitch" => Some(0),
       _ => None,
     },
+    ModuleType::Vocoder => match port_id {
+      "mod" => Some(0),
+      "car" => Some(1),
+      _ => None,
+    },
     ModuleType::Scope => match port_id {
       "in-a" => Some(0),
       "in-b" => Some(1),
@@ -2630,6 +2757,14 @@ fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize> {
       _ => None,
     },
     ModuleType::SnesOsc => match port_id {
+      "out" => Some(0),
+      _ => None,
+    },
+    ModuleType::AudioIn => match port_id {
+      "out" => Some(0),
+      _ => None,
+    },
+    ModuleType::Vocoder => match port_id {
       "out" => Some(0),
       _ => None,
     },

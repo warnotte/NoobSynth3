@@ -16,6 +16,8 @@ type WasmGraphEngineCtor = new (sampleRate: number) => {
   ): void
   set_mario_channel_cv(moduleId: string, channel: number, value: number): void
   set_mario_channel_gate(moduleId: string, channel: number, value: number): void
+  set_external_input(input: Float32Array): void
+  clear_external_input(): void
   render(frames: number): Float32Array
 }
 

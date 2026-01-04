@@ -126,6 +126,17 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
     inputs: [{ id: 'in', label: 'In', kind: 'audio', direction: 'in' }],
     outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
   },
+  'audio-in': {
+    inputs: [],
+    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
+  },
+  vocoder: {
+    inputs: [
+      { id: 'mod', label: 'Mod', kind: 'audio', direction: 'in' },
+      { id: 'car', label: 'Car', kind: 'audio', direction: 'in' },
+    ],
+    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
+  },
   delay: {
     inputs: [{ id: 'in', label: 'In', kind: 'audio', direction: 'in' }],
     outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],

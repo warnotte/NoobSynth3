@@ -1,4 +1,4 @@
-import { useEffect, type CSSProperties } from 'react'
+import { useEffect, useState, type CSSProperties } from 'react'
 import type { AudioEngine } from '../engine/WasmGraphEngine'
 import type { ModuleSpec } from '../shared/graph'
 import { clampMidiNote, clampVoiceCount, formatMidiNote } from '../state/midiUtils'
@@ -19,6 +19,7 @@ export type ModuleControlsProps = {
   module: ModuleSpec
   engine: AudioEngine
   status: 'idle' | 'running' | 'error'
+  audioMode: 'web' | 'native' | 'vst'
   nativeScope?: NativeScopeBridge | null
   updateParam: (
     moduleId: string,
@@ -50,6 +51,7 @@ export const ModuleControls = ({
   module,
   engine,
   status,
+  audioMode,
   nativeScope,
   updateParam,
   setManualGate,
@@ -67,8 +69,11 @@ export const ModuleControls = ({
   activeStep,
   marioStep,
 }: ModuleControlsProps) => {
+  const [micEnabled, setMicEnabled] = useState(false)
+  const [micLevel, setMicLevel] = useState(0)
   const vcfModel = module.type === 'vcf' ? String(module.params.model ?? 'svf') : null
   const vcfMode = module.type === 'vcf' ? String(module.params.mode ?? 'lp') : null
+  const isWebAudio = audioMode === 'web'
 
   useEffect(() => {
     if (module.type !== 'vcf') {
@@ -78,6 +83,34 @@ export const ModuleControls = ({
       updateParam(module.id, 'mode', 'lp')
     }
   }, [module.type, module.id, updateParam, vcfModel, vcfMode])
+
+  useEffect(() => {
+    if (module.type === 'audio-in' && isWebAudio) {
+      setMicEnabled(engine.isMicEnabled())
+      return
+    }
+    if (module.type === 'audio-in') {
+      setMicEnabled(false)
+    }
+  }, [engine, isWebAudio, module.type, status])
+
+  useEffect(() => {
+    if (module.type !== 'audio-in' || !isWebAudio) {
+      return
+    }
+    let raf = 0
+    const tick = () => {
+      const level = engine.getMicLevel()
+      if (engine.isMicEnabled() && level !== null) {
+        setMicLevel(level)
+      } else {
+        setMicLevel(0)
+      }
+      raf = requestAnimationFrame(tick)
+    }
+    tick()
+    return () => cancelAnimationFrame(raf)
+  }, [engine, module.type])
 
   if (module.type === 'oscillator') {
     const subOct = Number(module.params.subOct ?? 1)
@@ -233,6 +266,72 @@ export const ModuleControls = ({
                 </button>
               ))}
             </div>
+          </div>
+        </div>
+      </>
+    )
+  }
+
+  if (module.type === 'audio-in') {
+    if (!isWebAudio) {
+      return (
+        <>
+          <RotaryKnob
+            label="Gain"
+            min={0}
+            max={2}
+            step={0.01}
+            value={Number(module.params.gain ?? 1)}
+            onChange={(value) => updateParam(module.id, 'gain', value)}
+            format={(value) => value.toFixed(2)}
+          />
+          <div className="toggle-group">
+            <button
+              type="button"
+              className="ui-btn ui-btn--pill toggle-btn active"
+              disabled
+            >
+              Native Input
+            </button>
+          </div>
+          <p className="muted">Input is managed by the native audio engine.</p>
+        </>
+      )
+    }
+    const handleToggle = async () => {
+      if (engine.isMicEnabled()) {
+        engine.disableMic()
+        setMicEnabled(false)
+        return
+      }
+      const ok = await engine.enableMic()
+      setMicEnabled(ok)
+    }
+    const level = Math.min(1, micLevel * 2.5)
+    return (
+      <>
+        <RotaryKnob
+          label="Gain"
+          min={0}
+          max={2}
+          step={0.01}
+          value={Number(module.params.gain ?? 1)}
+          onChange={(value) => updateParam(module.id, 'gain', value)}
+          format={(value) => value.toFixed(2)}
+        />
+        <div className="toggle-group">
+          <button
+            type="button"
+            className={`ui-btn ui-btn--pill toggle-btn ${micEnabled ? 'active' : ''}`}
+            onClick={() => void handleToggle()}
+          >
+            {micEnabled ? 'Mic On' : 'Enable Mic'}
+          </button>
+        </div>
+        <div className="meter-row">
+          <span className="meter-label">Input</span>
+          <div className="meter-track">
+            <div className="meter-fill" style={{ width: `${level * 100}%` }} />
           </div>
         </div>
       </>
@@ -755,6 +854,99 @@ export const ModuleControls = ({
             </div>
           </div>
         </div>
+      </>
+    )
+  }
+
+  if (module.type === 'vocoder') {
+    return (
+      <>
+        <RotaryKnob
+          label="Attack"
+          min={2}
+          max={300}
+          step={1}
+          unit="ms"
+          value={Number(module.params.attack ?? 25)}
+          onChange={(value) => updateParam(module.id, 'attack', value)}
+          format={(value) => Math.round(value).toString()}
+        />
+        <RotaryKnob
+          label="Release"
+          min={10}
+          max={1200}
+          step={2}
+          unit="ms"
+          value={Number(module.params.release ?? 140)}
+          onChange={(value) => updateParam(module.id, 'release', value)}
+          format={(value) => Math.round(value).toString()}
+        />
+        <RotaryKnob
+          label="Low"
+          min={40}
+          max={2000}
+          step={5}
+          unit="Hz"
+          value={Number(module.params.low ?? 120)}
+          onChange={(value) => updateParam(module.id, 'low', value)}
+          format={(value) => Math.round(value).toString()}
+        />
+        <RotaryKnob
+          label="High"
+          min={400}
+          max={12000}
+          step={10}
+          unit="Hz"
+          value={Number(module.params.high ?? 5000)}
+          onChange={(value) => updateParam(module.id, 'high', value)}
+          format={(value) => Math.round(value).toString()}
+        />
+        <RotaryKnob
+          label="Q"
+          min={0.4}
+          max={8}
+          step={0.1}
+          value={Number(module.params.q ?? 2.5)}
+          onChange={(value) => updateParam(module.id, 'q', value)}
+          format={(value) => value.toFixed(1)}
+        />
+        <RotaryKnob
+          label="Formant"
+          min={-12}
+          max={12}
+          step={1}
+          unit="st"
+          value={Number(module.params.formant ?? 0)}
+          onChange={(value) => updateParam(module.id, 'formant', value)}
+          format={(value) => Math.round(value).toString()}
+        />
+        <RotaryKnob
+          label="Mod"
+          min={0}
+          max={4}
+          step={0.01}
+          value={Number(module.params.modGain ?? 1)}
+          onChange={(value) => updateParam(module.id, 'modGain', value)}
+          format={(value) => value.toFixed(2)}
+        />
+        <RotaryKnob
+          label="Carrier"
+          min={0}
+          max={4}
+          step={0.01}
+          value={Number(module.params.carGain ?? 1)}
+          onChange={(value) => updateParam(module.id, 'carGain', value)}
+          format={(value) => value.toFixed(2)}
+        />
+        <RotaryKnob
+          label="Mix"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.mix ?? 0.8)}
+          onChange={(value) => updateParam(module.id, 'mix', value)}
+          format={(value) => value.toFixed(2)}
+        />
       </>
     )
   }

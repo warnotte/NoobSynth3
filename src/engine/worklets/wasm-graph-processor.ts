@@ -61,6 +61,7 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
   private engine: InstanceType<NonNullable<typeof WasmGraphEngine>> | null = null
   private ready = false
   private pendingGraph: string | null = null
+  private inputScratch: Float32Array | null = null
 
   constructor() {
     super()
@@ -135,7 +136,7 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
     }
   }
 
-  process(_inputs: Float32Array[][], outputs: Float32Array[][]): boolean {
+  process(inputs: Float32Array[][], outputs: Float32Array[][]): boolean {
     if (!outputs || outputs.length === 0) {
       return true
     }
@@ -147,6 +148,29 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
     if (!this.ready || !this.engine || frames === 0) {
       outputs.forEach((group) => group.forEach((channel) => channel.fill(0)))
       return true
+    }
+
+    const inputGroup = inputs[0]
+    let inputChannel: Float32Array | null = null
+    if (inputGroup && inputGroup.length > 0) {
+      if (inputGroup.length === 1) {
+        inputChannel = inputGroup[0]
+      } else {
+        if (!this.inputScratch || this.inputScratch.length !== frames) {
+          this.inputScratch = new Float32Array(frames)
+        }
+        const left = inputGroup[0]
+        const right = inputGroup[1] ?? left
+        for (let i = 0; i < frames; i += 1) {
+          this.inputScratch[i] = 0.5 * (left[i] + right[i])
+        }
+        inputChannel = this.inputScratch
+      }
+    }
+    if (inputChannel && inputChannel.length === frames) {
+      this.engine.set_external_input(inputChannel)
+    } else {
+      this.engine.clear_external_input()
     }
 
     const data = this.engine.render(frames)

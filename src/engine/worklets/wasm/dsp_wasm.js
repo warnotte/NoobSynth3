@@ -56,6 +56,13 @@ heap.push(undefined, null, true, false);
 
 let heap_next = heap.length;
 
+function passArrayF32ToWasm0(arg, malloc) {
+    const ptr = malloc(arg.length * 4, 4) >>> 0;
+    getFloat32ArrayMemory0().set(arg, ptr / 4);
+    WASM_VECTOR_LEN = arg.length;
+    return ptr;
+}
+
 function passStringToWasm0(arg, malloc, realloc) {
     if (realloc === undefined) {
         const buf = cachedTextEncoder.encode(arg);
@@ -142,6 +149,17 @@ export class WasmGraphEngine {
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_wasmgraphengine_free(ptr, 0);
+    }
+    /**
+     * @param {Float32Array} input
+     */
+    set_external_input(input) {
+        const ptr0 = passArrayF32ToWasm0(input, wasm.__wbindgen_export);
+        const len0 = WASM_VECTOR_LEN;
+        wasm.wasmgraphengine_set_external_input(this.__wbg_ptr, ptr0, len0);
+    }
+    clear_external_input() {
+        wasm.wasmgraphengine_clear_external_input(this.__wbg_ptr);
     }
     /**
      * @param {string} module_id

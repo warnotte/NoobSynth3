@@ -212,6 +212,20 @@
       "group": "Module Tests"
     },
     {
+      "id": "mic-io-test",
+      "name": "Mic I/O Test",
+      "description": "Audio In monitoring chain with reverb.",
+      "file": "mic-io-test.json",
+      "group": "Mic & Vocoder"
+    },
+    {
+      "id": "vocoder-test",
+      "name": "Vocoder POC",
+      "description": "Mic-driven 12-band vocoder test patch.",
+      "file": "vocoder-test.json",
+      "group": "Mic & Vocoder"
+    },
+    {
       "id": "tape-delay-test",
       "name": "Tape Echo",
       "description": "Classic tape delay with wow/flutter and drive.",

@@ -375,6 +375,21 @@ Wavefolding pour timbres Buchla-style.
 
 ## Utilitaires
 
+### Audio In
+
+Entrée micro/système pour alimenter le rack.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `gain` | 0-2 | Gain d'entrée |
+
+**Sorties** : out (audio)
+
+Notes :
+- **Web** : active le micro via `getUserMedia`
+- **Standalone** : utilise l'input choisi dans Tauri Bridge
+- **VST** : input non disponible (plugin instrument)
+
 ### VCA (Voltage Controlled Amplifier)
 
 Contrôle le volume via CV.

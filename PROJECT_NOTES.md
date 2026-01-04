@@ -91,7 +91,6 @@ Presets support two formats:
 - MIDI disables the mini sequencer when enabled. Velocity can be toggled in Control IO.
 - Rapidly changing voice count while running can cause instability; adjust slowly.
 - **VST mode**: Oscilloscope not working yet (scope taps not wired through IPC).
-- **VST mode**: Only one instance recommended (shared memory is global).
 - **VST mode**: Proof of concept; host editor is a launcher for the Tauri UI.
 - **VST mode**: UI macro edits do not write back to host automation (DAW remains source of truth).
 
@@ -137,6 +136,7 @@ Presets support two formats:
 ### Other changes
 
 - **New DSP modules**: Supersaw (7 detuned voices), Phaser (4-stage stereo), Distortion (soft/hard/fold).
+- **Audio In**: Web mic input + native input device support in Tauri.
 - **Preset format extended**: Full graph replacement via `graph` property (alongside existing `updates` format).
 - **23 presets**: Added classic synth emulations (Juno, Minimoog, Prophet, Oberheim, CS-80, etc.) and new module showcases.
 - **VCV Rack-style UI overhaul**: Eurorack rails, brushed metal panels, compact spacing.
@@ -166,6 +166,7 @@ Presets support two formats:
 - **Jupiter essentials**: added Noise + HPF modules, plus VCO sub output with sub mix, and band-limited VCO waveforms.
 - **VCF ladder model**: added ladder option for the VCF (LP-focused) alongside SVF.
 - **Preset sync (native)**: loading presets now syncs the native DSP graph in Tauri mode.
+- **Graph sync (native/VST)**: debounced UI -> engine sync for module/connection changes (with VST pull suppression).
 - **Mario IO (native)**: sequencer now runs when native audio is active.
 - **VCO layout**: VCO module resized to 2x3 for extra controls.
 - **Hard sync**: VCO now exposes sync output for oscillator hard sync patching.

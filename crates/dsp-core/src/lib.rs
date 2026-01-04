@@ -2348,6 +2348,30 @@ pub struct ChoirParams<'a> {
   pub mix: &'a [Sample],
 }
 
+pub struct Vocoder {
+  sample_rate: f32,
+  mod_filters: [FormantFilter; 12],
+  car_filters: [FormantFilter; 12],
+  envelopes: [f32; 12],
+}
+
+pub struct VocoderInputs<'a> {
+  pub modulator: Option<&'a [Sample]>,
+  pub carrier: Option<&'a [Sample]>,
+}
+
+pub struct VocoderParams<'a> {
+  pub attack: &'a [Sample],
+  pub release: &'a [Sample],
+  pub low: &'a [Sample],
+  pub high: &'a [Sample],
+  pub q: &'a [Sample],
+  pub formant: &'a [Sample],
+  pub mix: &'a [Sample],
+  pub mod_gain: &'a [Sample],
+  pub car_gain: &'a [Sample],
+}
+
 impl Distortion {
   pub fn process_block(
     output: &mut [Sample],
@@ -2486,6 +2510,80 @@ impl Choir {
       if self.phase >= tau {
         self.phase -= tau;
       }
+    }
+  }
+}
+
+impl Vocoder {
+  pub fn new(sample_rate: f32) -> Self {
+    Self {
+      sample_rate: sample_rate.max(1.0),
+      mod_filters: [FormantFilter { ic1: 0.0, ic2: 0.0 }; 12],
+      car_filters: [FormantFilter { ic1: 0.0, ic2: 0.0 }; 12],
+      envelopes: [0.0; 12],
+    }
+  }
+
+  pub fn set_sample_rate(&mut self, sample_rate: f32) {
+    self.sample_rate = sample_rate.max(1.0);
+  }
+
+  pub fn process_block(
+    &mut self,
+    output: &mut [Sample],
+    inputs: VocoderInputs<'_>,
+    params: VocoderParams<'_>,
+  ) {
+    if output.is_empty() {
+      return;
+    }
+
+    let bands = 12;
+    for i in 0..output.len() {
+      let attack_ms = sample_at(params.attack, i, 25.0).clamp(2.0, 300.0);
+      let release_ms = sample_at(params.release, i, 140.0).clamp(10.0, 1200.0);
+      let low = sample_at(params.low, i, 120.0).clamp(40.0, 2000.0);
+      let mut high = sample_at(params.high, i, 5000.0).clamp(400.0, 12000.0);
+      if high <= low {
+        high = (low * 1.5).min(12000.0);
+      }
+      let q = sample_at(params.q, i, 2.5).clamp(0.4, 8.0);
+      let formant = sample_at(params.formant, i, 0.0).clamp(-12.0, 12.0);
+      let mix = sample_at(params.mix, i, 0.8).clamp(0.0, 1.0);
+      let mod_gain = sample_at(params.mod_gain, i, 1.0).clamp(0.0, 4.0);
+      let car_gain = sample_at(params.car_gain, i, 1.0).clamp(0.0, 4.0);
+
+      let mod_input = input_at(inputs.modulator, i) * mod_gain;
+      let car_input = input_at(inputs.carrier, i) * car_gain;
+
+      let attack = attack_ms * 0.001;
+      let release = release_ms * 0.001;
+      let attack_coeff = 1.0 - (-1.0 / (attack * self.sample_rate)).exp();
+      let release_coeff = 1.0 - (-1.0 / (release * self.sample_rate)).exp();
+      let shift = 2.0_f32.powf(formant / 12.0);
+      let ratio = high / low;
+
+      let mut wet = 0.0;
+      for band in 0..bands {
+        let t = band as f32 / (bands as f32 - 1.0);
+        let freq = low * ratio.powf(t) * shift;
+        let mod_band = self.mod_filters[band].process(mod_input, freq, q, self.sample_rate);
+        let car_band = self.car_filters[band].process(car_input, freq, q, self.sample_rate);
+        let env = self.envelopes[band];
+        let rectified = mod_band.abs();
+        let coeff = if rectified > env {
+          attack_coeff
+        } else {
+          release_coeff
+        };
+        let next_env = env + coeff * (rectified - env);
+        self.envelopes[band] = next_env;
+        wet += car_band * next_env;
+      }
+
+      let scaled = wet * (1.0 / bands as f32);
+      let dry = 1.0 - mix;
+      output[i] = car_input * dry + scaled * mix;
     }
   }
 }

@@ -37,15 +37,22 @@ type SidePanelProps = {
   tauriError: string | null
   tauriPing: string | null
   tauriAudioOutputs: string[]
+  tauriAudioInputs: string[]
   tauriMidiInputs: string[]
   tauriNativeRunning: boolean
   tauriNativeError: string | null
   tauriNativeSampleRate: number | null
   tauriNativeChannels: number | null
   tauriNativeDeviceName: string | null
+  tauriNativeInputDeviceName: string | null
+  tauriNativeInputSampleRate: number | null
+  tauriNativeInputChannels: number | null
+  tauriNativeInputError: string | null
   tauriSelectedOutput: string
+  tauriSelectedInput: string
   onRefreshTauri: () => void
   onTauriOutputChange: (value: string) => void
+  onTauriInputChange: (value: string) => void
   onTauriSyncGraph: () => void
 }
 
@@ -82,15 +89,22 @@ export const SidePanel = ({
   tauriError,
   tauriPing,
   tauriAudioOutputs,
+  tauriAudioInputs,
   tauriMidiInputs,
   tauriNativeRunning,
   tauriNativeError,
   tauriNativeSampleRate,
   tauriNativeChannels,
   tauriNativeDeviceName,
+  tauriNativeInputDeviceName,
+  tauriNativeInputSampleRate,
+  tauriNativeInputChannels,
+  tauriNativeInputError,
   tauriSelectedOutput,
+  tauriSelectedInput,
   onRefreshTauri,
   onTauriOutputChange,
+  onTauriInputChange,
   onTauriSyncGraph,
 }: SidePanelProps) => {
   const [compactPresets, setCompactPresets] = useState(false)
@@ -420,6 +434,7 @@ export const SidePanel = ({
                 )}
                 {tauriNativeError && <div className="preset-error">{tauriNativeError}</div>}
                 {tauriError && <div className="preset-error">{tauriError}</div>}
+                {tauriNativeInputError && <div className="preset-error">{tauriNativeInputError}</div>}
                 {tauriStatus === 'ready' && (
                   <div className="tauri-select-row">
                     <label className="tauri-label" htmlFor="tauri-output-select">
@@ -441,8 +456,29 @@ export const SidePanel = ({
                     </select>
                   </div>
                 )}
+                {tauriStatus === 'ready' && (
+                  <div className="tauri-select-row">
+                    <label className="tauri-label" htmlFor="tauri-input-select">
+                      Input
+                    </label>
+                    <select
+                      id="tauri-input-select"
+                      className="tauri-select"
+                      value={tauriSelectedInput}
+                      onChange={(event) => onTauriInputChange(event.target.value)}
+                      disabled={tauriAudioInputs.length === 0}
+                    >
+                      <option value="">No input</option>
+                      {tauriAudioInputs.map((name) => (
+                        <option key={name} value={name}>
+                          {name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
                 <div className="preset-status">
-                  Start/Stop from the top bar. Output changes apply on the next Start.
+                  Start/Stop from the top bar. Device changes apply on the next Start.
                 </div>
                 {tauriStatus === 'ready' && (
                   <div className="tauri-list">
@@ -459,6 +495,14 @@ export const SidePanel = ({
                     <div className="tauri-item">
                       <span className="tauri-label">Device</span>
                       <span className="tauri-value">{tauriNativeDeviceName ?? 'default'}</span>
+                    </div>
+                    <div className="tauri-item">
+                      <span className="tauri-label">Input</span>
+                      <span className="tauri-value">
+                        {tauriNativeInputDeviceName ?? 'none'}
+                        {tauriNativeInputSampleRate ? ` - ${tauriNativeInputSampleRate} Hz` : ''}
+                        {tauriNativeInputChannels ? ` - ${tauriNativeInputChannels} ch` : ''}
+                      </span>
                     </div>
                     <div className="tauri-item">
                       <span className="tauri-label">Native</span>
@@ -479,6 +523,23 @@ export const SidePanel = ({
                     {tauriAudioOutputs.length > 0 && (
                       <div className="tauri-device-list">
                         {tauriAudioOutputs.map((name, index) => (
+                          <div key={`${name}-${index}`} className="tauri-device">
+                            {name}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    <div className="tauri-item">
+                      <span className="tauri-label">Inputs</span>
+                      <span className="tauri-value">
+                        {tauriAudioInputs.length === 0
+                          ? 'no inputs'
+                          : `${tauriAudioInputs.length} inputs`}
+                      </span>
+                    </div>
+                    {tauriAudioInputs.length > 0 && (
+                      <div className="tauri-device-list">
+                        {tauriAudioInputs.map((name, index) => (
                           <div key={`${name}-${index}`} className="tauri-device">
                             {name}
                           </div>

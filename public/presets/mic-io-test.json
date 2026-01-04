@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "id": "mic-io-test",
+  "name": "Mic I/O Test",
+  "description": "Audio In routed to Reverb for mic monitoring.",
+  "graph": {
+    "modules": [
+      {
+        "id": "in-1",
+        "type": "audio-in",
+        "name": "Audio In",
+        "position": { "x": 120, "y": 120 },
+        "params": { "gain": 1 }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "x": 320, "y": 120 },
+        "params": { "time": 0.6, "damp": 0.4, "preDelay": 18, "mix": 0.35 }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Main Out",
+        "position": { "x": 520, "y": 120 },
+        "params": { "level": 0.8 }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "in-1", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}

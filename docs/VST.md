@@ -86,8 +86,11 @@ target/release/
 |-----------|---------|--------------|
 | DAW → UI | Notes MIDI | Temps réel |
 | DAW → UI | Presets | Refresh automatique |
+| DAW → UI | Graphe | Polling régulier (priorité DAW) |
 | UI → DAW | Paramètres | Temps réel |
-| UI → DAW | Graphe | Persisté dans le state |
+| UI → DAW | Graphe | Sync auto sur changements structurels (debounced) |
+
+Note : après un push UI → DAW, le polling est brièvement suspendu pour éviter les écrasements.
 
 ### Macros (Automation DAW)
 

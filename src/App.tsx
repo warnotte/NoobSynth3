@@ -96,6 +96,23 @@ const buildScopeTaps = (modules: ModuleSpec[]): NativeTap[] => {
   return taps
 }
 
+const buildGraphSignature = (graph: GraphState): string => {
+  const moduleSignature = graph.modules
+    .map((module) => `${module.id}:${module.type}`)
+    .sort()
+    .join('|')
+  const connectionSignature = graph.connections
+    .map(
+      (connection) =>
+        `${connection.from.moduleId}:${connection.from.portId}:${connection.kind}->${connection.to.moduleId}:${connection.to.portId}`,
+    )
+    .sort()
+    .join('|')
+  const macros = (graph.macros ?? []).slice().sort((a, b) => a.id - b.id)
+  const macroSignature = macros.length > 0 ? JSON.stringify(macros) : ''
+  return `${moduleSignature}::${connectionSignature}::${macroSignature}`
+}
+
 const normalizeNativeParamValue = (paramId: string, value: number | string | boolean): number => {
   if (typeof value === 'number') {
     if (paramId === 'slope') {
@@ -276,14 +293,20 @@ function App() {
   const [tauriError, setTauriError] = useState<string | null>(null)
   const [tauriPing, setTauriPing] = useState<string | null>(null)
   const [tauriAudioOutputs, setTauriAudioOutputs] = useState<string[]>([])
+  const [tauriAudioInputs, setTauriAudioInputs] = useState<string[]>([])
   const [tauriMidiInputs, setTauriMidiInputs] = useState<string[]>([])
   const [tauriNativeRunning, setTauriNativeRunning] = useState(false)
   const [tauriNativeError, setTauriNativeError] = useState<string | null>(null)
   const [tauriNativeSampleRate, setTauriNativeSampleRate] = useState<number | null>(null)
   const [tauriNativeChannels, setTauriNativeChannels] = useState<number | null>(null)
   const [tauriNativeDeviceName, setTauriNativeDeviceName] = useState<string | null>(null)
+  const [tauriNativeInputDeviceName, setTauriNativeInputDeviceName] = useState<string | null>(null)
+  const [tauriNativeInputSampleRate, setTauriNativeInputSampleRate] = useState<number | null>(null)
+  const [tauriNativeInputChannels, setTauriNativeInputChannels] = useState<number | null>(null)
+  const [tauriNativeInputError, setTauriNativeInputError] = useState<string | null>(null)
   const [tauriNativeBooting, setTauriNativeBooting] = useState(false)
   const [tauriSelectedOutput, setTauriSelectedOutput] = useState<string>('')
+  const [tauriSelectedInput, setTauriSelectedInput] = useState<string>('')
   const [macroValues, setMacroValues] = useState<number[]>(() => normalizeMacroValues())
   const [macroOverride, setMacroOverride] = useState(false)
   const [rackCollapsed, setRackCollapsed] = useState(false)
@@ -299,6 +322,16 @@ function App() {
   const gridMetricsRef = useRef<GridMetrics>(DEFAULT_GRID_METRICS)
   const nativeScopeRef = useRef<NativeScopeSnapshot | null>(null)
   const nativeScopeTapsRef = useRef<NativeTap[]>([])
+  const nativeGraphSyncRef = useRef<{
+    timer: ReturnType<typeof setTimeout> | null
+    lastSignature: string | null
+  }>({ timer: null, lastSignature: null })
+  const vstGraphSyncRef = useRef<{
+    timer: ReturnType<typeof setTimeout> | null
+    lastSignature: string | null
+    suppressUntil: number
+    skipNext: boolean
+  }>({ timer: null, lastSignature: null, suppressUntil: 0, skipNext: false })
   const lastVstGraphJsonRef = useRef<string | null>(null)
   const macroValuesRef = useRef(macroValues)
   const lastVstMacrosRef = useRef<number[] | null>(null)
@@ -331,7 +364,110 @@ function App() {
   const [vstError, setVstError] = useState<string | null>(null)
   const [vstSampleRate, setVstSampleRate] = useState<number | null>(null)
   const vstConnectedRef = useRef(false)
-
+  const buildNativeGraphJson = useCallback((nextGraph: GraphState) => {
+    const taps = buildScopeTaps(nextGraph.modules)
+    nativeScopeTapsRef.current = taps
+    return JSON.stringify({
+      modules: nextGraph.modules,
+      connections: nextGraph.connections,
+      taps,
+      macros: nextGraph.macros ?? [],
+    })
+  }, [])
+  const scheduleNativeGraphSync = useCallback(
+    (nextGraph: GraphState, signature: string, options?: { immediate?: boolean }) => {
+      if (!isTauri || !tauriNativeRunning) {
+        return
+      }
+      if (nativeGraphSyncRef.current.lastSignature === signature) {
+        return
+      }
+      const runSync = () => {
+        const graphJson = buildNativeGraphJson(nextGraph)
+        void invokeTauri('native_set_graph', { graphJson })
+          .then(() => {
+            nativeGraphSyncRef.current.lastSignature = signature
+          })
+          .catch((error) => {
+            console.error(error)
+            setTauriNativeError('Failed to sync graph.')
+          })
+      }
+      if (options?.immediate) {
+        if (nativeGraphSyncRef.current.timer) {
+          clearTimeout(nativeGraphSyncRef.current.timer)
+          nativeGraphSyncRef.current.timer = null
+        }
+        runSync()
+        return
+      }
+      if (nativeGraphSyncRef.current.timer) {
+        clearTimeout(nativeGraphSyncRef.current.timer)
+      }
+      nativeGraphSyncRef.current.timer = window.setTimeout(() => {
+        nativeGraphSyncRef.current.timer = null
+        runSync()
+      }, 160)
+    },
+    [buildNativeGraphJson, isTauri, tauriNativeRunning],
+  )
+  const buildVstGraphJson = useCallback(
+    (nextGraph: GraphState) =>
+      JSON.stringify({
+        modules: nextGraph.modules,
+        connections: nextGraph.connections,
+        macros: nextGraph.macros ?? [],
+      }),
+    [],
+  )
+  const scheduleVstGraphSync = useCallback(
+    (nextGraph: GraphState, signature: string, options?: { immediate?: boolean }) => {
+      if (!isVst || !vstConnected) {
+        return
+      }
+      if (vstGraphSyncRef.current.skipNext) {
+        vstGraphSyncRef.current.skipNext = false
+        vstGraphSyncRef.current.lastSignature = signature
+        return
+      }
+      if (vstGraphSyncRef.current.lastSignature === signature) {
+        return
+      }
+      const runSync = () => {
+        const graphJson = buildVstGraphJson(nextGraph)
+        vstGraphSyncRef.current.suppressUntil = Date.now() + 800
+        void invokeTauri('vst_set_graph', { graphJson })
+          .then(() => {
+            vstGraphSyncRef.current.lastSignature = signature
+            lastVstGraphJsonRef.current = graphJson
+          })
+          .catch((error) => {
+            console.error(error)
+            setVstError('Failed to sync graph to VST.')
+          })
+      }
+      if (options?.immediate) {
+        if (vstGraphSyncRef.current.timer) {
+          clearTimeout(vstGraphSyncRef.current.timer)
+          vstGraphSyncRef.current.timer = null
+        }
+        runSync()
+        return
+      }
+      if (vstGraphSyncRef.current.timer) {
+        clearTimeout(vstGraphSyncRef.current.timer)
+      }
+      vstGraphSyncRef.current.timer = window.setTimeout(() => {
+        vstGraphSyncRef.current.timer = null
+        runSync()
+      }, 160)
+    },
+    [buildVstGraphJson, isVst, vstConnected],
+  )
+  const graphStructureSignature = useMemo(
+    () => buildGraphSignature(graph),
+    [graph.modules, graph.connections, graph.macros],
+  )
   // Check for VST mode via Tauri command (most reliable method)
   useEffect(() => {
     console.log('[VST] Checking VST mode, isTauri:', isTauri)
@@ -408,6 +544,44 @@ function App() {
   useEffect(() => {
     graphRef.current = graph
   }, [graph])
+
+  useEffect(() => {
+    if (tauriNativeRunning) {
+      return
+    }
+    if (nativeGraphSyncRef.current.timer) {
+      clearTimeout(nativeGraphSyncRef.current.timer)
+      nativeGraphSyncRef.current.timer = null
+    }
+    nativeGraphSyncRef.current.lastSignature = null
+  }, [tauriNativeRunning])
+
+  useEffect(() => {
+    if (!isTauri || !tauriNativeRunning) {
+      return
+    }
+    scheduleNativeGraphSync(graphRef.current, graphStructureSignature)
+  }, [graphStructureSignature, isTauri, scheduleNativeGraphSync, tauriNativeRunning])
+
+  useEffect(() => {
+    if (isVst && vstConnected) {
+      return
+    }
+    if (vstGraphSyncRef.current.timer) {
+      clearTimeout(vstGraphSyncRef.current.timer)
+      vstGraphSyncRef.current.timer = null
+    }
+    vstGraphSyncRef.current.lastSignature = null
+    vstGraphSyncRef.current.suppressUntil = 0
+    vstGraphSyncRef.current.skipNext = false
+  }, [isVst, vstConnected])
+
+  useEffect(() => {
+    if (!isVst || !vstConnected) {
+      return
+    }
+    scheduleVstGraphSync(graphRef.current, graphStructureSignature)
+  }, [graphStructureSignature, isVst, scheduleVstGraphSync, vstConnected])
 
   useEffect(() => {
     statusRef.current = status
@@ -686,6 +860,9 @@ function App() {
       try {
         const status = await invokeTauri<VstStatus>('vst_connect')
         if (!active) return
+        if (status.connected && !vstConnectedRef.current) {
+          vstGraphSyncRef.current.skipNext = true
+        }
         setVstConnected(status.connected)
         setVstSampleRate(status.sampleRate || null)
         vstConnectedRef.current = status.connected
@@ -710,6 +887,9 @@ function App() {
       try {
         const status = await invokeTauri<VstStatus>('vst_status')
         if (!active) return
+        if (status.connected && !vstConnectedRef.current) {
+          vstGraphSyncRef.current.skipNext = true
+        }
         setVstConnected(status.connected)
         setVstSampleRate(status.sampleRate || null)
         vstConnectedRef.current = status.connected
@@ -758,6 +938,8 @@ function App() {
         macros: graphRef.current.macros ?? [],
       })
       lastVstGraphJsonRef.current = fallbackJson
+      vstGraphSyncRef.current.lastSignature = buildGraphSignature(graphRef.current)
+      vstGraphSyncRef.current.suppressUntil = Date.now() + 800
       void invokeTauri('vst_set_graph', { graphJson: fallbackJson }).catch((error) => {
         console.error('Failed to sync initial graph to VST:', error)
       })
@@ -773,6 +955,9 @@ function App() {
     let active = true
     const poll = async () => {
       try {
+        if (Date.now() < vstGraphSyncRef.current.suppressUntil) {
+          return
+        }
         const graphJson = await invokeTauri<string | null>('vst_pull_graph')
         if (!active || !graphJson || !graphJson.trim()) {
           return
@@ -1074,6 +1259,11 @@ function App() {
       controlModule.params.seqOn = false
     }
     const layouted = layoutGraph(cloned, moduleSizes, gridMetricsRef.current)
+    const signature = buildGraphSignature(layouted)
+    if (isVst && options?.skipVstSync) {
+      vstGraphSyncRef.current.skipNext = true
+      vstGraphSyncRef.current.lastSignature = signature
+    }
     resetPatching()
     setGridError(null)
     setGraph(layouted)
@@ -1087,28 +1277,15 @@ function App() {
       applyGraphParams(layouted)
     }
     if (isTauri && tauriNativeRunning) {
-      const taps = buildScopeTaps(layouted.modules)
-      nativeScopeTapsRef.current = taps
-      const graphJson = JSON.stringify({
-        modules: layouted.modules,
-        connections: layouted.connections,
-        taps,
-        macros: layouted.macros ?? [],
-      })
-      void invokeTauri('native_set_graph', { graphJson }).catch((error) => {
-        console.error(error)
-        setTauriNativeError('Failed to sync graph.')
-      })
+      scheduleNativeGraphSync(layouted, signature, { immediate: true })
     }
     // Sync to VST when in VST mode
     if (isVst && vstConnected) {
-      const graphJson = JSON.stringify({
-        modules: layouted.modules,
-        connections: layouted.connections,
-        macros: layouted.macros ?? [],
-      })
       if (!options?.skipVstSync) {
+        const graphJson = buildVstGraphJson(layouted)
         lastVstGraphJsonRef.current = graphJson
+        vstGraphSyncRef.current.lastSignature = signature
+        vstGraphSyncRef.current.suppressUntil = Date.now() + 800
         void invokeTauri('vst_set_graph', { graphJson }).catch((error) => {
           console.error(error)
           setVstError('Failed to sync graph to VST.')
@@ -1169,41 +1346,69 @@ function App() {
     setTauriStatus('loading')
     setTauriError(null)
     try {
-      const [ping, outputs, midi, nativeStatus] = await Promise.all([
-        invokeTauri<string>('dsp_ping'),
-        invokeTauri<string[]>('list_audio_outputs'),
-        invokeTauri<string[]>('list_midi_inputs'),
-        invokeTauri<{
-          running: boolean
-          deviceName?: string | null
-          sampleRate?: number
-          channels?: number
-        }>('native_status'),
-      ])
-      setTauriPing(typeof ping === 'string' ? ping : String(ping))
-      const outputList = Array.isArray(outputs) ? outputs : []
-      setTauriAudioOutputs(outputList)
-      setTauriMidiInputs(Array.isArray(midi) ? midi : [])
-      setTauriNativeRunning(Boolean(nativeStatus?.running))
-      setTauriNativeDeviceName(
-        typeof nativeStatus?.deviceName === 'string' ? nativeStatus.deviceName : null,
-      )
-      setTauriNativeSampleRate(
-        typeof nativeStatus?.sampleRate === 'number' ? nativeStatus.sampleRate : null,
-      )
-      setTauriNativeChannels(
-        typeof nativeStatus?.channels === 'number' ? nativeStatus.channels : null,
-      )
-      if (nativeStatus?.deviceName) {
-        setTauriSelectedOutput((prev) =>
-          prev && outputList.includes(prev) ? prev : nativeStatus.deviceName ?? '',
+        const [ping, outputs, inputs, midi, nativeStatus] = await Promise.all([
+          invokeTauri<string>('dsp_ping'),
+          invokeTauri<string[]>('list_audio_outputs'),
+          invokeTauri<string[]>('list_audio_inputs'),
+          invokeTauri<string[]>('list_midi_inputs'),
+          invokeTauri<{
+            running: boolean
+            deviceName?: string | null
+            sampleRate?: number
+            channels?: number
+            inputDeviceName?: string | null
+            inputSampleRate?: number
+            inputChannels?: number
+            inputError?: string | null
+          }>('native_status'),
+        ])
+        setTauriPing(typeof ping === 'string' ? ping : String(ping))
+        const outputList = Array.isArray(outputs) ? outputs : []
+        setTauriAudioOutputs(outputList)
+        const inputList = Array.isArray(inputs) ? inputs : []
+        setTauriAudioInputs(inputList)
+        setTauriMidiInputs(Array.isArray(midi) ? midi : [])
+        setTauriNativeRunning(Boolean(nativeStatus?.running))
+        setTauriNativeDeviceName(
+          typeof nativeStatus?.deviceName === 'string' ? nativeStatus.deviceName : null,
         )
-      } else if (outputList.length > 0) {
-        setTauriSelectedOutput((prev) => (prev && outputList.includes(prev) ? prev : outputList[0]))
-      } else {
-        setTauriSelectedOutput('')
-      }
-      setTauriStatus('ready')
+        setTauriNativeSampleRate(
+          typeof nativeStatus?.sampleRate === 'number' ? nativeStatus.sampleRate : null,
+        )
+        setTauriNativeChannels(
+          typeof nativeStatus?.channels === 'number' ? nativeStatus.channels : null,
+        )
+        setTauriNativeInputDeviceName(
+          typeof nativeStatus?.inputDeviceName === 'string' ? nativeStatus.inputDeviceName : null,
+        )
+        setTauriNativeInputSampleRate(
+          typeof nativeStatus?.inputSampleRate === 'number' ? nativeStatus.inputSampleRate : null,
+        )
+        setTauriNativeInputChannels(
+          typeof nativeStatus?.inputChannels === 'number' ? nativeStatus.inputChannels : null,
+        )
+        setTauriNativeInputError(
+          typeof nativeStatus?.inputError === 'string' ? nativeStatus.inputError : null,
+        )
+        if (nativeStatus?.deviceName) {
+          setTauriSelectedOutput((prev) =>
+            prev && outputList.includes(prev) ? prev : nativeStatus.deviceName ?? '',
+          )
+        } else if (outputList.length > 0) {
+          setTauriSelectedOutput((prev) => (prev && outputList.includes(prev) ? prev : outputList[0]))
+        } else {
+          setTauriSelectedOutput('')
+        }
+        if (nativeStatus?.inputDeviceName) {
+          setTauriSelectedInput((prev) =>
+            prev && inputList.includes(prev) ? prev : nativeStatus.inputDeviceName ?? '',
+          )
+        } else if (inputList.length > 0) {
+          setTauriSelectedInput((prev) => (prev && inputList.includes(prev) ? prev : ''))
+        } else {
+          setTauriSelectedInput('')
+        }
+        setTauriStatus('ready')
     } catch (error) {
       console.error(error)
       setTauriStatus('error')
@@ -1220,6 +1425,10 @@ function App() {
 
   const handleTauriOutputChange = useCallback((value: string) => {
     setTauriSelectedOutput(value)
+  }, [])
+
+  const handleTauriInputChange = useCallback((value: string) => {
+    setTauriSelectedInput(value)
   }, [])
 
   const handleTauriSyncGraph = useCallback(async () => {
@@ -1262,6 +1471,7 @@ function App() {
       await invokeTauri('native_start_graph', {
         graphJson,
         deviceName: tauriSelectedOutput || null,
+        inputDeviceName: tauriSelectedInput || null,
       })
       await refreshTauriStatus()
     } catch (error) {
@@ -1270,7 +1480,7 @@ function App() {
     } finally {
       setTauriNativeBooting(false)
     }
-  }, [isTauri, refreshTauriStatus, tauriSelectedOutput])
+  }, [isTauri, refreshTauriStatus, tauriSelectedInput, tauriSelectedOutput])
 
   const handleTauriStop = useCallback(async () => {
     if (!isTauri) {
@@ -1395,7 +1605,7 @@ function App() {
 
   const vstInstanceId = isVst ? getVstInstanceId() : null
   const vstInstanceLabel = vstInstanceId ? ` • instance ${vstInstanceId}` : ''
-  const audioMode = isVst ? 'vst' : isTauri ? 'native' : 'web'
+  const audioMode: 'web' | 'native' | 'vst' = isVst ? 'vst' : isTauri ? 'native' : 'web'
   const audioRunning = audioMode === 'vst'
     ? vstConnected
     : audioMode === 'native'
@@ -1569,6 +1779,7 @@ function App() {
   const moduleControls = {
     engine,
     status,
+    audioMode,
     nativeScope: nativeScopeBridge,
     updateParam,
     setManualGate,
@@ -1651,15 +1862,22 @@ function App() {
           tauriError={tauriError}
           tauriPing={tauriPing}
           tauriAudioOutputs={tauriAudioOutputs}
+          tauriAudioInputs={tauriAudioInputs}
           tauriMidiInputs={tauriMidiInputs}
           tauriNativeRunning={tauriNativeRunning}
           tauriNativeError={tauriNativeError}
           tauriNativeSampleRate={tauriNativeSampleRate}
           tauriNativeChannels={tauriNativeChannels}
           tauriNativeDeviceName={tauriNativeDeviceName}
+          tauriNativeInputDeviceName={tauriNativeInputDeviceName}
+          tauriNativeInputSampleRate={tauriNativeInputSampleRate}
+          tauriNativeInputChannels={tauriNativeInputChannels}
+          tauriNativeInputError={tauriNativeInputError}
           tauriSelectedOutput={tauriSelectedOutput}
+          tauriSelectedInput={tauriSelectedInput}
           onRefreshTauri={refreshTauriStatus}
           onTauriOutputChange={handleTauriOutputChange}
+          onTauriInputChange={handleTauriInputChange}
           onTauriSyncGraph={handleTauriSyncGraph}
         />
       </main>

@@ -5,6 +5,7 @@ use dsp_graph::GraphEngine;
 use dsp_ipc::{SharedParams, TauriBridge};
 use midir::MidiInput;
 use serde::Serialize;
+use std::collections::VecDeque;
 use std::sync::{mpsc, Arc, Mutex};
 use std::thread;
 use tauri::{Manager, State};
@@ -16,12 +17,17 @@ struct NativeStatus {
   device_name: Option<String>,
   sample_rate: u32,
   channels: u16,
+  input_device_name: Option<String>,
+  input_sample_rate: u32,
+  input_channels: u16,
+  input_error: Option<String>,
 }
 
 enum AudioCommand {
   Start {
     graph_json: Option<String>,
     device_name: Option<String>,
+    input_device_name: Option<String>,
     reply: mpsc::Sender<Result<NativeStatus, String>>,
   },
   Stop {
@@ -188,6 +194,49 @@ impl ScopeSnapshot {
   }
 }
 
+struct InputRing {
+  data: VecDeque<f32>,
+  capacity: usize,
+}
+
+impl InputRing {
+  fn new(capacity: usize) -> Self {
+    Self {
+      data: VecDeque::with_capacity(capacity),
+      capacity,
+    }
+  }
+
+  fn clear(&mut self) {
+    self.data.clear();
+  }
+
+  fn push_samples(&mut self, samples: &[f32]) {
+    if self.capacity == 0 {
+      return;
+    }
+    for &sample in samples {
+      if self.data.len() == self.capacity {
+        self.data.pop_front();
+      }
+      self.data.push_back(sample);
+    }
+  }
+
+  fn pop_samples(&mut self, output: &mut [f32]) -> bool {
+    let mut has_data = false;
+    for sample in output.iter_mut() {
+      if let Some(value) = self.data.pop_front() {
+        *sample = value;
+        has_data = true;
+      } else {
+        *sample = 0.0;
+      }
+    }
+    has_data
+  }
+}
+
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 struct ScopePacket {
@@ -199,11 +248,17 @@ struct ScopePacket {
 
 struct AudioThreadState {
   stream: Option<cpal::Stream>,
+  input_stream: Option<cpal::Stream>,
   graph: Option<Arc<Mutex<GraphEngine>>>,
   graph_json: Option<String>,
   device_name: Option<String>,
   sample_rate: u32,
   channels: u16,
+  input_device_name: Option<String>,
+  input_sample_rate: u32,
+  input_channels: u16,
+  input_error: Option<String>,
+  input_buffer: Arc<Mutex<InputRing>>,
   scope: Arc<Mutex<ScopeSnapshot>>,
 }
 
@@ -211,11 +266,17 @@ impl AudioThreadState {
   fn new(scope: Arc<Mutex<ScopeSnapshot>>) -> Self {
     Self {
       stream: None,
+      input_stream: None,
       graph: None,
       graph_json: None,
       device_name: None,
       sample_rate: 0,
       channels: 0,
+      input_device_name: None,
+      input_sample_rate: 0,
+      input_channels: 0,
+      input_error: None,
+      input_buffer: Arc::new(Mutex::new(InputRing::new(0))),
       scope,
     }
   }
@@ -228,6 +289,10 @@ impl AudioThreadState {
       device_name: self.device_name.clone(),
       sample_rate: self.sample_rate,
       channels: self.channels,
+      input_device_name: self.input_device_name.clone(),
+      input_sample_rate: self.input_sample_rate,
+      input_channels: self.input_channels,
+      input_error: self.input_error.clone(),
     }
   }
 }
@@ -272,9 +337,10 @@ fn audio_thread(rx: mpsc::Receiver<AudioCommand>, scope: Arc<Mutex<ScopeSnapshot
       AudioCommand::Start {
         graph_json,
         device_name,
+        input_device_name,
         reply,
       } => {
-        let result = start_audio(&mut state, graph_json, device_name);
+        let result = start_audio(&mut state, graph_json, device_name, input_device_name);
         let _ = reply.send(result);
       }
       AudioCommand::Stop { reply } => {
@@ -383,6 +449,7 @@ fn start_audio(
   state: &mut AudioThreadState,
   graph_json: Option<String>,
   device_name: Option<String>,
+  input_device_name: Option<String>,
 ) -> Result<NativeStatus, String> {
   if state.stream.is_some() {
     return Ok(state.status());
@@ -396,27 +463,119 @@ fn start_audio(
     .clone()
     .ok_or_else(|| "graph JSON required".to_string())?;
 
-  let device = find_output_device(device_name.as_deref())?;
-  let config = device
+  let output_device = find_output_device(device_name.as_deref())?;
+  let output_default_config = output_device
     .default_output_config()
     .map_err(|err| err.to_string())?;
-  let sample_rate = config.sample_rate().0;
-  let channels = config.channels();
-  let stream_config = config.clone().into();
+  let output_default_rate = output_default_config.sample_rate().0;
+  let mut output_config = output_default_config;
+  let mut input_device: Option<cpal::Device> = None;
+  let mut input_config: Option<cpal::SupportedStreamConfig> = None;
+  let mut input_error: Option<String> = None;
+
+  if let Some(input_name) = input_device_name.as_deref() {
+    match find_input_device(Some(input_name)) {
+      Ok(device) => {
+        let input_default_rate = device
+          .default_input_config()
+          .map(|cfg| cfg.sample_rate().0)
+          .unwrap_or(output_default_rate);
+        let mut candidate_rates = Vec::new();
+        push_rate(&mut candidate_rates, output_default_rate);
+        push_rate(&mut candidate_rates, input_default_rate);
+        for rate in [48_000, 44_100, 96_000, 88_200, 32_000, 22_050] {
+          push_rate(&mut candidate_rates, rate);
+        }
+
+        match find_common_config(&output_device, &device, &candidate_rates) {
+          Ok(Some((matched_output, matched_input))) => {
+            output_config = matched_output;
+            input_device = Some(device);
+            input_config = Some(matched_input);
+          }
+          Ok(None) => {
+            input_error = Some("No common sample rate between input and output.".to_string());
+          }
+          Err(err) => {
+            input_error = Some(err);
+          }
+        }
+      }
+      Err(err) => {
+        input_error = Some(format!("Input device error: {err}"));
+      }
+    }
+  }
+
+  let sample_rate = output_config.sample_rate().0;
+  let channels = output_config.channels();
+  let stream_config = output_config.clone().into();
+  let input_buffer = Arc::new(Mutex::new(InputRing::new(sample_rate as usize)));
+
+  let mut input_stream: Option<cpal::Stream> = None;
+  let mut input_device_name_actual: Option<String> = None;
+  let mut input_sample_rate = 0;
+  let mut input_channels = 0;
+
+  if let (Some(device), Some(config)) = (input_device, input_config) {
+    let input_stream_config = config.clone().into();
+    let stream_result = match config.sample_format() {
+      SampleFormat::F32 => build_input_stream::<f32>(&device, &input_stream_config, input_buffer.clone()),
+      SampleFormat::I16 => build_input_stream::<i16>(&device, &input_stream_config, input_buffer.clone()),
+      SampleFormat::U16 => build_input_stream::<u16>(&device, &input_stream_config, input_buffer.clone()),
+      sample_format => Err(format!("Unsupported input sample format '{sample_format:?}'")),
+    };
+    match stream_result {
+      Ok(stream) => {
+        if let Err(err) = stream.play() {
+          input_error = Some(format!("Input stream start error: {err}"));
+        } else {
+          input_device_name_actual = device.name().ok().or(input_device_name.clone());
+          input_sample_rate = config.sample_rate().0;
+          input_channels = config.channels();
+          input_stream = Some(stream);
+        }
+      }
+      Err(err) => {
+        input_error = Some(format!("Input stream error: {err}"));
+      }
+    }
+  }
 
   let mut engine = GraphEngine::new(sample_rate as f32);
   engine.set_graph_json(&graph_payload)?;
   let graph = Arc::new(Mutex::new(engine));
   let scope = Arc::clone(&state.scope);
-  let stream = match config.sample_format() {
+  let stream = match output_config.sample_format() {
     SampleFormat::F32 => {
-      build_graph_stream::<f32>(&device, &stream_config, graph.clone(), scope, sample_rate)?
+      build_graph_stream::<f32>(
+        &output_device,
+        &stream_config,
+        graph.clone(),
+        scope,
+        sample_rate,
+        input_buffer.clone(),
+      )?
     }
     SampleFormat::I16 => {
-      build_graph_stream::<i16>(&device, &stream_config, graph.clone(), scope, sample_rate)?
+      build_graph_stream::<i16>(
+        &output_device,
+        &stream_config,
+        graph.clone(),
+        scope,
+        sample_rate,
+        input_buffer.clone(),
+      )?
     }
     SampleFormat::U16 => {
-      build_graph_stream::<u16>(&device, &stream_config, graph.clone(), scope, sample_rate)?
+      build_graph_stream::<u16>(
+        &output_device,
+        &stream_config,
+        graph.clone(),
+        scope,
+        sample_rate,
+        input_buffer.clone(),
+      )?
     }
     sample_format => {
       return Err(format!("Unsupported sample format '{sample_format:?}'"))
@@ -426,17 +585,31 @@ fn start_audio(
   stream.play().map_err(|err| err.to_string())?;
 
   state.stream = Some(stream);
+  state.input_stream = input_stream;
   state.graph = Some(graph);
-  state.device_name = device.name().ok().or(device_name);
+  state.device_name = output_device.name().ok().or(device_name);
   state.sample_rate = sample_rate;
   state.channels = channels;
+  state.input_device_name = input_device_name_actual;
+  state.input_sample_rate = input_sample_rate;
+  state.input_channels = input_channels;
+  state.input_error = input_error;
+  state.input_buffer = input_buffer;
 
   Ok(state.status())
 }
 
 fn stop_audio(state: &mut AudioThreadState) -> Result<NativeStatus, String> {
   state.stream = None;
+  state.input_stream = None;
   state.graph = None;
+  state.input_device_name = None;
+  state.input_sample_rate = 0;
+  state.input_channels = 0;
+  state.input_error = None;
+  if let Ok(mut buffer) = state.input_buffer.lock() {
+    buffer.clear();
+  }
   if let Ok(mut scope) = state.scope.lock() {
     scope.reset();
   }
@@ -479,12 +652,101 @@ fn find_output_device(name: Option<&str>) -> Result<cpal::Device, String> {
     .ok_or_else(|| "no default output device".to_string())
 }
 
+fn find_input_device(name: Option<&str>) -> Result<cpal::Device, String> {
+  let host = cpal::default_host();
+  if let Some(name) = name {
+    let devices = host.input_devices().map_err(|err| err.to_string())?;
+    for device in devices {
+      let device_name = device.name().unwrap_or_default();
+      if device_name == name {
+        return Ok(device);
+      }
+    }
+  }
+  host
+    .default_input_device()
+    .ok_or_else(|| "no default input device".to_string())
+}
+
+fn is_supported_sample_format(format: SampleFormat) -> bool {
+  matches!(format, SampleFormat::F32 | SampleFormat::I16 | SampleFormat::U16)
+}
+
+fn push_rate(rates: &mut Vec<u32>, rate: u32) {
+  if rate == 0 {
+    return;
+  }
+  if !rates.contains(&rate) {
+    rates.push(rate);
+  }
+}
+
+fn config_for_rate(
+  configs: &[cpal::SupportedStreamConfigRange],
+  rate: u32,
+) -> Option<cpal::SupportedStreamConfig> {
+  let target = cpal::SampleRate(rate);
+  for config in configs {
+    if config.min_sample_rate().0 <= rate && config.max_sample_rate().0 >= rate {
+      if is_supported_sample_format(config.sample_format()) {
+        return Some(config.with_sample_rate(target));
+      }
+    }
+  }
+  None
+}
+
+fn find_common_config(
+  output_device: &cpal::Device,
+  input_device: &cpal::Device,
+  candidate_rates: &[u32],
+) -> Result<Option<(cpal::SupportedStreamConfig, cpal::SupportedStreamConfig)>, String> {
+  let output_configs: Vec<_> = output_device
+    .supported_output_configs()
+    .map_err(|err| err.to_string())?
+    .collect();
+  let input_configs: Vec<_> = input_device
+    .supported_input_configs()
+    .map_err(|err| err.to_string())?
+    .collect();
+  for &rate in candidate_rates {
+    let output_config = config_for_rate(&output_configs, rate);
+    let input_config = config_for_rate(&input_configs, rate);
+    if let (Some(output_config), Some(input_config)) = (output_config, input_config) {
+      return Ok(Some((output_config, input_config)));
+    }
+  }
+  Ok(None)
+}
+
+fn push_input_samples<T>(data: &[T], channels: usize, input_buffer: &Arc<Mutex<InputRing>>)
+where
+  T: Sample,
+  f32: FromSample<T>,
+{
+  if channels == 0 {
+    return;
+  }
+  let mut mono = Vec::with_capacity(data.len() / channels);
+  for frame in data.chunks(channels) {
+    let mut sum = 0.0;
+    for sample in frame {
+      sum += f32::from_sample(*sample);
+    }
+    mono.push(sum / frame.len().max(1) as f32);
+  }
+  if let Ok(mut buffer) = input_buffer.lock() {
+    buffer.push_samples(&mono);
+  }
+}
+
 fn write_graph_output<T>(
   output: &mut [T],
   channels: usize,
   graph: &Arc<Mutex<GraphEngine>>,
   scope: &Arc<Mutex<ScopeSnapshot>>,
   sample_rate: u32,
+  input_buffer: &Arc<Mutex<InputRing>>,
 ) where
   T: Sample + FromSample<f32>,
 {
@@ -497,6 +759,18 @@ fn write_graph_output<T>(
   }
 
   if let Ok(mut engine) = graph.try_lock() {
+    let mut input_block = vec![0.0_f32; frames];
+    let mut has_input = false;
+    let mut locked = false;
+    if let Ok(mut buffer) = input_buffer.try_lock() {
+      locked = true;
+      has_input = buffer.pop_samples(&mut input_block);
+    }
+    if has_input {
+      engine.set_external_input(&input_block);
+    } else if locked {
+      engine.clear_external_input();
+    }
     let data = engine.render(frames);
     let left = &data[0..frames];
     let right = if data.len() >= frames * 2 {
@@ -540,13 +814,37 @@ fn build_graph_stream<T: Sample + FromSample<f32> + cpal::SizedSample>(
   graph: Arc<Mutex<GraphEngine>>,
   scope: Arc<Mutex<ScopeSnapshot>>,
   sample_rate: u32,
+  input_buffer: Arc<Mutex<InputRing>>,
 ) -> Result<cpal::Stream, String> {
   let channels = config.channels as usize;
   let err_fn = |err| eprintln!("audio stream error: {err}");
   device
     .build_output_stream(
       config,
-      move |data: &mut [T], _| write_graph_output(data, channels, &graph, &scope, sample_rate),
+      move |data: &mut [T], _| {
+        write_graph_output(data, channels, &graph, &scope, sample_rate, &input_buffer)
+      },
+      err_fn,
+      None,
+    )
+    .map_err(|err| err.to_string())
+}
+
+fn build_input_stream<T>(
+  device: &cpal::Device,
+  config: &StreamConfig,
+  input_buffer: Arc<Mutex<InputRing>>,
+) -> Result<cpal::Stream, String>
+where
+  T: Sample + cpal::SizedSample,
+  f32: FromSample<T>,
+{
+  let channels = config.channels as usize;
+  let err_fn = |err| eprintln!("input stream error: {err}");
+  device
+    .build_input_stream(
+      config,
+      move |data: &[T], _| push_input_samples(data, channels, &input_buffer),
       err_fn,
       None,
     )
@@ -569,6 +867,18 @@ fn list_audio_outputs() -> Result<Vec<String>, String> {
   let mut names = Vec::new();
   for device in devices {
     let name = device.name().unwrap_or_else(|_| "Unknown Output".to_string());
+    names.push(name);
+  }
+  Ok(names)
+}
+
+#[tauri::command]
+fn list_audio_inputs() -> Result<Vec<String>, String> {
+  let host = cpal::default_host();
+  let devices = host.input_devices().map_err(|err| err.to_string())?;
+  let mut names = Vec::new();
+  for device in devices {
+    let name = device.name().unwrap_or_else(|_| "Unknown Input".to_string());
     names.push(name);
   }
   Ok(names)
@@ -721,10 +1031,12 @@ fn native_start_graph(
   state: State<NativeAudioState>,
   graph_json: Option<String>,
   device_name: Option<String>,
+  input_device_name: Option<String>,
 ) -> Result<NativeStatus, String> {
   send_audio_command(&state, |reply| AudioCommand::Start {
     graph_json,
     device_name,
+    input_device_name,
     reply,
   })
 }
@@ -1085,10 +1397,11 @@ pub fn run() {
     .manage(NativeAudioState::new())
     .manage(VstBridgeState::new(vst_instance_id.clone()))
     .manage(VstModeState { enabled: vst_mode })
-    .invoke_handler(tauri::generate_handler![
-      dsp_ping,
-      list_audio_outputs,
-      list_midi_inputs,
+      .invoke_handler(tauri::generate_handler![
+        dsp_ping,
+        list_audio_outputs,
+        list_audio_inputs,
+        list_midi_inputs,
       native_set_graph,
       native_set_param,
       native_set_control_voice_cv,

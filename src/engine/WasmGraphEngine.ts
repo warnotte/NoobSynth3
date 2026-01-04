@@ -14,6 +14,10 @@ export class AudioEngine {
   private tapOutputs: TapOutput[] = []
   private scopeAnalysers = new Map<string, Map<string, AnalyserNode>>()
   private recordingDestination: MediaStreamAudioDestinationNode | null = null
+  private micSource: MediaStreamAudioSourceNode | null = null
+  private micStream: MediaStream | null = null
+  private micAnalyser: AnalyserNode | null = null
+  private micMeterData: Uint8Array<ArrayBuffer> | null = null
 
   async start(graph: GraphState): Promise<void> {
     await this.init()
@@ -33,6 +37,73 @@ export class AudioEngine {
     this.context?.close()
     this.context = null
     this.recordingDestination = null
+    this.disableMic()
+  }
+
+  async enableMic(): Promise<boolean> {
+    await this.init()
+    if (!this.context) {
+      return false
+    }
+    if (!navigator.mediaDevices?.getUserMedia) {
+      console.warn('Media devices API not available')
+      return false
+    }
+    if (!this.micStream) {
+      try {
+        this.micStream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      } catch (error) {
+        console.error('Mic access denied', error)
+        return false
+      }
+    }
+    if (!this.micSource) {
+      this.micSource = this.context.createMediaStreamSource(this.micStream)
+    }
+    if (!this.micAnalyser) {
+      this.micAnalyser = new AnalyserNode(this.context, {
+        fftSize: 256,
+        smoothingTimeConstant: 0.8,
+      })
+    }
+    this.micSource.connect(this.micAnalyser)
+    if (this.graphNode) {
+      this.micSource.connect(this.graphNode, 0, 0)
+    }
+    return true
+  }
+
+  disableMic(): void {
+    if (this.micSource) {
+      this.micSource.disconnect()
+      this.micSource = null
+    }
+    this.micAnalyser = null
+    this.micMeterData = null
+    if (this.micStream) {
+      this.micStream.getTracks().forEach((track) => track.stop())
+      this.micStream = null
+    }
+  }
+
+  isMicEnabled(): boolean {
+    return Boolean(this.micStream && this.micSource)
+  }
+
+  getMicLevel(): number | null {
+    if (!this.micAnalyser) {
+      return null
+    }
+    if (!this.micMeterData || this.micMeterData.length !== this.micAnalyser.fftSize) {
+      this.micMeterData = new Uint8Array(this.micAnalyser.fftSize) as Uint8Array<ArrayBuffer>
+    }
+    this.micAnalyser.getByteTimeDomainData(this.micMeterData)
+    let sum = 0
+    for (let i = 0; i < this.micMeterData.length; i += 1) {
+      const centered = (this.micMeterData[i] - 128) / 128
+      sum += centered * centered
+    }
+    return Math.sqrt(sum / this.micMeterData.length)
   }
 
   getAnalyserNode(moduleId: string, inputId?: string): AnalyserNode | null {
@@ -209,8 +280,10 @@ export class AudioEngine {
     const tapCount = this.tapOutputs.length
     const outputChannelCount = [2, ...Array.from({ length: tapCount }, () => 1)]
     this.graphNode = new AudioWorkletNode(this.context, 'wasm-graph-processor', {
-      numberOfInputs: 0,
+      numberOfInputs: 1,
       numberOfOutputs: 1 + tapCount,
+      channelCount: 1,
+      channelCountMode: 'explicit',
       outputChannelCount,
     })
 
@@ -218,6 +291,10 @@ export class AudioEngine {
 
     if (this.recordingDestination) {
       this.graphNode.connect(this.recordingDestination, 0)
+    }
+
+    if (this.micSource) {
+      this.micSource.connect(this.graphNode, 0, 0)
     }
 
     this.buildScopeAnalysers()

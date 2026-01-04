@@ -35,6 +35,8 @@ export const moduleSizes: Record<ModuleType, string> = {
   mario: '2x4',
   ensemble: '2x1',
   choir: '2x2',
+  vocoder: '2x3',
+  'audio-in': '1x1',
 }
 
 export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>> = {
@@ -48,6 +50,7 @@ export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>>
   lfo: 'strip',
   'mod-router': 'strip',
   'ring-mod': 'strip',
+  vocoder: 'strip',
   mario: 'strip',
   'mixer-1x2': 'strip',
 }
@@ -72,6 +75,8 @@ export const moduleCatalog: { type: ModuleType; label: string }[] = [
   { type: 'chorus', label: 'Chorus' },
   { type: 'ensemble', label: 'Ensemble' },
   { type: 'choir', label: 'Choir' },
+  { type: 'vocoder', label: 'Vocoder' },
+  { type: 'audio-in', label: 'Audio In' },
   { type: 'delay', label: 'Delay' },
   { type: 'granular-delay', label: 'Granular Delay' },
   { type: 'tape-delay', label: 'Tape Delay' },
@@ -109,6 +114,8 @@ export const modulePrefixes: Record<ModuleType, string> = {
   chorus: 'chorus',
   ensemble: 'ens',
   choir: 'choir',
+  vocoder: 'vocode',
+  'audio-in': 'in',
   delay: 'delay',
   'granular-delay': 'grain',
   'tape-delay': 'tape',
@@ -146,6 +153,8 @@ export const moduleLabels: Record<ModuleType, string> = {
   chorus: 'Chorus',
   ensemble: 'Ensemble',
   choir: 'Choir',
+  vocoder: 'Vocoder',
+  'audio-in': 'Audio In',
   delay: 'Delay',
   'granular-delay': 'Granular Delay',
   'tape-delay': 'Tape Delay',
@@ -209,6 +218,18 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
   chorus: { rate: 0.3, depth: 8, delay: 18, mix: 0.4, spread: 0.6, feedback: 0.1 },
   ensemble: { rate: 0.25, depth: 12, delay: 12, mix: 0.6, spread: 0.7 },
   choir: { vowel: 0, rate: 0.25, depth: 0.35, mix: 0.5 },
+  vocoder: {
+    attack: 25,
+    release: 140,
+    low: 120,
+    high: 5000,
+    q: 2.5,
+    formant: 0,
+    mix: 0.8,
+    modGain: 1,
+    carGain: 1,
+  },
+  'audio-in': { gain: 1 },
   delay: { time: 360, feedback: 0.25, mix: 0.2, tone: 0.6, pingPong: false },
   'granular-delay': {
     time: 420,

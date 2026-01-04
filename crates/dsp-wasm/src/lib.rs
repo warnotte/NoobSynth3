@@ -61,6 +61,14 @@ impl WasmGraphEngine {
     self.engine.set_mario_channel_gate(module_id, channel, value);
   }
 
+  pub fn set_external_input(&mut self, input: &[f32]) {
+    self.engine.set_external_input(input);
+  }
+
+  pub fn clear_external_input(&mut self) {
+    self.engine.clear_external_input();
+  }
+
   pub fn render(&mut self, frames: usize) -> Float32Array {
     let data = self.engine.render(frames);
     unsafe { Float32Array::view(data) }

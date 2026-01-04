@@ -987,6 +987,37 @@
   --ui-btn-bg: rgba(18, 24, 32, 0.88);
 }
 
+.meter-row {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.meter-label {
+  font-size: 0.55rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(198, 212, 228, 0.62);
+  min-width: 36px;
+}
+
+.meter-track {
+  flex: 1;
+  height: 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(8, 12, 16, 0.65);
+  overflow: hidden;
+}
+
+.meter-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #6fe9a7 0%, #f5d17a 70%, #f08f5a 100%);
+  box-shadow: 0 0 6px rgba(111, 233, 167, 0.55);
+}
+
 .control-buttons {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
