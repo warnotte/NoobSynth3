@@ -221,7 +221,7 @@
     {
       "id": "vocoder-test",
       "name": "Vocoder POC",
-      "description": "Mic-driven 12-band vocoder test patch.",
+      "description": "Mic-driven 16-band vocoder test patch.",
       "file": "vocoder-test.json",
       "group": "Mic & Vocoder"
     },

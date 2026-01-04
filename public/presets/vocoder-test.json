@@ -2,7 +2,7 @@
   "version": 1,
   "id": "vocoder-test",
   "name": "Vocoder POC",
-  "description": "Mic modulator into a 12-band vocoder with saw carrier.",
+  "description": "Mic modulator into a 16-band vocoder with saw carrier.",
   "graph": {
     "modules": [
       {
@@ -10,7 +10,7 @@
         "type": "audio-in",
         "name": "Audio In",
         "position": { "x": 120, "y": 120 },
-        "params": { "gain": 1 }
+        "params": { "gain": 1.4 }
       },
       {
         "id": "osc-1",
@@ -21,8 +21,8 @@
           "frequency": 110,
           "type": "sawtooth",
           "pwm": 0.5,
-          "unison": 1,
-          "detune": 0,
+          "unison": 2,
+          "detune": 6,
           "subMix": 0,
           "subOct": 1
         }
@@ -33,15 +33,17 @@
         "name": "Vocoder",
         "position": { "x": 520, "y": 120 },
         "params": {
-          "attack": 25,
-          "release": 140,
-          "low": 120,
-          "high": 5000,
-          "q": 2.5,
+          "attack": 8,
+          "release": 90,
+          "low": 160,
+          "high": 5200,
+          "q": 3.2,
           "formant": 0,
-          "mix": 0.85,
-          "modGain": 1,
-          "carGain": 1
+          "emphasis": 0.7,
+          "unvoiced": 0.35,
+          "mix": 1,
+          "modGain": 2.2,
+          "carGain": 1.4
         }
       },
       {

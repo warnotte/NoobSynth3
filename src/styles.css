@@ -322,6 +322,11 @@
     0 10px 40px rgba(0, 0, 0, 0.6);
   overflow: hidden;
   isolation: isolate;
+  user-select: none;
+}
+
+.rack * {
+  user-select: none;
 }
 
 .rack::before,

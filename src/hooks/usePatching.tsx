@@ -398,10 +398,27 @@ export const usePatching = ({ graph, setGraph, rackRef }: UsePatchingParams) => 
     sync: 'cable-sync',
   }
 
-  const buildCablePath = (start: PortPosition, end: PortPosition) => {
-    const dist = Math.hypot(end.x - start.x, end.y - start.y)
+  const getCableControls = (start: PortPosition, end: PortPosition) => {
+    const dx = end.x - start.x
+    const dy = end.y - start.y
+    const dist = Math.hypot(dx, dy)
     const tension = Math.min(Math.max(35, dist * 0.28), 100)
-    return `M ${start.x} ${start.y} C ${start.x + tension} ${start.y}, ${end.x - tension} ${end.y}, ${end.x} ${end.y}`
+    let c1y = start.y
+    let c2y = end.y
+    if (Math.abs(dy) < 2) {
+      const bump = Math.min(3, Math.max(1.2, dist * 0.015))
+      c1y = start.y + bump
+      c2y = end.y + bump
+    }
+    return {
+      c1: { x: start.x + tension, y: c1y },
+      c2: { x: end.x - tension, y: c2y },
+    }
+  }
+
+  const buildCablePath = (start: PortPosition, end: PortPosition) => {
+    const { c1, c2 } = getCableControls(start, end)
+    return `M ${start.x} ${start.y} C ${c1.x} ${c1.y}, ${c2.x} ${c2.y}, ${end.x} ${end.y}`
   }
 
   const getBezierPoint = (
@@ -448,10 +465,10 @@ export const usePatching = ({ graph, setGraph, rackRef }: UsePatchingParams) => 
         if (!start || !end) {
           return
         }
-        const dx = Math.max(60, Math.abs(end.x - start.x) * 0.45)
         const p0 = start
-        const p1 = { x: start.x + dx, y: start.y }
-        const p2 = { x: end.x - dx, y: end.y }
+        const { c1, c2 } = getCableControls(start, end)
+        const p1 = c1
+        const p2 = c2
         const p3 = end
         const steps = 24
         let prev = p0

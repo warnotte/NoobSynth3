@@ -225,6 +225,8 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     high: 5000,
     q: 2.5,
     formant: 0,
+    emphasis: 0.4,
+    unvoiced: 0.0,
     mix: 0.8,
     modGain: 1,
     carGain: 1,

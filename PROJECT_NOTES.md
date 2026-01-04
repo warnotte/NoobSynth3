@@ -137,6 +137,8 @@ Presets support two formats:
 
 - **New DSP modules**: Supersaw (7 detuned voices), Phaser (4-stage stereo), Distortion (soft/hard/fold).
 - **Audio In**: Web mic input + native input device support in Tauri.
+- **Vocoder**: 16-band engine with pre-emphasis + unvoiced mix controls.
+- **Rack UX**: text selection disabled in the patch rack to keep knobs responsive.
 - **Preset format extended**: Full graph replacement via `graph` property (alongside existing `updates` format).
 - **23 presets**: Added classic synth emulations (Juno, Minimoog, Prophet, Oberheim, CS-80, etc.) and new module showcases.
 - **VCV Rack-style UI overhaul**: Eurorack rails, brushed metal panels, compact spacing.

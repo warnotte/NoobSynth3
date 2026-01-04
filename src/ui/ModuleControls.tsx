@@ -921,6 +921,24 @@ export const ModuleControls = ({
           format={(value) => Math.round(value).toString()}
         />
         <RotaryKnob
+          label="Emphasis"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.emphasis ?? 0.4)}
+          onChange={(value) => updateParam(module.id, 'emphasis', value)}
+          format={(value) => value.toFixed(2)}
+        />
+        <RotaryKnob
+          label="Unvoiced"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.unvoiced ?? 0)}
+          onChange={(value) => updateParam(module.id, 'unvoiced', value)}
+          format={(value) => value.toFixed(2)}
+        />
+        <RotaryKnob
           label="Mod"
           min={0}
           max={4}

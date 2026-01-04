@@ -2348,11 +2348,17 @@ pub struct ChoirParams<'a> {
   pub mix: &'a [Sample],
 }
 
+const VOCODER_BANDS: usize = 16;
+
 pub struct Vocoder {
   sample_rate: f32,
-  mod_filters: [FormantFilter; 12],
-  car_filters: [FormantFilter; 12],
-  envelopes: [f32; 12],
+  mod_filters: [FormantFilter; VOCODER_BANDS],
+  car_filters: [FormantFilter; VOCODER_BANDS],
+  envelopes: [f32; VOCODER_BANDS],
+  unvoiced_env: f32,
+  hp_state: f32,
+  hp_prev: f32,
+  rng: u32,
 }
 
 pub struct VocoderInputs<'a> {
@@ -2367,6 +2373,8 @@ pub struct VocoderParams<'a> {
   pub high: &'a [Sample],
   pub q: &'a [Sample],
   pub formant: &'a [Sample],
+  pub emphasis: &'a [Sample],
+  pub unvoiced: &'a [Sample],
   pub mix: &'a [Sample],
   pub mod_gain: &'a [Sample],
   pub car_gain: &'a [Sample],
@@ -2518,9 +2526,13 @@ impl Vocoder {
   pub fn new(sample_rate: f32) -> Self {
     Self {
       sample_rate: sample_rate.max(1.0),
-      mod_filters: [FormantFilter { ic1: 0.0, ic2: 0.0 }; 12],
-      car_filters: [FormantFilter { ic1: 0.0, ic2: 0.0 }; 12],
-      envelopes: [0.0; 12],
+      mod_filters: [FormantFilter { ic1: 0.0, ic2: 0.0 }; VOCODER_BANDS],
+      car_filters: [FormantFilter { ic1: 0.0, ic2: 0.0 }; VOCODER_BANDS],
+      envelopes: [0.0; VOCODER_BANDS],
+      unvoiced_env: 0.0,
+      hp_state: 0.0,
+      hp_prev: 0.0,
+      rng: 0x1234_5678,
     }
   }
 
@@ -2538,7 +2550,7 @@ impl Vocoder {
       return;
     }
 
-    let bands = 12;
+    let bands = VOCODER_BANDS as f32;
     for i in 0..output.len() {
       let attack_ms = sample_at(params.attack, i, 25.0).clamp(2.0, 300.0);
       let release_ms = sample_at(params.release, i, 140.0).clamp(10.0, 1200.0);
@@ -2549,6 +2561,8 @@ impl Vocoder {
       }
       let q = sample_at(params.q, i, 2.5).clamp(0.4, 8.0);
       let formant = sample_at(params.formant, i, 0.0).clamp(-12.0, 12.0);
+      let emphasis = sample_at(params.emphasis, i, 0.4).clamp(0.0, 1.0);
+      let unvoiced = sample_at(params.unvoiced, i, 0.0).clamp(0.0, 1.0);
       let mix = sample_at(params.mix, i, 0.8).clamp(0.0, 1.0);
       let mod_gain = sample_at(params.mod_gain, i, 1.0).clamp(0.0, 4.0);
       let car_gain = sample_at(params.car_gain, i, 1.0).clamp(0.0, 4.0);
@@ -2563,11 +2577,37 @@ impl Vocoder {
       let shift = 2.0_f32.powf(formant / 12.0);
       let ratio = high / low;
 
+      let emphasis_cutoff = 600.0 + emphasis * 3400.0;
+      let hp_coeff = (-2.0 * std::f32::consts::PI * emphasis_cutoff / self.sample_rate).exp();
+      let hp_out = mod_input - self.hp_prev + hp_coeff * self.hp_state;
+      self.hp_prev = mod_input;
+      self.hp_state = hp_out;
+      let mod_emph = mod_input + hp_out * (emphasis * 0.7);
+
+      let unvoiced_attack = 0.004;
+      let unvoiced_release = 0.06;
+      let unvoiced_attack_coeff =
+        1.0 - (-1.0 / (unvoiced_attack * self.sample_rate)).exp();
+      let unvoiced_release_coeff =
+        1.0 - (-1.0 / (unvoiced_release * self.sample_rate)).exp();
+      let unvoiced_target = hp_out.abs();
+      let unvoiced_coeff = if unvoiced_target > self.unvoiced_env {
+        unvoiced_attack_coeff
+      } else {
+        unvoiced_release_coeff
+      };
+      self.unvoiced_env += unvoiced_coeff * (unvoiced_target - self.unvoiced_env);
+      self.rng = self.rng.wrapping_mul(1664525).wrapping_add(1013904223);
+      let noise = ((self.rng >> 9) as f32 / 8_388_607.0) * 2.0 - 1.0;
+      let unvoiced_mix = noise * self.unvoiced_env * unvoiced * 0.45;
+
       let mut wet = 0.0;
-      for band in 0..bands {
-        let t = band as f32 / (bands as f32 - 1.0);
+      for band in 0..VOCODER_BANDS {
+        let t = band as f32 / (VOCODER_BANDS as f32 - 1.0);
         let freq = low * ratio.powf(t) * shift;
-        let mod_band = self.mod_filters[band].process(mod_input, freq, q, self.sample_rate);
+        let mod_band = self
+          .mod_filters[band]
+          .process(mod_emph, freq, q, self.sample_rate);
         let car_band = self.car_filters[band].process(car_input, freq, q, self.sample_rate);
         let env = self.envelopes[band];
         let rectified = mod_band.abs();
@@ -2581,9 +2621,9 @@ impl Vocoder {
         wet += car_band * next_env;
       }
 
-      let scaled = wet * (1.0 / bands as f32);
+      let scaled = wet * (1.0 / bands);
       let dry = 1.0 - mix;
-      output[i] = car_input * dry + scaled * mix;
+      output[i] = car_input * dry + (scaled + unvoiced_mix) * mix;
     }
   }
 }

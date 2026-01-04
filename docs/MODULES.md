@@ -253,6 +253,29 @@ Banque de formants (voyelles) pour timbres vocaux.
 **Entrées** : in (audio)  
 **Sorties** : out (audio)
 
+### Vocoder
+
+Vocoder 16 bandes (modulator + carrier).
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `attack` | 2-300 ms | Temps d'attaque |
+| `release` | 10-1200 ms | Temps de relâchement |
+| `low` | 40-2000 Hz | Fréquence basse |
+| `high` | 400-12000 Hz | Fréquence haute |
+| `q` | 0.4-8 | Résonance des bandes |
+| `formant` | -12 à +12 st | Décalage des bandes |
+| `emphasis` | 0-1 | Pré-emphasis du modulator |
+| `unvoiced` | 0-1 | Ajout bruité (sifflantes) |
+| `mix` | 0-1 | Dry/Wet |
+| `modGain` | 0-4 | Gain modulator |
+| `carGain` | 0-4 | Gain carrier |
+
+**Entrées** : mod (audio), car (audio)  
+**Sorties** : out (audio)
+
+Notes : 16 bandes log-spaced, enveloppes par bande (attack/release).
+
 ### Delay
 
 Délai stéréo avec option ping-pong (entrée/sortie mono dans le rack).
