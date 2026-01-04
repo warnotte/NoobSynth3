@@ -27,6 +27,9 @@ This file is meant to be reread by the coding assistant to keep context, decisio
 **Modulation:**
 - LFO (sine/triangle/saw/square, bipolar/unipolar)
 - ADSR (amp/filter envelopes)
+- Sample & Hold (CV sampling with trigger)
+- Slew (CV glide/portamento)
+- Quantizer (scale + root)
 - Mod Router (CV in, 4 CV outs with depth)
 - Mod VCA (CV multiplier)
 
@@ -36,10 +39,16 @@ This file is meant to be reread by the coding assistant to keep context, decisio
 
 **Effects:**
 - Chorus (stereo, Juno-style)
+- Ensemble (stereo, string chorus)
+- Choir (formant filter bank)
 - Delay (stereo, ping-pong option)
+- Tape Delay (wow/flutter + drive)
+- Granular Delay (grain size + density)
+- Spring Reverb (spring tank flavor)
 - Reverb (stereo, Freeverb-style)
 - Phaser (4-stage stereo allpass with LFO)
 - Distortion (soft clip / hard clip / foldback modes)
+- Wavefolder (foldback waveshaping)
 
 **Utilities:**
 - Ring Mod (audio A x audio B)
@@ -51,7 +60,7 @@ This file is meant to be reread by the coding assistant to keep context, decisio
 - Mario IO (seasonal/fun)
 - Lab Panel (test module)
 
-## Presets (24 total)
+## Presets (40 total)
 
 **Classic emulations (updates format):**
 - Jupiter Pad, Jupiter Brass, Jupiter-8 Demo
@@ -66,6 +75,7 @@ This file is meant to be reread by the coding assistant to keep context, decisio
 - Phaser Pad (Phaser effect)
 - Dirty Bass (Distortion foldback)
 - 8-Bit Mario (NES-style 5-channel with 8 classic tunes)
+- Module tests: Sample & Hold, Slew, Quantizer, Ensemble, Tape Delay, Spring Reverb, Wavefolder, Granular Delay, Choir
 
 Dev/test presets live in `public/presets/manifest-dev.json`.
 

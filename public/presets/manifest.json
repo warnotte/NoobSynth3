@@ -177,6 +177,69 @@
       "group": "Demos & Fun"
     },
     {
+      "id": "sample-hold-test",
+      "name": "Sample & Hold",
+      "description": "Stepped modulation from noise sampled by an LFO trigger.",
+      "file": "sample-hold-test.json",
+      "group": "Module Tests"
+    },
+    {
+      "id": "slew-test",
+      "name": "Slew Glide",
+      "description": "Portamento test using Slew on pitch CV.",
+      "file": "slew-test.json",
+      "group": "Module Tests"
+    },
+    {
+      "id": "quantizer-test",
+      "name": "Quantizer",
+      "description": "Quantized pitch steps from an LFO source.",
+      "file": "quantizer-test.json",
+      "group": "Module Tests"
+    },
+    {
+      "id": "ensemble-test",
+      "name": "Ensemble Strings",
+      "description": "Stringy pad through the Ensemble chorus.",
+      "file": "ensemble-test.json",
+      "group": "Module Tests"
+    },
+    {
+      "id": "choir-test",
+      "name": "Choir Formants",
+      "description": "Formant filter bank for vowel-style pads.",
+      "file": "choir-test.json",
+      "group": "Module Tests"
+    },
+    {
+      "id": "tape-delay-test",
+      "name": "Tape Echo",
+      "description": "Classic tape delay with wow/flutter and drive.",
+      "file": "tape-delay-test.json",
+      "group": "Module Tests"
+    },
+    {
+      "id": "spring-reverb-test",
+      "name": "Spring Tank",
+      "description": "Twanged spring reverb with drive.",
+      "file": "spring-reverb-test.json",
+      "group": "Module Tests"
+    },
+    {
+      "id": "wavefolder-test",
+      "name": "Wavefolder Drive",
+      "description": "Buchla-style wavefolding on a saw wave.",
+      "file": "wavefolder-test.json",
+      "group": "Module Tests"
+    },
+    {
+      "id": "granular-delay-test",
+      "name": "Granular Cloud",
+      "description": "Shimmering granular repeats with pitch and density control.",
+      "file": "granular-delay-test.json",
+      "group": "Module Tests"
+    },
+    {
       "id": "jarre-arp",
       "name": "Jarre Arp (Ch1)",
       "description": "Equinoxe-style bright arpeggio sequence. MIDI Channel 1.",

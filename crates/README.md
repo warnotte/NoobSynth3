@@ -44,8 +44,9 @@ Bibliothèque de traitement audio sans dépendance externe.
 **Modules** :
 - Oscillateurs : VCO (polyBLEP), Supersaw, NES Osc, SNES Osc, Noise
 - Filtres : VCF (SVF/Ladder), HPF
-- Modulation : LFO, ADSR
-- Effets : Chorus, Delay, Reverb, Phaser, Distortion
+- Modulation : LFO, ADSR, Sample & Hold, Slew, Quantizer
+- Effets : Chorus, Ensemble, Choir, Delay, Tape Delay, Granular Delay, Spring Reverb, Reverb, Phaser
+- Waveshaping : Distortion, Wavefolder
 - Utilitaires : VCA, Ring Mod, Mixer
 
 [Voir dsp-core/README.md](dsp-core/README.md)

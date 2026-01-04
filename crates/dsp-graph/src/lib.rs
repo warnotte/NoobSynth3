@@ -1,11 +1,14 @@
 use dsp_core::{
-  Adsr, AdsrInputs, AdsrParams, Chorus, ChorusInputs, ChorusParams, Delay, DelayInputs, DelayParams,
-  Distortion, DistortionParams, Lfo, LfoInputs, LfoParams, Mixer, Noise, NoiseParams,
-  NesOsc, NesOscInputs, NesOscParams,
-  SnesOsc, SnesOscInputs, SnesOscParams,
-  Phaser, PhaserInputs, PhaserParams, Reverb, ReverbInputs, ReverbParams,
-  RingMod, RingModParams, Sample, Supersaw, SupersawInputs, SupersawParams,
-  Vca, Vcf, VcfInputs, VcfParams, Vco, VcoInputs, VcoParams,
+  Adsr, AdsrInputs, AdsrParams, Choir, ChoirInputs, ChoirParams, Chorus, ChorusInputs,
+  ChorusParams, Delay, DelayInputs, DelayParams, Distortion, DistortionParams, Ensemble,
+  EnsembleInputs, EnsembleParams, Lfo, LfoInputs, LfoParams, Mixer, Noise, NoiseParams, NesOsc,
+  NesOscInputs, NesOscParams, Phaser, PhaserInputs, PhaserParams, Quantizer, QuantizerInputs,
+  QuantizerParams, Reverb, ReverbInputs, ReverbParams, RingMod, GranularDelay, GranularDelayInputs,
+  GranularDelayParams, RingModParams, Sample, SampleHold, SampleHoldInputs, SampleHoldParams,
+  SlewInputs, SlewLimiter, SlewParams, SnesOsc, SnesOscInputs, SnesOscParams, SpringReverb,
+  SpringReverbInputs, SpringReverbParams, Supersaw, SupersawInputs, SupersawParams, TapeDelay,
+  TapeDelayInputs, TapeDelayParams, Vca, Vcf, VcfInputs, VcfParams, Vco, VcoInputs, VcoParams,
+  Wavefolder, WavefolderParams,
 };
 use serde::Deserialize;
 use std::collections::{HashMap, VecDeque};
@@ -55,6 +58,9 @@ enum ModuleType {
   SnesOsc,
   Noise,
   ModRouter,
+  SampleHold,
+  Slew,
+  Quantizer,
   RingMod,
   Gain,
   CvVca,
@@ -67,10 +73,16 @@ enum ModuleType {
   Mixer,
   MixerWide,
   Chorus,
+  Ensemble,
+  Choir,
   Delay,
+  GranularDelay,
+  TapeDelay,
+  SpringReverb,
   Reverb,
   Phaser,
   Distortion,
+  Wavefolder,
   Control,
   Scope,
   Mario,
@@ -259,6 +271,22 @@ struct ModRouterState {
   depth_vca: ParamBuffer,
 }
 
+struct SampleHoldState {
+  sample_hold: SampleHold,
+  mode: ParamBuffer,
+}
+
+struct SlewState {
+  slew: SlewLimiter,
+  rise: ParamBuffer,
+  fall: ParamBuffer,
+}
+
+struct QuantizerState {
+  root: ParamBuffer,
+  scale: ParamBuffer,
+}
+
 struct RingModState {
   level: ParamBuffer,
 }
@@ -326,6 +354,23 @@ struct ChorusState {
   spread: ParamBuffer,
 }
 
+struct EnsembleState {
+  ensemble: Ensemble,
+  rate: ParamBuffer,
+  depth: ParamBuffer,
+  delay: ParamBuffer,
+  mix: ParamBuffer,
+  spread: ParamBuffer,
+}
+
+struct ChoirState {
+  choir: Choir,
+  vowel: ParamBuffer,
+  rate: ParamBuffer,
+  depth: ParamBuffer,
+  mix: ParamBuffer,
+}
+
 struct DelayState {
   delay: Delay,
   time: ParamBuffer,
@@ -333,6 +378,35 @@ struct DelayState {
   mix: ParamBuffer,
   tone: ParamBuffer,
   ping_pong: ParamBuffer,
+}
+
+struct GranularDelayState {
+  delay: GranularDelay,
+  time: ParamBuffer,
+  size: ParamBuffer,
+  density: ParamBuffer,
+  pitch: ParamBuffer,
+  feedback: ParamBuffer,
+  mix: ParamBuffer,
+}
+
+struct TapeDelayState {
+  delay: TapeDelay,
+  time: ParamBuffer,
+  feedback: ParamBuffer,
+  mix: ParamBuffer,
+  tone: ParamBuffer,
+  wow: ParamBuffer,
+  flutter: ParamBuffer,
+  drive: ParamBuffer,
+}
+
+struct SpringReverbState {
+  reverb: SpringReverb,
+  decay: ParamBuffer,
+  tone: ParamBuffer,
+  mix: ParamBuffer,
+  drive: ParamBuffer,
 }
 
 struct ReverbState {
@@ -356,6 +430,13 @@ struct DistortionState {
   tone: ParamBuffer,
   mix: ParamBuffer,
   mode: ParamBuffer,
+}
+
+struct WavefolderState {
+  drive: ParamBuffer,
+  fold: ParamBuffer,
+  bias: ParamBuffer,
+  mix: ParamBuffer,
 }
 
 struct SupersawState {
@@ -422,6 +503,9 @@ enum ModuleState {
   SnesOsc(SnesOscState),
   Noise(NoiseState),
   ModRouter(ModRouterState),
+  SampleHold(SampleHoldState),
+  Slew(SlewState),
+  Quantizer(QuantizerState),
   RingMod(RingModState),
   Gain(GainState),
   CvVca(GainState),
@@ -432,10 +516,16 @@ enum ModuleState {
   Mixer(MixerState),
   MixerWide(MixerWideState),
   Chorus(ChorusState),
+  Ensemble(EnsembleState),
+  Choir(ChoirState),
   Delay(DelayState),
+  GranularDelay(GranularDelayState),
+  TapeDelay(TapeDelayState),
+  SpringReverb(SpringReverbState),
   Reverb(ReverbState),
   Phaser(PhaserState),
   Distortion(DistortionState),
+  Wavefolder(WavefolderState),
   Output(OutputState),
   Lab(LabState),
   Control(ControlState),
@@ -834,6 +924,19 @@ impl ModuleNode {
         depth_vcf: ParamBuffer::new(param_number(params, "depthVcf", 0.0)),
         depth_vca: ParamBuffer::new(param_number(params, "depthVca", 0.0)),
       }),
+      ModuleType::SampleHold => ModuleState::SampleHold(SampleHoldState {
+        sample_hold: SampleHold::new(),
+        mode: ParamBuffer::new(param_number(params, "mode", 0.0)),
+      }),
+      ModuleType::Slew => ModuleState::Slew(SlewState {
+        slew: SlewLimiter::new(sample_rate),
+        rise: ParamBuffer::new(param_number(params, "rise", 0.05)),
+        fall: ParamBuffer::new(param_number(params, "fall", 0.05)),
+      }),
+      ModuleType::Quantizer => ModuleState::Quantizer(QuantizerState {
+        root: ParamBuffer::new(param_number(params, "root", 0.0)),
+        scale: ParamBuffer::new(param_number(params, "scale", 0.0)),
+      }),
       ModuleType::RingMod => ModuleState::RingMod(RingModState {
         level: ParamBuffer::new(param_number(params, "level", 0.9)),
       }),
@@ -901,6 +1004,21 @@ impl ModuleNode {
         feedback: ParamBuffer::new(param_number(params, "feedback", 0.15)),
         spread: ParamBuffer::new(param_number(params, "spread", 0.6)),
       }),
+      ModuleType::Ensemble => ModuleState::Ensemble(EnsembleState {
+        ensemble: Ensemble::new(sample_rate),
+        rate: ParamBuffer::new(param_number(params, "rate", 0.25)),
+        depth: ParamBuffer::new(param_number(params, "depth", 12.0)),
+        delay: ParamBuffer::new(param_number(params, "delay", 12.0)),
+        mix: ParamBuffer::new(param_number(params, "mix", 0.6)),
+        spread: ParamBuffer::new(param_number(params, "spread", 0.7)),
+      }),
+      ModuleType::Choir => ModuleState::Choir(ChoirState {
+        choir: Choir::new(sample_rate),
+        vowel: ParamBuffer::new(param_number(params, "vowel", 0.0)),
+        rate: ParamBuffer::new(param_number(params, "rate", 0.25)),
+        depth: ParamBuffer::new(param_number(params, "depth", 0.35)),
+        mix: ParamBuffer::new(param_number(params, "mix", 0.5)),
+      }),
       ModuleType::Delay => ModuleState::Delay(DelayState {
         delay: Delay::new(sample_rate),
         time: ParamBuffer::new(param_number(params, "time", 360.0)),
@@ -908,6 +1026,32 @@ impl ModuleNode {
         mix: ParamBuffer::new(param_number(params, "mix", 0.25)),
         tone: ParamBuffer::new(param_number(params, "tone", 0.55)),
         ping_pong: ParamBuffer::new(param_number(params, "pingPong", 0.0)),
+      }),
+      ModuleType::GranularDelay => ModuleState::GranularDelay(GranularDelayState {
+        delay: GranularDelay::new(sample_rate),
+        time: ParamBuffer::new(param_number(params, "time", 420.0)),
+        size: ParamBuffer::new(param_number(params, "size", 120.0)),
+        density: ParamBuffer::new(param_number(params, "density", 6.0)),
+        pitch: ParamBuffer::new(param_number(params, "pitch", 1.0)),
+        feedback: ParamBuffer::new(param_number(params, "feedback", 0.35)),
+        mix: ParamBuffer::new(param_number(params, "mix", 0.5)),
+      }),
+      ModuleType::TapeDelay => ModuleState::TapeDelay(TapeDelayState {
+        delay: TapeDelay::new(sample_rate),
+        time: ParamBuffer::new(param_number(params, "time", 420.0)),
+        feedback: ParamBuffer::new(param_number(params, "feedback", 0.35)),
+        mix: ParamBuffer::new(param_number(params, "mix", 0.35)),
+        tone: ParamBuffer::new(param_number(params, "tone", 0.55)),
+        wow: ParamBuffer::new(param_number(params, "wow", 0.2)),
+        flutter: ParamBuffer::new(param_number(params, "flutter", 0.2)),
+        drive: ParamBuffer::new(param_number(params, "drive", 0.2)),
+      }),
+      ModuleType::SpringReverb => ModuleState::SpringReverb(SpringReverbState {
+        reverb: SpringReverb::new(sample_rate),
+        decay: ParamBuffer::new(param_number(params, "decay", 0.6)),
+        tone: ParamBuffer::new(param_number(params, "tone", 0.4)),
+        mix: ParamBuffer::new(param_number(params, "mix", 0.4)),
+        drive: ParamBuffer::new(param_number(params, "drive", 0.2)),
       }),
       ModuleType::Reverb => ModuleState::Reverb(ReverbState {
         reverb: Reverb::new(sample_rate),
@@ -928,6 +1072,12 @@ impl ModuleNode {
         tone: ParamBuffer::new(param_number(params, "tone", 0.5)),
         mix: ParamBuffer::new(param_number(params, "mix", 1.0)),
         mode: ParamBuffer::new(param_number(params, "mode", 0.0)),
+      }),
+      ModuleType::Wavefolder => ModuleState::Wavefolder(WavefolderState {
+        drive: ParamBuffer::new(param_number(params, "drive", 0.4)),
+        fold: ParamBuffer::new(param_number(params, "fold", 0.5)),
+        bias: ParamBuffer::new(param_number(params, "bias", 0.0)),
+        mix: ParamBuffer::new(param_number(params, "mix", 0.8)),
       }),
       ModuleType::Supersaw => ModuleState::Supersaw(SupersawState {
         supersaw: Supersaw::new(sample_rate),
@@ -1012,6 +1162,21 @@ impl ModuleNode {
         "depthVca" => state.depth_vca.set(value),
         _ => {}
       },
+      ModuleState::SampleHold(state) => {
+        if param == "mode" {
+          state.mode.set(value);
+        }
+      }
+      ModuleState::Slew(state) => match param {
+        "rise" => state.rise.set(value),
+        "fall" => state.fall.set(value),
+        _ => {}
+      },
+      ModuleState::Quantizer(state) => match param {
+        "root" => state.root.set(value),
+        "scale" => state.scale.set(value),
+        _ => {}
+      },
       ModuleState::RingMod(state) => {
         if param == "level" {
           state.level.set(value);
@@ -1087,12 +1252,53 @@ impl ModuleNode {
         "spread" => state.spread.set(value),
         _ => {}
       },
+      ModuleState::Ensemble(state) => match param {
+        "rate" => state.rate.set(value),
+        "depth" => state.depth.set(value),
+        "delay" => state.delay.set(value),
+        "mix" => state.mix.set(value),
+        "spread" => state.spread.set(value),
+        _ => {}
+      },
+      ModuleState::Choir(state) => match param {
+        "vowel" => state.vowel.set(value),
+        "rate" => state.rate.set(value),
+        "depth" => state.depth.set(value),
+        "mix" => state.mix.set(value),
+        _ => {}
+      },
       ModuleState::Delay(state) => match param {
         "time" => state.time.set(value),
         "feedback" => state.feedback.set(value),
         "mix" => state.mix.set(value),
         "tone" => state.tone.set(value),
         "pingPong" => state.ping_pong.set(value),
+        _ => {}
+      },
+      ModuleState::GranularDelay(state) => match param {
+        "time" => state.time.set(value),
+        "size" => state.size.set(value),
+        "density" => state.density.set(value),
+        "pitch" => state.pitch.set(value),
+        "feedback" => state.feedback.set(value),
+        "mix" => state.mix.set(value),
+        _ => {}
+      },
+      ModuleState::TapeDelay(state) => match param {
+        "time" => state.time.set(value),
+        "feedback" => state.feedback.set(value),
+        "mix" => state.mix.set(value),
+        "tone" => state.tone.set(value),
+        "wow" => state.wow.set(value),
+        "flutter" => state.flutter.set(value),
+        "drive" => state.drive.set(value),
+        _ => {}
+      },
+      ModuleState::SpringReverb(state) => match param {
+        "decay" => state.decay.set(value),
+        "tone" => state.tone.set(value),
+        "mix" => state.mix.set(value),
+        "drive" => state.drive.set(value),
         _ => {}
       },
       ModuleState::Reverb(state) => match param {
@@ -1114,6 +1320,13 @@ impl ModuleNode {
         "tone" => state.tone.set(value),
         "mix" => state.mix.set(value),
         "mode" => state.mode.set(value),
+        _ => {}
+      },
+      ModuleState::Wavefolder(state) => match param {
+        "drive" => state.drive.set(value),
+        "fold" => state.fold.set(value),
+        "bias" => state.bias.set(value),
+        "mix" => state.mix.set(value),
         _ => {}
       },
       ModuleState::Supersaw(state) => match param {
@@ -1251,6 +1464,52 @@ impl ModuleNode {
           out_vcf[i] = source * depth_vcf[i];
           out_vca[i] = source * depth_vca[i];
         }
+      }
+      ModuleState::SampleHold(state) => {
+        let input = if self.connections[0].is_empty() {
+          None
+        } else {
+          Some(inputs[0].channel(0))
+        };
+        let trigger = if self.connections[1].is_empty() {
+          None
+        } else {
+          Some(inputs[1].channel(0))
+        };
+        let params = SampleHoldParams {
+          mode: state.mode.slice(frames),
+        };
+        let inputs = SampleHoldInputs { input, trigger };
+        let output = outputs[0].channel_mut(0);
+        state.sample_hold.process_block(output, inputs, params);
+      }
+      ModuleState::Slew(state) => {
+        let input = if self.connections[0].is_empty() {
+          None
+        } else {
+          Some(inputs[0].channel(0))
+        };
+        let params = SlewParams {
+          rise: state.rise.slice(frames),
+          fall: state.fall.slice(frames),
+        };
+        let inputs = SlewInputs { input };
+        let output = outputs[0].channel_mut(0);
+        state.slew.process_block(output, inputs, params);
+      }
+      ModuleState::Quantizer(state) => {
+        let input = if self.connections[0].is_empty() {
+          None
+        } else {
+          Some(inputs[0].channel(0))
+        };
+        let params = QuantizerParams {
+          root: state.root.slice(frames),
+          scale: state.scale.slice(frames),
+        };
+        let inputs = QuantizerInputs { input };
+        let output = outputs[0].channel_mut(0);
+        Quantizer::process_block(output, inputs, params);
       }
       ModuleState::RingMod(state) => {
         let input_a = if self.connections[0].is_empty() {
@@ -1567,6 +1826,63 @@ impl ModuleNode {
         let out_r = &mut right[0];
         state.chorus.process_block(out_l, out_r, inputs, params);
       }
+      ModuleState::Ensemble(state) => {
+        let input_connected = !self.connections[0].is_empty();
+        let input_l = if input_connected {
+          Some(inputs[0].channel(0))
+        } else {
+          None
+        };
+        let input_r = if input_connected {
+          Some(if inputs[0].channel_count() == 1 {
+            inputs[0].channel(0)
+          } else {
+            inputs[0].channel(1)
+          })
+        } else {
+          None
+        };
+        let params = EnsembleParams {
+          rate: state.rate.slice(frames),
+          depth_ms: state.depth.slice(frames),
+          delay_ms: state.delay.slice(frames),
+          mix: state.mix.slice(frames),
+          spread: state.spread.slice(frames),
+        };
+        let inputs = EnsembleInputs { input_l, input_r };
+        let (left, right) = outputs[0].channels.split_at_mut(1);
+        let out_l = &mut left[0];
+        let out_r = &mut right[0];
+        state.ensemble.process_block(out_l, out_r, inputs, params);
+      }
+      ModuleState::Choir(state) => {
+        let input_connected = !self.connections[0].is_empty();
+        let input_l = if input_connected {
+          Some(inputs[0].channel(0))
+        } else {
+          None
+        };
+        let input_r = if input_connected {
+          Some(if inputs[0].channel_count() == 1 {
+            inputs[0].channel(0)
+          } else {
+            inputs[0].channel(1)
+          })
+        } else {
+          None
+        };
+        let params = ChoirParams {
+          vowel: state.vowel.slice(frames),
+          rate: state.rate.slice(frames),
+          depth: state.depth.slice(frames),
+          mix: state.mix.slice(frames),
+        };
+        let inputs = ChoirInputs { input_l, input_r };
+        let (left, right) = outputs[0].channels.split_at_mut(1);
+        let out_l = &mut left[0];
+        let out_r = &mut right[0];
+        state.choir.process_block(out_l, out_r, inputs, params);
+      }
       ModuleState::Delay(state) => {
         let input_connected = !self.connections[0].is_empty();
         let input_l = if input_connected {
@@ -1595,6 +1911,95 @@ impl ModuleNode {
         let out_l = &mut left[0];
         let out_r = &mut right[0];
         state.delay.process_block(out_l, out_r, inputs, params);
+      }
+      ModuleState::GranularDelay(state) => {
+        let input_connected = !self.connections[0].is_empty();
+        let input_l = if input_connected {
+          Some(inputs[0].channel(0))
+        } else {
+          None
+        };
+        let input_r = if input_connected {
+          Some(if inputs[0].channel_count() == 1 {
+            inputs[0].channel(0)
+          } else {
+            inputs[0].channel(1)
+          })
+        } else {
+          None
+        };
+        let params = GranularDelayParams {
+          time_ms: state.time.slice(frames),
+          size_ms: state.size.slice(frames),
+          density: state.density.slice(frames),
+          pitch: state.pitch.slice(frames),
+          feedback: state.feedback.slice(frames),
+          mix: state.mix.slice(frames),
+        };
+        let inputs = GranularDelayInputs { input_l, input_r };
+        let (left, right) = outputs[0].channels.split_at_mut(1);
+        let out_l = &mut left[0];
+        let out_r = &mut right[0];
+        state.delay.process_block(out_l, out_r, inputs, params);
+      }
+      ModuleState::TapeDelay(state) => {
+        let input_connected = !self.connections[0].is_empty();
+        let input_l = if input_connected {
+          Some(inputs[0].channel(0))
+        } else {
+          None
+        };
+        let input_r = if input_connected {
+          Some(if inputs[0].channel_count() == 1 {
+            inputs[0].channel(0)
+          } else {
+            inputs[0].channel(1)
+          })
+        } else {
+          None
+        };
+        let params = TapeDelayParams {
+          time_ms: state.time.slice(frames),
+          feedback: state.feedback.slice(frames),
+          mix: state.mix.slice(frames),
+          tone: state.tone.slice(frames),
+          wow: state.wow.slice(frames),
+          flutter: state.flutter.slice(frames),
+          drive: state.drive.slice(frames),
+        };
+        let inputs = TapeDelayInputs { input_l, input_r };
+        let (left, right) = outputs[0].channels.split_at_mut(1);
+        let out_l = &mut left[0];
+        let out_r = &mut right[0];
+        state.delay.process_block(out_l, out_r, inputs, params);
+      }
+      ModuleState::SpringReverb(state) => {
+        let input_connected = !self.connections[0].is_empty();
+        let input_l = if input_connected {
+          Some(inputs[0].channel(0))
+        } else {
+          None
+        };
+        let input_r = if input_connected {
+          Some(if inputs[0].channel_count() == 1 {
+            inputs[0].channel(0)
+          } else {
+            inputs[0].channel(1)
+          })
+        } else {
+          None
+        };
+        let params = SpringReverbParams {
+          decay: state.decay.slice(frames),
+          tone: state.tone.slice(frames),
+          mix: state.mix.slice(frames),
+          drive: state.drive.slice(frames),
+        };
+        let inputs = SpringReverbInputs { input_l, input_r };
+        let (left, right) = outputs[0].channels.split_at_mut(1);
+        let out_l = &mut left[0];
+        let out_r = &mut right[0];
+        state.reverb.process_block(out_l, out_r, inputs, params);
       }
       ModuleState::Reverb(state) => {
         let input_connected = !self.connections[0].is_empty();
@@ -1667,6 +2072,22 @@ impl ModuleNode {
         };
         let output = outputs[0].channel_mut(0);
         Distortion::process_block(output, input, params);
+      }
+      ModuleState::Wavefolder(state) => {
+        let input_connected = !self.connections[0].is_empty();
+        let input = if input_connected {
+          Some(inputs[0].channel(0))
+        } else {
+          None
+        };
+        let params = WavefolderParams {
+          drive: state.drive.slice(frames),
+          fold: state.fold.slice(frames),
+          bias: state.bias.slice(frames),
+          mix: state.mix.slice(frames),
+        };
+        let output = outputs[0].channel_mut(0);
+        Wavefolder::process_block(output, input, params);
       }
       ModuleState::Supersaw(state) => {
         let pitch = if self.connections[0].is_empty() {
@@ -1789,6 +2210,9 @@ fn normalize_module_type(raw: &str) -> ModuleType {
     "snes-osc" => ModuleType::SnesOsc,
     "noise" => ModuleType::Noise,
     "mod-router" => ModuleType::ModRouter,
+    "sample-hold" => ModuleType::SampleHold,
+    "slew" => ModuleType::Slew,
+    "quantizer" => ModuleType::Quantizer,
     "ring-mod" => ModuleType::RingMod,
     "gain" => ModuleType::Gain,
     "cv-vca" => ModuleType::CvVca,
@@ -1801,10 +2225,16 @@ fn normalize_module_type(raw: &str) -> ModuleType {
     "mixer" => ModuleType::Mixer,
     "mixer-1x2" => ModuleType::MixerWide,
     "chorus" => ModuleType::Chorus,
+    "ensemble" => ModuleType::Ensemble,
+    "choir" => ModuleType::Choir,
     "delay" => ModuleType::Delay,
+    "granular-delay" => ModuleType::GranularDelay,
+    "tape-delay" => ModuleType::TapeDelay,
+    "spring-reverb" => ModuleType::SpringReverb,
     "reverb" => ModuleType::Reverb,
     "phaser" => ModuleType::Phaser,
     "distortion" => ModuleType::Distortion,
+    "wavefolder" => ModuleType::Wavefolder,
     "control" => ModuleType::Control,
     "scope" => ModuleType::Scope,
     "mario" => ModuleType::Mario,
@@ -1821,6 +2251,9 @@ fn is_poly_type(module_type: ModuleType) -> bool {
       | ModuleType::SnesOsc
       | ModuleType::Noise
       | ModuleType::ModRouter
+      | ModuleType::SampleHold
+      | ModuleType::Slew
+      | ModuleType::Quantizer
       | ModuleType::RingMod
       | ModuleType::Gain
       | ModuleType::CvVca
@@ -1831,6 +2264,7 @@ fn is_poly_type(module_type: ModuleType) -> bool {
       | ModuleType::Mixer
       | ModuleType::MixerWide
       | ModuleType::Distortion
+      | ModuleType::Wavefolder
       | ModuleType::Control
   )
 }
@@ -1847,6 +2281,9 @@ fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
     ],
     ModuleType::Noise => vec![],
     ModuleType::ModRouter => vec![PortInfo { channels: 1 }],
+    ModuleType::SampleHold => vec![PortInfo { channels: 1 }, PortInfo { channels: 1 }],
+    ModuleType::Slew => vec![PortInfo { channels: 1 }],
+    ModuleType::Quantizer => vec![PortInfo { channels: 1 }],
     ModuleType::RingMod => vec![PortInfo { channels: 1 }, PortInfo { channels: 1 }],
     ModuleType::Gain => vec![PortInfo { channels: 2 }, PortInfo { channels: 1 }],
     ModuleType::CvVca => vec![PortInfo { channels: 1 }, PortInfo { channels: 1 }],
@@ -1870,8 +2307,19 @@ fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },
       PortInfo { channels: 1 },
     ],
-    ModuleType::Chorus | ModuleType::Delay | ModuleType::Reverb | ModuleType::Phaser => vec![PortInfo { channels: 2 }],
+    ModuleType::Chorus
+    | ModuleType::Ensemble
+    | ModuleType::Choir
+    | ModuleType::Delay
+    | ModuleType::GranularDelay
+    | ModuleType::TapeDelay
+    | ModuleType::SpringReverb
+    | ModuleType::Reverb
+    | ModuleType::Phaser => {
+      vec![PortInfo { channels: 2 }]
+    },
     ModuleType::Distortion => vec![PortInfo { channels: 1 }],
+    ModuleType::Wavefolder => vec![PortInfo { channels: 1 }],
     ModuleType::Supersaw => vec![PortInfo { channels: 1 }],
     ModuleType::NesOsc => vec![PortInfo { channels: 1 }],  // pitch input
     ModuleType::SnesOsc => vec![PortInfo { channels: 1 }],  // pitch input
@@ -1900,6 +2348,9 @@ fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },
       PortInfo { channels: 1 },
     ],
+    ModuleType::SampleHold => vec![PortInfo { channels: 1 }],
+    ModuleType::Slew => vec![PortInfo { channels: 1 }],
+    ModuleType::Quantizer => vec![PortInfo { channels: 1 }],
     ModuleType::RingMod => vec![PortInfo { channels: 1 }],
     ModuleType::Gain => vec![PortInfo { channels: 2 }],
     ModuleType::CvVca => vec![PortInfo { channels: 1 }],
@@ -1911,8 +2362,19 @@ fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
     ModuleType::Hpf => vec![PortInfo { channels: 1 }],
     ModuleType::Mixer => vec![PortInfo { channels: 1 }],
     ModuleType::MixerWide => vec![PortInfo { channels: 1 }],
-    ModuleType::Chorus | ModuleType::Delay | ModuleType::Reverb | ModuleType::Phaser => vec![PortInfo { channels: 2 }],
+    ModuleType::Chorus
+    | ModuleType::Ensemble
+    | ModuleType::Choir
+    | ModuleType::Delay
+    | ModuleType::GranularDelay
+    | ModuleType::TapeDelay
+    | ModuleType::SpringReverb
+    | ModuleType::Reverb
+    | ModuleType::Phaser => {
+      vec![PortInfo { channels: 2 }]
+    },
     ModuleType::Distortion => vec![PortInfo { channels: 1 }],
+    ModuleType::Wavefolder => vec![PortInfo { channels: 1 }],
     ModuleType::Supersaw => vec![PortInfo { channels: 1 }],
     ModuleType::NesOsc => vec![PortInfo { channels: 1 }],  // audio output
     ModuleType::SnesOsc => vec![PortInfo { channels: 1 }],  // audio output
@@ -1946,6 +2408,19 @@ fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize> {
       _ => None,
     },
     ModuleType::ModRouter => match port_id {
+      "in" => Some(0),
+      _ => None,
+    },
+    ModuleType::SampleHold => match port_id {
+      "in" => Some(0),
+      "trig" => Some(1),
+      _ => None,
+    },
+    ModuleType::Slew => match port_id {
+      "in" => Some(0),
+      _ => None,
+    },
+    ModuleType::Quantizer => match port_id {
       "in" => Some(0),
       _ => None,
     },
@@ -2007,11 +2482,23 @@ fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize> {
       "in-f" => Some(5),
       _ => None,
     },
-    ModuleType::Chorus | ModuleType::Delay | ModuleType::Reverb | ModuleType::Phaser => match port_id {
+    ModuleType::Chorus
+    | ModuleType::Ensemble
+    | ModuleType::Choir
+    | ModuleType::Delay
+    | ModuleType::GranularDelay
+    | ModuleType::TapeDelay
+    | ModuleType::SpringReverb
+    | ModuleType::Reverb
+    | ModuleType::Phaser => match port_id {
       "in" => Some(0),
       _ => None,
     },
     ModuleType::Distortion => match port_id {
+      "in" => Some(0),
+      _ => None,
+    },
+    ModuleType::Wavefolder => match port_id {
       "in" => Some(0),
       _ => None,
     },
@@ -2055,6 +2542,18 @@ fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize> {
       "pwm" => Some(1),
       "vcf" => Some(2),
       "vca" => Some(3),
+      _ => None,
+    },
+    ModuleType::SampleHold => match port_id {
+      "out" => Some(0),
+      _ => None,
+    },
+    ModuleType::Slew => match port_id {
+      "out" => Some(0),
+      _ => None,
+    },
+    ModuleType::Quantizer => match port_id {
+      "out" => Some(0),
       _ => None,
     },
     ModuleType::RingMod => match port_id {
@@ -2102,11 +2601,23 @@ fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize> {
       "out" => Some(0),
       _ => None,
     },
-    ModuleType::Chorus | ModuleType::Delay | ModuleType::Reverb | ModuleType::Phaser => match port_id {
+    ModuleType::Chorus
+    | ModuleType::Ensemble
+    | ModuleType::Choir
+    | ModuleType::Delay
+    | ModuleType::GranularDelay
+    | ModuleType::TapeDelay
+    | ModuleType::SpringReverb
+    | ModuleType::Reverb
+    | ModuleType::Phaser => match port_id {
       "out" => Some(0),
       _ => None,
     },
     ModuleType::Distortion => match port_id {
+      "out" => Some(0),
+      _ => None,
+    },
+    ModuleType::Wavefolder => match port_id {
       "out" => Some(0),
       _ => None,
     },

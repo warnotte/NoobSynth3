@@ -43,6 +43,21 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
       { id: 'vca', label: 'VCA', kind: 'cv', direction: 'out' },
     ],
   },
+  'sample-hold': {
+    inputs: [
+      { id: 'in', label: 'In', kind: 'cv', direction: 'in' },
+      { id: 'trig', label: 'Trig', kind: 'sync', direction: 'in' },
+    ],
+    outputs: [{ id: 'out', label: 'Out', kind: 'cv', direction: 'out' }],
+  },
+  slew: {
+    inputs: [{ id: 'in', label: 'In', kind: 'cv', direction: 'in' }],
+    outputs: [{ id: 'out', label: 'Out', kind: 'cv', direction: 'out' }],
+  },
+  quantizer: {
+    inputs: [{ id: 'in', label: 'In', kind: 'cv', direction: 'in' }],
+    outputs: [{ id: 'out', label: 'Out', kind: 'cv', direction: 'out' }],
+  },
   'ring-mod': {
     inputs: [
       { id: 'in-a', label: 'In A', kind: 'audio', direction: 'in' },
@@ -103,7 +118,27 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
     inputs: [{ id: 'in', label: 'In', kind: 'audio', direction: 'in' }],
     outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
   },
+  ensemble: {
+    inputs: [{ id: 'in', label: 'In', kind: 'audio', direction: 'in' }],
+    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
+  },
+  choir: {
+    inputs: [{ id: 'in', label: 'In', kind: 'audio', direction: 'in' }],
+    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
+  },
   delay: {
+    inputs: [{ id: 'in', label: 'In', kind: 'audio', direction: 'in' }],
+    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
+  },
+  'granular-delay': {
+    inputs: [{ id: 'in', label: 'In', kind: 'audio', direction: 'in' }],
+    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
+  },
+  'tape-delay': {
+    inputs: [{ id: 'in', label: 'In', kind: 'audio', direction: 'in' }],
+    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
+  },
+  'spring-reverb': {
     inputs: [{ id: 'in', label: 'In', kind: 'audio', direction: 'in' }],
     outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
   },
@@ -116,6 +151,10 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
     outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
   },
   distortion: {
+    inputs: [{ id: 'in', label: 'In', kind: 'audio', direction: 'in' }],
+    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
+  },
+  wavefolder: {
     inputs: [{ id: 'in', label: 'In', kind: 'audio', direction: 'in' }],
     outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
   },

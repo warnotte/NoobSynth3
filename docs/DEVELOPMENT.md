@@ -69,6 +69,9 @@ npm run build:wasm
 
 Génère `src/engine/worklets/wasm/dsp_wasm.js` + `dsp_wasm_bg.wasm`.
 
+Note : même en mode `npm run dev`, le WASM n'est pas rebâti automatiquement. Après un changement DSP,
+relance `npm run build:wasm` puis recharge la page (Ctrl+F5).
+
 ## Build de production
 
 ### Script complet (Windows)
@@ -156,6 +159,8 @@ crates/
 3. **WASM** : Rebuild avec `npm run build:wasm`
 4. **TypeScript** : Ajouter le rendu UI dans `src/ui/ModuleControls.tsx`
 5. **TypeScript** : Déclarer le type dans `src/shared/graph.ts`
+6. **TypeScript** : Ajouter taille/labels/défauts dans `src/state/moduleRegistry.ts`
+7. **TypeScript** : Déclarer les ports dans `src/ui/portCatalog.ts`
 
 ### Ajouter un preset
 

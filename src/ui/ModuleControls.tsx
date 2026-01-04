@@ -282,6 +282,119 @@ export const ModuleControls = ({
     )
   }
 
+  if (module.type === 'sample-hold') {
+    const mode = Number(module.params.mode ?? 0)
+    return (
+      <div className="filter-row">
+        <div className="filter-group">
+          <span className="filter-label">Mode</span>
+          <div className="filter-buttons">
+            <button
+              type="button"
+              className={`ui-btn filter-btn ${mode < 0.5 ? 'active' : ''}`}
+              onClick={() => updateParam(module.id, 'mode', 0)}
+            >
+              Sample
+            </button>
+            <button
+              type="button"
+              className={`ui-btn filter-btn ${mode >= 0.5 ? 'active' : ''}`}
+              onClick={() => updateParam(module.id, 'mode', 1)}
+            >
+              Random
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (module.type === 'slew') {
+    return (
+      <>
+        <RotaryKnob
+          label="Rise"
+          min={0}
+          max={1}
+          step={0.01}
+          unit="s"
+          value={Number(module.params.rise ?? 0.05)}
+          onChange={(value) => updateParam(module.id, 'rise', value)}
+          format={(value) => value.toFixed(2)}
+        />
+        <RotaryKnob
+          label="Fall"
+          min={0}
+          max={1}
+          step={0.01}
+          unit="s"
+          value={Number(module.params.fall ?? 0.05)}
+          onChange={(value) => updateParam(module.id, 'fall', value)}
+          format={(value) => value.toFixed(2)}
+        />
+      </>
+    )
+  }
+
+  if (module.type === 'quantizer') {
+    const root = Number(module.params.root ?? 0)
+    const scale = Number(module.params.scale ?? 0)
+    const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+    const scales = [
+      { id: 0, label: 'CHR' },
+      { id: 1, label: 'MAJ' },
+      { id: 2, label: 'MIN' },
+      { id: 3, label: 'DOR' },
+      { id: 4, label: 'LYD' },
+      { id: 5, label: 'MIX' },
+      { id: 6, label: 'PMJ' },
+      { id: 7, label: 'PMN' },
+    ]
+    return (
+      <>
+        <RotaryKnob
+          label="Root"
+          min={0}
+          max={11}
+          step={1}
+          value={root}
+          onChange={(value) => updateParam(module.id, 'root', Math.round(value))}
+          format={(value) => notes[Math.round(value) % notes.length] ?? 'C'}
+        />
+        <div className="filter-row">
+          <span className="filter-label">Scale</span>
+          <div className="filter-buttons filter-wide">
+            {scales.slice(0, 4).map((option) => (
+              <button
+                key={option.id}
+                type="button"
+                className={`ui-btn filter-btn ${scale === option.id ? 'active' : ''}`}
+                onClick={() => updateParam(module.id, 'scale', option.id)}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="filter-row">
+          <span className="filter-label" />
+          <div className="filter-buttons filter-wide">
+            {scales.slice(4).map((option) => (
+              <button
+                key={option.id}
+                type="button"
+                className={`ui-btn filter-btn ${scale === option.id ? 'active' : ''}`}
+                onClick={() => updateParam(module.id, 'scale', option.id)}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </>
+    )
+  }
+
   if (module.type === 'ring-mod') {
     return (
       <RotaryKnob
@@ -531,6 +644,121 @@ export const ModuleControls = ({
     )
   }
 
+  if (module.type === 'ensemble') {
+    return (
+      <>
+        <RotaryKnob
+          label="Rate"
+          min={0.05}
+          max={3}
+          step={0.01}
+          unit="Hz"
+          value={Number(module.params.rate ?? 0.25)}
+          onChange={(value) => updateParam(module.id, 'rate', value)}
+          format={(value) => value.toFixed(2)}
+        />
+        <RotaryKnob
+          label="Depth"
+          min={2}
+          max={25}
+          step={0.1}
+          unit="ms"
+          value={Number(module.params.depth ?? 12)}
+          onChange={(value) => updateParam(module.id, 'depth', value)}
+          format={(value) => value.toFixed(1)}
+        />
+        <RotaryKnob
+          label="Delay"
+          min={6}
+          max={25}
+          step={0.1}
+          unit="ms"
+          value={Number(module.params.delay ?? 12)}
+          onChange={(value) => updateParam(module.id, 'delay', value)}
+          format={(value) => value.toFixed(1)}
+        />
+        <RotaryKnob
+          label="Mix"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.mix ?? 0.6)}
+          onChange={(value) => updateParam(module.id, 'mix', value)}
+          format={(value) => value.toFixed(2)}
+        />
+        <RotaryKnob
+          label="Spread"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.spread ?? 0.7)}
+          onChange={(value) => updateParam(module.id, 'spread', value)}
+          format={(value) => value.toFixed(2)}
+        />
+      </>
+    )
+  }
+
+  if (module.type === 'choir') {
+    const vowel = Number(module.params.vowel ?? 0)
+    const vowels = [
+      { id: 0, label: 'A' },
+      { id: 1, label: 'E' },
+      { id: 2, label: 'I' },
+      { id: 3, label: 'O' },
+      { id: 4, label: 'U' },
+    ]
+    return (
+      <>
+        <RotaryKnob
+          label="Rate"
+          min={0.05}
+          max={2}
+          step={0.01}
+          unit="Hz"
+          value={Number(module.params.rate ?? 0.25)}
+          onChange={(value) => updateParam(module.id, 'rate', value)}
+          format={(value) => value.toFixed(2)}
+        />
+        <RotaryKnob
+          label="Depth"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.depth ?? 0.35)}
+          onChange={(value) => updateParam(module.id, 'depth', value)}
+          format={(value) => value.toFixed(2)}
+        />
+        <RotaryKnob
+          label="Mix"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.mix ?? 0.5)}
+          onChange={(value) => updateParam(module.id, 'mix', value)}
+          format={(value) => value.toFixed(2)}
+        />
+        <div className="filter-row">
+          <div className="filter-group">
+            <span className="filter-label">Vowel</span>
+            <div className="filter-buttons filter-wide">
+              {vowels.map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  className={`ui-btn filter-btn ${vowel === option.id ? 'active' : ''}`}
+                  onClick={() => updateParam(module.id, 'vowel', option.id)}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </>
+    )
+  }
+
   if (module.type === 'delay') {
     const pingPong = Boolean(module.params.pingPong)
     return (
@@ -581,6 +809,184 @@ export const ModuleControls = ({
             Ping Pong
           </button>
         </div>
+      </>
+    )
+  }
+
+  if (module.type === 'granular-delay') {
+    return (
+      <>
+        <RotaryKnob
+          label="Time"
+          min={40}
+          max={1200}
+          step={1}
+          unit="ms"
+          value={Number(module.params.time ?? 420)}
+          onChange={(value) => updateParam(module.id, 'time', value)}
+          format={(value) => Math.round(value).toString()}
+        />
+        <RotaryKnob
+          label="Size"
+          min={10}
+          max={500}
+          step={1}
+          unit="ms"
+          value={Number(module.params.size ?? 120)}
+          onChange={(value) => updateParam(module.id, 'size', value)}
+          format={(value) => Math.round(value).toString()}
+        />
+        <RotaryKnob
+          label="Density"
+          min={0.2}
+          max={30}
+          step={0.1}
+          unit="Hz"
+          value={Number(module.params.density ?? 6)}
+          onChange={(value) => updateParam(module.id, 'density', value)}
+          format={(value) => value.toFixed(1)}
+        />
+        <RotaryKnob
+          label="Pitch"
+          min={0.25}
+          max={2}
+          step={0.01}
+          value={Number(module.params.pitch ?? 1)}
+          onChange={(value) => updateParam(module.id, 'pitch', value)}
+          format={(value) => value.toFixed(2)}
+        />
+        <RotaryKnob
+          label="Feedback"
+          min={0}
+          max={0.85}
+          step={0.01}
+          value={Number(module.params.feedback ?? 0.35)}
+          onChange={(value) => updateParam(module.id, 'feedback', value)}
+          format={(value) => value.toFixed(2)}
+        />
+        <RotaryKnob
+          label="Mix"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.mix ?? 0.5)}
+          onChange={(value) => updateParam(module.id, 'mix', value)}
+          format={(value) => value.toFixed(2)}
+        />
+      </>
+    )
+  }
+
+  if (module.type === 'tape-delay') {
+    return (
+      <>
+        <RotaryKnob
+          label="Time"
+          min={60}
+          max={1200}
+          step={1}
+          unit="ms"
+          value={Number(module.params.time ?? 420)}
+          onChange={(value) => updateParam(module.id, 'time', value)}
+          format={(value) => Math.round(value).toString()}
+        />
+        <RotaryKnob
+          label="Feedback"
+          min={0}
+          max={0.9}
+          step={0.01}
+          value={Number(module.params.feedback ?? 0.35)}
+          onChange={(value) => updateParam(module.id, 'feedback', value)}
+          format={(value) => value.toFixed(2)}
+        />
+        <RotaryKnob
+          label="Mix"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.mix ?? 0.35)}
+          onChange={(value) => updateParam(module.id, 'mix', value)}
+          format={(value) => value.toFixed(2)}
+        />
+        <RotaryKnob
+          label="Tone"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.tone ?? 0.55)}
+          onChange={(value) => updateParam(module.id, 'tone', value)}
+          format={(value) => `${Math.round(value * 100)}%`}
+        />
+        <RotaryKnob
+          label="Wow"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.wow ?? 0.2)}
+          onChange={(value) => updateParam(module.id, 'wow', value)}
+          format={(value) => `${Math.round(value * 100)}%`}
+        />
+        <RotaryKnob
+          label="Flutter"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.flutter ?? 0.2)}
+          onChange={(value) => updateParam(module.id, 'flutter', value)}
+          format={(value) => `${Math.round(value * 100)}%`}
+        />
+        <RotaryKnob
+          label="Drive"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.drive ?? 0.2)}
+          onChange={(value) => updateParam(module.id, 'drive', value)}
+          format={(value) => `${Math.round(value * 100)}%`}
+        />
+      </>
+    )
+  }
+
+  if (module.type === 'spring-reverb') {
+    return (
+      <>
+        <RotaryKnob
+          label="Decay"
+          min={0}
+          max={0.98}
+          step={0.01}
+          value={Number(module.params.decay ?? 0.6)}
+          onChange={(value) => updateParam(module.id, 'decay', value)}
+          format={(value) => `${Math.round(value * 100)}%`}
+        />
+        <RotaryKnob
+          label="Tone"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.tone ?? 0.4)}
+          onChange={(value) => updateParam(module.id, 'tone', value)}
+          format={(value) => `${Math.round(value * 100)}%`}
+        />
+        <RotaryKnob
+          label="Mix"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.mix ?? 0.4)}
+          onChange={(value) => updateParam(module.id, 'mix', value)}
+          format={(value) => `${Math.round(value * 100)}%`}
+        />
+        <RotaryKnob
+          label="Drive"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.drive ?? 0.2)}
+          onChange={(value) => updateParam(module.id, 'drive', value)}
+          format={(value) => `${Math.round(value * 100)}%`}
+        />
       </>
     )
   }
@@ -1047,7 +1453,7 @@ export const ModuleControls = ({
 
   if (module.type === 'adsr') {
     return (
-      <>
+      <div className="adsr-grid">
         <RotaryKnob
           label="Attack"
           min={0.001}
@@ -1087,7 +1493,7 @@ export const ModuleControls = ({
           onChange={(value) => updateParam(module.id, 'release', value)}
           format={(value) => value.toFixed(2)}
         />
-      </>
+      </div>
     )
   }
 
@@ -1582,6 +1988,49 @@ export const ModuleControls = ({
             </div>
           </div>
         </div>
+      </>
+    )
+  }
+
+  if (module.type === 'wavefolder') {
+    return (
+      <>
+        <RotaryKnob
+          label="Drive"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.drive ?? 0.4)}
+          onChange={(value) => updateParam(module.id, 'drive', value)}
+          format={(value) => `${Math.round(value * 100)}%`}
+        />
+        <RotaryKnob
+          label="Fold"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.fold ?? 0.5)}
+          onChange={(value) => updateParam(module.id, 'fold', value)}
+          format={(value) => `${Math.round(value * 100)}%`}
+        />
+        <RotaryKnob
+          label="Bias"
+          min={-1}
+          max={1}
+          step={0.01}
+          value={Number(module.params.bias ?? 0)}
+          onChange={(value) => updateParam(module.id, 'bias', value)}
+          format={(value) => value.toFixed(2)}
+        />
+        <RotaryKnob
+          label="Mix"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.mix ?? 0.8)}
+          onChange={(value) => updateParam(module.id, 'mix', value)}
+          format={(value) => `${Math.round(value * 100)}%`}
+        />
       </>
     )
   }

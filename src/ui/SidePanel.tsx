@@ -1,4 +1,4 @@
-import { useMemo, useState, type ChangeEvent, type RefObject } from 'react'
+import { useEffect, useMemo, useState, type ChangeEvent, type RefObject } from 'react'
 import type { GraphState, MacroSpec, MacroTarget, ModuleSpec, ModuleType } from '../shared/graph'
 import type { PresetSpec } from '../state/presets'
 import { moduleCatalog } from '../state/moduleRegistry'
@@ -128,6 +128,18 @@ export const SidePanel = ({
     })
     return order.map((group) => ({ group, presets: groups.get(group) ?? [] }))
   }, [filteredPresets])
+
+  useEffect(() => {
+    setCollapsedGroups((prev) => {
+      const next = { ...prev }
+      groupedPresets.forEach(({ group }) => {
+        if (!(group in next)) {
+          next[group] = true
+        }
+      })
+      return next
+    })
+  }, [groupedPresets])
 
   const toggleGroup = (group: string) => {
     setCollapsedGroups((prev) => ({ ...prev, [group]: !prev[group] }))

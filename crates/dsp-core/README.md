@@ -35,16 +35,25 @@ Bibliothèque DSP (Digital Signal Processing) pure Rust, sans dépendances exter
 |--------|-------------|
 | `Lfo` | LFO avec 4 formes d'onde |
 | `Adsr` | Enveloppe ADSR |
+| `SampleHold` | Échantillonneur de CV |
+| `SlewLimiter` | Limiteur de pente (portamento) |
+| `Quantizer` | Quantification de notes |
 
 ### Effets
 
 | Struct | Description |
 |--------|-------------|
 | `Chorus` | Chorus stéréo BBD-style |
+| `Ensemble` | Chorus large pour cordes |
+| `Choir` | Banque de formants vocales |
 | `Delay` | Délai avec feedback et tone |
+| `TapeDelay` | Délai avec wow/flutter + drive |
+| `GranularDelay` | Délai granulaire |
+| `SpringReverb` | Réverbe type ressort |
 | `Reverb` | Réverbe algorithmique (Freeverb) |
 | `Phaser` | Phaser 4-stage allpass |
 | `Distortion` | Saturation soft/hard/foldback |
+| `Wavefolder` | Wavefolding (Buchla-style) |
 
 ### Utilitaires
 
@@ -52,6 +61,7 @@ Bibliothèque DSP (Digital Signal Processing) pure Rust, sans dépendances exter
 |--------|-------------|
 | `Vca` | Amplificateur contrôlé par CV |
 | `RingMod` | Multiplication de signaux |
+| `Mixer` | Mixeur audio simple |
 
 ## Utilisation
 

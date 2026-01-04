@@ -249,6 +249,46 @@ pub struct RingModParams<'a> {
   pub level: &'a [Sample],
 }
 
+pub struct SampleHold {
+  last_trigger: f32,
+  held: f32,
+  seed: u32,
+}
+
+pub struct SampleHoldInputs<'a> {
+  pub input: Option<&'a [Sample]>,
+  pub trigger: Option<&'a [Sample]>,
+}
+
+pub struct SampleHoldParams<'a> {
+  pub mode: &'a [Sample],
+}
+
+pub struct SlewLimiter {
+  sample_rate: f32,
+  value: f32,
+}
+
+pub struct SlewInputs<'a> {
+  pub input: Option<&'a [Sample]>,
+}
+
+pub struct SlewParams<'a> {
+  pub rise: &'a [Sample],
+  pub fall: &'a [Sample],
+}
+
+pub struct Quantizer;
+
+pub struct QuantizerInputs<'a> {
+  pub input: Option<&'a [Sample]>,
+}
+
+pub struct QuantizerParams<'a> {
+  pub root: &'a [Sample],
+  pub scale: &'a [Sample],
+}
+
 impl Noise {
   pub fn new() -> Self {
     Self {
@@ -328,6 +368,142 @@ impl RingMod {
       let b = input_at(input_b, i);
       let level = sample_at(params.level, i, 1.0);
       output[i] = a * b * level;
+    }
+  }
+}
+
+impl SampleHold {
+  pub fn new() -> Self {
+    Self {
+      last_trigger: 0.0,
+      held: 0.0,
+      seed: 0x1234_5678,
+    }
+  }
+
+  fn next_random(&mut self) -> f32 {
+    self.seed = self
+      .seed
+      .wrapping_mul(1664525)
+      .wrapping_add(1013904223);
+    let raw = (self.seed >> 9) as f32 / 8_388_608.0;
+    raw * 2.0 - 1.0
+  }
+
+  pub fn process_block(
+    &mut self,
+    output: &mut [Sample],
+    inputs: SampleHoldInputs<'_>,
+    params: SampleHoldParams<'_>,
+  ) {
+    if output.is_empty() {
+      return;
+    }
+    for i in 0..output.len() {
+      let trigger = input_at(inputs.trigger, i);
+      if trigger > 0.5 && self.last_trigger <= 0.5 {
+        let mode = sample_at(params.mode, i, 0.0);
+        if mode < 0.5 {
+          self.held = input_at(inputs.input, i);
+        } else {
+          self.held = self.next_random();
+        }
+      }
+      self.last_trigger = trigger;
+      output[i] = self.held;
+    }
+  }
+}
+
+impl SlewLimiter {
+  pub fn new(sample_rate: f32) -> Self {
+    Self {
+      sample_rate: sample_rate.max(1.0),
+      value: 0.0,
+    }
+  }
+
+  pub fn set_sample_rate(&mut self, sample_rate: f32) {
+    self.sample_rate = sample_rate.max(1.0);
+  }
+
+  pub fn process_block(
+    &mut self,
+    output: &mut [Sample],
+    inputs: SlewInputs<'_>,
+    params: SlewParams<'_>,
+  ) {
+    if output.is_empty() {
+      return;
+    }
+
+    for i in 0..output.len() {
+      let target = input_at(inputs.input, i);
+      let rise = sample_at(params.rise, i, 0.05).max(0.0);
+      let fall = sample_at(params.fall, i, 0.05).max(0.0);
+      let time = if target >= self.value { rise } else { fall };
+      let coeff = if time <= 0.0001 {
+        1.0
+      } else {
+        1.0 - (-1.0 / (time * self.sample_rate)).exp()
+      };
+      self.value += (target - self.value) * coeff;
+      output[i] = self.value;
+    }
+  }
+}
+
+const SCALE_CHROMATIC: [i32; 12] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+const SCALE_MAJOR: [i32; 7] = [0, 2, 4, 5, 7, 9, 11];
+const SCALE_MINOR: [i32; 7] = [0, 2, 3, 5, 7, 8, 10];
+const SCALE_DORIAN: [i32; 7] = [0, 2, 3, 5, 7, 9, 10];
+const SCALE_LYDIAN: [i32; 7] = [0, 2, 4, 6, 7, 9, 11];
+const SCALE_MIXOLYDIAN: [i32; 7] = [0, 2, 4, 5, 7, 9, 10];
+const SCALE_PENT_MAJOR: [i32; 5] = [0, 2, 4, 7, 9];
+const SCALE_PENT_MINOR: [i32; 5] = [0, 3, 5, 7, 10];
+const SCALES: [&[i32]; 8] = [
+  &SCALE_CHROMATIC,
+  &SCALE_MAJOR,
+  &SCALE_MINOR,
+  &SCALE_DORIAN,
+  &SCALE_LYDIAN,
+  &SCALE_MIXOLYDIAN,
+  &SCALE_PENT_MAJOR,
+  &SCALE_PENT_MINOR,
+];
+
+impl Quantizer {
+  pub fn process_block(
+    output: &mut [Sample],
+    inputs: QuantizerInputs<'_>,
+    params: QuantizerParams<'_>,
+  ) {
+    if output.is_empty() {
+      return;
+    }
+    for i in 0..output.len() {
+      let input = input_at(inputs.input, i);
+      let root = sample_at(params.root, i, 0.0).round().clamp(0.0, 11.0) as i32;
+      let scale_index = sample_at(params.scale, i, 0.0).round();
+      let scale_index = if scale_index.is_finite() { scale_index as i32 } else { 0 };
+      let scale_index = scale_index.clamp(0, (SCALES.len() - 1) as i32) as usize;
+      let scale = SCALES[scale_index];
+
+      let semitone = input * 12.0;
+      let base_octave = (semitone / 12.0).floor() as i32;
+      let mut best_note = semitone;
+      let mut best_diff = f32::MAX;
+      for oct in (base_octave - 1)..=(base_octave + 1) {
+        for offset in scale {
+          let candidate = (oct * 12 + root + offset) as f32;
+          let diff = (candidate - semitone).abs();
+          if diff < best_diff {
+            best_diff = diff;
+            best_note = candidate;
+          }
+        }
+      }
+      output[i] = best_note / 12.0;
     }
   }
 }
@@ -747,6 +923,107 @@ pub struct ChorusParams<'a> {
   pub spread: &'a [Sample],
 }
 
+pub struct TapeDelay {
+  sample_rate: f32,
+  buffer_l: Vec<Sample>,
+  buffer_r: Vec<Sample>,
+  write_index: usize,
+  wow_phase: f32,
+  flutter_phase: f32,
+  damp_state_l: f32,
+  damp_state_r: f32,
+}
+
+pub struct TapeDelayInputs<'a> {
+  pub input_l: Option<&'a [Sample]>,
+  pub input_r: Option<&'a [Sample]>,
+}
+
+pub struct TapeDelayParams<'a> {
+  pub time_ms: &'a [Sample],
+  pub feedback: &'a [Sample],
+  pub mix: &'a [Sample],
+  pub tone: &'a [Sample],
+  pub wow: &'a [Sample],
+  pub flutter: &'a [Sample],
+  pub drive: &'a [Sample],
+}
+
+pub struct GranularDelay {
+  sample_rate: f32,
+  buffer_l: Vec<Sample>,
+  buffer_r: Vec<Sample>,
+  write_index: usize,
+  grains: Vec<Grain>,
+  spawn_phase: f32,
+  seed: u32,
+}
+
+#[derive(Clone, Copy)]
+struct Grain {
+  active: bool,
+  pos: f32,
+  step: f32,
+  age: usize,
+  length: usize,
+  pan: f32,
+}
+
+pub struct GranularDelayInputs<'a> {
+  pub input_l: Option<&'a [Sample]>,
+  pub input_r: Option<&'a [Sample]>,
+}
+
+pub struct GranularDelayParams<'a> {
+  pub time_ms: &'a [Sample],
+  pub size_ms: &'a [Sample],
+  pub density: &'a [Sample],
+  pub pitch: &'a [Sample],
+  pub feedback: &'a [Sample],
+  pub mix: &'a [Sample],
+}
+
+pub struct SpringReverb {
+  sample_rate: f32,
+  combs_l: Vec<CombFilter>,
+  combs_r: Vec<CombFilter>,
+  allpass_l: Vec<AllpassFilter>,
+  allpass_r: Vec<AllpassFilter>,
+}
+
+pub struct SpringReverbInputs<'a> {
+  pub input_l: Option<&'a [Sample]>,
+  pub input_r: Option<&'a [Sample]>,
+}
+
+pub struct SpringReverbParams<'a> {
+  pub decay: &'a [Sample],
+  pub tone: &'a [Sample],
+  pub mix: &'a [Sample],
+  pub drive: &'a [Sample],
+}
+
+pub struct Ensemble {
+  sample_rate: f32,
+  phases: [f32; 3],
+  buffer_l: Vec<Sample>,
+  buffer_r: Vec<Sample>,
+  write_index: usize,
+}
+
+pub struct EnsembleInputs<'a> {
+  pub input_l: Option<&'a [Sample]>,
+  pub input_r: Option<&'a [Sample]>,
+}
+
+pub struct EnsembleParams<'a> {
+  pub rate: &'a [Sample],
+  pub depth_ms: &'a [Sample],
+  pub delay_ms: &'a [Sample],
+  pub mix: &'a [Sample],
+  pub spread: &'a [Sample],
+}
+
 impl Chorus {
   pub fn new(sample_rate: f32) -> Self {
     let mut chorus = Self {
@@ -842,6 +1119,515 @@ impl Chorus {
       if self.phase >= tau {
         self.phase -= tau;
       }
+      self.write_index = (self.write_index + 1) % buffer_size;
+    }
+  }
+}
+
+impl TapeDelay {
+  pub fn new(sample_rate: f32) -> Self {
+    let mut delay = Self {
+      sample_rate: sample_rate.max(1.0),
+      buffer_l: Vec::new(),
+      buffer_r: Vec::new(),
+      write_index: 0,
+      wow_phase: 0.0,
+      flutter_phase: 0.0,
+      damp_state_l: 0.0,
+      damp_state_r: 0.0,
+    };
+    delay.allocate_buffers();
+    delay
+  }
+
+  pub fn set_sample_rate(&mut self, sample_rate: f32) {
+    self.sample_rate = sample_rate.max(1.0);
+    self.allocate_buffers();
+  }
+
+  fn allocate_buffers(&mut self) {
+    let max_delay_ms = 2000.0;
+    let max_samples = ((max_delay_ms / 1000.0) * self.sample_rate).ceil() as usize + 2;
+    if self.buffer_l.len() != max_samples {
+      self.buffer_l = vec![0.0; max_samples];
+      self.buffer_r = vec![0.0; max_samples];
+      self.write_index = 0;
+      self.wow_phase = 0.0;
+      self.flutter_phase = 0.0;
+      self.damp_state_l = 0.0;
+      self.damp_state_r = 0.0;
+    }
+  }
+
+  fn read_delay(&self, buffer: &[Sample], delay_samples: f32) -> f32 {
+    let size = buffer.len() as i32;
+    let read_pos = self.write_index as f32 - delay_samples;
+    let base_index = read_pos.floor();
+    let mut index_a = base_index as i32 % size;
+    if index_a < 0 {
+      index_a += size;
+    }
+    let index_b = (index_a + 1) % size;
+    let frac = read_pos - base_index;
+    let a = buffer[index_a as usize];
+    let b = buffer[index_b as usize];
+    a + (b - a) * frac
+  }
+
+  pub fn process_block(
+    &mut self,
+    out_l: &mut [Sample],
+    out_r: &mut [Sample],
+    inputs: TapeDelayInputs<'_>,
+    params: TapeDelayParams<'_>,
+  ) {
+    if out_l.is_empty() || out_r.is_empty() {
+      return;
+    }
+
+    let buffer_size = self.buffer_l.len();
+    let tau = std::f32::consts::TAU;
+    let max_delay = (buffer_size as f32 - 2.0).max(1.0);
+
+    for i in 0..out_l.len() {
+      let time_ms = sample_at(params.time_ms, i, 420.0).clamp(20.0, 2000.0);
+      let feedback = sample_at(params.feedback, i, 0.35).clamp(0.0, 0.9);
+      let mix = sample_at(params.mix, i, 0.35).clamp(0.0, 1.0);
+      let tone = sample_at(params.tone, i, 0.55).clamp(0.0, 1.0);
+      let wow = sample_at(params.wow, i, 0.2).clamp(0.0, 1.0);
+      let flutter = sample_at(params.flutter, i, 0.2).clamp(0.0, 1.0);
+      let drive = sample_at(params.drive, i, 0.2).clamp(0.0, 1.0);
+
+      let wow_depth = wow * 6.0;
+      let flutter_depth = flutter * 2.0;
+      let wow_rate = 0.25;
+      let flutter_rate = 6.0;
+      let mod_ms =
+        wow_depth * self.wow_phase.sin() + flutter_depth * self.flutter_phase.sin();
+
+      let delay_samples = ((time_ms + mod_ms).clamp(5.0, 2000.0) * self.sample_rate / 1000.0)
+        .clamp(1.0, max_delay);
+
+      let input_l = input_at(inputs.input_l, i);
+      let input_r = match inputs.input_r {
+        Some(values) => input_at(Some(values), i),
+        None => input_l,
+      };
+
+      let delayed_l = self.read_delay(&self.buffer_l, delay_samples);
+      let delayed_r = self.read_delay(&self.buffer_r, delay_samples);
+
+      let damp = 0.05 + (1.0 - tone) * 0.9;
+      let drive_gain = 1.0 + drive * 6.0;
+      let fb_l = saturate((input_l + delayed_l * feedback) * drive_gain);
+      let fb_r = saturate((input_r + delayed_r * feedback) * drive_gain);
+      self.damp_state_l = fb_l * (1.0 - damp) + self.damp_state_l * damp;
+      self.damp_state_r = fb_r * (1.0 - damp) + self.damp_state_r * damp;
+
+      self.buffer_l[self.write_index] = self.damp_state_l;
+      self.buffer_r[self.write_index] = self.damp_state_r;
+
+      let dry = 1.0 - mix;
+      out_l[i] = input_l * dry + delayed_l * mix;
+      out_r[i] = input_r * dry + delayed_r * mix;
+
+      self.write_index = (self.write_index + 1) % buffer_size;
+      self.wow_phase += (tau * wow_rate) / self.sample_rate;
+      if self.wow_phase >= tau {
+        self.wow_phase -= tau;
+      }
+      self.flutter_phase += (tau * flutter_rate) / self.sample_rate;
+      if self.flutter_phase >= tau {
+        self.flutter_phase -= tau;
+      }
+    }
+  }
+}
+
+impl GranularDelay {
+  pub fn new(sample_rate: f32) -> Self {
+    let mut delay = Self {
+      sample_rate: sample_rate.max(1.0),
+      buffer_l: Vec::new(),
+      buffer_r: Vec::new(),
+      write_index: 0,
+      grains: vec![
+        Grain { active: false, pos: 0.0, step: 1.0, age: 0, length: 1, pan: 0.0 };
+        6
+      ],
+      spawn_phase: 0.0,
+      seed: 0x9876_5432,
+    };
+    delay.allocate_buffers();
+    delay
+  }
+
+  pub fn set_sample_rate(&mut self, sample_rate: f32) {
+    self.sample_rate = sample_rate.max(1.0);
+    self.allocate_buffers();
+  }
+
+  fn allocate_buffers(&mut self) {
+    let max_delay_ms = 2500.0;
+    let max_samples = ((max_delay_ms / 1000.0) * self.sample_rate).ceil() as usize + 2;
+    if self.buffer_l.len() != max_samples {
+      self.buffer_l = vec![0.0; max_samples];
+      self.buffer_r = vec![0.0; max_samples];
+      self.write_index = 0;
+      for grain in &mut self.grains {
+        grain.active = false;
+      }
+    }
+  }
+
+  fn next_random(&mut self) -> f32 {
+    self.seed = self
+      .seed
+      .wrapping_mul(1664525)
+      .wrapping_add(1013904223);
+    let raw = (self.seed >> 9) as f32 / 8_388_608.0;
+    raw * 2.0 - 1.0
+  }
+
+  fn read_sample(buffer: &[Sample], index: f32) -> f32 {
+    let size = buffer.len() as i32;
+    let base = index.floor();
+    let frac = index - base;
+    let mut index_a = base as i32 % size;
+    if index_a < 0 {
+      index_a += size;
+    }
+    let index_b = (index_a + 1) % size;
+    let a = buffer[index_a as usize];
+    let b = buffer[index_b as usize];
+    a + (b - a) * frac
+  }
+
+  fn spawn_grain(&mut self, delay_samples: f32, length: usize, pitch: f32, pan: f32) {
+    if length == 0 {
+      return;
+    }
+    let mut target = None;
+    for (index, grain) in self.grains.iter().enumerate() {
+      if !grain.active {
+        target = Some(index);
+        break;
+      }
+    }
+    let index = target.unwrap_or(0);
+    let grain = &mut self.grains[index];
+    let mut start = self.write_index as f32 - delay_samples;
+    let size = self.buffer_l.len() as f32;
+    while start < 0.0 {
+      start += size;
+    }
+    while start >= size {
+      start -= size;
+    }
+    grain.active = true;
+    grain.pos = start;
+    grain.step = pitch;
+    grain.age = 0;
+    grain.length = length;
+    grain.pan = pan;
+  }
+
+  pub fn process_block(
+    &mut self,
+    out_l: &mut [Sample],
+    out_r: &mut [Sample],
+    inputs: GranularDelayInputs<'_>,
+    params: GranularDelayParams<'_>,
+  ) {
+    if out_l.is_empty() || out_r.is_empty() {
+      return;
+    }
+
+    let buffer_size = self.buffer_l.len() as f32;
+
+    for i in 0..out_l.len() {
+      let time_ms = sample_at(params.time_ms, i, 420.0).clamp(40.0, 2000.0);
+      let size_ms = sample_at(params.size_ms, i, 120.0).clamp(10.0, 500.0);
+      let density = sample_at(params.density, i, 6.0).clamp(0.2, 40.0);
+      let pitch = sample_at(params.pitch, i, 1.0).clamp(0.25, 2.0);
+      let feedback = sample_at(params.feedback, i, 0.35).clamp(0.0, 0.85);
+      let mix = sample_at(params.mix, i, 0.5).clamp(0.0, 1.0);
+
+      let base_delay = (time_ms * self.sample_rate / 1000.0).clamp(1.0, buffer_size - 2.0);
+      let grain_length = (size_ms * self.sample_rate / 1000.0).max(1.0) as usize;
+      let jitter = size_ms * 0.5 * self.sample_rate / 1000.0;
+
+      self.spawn_phase += density / self.sample_rate;
+      while self.spawn_phase >= 1.0 {
+        self.spawn_phase -= 1.0;
+        let offset = base_delay + self.next_random() * jitter;
+        let delay_samples = offset.clamp(1.0, buffer_size - 2.0);
+        let pan = self.next_random().clamp(-1.0, 1.0);
+        self.spawn_grain(delay_samples, grain_length, pitch, pan);
+      }
+
+      let input_l = input_at(inputs.input_l, i);
+      let input_r = match inputs.input_r {
+        Some(values) => input_at(Some(values), i),
+        None => input_l,
+      };
+
+      let mut wet_l = 0.0;
+      let mut wet_r = 0.0;
+      for grain in &mut self.grains {
+        if !grain.active {
+          continue;
+        }
+        let phase = grain.age as f32 / grain.length as f32;
+        let window = 1.0 - (phase * 2.0 - 1.0).abs();
+        let sample_l = Self::read_sample(&self.buffer_l, grain.pos);
+        let sample_r = Self::read_sample(&self.buffer_r, grain.pos);
+        let pan = grain.pan;
+        let pan_l = 0.5 * (1.0 - pan);
+        let pan_r = 0.5 * (1.0 + pan);
+        wet_l += sample_l * window * pan_l;
+        wet_r += sample_r * window * pan_r;
+        grain.pos += grain.step;
+        if grain.pos >= buffer_size {
+          grain.pos -= buffer_size;
+        }
+        grain.age += 1;
+        if grain.age >= grain.length {
+          grain.active = false;
+        }
+      }
+
+      self.buffer_l[self.write_index] = input_l + wet_l * feedback;
+      self.buffer_r[self.write_index] = input_r + wet_r * feedback;
+
+      let dry = 1.0 - mix;
+      out_l[i] = input_l * dry + wet_l * mix;
+      out_r[i] = input_r * dry + wet_r * mix;
+
+      self.write_index += 1;
+      if self.write_index >= self.buffer_l.len() {
+        self.write_index = 0;
+      }
+    }
+  }
+}
+
+impl SpringReverb {
+  pub fn new(sample_rate: f32) -> Self {
+    let mut spring = Self {
+      sample_rate: sample_rate.max(1.0),
+      combs_l: Vec::new(),
+      combs_r: Vec::new(),
+      allpass_l: Vec::new(),
+      allpass_r: Vec::new(),
+    };
+    spring.allocate_buffers();
+    spring
+  }
+
+  pub fn set_sample_rate(&mut self, sample_rate: f32) {
+    self.sample_rate = sample_rate.max(1.0);
+    self.allocate_buffers();
+  }
+
+  fn allocate_buffers(&mut self) {
+    let scale = self.sample_rate / 44100.0;
+    let comb_tuning = [1687, 2053, 2389];
+    let allpass_tuning = [347, 113];
+    let stereo_spread = 17;
+
+    self.combs_l = comb_tuning
+      .iter()
+      .map(|length| CombFilter::new(((*length as f32 * scale).round() as usize).max(1)))
+      .collect();
+    self.combs_r = comb_tuning
+      .iter()
+      .map(|length| CombFilter::new((((length + stereo_spread) as f32 * scale).round() as usize).max(1)))
+      .collect();
+    self.allpass_l = allpass_tuning
+      .iter()
+      .map(|length| AllpassFilter::new(((*length as f32 * scale).round() as usize).max(1), 0.5))
+      .collect();
+    self.allpass_r = allpass_tuning
+      .iter()
+      .map(|length| AllpassFilter::new((((length + stereo_spread) as f32 * scale).round() as usize).max(1), 0.5))
+      .collect();
+  }
+
+  pub fn process_block(
+    &mut self,
+    out_l: &mut [Sample],
+    out_r: &mut [Sample],
+    inputs: SpringReverbInputs<'_>,
+    params: SpringReverbParams<'_>,
+  ) {
+    if out_l.is_empty() || out_r.is_empty() {
+      return;
+    }
+
+    let decay = clamp(sample_at(params.decay, 0, 0.6), 0.0, 0.98);
+    let tone = clamp(sample_at(params.tone, 0, 0.4), 0.0, 1.0);
+    let feedback = clamp(0.35 + decay * 0.6, 0.2, 0.98);
+    let damp = 0.08 + (1.0 - tone) * 0.82;
+
+    for comb in &mut self.combs_l {
+      comb.set_feedback(feedback);
+      comb.set_damp(damp);
+    }
+    for comb in &mut self.combs_r {
+      comb.set_feedback(feedback);
+      comb.set_damp(damp);
+    }
+
+    for i in 0..out_l.len() {
+      let mix = clamp(sample_at(params.mix, i, 0.4), 0.0, 1.0);
+      let drive = clamp(sample_at(params.drive, i, 0.2), 0.0, 1.0);
+
+      let input_l = input_at(inputs.input_l, i);
+      let input_r = match inputs.input_r {
+        Some(values) => input_at(Some(values), i),
+        None => input_l,
+      };
+
+      let drive_gain = 1.0 + drive * 4.0;
+      let spring_in_l = saturate(input_l * drive_gain) * 0.35;
+      let spring_in_r = saturate(input_r * drive_gain) * 0.35;
+
+      let mut wet_l = 0.0;
+      let mut wet_r = 0.0;
+      for comb in &mut self.combs_l {
+        wet_l += comb.process(spring_in_l);
+      }
+      for comb in &mut self.combs_r {
+        wet_r += comb.process(spring_in_r);
+      }
+      for allpass in &mut self.allpass_l {
+        wet_l = allpass.process(wet_l);
+      }
+      for allpass in &mut self.allpass_r {
+        wet_r = allpass.process(wet_r);
+      }
+
+      let wet_scale = 0.4;
+      wet_l *= wet_scale;
+      wet_r *= wet_scale;
+
+      let dry = 1.0 - mix;
+      out_l[i] = input_l * dry + wet_l * mix;
+      out_r[i] = input_r * dry + wet_r * mix;
+    }
+  }
+}
+
+impl Ensemble {
+  pub fn new(sample_rate: f32) -> Self {
+    let mut ensemble = Self {
+      sample_rate: sample_rate.max(1.0),
+      phases: [0.0, std::f32::consts::TAU / 3.0, (2.0 * std::f32::consts::TAU) / 3.0],
+      buffer_l: Vec::new(),
+      buffer_r: Vec::new(),
+      write_index: 0,
+    };
+    ensemble.allocate_buffers();
+    ensemble
+  }
+
+  pub fn set_sample_rate(&mut self, sample_rate: f32) {
+    self.sample_rate = sample_rate.max(1.0);
+    self.allocate_buffers();
+  }
+
+  fn allocate_buffers(&mut self) {
+    let max_delay_ms = 60.0;
+    let max_samples = ((max_delay_ms / 1000.0) * self.sample_rate).ceil() as usize + 2;
+    if self.buffer_l.len() != max_samples {
+      self.buffer_l = vec![0.0; max_samples];
+      self.buffer_r = vec![0.0; max_samples];
+      self.write_index = 0;
+      self.phases = [0.0, std::f32::consts::TAU / 3.0, (2.0 * std::f32::consts::TAU) / 3.0];
+    }
+  }
+
+  pub fn process_block(
+    &mut self,
+    out_l: &mut [Sample],
+    out_r: &mut [Sample],
+    inputs: EnsembleInputs<'_>,
+    params: EnsembleParams<'_>,
+  ) {
+    if out_l.is_empty() || out_r.is_empty() {
+      return;
+    }
+
+    let buffer_size = self.buffer_l.len();
+    let tau = std::f32::consts::TAU;
+    let rate_mults = [0.85, 1.0, 1.2];
+    let max_delay = (buffer_size as f32 - 2.0).max(1.0);
+
+    for i in 0..out_l.len() {
+      let rate = sample_at(params.rate, i, 0.25).clamp(0.01, 5.0);
+      let depth_ms = sample_at(params.depth_ms, i, 12.0).clamp(0.0, 25.0);
+      let delay_ms = sample_at(params.delay_ms, i, 12.0).clamp(1.0, 30.0);
+      let mix = sample_at(params.mix, i, 0.6).clamp(0.0, 1.0);
+      let spread = sample_at(params.spread, i, 0.7).clamp(0.0, 1.0);
+      let spread_offset = spread * tau * 0.25;
+
+      let input_l = input_at(inputs.input_l, i);
+      let input_r = match inputs.input_r {
+        Some(values) => input_at(Some(values), i),
+        None => input_l,
+      };
+
+      let mut delays_l = [0.0; 3];
+      let mut delays_r = [0.0; 3];
+      for (index, phase) in self.phases.iter_mut().enumerate() {
+        let lfo_l = (*phase).sin();
+        let lfo_r = (*phase + spread_offset).sin();
+        delays_l[index] =
+          ((delay_ms + depth_ms * lfo_l) * self.sample_rate / 1000.0).clamp(1.0, max_delay);
+        delays_r[index] =
+          ((delay_ms + depth_ms * lfo_r) * self.sample_rate / 1000.0).clamp(1.0, max_delay);
+        *phase += (tau * rate * rate_mults[index]) / self.sample_rate;
+        if *phase >= tau {
+          *phase -= tau;
+        }
+      }
+
+      let write_index = self.write_index;
+      let read_delay = |buffer: &[Sample], delay_samples: f32| {
+        let size = buffer.len() as i32;
+        let read_pos = write_index as f32 - delay_samples;
+        let base_index = read_pos.floor();
+        let mut index_a = base_index as i32 % size;
+        if index_a < 0 {
+          index_a += size;
+        }
+        let index_b = (index_a + 1) % size;
+        let frac = read_pos - base_index;
+        let a = buffer[index_a as usize];
+        let b = buffer[index_b as usize];
+        a + (b - a) * frac
+      };
+
+      let mut sum_l = 0.0;
+      let mut sum_r = 0.0;
+      {
+        let buffer_l = &self.buffer_l;
+        let buffer_r = &self.buffer_r;
+        for idx in 0..3 {
+          sum_l += read_delay(buffer_l, delays_l[idx]);
+          sum_r += read_delay(buffer_r, delays_r[idx]);
+        }
+      }
+
+      let wet_l = sum_l / 3.0;
+      let wet_r = sum_r / 3.0;
+      let dry = 1.0 - mix;
+      out_l[i] = input_l * dry + wet_l * mix;
+      out_r[i] = input_r * dry + wet_r * mix;
+
+      self.buffer_l[self.write_index] = input_l;
+      self.buffer_r[self.write_index] = input_r;
       self.write_index = (self.write_index + 1) % buffer_size;
     }
   }
@@ -1528,6 +2314,40 @@ pub struct DistortionParams<'a> {
   pub mode: &'a [Sample],
 }
 
+pub struct Wavefolder;
+
+pub struct WavefolderParams<'a> {
+  pub drive: &'a [Sample],
+  pub fold: &'a [Sample],
+  pub bias: &'a [Sample],
+  pub mix: &'a [Sample],
+}
+
+pub struct Choir {
+  sample_rate: f32,
+  phase: f32,
+  filters_l: [FormantFilter; 3],
+  filters_r: [FormantFilter; 3],
+}
+
+#[derive(Clone, Copy)]
+struct FormantFilter {
+  ic1: f32,
+  ic2: f32,
+}
+
+pub struct ChoirInputs<'a> {
+  pub input_l: Option<&'a [Sample]>,
+  pub input_r: Option<&'a [Sample]>,
+}
+
+pub struct ChoirParams<'a> {
+  pub vowel: &'a [Sample],
+  pub rate: &'a [Sample],
+  pub depth: &'a [Sample],
+  pub mix: &'a [Sample],
+}
+
 impl Distortion {
   pub fn process_block(
     output: &mut [Sample],
@@ -1574,6 +2394,142 @@ impl Distortion {
       let output_sample = shaped * tone + shaped * (1.0 - tone) * 0.7;
       let dry = 1.0 - mix;
       output[i] = in_sample * dry + output_sample * mix;
+    }
+  }
+}
+
+impl FormantFilter {
+  fn process(&mut self, input: f32, cutoff: f32, q: f32, sample_rate: f32) -> f32 {
+    let cutoff = cutoff.min(sample_rate * 0.45).max(20.0);
+    let g = (std::f32::consts::PI * cutoff / sample_rate).tan();
+    let k = 1.0 / q.max(0.1);
+    let a1 = 1.0 / (1.0 + g * (g + k));
+    let a2 = g * a1;
+    let a3 = g * a2;
+    let v3 = input - self.ic2;
+    let v1 = a1 * self.ic1 + a2 * v3;
+    let v2 = self.ic2 + a2 * self.ic1 + a3 * v3;
+    self.ic1 = 2.0 * v1 - self.ic1;
+    self.ic2 = 2.0 * v2 - self.ic2;
+    v1
+  }
+}
+
+impl Choir {
+  pub fn new(sample_rate: f32) -> Self {
+    Self {
+      sample_rate: sample_rate.max(1.0),
+      phase: 0.0,
+      filters_l: [FormantFilter { ic1: 0.0, ic2: 0.0 }; 3],
+      filters_r: [FormantFilter { ic1: 0.0, ic2: 0.0 }; 3],
+    }
+  }
+
+  pub fn set_sample_rate(&mut self, sample_rate: f32) {
+    self.sample_rate = sample_rate.max(1.0);
+  }
+
+  pub fn process_block(
+    &mut self,
+    out_l: &mut [Sample],
+    out_r: &mut [Sample],
+    inputs: ChoirInputs<'_>,
+    params: ChoirParams<'_>,
+  ) {
+    if out_l.is_empty() || out_r.is_empty() {
+      return;
+    }
+
+    let vowels: [[f32; 3]; 5] = [
+      [800.0, 1150.0, 2900.0],
+      [400.0, 1700.0, 2600.0],
+      [350.0, 1700.0, 2700.0],
+      [450.0, 800.0, 2830.0],
+      [325.0, 700.0, 2530.0],
+    ];
+    let q_values = [5.0, 4.5, 4.0];
+    let weights = [0.55, 0.45, 0.35];
+    let tau = std::f32::consts::TAU;
+
+    for i in 0..out_l.len() {
+      let vowel = sample_at(params.vowel, i, 0.0).round().clamp(0.0, 4.0) as usize;
+      let rate = sample_at(params.rate, i, 0.25).clamp(0.05, 2.0);
+      let depth = sample_at(params.depth, i, 0.35).clamp(0.0, 1.0);
+      let mix = sample_at(params.mix, i, 0.5).clamp(0.0, 1.0);
+
+      let input_l = input_at(inputs.input_l, i);
+      let input_r = match inputs.input_r {
+        Some(values) => input_at(Some(values), i),
+        None => input_l,
+      };
+
+      let lfo_l = self.phase.sin();
+      let lfo_r = (self.phase + 0.7).sin();
+      let mod_l = 1.0 + depth * 0.04 * lfo_l;
+      let mod_r = 1.0 + depth * 0.04 * lfo_r;
+
+      let mut wet_l = 0.0;
+      let mut wet_r = 0.0;
+      for band in 0..3 {
+        let freq = vowels[vowel][band];
+        wet_l += self.filters_l[band].process(input_l, freq * mod_l, q_values[band], self.sample_rate)
+          * weights[band];
+        wet_r += self.filters_r[band].process(input_r, freq * mod_r, q_values[band], self.sample_rate)
+          * weights[band];
+      }
+
+      let dry = 1.0 - mix;
+      out_l[i] = input_l * dry + wet_l * mix;
+      out_r[i] = input_r * dry + wet_r * mix;
+
+      self.phase += (tau * rate) / self.sample_rate;
+      if self.phase >= tau {
+        self.phase -= tau;
+      }
+    }
+  }
+}
+
+impl Wavefolder {
+  fn foldback(value: f32, threshold: f32) -> f32 {
+    if threshold <= 0.0 {
+      return value;
+    }
+    let limit = threshold.abs();
+    if value <= limit && value >= -limit {
+      return value;
+    }
+    let range = 4.0 * limit;
+    let mut folded = (value + limit).rem_euclid(range);
+    if folded > 2.0 * limit {
+      folded = range - folded;
+    }
+    folded - limit
+  }
+
+  pub fn process_block(
+    output: &mut [Sample],
+    input: Option<&[Sample]>,
+    params: WavefolderParams<'_>,
+  ) {
+    if output.is_empty() {
+      return;
+    }
+
+    for i in 0..output.len() {
+      let drive = sample_at(params.drive, i, 0.4).clamp(0.0, 1.0);
+      let fold = sample_at(params.fold, i, 0.5).clamp(0.0, 1.0);
+      let bias = sample_at(params.bias, i, 0.0).clamp(-1.0, 1.0);
+      let mix = sample_at(params.mix, i, 0.8).clamp(0.0, 1.0);
+
+      let input_sample = input_at(input, i);
+      let pre = input_sample * (1.0 + drive * 8.0) + bias;
+      let threshold = (1.0 - fold * 0.85).clamp(0.1, 1.0);
+      let folded = Self::foldback(pre, threshold);
+      let shaped = saturate(folded * (1.0 + fold * 0.5));
+
+      let dry = 1.0 - mix;
+      output[i] = input_sample * dry + shaped * mix;
     }
   }
 }

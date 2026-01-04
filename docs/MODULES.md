@@ -144,6 +144,41 @@ Filtre passe-haut simple.
 **Entrées** : gate (gate)  
 **Sorties** : env (CV)
 
+### Sample & Hold
+
+Échantillonne un signal au rythme d'un trigger.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `mode` | 0-1 | 0=Sample, 1=Random |
+
+**Entrées** : in (CV), trig (sync)  
+**Sorties** : out (CV)
+
+### Slew
+
+Limiteur de pente (portamento CV).
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `rise` | 0-1 s | Temps de montée |
+| `fall` | 0-1 s | Temps de descente |
+
+**Entrées** : in (CV)  
+**Sorties** : out (CV)
+
+### Quantizer
+
+Quantifie un CV sur une gamme musicale.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `root` | 0-11 | Note de base (C à B) |
+| `scale` | 0-7 | CHR/MAJ/MIN/DOR/LYD/MIX/PMJ/PMN |
+
+**Entrées** : in (CV)  
+**Sorties** : out (CV)
+
 ### Mod Router
 
 Distribue un CV vers 4 destinations avec profondeur réglable.
@@ -189,6 +224,35 @@ Chorus stéréo style Juno (entrée/sortie mono dans le rack).
 **Entrées** : in (audio)  
 **Sorties** : out (audio)
 
+### Ensemble
+
+Chorus élargi pour cordes et pads.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `rate` | 0.05-3 Hz | Vitesse de modulation |
+| `depth` | 2-25 ms | Profondeur de modulation |
+| `delay` | 6-25 ms | Délai de base |
+| `mix` | 0-1 | Dry/Wet |
+| `spread` | 0-1 | Largeur stéréo |
+
+**Entrées** : in (audio)  
+**Sorties** : out (audio)
+
+### Choir
+
+Banque de formants (voyelles) pour timbres vocaux.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `vowel` | 0-4 | A/E/I/O/U |
+| `rate` | 0.05-2 Hz | LFO interne |
+| `depth` | 0-1 | Profondeur de modulation |
+| `mix` | 0-1 | Dry/Wet |
+
+**Entrées** : in (audio)  
+**Sorties** : out (audio)
+
 ### Delay
 
 Délai stéréo avec option ping-pong (entrée/sortie mono dans le rack).
@@ -200,6 +264,53 @@ Délai stéréo avec option ping-pong (entrée/sortie mono dans le rack).
 | `mix` | 0-1 | Dry/Wet |
 | `tone` | 0-1 | Filtre (0=sombre, 1=brillant) |
 | `pingPong` | true/false | Mode ping-pong |
+
+**Entrées** : in (audio)  
+**Sorties** : out (audio)
+
+### Tape Delay
+
+Delay avec wow/flutter et saturation.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `time` | 60-1200 ms | Temps de délai |
+| `feedback` | 0-0.9 | Rétroaction |
+| `mix` | 0-1 | Dry/Wet |
+| `tone` | 0-1 | Filtre (0=sombre, 1=brillant) |
+| `wow` | 0-1 | Modulation lente |
+| `flutter` | 0-1 | Modulation rapide |
+| `drive` | 0-1 | Saturation |
+
+**Entrées** : in (audio)  
+**Sorties** : out (audio)
+
+### Granular Delay
+
+Délai granulaire pour textures shimmer.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `time` | 40-1200 ms | Temps de délai |
+| `size` | 10-500 ms | Taille des grains |
+| `density` | 0.2-30 Hz | Taux de grains |
+| `pitch` | 0.25-2 | Ratio de pitch |
+| `feedback` | 0-0.85 | Rétroaction |
+| `mix` | 0-1 | Dry/Wet |
+
+**Entrées** : in (audio)  
+**Sorties** : out (audio)
+
+### Spring Reverb
+
+Réverbération type ressort.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `decay` | 0-0.98 | Longueur de queue |
+| `tone` | 0-1 | Brillance |
+| `mix` | 0-1 | Dry/Wet |
+| `drive` | 0-1 | Saturation |
 
 **Entrées** : in (audio)  
 **Sorties** : out (audio)
@@ -242,6 +353,20 @@ Distorsion avec 3 modes.
 | `tone` | 0-1 | Filtre tonal |
 | `mix` | 0-1 | Dry/Wet |
 | `mode` | soft/hard/fold | Type de saturation |
+
+**Entrées** : in (audio)  
+**Sorties** : out (audio)
+
+### Wavefolder
+
+Wavefolding pour timbres Buchla-style.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `drive` | 0-1 | Gain d'entrée |
+| `fold` | 0-1 | Intensité de pliage |
+| `bias` | -1 à 1 | Décalage |
+| `mix` | 0-1 | Dry/Wet |
 
 **Entrées** : in (audio)  
 **Sorties** : out (audio)
@@ -388,10 +513,12 @@ Sortie audio principale.
 ## Polyphonie
 
 Les modules suivants sont dupliqués par voix :
-- VCO, Supersaw, NES Osc, SNES Osc
+- VCO, Supersaw, NES Osc, SNES Osc, Noise
 - VCF, HPF
-- LFO, ADSR
-- VCA, Mod VCA
-- Noise
+- LFO, ADSR, Sample & Hold, Slew, Quantizer
+- Mod Router, Ring Mod
+- VCA, Mod VCA, Gain
+- Distortion, Wavefolder
 
-Les effets (Chorus, Delay, Reverb, Phaser, Distortion) sont globaux et traitent la somme des voix.
+Les effets (Chorus, Ensemble, Choir, Delay, Tape Delay, Granular Delay, Spring Reverb, Reverb, Phaser)
+sont globaux et traitent la somme des voix.

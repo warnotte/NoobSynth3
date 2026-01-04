@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "id": "sample-hold-test",
+  "name": "Sample & Hold",
+  "description": "Stepped modulation from LFO sampled by a trigger.",
+  "graph": {
+    "modules": [
+      {
+        "id": "lfo-1",
+        "type": "lfo",
+        "name": "LFO Source",
+        "position": { "x": 120, "y": 120 },
+        "params": { "rate": 0.2, "depth": 1, "offset": 0, "shape": "triangle", "bipolar": true }
+      },
+      {
+        "id": "lfo-2",
+        "type": "lfo",
+        "name": "LFO Trigger",
+        "position": { "x": 320, "y": 120 },
+        "params": { "rate": 2, "depth": 1, "offset": 0, "shape": "square", "bipolar": false }
+      },
+      {
+        "id": "sh-1",
+        "type": "sample-hold",
+        "name": "Sample & Hold",
+        "position": { "x": 520, "y": 120 },
+        "params": { "mode": 0 }
+      },
+      {
+        "id": "mod-1",
+        "type": "cv-vca",
+        "name": "Mod VCA",
+        "position": { "x": 720, "y": 120 },
+        "params": { "gain": 0.5 }
+      },
+      {
+        "id": "osc-1",
+        "type": "oscillator",
+        "name": "VCO",
+        "position": { "x": 920, "y": 120 },
+        "params": {
+          "frequency": 110,
+          "type": "sawtooth",
+          "pwm": 0.5,
+          "unison": 1,
+          "detune": 0,
+          "subMix": 0.1,
+          "subOct": 1
+        }
+      },
+      {
+        "id": "gain-1",
+        "type": "gain",
+        "name": "VCA",
+        "position": { "x": 1120, "y": 120 },
+        "params": { "gain": 0.7 }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Main Out",
+        "position": { "x": 1320, "y": 120 },
+        "params": { "level": 0.8 }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "lfo-1", "portId": "cv-out" }, "to": { "moduleId": "sh-1", "portId": "in" }, "kind": "cv" },
+      { "from": { "moduleId": "lfo-2", "portId": "cv-out" }, "to": { "moduleId": "sh-1", "portId": "trig" }, "kind": "sync" },
+      { "from": { "moduleId": "sh-1", "portId": "out" }, "to": { "moduleId": "mod-1", "portId": "in" }, "kind": "cv" },
+      { "from": { "moduleId": "mod-1", "portId": "out" }, "to": { "moduleId": "osc-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "osc-1", "portId": "out" }, "to": { "moduleId": "gain-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "gain-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}
