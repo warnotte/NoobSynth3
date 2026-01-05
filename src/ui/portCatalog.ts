@@ -249,4 +249,16 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
       { id: 'gate-5', label: 'G5', kind: 'gate', direction: 'out' },
     ],
   },
+  arpeggiator: {
+    inputs: [
+      { id: 'cv-in', label: 'CV In', kind: 'cv', direction: 'in' },
+      { id: 'gate-in', label: 'Gate', kind: 'gate', direction: 'in' },
+      { id: 'clock', label: 'Clk', kind: 'sync', direction: 'in' },
+    ],
+    outputs: [
+      { id: 'cv-out', label: 'CV', kind: 'cv', direction: 'out' },
+      { id: 'gate-out', label: 'Gate', kind: 'gate', direction: 'out' },
+      { id: 'accent', label: 'Acc', kind: 'cv', direction: 'out' },
+    ],
+  },
 }

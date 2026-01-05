@@ -37,6 +37,7 @@ export type ModuleType =
   | 'distortion'
   | 'wavefolder'
   | 'mario'
+  | 'arpeggiator'
 
 export interface ModuleSpec {
   id: string

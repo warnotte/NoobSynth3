@@ -1,6 +1,7 @@
 import { useEffect, useState, type CSSProperties } from 'react'
 import type { AudioEngine } from '../engine/WasmGraphEngine'
 import type { ModuleSpec } from '../shared/graph'
+import { useComputerKeyboard } from '../hooks/useComputerKeyboard'
 import { clampMidiNote, clampVoiceCount, formatMidiNote } from '../state/midiUtils'
 import { marioSongs } from '../state/marioSongs'
 import { DEFAULT_SEQUENCER_PATTERN } from '../state/sequencerPattern'
@@ -74,6 +75,22 @@ export const ModuleControls = ({
   const vcfModel = module.type === 'vcf' ? String(module.params.model ?? 'svf') : null
   const vcfMode = module.type === 'vcf' ? String(module.params.mode ?? 'lp') : null
   const isWebAudio = audioMode === 'web'
+
+  // Computer keyboard support - must be at top level (React hooks rules)
+  const isControlModule = module.type === 'control'
+  const keyboardEnabled = isControlModule && Boolean(module.params.keyboardEnabled)
+  const keyboardBaseNote = isControlModule ? Number(module.params.midiRoot ?? 60) : 60
+
+  useComputerKeyboard({
+    enabled: keyboardEnabled,
+    baseNote: keyboardBaseNote,
+    onNoteOn: (note, velocity) => {
+      triggerVoiceNote(note, velocity, { useVelocity: true, velocitySlew: 0 })
+    },
+    onNoteOff: (note) => {
+      releaseVoiceNote(note)
+    },
+  })
 
   useEffect(() => {
     if (module.type !== 'vcf') {
@@ -1415,6 +1432,7 @@ export const ModuleControls = ({
       const noteNumber = midiRoot + semitone
       releaseVoiceNote(noteNumber)
     }
+
     return (
       <>
         <RotaryKnob
@@ -1480,12 +1498,33 @@ export const ModuleControls = ({
             Sync
           </button>
         </div>
+        <div className="toggle-group">
+          <button
+            type="button"
+            className={`ui-btn ui-btn--pill toggle-btn ${keyboardEnabled ? 'active' : ''}`}
+            onClick={() => updateParam(module.id, 'keyboardEnabled', !keyboardEnabled)}
+            title="Use computer keyboard as piano (Z-M = lower octave, Q-U = upper octave)"
+          >
+            PC Keyboard
+          </button>
+        </div>
+        {keyboardEnabled && (
+          <div className="keyboard-hint" style={{ fontSize: 10, color: '#8af', marginBottom: 8, textAlign: 'center', lineHeight: 1.4 }}>
+            <div>QWERTY: Z X C V B N M | Q W E R T Y U</div>
+            <div>AZERTY: W X C V B N , | A Z E R T Y U</div>
+            <div style={{ color: '#6a8' }}>S D _ G H J = dièses</div>
+          </div>
+        )}
         <div className="mini-keys">
           {[
-            { label: 'DO', semitone: 0 },
-            { label: 'RE', semitone: 2 },
-            { label: 'MI', semitone: 4 },
-            { label: 'FA', semitone: 5 },
+            { label: 'C', semitone: 0 },
+            { label: 'D', semitone: 2 },
+            { label: 'E', semitone: 4 },
+            { label: 'F', semitone: 5 },
+            { label: 'G', semitone: 7 },
+            { label: 'A', semitone: 9 },
+            { label: 'B', semitone: 11 },
+            { label: 'C+', semitone: 12 },
           ].map((key) => (
             <button
               key={key.label}
@@ -2333,6 +2372,250 @@ export const ModuleControls = ({
           <div className="mario-ch"><span className="ch-dot ch4" /> Triangle</div>
           <div className="mario-ch"><span className="ch-dot ch5" /> Extra</div>
         </div>
+      </>
+    )
+  }
+
+  if (module.type === 'arpeggiator') {
+    const enabled = module.params.enabled !== false
+    const hold = Boolean(module.params.hold)
+    const mode = Number(module.params.mode ?? 0)
+    const octaves = Number(module.params.octaves ?? 1)
+    const rate = Number(module.params.rate ?? 9)
+    const gate = Number(module.params.gate ?? 75)
+    const swing = Number(module.params.swing ?? 0)
+    const tempo = Number(module.params.tempo ?? 120)
+    const ratchet = Number(module.params.ratchet ?? 1)
+    const probability = Number(module.params.probability ?? 100)
+    const euclidEnabled = Boolean(module.params.euclidEnabled)
+    const euclidSteps = Number(module.params.euclidSteps ?? 8)
+    const euclidFill = Number(module.params.euclidFill ?? 4)
+    const euclidRotate = Number(module.params.euclidRotate ?? 0)
+
+    const arpModes = [
+      { id: 0, label: 'Up' },
+      { id: 1, label: 'Down' },
+      { id: 2, label: 'Up/Down' },
+      { id: 3, label: 'Down/Up' },
+      { id: 4, label: 'Converge' },
+      { id: 5, label: 'Diverge' },
+      { id: 6, label: 'Random' },
+      { id: 7, label: 'Rand Once' },
+      { id: 8, label: 'Order' },
+      { id: 9, label: 'Chord' },
+    ]
+
+    const rateDivisions = [
+      { id: 6, label: '1/4' },
+      { id: 9, label: '1/8' },
+      { id: 12, label: '1/16' },
+      { id: 8, label: '1/4T' },
+      { id: 11, label: '1/8T' },
+      { id: 14, label: '1/16T' },
+    ]
+
+    return (
+      <>
+        {/* ON/OFF and HOLD */}
+        <div className="toggle-group">
+          <button
+            type="button"
+            className={`ui-btn ui-btn--pill toggle-btn ${enabled ? 'active' : ''}`}
+            onClick={() => updateParam(module.id, 'enabled', !enabled)}
+          >
+            {enabled ? 'ON' : 'OFF'}
+          </button>
+          <button
+            type="button"
+            className={`ui-btn ui-btn--pill toggle-btn ${hold ? 'active' : ''}`}
+            onClick={() => updateParam(module.id, 'hold', !hold)}
+          >
+            HOLD
+          </button>
+        </div>
+
+        {/* Knobs row */}
+        <RotaryKnob
+          label="Tempo"
+          min={40}
+          max={300}
+          step={1}
+          unit="BPM"
+          value={tempo}
+          onChange={(value) => updateParam(module.id, 'tempo', value)}
+          format={(value) => Math.round(value).toString()}
+        />
+        <RotaryKnob
+          label="Gate"
+          min={10}
+          max={100}
+          step={1}
+          unit="%"
+          value={gate}
+          onChange={(value) => updateParam(module.id, 'gate', value)}
+          format={(value) => Math.round(value).toString()}
+        />
+        <RotaryKnob
+          label="Swing"
+          min={0}
+          max={90}
+          step={1}
+          unit="%"
+          value={swing}
+          onChange={(value) => updateParam(module.id, 'swing', value)}
+          format={(value) => Math.round(value).toString()}
+        />
+
+        {/* Mode */}
+        <div className="filter-row">
+          <span className="filter-label">Mode</span>
+          <div className="filter-buttons filter-wide">
+            {arpModes.slice(0, 5).map((m) => (
+              <button
+                key={m.id}
+                type="button"
+                className={`ui-btn filter-btn ${mode === m.id ? 'active' : ''}`}
+                onClick={() => updateParam(module.id, 'mode', m.id)}
+              >
+                {m.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="filter-row">
+          <span className="filter-label" />
+          <div className="filter-buttons filter-wide">
+            {arpModes.slice(5, 10).map((m) => (
+              <button
+                key={m.id}
+                type="button"
+                className={`ui-btn filter-btn ${mode === m.id ? 'active' : ''}`}
+                onClick={() => updateParam(module.id, 'mode', m.id)}
+              >
+                {m.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Rate */}
+        <div className="filter-row">
+          <span className="filter-label">Rate</span>
+          <div className="filter-buttons filter-wide">
+            {rateDivisions.slice(0, 3).map((r) => (
+              <button
+                key={r.id}
+                type="button"
+                className={`ui-btn filter-btn ${rate === r.id ? 'active' : ''}`}
+                onClick={() => updateParam(module.id, 'rate', r.id)}
+              >
+                {r.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="filter-row">
+          <span className="filter-label" />
+          <div className="filter-buttons filter-wide">
+            {rateDivisions.slice(3, 6).map((r) => (
+              <button
+                key={r.id}
+                type="button"
+                className={`ui-btn filter-btn ${rate === r.id ? 'active' : ''}`}
+                onClick={() => updateParam(module.id, 'rate', r.id)}
+              >
+                {r.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Octaves */}
+        <div className="filter-row">
+          <span className="filter-label">Oct</span>
+          <div className="filter-buttons">
+            {[1, 2, 3, 4].map((o) => (
+              <button
+                key={o}
+                type="button"
+                className={`ui-btn filter-btn ${octaves === o ? 'active' : ''}`}
+                onClick={() => updateParam(module.id, 'octaves', o)}
+              >
+                {o}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Ratchet */}
+        <div className="filter-row">
+          <span className="filter-label">Ratchet</span>
+          <div className="filter-buttons">
+            {[1, 2, 3, 4].map((r) => (
+              <button
+                key={r}
+                type="button"
+                className={`ui-btn filter-btn ${ratchet === r ? 'active' : ''}`}
+                onClick={() => updateParam(module.id, 'ratchet', r)}
+              >
+                {r}x
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <RotaryKnob
+          label="Prob"
+          min={0}
+          max={100}
+          step={1}
+          unit="%"
+          value={probability}
+          onChange={(value) => updateParam(module.id, 'probability', value)}
+          format={(value) => Math.round(value).toString()}
+        />
+
+        {/* Euclidean */}
+        <div className="toggle-group">
+          <button
+            type="button"
+            className={`ui-btn ui-btn--pill toggle-btn ${euclidEnabled ? 'active' : ''}`}
+            onClick={() => updateParam(module.id, 'euclidEnabled', !euclidEnabled)}
+          >
+            Euclidean
+          </button>
+        </div>
+        {euclidEnabled && (
+          <>
+            <RotaryKnob
+              label="Steps"
+              min={2}
+              max={16}
+              step={1}
+              value={euclidSteps}
+              onChange={(value) => updateParam(module.id, 'euclidSteps', value)}
+              format={(value) => Math.round(value).toString()}
+            />
+            <RotaryKnob
+              label="Fill"
+              min={1}
+              max={euclidSteps}
+              step={1}
+              value={euclidFill}
+              onChange={(value) => updateParam(module.id, 'euclidFill', value)}
+              format={(value) => Math.round(value).toString()}
+            />
+            <RotaryKnob
+              label="Rotate"
+              min={0}
+              max={euclidSteps - 1}
+              step={1}
+              value={euclidRotate}
+              onChange={(value) => updateParam(module.id, 'euclidRotate', value)}
+              format={(value) => Math.round(value).toString()}
+            />
+          </>
+        )}
       </>
     )
   }

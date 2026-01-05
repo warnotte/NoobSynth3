@@ -24,10 +24,45 @@
     },
     {
       "id": "cs80-vangelis",
-      "name": "CS-80 Vangelis",
+      "name": "CS-80 Pad",
       "description": "Blade Runner inspired evolving pad.",
       "file": "cs80-vangelis.json",
-      "group": "Pads & Strings"
+      "group": "Vangelis / Blade Runner"
+    },
+    {
+      "id": "vangelis-main-title",
+      "name": "Main Title",
+      "description": "Iconic brass/pad from the opening titles.",
+      "file": "vangelis-main-title.json",
+      "group": "Vangelis / Blade Runner"
+    },
+    {
+      "id": "vangelis-tears-rain",
+      "name": "Tears in Rain",
+      "description": "Emotional pad from the final scene.",
+      "file": "vangelis-tears-rain.json",
+      "group": "Vangelis / Blade Runner"
+    },
+    {
+      "id": "vangelis-love-theme",
+      "name": "Love Theme",
+      "description": "Expressive sax-like lead with vibrato.",
+      "file": "vangelis-love-theme.json",
+      "group": "Vangelis / Blade Runner"
+    },
+    {
+      "id": "vangelis-memories",
+      "name": "Memories of Green",
+      "description": "Soft, nostalgic melodic pad.",
+      "file": "vangelis-memories.json",
+      "group": "Vangelis / Blade Runner"
+    },
+    {
+      "id": "vangelis-end-titles",
+      "name": "End Titles",
+      "description": "Big, triumphant brass for the finale.",
+      "file": "vangelis-end-titles.json",
+      "group": "Vangelis / Blade Runner"
     },
     {
       "id": "oberheim-pad",
@@ -294,6 +329,55 @@
       "description": "Ethereal Equinoxe ambient pad. MIDI Channel 7.",
       "file": "jarre-pad2.json",
       "group": "Jarre / Equinoxe"
+    },
+    {
+      "id": "arp-demo",
+      "name": "Arpeggiator Demo",
+      "description": "Simple arpeggiator demo with synth bass sound.",
+      "file": "arp-demo.json",
+      "group": "Arpeggiator / Sequences"
+    },
+    {
+      "id": "morodor-chase",
+      "name": "Moroder Chase",
+      "description": "Giorgio Moroder style pulsing synth arp - Midnight Express / Scarface vibes.",
+      "file": "morodor-chase.json",
+      "group": "Arpeggiator / Sequences"
+    },
+    {
+      "id": "disco-donna",
+      "name": "Disco Donna",
+      "description": "Donna Summer / I Feel Love style sequenced disco synth.",
+      "file": "disco-donna.json",
+      "group": "Arpeggiator / Sequences"
+    },
+    {
+      "id": "berlin-school",
+      "name": "Berlin School",
+      "description": "Tangerine Dream / Klaus Schulze style sequenced synth with evolving filter.",
+      "file": "berlin-school.json",
+      "group": "Arpeggiator / Sequences"
+    },
+    {
+      "id": "kraftwerk-robots",
+      "name": "Kraftwerk Robots",
+      "description": "Precise mechanical electronic sequences - Die Roboter / Trans-Europe Express style.",
+      "file": "kraftwerk-robots.json",
+      "group": "Arpeggiator / Sequences"
+    },
+    {
+      "id": "trance-gate",
+      "name": "Trance Gate",
+      "description": "Fast pumping trance gated synth with supersaw and sidechain-style pumping.",
+      "file": "trance-gate.json",
+      "group": "Arpeggiator / Sequences"
+    },
+    {
+      "id": "ambient-drift",
+      "name": "Ambient Drift",
+      "description": "Slow evolving generative ambient textures with probability and euclidean rhythms.",
+      "file": "ambient-drift.json",
+      "group": "Arpeggiator / Sequences"
     }
   ]
 }

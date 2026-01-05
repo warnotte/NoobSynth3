@@ -1,0 +1,132 @@
+{
+  "version": 1,
+  "id": "arp-demo",
+  "name": "Arpeggiator Demo",
+  "description": "Simple arpeggiator demo with synth bass sound.",
+  "graph": {
+    "modules": [
+      {
+        "id": "ctrl-1",
+        "type": "control",
+        "name": "Control IO",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "cv": 0,
+          "cvMode": "unipolar",
+          "velocity": 1,
+          "midiVelocity": true,
+          "gate": 0,
+          "glide": 0,
+          "midiEnabled": true,
+          "midiChannel": 0,
+          "midiRoot": 48,
+          "voices": 1
+        }
+      },
+      {
+        "id": "arp-1",
+        "type": "arpeggiator",
+        "name": "Arpeggiator",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "enabled": true,
+          "hold": true,
+          "mode": 0,
+          "octaves": 2,
+          "rate": 9,
+          "gate": 60,
+          "swing": 0,
+          "tempo": 120,
+          "ratchet": 1,
+          "probability": 100,
+          "euclidEnabled": false
+        }
+      },
+      {
+        "id": "osc-1",
+        "type": "oscillator",
+        "name": "VCO",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "frequency": 220,
+          "type": "sawtooth",
+          "pwm": 0.5,
+          "unison": 2,
+          "detune": 8,
+          "subMix": 0.3
+        }
+      },
+      {
+        "id": "adsr-1",
+        "type": "adsr",
+        "name": "Amp ADSR",
+        "position": { "x": 0, "y": 0 },
+        "params": { "attack": 0.005, "decay": 0.15, "sustain": 0.4, "release": 0.15 }
+      },
+      {
+        "id": "vcf-1",
+        "type": "vcf",
+        "name": "VCF",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "cutoff": 1800,
+          "resonance": 0.3,
+          "drive": 0.1,
+          "envAmount": 0.35,
+          "model": "svf",
+          "mode": "lp",
+          "slope": 24
+        }
+      },
+      {
+        "id": "adsr-2",
+        "type": "adsr",
+        "name": "Filter ADSR",
+        "position": { "x": 0, "y": 0 },
+        "params": { "attack": 0.001, "decay": 0.2, "sustain": 0.2, "release": 0.1 }
+      },
+      {
+        "id": "gain-1",
+        "type": "gain",
+        "name": "VCA",
+        "position": { "x": 0, "y": 0 },
+        "params": { "gain": 0.8 }
+      },
+      {
+        "id": "delay-1",
+        "type": "delay",
+        "name": "Delay",
+        "position": { "x": 0, "y": 0 },
+        "params": { "time": 250, "feedback": 0.3, "mix": 0.25, "tone": 0.6, "pingPong": true }
+      },
+      {
+        "id": "scope-1",
+        "type": "scope",
+        "name": "Scope",
+        "position": { "x": 0, "y": 0 },
+        "params": { "time": 1, "gain": 1 }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Main Out",
+        "position": { "x": 0, "y": 0 },
+        "params": { "level": 0.75 }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "ctrl-1", "portId": "cv-out" }, "to": { "moduleId": "arp-1", "portId": "cv-in" }, "kind": "cv" },
+      { "from": { "moduleId": "ctrl-1", "portId": "gate-out" }, "to": { "moduleId": "arp-1", "portId": "gate-in" }, "kind": "gate" },
+      { "from": { "moduleId": "arp-1", "portId": "cv-out" }, "to": { "moduleId": "osc-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "arp-1", "portId": "gate-out" }, "to": { "moduleId": "adsr-1", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "arp-1", "portId": "gate-out" }, "to": { "moduleId": "adsr-2", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "osc-1", "portId": "out" }, "to": { "moduleId": "vcf-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-2", "portId": "env" }, "to": { "moduleId": "vcf-1", "portId": "env" }, "kind": "cv" },
+      { "from": { "moduleId": "vcf-1", "portId": "out" }, "to": { "moduleId": "gain-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-1", "portId": "env" }, "to": { "moduleId": "gain-1", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "gain-1", "portId": "out" }, "to": { "moduleId": "delay-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "delay-1", "portId": "out" }, "to": { "moduleId": "scope-1", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "scope-1", "portId": "out-a" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}

@@ -1,0 +1,115 @@
+{
+  "version": 1,
+  "id": "kraftwerk-robots",
+  "name": "Kraftwerk Robots",
+  "description": "Precise mechanical electronic sequences - Die Roboter / Trans-Europe Express style.",
+  "graph": {
+    "modules": [
+      {
+        "id": "ctrl-1",
+        "type": "control",
+        "name": "Control IO",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "cv": 0,
+          "midiEnabled": true,
+          "midiRoot": 36,
+          "voices": 1
+        }
+      },
+      {
+        "id": "arp-1",
+        "type": "arpeggiator",
+        "name": "Sequencer",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "enabled": true,
+          "hold": true,
+          "mode": 0,
+          "octaves": 1,
+          "rate": 12,
+          "gate": 45,
+          "swing": 0,
+          "tempo": 120,
+          "ratchet": 1,
+          "probability": 100
+        }
+      },
+      {
+        "id": "osc-1",
+        "type": "oscillator",
+        "name": "VCO",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "frequency": 220,
+          "type": "pulse",
+          "pwm": 0.25,
+          "unison": 1
+        }
+      },
+      {
+        "id": "adsr-1",
+        "type": "adsr",
+        "name": "Amp ADSR",
+        "position": { "x": 0, "y": 0 },
+        "params": { "attack": 0.001, "decay": 0.05, "sustain": 0.5, "release": 0.05 }
+      },
+      {
+        "id": "adsr-2",
+        "type": "adsr",
+        "name": "Filter ADSR",
+        "position": { "x": 0, "y": 0 },
+        "params": { "attack": 0.001, "decay": 0.08, "sustain": 0.2, "release": 0.05 }
+      },
+      {
+        "id": "vcf-1",
+        "type": "vcf",
+        "name": "VCF",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "cutoff": 1500,
+          "resonance": 0.15,
+          "drive": 0,
+          "envAmount": 0.3,
+          "model": "svf",
+          "mode": "lp",
+          "slope": 12
+        }
+      },
+      {
+        "id": "gain-1",
+        "type": "gain",
+        "name": "VCA",
+        "position": { "x": 0, "y": 0 },
+        "params": { "gain": 0.9 }
+      },
+      {
+        "id": "delay-1",
+        "type": "delay",
+        "name": "Delay",
+        "position": { "x": 0, "y": 0 },
+        "params": { "time": 250, "feedback": 0.25, "mix": 0.15, "tone": 0.7, "pingPong": false }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Main Out",
+        "position": { "x": 0, "y": 0 },
+        "params": { "level": 0.8 }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "ctrl-1", "portId": "cv-out" }, "to": { "moduleId": "arp-1", "portId": "cv-in" }, "kind": "cv" },
+      { "from": { "moduleId": "ctrl-1", "portId": "gate-out" }, "to": { "moduleId": "arp-1", "portId": "gate-in" }, "kind": "gate" },
+      { "from": { "moduleId": "arp-1", "portId": "cv-out" }, "to": { "moduleId": "osc-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "arp-1", "portId": "gate-out" }, "to": { "moduleId": "adsr-1", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "arp-1", "portId": "gate-out" }, "to": { "moduleId": "adsr-2", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "osc-1", "portId": "out" }, "to": { "moduleId": "vcf-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-2", "portId": "env" }, "to": { "moduleId": "vcf-1", "portId": "env" }, "kind": "cv" },
+      { "from": { "moduleId": "vcf-1", "portId": "out" }, "to": { "moduleId": "gain-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-1", "portId": "env" }, "to": { "moduleId": "gain-1", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "gain-1", "portId": "out" }, "to": { "moduleId": "delay-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "delay-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}

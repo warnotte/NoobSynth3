@@ -37,6 +37,7 @@ export const moduleSizes: Record<ModuleType, string> = {
   choir: '2x2',
   vocoder: '2x3',
   'audio-in': '1x1',
+  arpeggiator: '2x5',
 }
 
 export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>> = {
@@ -53,6 +54,7 @@ export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>>
   vocoder: 'strip',
   mario: 'strip',
   'mixer-1x2': 'strip',
+  arpeggiator: 'strip',
 }
 
 export const moduleCatalog: { type: ModuleType; label: string }[] = [
@@ -92,6 +94,7 @@ export const moduleCatalog: { type: ModuleType; label: string }[] = [
   { type: 'output', label: 'Main Out' },
   { type: 'lab', label: 'Lab' },
   { type: 'mario', label: 'Mario IO' },
+  { type: 'arpeggiator', label: 'Arpeggiator' },
 ]
 
 export const modulePrefixes: Record<ModuleType, string> = {
@@ -131,6 +134,7 @@ export const modulePrefixes: Record<ModuleType, string> = {
   output: 'out',
   lab: 'lab',
   mario: 'mario',
+  arpeggiator: 'arp',
 }
 
 export const moduleLabels: Record<ModuleType, string> = {
@@ -170,6 +174,7 @@ export const moduleLabels: Record<ModuleType, string> = {
   output: 'Main Out',
   lab: 'Lab Panel',
   mario: 'Mario IO',
+  arpeggiator: 'Arpeggiator',
 }
 
 export const moduleDefaults: Record<ModuleType, Record<string, number | string | boolean>> = {
@@ -302,6 +307,27 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
   output: { level: 0.8 },
   lab: { level: 0.5, drive: 0.3, bias: 0, shape: 'triangle' },
   mario: { running: false, tempo: 180, song: 'smb' },
+  arpeggiator: {
+    enabled: true,
+    hold: false,
+    mode: 0,           // 0=UP, 1=DOWN, 2=UP_DOWN, etc.
+    octaves: 1,
+    rate: 7,           // 1/8 note
+    gate: 75,          // 75% gate length
+    swing: 0,
+    tempo: 120,
+    ratchet: 1,
+    ratchetDecay: 0,
+    probability: 100,
+    velocityMode: 0,   // 0=FIXED
+    accentPattern: 0,  // 0=OFF
+    euclidSteps: 8,
+    euclidFill: 4,
+    euclidRotate: 0,
+    euclidEnabled: false,
+    mutate: 0,
+    preset: 0,
+  },
 }
 
 export const getNextModuleIndex = (type: ModuleType, modules: ModuleSpec[]) => {

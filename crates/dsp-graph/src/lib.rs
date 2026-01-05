@@ -1,14 +1,15 @@
 use dsp_core::{
-  Adsr, AdsrInputs, AdsrParams, Choir, ChoirInputs, ChoirParams, Chorus, ChorusInputs,
-  ChorusParams, Delay, DelayInputs, DelayParams, Distortion, DistortionParams, Ensemble,
-  EnsembleInputs, EnsembleParams, Lfo, LfoInputs, LfoParams, Mixer, Noise, NoiseParams, NesOsc,
-  NesOscInputs, NesOscParams, Phaser, PhaserInputs, PhaserParams, Quantizer, QuantizerInputs,
-  QuantizerParams, Reverb, ReverbInputs, ReverbParams, RingMod, GranularDelay, GranularDelayInputs,
-  GranularDelayParams, RingModParams, Sample, SampleHold, SampleHoldInputs, SampleHoldParams,
-  SlewInputs, SlewLimiter, SlewParams, SnesOsc, SnesOscInputs, SnesOscParams, SpringReverb,
-  SpringReverbInputs, SpringReverbParams, Supersaw, SupersawInputs, SupersawParams, TapeDelay,
-  TapeDelayInputs, TapeDelayParams, Vca, Vcf, VcfInputs, VcfParams, Vco, VcoInputs, VcoParams,
-  Vocoder, VocoderInputs, VocoderParams, Wavefolder, WavefolderParams,
+  Adsr, AdsrInputs, AdsrParams, Arpeggiator, ArpeggiatorInputs, ArpeggiatorOutputs, ArpeggiatorParams,
+  Choir, ChoirInputs, ChoirParams, Chorus, ChorusInputs, ChorusParams, Delay, DelayInputs,
+  DelayParams, Distortion, DistortionParams, Ensemble, EnsembleInputs, EnsembleParams,
+  GranularDelay, GranularDelayInputs, GranularDelayParams, Lfo, LfoInputs, LfoParams, Mixer,
+  NesOsc, NesOscInputs, NesOscParams, Noise, NoiseParams, Phaser, PhaserInputs, PhaserParams,
+  Quantizer, QuantizerInputs, QuantizerParams, Reverb, ReverbInputs, ReverbParams, RingMod,
+  RingModParams, Sample, SampleHold, SampleHoldInputs, SampleHoldParams, SlewInputs, SlewLimiter,
+  SlewParams, SnesOsc, SnesOscInputs, SnesOscParams, SpringReverb, SpringReverbInputs,
+  SpringReverbParams, Supersaw, SupersawInputs, SupersawParams, TapeDelay, TapeDelayInputs,
+  TapeDelayParams, Vca, Vcf, VcfInputs, VcfParams, Vco, VcoInputs, VcoParams, Vocoder,
+  VocoderInputs, VocoderParams, Wavefolder, WavefolderParams,
 };
 use serde::Deserialize;
 use std::collections::{HashMap, VecDeque};
@@ -88,6 +89,7 @@ enum ModuleType {
   Control,
   Scope,
   Mario,
+  Arpeggiator,
 }
 
 #[derive(Clone, Copy)]
@@ -507,6 +509,8 @@ struct ControlState {
   velocity_step: f32,
   velocity_remaining: usize,
   gate: f32,
+  /// When > 0, output gate=0 for these samples to force a rising edge retrigger
+  retrigger_samples: usize,
   sync_remaining: usize,
   glide_seconds: f32,
   sample_rate: f32,
@@ -515,6 +519,28 @@ struct ControlState {
 struct MarioState {
   cv: [f32; 5],
   gate: [f32; 5],
+}
+
+struct ArpeggiatorState {
+  arp: Arpeggiator,
+  enabled: ParamBuffer,
+  hold: ParamBuffer,
+  mode: ParamBuffer,
+  octaves: ParamBuffer,
+  rate: ParamBuffer,
+  gate_len: ParamBuffer,
+  swing: ParamBuffer,
+  tempo: ParamBuffer,
+  ratchet: ParamBuffer,
+  ratchet_decay: ParamBuffer,
+  probability: ParamBuffer,
+  velocity_mode: ParamBuffer,
+  accent_pattern: ParamBuffer,
+  euclid_steps: ParamBuffer,
+  euclid_fill: ParamBuffer,
+  euclid_rotate: ParamBuffer,
+  euclid_enabled: ParamBuffer,
+  mutate: ParamBuffer,
 }
 
 enum ModuleState {
@@ -554,6 +580,7 @@ enum ModuleState {
   Control(ControlState),
   Scope,
   Mario(MarioState),
+  Arpeggiator(ArpeggiatorState),
 }
 
 struct ModuleNode {
@@ -658,6 +685,9 @@ impl GraphEngine {
   pub fn trigger_control_voice_gate(&mut self, module_id: &str, voice: usize) {
     if let Some(index) = self.find_voice_instance(module_id, voice) {
       if let Some(ModuleState::Control(state)) = self.modules.get_mut(index).map(|m| &mut m.state) {
+        // Force a brief gate=0 period to guarantee rising edge for ADSR retrigger
+        // 8 samples at 48kHz = ~0.17ms, imperceptible but ensures proper envelope restart
+        state.retrigger_samples = 8;
         state.gate = 1.0;
       }
     }
@@ -1186,6 +1216,7 @@ impl ModuleNode {
         velocity_step: 0.0,
         velocity_remaining: 0,
         gate: param_number(params, "gate", 0.0),
+        retrigger_samples: 0,
         sync_remaining: 0,
         glide_seconds: param_number(params, "glide", 0.0).max(0.0),
         sample_rate,
@@ -1194,6 +1225,27 @@ impl ModuleNode {
       ModuleType::Mario => ModuleState::Mario(MarioState {
         cv: [0.0; 5],
         gate: [0.0; 5],
+      }),
+      ModuleType::Arpeggiator => ModuleState::Arpeggiator(ArpeggiatorState {
+        arp: Arpeggiator::new(sample_rate),
+        enabled: ParamBuffer::new(param_number(params, "enabled", 1.0)),
+        hold: ParamBuffer::new(param_number(params, "hold", 0.0)),
+        mode: ParamBuffer::new(param_number(params, "mode", 0.0)),
+        octaves: ParamBuffer::new(param_number(params, "octaves", 1.0)),
+        rate: ParamBuffer::new(param_number(params, "rate", 7.0)),
+        gate_len: ParamBuffer::new(param_number(params, "gate", 75.0)),
+        swing: ParamBuffer::new(param_number(params, "swing", 0.0)),
+        tempo: ParamBuffer::new(param_number(params, "tempo", 120.0)),
+        ratchet: ParamBuffer::new(param_number(params, "ratchet", 1.0)),
+        ratchet_decay: ParamBuffer::new(param_number(params, "ratchetDecay", 0.0)),
+        probability: ParamBuffer::new(param_number(params, "probability", 100.0)),
+        velocity_mode: ParamBuffer::new(param_number(params, "velocityMode", 0.0)),
+        accent_pattern: ParamBuffer::new(param_number(params, "accentPattern", 0.0)),
+        euclid_steps: ParamBuffer::new(param_number(params, "euclidSteps", 8.0)),
+        euclid_fill: ParamBuffer::new(param_number(params, "euclidFill", 4.0)),
+        euclid_rotate: ParamBuffer::new(param_number(params, "euclidRotate", 0.0)),
+        euclid_enabled: ParamBuffer::new(param_number(params, "euclidEnabled", 0.0)),
+        mutate: ParamBuffer::new(param_number(params, "mutate", 0.0)),
       }),
     };
 
@@ -1474,6 +1526,27 @@ impl ModuleNode {
           _ => {}
         }
       }
+      ModuleState::Arpeggiator(state) => match param {
+        "enabled" => state.enabled.set(value),
+        "hold" => state.hold.set(value),
+        "mode" => state.mode.set(value),
+        "octaves" => state.octaves.set(value),
+        "rate" => state.rate.set(value),
+        "gate" => state.gate_len.set(value),
+        "swing" => state.swing.set(value),
+        "tempo" => state.tempo.set(value),
+        "ratchet" => state.ratchet.set(value),
+        "ratchetDecay" => state.ratchet_decay.set(value),
+        "probability" => state.probability.set(value),
+        "velocityMode" => state.velocity_mode.set(value),
+        "accentPattern" => state.accent_pattern.set(value),
+        "euclidSteps" => state.euclid_steps.set(value),
+        "euclidFill" => state.euclid_fill.set(value),
+        "euclidRotate" => state.euclid_rotate.set(value),
+        "euclidEnabled" => state.euclid_enabled.set(value),
+        "mutate" => state.mutate.set(value),
+        _ => {}
+      },
       _ => {}
     }
   }
@@ -2285,7 +2358,13 @@ impl ModuleNode {
           }
           cv_out[i] = state.cv;
           vel_out[i] = state.velocity;
-          gate_out[i] = state.gate;
+          // During retrigger period, output gate=0 to force rising edge
+          if state.retrigger_samples > 0 {
+            gate_out[i] = 0.0;
+            state.retrigger_samples -= 1;
+          } else {
+            gate_out[i] = state.gate;
+          }
           if state.sync_remaining > 0 {
             sync_out[i] = 1.0;
             state.sync_remaining -= 1;
@@ -2322,6 +2401,51 @@ impl ModuleNode {
             gate_out[i] = state.gate[channel];
           }
         }
+      }
+      ModuleState::Arpeggiator(state) => {
+        let cv_in = if self.connections[0].is_empty() {
+          None
+        } else {
+          Some(inputs[0].channel(0))
+        };
+        let gate_in = if self.connections[1].is_empty() {
+          None
+        } else {
+          Some(inputs[1].channel(0))
+        };
+        let clock = if self.connections[2].is_empty() {
+          None
+        } else {
+          Some(inputs[2].channel(0))
+        };
+        let (cv_group, rest) = outputs.split_at_mut(1);
+        let (gate_group, accent_group) = rest.split_at_mut(1);
+        let cv_out = cv_group[0].channel_mut(0);
+        let gate_out = gate_group[0].channel_mut(0);
+        let accent_out = accent_group[0].channel_mut(0);
+        let arp_inputs = ArpeggiatorInputs { cv_in, gate_in, clock };
+        let params = ArpeggiatorParams {
+          enabled: state.enabled.slice(frames),
+          hold: state.hold.slice(frames),
+          mode: state.mode.slice(frames),
+          octaves: state.octaves.slice(frames),
+          rate: state.rate.slice(frames),
+          gate: state.gate_len.slice(frames),
+          swing: state.swing.slice(frames),
+          tempo: state.tempo.slice(frames),
+          ratchet: state.ratchet.slice(frames),
+          ratchet_decay: state.ratchet_decay.slice(frames),
+          probability: state.probability.slice(frames),
+          velocity_mode: state.velocity_mode.slice(frames),
+          accent_pattern: state.accent_pattern.slice(frames),
+          euclid_steps: state.euclid_steps.slice(frames),
+          euclid_fill: state.euclid_fill.slice(frames),
+          euclid_rotate: state.euclid_rotate.slice(frames),
+          euclid_enabled: state.euclid_enabled.slice(frames),
+          mutate: state.mutate.slice(frames),
+        };
+        let arp_outputs = ArpeggiatorOutputs { cv_out, gate_out, accent_out };
+        state.arp.process_block(arp_outputs, arp_inputs, params);
       }
     }
   }
@@ -2364,6 +2488,7 @@ fn normalize_module_type(raw: &str) -> ModuleType {
     "control" => ModuleType::Control,
     "scope" => ModuleType::Scope,
     "mario" => ModuleType::Mario,
+    "arpeggiator" => ModuleType::Arpeggiator,
     _ => ModuleType::Oscillator,
   }
 }
@@ -2459,6 +2584,11 @@ fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },
     ],
     ModuleType::Mario => vec![],
+    ModuleType::Arpeggiator => vec![
+      PortInfo { channels: 1 },  // cv-in
+      PortInfo { channels: 1 },  // gate-in
+      PortInfo { channels: 1 },  // clock
+    ],
   }
 }
 
@@ -2523,6 +2653,11 @@ fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
       }
       outputs
     }
+    ModuleType::Arpeggiator => vec![
+      PortInfo { channels: 1 },  // cv-out
+      PortInfo { channels: 1 },  // gate-out
+      PortInfo { channels: 1 },  // accent
+    ],
   }
 }
 
@@ -2654,6 +2789,12 @@ fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize> {
       "in-b" => Some(1),
       "in-c" => Some(2),
       "in-d" => Some(3),
+      _ => None,
+    },
+    ModuleType::Arpeggiator => match port_id {
+      "cv-in" => Some(0),
+      "gate-in" => Some(1),
+      "clock" => Some(2),
       _ => None,
     },
     _ => None,
@@ -2799,6 +2940,12 @@ fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize> {
       "gate-4" => Some(7),
       "cv-5" => Some(8),
       "gate-5" => Some(9),
+      _ => None,
+    },
+    ModuleType::Arpeggiator => match port_id {
+      "cv-out" => Some(0),
+      "gate-out" => Some(1),
+      "accent" => Some(2),
       _ => None,
     },
   }
