@@ -53,6 +53,18 @@ export function useComputerKeyboard({
   const [activeKeys, setActiveKeys] = useState<Set<string>>(new Set())
   const activeKeysRef = useRef<Set<string>>(new Set())
 
+  // Use refs for callbacks to avoid dependency cycles
+  const onNoteOnRef = useRef(onNoteOn)
+  const onNoteOffRef = useRef(onNoteOff)
+  const baseNoteRef = useRef(baseNote)
+
+  // Keep refs updated
+  useEffect(() => {
+    onNoteOnRef.current = onNoteOn
+    onNoteOffRef.current = onNoteOff
+    baseNoteRef.current = baseNote
+  })
+
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
       if (!enabled) return
@@ -73,10 +85,10 @@ export function useComputerKeyboard({
       activeKeysRef.current.add(event.code)
       setActiveKeys(new Set(activeKeysRef.current))
 
-      const note = baseNote + semitone
-      onNoteOn(note, 0.8)
+      const note = baseNoteRef.current + semitone
+      onNoteOnRef.current(note, 0.8)
     },
-    [enabled, baseNote, onNoteOn]
+    [enabled]
   )
 
   const handleKeyUp = useCallback(
@@ -90,10 +102,10 @@ export function useComputerKeyboard({
       activeKeysRef.current.delete(event.code)
       setActiveKeys(new Set(activeKeysRef.current))
 
-      const note = baseNote + semitone
-      onNoteOff(note)
+      const note = baseNoteRef.current + semitone
+      onNoteOffRef.current(note)
     },
-    [enabled, baseNote, onNoteOff]
+    [enabled]
   )
 
   // Release all notes when disabled or on blur
@@ -101,12 +113,12 @@ export function useComputerKeyboard({
     for (const code of activeKeysRef.current) {
       const semitone = KEY_MAP[code]
       if (semitone !== undefined) {
-        onNoteOff(baseNote + semitone)
+        onNoteOffRef.current(baseNoteRef.current + semitone)
       }
     }
     activeKeysRef.current.clear()
     setActiveKeys(new Set())
-  }, [baseNote, onNoteOff])
+  }, [])
 
   useEffect(() => {
     if (!enabled) {

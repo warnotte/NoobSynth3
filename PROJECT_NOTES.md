@@ -27,6 +27,14 @@ This file is meant to be reread by the coding assistant to keep context, decisio
 **Synth Voices:**
 - TB-303 (saw/square osc + 18dB diode ladder filter + accent + glide)
 
+**TR-909 Drums:**
+- 909 Kick (sine + pitch envelope + click + drive)
+- 909 Snare (tone oscillator + noise + snappy envelope)
+- 909 HiHat (6 metallic square waves + bandpass filter)
+- 909 Clap (filtered noise + multi-stage envelope)
+- 909 Tom (sine + pitch envelope)
+- 909 Rimshot (dual tone + noise burst)
+
 **Modulation:**
 - LFO (sine/triangle/saw/square, bipolar/unipolar)
 - ADSR (amp/filter envelopes)
@@ -64,7 +72,7 @@ This file is meant to be reread by the coding assistant to keep context, decisio
 - Mario IO (seasonal/fun)
 - Lab Panel (test module)
 
-## Presets (45+ total)
+## Presets (50+ total)
 
 **Classic emulations (updates format):**
 - Jupiter Pad, Jupiter Brass, Jupiter-8 Demo
@@ -85,6 +93,10 @@ This file is meant to be reread by the coding assistant to keep context, decisio
 - Acid Classic, Acid Squelch, Acid Drone (single TB-303)
 - Moroder Chase 303 (2x TB-303 + Supersaw, 3-voice Moroder style)
 - Acid Trio (3x TB-303: bass/mid/lead)
+
+**TR-909 / Drums (full graph format):**
+- 909 Kit Basic (full kit: kick, snare, hihat, clap, 2x tom, rimshot)
+- 909 House (4-on-the-floor with LFO trigger + reverb + distortion)
 
 Dev/test presets live in `public/presets/manifest-dev.json`.
 
@@ -122,9 +134,21 @@ Presets support two formats:
 - MIDI enhancements (pitch bend, CC mapping).
 - Optional: add native MIDI input via `midir` for Tauri (lower latency, more reliable than Web MIDI).
 - **VST**: Wire scope taps through IPC for oscilloscope in VST mode.
-- **TR-808/909 Drum Module**: Analog drum synthesis (kick, snare, hats, clap, toms) with step sequencer.
+- **Drum Sequencer Module**: 8-track step sequencer for TR-909 drums (future).
 
 ## Recent changes (Jan 2026)
+
+### TR-909 Drum Modules
+
+- **6 analog drum modules** with authentic TR-909 synthesis algorithms
+- **909 Kick**: Sine oscillator + pitch envelope + click transient + drive saturation
+- **909 Snare**: Tone oscillator + noise generator + snappy envelope
+- **909 HiHat**: 6 metallic square waves at classic ratios + bandpass filter
+- **909 Clap**: Filtered noise + multi-stage envelope for realistic clap spread
+- **909 Tom**: Sine + pitch envelope with tunable frequency
+- **909 Rimshot**: Dual tone generators + noise burst
+- **Trigger/Accent inputs**: All drums support gate trigger and accent CV
+- **2 preset files**: 909-kit-basic (full kit), 909-house (4-on-the-floor)
 
 ### TB-303 Module
 

@@ -434,6 +434,20 @@
       "description": "3x TB-303 acid jam - bass, mid, and lead lines.",
       "file": "acid-trio.json",
       "group": "TB-303 / Acid"
+    },
+    {
+      "id": "909-kit-basic",
+      "name": "909 Kit Basic",
+      "description": "Complete TR-909 drum kit - kick, snare, hihat, clap, toms, rimshot.",
+      "file": "909-kit-basic.json",
+      "group": "TR-909 / Drums"
+    },
+    {
+      "id": "909-house",
+      "name": "909 House",
+      "description": "Classic house 4-on-the-floor beat with 909 drums and room reverb.",
+      "file": "909-house.json",
+      "group": "TR-909 / Drums"
     }
   ]
 }

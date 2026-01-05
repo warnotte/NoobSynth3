@@ -40,6 +40,13 @@ export type ModuleType =
   | 'arpeggiator'
   | 'step-sequencer'
   | 'tb-303'
+  // TR-909 Drums
+  | '909-kick'
+  | '909-snare'
+  | '909-hihat'
+  | '909-clap'
+  | '909-tom'
+  | '909-rimshot'
 
 export interface ModuleSpec {
   id: string

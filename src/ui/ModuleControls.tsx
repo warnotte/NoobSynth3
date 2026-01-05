@@ -3220,5 +3220,241 @@ export const ModuleControls = ({
     )
   }
 
+  // TR-909 Drum Modules
+  if (module.type === '909-kick') {
+    return (
+      <>
+        <RotaryKnob
+          label="Tune"
+          min={30}
+          max={100}
+          step={1}
+          unit="Hz"
+          value={Number(module.params.tune ?? 55)}
+          onChange={(value) => updateParam(module.id, 'tune', value)}
+          format={(value) => Math.round(value).toString()}
+        />
+        <RotaryKnob
+          label="Attack"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.attack ?? 0.5)}
+          onChange={(value) => updateParam(module.id, 'attack', value)}
+          format={(value) => Math.round(value * 100).toString()}
+        />
+        <RotaryKnob
+          label="Decay"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.decay ?? 0.5)}
+          onChange={(value) => updateParam(module.id, 'decay', value)}
+          format={(value) => Math.round(value * 100).toString()}
+        />
+        <RotaryKnob
+          label="Drive"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.drive ?? 0.3)}
+          onChange={(value) => updateParam(module.id, 'drive', value)}
+          format={(value) => Math.round(value * 100).toString()}
+        />
+      </>
+    )
+  }
+
+  if (module.type === '909-snare') {
+    return (
+      <>
+        <RotaryKnob
+          label="Tune"
+          min={100}
+          max={400}
+          step={1}
+          unit="Hz"
+          value={Number(module.params.tune ?? 200)}
+          onChange={(value) => updateParam(module.id, 'tune', value)}
+          format={(value) => Math.round(value).toString()}
+        />
+        <RotaryKnob
+          label="Tone"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.tone ?? 0.5)}
+          onChange={(value) => updateParam(module.id, 'tone', value)}
+          format={(value) => Math.round(value * 100).toString()}
+        />
+        <RotaryKnob
+          label="Snappy"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.snappy ?? 0.5)}
+          onChange={(value) => updateParam(module.id, 'snappy', value)}
+          format={(value) => Math.round(value * 100).toString()}
+        />
+        <RotaryKnob
+          label="Decay"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.decay ?? 0.3)}
+          onChange={(value) => updateParam(module.id, 'decay', value)}
+          format={(value) => Math.round(value * 100).toString()}
+        />
+      </>
+    )
+  }
+
+  if (module.type === '909-hihat') {
+    return (
+      <>
+        <RotaryKnob
+          label="Open"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.openDecay ?? 0.4)}
+          onChange={(value) => updateParam(module.id, 'openDecay', value)}
+          format={(value) => Math.round(value * 100).toString()}
+        />
+        <RotaryKnob
+          label="Closed"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.closedDecay ?? 0.1)}
+          onChange={(value) => updateParam(module.id, 'closedDecay', value)}
+          format={(value) => Math.round(value * 100).toString()}
+        />
+        <RotaryKnob
+          label="Tone"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.tone ?? 0.6)}
+          onChange={(value) => updateParam(module.id, 'tone', value)}
+          format={(value) => Math.round(value * 100).toString()}
+        />
+        <RotaryKnob
+          label="Mix"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.mix ?? 0.5)}
+          onChange={(value) => updateParam(module.id, 'mix', value)}
+          format={(value) => Math.round(value * 100).toString()}
+        />
+      </>
+    )
+  }
+
+  if (module.type === '909-clap') {
+    return (
+      <>
+        <RotaryKnob
+          label="Tone"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.tone ?? 0.5)}
+          onChange={(value) => updateParam(module.id, 'tone', value)}
+          format={(value) => Math.round(value * 100).toString()}
+        />
+        <RotaryKnob
+          label="Decay"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.decay ?? 0.4)}
+          onChange={(value) => updateParam(module.id, 'decay', value)}
+          format={(value) => Math.round(value * 100).toString()}
+        />
+        <RotaryKnob
+          label="Spread"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.spread ?? 0.5)}
+          onChange={(value) => updateParam(module.id, 'spread', value)}
+          format={(value) => Math.round(value * 100).toString()}
+        />
+      </>
+    )
+  }
+
+  if (module.type === '909-tom') {
+    return (
+      <>
+        <RotaryKnob
+          label="Tune"
+          min={60}
+          max={300}
+          step={1}
+          unit="Hz"
+          value={Number(module.params.tune ?? 150)}
+          onChange={(value) => updateParam(module.id, 'tune', value)}
+          format={(value) => Math.round(value).toString()}
+        />
+        <RotaryKnob
+          label="Decay"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.decay ?? 0.4)}
+          onChange={(value) => updateParam(module.id, 'decay', value)}
+          format={(value) => Math.round(value * 100).toString()}
+        />
+        <RotaryKnob
+          label="Pitch"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.pitch ?? 0.5)}
+          onChange={(value) => updateParam(module.id, 'pitch', value)}
+          format={(value) => Math.round(value * 100).toString()}
+        />
+      </>
+    )
+  }
+
+  if (module.type === '909-rimshot') {
+    return (
+      <>
+        <RotaryKnob
+          label="Tune"
+          min={300}
+          max={800}
+          step={1}
+          unit="Hz"
+          value={Number(module.params.tune ?? 500)}
+          onChange={(value) => updateParam(module.id, 'tune', value)}
+          format={(value) => Math.round(value).toString()}
+        />
+        <RotaryKnob
+          label="Tone"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.tone ?? 0.6)}
+          onChange={(value) => updateParam(module.id, 'tone', value)}
+          format={(value) => Math.round(value * 100).toString()}
+        />
+        <RotaryKnob
+          label="Decay"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.decay ?? 0.2)}
+          onChange={(value) => updateParam(module.id, 'decay', value)}
+          format={(value) => Math.round(value * 100).toString()}
+        />
+      </>
+    )
+  }
+
   return null
 }

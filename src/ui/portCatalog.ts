@@ -286,4 +286,59 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
       { id: 'env-out', label: 'Env', kind: 'cv', direction: 'out' },
     ],
   },
+  // TR-909 Drums
+  '909-kick': {
+    inputs: [
+      { id: 'trigger', label: 'Trig', kind: 'gate', direction: 'in' },
+      { id: 'accent', label: 'Acc', kind: 'cv', direction: 'in' },
+    ],
+    outputs: [
+      { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
+    ],
+  },
+  '909-snare': {
+    inputs: [
+      { id: 'trigger', label: 'Trig', kind: 'gate', direction: 'in' },
+      { id: 'accent', label: 'Acc', kind: 'cv', direction: 'in' },
+    ],
+    outputs: [
+      { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
+    ],
+  },
+  '909-hihat': {
+    inputs: [
+      { id: 'trigger', label: 'Trig', kind: 'gate', direction: 'in' },
+      { id: 'accent', label: 'Acc', kind: 'cv', direction: 'in' },
+    ],
+    outputs: [
+      { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
+    ],
+  },
+  '909-clap': {
+    inputs: [
+      { id: 'trigger', label: 'Trig', kind: 'gate', direction: 'in' },
+      { id: 'accent', label: 'Acc', kind: 'cv', direction: 'in' },
+    ],
+    outputs: [
+      { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
+    ],
+  },
+  '909-tom': {
+    inputs: [
+      { id: 'trigger', label: 'Trig', kind: 'gate', direction: 'in' },
+      { id: 'accent', label: 'Acc', kind: 'cv', direction: 'in' },
+    ],
+    outputs: [
+      { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
+    ],
+  },
+  '909-rimshot': {
+    inputs: [
+      { id: 'trigger', label: 'Trig', kind: 'gate', direction: 'in' },
+      { id: 'accent', label: 'Acc', kind: 'cv', direction: 'in' },
+    ],
+    outputs: [
+      { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
+    ],
+  },
 }

@@ -1,0 +1,162 @@
+{
+  "version": 1,
+  "id": "909-kit-basic",
+  "name": "909 Kit Basic",
+  "description": "Complete TR-909 drum kit - kick, snare, hihat, clap, toms, rimshot.",
+  "graph": {
+    "modules": [
+      {
+        "id": "kick-1",
+        "type": "909-kick",
+        "name": "909 Kick",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "tune": 55,
+          "attack": 0.5,
+          "decay": 0.6,
+          "drive": 0.3
+        }
+      },
+      {
+        "id": "snare-1",
+        "type": "909-snare",
+        "name": "909 Snare",
+        "position": { "x": 1, "y": 0 },
+        "params": {
+          "tune": 200,
+          "tone": 0.5,
+          "snappy": 0.6,
+          "decay": 0.35
+        }
+      },
+      {
+        "id": "hh-1",
+        "type": "909-hihat",
+        "name": "909 HiHat",
+        "position": { "x": 2, "y": 0 },
+        "params": {
+          "openDecay": 0.4,
+          "closedDecay": 0.1,
+          "tone": 0.6,
+          "mix": 0.5
+        }
+      },
+      {
+        "id": "clap-1",
+        "type": "909-clap",
+        "name": "909 Clap",
+        "position": { "x": 3, "y": 0 },
+        "params": {
+          "tone": 0.5,
+          "decay": 0.4,
+          "spread": 0.5
+        }
+      },
+      {
+        "id": "tom-1",
+        "type": "909-tom",
+        "name": "909 Tom Lo",
+        "position": { "x": 4, "y": 0 },
+        "params": {
+          "tune": 100,
+          "decay": 0.5,
+          "pitch": 0.6
+        }
+      },
+      {
+        "id": "tom-2",
+        "type": "909-tom",
+        "name": "909 Tom Hi",
+        "position": { "x": 5, "y": 0 },
+        "params": {
+          "tune": 180,
+          "decay": 0.4,
+          "pitch": 0.5
+        }
+      },
+      {
+        "id": "rim-1",
+        "type": "909-rimshot",
+        "name": "909 Rim",
+        "position": { "x": 6, "y": 0 },
+        "params": {
+          "tune": 500,
+          "tone": 0.6,
+          "decay": 0.2
+        }
+      },
+      {
+        "id": "mix-1",
+        "type": "mixer-1x2",
+        "name": "Drum Mix",
+        "position": { "x": 7, "y": 0 },
+        "params": {
+          "levelA": 0.9,
+          "levelB": 0.7,
+          "levelC": 0.5,
+          "levelD": 0.6,
+          "levelE": 0.6,
+          "levelF": 0.5
+        }
+      },
+      {
+        "id": "mix-2",
+        "type": "mixer",
+        "name": "Sub Mix",
+        "position": { "x": 8, "y": 0 },
+        "params": {
+          "levelA": 0.6,
+          "levelB": 0.8
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "x": 9, "y": 0 },
+        "params": {
+          "time": 0.3,
+          "damp": 0.6,
+          "preDelay": 10,
+          "mix": 0.15
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Main Out",
+        "position": { "x": 10, "y": 0 },
+        "params": {
+          "level": 0.8
+        }
+      },
+      {
+        "id": "ctrl-1",
+        "type": "control",
+        "name": "Control IO",
+        "position": { "x": 0, "y": 2 },
+        "params": {
+          "cv": 0,
+          "velocity": 1,
+          "midiEnabled": false,
+          "voices": 1
+        }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "kick-1", "portId": "out" }, "to": { "moduleId": "mix-1", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "snare-1", "portId": "out" }, "to": { "moduleId": "mix-1", "portId": "in-b" }, "kind": "audio" },
+      { "from": { "moduleId": "hh-1", "portId": "out" }, "to": { "moduleId": "mix-1", "portId": "in-c" }, "kind": "audio" },
+      { "from": { "moduleId": "clap-1", "portId": "out" }, "to": { "moduleId": "mix-1", "portId": "in-d" }, "kind": "audio" },
+      { "from": { "moduleId": "tom-1", "portId": "out" }, "to": { "moduleId": "mix-1", "portId": "in-e" }, "kind": "audio" },
+      { "from": { "moduleId": "tom-2", "portId": "out" }, "to": { "moduleId": "mix-1", "portId": "in-f" }, "kind": "audio" },
+      { "from": { "moduleId": "rim-1", "portId": "out" }, "to": { "moduleId": "mix-2", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "mix-1", "portId": "out" }, "to": { "moduleId": "mix-2", "portId": "in-b" }, "kind": "audio" },
+      { "from": { "moduleId": "mix-2", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "ctrl-1", "portId": "gate-out" }, "to": { "moduleId": "kick-1", "portId": "trigger" }, "kind": "gate" },
+      { "from": { "moduleId": "ctrl-1", "portId": "gate-out" }, "to": { "moduleId": "snare-1", "portId": "trigger" }, "kind": "gate" },
+      { "from": { "moduleId": "ctrl-1", "portId": "gate-out" }, "to": { "moduleId": "hh-1", "portId": "trigger" }, "kind": "gate" }
+    ]
+  }
+}

@@ -1,16 +1,19 @@
 use dsp_core::{
   Adsr, AdsrInputs, AdsrParams, Arpeggiator, ArpeggiatorInputs, ArpeggiatorOutputs, ArpeggiatorParams,
-  Choir, ChoirInputs, ChoirParams, Chorus, ChorusInputs, ChorusParams, Delay, DelayInputs,
-  DelayParams, Distortion, DistortionParams, Ensemble, EnsembleInputs, EnsembleParams,
-  GranularDelay, GranularDelayInputs, GranularDelayParams, Lfo, LfoInputs, LfoParams, Mixer,
-  NesOsc, NesOscInputs, NesOscParams, Noise, NoiseParams, Phaser, PhaserInputs, PhaserParams,
-  Quantizer, QuantizerInputs, QuantizerParams, Reverb, ReverbInputs, ReverbParams, RingMod,
-  RingModParams, Sample, SampleHold, SampleHoldInputs, SampleHoldParams, SlewInputs, SlewLimiter,
-  SlewParams, SnesOsc, SnesOscInputs, SnesOscParams, SpringReverb, SpringReverbInputs,
+  Choir, ChoirInputs, ChoirParams, Chorus, ChorusInputs, ChorusParams, Clap909, Clap909Inputs,
+  Clap909Params, Delay, DelayInputs, DelayParams, Distortion, DistortionParams, Ensemble,
+  EnsembleInputs, EnsembleParams, GranularDelay, GranularDelayInputs, GranularDelayParams,
+  HiHat909, HiHat909Inputs, HiHat909Params, Kick909, Kick909Inputs, Kick909Params, Lfo, LfoInputs,
+  LfoParams, Mixer, NesOsc, NesOscInputs, NesOscParams, Noise, NoiseParams, Phaser, PhaserInputs,
+  PhaserParams, Quantizer, QuantizerInputs, QuantizerParams, Reverb, ReverbInputs, ReverbParams,
+  Rimshot909, Rimshot909Inputs, Rimshot909Params, RingMod, RingModParams, Sample, SampleHold,
+  SampleHoldInputs, SampleHoldParams, SlewInputs, SlewLimiter, SlewParams, Snare909, Snare909Inputs,
+  Snare909Params, SnesOsc, SnesOscInputs, SnesOscParams, SpringReverb, SpringReverbInputs,
   SpringReverbParams, StepSequencer, StepSequencerInputs, StepSequencerOutputs, StepSequencerParams,
-  Supersaw, SupersawInputs, SupersawParams, TapeDelay, TapeDelayInputs,
-  TapeDelayParams, Tb303, Tb303Inputs, Tb303Outputs, Tb303Params, Vca, Vcf, VcfInputs, VcfParams,
-  Vco, VcoInputs, VcoParams, Vocoder, VocoderInputs, VocoderParams, Wavefolder, WavefolderParams,
+  Supersaw, SupersawInputs, SupersawParams, TapeDelay, TapeDelayInputs, TapeDelayParams, Tb303,
+  Tb303Inputs, Tb303Outputs, Tb303Params, Tom909, Tom909Inputs, Tom909Params, Vca, Vcf, VcfInputs,
+  VcfParams, Vco, VcoInputs, VcoParams, Vocoder, VocoderInputs, VocoderParams, Wavefolder,
+  WavefolderParams,
 };
 use serde::Deserialize;
 use std::collections::{HashMap, VecDeque};
@@ -93,6 +96,13 @@ enum ModuleType {
   Arpeggiator,
   StepSequencer,
   Tb303,
+  // TR-909 Drums
+  Kick909,
+  Snare909,
+  HiHat909,
+  Clap909,
+  Tom909,
+  Rimshot909,
 }
 
 #[derive(Clone, Copy)]
@@ -569,6 +579,48 @@ struct Tb303State {
   glide: ParamBuffer,
 }
 
+// TR-909 Drum States
+struct Kick909State {
+  kick: Kick909,
+  tune: ParamBuffer,
+  attack: ParamBuffer,
+  decay: ParamBuffer,
+  drive: ParamBuffer,
+}
+
+struct Snare909State {
+  snare: Snare909,
+  tune: ParamBuffer,
+  tone: ParamBuffer,
+  snappy: ParamBuffer,
+  decay: ParamBuffer,
+}
+
+struct HiHat909State {
+  hihat: HiHat909,
+  tune: ParamBuffer,
+  decay: ParamBuffer,
+  tone: ParamBuffer,
+  open: ParamBuffer,
+}
+
+struct Clap909State {
+  clap: Clap909,
+  tone: ParamBuffer,
+  decay: ParamBuffer,
+}
+
+struct Tom909State {
+  tom: Tom909,
+  tune: ParamBuffer,
+  decay: ParamBuffer,
+}
+
+struct Rimshot909State {
+  rimshot: Rimshot909,
+  tune: ParamBuffer,
+}
+
 enum ModuleState {
   Vco(VcoState),
   Supersaw(SupersawState),
@@ -609,6 +661,13 @@ enum ModuleState {
   Arpeggiator(ArpeggiatorState),
   StepSequencer(StepSequencerState),
   Tb303(Tb303State),
+  // TR-909 Drums
+  Kick909(Kick909State),
+  Snare909(Snare909State),
+  HiHat909(HiHat909State),
+  Clap909(Clap909State),
+  Tom909(Tom909State),
+  Rimshot909(Rimshot909State),
 }
 
 struct ModuleNode {
@@ -1315,6 +1374,42 @@ impl ModuleNode {
         accent: ParamBuffer::new(param_number(params, "accent", 0.6)),
         glide: ParamBuffer::new(param_number(params, "glide", 0.02)),
       }),
+      // TR-909 Drums
+      ModuleType::Kick909 => ModuleState::Kick909(Kick909State {
+        kick: Kick909::new(sample_rate),
+        tune: ParamBuffer::new(param_number(params, "tune", 55.0)),
+        attack: ParamBuffer::new(param_number(params, "attack", 0.5)),
+        decay: ParamBuffer::new(param_number(params, "decay", 0.5)),
+        drive: ParamBuffer::new(param_number(params, "drive", 0.3)),
+      }),
+      ModuleType::Snare909 => ModuleState::Snare909(Snare909State {
+        snare: Snare909::new(sample_rate),
+        tune: ParamBuffer::new(param_number(params, "tune", 200.0)),
+        tone: ParamBuffer::new(param_number(params, "tone", 0.5)),
+        snappy: ParamBuffer::new(param_number(params, "snappy", 0.5)),
+        decay: ParamBuffer::new(param_number(params, "decay", 0.3)),
+      }),
+      ModuleType::HiHat909 => ModuleState::HiHat909(HiHat909State {
+        hihat: HiHat909::new(sample_rate),
+        tune: ParamBuffer::new(param_number(params, "tune", 1.0)),
+        decay: ParamBuffer::new(param_number(params, "decay", 0.2)),
+        tone: ParamBuffer::new(param_number(params, "tone", 0.5)),
+        open: ParamBuffer::new(param_number(params, "open", 0.0)),
+      }),
+      ModuleType::Clap909 => ModuleState::Clap909(Clap909State {
+        clap: Clap909::new(sample_rate),
+        tone: ParamBuffer::new(param_number(params, "tone", 0.5)),
+        decay: ParamBuffer::new(param_number(params, "decay", 0.4)),
+      }),
+      ModuleType::Tom909 => ModuleState::Tom909(Tom909State {
+        tom: Tom909::new(sample_rate),
+        tune: ParamBuffer::new(param_number(params, "tune", 120.0)),
+        decay: ParamBuffer::new(param_number(params, "decay", 0.4)),
+      }),
+      ModuleType::Rimshot909 => ModuleState::Rimshot909(Rimshot909State {
+        rimshot: Rimshot909::new(sample_rate),
+        tune: ParamBuffer::new(param_number(params, "tune", 400.0)),
+      }),
     };
 
     Self {
@@ -1634,6 +1729,42 @@ impl ModuleNode {
         "envmod" => state.envmod.set(value),
         "accent" => state.accent.set(value),
         "glide" => state.glide.set(value),
+        _ => {}
+      },
+      // TR-909 Drums
+      ModuleState::Kick909(state) => match param {
+        "tune" => state.tune.set(value),
+        "attack" => state.attack.set(value),
+        "decay" => state.decay.set(value),
+        "drive" => state.drive.set(value),
+        _ => {}
+      },
+      ModuleState::Snare909(state) => match param {
+        "tune" => state.tune.set(value),
+        "tone" => state.tone.set(value),
+        "snappy" => state.snappy.set(value),
+        "decay" => state.decay.set(value),
+        _ => {}
+      },
+      ModuleState::HiHat909(state) => match param {
+        "tune" => state.tune.set(value),
+        "decay" => state.decay.set(value),
+        "tone" => state.tone.set(value),
+        "open" => state.open.set(value),
+        _ => {}
+      },
+      ModuleState::Clap909(state) => match param {
+        "tone" => state.tone.set(value),
+        "decay" => state.decay.set(value),
+        _ => {}
+      },
+      ModuleState::Tom909(state) => match param {
+        "tune" => state.tune.set(value),
+        "decay" => state.decay.set(value),
+        _ => {}
+      },
+      ModuleState::Rimshot909(state) => match param {
+        "tune" => state.tune.set(value),
         _ => {}
       },
       _ => {}
@@ -2621,6 +2752,78 @@ impl ModuleNode {
         let tb_outputs = Tb303Outputs { audio, env_out };
         state.tb303.process_block(tb_outputs, tb_inputs, params);
       }
+      // TR-909 Drums
+      ModuleState::Kick909(state) => {
+        let trigger = if self.connections[0].is_empty() { None } else { Some(inputs[0].channel(0)) };
+        let accent = if self.connections[1].is_empty() { None } else { Some(inputs[1].channel(0)) };
+        let out = outputs[0].channel_mut(0);
+        let inputs = Kick909Inputs { trigger, accent };
+        let params = Kick909Params {
+          tune: state.tune.slice(frames),
+          attack: state.attack.slice(frames),
+          decay: state.decay.slice(frames),
+          drive: state.drive.slice(frames),
+        };
+        state.kick.process_block(out, inputs, params);
+      }
+      ModuleState::Snare909(state) => {
+        let trigger = if self.connections[0].is_empty() { None } else { Some(inputs[0].channel(0)) };
+        let accent = if self.connections[1].is_empty() { None } else { Some(inputs[1].channel(0)) };
+        let out = outputs[0].channel_mut(0);
+        let inputs = Snare909Inputs { trigger, accent };
+        let params = Snare909Params {
+          tune: state.tune.slice(frames),
+          tone: state.tone.slice(frames),
+          snappy: state.snappy.slice(frames),
+          decay: state.decay.slice(frames),
+        };
+        state.snare.process_block(out, inputs, params);
+      }
+      ModuleState::HiHat909(state) => {
+        let trigger = if self.connections[0].is_empty() { None } else { Some(inputs[0].channel(0)) };
+        let accent = if self.connections[1].is_empty() { None } else { Some(inputs[1].channel(0)) };
+        let out = outputs[0].channel_mut(0);
+        let inputs = HiHat909Inputs { trigger, accent };
+        let params = HiHat909Params {
+          tune: state.tune.slice(frames),
+          decay: state.decay.slice(frames),
+          tone: state.tone.slice(frames),
+          open: state.open.slice(frames),
+        };
+        state.hihat.process_block(out, inputs, params);
+      }
+      ModuleState::Clap909(state) => {
+        let trigger = if self.connections[0].is_empty() { None } else { Some(inputs[0].channel(0)) };
+        let accent = if self.connections[1].is_empty() { None } else { Some(inputs[1].channel(0)) };
+        let out = outputs[0].channel_mut(0);
+        let inputs = Clap909Inputs { trigger, accent };
+        let params = Clap909Params {
+          tone: state.tone.slice(frames),
+          decay: state.decay.slice(frames),
+        };
+        state.clap.process_block(out, inputs, params);
+      }
+      ModuleState::Tom909(state) => {
+        let trigger = if self.connections[0].is_empty() { None } else { Some(inputs[0].channel(0)) };
+        let accent = if self.connections[1].is_empty() { None } else { Some(inputs[1].channel(0)) };
+        let out = outputs[0].channel_mut(0);
+        let inputs = Tom909Inputs { trigger, accent };
+        let params = Tom909Params {
+          tune: state.tune.slice(frames),
+          decay: state.decay.slice(frames),
+        };
+        state.tom.process_block(out, inputs, params);
+      }
+      ModuleState::Rimshot909(state) => {
+        let trigger = if self.connections[0].is_empty() { None } else { Some(inputs[0].channel(0)) };
+        let accent = if self.connections[1].is_empty() { None } else { Some(inputs[1].channel(0)) };
+        let out = outputs[0].channel_mut(0);
+        let inputs = Rimshot909Inputs { trigger, accent };
+        let params = Rimshot909Params {
+          tune: state.tune.slice(frames),
+        };
+        state.rimshot.process_block(out, inputs, params);
+      }
     }
   }
 }
@@ -2665,6 +2868,13 @@ fn normalize_module_type(raw: &str) -> ModuleType {
     "arpeggiator" => ModuleType::Arpeggiator,
     "step-sequencer" => ModuleType::StepSequencer,
     "tb-303" => ModuleType::Tb303,
+    // TR-909 Drums
+    "909-kick" => ModuleType::Kick909,
+    "909-snare" => ModuleType::Snare909,
+    "909-hihat" => ModuleType::HiHat909,
+    "909-clap" => ModuleType::Clap909,
+    "909-tom" => ModuleType::Tom909,
+    "909-rimshot" => ModuleType::Rimshot909,
     _ => ModuleType::Oscillator,
   }
 }
@@ -2776,6 +2986,12 @@ fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // velocity
       PortInfo { channels: 1 },  // cutoff-cv
     ],
+    // TR-909 Drums - all have trigger + accent inputs
+    ModuleType::Kick909 | ModuleType::Snare909 | ModuleType::HiHat909 |
+    ModuleType::Clap909 | ModuleType::Tom909 | ModuleType::Rimshot909 => vec![
+      PortInfo { channels: 1 },  // trigger
+      PortInfo { channels: 1 },  // accent
+    ],
   }
 }
 
@@ -2854,6 +3070,11 @@ fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
     ModuleType::Tb303 => vec![
       PortInfo { channels: 1 },  // out
       PortInfo { channels: 1 },  // env-out
+    ],
+    // TR-909 Drums - all have single audio output
+    ModuleType::Kick909 | ModuleType::Snare909 | ModuleType::HiHat909 |
+    ModuleType::Clap909 | ModuleType::Tom909 | ModuleType::Rimshot909 => vec![
+      PortInfo { channels: 1 },  // out
     ],
   }
 }
@@ -3005,6 +3226,13 @@ fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize> {
       "gate" => Some(1),
       "velocity" | "vel" => Some(2),
       "cutoff-cv" | "cut" => Some(3),
+      _ => None,
+    },
+    // TR-909 Drums
+    ModuleType::Kick909 | ModuleType::Snare909 | ModuleType::HiHat909 |
+    ModuleType::Clap909 | ModuleType::Tom909 | ModuleType::Rimshot909 => match port_id {
+      "trigger" | "trig" => Some(0),
+      "accent" | "acc" => Some(1),
       _ => None,
     },
     _ => None,
@@ -3168,6 +3396,12 @@ fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize> {
     ModuleType::Tb303 => match port_id {
       "out" => Some(0),
       "env-out" => Some(1),
+      _ => None,
+    },
+    // TR-909 Drums
+    ModuleType::Kick909 | ModuleType::Snare909 | ModuleType::HiHat909 |
+    ModuleType::Clap909 | ModuleType::Tom909 | ModuleType::Rimshot909 => match port_id {
+      "out" => Some(0),
       _ => None,
     },
   }

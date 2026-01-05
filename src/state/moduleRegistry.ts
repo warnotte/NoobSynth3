@@ -40,6 +40,13 @@ export const moduleSizes: Record<ModuleType, string> = {
   arpeggiator: '2x5',
   'step-sequencer': '3x5',
   'tb-303': '2x3',
+  // TR-909 Drums
+  '909-kick': '1x2',
+  '909-snare': '1x2',
+  '909-hihat': '1x2',
+  '909-clap': '1x2',
+  '909-tom': '1x2',
+  '909-rimshot': '1x2',
 }
 
 export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>> = {
@@ -59,6 +66,13 @@ export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>>
   arpeggiator: 'strip',
   'step-sequencer': 'strip',
   'tb-303': 'strip',
+  // TR-909 Drums
+  '909-kick': 'strip',
+  '909-snare': 'strip',
+  '909-hihat': 'strip',
+  '909-clap': 'strip',
+  '909-tom': 'strip',
+  '909-rimshot': 'strip',
 }
 
 export const moduleCatalog: { type: ModuleType; label: string }[] = [
@@ -101,6 +115,13 @@ export const moduleCatalog: { type: ModuleType; label: string }[] = [
   { type: 'arpeggiator', label: 'Arpeggiator' },
   { type: 'step-sequencer', label: 'Step Sequencer' },
   { type: 'tb-303', label: 'TB-303' },
+  // TR-909 Drums
+  { type: '909-kick', label: '909 Kick' },
+  { type: '909-snare', label: '909 Snare' },
+  { type: '909-hihat', label: '909 HiHat' },
+  { type: '909-clap', label: '909 Clap' },
+  { type: '909-tom', label: '909 Tom' },
+  { type: '909-rimshot', label: '909 Rim' },
 ]
 
 export const modulePrefixes: Record<ModuleType, string> = {
@@ -143,6 +164,13 @@ export const modulePrefixes: Record<ModuleType, string> = {
   arpeggiator: 'arp',
   'step-sequencer': 'seq',
   'tb-303': 'tb303',
+  // TR-909 Drums
+  '909-kick': 'kick',
+  '909-snare': 'snare',
+  '909-hihat': 'hh',
+  '909-clap': 'clap',
+  '909-tom': 'tom',
+  '909-rimshot': 'rim',
 }
 
 export const moduleLabels: Record<ModuleType, string> = {
@@ -185,6 +213,13 @@ export const moduleLabels: Record<ModuleType, string> = {
   arpeggiator: 'Arpeggiator',
   'step-sequencer': 'Step Seq',
   'tb-303': 'TB-303',
+  // TR-909 Drums
+  '909-kick': '909 Kick',
+  '909-snare': '909 Snare',
+  '909-hihat': '909 HiHat',
+  '909-clap': '909 Clap',
+  '909-tom': '909 Tom',
+  '909-rimshot': '909 Rim',
 }
 
 export const moduleDefaults: Record<ModuleType, Record<string, number | string | boolean>> = {
@@ -374,6 +409,40 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     envmod: 0.5,        // 0-1
     accent: 0.6,        // 0-1
     glide: 0.02,        // seconds
+  },
+  // TR-909 Drums
+  '909-kick': {
+    tune: 55,           // Base frequency Hz
+    attack: 0.5,        // Click amount 0-1
+    decay: 0.5,         // Decay time 0-1
+    drive: 0.3,         // Saturation 0-1
+  },
+  '909-snare': {
+    tune: 200,          // Tone frequency Hz
+    tone: 0.5,          // Tone/noise mix 0-1
+    snappy: 0.5,        // Noise snap 0-1
+    decay: 0.3,         // Decay time 0-1
+  },
+  '909-hihat': {
+    openDecay: 0.4,     // Open hat decay 0-1
+    closedDecay: 0.1,   // Closed hat decay 0-1
+    tone: 0.6,          // Brightness 0-1
+    mix: 0.5,           // Tone/noise mix 0-1
+  },
+  '909-clap': {
+    tone: 0.5,          // Brightness 0-1
+    decay: 0.4,         // Decay time 0-1
+    spread: 0.5,        // Multi-clap spread 0-1
+  },
+  '909-tom': {
+    tune: 150,          // Base frequency Hz
+    decay: 0.4,         // Decay time 0-1
+    pitch: 0.5,         // Pitch envelope 0-1
+  },
+  '909-rimshot': {
+    tune: 500,          // Base frequency Hz
+    tone: 0.6,          // Brightness 0-1
+    decay: 0.2,         // Decay time 0-1
   },
 }
 
