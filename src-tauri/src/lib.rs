@@ -43,6 +43,12 @@ enum AudioCommand {
     value: f32,
     reply: mpsc::Sender<Result<NativeStatus, String>>,
   },
+  SetParamString {
+    module_id: String,
+    param_id: String,
+    value: String,
+    reply: mpsc::Sender<Result<NativeStatus, String>>,
+  },
   SetControlVoiceCv {
     module_id: String,
     voice: usize,
@@ -359,6 +365,17 @@ fn audio_thread(rx: mpsc::Receiver<AudioCommand>, scope: Arc<Mutex<ScopeSnapshot
       } => {
         let result = with_graph_mut(&mut state, |engine| {
           engine.set_param(&module_id, &param_id, value);
+        });
+        let _ = reply.send(result.map(|_| state.status()));
+      }
+      AudioCommand::SetParamString {
+        module_id,
+        param_id,
+        value,
+        reply,
+      } => {
+        let result = with_graph_mut(&mut state, |engine| {
+          engine.set_param_string(&module_id, &param_id, &value);
         });
         let _ = reply.send(result.map(|_| state.status()));
       }
@@ -917,6 +934,22 @@ fn native_set_param(
 }
 
 #[tauri::command]
+fn native_set_param_string(
+  state: State<NativeAudioState>,
+  module_id: String,
+  param_id: String,
+  value: String,
+) -> Result<(), String> {
+  send_audio_command(&state, |reply| AudioCommand::SetParamString {
+    module_id,
+    param_id,
+    value,
+    reply,
+  })
+  .map(|_| ())
+}
+
+#[tauri::command]
 fn native_set_control_voice_cv(
   state: State<NativeAudioState>,
   module_id: String,
@@ -1404,6 +1437,7 @@ pub fn run() {
         list_midi_inputs,
       native_set_graph,
       native_set_param,
+      native_set_param_string,
       native_set_control_voice_cv,
       native_set_control_voice_gate,
       native_trigger_control_voice_gate,

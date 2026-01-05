@@ -671,9 +671,14 @@ function App() {
         }
       }
       if (isTauri && tauriNativeRunning && !options?.skipEngine) {
-        const numeric = normalizeNativeParamValue(paramId, value)
-        if (!Number.isNaN(numeric)) {
-          void invokeTauri('native_set_param', { moduleId, paramId, value: numeric })
+        // String params like stepData need special handling
+        if (typeof value === 'string' && paramId === 'stepData') {
+          void invokeTauri('native_set_param_string', { moduleId, paramId, value })
+        } else {
+          const numeric = normalizeNativeParamValue(paramId, value)
+          if (!Number.isNaN(numeric)) {
+            void invokeTauri('native_set_param', { moduleId, paramId, value: numeric })
+          }
         }
       }
       // VST mode param updates
@@ -1783,7 +1788,7 @@ function App() {
 
   const moduleControls = {
     engine,
-    status,
+    status: audioStatus,
     audioMode,
     nativeScope: nativeScopeBridge,
     updateParam,
