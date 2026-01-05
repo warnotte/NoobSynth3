@@ -420,6 +420,20 @@
       "description": "Slow atmospheric TB-303 with long decay and reverb.",
       "file": "acid-drone.json",
       "group": "TB-303 / Acid"
+    },
+    {
+      "id": "moroder-chase-303",
+      "name": "Moroder Chase 303",
+      "description": "Giorgio Moroder 3-voice acid chase - Midnight Express / Scarface vibes.",
+      "file": "moroder-chase-303.json",
+      "group": "TB-303 / Acid"
+    },
+    {
+      "id": "acid-trio",
+      "name": "Acid Trio",
+      "description": "3x TB-303 acid jam - bass, mid, and lead lines.",
+      "file": "acid-trio.json",
+      "group": "TB-303 / Acid"
     }
   ]
 }
