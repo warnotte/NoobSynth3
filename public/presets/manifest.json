@@ -378,6 +378,27 @@
       "description": "Slow evolving generative ambient textures with probability and euclidean rhythms.",
       "file": "ambient-drift.json",
       "group": "Arpeggiator / Sequences"
+    },
+    {
+      "id": "seq-moroder-chase",
+      "name": "Seq Moroder Chase",
+      "description": "Classic Moroder step sequence - Midnight Express / Scarface vibes with slide.",
+      "file": "seq-moroder-chase.json",
+      "group": "Step Sequencer"
+    },
+    {
+      "id": "seq-feel-love",
+      "name": "Seq I Feel Love",
+      "description": "Donna Summer / I Feel Love style pulsing 1/16 sequence with octave jumps.",
+      "file": "seq-feel-love.json",
+      "group": "Step Sequencer"
+    },
+    {
+      "id": "seq-acid-bass",
+      "name": "Seq Acid Bass",
+      "description": "TB-303 style acid bass line with slides and accents.",
+      "file": "seq-acid-bass.json",
+      "group": "Step Sequencer"
     }
   ]
 }

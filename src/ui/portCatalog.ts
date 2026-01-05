@@ -261,4 +261,17 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
       { id: 'accent', label: 'Acc', kind: 'cv', direction: 'out' },
     ],
   },
+  'step-sequencer': {
+    inputs: [
+      { id: 'clock', label: 'Clk', kind: 'sync', direction: 'in' },
+      { id: 'reset', label: 'Rst', kind: 'sync', direction: 'in' },
+      { id: 'cv-offset', label: 'CV', kind: 'cv', direction: 'in' },
+    ],
+    outputs: [
+      { id: 'cv-out', label: 'CV', kind: 'cv', direction: 'out' },
+      { id: 'gate-out', label: 'Gate', kind: 'gate', direction: 'out' },
+      { id: 'velocity-out', label: 'Vel', kind: 'cv', direction: 'out' },
+      { id: 'step-out', label: 'Step', kind: 'cv', direction: 'out' },
+    ],
+  },
 }

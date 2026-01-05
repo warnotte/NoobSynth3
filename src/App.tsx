@@ -663,7 +663,12 @@ function App() {
       }))
 
       if (status === 'running' && !options?.skipEngine) {
-        engine.setParam(moduleId, paramId, value)
+        // String params like stepData go through setParamString
+        if (typeof value === 'string' && paramId === 'stepData') {
+          engine.setParamString(moduleId, paramId, value)
+        } else {
+          engine.setParam(moduleId, paramId, value)
+        }
       }
       if (isTauri && tauriNativeRunning && !options?.skipEngine) {
         const numeric = normalizeNativeParamValue(paramId, value)

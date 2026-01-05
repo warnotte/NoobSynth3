@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties } from 'react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import type { AudioEngine } from '../engine/WasmGraphEngine'
 import type { ModuleSpec } from '../shared/graph'
 import { useComputerKeyboard } from '../hooks/useComputerKeyboard'
@@ -2616,6 +2616,511 @@ export const ModuleControls = ({
             />
           </>
         )}
+      </>
+    )
+  }
+
+  if (module.type === 'step-sequencer') {
+    const enabled = module.params.enabled !== false
+    const tempo = Number(module.params.tempo ?? 120)
+    const rate = Number(module.params.rate ?? 9)
+    const gateLength = Number(module.params.gateLength ?? 50)
+    const swing = Number(module.params.swing ?? 0)
+    const slideTime = Number(module.params.slideTime ?? 50)
+    const length = Number(module.params.length ?? 16)
+    const direction = Number(module.params.direction ?? 0)
+
+    // Parse step data
+    type StepData = { pitch: number; gate: boolean; velocity: number; slide: boolean }
+    let steps: StepData[] = []
+    try {
+      const raw = module.params.stepData
+      if (typeof raw === 'string') {
+        steps = JSON.parse(raw)
+      }
+    } catch {
+      // Use defaults if parse fails
+      steps = Array.from({ length: 16 }, () => ({ pitch: 0, gate: true, velocity: 100, slide: false }))
+    }
+    // Ensure 16 steps
+    while (steps.length < 16) {
+      steps.push({ pitch: 0, gate: true, velocity: 100, slide: false })
+    }
+
+    const updateSteps = (newSteps: StepData[]) => {
+      updateParam(module.id, 'stepData', JSON.stringify(newSteps))
+    }
+
+    // Pattern presets - expanded
+    const patternPresets = [
+      { id: 'init', label: 'Init', steps: Array.from({ length: 16 }, () => ({ pitch: 0, gate: true, velocity: 100, slide: false })) },
+      { id: 'moroder', label: 'Moroder', steps: [
+        { pitch: 0, gate: true, velocity: 100, slide: false }, { pitch: 0, gate: true, velocity: 70, slide: false },
+        { pitch: 12, gate: true, velocity: 90, slide: false }, { pitch: 0, gate: true, velocity: 60, slide: false },
+        { pitch: 7, gate: true, velocity: 100, slide: true }, { pitch: 12, gate: true, velocity: 70, slide: false },
+        { pitch: 0, gate: true, velocity: 80, slide: false }, { pitch: 7, gate: true, velocity: 60, slide: false },
+        { pitch: 12, gate: true, velocity: 100, slide: false }, { pitch: 0, gate: true, velocity: 70, slide: false },
+        { pitch: 7, gate: true, velocity: 90, slide: true }, { pitch: 0, gate: true, velocity: 60, slide: false },
+        { pitch: 0, gate: true, velocity: 100, slide: false }, { pitch: 12, gate: true, velocity: 70, slide: false },
+        { pitch: 7, gate: true, velocity: 80, slide: true }, { pitch: 0, gate: true, velocity: 60, slide: false },
+      ]},
+      { id: 'feel-love', label: 'Feel Love', steps: [
+        { pitch: 0, gate: true, velocity: 100, slide: false }, { pitch: 12, gate: true, velocity: 80, slide: false },
+        { pitch: 7, gate: true, velocity: 90, slide: false }, { pitch: 12, gate: true, velocity: 70, slide: false },
+        { pitch: 0, gate: true, velocity: 100, slide: false }, { pitch: 12, gate: true, velocity: 80, slide: false },
+        { pitch: 7, gate: true, velocity: 90, slide: false }, { pitch: 12, gate: true, velocity: 70, slide: false },
+        { pitch: 0, gate: true, velocity: 100, slide: false }, { pitch: 12, gate: true, velocity: 80, slide: false },
+        { pitch: 7, gate: true, velocity: 90, slide: false }, { pitch: 12, gate: true, velocity: 70, slide: false },
+        { pitch: 0, gate: true, velocity: 100, slide: false }, { pitch: 12, gate: true, velocity: 80, slide: false },
+        { pitch: 7, gate: true, velocity: 90, slide: false }, { pitch: 12, gate: true, velocity: 70, slide: false },
+      ]},
+      { id: 'acid', label: 'Acid', steps: [
+        { pitch: 0, gate: true, velocity: 100, slide: false }, { pitch: 0, gate: true, velocity: 60, slide: true },
+        { pitch: 12, gate: true, velocity: 100, slide: false }, { pitch: 0, gate: false, velocity: 100, slide: false },
+        { pitch: 7, gate: true, velocity: 80, slide: true }, { pitch: 5, gate: true, velocity: 70, slide: true },
+        { pitch: 0, gate: true, velocity: 100, slide: false }, { pitch: 0, gate: true, velocity: 50, slide: false },
+        { pitch: 0, gate: true, velocity: 100, slide: false }, { pitch: 12, gate: true, velocity: 60, slide: true },
+        { pitch: 7, gate: true, velocity: 90, slide: false }, { pitch: 0, gate: false, velocity: 100, slide: false },
+        { pitch: 3, gate: true, velocity: 80, slide: true }, { pitch: 0, gate: true, velocity: 70, slide: false },
+        { pitch: 0, gate: true, velocity: 100, slide: false }, { pitch: 0, gate: true, velocity: 50, slide: false },
+      ]},
+      { id: 'octaves', label: 'Octaves', steps: [
+        { pitch: 0, gate: true, velocity: 100, slide: false }, { pitch: 12, gate: true, velocity: 80, slide: false },
+        { pitch: 0, gate: true, velocity: 90, slide: false }, { pitch: 12, gate: true, velocity: 70, slide: false },
+        { pitch: 0, gate: true, velocity: 100, slide: false }, { pitch: 12, gate: true, velocity: 80, slide: false },
+        { pitch: 0, gate: true, velocity: 90, slide: false }, { pitch: 12, gate: true, velocity: 70, slide: false },
+        { pitch: 0, gate: true, velocity: 100, slide: false }, { pitch: 12, gate: true, velocity: 80, slide: false },
+        { pitch: 0, gate: true, velocity: 90, slide: false }, { pitch: 12, gate: true, velocity: 70, slide: false },
+        { pitch: 0, gate: true, velocity: 100, slide: false }, { pitch: 12, gate: true, velocity: 80, slide: false },
+        { pitch: 0, gate: true, velocity: 90, slide: false }, { pitch: 12, gate: true, velocity: 70, slide: false },
+      ]},
+      { id: 'arp-up', label: 'Arp Up', steps: [
+        { pitch: 0, gate: true, velocity: 100, slide: false }, { pitch: 3, gate: true, velocity: 80, slide: false },
+        { pitch: 7, gate: true, velocity: 90, slide: false }, { pitch: 12, gate: true, velocity: 70, slide: false },
+        { pitch: 15, gate: true, velocity: 100, slide: false }, { pitch: 19, gate: true, velocity: 80, slide: false },
+        { pitch: 24, gate: true, velocity: 90, slide: false }, { pitch: 19, gate: true, velocity: 70, slide: false },
+        { pitch: 15, gate: true, velocity: 100, slide: false }, { pitch: 12, gate: true, velocity: 80, slide: false },
+        { pitch: 7, gate: true, velocity: 90, slide: false }, { pitch: 3, gate: true, velocity: 70, slide: false },
+        { pitch: 0, gate: true, velocity: 100, slide: false }, { pitch: 3, gate: true, velocity: 80, slide: false },
+        { pitch: 7, gate: true, velocity: 90, slide: false }, { pitch: 12, gate: true, velocity: 70, slide: false },
+      ]},
+      { id: 'arp-down', label: 'Arp Dn', steps: [
+        { pitch: 24, gate: true, velocity: 100, slide: false }, { pitch: 19, gate: true, velocity: 80, slide: false },
+        { pitch: 15, gate: true, velocity: 90, slide: false }, { pitch: 12, gate: true, velocity: 70, slide: false },
+        { pitch: 7, gate: true, velocity: 100, slide: false }, { pitch: 3, gate: true, velocity: 80, slide: false },
+        { pitch: 0, gate: true, velocity: 90, slide: false }, { pitch: 3, gate: true, velocity: 70, slide: false },
+        { pitch: 7, gate: true, velocity: 100, slide: false }, { pitch: 12, gate: true, velocity: 80, slide: false },
+        { pitch: 15, gate: true, velocity: 90, slide: false }, { pitch: 19, gate: true, velocity: 70, slide: false },
+        { pitch: 24, gate: true, velocity: 100, slide: false }, { pitch: 19, gate: true, velocity: 80, slide: false },
+        { pitch: 15, gate: true, velocity: 90, slide: false }, { pitch: 12, gate: true, velocity: 70, slide: false },
+      ]},
+      { id: 'bass-line', label: 'Bass', steps: [
+        { pitch: 0, gate: true, velocity: 100, slide: false }, { pitch: 0, gate: true, velocity: 60, slide: false },
+        { pitch: 0, gate: true, velocity: 80, slide: false }, { pitch: 0, gate: false, velocity: 100, slide: false },
+        { pitch: -5, gate: true, velocity: 100, slide: false }, { pitch: -5, gate: true, velocity: 60, slide: false },
+        { pitch: 0, gate: true, velocity: 80, slide: true }, { pitch: 0, gate: false, velocity: 100, slide: false },
+        { pitch: 0, gate: true, velocity: 100, slide: false }, { pitch: 0, gate: true, velocity: 60, slide: false },
+        { pitch: 3, gate: true, velocity: 80, slide: true }, { pitch: 0, gate: true, velocity: 70, slide: true },
+        { pitch: -5, gate: true, velocity: 100, slide: false }, { pitch: -5, gate: true, velocity: 60, slide: false },
+        { pitch: -7, gate: true, velocity: 90, slide: true }, { pitch: 0, gate: false, velocity: 100, slide: false },
+      ]},
+      { id: 'trance', label: 'Trance', steps: [
+        { pitch: 0, gate: true, velocity: 100, slide: false }, { pitch: 0, gate: true, velocity: 70, slide: false },
+        { pitch: 0, gate: true, velocity: 90, slide: false }, { pitch: 0, gate: true, velocity: 60, slide: false },
+        { pitch: 7, gate: true, velocity: 100, slide: false }, { pitch: 7, gate: true, velocity: 70, slide: false },
+        { pitch: 5, gate: true, velocity: 90, slide: false }, { pitch: 5, gate: true, velocity: 60, slide: false },
+        { pitch: 0, gate: true, velocity: 100, slide: false }, { pitch: 0, gate: true, velocity: 70, slide: false },
+        { pitch: 0, gate: true, velocity: 90, slide: false }, { pitch: 0, gate: true, velocity: 60, slide: false },
+        { pitch: 3, gate: true, velocity: 100, slide: false }, { pitch: 3, gate: true, velocity: 70, slide: false },
+        { pitch: 5, gate: true, velocity: 90, slide: false }, { pitch: 7, gate: true, velocity: 80, slide: true },
+      ]},
+      { id: 'kraftwerk', label: 'Kraft', steps: [
+        { pitch: 0, gate: true, velocity: 100, slide: false }, { pitch: 0, gate: false, velocity: 100, slide: false },
+        { pitch: 0, gate: true, velocity: 80, slide: false }, { pitch: 0, gate: false, velocity: 100, slide: false },
+        { pitch: 0, gate: true, velocity: 100, slide: false }, { pitch: 0, gate: false, velocity: 100, slide: false },
+        { pitch: 12, gate: true, velocity: 80, slide: false }, { pitch: 0, gate: false, velocity: 100, slide: false },
+        { pitch: 0, gate: true, velocity: 100, slide: false }, { pitch: 0, gate: false, velocity: 100, slide: false },
+        { pitch: 0, gate: true, velocity: 80, slide: false }, { pitch: 0, gate: false, velocity: 100, slide: false },
+        { pitch: 7, gate: true, velocity: 100, slide: false }, { pitch: 0, gate: false, velocity: 100, slide: false },
+        { pitch: 5, gate: true, velocity: 80, slide: false }, { pitch: 0, gate: false, velocity: 100, slide: false },
+      ]},
+      { id: 'random', label: 'Random', steps: Array.from({ length: 16 }, () => ({
+        pitch: Math.floor(Math.random() * 25) - 12,
+        gate: Math.random() > 0.2,
+        velocity: 50 + Math.floor(Math.random() * 50),
+        slide: Math.random() > 0.7,
+      }))},
+    ]
+
+    const rateDivisions = [
+      { id: 6, label: '1/4' },
+      { id: 9, label: '1/8' },
+      { id: 12, label: '1/16' },
+      { id: 8, label: '1/4T' },
+      { id: 11, label: '1/8T' },
+      { id: 14, label: '1/16T' },
+    ]
+
+    const directions = [
+      { id: 0, label: 'FWD' },
+      { id: 1, label: 'REV' },
+      { id: 2, label: 'P/P' },
+      { id: 3, label: 'RND' },
+    ]
+
+    // Format pitch display
+    const formatPitch = (pitch: number) => {
+      if (pitch === 0) return '0'
+      return pitch > 0 ? `+${pitch}` : `${pitch}`
+    }
+
+    // Calculate step duration in ms based on rate
+    const getRateMultiplier = (r: number) => {
+      switch (r) {
+        case 6: return 1      // 1/4
+        case 9: return 0.5    // 1/8
+        case 12: return 0.25  // 1/16
+        case 8: return 2/3    // 1/4T
+        case 11: return 1/3   // 1/8T
+        case 14: return 1/6   // 1/16T
+        default: return 0.5
+      }
+    }
+    const stepDurationMs = (60000 / tempo) * getRateMultiplier(rate)
+
+    // Use ref for step grid and interval-based LED animation
+    const gridRef = useRef<HTMLDivElement>(null)
+    const intervalRef = useRef<number | null>(null)
+    const stepRef = useRef({ current: 0, forward: true })
+
+    useEffect(() => {
+      // Clear previous interval
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+        intervalRef.current = null
+      }
+
+      // Clear all playing states
+      if (gridRef.current) {
+        gridRef.current.querySelectorAll('.seq-step.playing').forEach(el => {
+          el.classList.remove('playing')
+        })
+      }
+
+      // Don't animate if not enabled or not running
+      if (!enabled || status !== 'running') {
+        return
+      }
+
+      // Reset step counter
+      stepRef.current = { current: 0, forward: true }
+
+      // Start interval
+      intervalRef.current = window.setInterval(() => {
+        if (!gridRef.current) return
+
+        // Remove previous playing class
+        gridRef.current.querySelectorAll('.seq-step.playing').forEach(el => {
+          el.classList.remove('playing')
+        })
+
+        // Add playing class to current step
+        const stepEl = gridRef.current.querySelector(`[data-step="${stepRef.current.current}"]`)
+        if (stepEl) {
+          stepEl.classList.add('playing')
+        }
+
+        // Calculate next step based on direction
+        const s = stepRef.current
+        if (direction === 0) {
+          // Forward
+          s.current = (s.current + 1) % length
+        } else if (direction === 1) {
+          // Reverse
+          s.current = s.current - 1
+          if (s.current < 0) s.current = length - 1
+        } else if (direction === 2) {
+          // Ping-pong
+          if (s.forward) {
+            s.current++
+            if (s.current >= length - 1) {
+              s.current = length - 1
+              s.forward = false
+            }
+          } else {
+            s.current--
+            if (s.current <= 0) {
+              s.current = 0
+              s.forward = true
+            }
+          }
+        } else {
+          // Random
+          s.current = Math.floor(Math.random() * length)
+        }
+      }, stepDurationMs)
+
+      return () => {
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current)
+          intervalRef.current = null
+        }
+      }
+    }, [enabled, status, tempo, rate, length, direction, stepDurationMs])
+
+    return (
+      <>
+        {/* ON/OFF */}
+        <div className="toggle-group">
+          <button
+            type="button"
+            className={`ui-btn ui-btn--pill toggle-btn ${enabled ? 'active' : ''}`}
+            onClick={() => updateParam(module.id, 'enabled', !enabled)}
+          >
+            {enabled ? 'ON' : 'OFF'}
+          </button>
+        </div>
+
+        {/* Pattern Presets - All in one row */}
+        <div className="seq-pattern-row">
+          {patternPresets.map((p) => (
+            <button
+              key={p.id}
+              type="button"
+              className="seq-pattern-btn"
+              onClick={() => updateSteps(p.steps)}
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Knobs row */}
+        <RotaryKnob
+          label="Tempo"
+          min={40}
+          max={300}
+          step={1}
+          unit="BPM"
+          value={tempo}
+          onChange={(value) => updateParam(module.id, 'tempo', value)}
+          format={(value) => Math.round(value).toString()}
+        />
+        <RotaryKnob
+          label="Gate"
+          min={10}
+          max={100}
+          step={1}
+          unit="%"
+          value={gateLength}
+          onChange={(value) => updateParam(module.id, 'gateLength', value)}
+          format={(value) => Math.round(value).toString()}
+        />
+        <RotaryKnob
+          label="Swing"
+          min={0}
+          max={90}
+          step={1}
+          unit="%"
+          value={swing}
+          onChange={(value) => updateParam(module.id, 'swing', value)}
+          format={(value) => Math.round(value).toString()}
+        />
+        <RotaryKnob
+          label="Slide"
+          min={10}
+          max={200}
+          step={1}
+          unit="ms"
+          value={slideTime}
+          onChange={(value) => updateParam(module.id, 'slideTime', value)}
+          format={(value) => Math.round(value).toString()}
+        />
+
+        {/* Rate / Direction / Length - 3 separate visual groups */}
+        <div className="seq-control-section">
+          <div className="seq-control-box">
+            <span className="seq-control-label">Rate</span>
+            <div className="seq-control-buttons">
+              {rateDivisions.map((r) => (
+                <button
+                  key={r.id}
+                  type="button"
+                  className={`seq-control-btn ${rate === r.id ? 'active' : ''}`}
+                  onClick={() => updateParam(module.id, 'rate', r.id)}
+                >
+                  {r.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="seq-control-box">
+            <span className="seq-control-label">Direction</span>
+            <div className="seq-control-buttons">
+              {directions.map((d) => (
+                <button
+                  key={d.id}
+                  type="button"
+                  className={`seq-control-btn ${direction === d.id ? 'active' : ''}`}
+                  onClick={() => updateParam(module.id, 'direction', d.id)}
+                >
+                  {d.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="seq-control-box">
+            <span className="seq-control-label">Length</span>
+            <div className="seq-control-buttons">
+              {[4, 8, 12, 16].map((l) => (
+                <button
+                  key={l}
+                  type="button"
+                  className={`seq-control-btn ${length === l ? 'active' : ''}`}
+                  onClick={() => updateParam(module.id, 'length', l)}
+                >
+                  {l}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Step Grid with LED indicators */}
+        <div className="seq-step-grid" ref={gridRef}>
+          {/* Steps 1-8 */}
+          <div className="seq-step-bank">
+            {steps.slice(0, 8).map((step, i) => (
+              <div key={i} data-step={i} className={`seq-step ${i >= length ? 'disabled' : ''}`}>
+                <div className="seq-step-led" />
+                <div className="seq-step-num">{i + 1}</div>
+                <button
+                  type="button"
+                  className={`seq-step-gate ${step.gate ? 'active' : ''}`}
+                  onClick={() => {
+                    const newSteps = [...steps]
+                    newSteps[i] = { ...newSteps[i], gate: !newSteps[i].gate }
+                    updateSteps(newSteps)
+                  }}
+                >
+                  {step.gate ? 'ON' : '-'}
+                </button>
+                <div
+                  className="seq-step-pitch"
+                  onWheel={(e) => {
+                    e.preventDefault()
+                    const delta = e.deltaY > 0 ? -1 : 1
+                    const newPitch = Math.max(-24, Math.min(24, step.pitch + delta))
+                    const newSteps = [...steps]
+                    newSteps[i] = { ...newSteps[i], pitch: newPitch }
+                    updateSteps(newSteps)
+                  }}
+                  onClick={(e) => {
+                    const delta = e.button === 2 ? -1 : 1
+                    const newPitch = Math.max(-24, Math.min(24, step.pitch + delta))
+                    const newSteps = [...steps]
+                    newSteps[i] = { ...newSteps[i], pitch: newPitch }
+                    updateSteps(newSteps)
+                  }}
+                  onContextMenu={(e) => e.preventDefault()}
+                  title="Scroll or click to change, right-click to decrease"
+                >
+                  {formatPitch(step.pitch)}
+                </div>
+                <div
+                  className="seq-step-vel"
+                  style={{ '--vel': step.velocity } as React.CSSProperties}
+                  onClick={(e) => {
+                    const rect = e.currentTarget.getBoundingClientRect()
+                    const y = e.clientY - rect.top
+                    const velocity = Math.round(100 - (y / rect.height) * 100)
+                    const newSteps = [...steps]
+                    newSteps[i] = { ...newSteps[i], velocity: Math.max(0, Math.min(100, velocity)) }
+                    updateSteps(newSteps)
+                  }}
+                />
+                <button
+                  type="button"
+                  className={`seq-step-slide ${step.slide ? 'active' : ''}`}
+                  onClick={() => {
+                    const newSteps = [...steps]
+                    newSteps[i] = { ...newSteps[i], slide: !newSteps[i].slide }
+                    updateSteps(newSteps)
+                  }}
+                >
+                  S
+                </button>
+              </div>
+            ))}
+          </div>
+          {/* Steps 9-16 */}
+          <div className="seq-step-bank">
+            {steps.slice(8, 16).map((step, i) => (
+              <div key={i + 8} data-step={i + 8} className={`seq-step ${i + 8 >= length ? 'disabled' : ''}`}>
+                <div className="seq-step-led" />
+                <div className="seq-step-num">{i + 9}</div>
+                <button
+                  type="button"
+                  className={`seq-step-gate ${step.gate ? 'active' : ''}`}
+                  onClick={() => {
+                    const newSteps = [...steps]
+                    newSteps[i + 8] = { ...newSteps[i + 8], gate: !newSteps[i + 8].gate }
+                    updateSteps(newSteps)
+                  }}
+                >
+                  {step.gate ? 'ON' : '-'}
+                </button>
+                <div
+                  className="seq-step-pitch"
+                  onWheel={(e) => {
+                    e.preventDefault()
+                    const delta = e.deltaY > 0 ? -1 : 1
+                    const newPitch = Math.max(-24, Math.min(24, step.pitch + delta))
+                    const newSteps = [...steps]
+                    newSteps[i + 8] = { ...newSteps[i + 8], pitch: newPitch }
+                    updateSteps(newSteps)
+                  }}
+                  onClick={(e) => {
+                    const delta = e.button === 2 ? -1 : 1
+                    const newPitch = Math.max(-24, Math.min(24, step.pitch + delta))
+                    const newSteps = [...steps]
+                    newSteps[i + 8] = { ...newSteps[i + 8], pitch: newPitch }
+                    updateSteps(newSteps)
+                  }}
+                  onContextMenu={(e) => e.preventDefault()}
+                  title="Scroll or click to change, right-click to decrease"
+                >
+                  {formatPitch(step.pitch)}
+                </div>
+                <div
+                  className="seq-step-vel"
+                  style={{ '--vel': step.velocity } as React.CSSProperties}
+                  onClick={(e) => {
+                    const rect = e.currentTarget.getBoundingClientRect()
+                    const y = e.clientY - rect.top
+                    const velocity = Math.round(100 - (y / rect.height) * 100)
+                    const newSteps = [...steps]
+                    newSteps[i + 8] = { ...newSteps[i + 8], velocity: Math.max(0, Math.min(100, velocity)) }
+                    updateSteps(newSteps)
+                  }}
+                />
+                <button
+                  type="button"
+                  className={`seq-step-slide ${step.slide ? 'active' : ''}`}
+                  onClick={() => {
+                    const newSteps = [...steps]
+                    newSteps[i + 8] = { ...newSteps[i + 8], slide: !newSteps[i + 8].slide }
+                    updateSteps(newSteps)
+                  }}
+                >
+                  S
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
       </>
     )
   }

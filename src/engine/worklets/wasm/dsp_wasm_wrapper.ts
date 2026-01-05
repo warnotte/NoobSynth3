@@ -4,6 +4,7 @@ import init, * as wasm from './dsp_wasm.js'
 type WasmGraphEngineCtor = new (sampleRate: number) => {
   set_graph(graphJson: string): void
   set_param(moduleId: string, paramId: string, value: number): void
+  set_param_string(moduleId: string, paramId: string, value: string): void
   set_control_voice_cv(moduleId: string, voice: number, value: number): void
   set_control_voice_gate(moduleId: string, voice: number, value: number): void
   trigger_control_voice_gate(moduleId: string, voice: number): void

@@ -151,6 +151,20 @@ export class WasmGraphEngine {
         wasm.__wbg_wasmgraphengine_free(ptr, 0);
     }
     /**
+     * @param {string} module_id
+     * @param {string} param_id
+     * @param {string} value
+     */
+    set_param_string(module_id, param_id, value) {
+        const ptr0 = passStringToWasm0(module_id, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passStringToWasm0(param_id, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+        const len1 = WASM_VECTOR_LEN;
+        const ptr2 = passStringToWasm0(value, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+        const len2 = WASM_VECTOR_LEN;
+        wasm.wasmgraphengine_set_param_string(this.__wbg_ptr, ptr0, len0, ptr1, len1, ptr2, len2);
+    }
+    /**
      * @param {Float32Array} input
      */
     set_external_input(input) {

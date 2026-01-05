@@ -165,6 +165,29 @@ export class AudioEngine {
     }
   }
 
+  setParamString(moduleId: string, paramId: string, value: string): void {
+    const node = this.graphNode
+    if (!node) {
+      return
+    }
+    node.port.postMessage({
+      type: 'setParamString',
+      moduleId,
+      paramId,
+      value,
+    })
+    if (this.currentGraph) {
+      this.currentGraph = {
+        ...this.currentGraph,
+        modules: this.currentGraph.modules.map((module) =>
+          module.id === moduleId
+            ? { ...module, params: { ...module.params, [paramId]: value } }
+            : module,
+        ),
+      }
+    }
+  }
+
   setControlVoiceCv(moduleId: string, voiceIndex: number, value: number): void {
     this.graphNode?.port.postMessage({
       type: 'controlVoiceCv',

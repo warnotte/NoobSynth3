@@ -38,6 +38,7 @@ export type ModuleType =
   | 'wavefolder'
   | 'mario'
   | 'arpeggiator'
+  | 'step-sequencer'
 
 export interface ModuleSpec {
   id: string

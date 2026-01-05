@@ -32,6 +32,7 @@ This file is meant to be reread by the coding assistant to keep context, decisio
 - Quantizer (scale + root)
 - Mod Router (CV in, 4 CV outs with depth)
 - Mod VCA (CV multiplier)
+- Step Sequencer (16-step TB-303 style with pitch/gate/velocity/slide per step, 11 built-in patterns)
 
 **Filters:**
 - VCF (SVF + ladder models, LP/HP/BP/Notch, 12/24 dB)
@@ -112,6 +113,18 @@ Presets support two formats:
 - MIDI enhancements (pitch bend, CC mapping).
 - Optional: add native MIDI input via `midir` for Tauri (lower latency, more reliable than Web MIDI).
 - **VST**: Wire scope taps through IPC for oscilloscope in VST mode.
+
+## Recent changes (Jan 2026)
+
+### Step Sequencer Module
+
+- **16-step TB-303 style sequencer** with per-step pitch, gate, velocity, and slide
+- **11 built-in patterns**: Init, Moroder, Feel Love, Acid, Octaves, Arp Up, Arp Down, Bass, Trance, Kraftwerk, Random
+- **4 direction modes**: Forward, Reverse, Ping-pong, Random
+- **6 rate divisions**: 1/4, 1/8, 1/16, 1/4T, 1/8T, 1/16T
+- **Variable length**: 4, 8, 12, or 16 steps
+- **Visual feedback**: LED indicators show current playing step
+- **3 preset files**: seq-moroder-chase, seq-feel-love, seq-acid-bass
 
 ## Recent changes (Dec 2025)
 

@@ -43,6 +43,7 @@ const decodeWasmDataUrl = (dataUrl: string) => {
 type GraphMessage =
   | { type: 'setGraph'; graphJson: string }
   | { type: 'setParam'; moduleId: string; paramId: string; value: number }
+  | { type: 'setParamString'; moduleId: string; paramId: string; value: string }
   | { type: 'controlVoiceCv'; moduleId: string; voice: number; value: number }
   | { type: 'controlVoiceGate'; moduleId: string; voice: number; value: number }
   | { type: 'controlVoiceTriggerGate'; moduleId: string; voice: number }
@@ -104,6 +105,9 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
     switch (message.type) {
       case 'setParam':
         this.engine.set_param(message.moduleId, message.paramId, message.value)
+        break
+      case 'setParamString':
+        this.engine.set_param_string(message.moduleId, message.paramId, message.value)
         break
       case 'controlVoiceCv':
         this.engine.set_control_voice_cv(message.moduleId, message.voice, message.value)

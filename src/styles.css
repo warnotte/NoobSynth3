@@ -2303,6 +2303,307 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* ============================================
+   STEP SEQUENCER GRID - New Vertical Design
+   ============================================ */
+
+.seq-step-grid {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.35);
+  padding: 10px;
+  border-radius: 6px;
+  margin-top: 8px;
+}
+
+.seq-step-bank {
+  display: flex;
+  gap: 4px;
+}
+
+.seq-step {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 4px 2px;
+  background: rgba(30, 40, 50, 0.6);
+  border-radius: 4px;
+  border: 1px solid rgba(60, 80, 100, 0.3);
+  transition: opacity 0.2s;
+}
+
+.seq-step.disabled {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.seq-step-num {
+  font-size: 9px;
+  font-weight: 700;
+  color: rgba(198, 212, 228, 0.7);
+  text-align: center;
+  width: 100%;
+}
+
+/* Gate button - ON/OFF toggle */
+.seq-step-gate {
+  width: 100%;
+  height: 22px;
+  border: none;
+  border-radius: 3px;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.1s;
+  background: rgba(40, 50, 60, 0.9);
+  color: rgba(198, 212, 228, 0.5);
+}
+
+.seq-step-gate:hover {
+  background: rgba(60, 80, 100, 0.9);
+}
+
+.seq-step-gate.active {
+  background: linear-gradient(180deg, #3b8beb 0%, #2563eb 100%);
+  color: #fff;
+  box-shadow: 0 0 6px rgba(59, 139, 235, 0.4);
+}
+
+/* Pitch display - clickable/scrollable */
+.seq-step-pitch {
+  width: 100%;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(20, 30, 40, 0.9);
+  border: 1px solid rgba(60, 80, 100, 0.4);
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  color: #a5d6ff;
+  cursor: ns-resize;
+  user-select: none;
+  transition: background 0.1s;
+}
+
+.seq-step-pitch:hover {
+  background: rgba(30, 45, 60, 0.9);
+  border-color: rgba(90, 120, 150, 0.5);
+}
+
+.seq-step-pitch:active {
+  background: rgba(40, 60, 80, 0.9);
+}
+
+/* Velocity bar */
+.seq-step-vel {
+  width: 100%;
+  height: 28px;
+  background: rgba(20, 30, 40, 0.9);
+  border: 1px solid rgba(60, 80, 100, 0.3);
+  border-radius: 3px;
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.seq-step-vel::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: calc(var(--vel, 100) * 1%);
+  background: linear-gradient(180deg, #34d399 0%, #10b981 50%, #059669 100%);
+  border-radius: 2px;
+  transition: height 0.05s;
+}
+
+/* Slide toggle button */
+.seq-step-slide {
+  width: 100%;
+  height: 18px;
+  border: none;
+  border-radius: 3px;
+  font-size: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.1s;
+  background: rgba(40, 50, 60, 0.9);
+  color: rgba(198, 212, 228, 0.4);
+}
+
+.seq-step-slide:hover {
+  background: rgba(60, 80, 100, 0.9);
+}
+
+.seq-step-slide.active {
+  background: linear-gradient(180deg, #fbbf24 0%, #f59e0b 100%);
+  color: #1a1a1a;
+  box-shadow: 0 0 6px rgba(251, 191, 36, 0.4);
+}
+
+/* ============================================
+   STEP SEQUENCER - Rate/Dir/Len Controls
+   ============================================ */
+
+/* Container for all 3 control boxes */
+.seq-control-section {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* Individual box with its own background */
+.seq-control-box {
+  flex: 1;
+  min-width: 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+  border: 1px solid rgba(60, 80, 100, 0.25);
+}
+
+/* Rate box is wider due to more buttons */
+.seq-control-box:first-child {
+  flex: 1.8;
+  min-width: 200px;
+}
+
+/* Legacy support for old class names */
+.seq-controls-row {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: stretch;
+}
+
+.seq-control-group {
+  flex: 1;
+  min-width: 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.seq-control-group--rate {
+  flex: 1.5;
+  min-width: 180px;
+}
+
+.seq-control-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(198, 212, 228, 0.7);
+  text-align: center;
+}
+
+.seq-control-buttons {
+  display: flex;
+  gap: 3px;
+  flex: 1;
+}
+
+.seq-control-btn {
+  flex: 1;
+  padding: 8px 4px;
+  border: 1px solid rgba(80, 100, 130, 0.5);
+  border-radius: 4px;
+  background: rgba(30, 40, 55, 0.9);
+  color: rgba(198, 212, 228, 0.85);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-transform: uppercase;
+}
+
+.seq-control-btn:hover {
+  background: rgba(50, 65, 85, 0.9);
+  border-color: rgba(100, 130, 170, 0.6);
+}
+
+.seq-control-btn.active {
+  background: linear-gradient(180deg, #42e2b1 0%, #2eb88d 100%);
+  border-color: #42e2b1;
+  color: #0a0a0a;
+  box-shadow: 0 2px 8px rgba(66, 226, 177, 0.4);
+}
+
+/* Pattern preset row */
+.seq-pattern-row {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 6px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+}
+
+.seq-pattern-btn {
+  flex: 1 1 auto;
+  min-width: 55px;
+  padding: 6px 8px;
+  border: 1px solid rgba(80, 100, 130, 0.4);
+  border-radius: 4px;
+  background: rgba(30, 40, 55, 0.8);
+  color: rgba(198, 212, 228, 0.9);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.seq-pattern-btn:hover {
+  background: rgba(50, 65, 85, 0.9);
+  border-color: rgba(100, 130, 170, 0.6);
+}
+
+/* Step indicator LED */
+.seq-step.playing {
+  background: rgba(66, 226, 177, 0.2);
+  border-color: rgba(66, 226, 177, 0.5);
+  box-shadow: 0 0 8px rgba(66, 226, 177, 0.3);
+}
+
+.seq-step.playing .seq-step-num {
+  color: #42e2b1;
+  text-shadow: 0 0 4px rgba(66, 226, 177, 0.6);
+}
+
+/* LED indicator - simple structure, no animation for now */
+.seq-step-led {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(60, 80, 100, 0.4);
+  margin-bottom: 2px;
+  transition: background 0.1s, box-shadow 0.1s;
+}
+
+/* Active state - will be controlled by JS later */
+.seq-step.playing .seq-step-led {
+  background: #42e2b1;
+  box-shadow: 0 0 6px #42e2b1, 0 0 10px rgba(66, 226, 177, 0.5);
+}
+
 @media (max-width: 960px) {
   .topbar {
     gap: 12px;

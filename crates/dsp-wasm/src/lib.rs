@@ -26,6 +26,10 @@ impl WasmGraphEngine {
     self.engine.set_param(module_id, param_id, value);
   }
 
+  pub fn set_param_string(&mut self, module_id: &str, param_id: &str, value: &str) {
+    self.engine.set_param_string(module_id, param_id, value);
+  }
+
   pub fn set_control_voice_cv(&mut self, module_id: &str, voice: usize, value: f32) {
     self.engine.set_control_voice_cv(module_id, voice, value);
   }

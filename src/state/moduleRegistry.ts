@@ -38,6 +38,7 @@ export const moduleSizes: Record<ModuleType, string> = {
   vocoder: '2x3',
   'audio-in': '1x1',
   arpeggiator: '2x5',
+  'step-sequencer': '3x5',
 }
 
 export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>> = {
@@ -55,6 +56,7 @@ export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>>
   mario: 'strip',
   'mixer-1x2': 'strip',
   arpeggiator: 'strip',
+  'step-sequencer': 'strip',
 }
 
 export const moduleCatalog: { type: ModuleType; label: string }[] = [
@@ -95,6 +97,7 @@ export const moduleCatalog: { type: ModuleType; label: string }[] = [
   { type: 'lab', label: 'Lab' },
   { type: 'mario', label: 'Mario IO' },
   { type: 'arpeggiator', label: 'Arpeggiator' },
+  { type: 'step-sequencer', label: 'Step Sequencer' },
 ]
 
 export const modulePrefixes: Record<ModuleType, string> = {
@@ -135,6 +138,7 @@ export const modulePrefixes: Record<ModuleType, string> = {
   lab: 'lab',
   mario: 'mario',
   arpeggiator: 'arp',
+  'step-sequencer': 'seq',
 }
 
 export const moduleLabels: Record<ModuleType, string> = {
@@ -175,6 +179,7 @@ export const moduleLabels: Record<ModuleType, string> = {
   lab: 'Lab Panel',
   mario: 'Mario IO',
   arpeggiator: 'Arpeggiator',
+  'step-sequencer': 'Step Seq',
 }
 
 export const moduleDefaults: Record<ModuleType, Record<string, number | string | boolean>> = {
@@ -327,6 +332,34 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     euclidEnabled: false,
     mutate: 0,
     preset: 0,
+  },
+  'step-sequencer': {
+    enabled: true,
+    tempo: 120,
+    rate: 9,           // 1/16 note
+    gateLength: 50,    // 50% gate
+    swing: 0,
+    slideTime: 50,     // 50ms slide
+    length: 16,        // 16 steps
+    direction: 0,      // 0=FWD, 1=REV, 2=PINGPONG, 3=RANDOM
+    stepData: JSON.stringify([
+      { pitch: 0, gate: true, velocity: 100, slide: false },
+      { pitch: 0, gate: false, velocity: 100, slide: false },
+      { pitch: 0, gate: true, velocity: 80, slide: false },
+      { pitch: 0, gate: false, velocity: 100, slide: false },
+      { pitch: 0, gate: true, velocity: 100, slide: false },
+      { pitch: 0, gate: false, velocity: 100, slide: false },
+      { pitch: 0, gate: true, velocity: 80, slide: false },
+      { pitch: 0, gate: false, velocity: 100, slide: false },
+      { pitch: 0, gate: true, velocity: 100, slide: false },
+      { pitch: 0, gate: false, velocity: 100, slide: false },
+      { pitch: 0, gate: true, velocity: 80, slide: false },
+      { pitch: 0, gate: false, velocity: 100, slide: false },
+      { pitch: 0, gate: true, velocity: 100, slide: false },
+      { pitch: 0, gate: false, velocity: 100, slide: false },
+      { pitch: 0, gate: true, velocity: 80, slide: false },
+      { pitch: 0, gate: false, velocity: 100, slide: false },
+    ]),
   },
 }
 

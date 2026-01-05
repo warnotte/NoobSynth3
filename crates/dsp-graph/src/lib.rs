@@ -7,7 +7,8 @@ use dsp_core::{
   Quantizer, QuantizerInputs, QuantizerParams, Reverb, ReverbInputs, ReverbParams, RingMod,
   RingModParams, Sample, SampleHold, SampleHoldInputs, SampleHoldParams, SlewInputs, SlewLimiter,
   SlewParams, SnesOsc, SnesOscInputs, SnesOscParams, SpringReverb, SpringReverbInputs,
-  SpringReverbParams, Supersaw, SupersawInputs, SupersawParams, TapeDelay, TapeDelayInputs,
+  SpringReverbParams, StepSequencer, StepSequencerInputs, StepSequencerOutputs, StepSequencerParams,
+  Supersaw, SupersawInputs, SupersawParams, TapeDelay, TapeDelayInputs,
   TapeDelayParams, Vca, Vcf, VcfInputs, VcfParams, Vco, VcoInputs, VcoParams, Vocoder,
   VocoderInputs, VocoderParams, Wavefolder, WavefolderParams,
 };
@@ -90,6 +91,7 @@ enum ModuleType {
   Scope,
   Mario,
   Arpeggiator,
+  StepSequencer,
 }
 
 #[derive(Clone, Copy)]
@@ -543,6 +545,18 @@ struct ArpeggiatorState {
   mutate: ParamBuffer,
 }
 
+struct StepSequencerState {
+  seq: StepSequencer,
+  enabled: ParamBuffer,
+  tempo: ParamBuffer,
+  rate: ParamBuffer,
+  gate_length: ParamBuffer,
+  swing: ParamBuffer,
+  slide_time: ParamBuffer,
+  length: ParamBuffer,
+  direction: ParamBuffer,
+}
+
 enum ModuleState {
   Vco(VcoState),
   Supersaw(SupersawState),
@@ -581,6 +595,7 @@ enum ModuleState {
   Scope,
   Mario(MarioState),
   Arpeggiator(ArpeggiatorState),
+  StepSequencer(StepSequencerState),
 }
 
 struct ModuleNode {
@@ -641,6 +656,16 @@ impl GraphEngine {
       for &index in indices {
         if let Some(module) = self.modules.get_mut(index) {
           module.apply_param(param, value);
+        }
+      }
+    }
+  }
+
+  pub fn set_param_string(&mut self, module_id: &str, param: &str, value: &str) {
+    if let Some(indices) = self.module_map.get(module_id) {
+      for &index in indices {
+        if let Some(module) = self.modules.get_mut(index) {
+          module.apply_param_str(param, value);
         }
       }
     }
@@ -1247,6 +1272,26 @@ impl ModuleNode {
         euclid_enabled: ParamBuffer::new(param_number(params, "euclidEnabled", 0.0)),
         mutate: ParamBuffer::new(param_number(params, "mutate", 0.0)),
       }),
+      ModuleType::StepSequencer => {
+        let mut seq = StepSequencer::new(sample_rate);
+        // Parse initial step data if provided
+        if let Some(step_data) = params.get("stepData") {
+          if let Some(s) = step_data.as_str() {
+            seq.parse_step_data(s);
+          }
+        }
+        ModuleState::StepSequencer(StepSequencerState {
+          seq,
+          enabled: ParamBuffer::new(param_number(params, "enabled", 1.0)),
+          tempo: ParamBuffer::new(param_number(params, "tempo", 120.0)),
+          rate: ParamBuffer::new(param_number(params, "rate", 3.0)), // Default 1/8
+          gate_length: ParamBuffer::new(param_number(params, "gateLength", 50.0)),
+          swing: ParamBuffer::new(param_number(params, "swing", 0.0)),
+          slide_time: ParamBuffer::new(param_number(params, "slideTime", 50.0)),
+          length: ParamBuffer::new(param_number(params, "length", 16.0)),
+          direction: ParamBuffer::new(param_number(params, "direction", 0.0)),
+        })
+      }
     };
 
     Self {
@@ -1547,6 +1592,28 @@ impl ModuleNode {
         "mutate" => state.mutate.set(value),
         _ => {}
       },
+      ModuleState::StepSequencer(state) => match param {
+        "enabled" => state.enabled.set(value),
+        "tempo" => state.tempo.set(value),
+        "rate" => state.rate.set(value),
+        "gateLength" => state.gate_length.set(value),
+        "swing" => state.swing.set(value),
+        "slideTime" => state.slide_time.set(value),
+        "length" => state.length.set(value),
+        "direction" => state.direction.set(value),
+        _ => {}
+      },
+      _ => {}
+    }
+  }
+
+  fn apply_param_str(&mut self, param: &str, value: &str) {
+    match &mut self.state {
+      ModuleState::StepSequencer(state) => {
+        if param == "stepData" {
+          state.seq.parse_step_data(value);
+        }
+      }
       _ => {}
     }
   }
@@ -2447,6 +2514,43 @@ impl ModuleNode {
         let arp_outputs = ArpeggiatorOutputs { cv_out, gate_out, accent_out };
         state.arp.process_block(arp_outputs, arp_inputs, params);
       }
+      ModuleState::StepSequencer(state) => {
+        let clock = if self.connections[0].is_empty() {
+          None
+        } else {
+          Some(inputs[0].channel(0))
+        };
+        let reset = if self.connections[1].is_empty() {
+          None
+        } else {
+          Some(inputs[1].channel(0))
+        };
+        let cv_offset = if self.connections[2].is_empty() {
+          None
+        } else {
+          Some(inputs[2].channel(0))
+        };
+        let (cv_group, rest) = outputs.split_at_mut(1);
+        let (gate_group, rest2) = rest.split_at_mut(1);
+        let (vel_group, step_group) = rest2.split_at_mut(1);
+        let cv_out = cv_group[0].channel_mut(0);
+        let gate_out = gate_group[0].channel_mut(0);
+        let velocity_out = vel_group[0].channel_mut(0);
+        let step_out = step_group[0].channel_mut(0);
+        let seq_inputs = StepSequencerInputs { clock, reset, cv_offset };
+        let params = StepSequencerParams {
+          enabled: state.enabled.slice(frames),
+          tempo: state.tempo.slice(frames),
+          rate: state.rate.slice(frames),
+          gate_length: state.gate_length.slice(frames),
+          swing: state.swing.slice(frames),
+          slide_time: state.slide_time.slice(frames),
+          length: state.length.slice(frames),
+          direction: state.direction.slice(frames),
+        };
+        let seq_outputs = StepSequencerOutputs { cv_out, gate_out, velocity_out, step_out };
+        state.seq.process_block(seq_outputs, seq_inputs, params);
+      }
     }
   }
 }
@@ -2489,6 +2593,7 @@ fn normalize_module_type(raw: &str) -> ModuleType {
     "scope" => ModuleType::Scope,
     "mario" => ModuleType::Mario,
     "arpeggiator" => ModuleType::Arpeggiator,
+    "step-sequencer" => ModuleType::StepSequencer,
     _ => ModuleType::Oscillator,
   }
 }
@@ -2589,6 +2694,11 @@ fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // gate-in
       PortInfo { channels: 1 },  // clock
     ],
+    ModuleType::StepSequencer => vec![
+      PortInfo { channels: 1 },  // clock
+      PortInfo { channels: 1 },  // reset
+      PortInfo { channels: 1 },  // cv-offset
+    ],
   }
 }
 
@@ -2657,6 +2767,12 @@ fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // cv-out
       PortInfo { channels: 1 },  // gate-out
       PortInfo { channels: 1 },  // accent
+    ],
+    ModuleType::StepSequencer => vec![
+      PortInfo { channels: 1 },  // cv-out
+      PortInfo { channels: 1 },  // gate-out
+      PortInfo { channels: 1 },  // velocity-out
+      PortInfo { channels: 1 },  // step-out
     ],
   }
 }
@@ -2795,6 +2911,12 @@ fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize> {
       "cv-in" => Some(0),
       "gate-in" => Some(1),
       "clock" => Some(2),
+      _ => None,
+    },
+    ModuleType::StepSequencer => match port_id {
+      "clock" => Some(0),
+      "reset" => Some(1),
+      "cv-offset" => Some(2),
       _ => None,
     },
     _ => None,
@@ -2946,6 +3068,13 @@ fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize> {
       "cv-out" => Some(0),
       "gate-out" => Some(1),
       "accent" => Some(2),
+      _ => None,
+    },
+    ModuleType::StepSequencer => match port_id {
+      "cv-out" => Some(0),
+      "gate-out" => Some(1),
+      "velocity-out" => Some(2),
+      "step-out" => Some(3),
       _ => None,
     },
   }
