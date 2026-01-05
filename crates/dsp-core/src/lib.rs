@@ -4304,6 +4304,620 @@ impl Tb303 {
   }
 }
 
+// ============================================================================
+// TR-909 DRUM SYNTHESIS
+// ============================================================================
+
+/// TR-909 Kick Drum
+/// Analog synthesis: sine oscillator with pitch envelope + click + drive
+pub struct Kick909 {
+  sample_rate: f32,
+  phase: f32,
+  pitch_env: f32,
+  amp_env: f32,
+  click_env: f32,
+  triggered: bool,
+  last_trig: f32,
+}
+
+pub struct Kick909Params<'a> {
+  pub tune: &'a [f32],      // Base pitch (Hz), typically 40-80
+  pub attack: &'a [f32],    // Click attack amount 0-1
+  pub decay: &'a [f32],     // Amp decay time 0.1-2.0 seconds
+  pub drive: &'a [f32],     // Saturation amount 0-1
+}
+
+pub struct Kick909Inputs<'a> {
+  pub trigger: Option<&'a [f32]>,
+  pub accent: Option<&'a [f32]>,
+}
+
+impl Kick909 {
+  pub fn new(sample_rate: f32) -> Self {
+    Self {
+      sample_rate: sample_rate.max(1.0),
+      phase: 0.0,
+      pitch_env: 0.0,
+      amp_env: 0.0,
+      click_env: 0.0,
+      triggered: false,
+      last_trig: 0.0,
+    }
+  }
+
+  pub fn set_sample_rate(&mut self, sample_rate: f32) {
+    self.sample_rate = sample_rate.max(1.0);
+  }
+
+  pub fn process_block(
+    &mut self,
+    output: &mut [f32],
+    inputs: Kick909Inputs,
+    params: Kick909Params,
+  ) {
+    let len = output.len();
+
+    for i in 0..len {
+      let tune = params.tune.get(i).copied().unwrap_or(params.tune[0]).clamp(30.0, 120.0);
+      let attack = params.attack.get(i).copied().unwrap_or(params.attack[0]).clamp(0.0, 1.0);
+      let decay = params.decay.get(i).copied().unwrap_or(params.decay[0]).clamp(0.1, 2.0);
+      let drive = params.drive.get(i).copied().unwrap_or(params.drive[0]).clamp(0.0, 1.0);
+
+      let trig = inputs.trigger.map_or(0.0, |t| t.get(i).copied().unwrap_or(t[0]));
+      let accent = inputs.accent.map_or(0.5, |a| a.get(i).copied().unwrap_or(a[0])).clamp(0.0, 1.0);
+
+      // Trigger detection (rising edge)
+      if trig > 0.5 && self.last_trig <= 0.5 {
+        self.triggered = true;
+        self.pitch_env = 1.0;
+        self.amp_env = 1.0;
+        self.click_env = 1.0;
+        self.phase = 0.0;
+      }
+      self.last_trig = trig;
+
+      // Pitch envelope: fast exponential decay (gives the "thump")
+      // Higher pitch at start, drops to base tune
+      let pitch_decay_rate = 0.0003; // Very fast
+      self.pitch_env *= 1.0 - pitch_decay_rate * (self.sample_rate / 48000.0);
+
+      // Current frequency: base + pitch envelope sweep (up to +3 octaves at trigger)
+      let freq = tune * (1.0 + self.pitch_env * 8.0);
+
+      // Oscillator (sine wave)
+      let dt = freq / self.sample_rate;
+      self.phase += dt;
+      if self.phase >= 1.0 {
+        self.phase -= 1.0;
+      }
+      let sine = (self.phase * std::f32::consts::TAU).sin();
+
+      // Click (short noise burst for attack)
+      self.click_env *= 1.0 - 0.01 * (self.sample_rate / 48000.0);
+      let click_noise = (self.phase * 12345.6789).sin() * 0.3;
+      let click = click_noise * self.click_env * attack;
+
+      // Amplitude envelope
+      let amp_decay_rate = 1.0 / (decay * self.sample_rate);
+      self.amp_env = (self.amp_env - amp_decay_rate).max(0.0);
+
+      // Mix sine + click
+      let mut sample = (sine + click) * self.amp_env;
+
+      // Apply accent (louder + more punch)
+      sample *= 0.7 + accent * 0.6;
+
+      // Drive/saturation
+      if drive > 0.0 {
+        let gain = 1.0 + drive * 4.0;
+        sample = (sample * gain).tanh();
+      }
+
+      output[i] = sample.clamp(-1.0, 1.0);
+    }
+  }
+}
+
+/// TR-909 Snare Drum
+/// Analog synthesis: tone oscillator + filtered noise
+pub struct Snare909 {
+  sample_rate: f32,
+  phase: f32,
+  noise_state: u32,
+  amp_env: f32,
+  noise_env: f32,
+  last_trig: f32,
+}
+
+pub struct Snare909Params<'a> {
+  pub tune: &'a [f32],      // Tone pitch 100-400 Hz
+  pub tone: &'a [f32],      // Tone vs noise mix 0-1
+  pub snappy: &'a [f32],    // Noise brightness/snap 0-1
+  pub decay: &'a [f32],     // Decay time 0.1-1.0 seconds
+}
+
+pub struct Snare909Inputs<'a> {
+  pub trigger: Option<&'a [f32]>,
+  pub accent: Option<&'a [f32]>,
+}
+
+impl Snare909 {
+  pub fn new(sample_rate: f32) -> Self {
+    Self {
+      sample_rate: sample_rate.max(1.0),
+      phase: 0.0,
+      noise_state: 0x12345678,
+      amp_env: 0.0,
+      noise_env: 0.0,
+      last_trig: 0.0,
+    }
+  }
+
+  pub fn set_sample_rate(&mut self, sample_rate: f32) {
+    self.sample_rate = sample_rate.max(1.0);
+  }
+
+  fn white_noise(&mut self) -> f32 {
+    // Simple LFSR noise
+    self.noise_state ^= self.noise_state << 13;
+    self.noise_state ^= self.noise_state >> 17;
+    self.noise_state ^= self.noise_state << 5;
+    (self.noise_state as f32 / u32::MAX as f32) * 2.0 - 1.0
+  }
+
+  pub fn process_block(
+    &mut self,
+    output: &mut [f32],
+    inputs: Snare909Inputs,
+    params: Snare909Params,
+  ) {
+    let len = output.len();
+
+    for i in 0..len {
+      let tune = params.tune.get(i).copied().unwrap_or(params.tune[0]).clamp(100.0, 400.0);
+      let tone_mix = params.tone.get(i).copied().unwrap_or(params.tone[0]).clamp(0.0, 1.0);
+      let snappy = params.snappy.get(i).copied().unwrap_or(params.snappy[0]).clamp(0.0, 1.0);
+      let decay = params.decay.get(i).copied().unwrap_or(params.decay[0]).clamp(0.05, 1.0);
+
+      let trig = inputs.trigger.map_or(0.0, |t| t.get(i).copied().unwrap_or(t[0]));
+      let accent = inputs.accent.map_or(0.5, |a| a.get(i).copied().unwrap_or(a[0])).clamp(0.0, 1.0);
+
+      // Trigger detection
+      if trig > 0.5 && self.last_trig <= 0.5 {
+        self.amp_env = 1.0;
+        self.noise_env = 1.0;
+        self.phase = 0.0;
+      }
+      self.last_trig = trig;
+
+      // Tone oscillator (two detuned oscillators for thickness)
+      let dt1 = tune / self.sample_rate;
+      let dt2 = (tune * 1.5) / self.sample_rate; // Fifth harmonic
+      self.phase += dt1;
+      if self.phase >= 1.0 {
+        self.phase -= 1.0;
+      }
+      let tone1 = (self.phase * std::f32::consts::TAU).sin();
+      let tone2 = (self.phase * 1.5 * std::f32::consts::TAU).sin() * 0.5;
+      let tone_signal = (tone1 + tone2) * 0.6;
+
+      // Noise with envelope (decays faster than tone)
+      let noise_decay_rate = 1.0 / (decay * 0.4 * self.sample_rate);
+      self.noise_env = (self.noise_env - noise_decay_rate).max(0.0);
+      let noise = self.white_noise();
+
+      // Snappy control affects noise high-pass (simple approximation)
+      let noise_signal = noise * self.noise_env * (0.3 + snappy * 0.7);
+
+      // Amplitude envelope for tone
+      let amp_decay_rate = 1.0 / (decay * self.sample_rate);
+      self.amp_env = (self.amp_env - amp_decay_rate).max(0.0);
+
+      // Mix tone and noise
+      let tone_amount = tone_signal * self.amp_env * tone_mix;
+      let noise_amount = noise_signal * (1.0 - tone_mix * 0.3);
+      let mut sample = (tone_amount + noise_amount) * 0.7;
+
+      // Apply accent
+      sample *= 0.7 + accent * 0.5;
+
+      output[i] = sample.clamp(-1.0, 1.0);
+    }
+  }
+}
+
+/// TR-909 Hi-Hat
+/// Metallic noise: 6 square waves at inharmonic ratios + bandpass filter
+pub struct HiHat909 {
+  sample_rate: f32,
+  phases: [f32; 6],
+  filter_state: [f32; 2], // Simple bandpass state
+  amp_env: f32,
+  last_trig: f32,
+  is_open: bool,
+}
+
+pub struct HiHat909Params<'a> {
+  pub tune: &'a [f32],      // Base frequency multiplier 0.5-2.0
+  pub decay: &'a [f32],     // Decay time 0.05-1.0 seconds
+  pub tone: &'a [f32],      // Filter brightness 0-1
+  pub open: &'a [f32],      // 0 = closed, 1 = open
+}
+
+pub struct HiHat909Inputs<'a> {
+  pub trigger: Option<&'a [f32]>,
+  pub accent: Option<&'a [f32]>,
+}
+
+impl HiHat909 {
+  // Metallic ratios from TR-909 analysis
+  const RATIOS: [f32; 6] = [1.0, 1.4471, 1.6170, 1.9265, 2.5028, 2.6637];
+  const BASE_FREQ: f32 = 320.0; // Base metallic frequency
+
+  pub fn new(sample_rate: f32) -> Self {
+    Self {
+      sample_rate: sample_rate.max(1.0),
+      phases: [0.0; 6],
+      filter_state: [0.0; 2],
+      amp_env: 0.0,
+      last_trig: 0.0,
+      is_open: false,
+    }
+  }
+
+  pub fn set_sample_rate(&mut self, sample_rate: f32) {
+    self.sample_rate = sample_rate.max(1.0);
+  }
+
+  pub fn process_block(
+    &mut self,
+    output: &mut [f32],
+    inputs: HiHat909Inputs,
+    params: HiHat909Params,
+  ) {
+    let len = output.len();
+
+    for i in 0..len {
+      let tune = params.tune.get(i).copied().unwrap_or(params.tune[0]).clamp(0.5, 2.0);
+      let decay = params.decay.get(i).copied().unwrap_or(params.decay[0]).clamp(0.02, 1.5);
+      let tone = params.tone.get(i).copied().unwrap_or(params.tone[0]).clamp(0.0, 1.0);
+      let open = params.open.get(i).copied().unwrap_or(params.open[0]);
+
+      let trig = inputs.trigger.map_or(0.0, |t| t.get(i).copied().unwrap_or(t[0]));
+      let accent = inputs.accent.map_or(0.5, |a| a.get(i).copied().unwrap_or(a[0])).clamp(0.0, 1.0);
+
+      // Trigger detection
+      if trig > 0.5 && self.last_trig <= 0.5 {
+        self.amp_env = 1.0;
+        self.is_open = open > 0.5;
+      }
+      self.last_trig = trig;
+
+      // Generate metallic noise from 6 square waves
+      let base_freq = Self::BASE_FREQ * tune;
+      let mut metallic = 0.0_f32;
+
+      for (j, phase) in self.phases.iter_mut().enumerate() {
+        let freq = base_freq * Self::RATIOS[j];
+        let dt = freq / self.sample_rate;
+        *phase += dt;
+        if *phase >= 1.0 {
+          *phase -= 1.0;
+        }
+        // Square wave
+        let square = if *phase < 0.5 { 1.0 } else { -1.0 };
+        metallic += square;
+      }
+      metallic /= 6.0; // Normalize
+
+      // Simple bandpass filter (resonant)
+      let cutoff = 4000.0 + tone * 8000.0; // 4-12 kHz
+      let f = (std::f32::consts::PI * cutoff / self.sample_rate).tan();
+      let q = 0.5 + tone * 1.5;
+      let k = 1.0 / q;
+      let norm = 1.0 / (1.0 + k * f + f * f);
+
+      let filtered = metallic - self.filter_state[0] * 2.0;
+      self.filter_state[0] += f * (metallic - self.filter_state[0] - self.filter_state[1] * k);
+      self.filter_state[1] += f * self.filter_state[0];
+      let bandpass = self.filter_state[0] * f * norm * 2.0;
+
+      // Amplitude envelope
+      let actual_decay = if self.is_open { decay } else { decay * 0.15 }; // Closed is much shorter
+      let amp_decay_rate = 1.0 / (actual_decay * self.sample_rate);
+      self.amp_env = (self.amp_env - amp_decay_rate).max(0.0);
+
+      let mut sample = bandpass * self.amp_env * 0.8;
+
+      // Apply accent
+      sample *= 0.7 + accent * 0.4;
+
+      output[i] = sample.clamp(-1.0, 1.0);
+    }
+  }
+}
+
+/// TR-909 Clap
+/// Filtered noise with multi-trigger envelope for that "clap" character
+pub struct Clap909 {
+  sample_rate: f32,
+  noise_state: u32,
+  filter_state: [f32; 2],
+  amp_env: f32,
+  clap_stage: u8, // 0-3 for multi-trigger effect
+  stage_counter: u32,
+  last_trig: f32,
+}
+
+pub struct Clap909Params<'a> {
+  pub tone: &'a [f32],      // Filter brightness 0-1
+  pub decay: &'a [f32],     // Tail decay 0.1-1.0 seconds
+}
+
+pub struct Clap909Inputs<'a> {
+  pub trigger: Option<&'a [f32]>,
+  pub accent: Option<&'a [f32]>,
+}
+
+impl Clap909 {
+  pub fn new(sample_rate: f32) -> Self {
+    Self {
+      sample_rate: sample_rate.max(1.0),
+      noise_state: 0xABCDEF01,
+      filter_state: [0.0; 2],
+      amp_env: 0.0,
+      clap_stage: 0,
+      stage_counter: 0,
+      last_trig: 0.0,
+    }
+  }
+
+  pub fn set_sample_rate(&mut self, sample_rate: f32) {
+    self.sample_rate = sample_rate.max(1.0);
+  }
+
+  fn white_noise(&mut self) -> f32 {
+    self.noise_state ^= self.noise_state << 13;
+    self.noise_state ^= self.noise_state >> 17;
+    self.noise_state ^= self.noise_state << 5;
+    (self.noise_state as f32 / u32::MAX as f32) * 2.0 - 1.0
+  }
+
+  pub fn process_block(
+    &mut self,
+    output: &mut [f32],
+    inputs: Clap909Inputs,
+    params: Clap909Params,
+  ) {
+    let len = output.len();
+    let stage_samples = (self.sample_rate * 0.012) as u32; // ~12ms between claps
+
+    for i in 0..len {
+      let tone = params.tone.get(i).copied().unwrap_or(params.tone[0]).clamp(0.0, 1.0);
+      let decay = params.decay.get(i).copied().unwrap_or(params.decay[0]).clamp(0.1, 1.0);
+
+      let trig = inputs.trigger.map_or(0.0, |t| t.get(i).copied().unwrap_or(t[0]));
+      let accent = inputs.accent.map_or(0.5, |a| a.get(i).copied().unwrap_or(a[0])).clamp(0.0, 1.0);
+
+      // Trigger detection - start multi-clap sequence
+      if trig > 0.5 && self.last_trig <= 0.5 {
+        self.clap_stage = 0;
+        self.stage_counter = 0;
+        self.amp_env = 1.0;
+      }
+      self.last_trig = trig;
+
+      // Multi-clap stages (3 quick hits then decay)
+      self.stage_counter += 1;
+      if self.clap_stage < 3 && self.stage_counter >= stage_samples {
+        self.clap_stage += 1;
+        self.stage_counter = 0;
+        self.amp_env = 0.8; // Re-trigger envelope
+      }
+
+      // Generate filtered noise
+      let noise = self.white_noise();
+
+      // Bandpass filter around 1-3 kHz
+      let cutoff = 1000.0 + tone * 2000.0;
+      let f = (std::f32::consts::PI * cutoff / self.sample_rate).tan();
+      let q = 2.0 + tone * 4.0; // Higher Q for more resonant clap
+      let k = 1.0 / q;
+
+      self.filter_state[0] += f * (noise - self.filter_state[0] - self.filter_state[1] * k);
+      self.filter_state[1] += f * self.filter_state[0];
+      let bandpass = self.filter_state[0] * 3.0;
+
+      // Envelope
+      let env_decay = if self.clap_stage < 3 { 0.002 } else { 1.0 / (decay * self.sample_rate) };
+      self.amp_env = (self.amp_env - env_decay).max(0.0);
+
+      let mut sample = bandpass * self.amp_env * 0.7;
+
+      // Apply accent
+      sample *= 0.7 + accent * 0.5;
+
+      output[i] = sample.clamp(-1.0, 1.0);
+    }
+  }
+}
+
+/// TR-909 Toms (Low/Mid/High)
+/// Sine wave with pitch envelope + slight noise
+pub struct Tom909 {
+  sample_rate: f32,
+  phase: f32,
+  pitch_env: f32,
+  amp_env: f32,
+  noise_state: u32,
+  last_trig: f32,
+}
+
+pub struct Tom909Params<'a> {
+  pub tune: &'a [f32],      // Base pitch 60-300 Hz
+  pub decay: &'a [f32],     // Decay time 0.1-1.5 seconds
+}
+
+pub struct Tom909Inputs<'a> {
+  pub trigger: Option<&'a [f32]>,
+  pub accent: Option<&'a [f32]>,
+}
+
+impl Tom909 {
+  pub fn new(sample_rate: f32) -> Self {
+    Self {
+      sample_rate: sample_rate.max(1.0),
+      phase: 0.0,
+      pitch_env: 0.0,
+      amp_env: 0.0,
+      noise_state: 0x87654321,
+      last_trig: 0.0,
+    }
+  }
+
+  pub fn set_sample_rate(&mut self, sample_rate: f32) {
+    self.sample_rate = sample_rate.max(1.0);
+  }
+
+  pub fn process_block(
+    &mut self,
+    output: &mut [f32],
+    inputs: Tom909Inputs,
+    params: Tom909Params,
+  ) {
+    let len = output.len();
+
+    for i in 0..len {
+      let tune = params.tune.get(i).copied().unwrap_or(params.tune[0]).clamp(60.0, 300.0);
+      let decay = params.decay.get(i).copied().unwrap_or(params.decay[0]).clamp(0.1, 1.5);
+
+      let trig = inputs.trigger.map_or(0.0, |t| t.get(i).copied().unwrap_or(t[0]));
+      let accent = inputs.accent.map_or(0.5, |a| a.get(i).copied().unwrap_or(a[0])).clamp(0.0, 1.0);
+
+      // Trigger detection
+      if trig > 0.5 && self.last_trig <= 0.5 {
+        self.pitch_env = 1.0;
+        self.amp_env = 1.0;
+        self.phase = 0.0;
+      }
+      self.last_trig = trig;
+
+      // Pitch envelope (subtle drop)
+      let pitch_decay = 0.001;
+      self.pitch_env *= 1.0 - pitch_decay * (self.sample_rate / 48000.0);
+
+      let freq = tune * (1.0 + self.pitch_env * 1.5);
+      let dt = freq / self.sample_rate;
+      self.phase += dt;
+      if self.phase >= 1.0 {
+        self.phase -= 1.0;
+      }
+      let sine = (self.phase * std::f32::consts::TAU).sin();
+
+      // Slight noise for attack
+      self.noise_state ^= self.noise_state << 13;
+      self.noise_state ^= self.noise_state >> 17;
+      self.noise_state ^= self.noise_state << 5;
+      let noise = (self.noise_state as f32 / u32::MAX as f32) * 2.0 - 1.0;
+      let noise_env = (self.amp_env * 2.0 - 1.0).max(0.0); // Quick noise burst
+
+      // Amplitude envelope
+      let amp_decay_rate = 1.0 / (decay * self.sample_rate);
+      self.amp_env = (self.amp_env - amp_decay_rate).max(0.0);
+
+      let mut sample = (sine + noise * noise_env * 0.1) * self.amp_env * 0.8;
+
+      // Apply accent
+      sample *= 0.7 + accent * 0.5;
+
+      output[i] = sample.clamp(-1.0, 1.0);
+    }
+  }
+}
+
+/// TR-909 Rimshot
+/// Short metallic ping
+pub struct Rimshot909 {
+  sample_rate: f32,
+  phases: [f32; 2],
+  amp_env: f32,
+  last_trig: f32,
+}
+
+pub struct Rimshot909Params<'a> {
+  pub tune: &'a [f32],      // Pitch 200-600 Hz
+}
+
+pub struct Rimshot909Inputs<'a> {
+  pub trigger: Option<&'a [f32]>,
+  pub accent: Option<&'a [f32]>,
+}
+
+impl Rimshot909 {
+  pub fn new(sample_rate: f32) -> Self {
+    Self {
+      sample_rate: sample_rate.max(1.0),
+      phases: [0.0; 2],
+      amp_env: 0.0,
+      last_trig: 0.0,
+    }
+  }
+
+  pub fn set_sample_rate(&mut self, sample_rate: f32) {
+    self.sample_rate = sample_rate.max(1.0);
+  }
+
+  pub fn process_block(
+    &mut self,
+    output: &mut [f32],
+    inputs: Rimshot909Inputs,
+    params: Rimshot909Params,
+  ) {
+    let len = output.len();
+
+    for i in 0..len {
+      let tune = params.tune.get(i).copied().unwrap_or(params.tune[0]).clamp(200.0, 600.0);
+
+      let trig = inputs.trigger.map_or(0.0, |t| t.get(i).copied().unwrap_or(t[0]));
+      let accent = inputs.accent.map_or(0.5, |a| a.get(i).copied().unwrap_or(a[0])).clamp(0.0, 1.0);
+
+      // Trigger detection
+      if trig > 0.5 && self.last_trig <= 0.5 {
+        self.amp_env = 1.0;
+        self.phases = [0.0; 2];
+      }
+      self.last_trig = trig;
+
+      // Two detuned triangle waves for metallic character
+      let freq1 = tune;
+      let freq2 = tune * 1.47; // Inharmonic ratio
+
+      let dt1 = freq1 / self.sample_rate;
+      let dt2 = freq2 / self.sample_rate;
+
+      self.phases[0] += dt1;
+      self.phases[1] += dt2;
+      if self.phases[0] >= 1.0 { self.phases[0] -= 1.0; }
+      if self.phases[1] >= 1.0 { self.phases[1] -= 1.0; }
+
+      // Triangle waves
+      let tri1 = 4.0 * (self.phases[0] - (self.phases[0] + 0.5).floor()).abs() - 1.0;
+      let tri2 = 4.0 * (self.phases[1] - (self.phases[1] + 0.5).floor()).abs() - 1.0;
+
+      // Very fast decay for sharp transient
+      let amp_decay_rate = 1.0 / (0.02 * self.sample_rate); // 20ms
+      self.amp_env = (self.amp_env - amp_decay_rate).max(0.0);
+
+      let mut sample = (tri1 + tri2 * 0.5) * self.amp_env * 0.6;
+
+      // Apply accent
+      sample *= 0.7 + accent * 0.5;
+
+      output[i] = sample.clamp(-1.0, 1.0);
+    }
+  }
+}
+
 #[cfg(test)]
 mod tests {
   use super::*;
