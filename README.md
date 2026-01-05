@@ -2,6 +2,8 @@
 
 Synthétiseur modulaire inspiré de VCV Rack, construit avec React + Rust/WASM.
 
+**[Démo en ligne](https://ressources.warnotte.be/Projects/NoobSynth3/)**
+
 ![NoobSynth3 Screenshot](docs/screenshot.png)
 
 ## Caractéristiques
