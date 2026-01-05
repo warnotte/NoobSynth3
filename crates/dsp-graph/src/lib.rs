@@ -9,8 +9,8 @@ use dsp_core::{
   SlewParams, SnesOsc, SnesOscInputs, SnesOscParams, SpringReverb, SpringReverbInputs,
   SpringReverbParams, StepSequencer, StepSequencerInputs, StepSequencerOutputs, StepSequencerParams,
   Supersaw, SupersawInputs, SupersawParams, TapeDelay, TapeDelayInputs,
-  TapeDelayParams, Vca, Vcf, VcfInputs, VcfParams, Vco, VcoInputs, VcoParams, Vocoder,
-  VocoderInputs, VocoderParams, Wavefolder, WavefolderParams,
+  TapeDelayParams, Tb303, Tb303Inputs, Tb303Outputs, Tb303Params, Vca, Vcf, VcfInputs, VcfParams,
+  Vco, VcoInputs, VcoParams, Vocoder, VocoderInputs, VocoderParams, Wavefolder, WavefolderParams,
 };
 use serde::Deserialize;
 use std::collections::{HashMap, VecDeque};
@@ -92,6 +92,7 @@ enum ModuleType {
   Mario,
   Arpeggiator,
   StepSequencer,
+  Tb303,
 }
 
 #[derive(Clone, Copy)]
@@ -557,6 +558,17 @@ struct StepSequencerState {
   direction: ParamBuffer,
 }
 
+struct Tb303State {
+  tb303: Tb303,
+  waveform: ParamBuffer,
+  cutoff: ParamBuffer,
+  resonance: ParamBuffer,
+  decay: ParamBuffer,
+  envmod: ParamBuffer,
+  accent: ParamBuffer,
+  glide: ParamBuffer,
+}
+
 enum ModuleState {
   Vco(VcoState),
   Supersaw(SupersawState),
@@ -596,6 +608,7 @@ enum ModuleState {
   Mario(MarioState),
   Arpeggiator(ArpeggiatorState),
   StepSequencer(StepSequencerState),
+  Tb303(Tb303State),
 }
 
 struct ModuleNode {
@@ -1292,6 +1305,16 @@ impl ModuleNode {
           direction: ParamBuffer::new(param_number(params, "direction", 0.0)),
         })
       }
+      ModuleType::Tb303 => ModuleState::Tb303(Tb303State {
+        tb303: Tb303::new(sample_rate),
+        waveform: ParamBuffer::new(param_number(params, "waveform", 0.0)),
+        cutoff: ParamBuffer::new(param_number(params, "cutoff", 800.0)),
+        resonance: ParamBuffer::new(param_number(params, "resonance", 0.3)),
+        decay: ParamBuffer::new(param_number(params, "decay", 0.3)),
+        envmod: ParamBuffer::new(param_number(params, "envmod", 0.5)),
+        accent: ParamBuffer::new(param_number(params, "accent", 0.6)),
+        glide: ParamBuffer::new(param_number(params, "glide", 0.02)),
+      }),
     };
 
     Self {
@@ -1601,6 +1624,16 @@ impl ModuleNode {
         "slideTime" => state.slide_time.set(value),
         "length" => state.length.set(value),
         "direction" => state.direction.set(value),
+        _ => {}
+      },
+      ModuleState::Tb303(state) => match param {
+        "waveform" => state.waveform.set(value),
+        "cutoff" => state.cutoff.set(value),
+        "resonance" => state.resonance.set(value),
+        "decay" => state.decay.set(value),
+        "envmod" => state.envmod.set(value),
+        "accent" => state.accent.set(value),
+        "glide" => state.glide.set(value),
         _ => {}
       },
       _ => {}
@@ -2551,6 +2584,43 @@ impl ModuleNode {
         let seq_outputs = StepSequencerOutputs { cv_out, gate_out, velocity_out, step_out };
         state.seq.process_block(seq_outputs, seq_inputs, params);
       }
+      ModuleState::Tb303(state) => {
+        let pitch = if self.connections[0].is_empty() {
+          None
+        } else {
+          Some(inputs[0].channel(0))
+        };
+        let gate = if self.connections[1].is_empty() {
+          None
+        } else {
+          Some(inputs[1].channel(0))
+        };
+        let velocity = if self.connections[2].is_empty() {
+          None
+        } else {
+          Some(inputs[2].channel(0))
+        };
+        let cutoff_cv = if self.connections[3].is_empty() {
+          None
+        } else {
+          Some(inputs[3].channel(0))
+        };
+        let (audio_group, env_group) = outputs.split_at_mut(1);
+        let audio = audio_group[0].channel_mut(0);
+        let env_out = env_group[0].channel_mut(0);
+        let tb_inputs = Tb303Inputs { pitch, gate, velocity, cutoff_cv };
+        let params = Tb303Params {
+          waveform: state.waveform.slice(frames),
+          cutoff: state.cutoff.slice(frames),
+          resonance: state.resonance.slice(frames),
+          decay: state.decay.slice(frames),
+          envmod: state.envmod.slice(frames),
+          accent: state.accent.slice(frames),
+          glide: state.glide.slice(frames),
+        };
+        let tb_outputs = Tb303Outputs { audio, env_out };
+        state.tb303.process_block(tb_outputs, tb_inputs, params);
+      }
     }
   }
 }
@@ -2594,6 +2664,7 @@ fn normalize_module_type(raw: &str) -> ModuleType {
     "mario" => ModuleType::Mario,
     "arpeggiator" => ModuleType::Arpeggiator,
     "step-sequencer" => ModuleType::StepSequencer,
+    "tb-303" => ModuleType::Tb303,
     _ => ModuleType::Oscillator,
   }
 }
@@ -2699,6 +2770,12 @@ fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // reset
       PortInfo { channels: 1 },  // cv-offset
     ],
+    ModuleType::Tb303 => vec![
+      PortInfo { channels: 1 },  // pitch
+      PortInfo { channels: 1 },  // gate
+      PortInfo { channels: 1 },  // velocity
+      PortInfo { channels: 1 },  // cutoff-cv
+    ],
   }
 }
 
@@ -2773,6 +2850,10 @@ fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // gate-out
       PortInfo { channels: 1 },  // velocity-out
       PortInfo { channels: 1 },  // step-out
+    ],
+    ModuleType::Tb303 => vec![
+      PortInfo { channels: 1 },  // out
+      PortInfo { channels: 1 },  // env-out
     ],
   }
 }
@@ -2917,6 +2998,13 @@ fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize> {
       "clock" => Some(0),
       "reset" => Some(1),
       "cv-offset" => Some(2),
+      _ => None,
+    },
+    ModuleType::Tb303 => match port_id {
+      "pitch" => Some(0),
+      "gate" => Some(1),
+      "velocity" | "vel" => Some(2),
+      "cutoff-cv" | "cut" => Some(3),
       _ => None,
     },
     _ => None,
@@ -3075,6 +3163,11 @@ fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize> {
       "gate-out" => Some(1),
       "velocity-out" => Some(2),
       "step-out" => Some(3),
+      _ => None,
+    },
+    ModuleType::Tb303 => match port_id {
+      "out" => Some(0),
+      "env-out" => Some(1),
       _ => None,
     },
   }

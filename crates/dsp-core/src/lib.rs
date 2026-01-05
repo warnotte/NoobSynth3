@@ -4089,6 +4089,221 @@ impl StepSequencer {
   }
 }
 
+// ============================================================================
+// TB-303 Synthesizer Module
+// ============================================================================
+
+pub struct Tb303 {
+  sample_rate: f32,
+
+  // Oscillator
+  phase: f32,
+  current_freq: f32,
+  target_freq: f32,
+
+  // Filter (3-pole diode ladder = 18dB/oct)
+  stage1: f32,
+  stage2: f32,
+  stage3: f32,
+
+  // Envelopes
+  filter_env: f32,
+  accent_env: f32,
+  amp_env: f32,
+
+  // Gate state
+  gate_on: bool,
+  last_gate: f32,
+  last_velocity: f32,
+}
+
+pub struct Tb303Params<'a> {
+  pub waveform: &'a [Sample],    // 0 = saw, 1 = square
+  pub cutoff: &'a [Sample],      // Hz
+  pub resonance: &'a [Sample],   // 0-1
+  pub decay: &'a [Sample],       // seconds
+  pub envmod: &'a [Sample],      // 0-1 filter env amount
+  pub accent: &'a [Sample],      // 0-1 accent boost
+  pub glide: &'a [Sample],       // seconds
+}
+
+pub struct Tb303Inputs<'a> {
+  pub pitch: Option<&'a [Sample]>,    // V/oct CV
+  pub gate: Option<&'a [Sample]>,     // Gate signal
+  pub velocity: Option<&'a [Sample]>, // Velocity (>0.7 = accent)
+  pub cutoff_cv: Option<&'a [Sample]>,// External cutoff modulation
+}
+
+pub struct Tb303Outputs<'a> {
+  pub audio: &'a mut [Sample],
+  pub env_out: &'a mut [Sample],
+}
+
+impl Tb303 {
+  pub fn new(sample_rate: f32) -> Self {
+    Self {
+      sample_rate: sample_rate.max(1.0),
+      phase: 0.0,
+      current_freq: 110.0,
+      target_freq: 110.0,
+      stage1: 0.0,
+      stage2: 0.0,
+      stage3: 0.0,
+      filter_env: 0.0,
+      accent_env: 0.0,
+      amp_env: 0.0,
+      gate_on: false,
+      last_gate: 0.0,
+      last_velocity: 0.0,
+    }
+  }
+
+  pub fn set_sample_rate(&mut self, sample_rate: f32) {
+    self.sample_rate = sample_rate.max(1.0);
+  }
+
+  /// 3-pole diode ladder filter (18dB/oct) - TB-303 character
+  fn process_diode_ladder(&mut self, input: f32, cutoff: f32, reso: f32) -> f32 {
+    // Normalize cutoff to coefficient
+    let f = (std::f32::consts::PI * cutoff / self.sample_rate).tan();
+    let f = f / (1.0 + f); // One-pole coefficient
+
+    // Feedback for resonance (3-pole feedback)
+    let feedback = reso * 3.8 * self.stage3;
+
+    // Input with feedback and saturation
+    let x = (input - feedback).tanh();
+
+    // Three cascaded one-pole filters (18dB/oct)
+    self.stage1 += f * (x - self.stage1);
+    self.stage2 += f * (self.stage1 - self.stage2);
+    self.stage3 += f * (self.stage2 - self.stage3);
+
+    // Soft saturation on output
+    (self.stage3 * 1.2).tanh()
+  }
+
+  pub fn process_block(
+    &mut self,
+    outputs: Tb303Outputs<'_>,
+    inputs: Tb303Inputs<'_>,
+    params: Tb303Params<'_>,
+  ) {
+    let len = outputs.audio.len().min(outputs.env_out.len());
+    if len == 0 {
+      return;
+    }
+
+    let base_cutoff = sample_at(params.cutoff, 0, 800.0).clamp(40.0, 12000.0);
+    let resonance = sample_at(params.resonance, 0, 0.3).clamp(0.0, 1.0);
+    let decay_time = sample_at(params.decay, 0, 0.3).clamp(0.01, 2.0);
+    let envmod = sample_at(params.envmod, 0, 0.5).clamp(0.0, 1.0);
+    let accent_amount = sample_at(params.accent, 0, 0.6).clamp(0.0, 1.0);
+    let glide_time = sample_at(params.glide, 0, 0.02).clamp(0.0, 0.5);
+    let waveform = sample_at(params.waveform, 0, 0.0);
+
+    // Envelope coefficients
+    let decay_coeff = (-1.0 / (decay_time * self.sample_rate)).exp();
+    let accent_decay_coeff = (-1.0 / (0.05 * self.sample_rate)).exp(); // Fast accent decay (50ms)
+    let amp_attack_coeff = 1.0 - (-1.0 / (0.003 * self.sample_rate)).exp(); // 3ms attack
+    let amp_release_coeff = (-1.0 / (0.01 * self.sample_rate)).exp(); // 10ms release
+
+    // Glide coefficient
+    let glide_coeff = if glide_time > 0.001 {
+      1.0 - (-1.0 / (glide_time * self.sample_rate)).exp()
+    } else {
+      1.0
+    };
+
+    for i in 0..len {
+      let pitch_cv = input_at(inputs.pitch, i);
+      let gate = input_at(inputs.gate, i);
+      let velocity = input_at(inputs.velocity, i).clamp(0.0, 1.0);
+      let cutoff_cv = input_at(inputs.cutoff_cv, i);
+
+      // Gate edge detection
+      let gate_rising = gate > 0.5 && self.last_gate <= 0.5;
+      let gate_falling = gate <= 0.5 && self.last_gate > 0.5;
+      self.last_gate = gate;
+
+      // On gate rising: set target frequency and trigger envelopes
+      if gate_rising {
+        // Convert V/oct to Hz (A2 = 110Hz at 0V)
+        self.target_freq = 110.0 * 2.0_f32.powf(pitch_cv);
+        self.gate_on = true;
+        self.last_velocity = velocity;
+
+        // Trigger filter envelope
+        self.filter_env = 1.0;
+
+        // Trigger accent envelope if velocity > 0.7
+        if velocity > 0.7 {
+          self.accent_env = 1.0;
+        }
+      }
+
+      if gate_falling {
+        self.gate_on = false;
+      }
+
+      // Glide (portamento)
+      self.current_freq += (self.target_freq - self.current_freq) * glide_coeff;
+      self.current_freq = self.current_freq.clamp(20.0, 20000.0);
+
+      // Filter envelope decay
+      self.filter_env *= decay_coeff;
+
+      // Accent envelope decay (faster)
+      self.accent_env *= accent_decay_coeff;
+
+      // Amp envelope
+      if self.gate_on {
+        self.amp_env += (1.0 - self.amp_env) * amp_attack_coeff;
+      } else {
+        self.amp_env *= amp_release_coeff;
+      }
+
+      // Calculate oscillator
+      let dt = self.current_freq / self.sample_rate;
+      self.phase += dt;
+      if self.phase >= 1.0 {
+        self.phase -= 1.0;
+      }
+
+      // Waveform selection with polyBLEP anti-aliasing
+      let osc_out = if waveform < 0.5 {
+        // Sawtooth
+        let mut saw = 2.0 * self.phase - 1.0;
+        saw -= poly_blep(self.phase, dt);
+        saw
+      } else {
+        // Square (50% duty)
+        let mut square = if self.phase < 0.5 { 1.0 } else { -1.0 };
+        square += poly_blep(self.phase, dt);
+        square -= poly_blep((self.phase + 0.5).fract(), dt);
+        square
+      };
+
+      // Calculate filter cutoff with envelope modulation
+      // env_mod in octaves: envmod * 4 octaves range
+      let accent_boost = self.accent_env * accent_amount * 2.0; // 2 octaves accent boost
+      let env_mod_octaves = self.filter_env * envmod * 4.0 + accent_boost;
+      let modulated_cutoff = base_cutoff * 2.0_f32.powf(env_mod_octaves + cutoff_cv);
+      let final_cutoff = modulated_cutoff.clamp(40.0, 18000.0);
+
+      // Apply filter
+      let filtered = self.process_diode_ladder(osc_out, final_cutoff, resonance);
+
+      // Apply VCA with accent amplitude boost
+      let accent_amp_boost = if self.last_velocity > 0.7 { 1.0 + accent_amount * 0.5 } else { 1.0 };
+      let audio_out = filtered * self.amp_env * accent_amp_boost;
+
+      outputs.audio[i] = audio_out.clamp(-1.0, 1.0);
+      outputs.env_out[i] = self.filter_env;
+    }
+  }
+}
+
 #[cfg(test)]
 mod tests {
   use super::*;

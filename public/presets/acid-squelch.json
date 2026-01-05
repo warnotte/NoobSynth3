@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "id": "acid-squelch",
+  "name": "Acid Squelch",
+  "description": "High resonance TB-303 with fast decay and heavy accents.",
+  "graph": {
+    "modules": [
+      {
+        "id": "ctrl-1",
+        "type": "control",
+        "name": "Control IO",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "cv": 0,
+          "cvMode": "unipolar",
+          "velocity": 1,
+          "midiEnabled": true,
+          "midiRoot": 36,
+          "voices": 1
+        }
+      },
+      {
+        "id": "seq-1",
+        "type": "step-sequencer",
+        "name": "Step Seq",
+        "position": { "x": 2, "y": 0 },
+        "params": {
+          "enabled": true,
+          "tempo": 140,
+          "rate": 12,
+          "gateLength": 60,
+          "swing": 0,
+          "slideTime": 40,
+          "length": 16,
+          "direction": 0,
+          "stepData": "[{\"pitch\":0,\"gate\":true,\"velocity\":100,\"slide\":false},{\"pitch\":12,\"gate\":true,\"velocity\":50,\"slide\":true},{\"pitch\":0,\"gate\":true,\"velocity\":100,\"slide\":false},{\"pitch\":0,\"gate\":true,\"velocity\":50,\"slide\":false},{\"pitch\":7,\"gate\":true,\"velocity\":100,\"slide\":true},{\"pitch\":0,\"gate\":false,\"velocity\":100,\"slide\":false},{\"pitch\":0,\"gate\":true,\"velocity\":100,\"slide\":false},{\"pitch\":12,\"gate\":true,\"velocity\":50,\"slide\":true},{\"pitch\":0,\"gate\":true,\"velocity\":100,\"slide\":false},{\"pitch\":5,\"gate\":true,\"velocity\":50,\"slide\":true},{\"pitch\":0,\"gate\":true,\"velocity\":100,\"slide\":false},{\"pitch\":0,\"gate\":true,\"velocity\":50,\"slide\":false},{\"pitch\":10,\"gate\":true,\"velocity\":100,\"slide\":true},{\"pitch\":7,\"gate\":true,\"velocity\":50,\"slide\":true},{\"pitch\":0,\"gate\":true,\"velocity\":100,\"slide\":false},{\"pitch\":0,\"gate\":false,\"velocity\":100,\"slide\":false}]"
+        }
+      },
+      {
+        "id": "tb303-1",
+        "type": "tb-303",
+        "name": "TB-303",
+        "position": { "x": 5, "y": 0 },
+        "params": {
+          "waveform": 0,
+          "cutoff": 400,
+          "resonance": 0.85,
+          "decay": 0.12,
+          "envmod": 0.9,
+          "accent": 0.8,
+          "glide": 0.02
+        }
+      },
+      {
+        "id": "dist-1",
+        "type": "distortion",
+        "name": "Distortion",
+        "position": { "x": 7, "y": 0 },
+        "params": { "drive": 0.4, "tone": 0.6, "mix": 0.5 }
+      },
+      {
+        "id": "delay-1",
+        "type": "delay",
+        "name": "Delay",
+        "position": { "x": 9, "y": 0 },
+        "params": { "time": 170, "feedback": 0.35, "mix": 0.25, "tone": 0.4, "pingPong": true }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Main Out",
+        "position": { "x": 11, "y": 0 },
+        "params": { "level": 0.7 }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "seq-1", "portId": "cv-out" }, "to": { "moduleId": "tb303-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "seq-1", "portId": "gate-out" }, "to": { "moduleId": "tb303-1", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "seq-1", "portId": "velocity-out" }, "to": { "moduleId": "tb303-1", "portId": "velocity" }, "kind": "cv" },
+      { "from": { "moduleId": "tb303-1", "portId": "out" }, "to": { "moduleId": "dist-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "dist-1", "portId": "out" }, "to": { "moduleId": "delay-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "delay-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}

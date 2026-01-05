@@ -399,6 +399,27 @@
       "description": "TB-303 style acid bass line with slides and accents.",
       "file": "seq-acid-bass.json",
       "group": "Step Sequencer"
+    },
+    {
+      "id": "acid-classic",
+      "name": "Acid Classic",
+      "description": "Classic acid bassline with TB-303 module and Step Sequencer.",
+      "file": "acid-classic.json",
+      "group": "TB-303 / Acid"
+    },
+    {
+      "id": "acid-squelch",
+      "name": "Acid Squelch",
+      "description": "High resonance TB-303 with fast decay and heavy accents.",
+      "file": "acid-squelch.json",
+      "group": "TB-303 / Acid"
+    },
+    {
+      "id": "acid-drone",
+      "name": "Acid Drone",
+      "description": "Slow atmospheric TB-303 with long decay and reverb.",
+      "file": "acid-drone.json",
+      "group": "TB-303 / Acid"
     }
   ]
 }

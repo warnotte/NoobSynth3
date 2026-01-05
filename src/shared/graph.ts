@@ -39,6 +39,7 @@ export type ModuleType =
   | 'mario'
   | 'arpeggiator'
   | 'step-sequencer'
+  | 'tb-303'
 
 export interface ModuleSpec {
   id: string

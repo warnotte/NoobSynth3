@@ -24,6 +24,9 @@ This file is meant to be reread by the coding assistant to keep context, decisio
 - SNES Osc (S-DSP style: 8 wavetables, gaussian filter, 32kHz lo-fi)
 - Noise (white/pink/brown)
 
+**Synth Voices:**
+- TB-303 (saw/square osc + 18dB diode ladder filter + accent + glide)
+
 **Modulation:**
 - LFO (sine/triangle/saw/square, bipolar/unipolar)
 - ADSR (amp/filter envelopes)
@@ -94,6 +97,7 @@ Presets support two formats:
 - **VST mode**: Oscilloscope not working yet (scope taps not wired through IPC).
 - **VST mode**: Proof of concept; host editor is a launcher for the Tauri UI.
 - **VST mode**: UI macro edits do not write back to host automation (DAW remains source of truth).
+- **WASM build**: `wasm-opt` disabled due to bulk memory feature mismatch; WASM is unoptimized but functional.
 
 ## Decisions
 
@@ -115,6 +119,17 @@ Presets support two formats:
 - **VST**: Wire scope taps through IPC for oscilloscope in VST mode.
 
 ## Recent changes (Jan 2026)
+
+### TB-303 Module
+
+- **Dedicated TB-303 synth voice** with integrated oscillator, filter, and envelope
+- **Saw/Square oscillator** with polyBLEP anti-aliasing
+- **18dB/oct diode ladder filter** (3-pole, authentic 303 character)
+- **Accent system**: velocity > 70% triggers accent boost on filter + amplitude
+- **Glide/portamento** with exponential smoothing
+- **7 parameters**: Cutoff, Resonance, Decay, EnvMod, Accent, Glide, Waveform
+- **Step Sequencer integration**: CV/Gate/Velocity inputs for acid sequences
+- **3 preset files**: acid-classic, acid-squelch, acid-drone
 
 ### Step Sequencer Module
 

@@ -274,4 +274,16 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
       { id: 'step-out', label: 'Step', kind: 'cv', direction: 'out' },
     ],
   },
+  'tb-303': {
+    inputs: [
+      { id: 'pitch', label: 'Pitch', kind: 'cv', direction: 'in' },
+      { id: 'gate', label: 'Gate', kind: 'gate', direction: 'in' },
+      { id: 'velocity', label: 'Vel', kind: 'cv', direction: 'in' },
+      { id: 'cutoff-cv', label: 'Cut', kind: 'cv', direction: 'in' },
+    ],
+    outputs: [
+      { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
+      { id: 'env-out', label: 'Env', kind: 'cv', direction: 'out' },
+    ],
+  },
 }

@@ -39,6 +39,7 @@ export const moduleSizes: Record<ModuleType, string> = {
   'audio-in': '1x1',
   arpeggiator: '2x5',
   'step-sequencer': '3x5',
+  'tb-303': '2x3',
 }
 
 export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>> = {
@@ -57,6 +58,7 @@ export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>>
   'mixer-1x2': 'strip',
   arpeggiator: 'strip',
   'step-sequencer': 'strip',
+  'tb-303': 'strip',
 }
 
 export const moduleCatalog: { type: ModuleType; label: string }[] = [
@@ -98,6 +100,7 @@ export const moduleCatalog: { type: ModuleType; label: string }[] = [
   { type: 'mario', label: 'Mario IO' },
   { type: 'arpeggiator', label: 'Arpeggiator' },
   { type: 'step-sequencer', label: 'Step Sequencer' },
+  { type: 'tb-303', label: 'TB-303' },
 ]
 
 export const modulePrefixes: Record<ModuleType, string> = {
@@ -139,6 +142,7 @@ export const modulePrefixes: Record<ModuleType, string> = {
   mario: 'mario',
   arpeggiator: 'arp',
   'step-sequencer': 'seq',
+  'tb-303': 'tb303',
 }
 
 export const moduleLabels: Record<ModuleType, string> = {
@@ -180,6 +184,7 @@ export const moduleLabels: Record<ModuleType, string> = {
   mario: 'Mario IO',
   arpeggiator: 'Arpeggiator',
   'step-sequencer': 'Step Seq',
+  'tb-303': 'TB-303',
 }
 
 export const moduleDefaults: Record<ModuleType, Record<string, number | string | boolean>> = {
@@ -360,6 +365,15 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
       { pitch: 0, gate: true, velocity: 80, slide: false },
       { pitch: 0, gate: false, velocity: 100, slide: false },
     ]),
+  },
+  'tb-303': {
+    waveform: 0,        // 0 = saw, 1 = square
+    cutoff: 800,        // Hz
+    resonance: 0.3,     // 0-1
+    decay: 0.3,         // seconds
+    envmod: 0.5,        // 0-1
+    accent: 0.6,        // 0-1
+    glide: 0.02,        // seconds
   },
 }
 

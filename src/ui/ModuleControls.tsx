@@ -3125,5 +3125,100 @@ export const ModuleControls = ({
     )
   }
 
+  if (module.type === 'tb-303') {
+    const waveform = Number(module.params.waveform ?? 0)
+    const cutoff = Number(module.params.cutoff ?? 800)
+    const resonance = Number(module.params.resonance ?? 0.3)
+    const decay = Number(module.params.decay ?? 0.3)
+    const envmod = Number(module.params.envmod ?? 0.5)
+    const accent = Number(module.params.accent ?? 0.6)
+    const glide = Number(module.params.glide ?? 0.02)
+
+    return (
+      <>
+        {/* Waveform selector */}
+        <div className="filter-row">
+          <div className="filter-group">
+            <span className="filter-label">Wave</span>
+            <div className="filter-buttons">
+              <button
+                type="button"
+                className={`ui-btn filter-btn ${waveform < 0.5 ? 'active' : ''}`}
+                onClick={() => updateParam(module.id, 'waveform', 0)}
+              >
+                SAW
+              </button>
+              <button
+                type="button"
+                className={`ui-btn filter-btn ${waveform >= 0.5 ? 'active' : ''}`}
+                onClick={() => updateParam(module.id, 'waveform', 1)}
+              >
+                SQ
+              </button>
+            </div>
+          </div>
+        </div>
+        {/* Main knobs */}
+        <RotaryKnob
+          label="Cutoff"
+          min={40}
+          max={12000}
+          step={10}
+          unit="Hz"
+          value={cutoff}
+          onChange={(value) => updateParam(module.id, 'cutoff', value)}
+          format={(value) => value >= 1000 ? `${(value / 1000).toFixed(1)}k` : Math.round(value).toString()}
+        />
+        <RotaryKnob
+          label="Reso"
+          min={0}
+          max={1}
+          step={0.01}
+          value={resonance}
+          onChange={(value) => updateParam(module.id, 'resonance', value)}
+          format={(value) => Math.round(value * 100).toString()}
+        />
+        <RotaryKnob
+          label="Decay"
+          min={0.01}
+          max={2}
+          step={0.01}
+          unit="s"
+          value={decay}
+          onChange={(value) => updateParam(module.id, 'decay', value)}
+          format={(value) => value.toFixed(2)}
+        />
+        <RotaryKnob
+          label="EnvMod"
+          min={0}
+          max={1}
+          step={0.01}
+          value={envmod}
+          onChange={(value) => updateParam(module.id, 'envmod', value)}
+          format={(value) => Math.round(value * 100).toString()}
+        />
+        <RotaryKnob
+          label="Accent"
+          min={0}
+          max={1}
+          step={0.01}
+          value={accent}
+          onChange={(value) => updateParam(module.id, 'accent', value)}
+          format={(value) => Math.round(value * 100).toString()}
+        />
+        <RotaryKnob
+          label="Glide"
+          min={0}
+          max={0.5}
+          step={0.001}
+          unit="s"
+          value={glide}
+          onChange={(value) => updateParam(module.id, 'glide', value)}
+          format={(value) => (value * 1000).toFixed(0)}
+        />
+      </>
+    )
+  }
+
   return null
 }
