@@ -44,6 +44,7 @@ This file is meant to be reread by the coding assistant to keep context, decisio
 - Mod Router (CV in, 4 CV outs with depth)
 - Mod VCA (CV multiplier)
 - Step Sequencer (16-step TB-303 style with pitch/gate/velocity/slide per step, 11 built-in patterns)
+- Drum Sequencer (8-track x16-step TR-909 style, 8 gate outputs + accent, swing, pattern presets)
 
 **Filters:**
 - VCF (SVF + ladder models, LP/HP/BP/Notch, 12/24 dB)
@@ -134,9 +135,22 @@ Presets support two formats:
 - MIDI enhancements (pitch bend, CC mapping).
 - Optional: add native MIDI input via `midir` for Tauri (lower latency, more reliable than Web MIDI).
 - **VST**: Wire scope taps through IPC for oscilloscope in VST mode.
-- **Drum Sequencer Module**: 8-track step sequencer for TR-909 drums (future).
 
 ## Recent changes (Jan 2026)
+
+### Drum Sequencer Module
+
+- **8-track x 16-step drum sequencer** for TR-909 drums
+- **8 gate outputs**: Kick, Snare, HH-C, HH-O, Clap, Tom, Rim, Aux
+- **8 accent outputs**: Per-track velocity CV for accent hits
+- **Step output**: Current step position CV
+- **Swing control**: 0-90% swing on odd steps
+- **Rate divisions**: 1/4, 1/8, 1/16, 1/32
+- **Variable length**: 8, 12, or 16 steps
+- **Pattern presets**: Basic, House, Techno, Breakbeat, Clear
+- **Visual feedback**: LED indicators show current playing step
+- **Shift+Click accent**: Toggle accent on individual steps
+- **Updated 909 presets** to use drum sequencer
 
 ### TR-909 Drum Modules
 

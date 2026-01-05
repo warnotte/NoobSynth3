@@ -341,4 +341,33 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
       { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
     ],
   },
+  // Drum Sequencer
+  'drum-sequencer': {
+    inputs: [
+      { id: 'clock', label: 'Clk', kind: 'sync', direction: 'in' },
+      { id: 'reset', label: 'Rst', kind: 'sync', direction: 'in' },
+    ],
+    outputs: [
+      // 8 gate outputs
+      { id: 'gate-kick', label: 'Kick', kind: 'gate', direction: 'out' },
+      { id: 'gate-snare', label: 'Snr', kind: 'gate', direction: 'out' },
+      { id: 'gate-hhc', label: 'HHC', kind: 'gate', direction: 'out' },
+      { id: 'gate-hho', label: 'HHO', kind: 'gate', direction: 'out' },
+      { id: 'gate-clap', label: 'Clp', kind: 'gate', direction: 'out' },
+      { id: 'gate-tom', label: 'Tom', kind: 'gate', direction: 'out' },
+      { id: 'gate-rim', label: 'Rim', kind: 'gate', direction: 'out' },
+      { id: 'gate-aux', label: 'Aux', kind: 'gate', direction: 'out' },
+      // 8 accent outputs
+      { id: 'acc-kick', label: 'K.Ac', kind: 'cv', direction: 'out' },
+      { id: 'acc-snare', label: 'S.Ac', kind: 'cv', direction: 'out' },
+      { id: 'acc-hhc', label: 'H.Ac', kind: 'cv', direction: 'out' },
+      { id: 'acc-hho', label: 'O.Ac', kind: 'cv', direction: 'out' },
+      { id: 'acc-clap', label: 'C.Ac', kind: 'cv', direction: 'out' },
+      { id: 'acc-tom', label: 'T.Ac', kind: 'cv', direction: 'out' },
+      { id: 'acc-rim', label: 'R.Ac', kind: 'cv', direction: 'out' },
+      { id: 'acc-aux', label: 'A.Ac', kind: 'cv', direction: 'out' },
+      // Step output
+      { id: 'step-out', label: 'Step', kind: 'cv', direction: 'out' },
+    ],
+  },
 }

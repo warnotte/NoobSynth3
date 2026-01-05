@@ -1,19 +1,20 @@
 use dsp_core::{
   Adsr, AdsrInputs, AdsrParams, Arpeggiator, ArpeggiatorInputs, ArpeggiatorOutputs, ArpeggiatorParams,
   Choir, ChoirInputs, ChoirParams, Chorus, ChorusInputs, ChorusParams, Clap909, Clap909Inputs,
-  Clap909Params, Delay, DelayInputs, DelayParams, Distortion, DistortionParams, Ensemble,
-  EnsembleInputs, EnsembleParams, GranularDelay, GranularDelayInputs, GranularDelayParams,
-  HiHat909, HiHat909Inputs, HiHat909Params, Kick909, Kick909Inputs, Kick909Params, Lfo, LfoInputs,
-  LfoParams, Mixer, NesOsc, NesOscInputs, NesOscParams, Noise, NoiseParams, Phaser, PhaserInputs,
-  PhaserParams, Quantizer, QuantizerInputs, QuantizerParams, Reverb, ReverbInputs, ReverbParams,
-  Rimshot909, Rimshot909Inputs, Rimshot909Params, RingMod, RingModParams, Sample, SampleHold,
-  SampleHoldInputs, SampleHoldParams, SlewInputs, SlewLimiter, SlewParams, Snare909, Snare909Inputs,
-  Snare909Params, SnesOsc, SnesOscInputs, SnesOscParams, SpringReverb, SpringReverbInputs,
-  SpringReverbParams, StepSequencer, StepSequencerInputs, StepSequencerOutputs, StepSequencerParams,
-  Supersaw, SupersawInputs, SupersawParams, TapeDelay, TapeDelayInputs, TapeDelayParams, Tb303,
-  Tb303Inputs, Tb303Outputs, Tb303Params, Tom909, Tom909Inputs, Tom909Params, Vca, Vcf, VcfInputs,
-  VcfParams, Vco, VcoInputs, VcoParams, Vocoder, VocoderInputs, VocoderParams, Wavefolder,
-  WavefolderParams,
+  Clap909Params, Delay, DelayInputs, DelayParams, Distortion, DistortionParams, DrumSequencer,
+  DrumSequencerInputs, DrumSequencerOutputs, DrumSequencerParams, Ensemble, EnsembleInputs,
+  EnsembleParams, GranularDelay, GranularDelayInputs, GranularDelayParams, HiHat909, HiHat909Inputs,
+  HiHat909Params, Kick909, Kick909Inputs, Kick909Params, Lfo, LfoInputs, LfoParams, Mixer, NesOsc,
+  NesOscInputs, NesOscParams, Noise, NoiseParams, Phaser, PhaserInputs, PhaserParams, Quantizer,
+  QuantizerInputs, QuantizerParams, Reverb, ReverbInputs, ReverbParams, Rimshot909, Rimshot909Inputs,
+  Rimshot909Params, RingMod, RingModParams, Sample, SampleHold, SampleHoldInputs, SampleHoldParams,
+  SlewInputs, SlewLimiter, SlewParams, Snare909, Snare909Inputs, Snare909Params, SnesOsc,
+  SnesOscInputs, SnesOscParams, SpringReverb, SpringReverbInputs, SpringReverbParams, StepSequencer,
+  StepSequencerInputs, StepSequencerOutputs, StepSequencerParams, Supersaw, SupersawInputs,
+  SupersawParams, TapeDelay, TapeDelayInputs, TapeDelayParams, Tb303, Tb303Inputs, Tb303Outputs,
+  Tb303Params, Tom909, Tom909Inputs, Tom909Params, Vca, Vcf, VcfInputs, VcfParams, Vco, VcoInputs,
+  VcoParams, Vocoder, VocoderInputs, VocoderParams, Wavefolder, WavefolderParams,
+  DRUM_TRACKS,
 };
 use serde::Deserialize;
 use std::collections::{HashMap, VecDeque};
@@ -103,6 +104,8 @@ enum ModuleType {
   Clap909,
   Tom909,
   Rimshot909,
+  // Drum Sequencer
+  DrumSequencer,
 }
 
 #[derive(Clone, Copy)]
@@ -621,6 +624,16 @@ struct Rimshot909State {
   tune: ParamBuffer,
 }
 
+struct DrumSequencerState {
+  seq: DrumSequencer,
+  enabled: ParamBuffer,
+  tempo: ParamBuffer,
+  rate: ParamBuffer,
+  gate_length: ParamBuffer,
+  swing: ParamBuffer,
+  length: ParamBuffer,
+}
+
 enum ModuleState {
   Vco(VcoState),
   Supersaw(SupersawState),
@@ -668,6 +681,7 @@ enum ModuleState {
   Clap909(Clap909State),
   Tom909(Tom909State),
   Rimshot909(Rimshot909State),
+  DrumSequencer(DrumSequencerState),
 }
 
 struct ModuleNode {
@@ -1410,6 +1424,24 @@ impl ModuleNode {
         rimshot: Rimshot909::new(sample_rate),
         tune: ParamBuffer::new(param_number(params, "tune", 400.0)),
       }),
+      ModuleType::DrumSequencer => {
+        let mut seq = DrumSequencer::new(sample_rate);
+        // Parse initial drum data if provided
+        if let Some(drum_data) = params.get("drumData") {
+          if let Some(s) = drum_data.as_str() {
+            seq.parse_drum_data(s);
+          }
+        }
+        ModuleState::DrumSequencer(DrumSequencerState {
+          seq,
+          enabled: ParamBuffer::new(param_number(params, "enabled", 1.0)),
+          tempo: ParamBuffer::new(param_number(params, "tempo", 120.0)),
+          rate: ParamBuffer::new(param_number(params, "rate", 4.0)),
+          gate_length: ParamBuffer::new(param_number(params, "gateLength", 50.0)),
+          swing: ParamBuffer::new(param_number(params, "swing", 0.0)),
+          length: ParamBuffer::new(param_number(params, "length", 16.0)),
+        })
+      }
     };
 
     Self {
@@ -1767,6 +1799,15 @@ impl ModuleNode {
         "tune" => state.tune.set(value),
         _ => {}
       },
+      ModuleState::DrumSequencer(state) => match param {
+        "enabled" => state.enabled.set(value),
+        "tempo" => state.tempo.set(value),
+        "rate" => state.rate.set(value),
+        "gateLength" => state.gate_length.set(value),
+        "swing" => state.swing.set(value),
+        "length" => state.length.set(value),
+        _ => {}
+      },
       _ => {}
     }
   }
@@ -1776,6 +1817,11 @@ impl ModuleNode {
       ModuleState::StepSequencer(state) => {
         if param == "stepData" {
           state.seq.parse_step_data(value);
+        }
+      }
+      ModuleState::DrumSequencer(state) => {
+        if param == "drumData" {
+          state.seq.parse_drum_data(value);
         }
       }
       _ => {}
@@ -2824,6 +2870,90 @@ impl ModuleNode {
         };
         state.rimshot.process_block(out, inputs, params);
       }
+      ModuleState::DrumSequencer(state) => {
+        let clock = if self.connections[0].is_empty() {
+          None
+        } else {
+          Some(inputs[0].channel(0))
+        };
+        let reset = if self.connections[1].is_empty() {
+          None
+        } else {
+          Some(inputs[1].channel(0))
+        };
+
+        // Create individual temporary buffers (avoids array borrowing issues)
+        // Use 1024 to handle larger buffer sizes safely
+        const DRUM_BUF_SIZE: usize = 1024;
+        let safe_frames = frames.min(DRUM_BUF_SIZE);
+        let mut buf_gate_kick: [Sample; DRUM_BUF_SIZE] = [0.0; DRUM_BUF_SIZE];
+        let mut buf_gate_snare: [Sample; DRUM_BUF_SIZE] = [0.0; DRUM_BUF_SIZE];
+        let mut buf_gate_hhc: [Sample; DRUM_BUF_SIZE] = [0.0; DRUM_BUF_SIZE];
+        let mut buf_gate_hho: [Sample; DRUM_BUF_SIZE] = [0.0; DRUM_BUF_SIZE];
+        let mut buf_gate_clap: [Sample; DRUM_BUF_SIZE] = [0.0; DRUM_BUF_SIZE];
+        let mut buf_gate_tom: [Sample; DRUM_BUF_SIZE] = [0.0; DRUM_BUF_SIZE];
+        let mut buf_gate_rim: [Sample; DRUM_BUF_SIZE] = [0.0; DRUM_BUF_SIZE];
+        let mut buf_gate_aux: [Sample; DRUM_BUF_SIZE] = [0.0; DRUM_BUF_SIZE];
+        let mut buf_acc_kick: [Sample; DRUM_BUF_SIZE] = [0.0; DRUM_BUF_SIZE];
+        let mut buf_acc_snare: [Sample; DRUM_BUF_SIZE] = [0.0; DRUM_BUF_SIZE];
+        let mut buf_acc_hhc: [Sample; DRUM_BUF_SIZE] = [0.0; DRUM_BUF_SIZE];
+        let mut buf_acc_hho: [Sample; DRUM_BUF_SIZE] = [0.0; DRUM_BUF_SIZE];
+        let mut buf_acc_clap: [Sample; DRUM_BUF_SIZE] = [0.0; DRUM_BUF_SIZE];
+        let mut buf_acc_tom: [Sample; DRUM_BUF_SIZE] = [0.0; DRUM_BUF_SIZE];
+        let mut buf_acc_rim: [Sample; DRUM_BUF_SIZE] = [0.0; DRUM_BUF_SIZE];
+        let mut buf_acc_aux: [Sample; DRUM_BUF_SIZE] = [0.0; DRUM_BUF_SIZE];
+        let mut buf_step: [Sample; DRUM_BUF_SIZE] = [0.0; DRUM_BUF_SIZE];
+
+        // Process into temp buffers
+        let seq_inputs = DrumSequencerInputs { clock, reset };
+        let seq_params = DrumSequencerParams {
+          enabled: state.enabled.slice(safe_frames),
+          tempo: state.tempo.slice(safe_frames),
+          rate: state.rate.slice(safe_frames),
+          gate_length: state.gate_length.slice(safe_frames),
+          swing: state.swing.slice(safe_frames),
+          length: state.length.slice(safe_frames),
+        };
+        let seq_outputs = DrumSequencerOutputs {
+          gate_kick: &mut buf_gate_kick[..safe_frames],
+          gate_snare: &mut buf_gate_snare[..safe_frames],
+          gate_hhc: &mut buf_gate_hhc[..safe_frames],
+          gate_hho: &mut buf_gate_hho[..safe_frames],
+          gate_clap: &mut buf_gate_clap[..safe_frames],
+          gate_tom: &mut buf_gate_tom[..safe_frames],
+          gate_rim: &mut buf_gate_rim[..safe_frames],
+          gate_aux: &mut buf_gate_aux[..safe_frames],
+          acc_kick: &mut buf_acc_kick[..safe_frames],
+          acc_snare: &mut buf_acc_snare[..safe_frames],
+          acc_hhc: &mut buf_acc_hhc[..safe_frames],
+          acc_hho: &mut buf_acc_hho[..safe_frames],
+          acc_clap: &mut buf_acc_clap[..safe_frames],
+          acc_tom: &mut buf_acc_tom[..safe_frames],
+          acc_rim: &mut buf_acc_rim[..safe_frames],
+          acc_aux: &mut buf_acc_aux[..safe_frames],
+          step_out: &mut buf_step[..safe_frames],
+        };
+        state.seq.process_block(seq_outputs, seq_inputs, seq_params);
+
+        // Copy temp buffers to outputs
+        outputs[0].channel_mut(0)[..safe_frames].copy_from_slice(&buf_gate_kick[..safe_frames]);
+        outputs[1].channel_mut(0)[..safe_frames].copy_from_slice(&buf_gate_snare[..safe_frames]);
+        outputs[2].channel_mut(0)[..safe_frames].copy_from_slice(&buf_gate_hhc[..safe_frames]);
+        outputs[3].channel_mut(0)[..safe_frames].copy_from_slice(&buf_gate_hho[..safe_frames]);
+        outputs[4].channel_mut(0)[..safe_frames].copy_from_slice(&buf_gate_clap[..safe_frames]);
+        outputs[5].channel_mut(0)[..safe_frames].copy_from_slice(&buf_gate_tom[..safe_frames]);
+        outputs[6].channel_mut(0)[..safe_frames].copy_from_slice(&buf_gate_rim[..safe_frames]);
+        outputs[7].channel_mut(0)[..safe_frames].copy_from_slice(&buf_gate_aux[..safe_frames]);
+        outputs[8].channel_mut(0)[..safe_frames].copy_from_slice(&buf_acc_kick[..safe_frames]);
+        outputs[9].channel_mut(0)[..safe_frames].copy_from_slice(&buf_acc_snare[..safe_frames]);
+        outputs[10].channel_mut(0)[..safe_frames].copy_from_slice(&buf_acc_hhc[..safe_frames]);
+        outputs[11].channel_mut(0)[..safe_frames].copy_from_slice(&buf_acc_hho[..safe_frames]);
+        outputs[12].channel_mut(0)[..safe_frames].copy_from_slice(&buf_acc_clap[..safe_frames]);
+        outputs[13].channel_mut(0)[..safe_frames].copy_from_slice(&buf_acc_tom[..safe_frames]);
+        outputs[14].channel_mut(0)[..safe_frames].copy_from_slice(&buf_acc_rim[..safe_frames]);
+        outputs[15].channel_mut(0)[..safe_frames].copy_from_slice(&buf_acc_aux[..safe_frames]);
+        outputs[16].channel_mut(0)[..safe_frames].copy_from_slice(&buf_step[..safe_frames]);
+      }
     }
   }
 }
@@ -2875,6 +3005,8 @@ fn normalize_module_type(raw: &str) -> ModuleType {
     "909-clap" => ModuleType::Clap909,
     "909-tom" => ModuleType::Tom909,
     "909-rimshot" => ModuleType::Rimshot909,
+    // Drum Sequencer
+    "drum-sequencer" => ModuleType::DrumSequencer,
     _ => ModuleType::Oscillator,
   }
 }
@@ -2992,6 +3124,11 @@ fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // trigger
       PortInfo { channels: 1 },  // accent
     ],
+    // Drum Sequencer - 2 inputs (clock, reset)
+    ModuleType::DrumSequencer => vec![
+      PortInfo { channels: 1 },  // clock
+      PortInfo { channels: 1 },  // reset
+    ],
   }
 }
 
@@ -3075,6 +3212,26 @@ fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
     ModuleType::Kick909 | ModuleType::Snare909 | ModuleType::HiHat909 |
     ModuleType::Clap909 | ModuleType::Tom909 | ModuleType::Rimshot909 => vec![
       PortInfo { channels: 1 },  // out
+    ],
+    // Drum Sequencer - 17 outputs (8 gates + 8 accents + step)
+    ModuleType::DrumSequencer => vec![
+      PortInfo { channels: 1 },  // gate-kick
+      PortInfo { channels: 1 },  // gate-snare
+      PortInfo { channels: 1 },  // gate-hhc
+      PortInfo { channels: 1 },  // gate-hho
+      PortInfo { channels: 1 },  // gate-clap
+      PortInfo { channels: 1 },  // gate-tom
+      PortInfo { channels: 1 },  // gate-rim
+      PortInfo { channels: 1 },  // gate-aux
+      PortInfo { channels: 1 },  // acc-kick
+      PortInfo { channels: 1 },  // acc-snare
+      PortInfo { channels: 1 },  // acc-hhc
+      PortInfo { channels: 1 },  // acc-hho
+      PortInfo { channels: 1 },  // acc-clap
+      PortInfo { channels: 1 },  // acc-tom
+      PortInfo { channels: 1 },  // acc-rim
+      PortInfo { channels: 1 },  // acc-aux
+      PortInfo { channels: 1 },  // step-out
     ],
   }
 }
@@ -3233,6 +3390,12 @@ fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize> {
     ModuleType::Clap909 | ModuleType::Tom909 | ModuleType::Rimshot909 => match port_id {
       "trigger" | "trig" => Some(0),
       "accent" | "acc" => Some(1),
+      _ => None,
+    },
+    // Drum Sequencer
+    ModuleType::DrumSequencer => match port_id {
+      "clock" => Some(0),
+      "reset" => Some(1),
       _ => None,
     },
     _ => None,
@@ -3402,6 +3565,27 @@ fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize> {
     ModuleType::Kick909 | ModuleType::Snare909 | ModuleType::HiHat909 |
     ModuleType::Clap909 | ModuleType::Tom909 | ModuleType::Rimshot909 => match port_id {
       "out" => Some(0),
+      _ => None,
+    },
+    // Drum Sequencer - 17 outputs
+    ModuleType::DrumSequencer => match port_id {
+      "gate-kick" => Some(0),
+      "gate-snare" => Some(1),
+      "gate-hhc" => Some(2),
+      "gate-hho" => Some(3),
+      "gate-clap" => Some(4),
+      "gate-tom" => Some(5),
+      "gate-rim" => Some(6),
+      "gate-aux" => Some(7),
+      "acc-kick" => Some(8),
+      "acc-snare" => Some(9),
+      "acc-hhc" => Some(10),
+      "acc-hho" => Some(11),
+      "acc-clap" => Some(12),
+      "acc-tom" => Some(13),
+      "acc-rim" => Some(14),
+      "acc-aux" => Some(15),
+      "step-out" => Some(16),
       _ => None,
     },
   }

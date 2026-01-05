@@ -663,16 +663,16 @@ function App() {
       }))
 
       if (status === 'running' && !options?.skipEngine) {
-        // String params like stepData go through setParamString
-        if (typeof value === 'string' && paramId === 'stepData') {
+        // String params like stepData/drumData go through setParamString
+        if (typeof value === 'string' && (paramId === 'stepData' || paramId === 'drumData')) {
           engine.setParamString(moduleId, paramId, value)
         } else {
           engine.setParam(moduleId, paramId, value)
         }
       }
       if (isTauri && tauriNativeRunning && !options?.skipEngine) {
-        // String params like stepData need special handling
-        if (typeof value === 'string' && paramId === 'stepData') {
+        // String params like stepData/drumData need special handling
+        if (typeof value === 'string' && (paramId === 'stepData' || paramId === 'drumData')) {
           void invokeTauri('native_set_param_string', { moduleId, paramId, value })
         } else {
           const numeric = normalizeNativeParamValue(paramId, value)

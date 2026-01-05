@@ -47,6 +47,8 @@ export const moduleSizes: Record<ModuleType, string> = {
   '909-clap': '1x2',
   '909-tom': '1x2',
   '909-rimshot': '1x2',
+  // Drum Sequencer
+  'drum-sequencer': '5x5',
 }
 
 export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>> = {
@@ -73,6 +75,8 @@ export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>>
   '909-clap': 'strip',
   '909-tom': 'strip',
   '909-rimshot': 'strip',
+  // Drum Sequencer
+  'drum-sequencer': 'strip',
 }
 
 export const moduleCatalog: { type: ModuleType; label: string }[] = [
@@ -122,6 +126,8 @@ export const moduleCatalog: { type: ModuleType; label: string }[] = [
   { type: '909-clap', label: '909 Clap' },
   { type: '909-tom', label: '909 Tom' },
   { type: '909-rimshot', label: '909 Rim' },
+  // Drum Sequencer
+  { type: 'drum-sequencer', label: 'Drum Seq' },
 ]
 
 export const modulePrefixes: Record<ModuleType, string> = {
@@ -171,6 +177,8 @@ export const modulePrefixes: Record<ModuleType, string> = {
   '909-clap': 'clap',
   '909-tom': 'tom',
   '909-rimshot': 'rim',
+  // Drum Sequencer
+  'drum-sequencer': 'drumseq',
 }
 
 export const moduleLabels: Record<ModuleType, string> = {
@@ -220,6 +228,8 @@ export const moduleLabels: Record<ModuleType, string> = {
   '909-clap': '909 Clap',
   '909-tom': '909 Tom',
   '909-rimshot': '909 Rim',
+  // Drum Sequencer
+  'drum-sequencer': 'Drum Seq',
 }
 
 export const moduleDefaults: Record<ModuleType, Record<string, number | string | boolean>> = {
@@ -443,6 +453,35 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     tune: 500,          // Base frequency Hz
     tone: 0.6,          // Brightness 0-1
     decay: 0.2,         // Decay time 0-1
+  },
+  // Drum Sequencer
+  'drum-sequencer': {
+    enabled: true,
+    tempo: 120,
+    rate: 4,            // 1/16 note
+    gateLength: 50,     // 50% gate
+    swing: 0,
+    length: 16,
+    drumData: JSON.stringify({
+      tracks: [
+        // Kick: 4 on the floor
+        [{ g: 1, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 1, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 1, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 1, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }],
+        // Snare: 2 and 4
+        [{ g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 1, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 1, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }],
+        // HH Closed: all 16ths
+        [{ g: 1, a: 0 }, { g: 1, a: 0 }, { g: 1, a: 0 }, { g: 1, a: 0 }, { g: 1, a: 0 }, { g: 1, a: 0 }, { g: 1, a: 0 }, { g: 1, a: 0 }, { g: 1, a: 0 }, { g: 1, a: 0 }, { g: 1, a: 0 }, { g: 1, a: 0 }, { g: 1, a: 0 }, { g: 1, a: 0 }, { g: 1, a: 0 }, { g: 1, a: 0 }],
+        // HH Open: empty
+        [{ g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }],
+        // Clap: empty
+        [{ g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }],
+        // Tom: empty
+        [{ g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }],
+        // Rim: empty
+        [{ g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }],
+        // Aux: empty
+        [{ g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }],
+      ],
+    }),
   },
 }
 

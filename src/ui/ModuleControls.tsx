@@ -3125,6 +3125,293 @@ export const ModuleControls = ({
     )
   }
 
+  // Drum Sequencer - 8 track x 16 step grid (x0x style)
+  if (module.type === 'drum-sequencer') {
+    const enabled = module.params.enabled !== false
+    const tempo = Number(module.params.tempo ?? 120)
+    const rate = Number(module.params.rate ?? 4)
+    const swing = Number(module.params.swing ?? 0)
+    const length = Number(module.params.length ?? 16)
+
+    // Track names
+    const trackNames = ['KICK', 'SNARE', 'HH-C', 'HH-O', 'CLAP', 'TOM', 'RIM', 'AUX']
+
+    // Parse drum data
+    type DrumStep = { g: number; a: number }
+    type DrumData = { tracks: DrumStep[][] }
+    let tracks: DrumStep[][] = []
+    try {
+      const raw = module.params.drumData
+      if (typeof raw === 'string') {
+        const parsed: DrumData = JSON.parse(raw)
+        tracks = parsed.tracks || []
+      }
+    } catch {
+      // Use defaults if parse fails
+    }
+    // Ensure 8 tracks x 16 steps
+    while (tracks.length < 8) {
+      tracks.push(Array.from({ length: 16 }, () => ({ g: 0, a: 0 })))
+    }
+    for (let t = 0; t < 8; t++) {
+      while (tracks[t].length < 16) {
+        tracks[t].push({ g: 0, a: 0 })
+      }
+    }
+
+    const updateDrumData = (newTracks: DrumStep[][]) => {
+      updateParam(module.id, 'drumData', JSON.stringify({ tracks: newTracks }))
+    }
+
+    // Pattern presets
+    const drumPatterns = [
+      { id: 'basic', label: 'Basic', tracks: [
+        [1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0], // Kick
+        [0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0], // Snare
+        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1], // HH-C
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], // HH-O
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], // Clap
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], // Tom
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], // Rim
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], // Aux
+      ]},
+      { id: 'house', label: 'House', tracks: [
+        [1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0],
+        [0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0],
+        [0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1],
+        [0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0],
+        [0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      ]},
+      { id: 'techno', label: 'Techno', tracks: [
+        [1,0,0,1,1,0,0,0,1,0,0,1,1,0,0,0],
+        [0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0],
+        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      ]},
+      { id: 'breakbeat', label: 'Break', tracks: [
+        [1,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0],
+        [0,0,0,0,1,0,0,0,0,0,1,0,1,0,0,0],
+        [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      ]},
+      { id: 'clear', label: 'Clear', tracks: Array.from({ length: 8 }, () => Array(16).fill(0)) },
+    ]
+
+    const applyPattern = (pattern: number[][]) => {
+      const newTracks = pattern.map(row =>
+        row.map(g => ({ g, a: 0 }))
+      )
+      updateDrumData(newTracks)
+    }
+
+    const rateDivisions = [
+      { id: 2, label: '1/4' },
+      { id: 3, label: '1/8' },
+      { id: 4, label: '1/16' },
+      { id: 5, label: '1/32' },
+    ]
+
+    // Calculate step duration for LED animation
+    const getRateMultiplier = (r: number) => {
+      switch (r) {
+        case 2: return 1      // 1/4
+        case 3: return 0.5    // 1/8
+        case 4: return 0.25   // 1/16
+        case 5: return 0.125  // 1/32
+        default: return 0.25
+      }
+    }
+    const stepDurationMs = (60000 / tempo) * getRateMultiplier(rate)
+
+    // Use ref for grid and interval-based LED animation
+    const gridRef = useRef<HTMLDivElement>(null)
+    const intervalRef = useRef<number | null>(null)
+    const stepRef = useRef(0)
+
+    useEffect(() => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+        intervalRef.current = null
+      }
+
+      if (gridRef.current) {
+        gridRef.current.querySelectorAll('.drum-step.playing').forEach(el => {
+          el.classList.remove('playing')
+        })
+      }
+
+      if (!enabled || status !== 'running') {
+        return
+      }
+
+      stepRef.current = 0
+
+      intervalRef.current = window.setInterval(() => {
+        if (!gridRef.current) return
+
+        // Clear previous
+        gridRef.current.querySelectorAll('.drum-step.playing').forEach(el => {
+          el.classList.remove('playing')
+        })
+
+        // Highlight current step column
+        gridRef.current.querySelectorAll(`[data-step="${stepRef.current}"]`).forEach(el => {
+          el.classList.add('playing')
+        })
+
+        // Advance
+        stepRef.current = (stepRef.current + 1) % length
+      }, stepDurationMs)
+
+      return () => {
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current)
+        }
+      }
+    }, [enabled, status, tempo, rate, length, stepDurationMs])
+
+    return (
+      <>
+        {/* Row 1: Play + BPM */}
+        <div className="drum-seq-row1">
+          <button
+            type="button"
+            className={`drum-seq-play ${enabled ? 'active' : ''}`}
+            onClick={() => updateParam(module.id, 'enabled', !enabled)}
+          >
+            {enabled ? '■ STOP' : '▶ PLAY'}
+          </button>
+          <div className="drum-seq-bpm">
+            <span className="drum-seq-label">BPM</span>
+            <input
+              type="number"
+              className="drum-seq-bpm-input"
+              value={tempo}
+              min={40}
+              max={300}
+              onChange={(e) => updateParam(module.id, 'tempo', Number(e.target.value))}
+            />
+          </div>
+        </div>
+
+        {/* Row 2: Rate + Swing + Length */}
+        <div className="drum-seq-row2">
+          <div className="drum-seq-box">
+            <span className="drum-seq-label">Rate</span>
+            <div className="drum-seq-btns">
+              {rateDivisions.map((r) => (
+                <button
+                  key={r.id}
+                  type="button"
+                  className={`drum-seq-btn ${rate === r.id ? 'active' : ''}`}
+                  onClick={() => updateParam(module.id, 'rate', r.id)}
+                >
+                  {r.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="drum-seq-box">
+            <span className="drum-seq-label">Swing</span>
+            <div className="drum-seq-swing">
+              <input
+                type="range"
+                min={0}
+                max={90}
+                value={swing}
+                onChange={(e) => updateParam(module.id, 'swing', Number(e.target.value))}
+                className="drum-seq-slider"
+              />
+              <span className="drum-seq-value">{swing}%</span>
+            </div>
+          </div>
+          <div className="drum-seq-box">
+            <span className="drum-seq-label">Len</span>
+            <div className="drum-seq-btns">
+              {[8, 12, 16].map((l) => (
+                <button
+                  key={l}
+                  type="button"
+                  className={`drum-seq-btn ${length === l ? 'active' : ''}`}
+                  onClick={() => updateParam(module.id, 'length', l)}
+                >
+                  {l}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Row 3: Pattern presets */}
+        <div className="drum-seq-row3">
+          <span className="drum-seq-label">Pattern</span>
+          <div className="drum-seq-patterns">
+            {drumPatterns.map((p) => (
+              <button
+                key={p.id}
+                type="button"
+                className="drum-seq-pattern-btn"
+                onClick={() => applyPattern(p.tracks)}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Drum Grid - 8 tracks x 16 steps */}
+        <div className="drum-seq-grid" ref={gridRef}>
+          {trackNames.map((trackName, trackIdx) => (
+            <div key={trackIdx} className="drum-track">
+              <div className="drum-track-label">{trackName}</div>
+              <div className="drum-track-steps">
+                {tracks[trackIdx].map((step, stepIdx) => (
+                  <button
+                    key={stepIdx}
+                    type="button"
+                    data-step={stepIdx}
+                    className={`drum-step ${step.g ? 'active' : ''} ${step.a ? 'accent' : ''} ${stepIdx >= length ? 'disabled' : ''} ${stepIdx % 4 === 0 ? 'beat' : ''}`}
+                    onClick={(e) => {
+                      const newTracks = tracks.map(t => [...t])
+                      if (e.shiftKey) {
+                        // Toggle accent
+                        newTracks[trackIdx][stepIdx] = {
+                          ...newTracks[trackIdx][stepIdx],
+                          a: newTracks[trackIdx][stepIdx].a ? 0 : 1
+                        }
+                      } else {
+                        // Toggle gate
+                        newTracks[trackIdx][stepIdx] = {
+                          ...newTracks[trackIdx][stepIdx],
+                          g: newTracks[trackIdx][stepIdx].g ? 0 : 1
+                        }
+                      }
+                      updateDrumData(newTracks)
+                    }}
+                    title={`${trackName} Step ${stepIdx + 1}${step.a ? ' (Accent)' : ''} - Click=toggle, Shift+Click=accent`}
+                  >
+                    {step.g ? (step.a ? '◆' : '●') : '○'}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </>
+    )
+  }
+
   if (module.type === 'tb-303') {
     const waveform = Number(module.params.waveform ?? 0)
     const cutoff = Number(module.params.cutoff ?? 800)
@@ -3220,10 +3507,10 @@ export const ModuleControls = ({
     )
   }
 
-  // TR-909 Drum Modules
+  // TR-909 Drum Modules - 2 column layout
   if (module.type === '909-kick') {
     return (
-      <>
+      <div className="drum-knobs-grid">
         <RotaryKnob
           label="Tune"
           min={30}
@@ -3235,7 +3522,7 @@ export const ModuleControls = ({
           format={(value) => Math.round(value).toString()}
         />
         <RotaryKnob
-          label="Attack"
+          label="Click"
           min={0}
           max={1}
           step={0.01}
@@ -3261,13 +3548,13 @@ export const ModuleControls = ({
           onChange={(value) => updateParam(module.id, 'drive', value)}
           format={(value) => Math.round(value * 100).toString()}
         />
-      </>
+      </div>
     )
   }
 
   if (module.type === '909-snare') {
     return (
-      <>
+      <div className="drum-knobs-grid">
         <RotaryKnob
           label="Tune"
           min={100}
@@ -3305,13 +3592,13 @@ export const ModuleControls = ({
           onChange={(value) => updateParam(module.id, 'decay', value)}
           format={(value) => Math.round(value * 100).toString()}
         />
-      </>
+      </div>
     )
   }
 
   if (module.type === '909-hihat') {
     return (
-      <>
+      <div className="drum-knobs-grid">
         <RotaryKnob
           label="Open"
           min={0}
@@ -3348,13 +3635,13 @@ export const ModuleControls = ({
           onChange={(value) => updateParam(module.id, 'mix', value)}
           format={(value) => Math.round(value * 100).toString()}
         />
-      </>
+      </div>
     )
   }
 
   if (module.type === '909-clap') {
     return (
-      <>
+      <div className="drum-knobs-grid">
         <RotaryKnob
           label="Tone"
           min={0}
@@ -3382,13 +3669,13 @@ export const ModuleControls = ({
           onChange={(value) => updateParam(module.id, 'spread', value)}
           format={(value) => Math.round(value * 100).toString()}
         />
-      </>
+      </div>
     )
   }
 
   if (module.type === '909-tom') {
     return (
-      <>
+      <div className="drum-knobs-grid">
         <RotaryKnob
           label="Tune"
           min={60}
@@ -3417,13 +3704,13 @@ export const ModuleControls = ({
           onChange={(value) => updateParam(module.id, 'pitch', value)}
           format={(value) => Math.round(value * 100).toString()}
         />
-      </>
+      </div>
     )
   }
 
   if (module.type === '909-rimshot') {
     return (
-      <>
+      <div className="drum-knobs-grid">
         <RotaryKnob
           label="Tune"
           min={300}
@@ -3452,7 +3739,7 @@ export const ModuleControls = ({
           onChange={(value) => updateParam(module.id, 'decay', value)}
           format={(value) => Math.round(value * 100).toString()}
         />
-      </>
+      </div>
     )
   }
 
