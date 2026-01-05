@@ -64,7 +64,7 @@ This file is meant to be reread by the coding assistant to keep context, decisio
 - Mario IO (seasonal/fun)
 - Lab Panel (test module)
 
-## Presets (40 total)
+## Presets (45+ total)
 
 **Classic emulations (updates format):**
 - Jupiter Pad, Jupiter Brass, Jupiter-8 Demo
@@ -80,6 +80,11 @@ This file is meant to be reread by the coding assistant to keep context, decisio
 - Dirty Bass (Distortion foldback)
 - 8-Bit Mario (NES-style 5-channel with 8 classic tunes)
 - Module tests: Sample & Hold, Slew, Quantizer, Ensemble, Tape Delay, Spring Reverb, Wavefolder, Granular Delay, Choir
+
+**TB-303 / Acid (full graph format):**
+- Acid Classic, Acid Squelch, Acid Drone (single TB-303)
+- Moroder Chase 303 (2x TB-303 + Supersaw, 3-voice Moroder style)
+- Acid Trio (3x TB-303: bass/mid/lead)
 
 Dev/test presets live in `public/presets/manifest-dev.json`.
 
@@ -117,6 +122,7 @@ Presets support two formats:
 - MIDI enhancements (pitch bend, CC mapping).
 - Optional: add native MIDI input via `midir` for Tauri (lower latency, more reliable than Web MIDI).
 - **VST**: Wire scope taps through IPC for oscilloscope in VST mode.
+- **TR-808/909 Drum Module**: Analog drum synthesis (kick, snare, hats, clap, toms) with step sequencer.
 
 ## Recent changes (Jan 2026)
 
@@ -129,7 +135,19 @@ Presets support two formats:
 - **Glide/portamento** with exponential smoothing
 - **7 parameters**: Cutoff, Resonance, Decay, EnvMod, Accent, Glide, Waveform
 - **Step Sequencer integration**: CV/Gate/Velocity inputs for acid sequences
-- **3 preset files**: acid-classic, acid-squelch, acid-drone
+- **6 preset files**: acid-classic, acid-squelch, acid-drone, moroder-chase-303, acid-trio
+
+### Multi-Voice Acid Presets
+
+- **Moroder Chase 303**: 3-voice Moroder/Midnight Express style
+  - TB-303 Bass (saw, heavy accent, octave jumps)
+  - TB-303 Lead (square, arpeggiated)
+  - Supersaw Stab (VCF + ADSR gated pad)
+  - Chorus → Ping-pong Delay → Reverb FX chain
+- **Acid Trio**: Pure 3x TB-303 acid jam
+  - Bass (saw, 350 Hz, accent 0.9)
+  - Mid (square, 800 Hz, arpeggios)
+  - Lead (square, 1500 Hz, melodic slides)
 
 ### Step Sequencer Module
 
