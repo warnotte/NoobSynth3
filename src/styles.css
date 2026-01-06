@@ -2034,6 +2034,94 @@
   --ui-btn-border: rgba(90, 104, 126, 0.8);
 }
 
+/* Module Library Categories */
+.module-search {
+  width: 100%;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(8, 12, 18, 0.8);
+  color: rgba(230, 238, 248, 0.95);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+}
+
+.module-search::placeholder {
+  color: rgba(180, 195, 215, 0.5);
+}
+
+.module-search:focus {
+  outline: none;
+  border-color: rgba(91, 182, 255, 0.5);
+}
+
+.module-categories {
+  display: grid;
+  gap: 8px;
+}
+
+.module-category {
+  display: grid;
+  gap: 6px;
+}
+
+.module-category-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(8, 12, 18, 0.6);
+  color: rgba(216, 230, 246, 0.92);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  appearance: none;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.module-category-header:hover:not(:disabled) {
+  border-color: rgba(130, 150, 190, 0.5);
+  background: rgba(12, 18, 26, 0.7);
+}
+
+.module-category-header:disabled {
+  cursor: default;
+}
+
+.module-category-icon {
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+.module-category-label {
+  flex: 1;
+  font-weight: 600;
+  text-align: left;
+}
+
+.module-category-count {
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: rgba(90, 104, 126, 0.25);
+  font-size: 0.55rem;
+  color: rgba(198, 214, 232, 0.7);
+}
+
+.module-category-arrow {
+  font-size: 0.7rem;
+  color: rgba(198, 214, 232, 0.7);
+  margin-left: 4px;
+}
+
+.module-category .chip-row {
+  padding-left: 8px;
+}
+
 /* ============================================
    SECTION 23: MISC CONTROLS
    ============================================ */

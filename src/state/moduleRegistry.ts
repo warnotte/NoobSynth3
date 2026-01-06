@@ -79,55 +79,93 @@ export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>>
   'drum-sequencer': 'strip',
 }
 
-export const moduleCatalog: { type: ModuleType; label: string }[] = [
-  { type: 'oscillator', label: 'VCO' },
-  { type: 'supersaw', label: 'Supersaw' },
-  { type: 'nes-osc', label: 'NES Osc' },
-  { type: 'snes-osc', label: 'SNES Osc' },
-  { type: 'noise', label: 'Noise' },
-  { type: 'mod-router', label: 'Mod Router' },
-  { type: 'sample-hold', label: 'Sample & Hold' },
-  { type: 'slew', label: 'Slew' },
-  { type: 'quantizer', label: 'Quantizer' },
-  { type: 'ring-mod', label: 'Ring Mod' },
-  { type: 'vcf', label: 'VCF' },
-  { type: 'hpf', label: 'HPF' },
-  { type: 'gain', label: 'VCA' },
-  { type: 'cv-vca', label: 'Mod VCA' },
-  { type: 'mixer', label: 'Mixer 1x1' },
-  { type: 'mixer-1x2', label: 'Mixer 1x2' },
-  { type: 'chorus', label: 'Chorus' },
-  { type: 'ensemble', label: 'Ensemble' },
-  { type: 'choir', label: 'Choir' },
-  { type: 'vocoder', label: 'Vocoder' },
-  { type: 'audio-in', label: 'Audio In' },
-  { type: 'delay', label: 'Delay' },
-  { type: 'granular-delay', label: 'Granular Delay' },
-  { type: 'tape-delay', label: 'Tape Delay' },
-  { type: 'spring-reverb', label: 'Spring Reverb' },
-  { type: 'reverb', label: 'Reverb' },
-  { type: 'phaser', label: 'Phaser' },
-  { type: 'distortion', label: 'Distortion' },
-  { type: 'wavefolder', label: 'Wavefolder' },
-  { type: 'adsr', label: 'ADSR' },
-  { type: 'lfo', label: 'LFO' },
-  { type: 'scope', label: 'Scope' },
-  { type: 'control', label: 'Control IO' },
-  { type: 'output', label: 'Main Out' },
-  { type: 'lab', label: 'Lab' },
-  { type: 'mario', label: 'Mario IO' },
-  { type: 'arpeggiator', label: 'Arpeggiator' },
-  { type: 'step-sequencer', label: 'Step Sequencer' },
-  { type: 'tb-303', label: 'TB-303' },
+export type ModuleCategory =
+  | 'sources'
+  | 'filters'
+  | 'amplifiers'
+  | 'effects'
+  | 'modulators'
+  | 'sequencers'
+  | 'drums'
+  | 'io'
+
+export const moduleCategoryMeta: Record<ModuleCategory, { label: string; icon: string }> = {
+  sources: { label: 'Sources', icon: '〰️' },
+  filters: { label: 'Filters', icon: '🎚️' },
+  amplifiers: { label: 'Amplifiers', icon: '📢' },
+  effects: { label: 'Effects', icon: '✨' },
+  modulators: { label: 'Modulators', icon: '📈' },
+  sequencers: { label: 'Sequencers', icon: '🎼' },
+  drums: { label: 'TR-909 Drums', icon: '🥁' },
+  io: { label: 'I/O', icon: '🔌' },
+}
+
+export const moduleCategoryOrder: ModuleCategory[] = [
+  'sources',
+  'filters',
+  'amplifiers',
+  'effects',
+  'modulators',
+  'sequencers',
+  'drums',
+  'io',
+]
+
+export const moduleCatalog: { type: ModuleType; label: string; category: ModuleCategory }[] = [
+  // Sources
+  { type: 'oscillator', label: 'VCO', category: 'sources' },
+  { type: 'supersaw', label: 'Supersaw', category: 'sources' },
+  { type: 'nes-osc', label: 'NES Osc', category: 'sources' },
+  { type: 'snes-osc', label: 'SNES Osc', category: 'sources' },
+  { type: 'noise', label: 'Noise', category: 'sources' },
+  { type: 'tb-303', label: 'TB-303', category: 'sources' },
+  // Filters
+  { type: 'vcf', label: 'VCF', category: 'filters' },
+  { type: 'hpf', label: 'HPF', category: 'filters' },
+  // Amplifiers
+  { type: 'gain', label: 'VCA', category: 'amplifiers' },
+  { type: 'cv-vca', label: 'Mod VCA', category: 'amplifiers' },
+  { type: 'mixer', label: 'Mixer 1x1', category: 'amplifiers' },
+  { type: 'mixer-1x2', label: 'Mixer 1x2', category: 'amplifiers' },
+  // Effects
+  { type: 'chorus', label: 'Chorus', category: 'effects' },
+  { type: 'ensemble', label: 'Ensemble', category: 'effects' },
+  { type: 'choir', label: 'Choir', category: 'effects' },
+  { type: 'vocoder', label: 'Vocoder', category: 'effects' },
+  { type: 'delay', label: 'Delay', category: 'effects' },
+  { type: 'granular-delay', label: 'Granular', category: 'effects' },
+  { type: 'tape-delay', label: 'Tape Delay', category: 'effects' },
+  { type: 'spring-reverb', label: 'Spring', category: 'effects' },
+  { type: 'reverb', label: 'Reverb', category: 'effects' },
+  { type: 'phaser', label: 'Phaser', category: 'effects' },
+  { type: 'distortion', label: 'Distortion', category: 'effects' },
+  { type: 'wavefolder', label: 'Wavefolder', category: 'effects' },
+  { type: 'ring-mod', label: 'Ring Mod', category: 'effects' },
+  // Modulators
+  { type: 'adsr', label: 'ADSR', category: 'modulators' },
+  { type: 'lfo', label: 'LFO', category: 'modulators' },
+  { type: 'mod-router', label: 'Mod Router', category: 'modulators' },
+  { type: 'sample-hold', label: 'S&H', category: 'modulators' },
+  { type: 'slew', label: 'Slew', category: 'modulators' },
+  { type: 'quantizer', label: 'Quantizer', category: 'modulators' },
+  // Sequencers
+  { type: 'arpeggiator', label: 'Arpeggiator', category: 'sequencers' },
+  { type: 'step-sequencer', label: 'Step Seq', category: 'sequencers' },
+  { type: 'drum-sequencer', label: 'Drum Seq', category: 'sequencers' },
+  { type: 'mario', label: 'Mario IO', category: 'sequencers' },
   // TR-909 Drums
-  { type: '909-kick', label: '909 Kick' },
-  { type: '909-snare', label: '909 Snare' },
-  { type: '909-hihat', label: '909 HiHat' },
-  { type: '909-clap', label: '909 Clap' },
-  { type: '909-tom', label: '909 Tom' },
-  { type: '909-rimshot', label: '909 Rim' },
-  // Drum Sequencer
-  { type: 'drum-sequencer', label: 'Drum Seq' },
+  { type: '909-kick', label: 'Kick', category: 'drums' },
+  { type: '909-snare', label: 'Snare', category: 'drums' },
+  { type: '909-hihat', label: 'HiHat', category: 'drums' },
+  { type: '909-clap', label: 'Clap', category: 'drums' },
+  { type: '909-tom', label: 'Tom', category: 'drums' },
+  { type: '909-rimshot', label: 'Rimshot', category: 'drums' },
+  // I/O
+  { type: 'control', label: 'Control IO', category: 'io' },
+  { type: 'output', label: 'Main Out', category: 'io' },
+  { type: 'audio-in', label: 'Audio In', category: 'io' },
+  { type: 'scope', label: 'Scope', category: 'io' },
+  { type: 'lab', label: 'Lab', category: 'io' },
 ]
 
 export const modulePrefixes: Record<ModuleType, string> = {

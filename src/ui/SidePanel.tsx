@@ -1,7 +1,12 @@
 import { useEffect, useMemo, useState, type ChangeEvent, type RefObject } from 'react'
 import type { GraphState, MacroSpec, MacroTarget, ModuleSpec, ModuleType } from '../shared/graph'
 import type { PresetSpec } from '../state/presets'
-import { moduleCatalog } from '../state/moduleRegistry'
+import {
+  moduleCatalog,
+  moduleCategoryMeta,
+  moduleCategoryOrder,
+  type ModuleCategory,
+} from '../state/moduleRegistry'
 import { MacroPanel } from './MacroPanel'
 
 type SidePanelProps = {
@@ -111,9 +116,42 @@ export const SidePanel = ({
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({})
   const [presetQuery, setPresetQuery] = useState('')
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({})
+  const [moduleQuery, setModuleQuery] = useState('')
+  const [collapsedModuleCategories, setCollapsedModuleCategories] = useState<Record<ModuleCategory, boolean>>(() => {
+    const initial: Record<string, boolean> = {}
+    moduleCategoryOrder.forEach((cat) => {
+      initial[cat] = false
+    })
+    return initial as Record<ModuleCategory, boolean>
+  })
 
   const toggleSection = (key: string) => {
     setCollapsedSections((prev) => ({ ...prev, [key]: !prev[key] }))
+  }
+
+  const normalizedModuleQuery = moduleQuery.trim().toLowerCase()
+  const filteredModuleCatalog = useMemo(() => {
+    if (!normalizedModuleQuery) return moduleCatalog
+    return moduleCatalog.filter((entry) =>
+      entry.label.toLowerCase().includes(normalizedModuleQuery) ||
+      entry.type.toLowerCase().includes(normalizedModuleQuery)
+    )
+  }, [normalizedModuleQuery])
+
+  const groupedModules = useMemo(() => {
+    const groups = new Map<ModuleCategory, typeof moduleCatalog>()
+    moduleCategoryOrder.forEach((cat) => groups.set(cat, []))
+    filteredModuleCatalog.forEach((entry) => {
+      const list = groups.get(entry.category)
+      if (list) list.push(entry)
+    })
+    return moduleCategoryOrder
+      .map((cat) => ({ category: cat, modules: groups.get(cat) || [] }))
+      .filter((g) => g.modules.length > 0)
+  }, [filteredModuleCatalog])
+
+  const toggleModuleCategory = (cat: ModuleCategory) => {
+    setCollapsedModuleCategories((prev) => ({ ...prev, [cat]: !prev[cat] }))
   }
 
   const normalizedQuery = presetQuery.trim().toLowerCase()
@@ -200,23 +238,55 @@ export const SidePanel = ({
               </button>
             </div>
             {gridError && <div className="preset-error">{gridError}</div>}
-            <div className="chip-row">
-              {moduleCatalog.map((entry) => {
-                const isSingleton = entry.type === 'control' || entry.type === 'output'
-                const isDisabled =
-                  (entry.type === 'control' && hasControlModule) ||
-                  (entry.type === 'output' && hasOutputModule)
+            <input
+              className="module-search"
+              type="search"
+              placeholder="Search modules..."
+              value={moduleQuery}
+              onChange={(e) => setModuleQuery(e.target.value)}
+            />
+            <div className="module-categories">
+              {groupedModules.map(({ category, modules }) => {
+                const meta = moduleCategoryMeta[category]
+                const isCollapsed = normalizedModuleQuery ? false : collapsedModuleCategories[category]
                 return (
-                  <button
-                    key={entry.type}
-                    type="button"
-                    className="chip"
-                    onClick={() => onAddModule(entry.type)}
-                    disabled={isSingleton && isDisabled}
-                    title={isDisabled ? `${entry.label} already exists` : `Add ${entry.label}`}
-                  >
-                    {entry.label}
-                  </button>
+                  <div key={category} className="module-category">
+                    <button
+                      type="button"
+                      className={`module-category-header ${isCollapsed ? 'collapsed' : ''}`}
+                      onClick={() => toggleModuleCategory(category)}
+                      disabled={!!normalizedModuleQuery}
+                    >
+                      <span className="module-category-icon">{meta.icon}</span>
+                      <span className="module-category-label">{meta.label}</span>
+                      <span className="module-category-count">{modules.length}</span>
+                      {!normalizedModuleQuery && (
+                        <span className="module-category-arrow">{isCollapsed ? '+' : '-'}</span>
+                      )}
+                    </button>
+                    {!isCollapsed && (
+                      <div className="chip-row">
+                        {modules.map((entry) => {
+                          const isSingleton = entry.type === 'control' || entry.type === 'output'
+                          const isDisabled =
+                            (entry.type === 'control' && hasControlModule) ||
+                            (entry.type === 'output' && hasOutputModule)
+                          return (
+                            <button
+                              key={entry.type}
+                              type="button"
+                              className="chip"
+                              onClick={() => onAddModule(entry.type)}
+                              disabled={isSingleton && isDisabled}
+                              title={isDisabled ? `${entry.label} already exists` : `Add ${entry.label}`}
+                            >
+                              {entry.label}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    )}
+                  </div>
                 )
               })}
             </div>
