@@ -129,7 +129,6 @@ Presets support two formats:
 ## TODO (short list)
 
 - Refine VCF 24 dB stability.
-- Add macro panel (global knobs driving multiple params).
 - Consider drag-and-drop add for modules.
 - Optional: expand sequencer (8 steps, per-step toggles).
 - MIDI enhancements (pitch bend, CC mapping).
