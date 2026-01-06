@@ -48,6 +48,7 @@ Bibliothèque de traitement audio sans dépendance externe.
 - Effets : Chorus, Ensemble, Choir, Delay, Tape Delay, Granular Delay, Spring Reverb, Reverb, Phaser
 - Waveshaping : Distortion, Wavefolder
 - Utilitaires : VCA, Ring Mod, Mixer
+Note: Arpeggiator gate handling ignores short retrigger dips; when HOLD is off and no notes remain, Control IO forces gates low to avoid stuck arp.
 
 [Voir dsp-core/README.md](dsp-core/README.md)
 

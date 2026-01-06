@@ -3112,6 +3112,7 @@ pub struct Arpeggiator {
   // Previous gate input (edge detection)
   prev_gate_in: f32,
   prev_clock: f32,
+  gate_low_samples: usize,
 
   // Euclidean pattern cache
   euclid_pattern: Vec<bool>,
@@ -3189,6 +3190,7 @@ impl Arpeggiator {
       current_accent: 0.0,
       prev_gate_in: 0.0,
       prev_clock: 0.0,
+      gate_low_samples: 0,
       euclid_pattern: vec![true; 8],
       euclid_step: 0,
       swing_pending: false,
@@ -3395,6 +3397,7 @@ impl Arpeggiator {
     let euclid_fill = (sample_at(params.euclid_fill, 0, 4.0) as usize).clamp(1, 16);
     let euclid_rotate = sample_at(params.euclid_rotate, 0, 0.0) as usize;
     let mutate = sample_at(params.mutate, 0, 0.0).clamp(0.0, 100.0) / 100.0;
+    let gate_release_threshold = (self.sample_rate * 0.001).max(1.0) as usize;
 
     // Calculate timing
     let beats_per_second = tempo / 60.0;
@@ -3413,9 +3416,15 @@ impl Arpeggiator {
       let gate_in = inputs.gate_in.map_or(0.0, |b| sample_at(b, i, 0.0));
       let clock_in = inputs.clock.map_or(-1.0, |b| sample_at(b, i, 0.0));
 
-      // Detect note on/off
-      let gate_rising = gate_in > 0.5 && self.prev_gate_in <= 0.5;
-      let gate_falling = gate_in <= 0.5 && self.prev_gate_in > 0.5;
+      // Detect note on/off with a small debounce to ignore retrigger dips.
+      let gate_high = gate_in > 0.5;
+      if gate_high {
+        self.gate_low_samples = 0;
+      } else {
+        self.gate_low_samples = self.gate_low_samples.saturating_add(1);
+      }
+      let gate_rising = gate_high && self.prev_gate_in <= 0.5;
+      let gate_released = !gate_high && self.gate_low_samples == gate_release_threshold;
 
       if gate_rising {
         // Add note
@@ -3439,17 +3448,8 @@ impl Arpeggiator {
         }
       }
 
-      if gate_falling && !hold {
-        // Remove note
-        if let Some(pos) = self.notes.iter().position(|&n| (n - cv_in).abs() < 0.001) {
-          self.notes.remove(pos);
-        }
-        if self.notes.is_empty() {
-          self.play_order.clear();
-          self.current_step = 0;
-          self.phase = 0.0;
-        }
-        self.build_pattern(mode, octaves);
+      if gate_released && !hold {
+        self.clear_notes();
       }
 
       self.prev_gate_in = gate_in;

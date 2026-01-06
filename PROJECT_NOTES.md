@@ -138,6 +138,11 @@ Presets support two formats:
 
 ## Recent changes (Jan 2026)
 
+### Arpeggiator gate handling
+
+- Ignore short gate retrigger dips from Control IO (about 1ms).
+- When HOLD is off and no notes remain, Control IO forces all gates low to avoid stuck arp.
+
 ### Drum Sequencer Module
 
 - **8-track x 16-step drum sequencer** for TR-909 drums

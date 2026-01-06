@@ -50,6 +50,7 @@ export const useControlVoices = ({
   const [activeStep, setActiveStep] = useState<number | null>(null)
   const voiceStateRef = useRef<VoiceState[]>([])
   const voiceClockRef = useRef(0)
+  const activeNotesRef = useRef<Map<number, number>>(new Map())
   const sequencerRef = useRef<{ timer: number | null; gateTimer: number | null; step: number }>({
     timer: null,
     gateTimer: null,
@@ -63,6 +64,7 @@ export const useControlVoices = ({
       age: 0,
     }))
     voiceClockRef.current = 0
+    activeNotesRef.current.clear()
   }, [voiceCount])
 
   const ensureVoiceState = useCallback(() => {
@@ -75,6 +77,7 @@ export const useControlVoices = ({
       age: 0,
     }))
     voiceClockRef.current = 0
+    activeNotesRef.current.clear()
   }, [voiceCount])
 
   const allocateVoice = useCallback(
@@ -125,6 +128,7 @@ export const useControlVoices = ({
       age: 0,
     }))
     voiceClockRef.current = 0
+    activeNotesRef.current.clear()
   }, [controlModuleId, engine, nativeControl, voiceCount])
 
   const triggerVoiceNote = useCallback(
@@ -136,6 +140,8 @@ export const useControlVoices = ({
       if (!controlModuleId) {
         return
       }
+      const activeNotes = activeNotesRef.current
+      activeNotes.set(note, (activeNotes.get(note) ?? 0) + 1)
       const useVelocity = options?.useVelocity ?? true
       const clampedVelocity = Math.max(0, Math.min(1, velocity))
       const voiceIndex = allocateVoice(note, clampedVelocity)
@@ -173,14 +179,29 @@ export const useControlVoices = ({
       if (!controlModuleId) {
         return
       }
+      const activeNotes = activeNotesRef.current
+      const remaining = activeNotes.get(note)
+      if (remaining !== undefined) {
+        if (remaining <= 1) {
+          activeNotes.delete(note)
+        } else {
+          activeNotes.set(note, remaining - 1)
+        }
+      }
       const voiceIndex = releaseVoice(note)
       if (voiceIndex === null) {
+        if (activeNotes.size === 0) {
+          releaseAllVoices()
+        }
         return
       }
       engine.setControlVoiceGate(controlModuleId, voiceIndex, 0)
       nativeControl?.setControlVoiceGate(controlModuleId, voiceIndex, 0)
+      if (activeNotes.size === 0) {
+        releaseAllVoices()
+      }
     },
-    [controlModuleId, engine, nativeControl, releaseVoice],
+    [controlModuleId, engine, nativeControl, releaseAllVoices, releaseVoice],
   )
 
   const setManualGate = useCallback(

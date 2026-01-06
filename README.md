@@ -42,6 +42,7 @@ Les binaires sont dans `target/release/` :
 - **Dépatcher** : Double-clic sur un câble
 - **Modules** : Ajouter depuis la bibliothèque (panneau gauche)
 - **Presets** : Charger depuis le panneau droit
+- **Arpeggiator** : Gate retrigger dips are ignored; HOLD off stops when no notes are held
 
 ## Documentation
 

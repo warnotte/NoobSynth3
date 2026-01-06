@@ -515,6 +515,12 @@ Module central pour le contrôle du synthé.
 
 **Sorties** : cv-out (CV), vel-out (CV), gate-out (gate), sync-out (sync)
 
+### Arpeggiator
+
+Arpeggiateur CV/Gate synchronisable (tempo interne ou clock externe).
+
+**Note** : les micro-coupures de gate (retrigger) sont ignorees ; avec HOLD desactive, l'arp s'arrete quand aucune note n'est tenue.
+
 ### Mario IO
 
 Séquenceur thématique avec chansons NES/SNES.
