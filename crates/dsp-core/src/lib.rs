@@ -3082,6 +3082,7 @@ pub struct Arpeggiator {
   samples_per_beat: f64,
   current_step: usize,
   pattern_length: usize,
+  #[allow(dead_code)]
   direction: i32,            // 1 or -1 for ping-pong
 
   // Gate state
@@ -3092,11 +3093,15 @@ pub struct Arpeggiator {
   // Ratchet state
   ratchet_count: usize,
   ratchet_current: usize,
+  #[allow(dead_code)]
   ratchet_phase: f64,
 
   // Strum state (for guitar-like strum)
+  #[allow(dead_code)]
   strum_index: usize,
+  #[allow(dead_code)]
   strum_delay_samples: usize,
+  #[allow(dead_code)]
   strum_counter: usize,
 
   // Output values
@@ -3216,7 +3221,7 @@ impl Arpeggiator {
     sorted_notes.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap_or(std::cmp::Ordering::Equal));
 
     let note_count = self.notes.len();
-    let total_notes = note_count * octaves;
+    let _total_notes = note_count * octaves;
 
     match mode {
       ArpMode::Up => {
@@ -3337,7 +3342,7 @@ impl Arpeggiator {
     self.pattern_length = self.pattern.len().max(1);
   }
 
-  fn get_note_cv(&self, pattern_idx: usize, octaves: usize) -> f32 {
+  fn get_note_cv(&self, pattern_idx: usize, _octaves: usize) -> f32 {
     if self.notes.is_empty() || self.pattern.is_empty() {
       return 0.0;
     }
@@ -3666,6 +3671,7 @@ pub struct StepSequencer {
   current_step: usize,
   phase: f64,
   samples_per_beat: f64,
+  #[allow(dead_code)]
   direction: i32,        // 1 or -1 for ping-pong
   ping_pong_forward: bool,
 
@@ -4513,7 +4519,7 @@ impl Snare909 {
 
       // Tone oscillator (two detuned oscillators for thickness)
       let dt1 = tune / self.sample_rate;
-      let dt2 = (tune * 1.5) / self.sample_rate; // Fifth harmonic
+      let _dt2 = (tune * 1.5) / self.sample_rate; // Fifth harmonic (reserved)
       self.phase += dt1;
       if self.phase >= 1.0 {
         self.phase -= 1.0;
@@ -4641,7 +4647,7 @@ impl HiHat909 {
       let k = 1.0 / q;
       let norm = 1.0 / (1.0 + k * f + f * f);
 
-      let filtered = metallic - self.filter_state[0] * 2.0;
+      let _filtered = metallic - self.filter_state[0] * 2.0;
       self.filter_state[0] += f * (metallic - self.filter_state[0] - self.filter_state[1] * k);
       self.filter_state[1] += f * self.filter_state[0];
       let bandpass = self.filter_state[0] * f * norm * 2.0;

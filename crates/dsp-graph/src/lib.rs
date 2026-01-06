@@ -14,7 +14,6 @@ use dsp_core::{
   SupersawParams, TapeDelay, TapeDelayInputs, TapeDelayParams, Tb303, Tb303Inputs, Tb303Outputs,
   Tb303Params, Tom909, Tom909Inputs, Tom909Params, Vca, Vcf, VcfInputs, VcfParams, Vco, VcoInputs,
   VcoParams, Vocoder, VocoderInputs, VocoderParams, Wavefolder, WavefolderParams,
-  DRUM_TRACKS,
 };
 use serde::Deserialize;
 use std::collections::{HashMap, VecDeque};
