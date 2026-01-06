@@ -653,14 +653,19 @@ function App() {
       value: number | string | boolean,
       options?: { skipEngine?: boolean },
     ) => {
-      setGraph((prev) => ({
-        ...prev,
-        modules: prev.modules.map((module) =>
-          module.id === moduleId
-            ? { ...module, params: { ...module.params, [paramId]: value } }
-            : module,
-        ),
-      }))
+      setGraph((prev) => {
+        const next = {
+          ...prev,
+          modules: prev.modules.map((module) =>
+            module.id === moduleId
+              ? { ...module, params: { ...module.params, [paramId]: value } }
+              : module,
+          ),
+        }
+        // Update ref synchronously to avoid race conditions when adding/removing modules
+        graphRef.current = next
+        return next
+      })
 
       if (status === 'running' && !options?.skipEngine) {
         // String params like stepData/drumData go through setParamString

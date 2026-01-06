@@ -57,12 +57,16 @@ type GraphMessage =
     }
   | { type: 'marioCv'; moduleId: string; channel: number; value: number }
   | { type: 'marioGate'; moduleId: string; channel: number; value: number }
+  | { type: 'watchSequencers'; moduleIds: string[] }
 
 class WasmGraphProcessor extends AudioWorkletProcessor {
   private engine: InstanceType<NonNullable<typeof WasmGraphEngine>> | null = null
   private ready = false
   private pendingGraph: string | null = null
   private inputScratch: Float32Array | null = null
+  private watchedSequencers: string[] = []
+  private lastSteps: Map<string, number> = new Map()
+  private stepPollCounter = 0
 
   constructor() {
     super()
@@ -135,6 +139,10 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
       case 'marioGate':
         this.engine.set_mario_channel_gate(message.moduleId, message.channel, message.value)
         break
+      case 'watchSequencers':
+        this.watchedSequencers = message.moduleIds
+        this.lastSteps.clear()
+        break
       default:
         break
     }
@@ -196,6 +204,24 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
         const outputIndex = channelIndex - 1
         const outputGroup = outputs[outputIndex]
         outputGroup?.[0]?.set(data.subarray(start, end))
+      }
+    }
+
+    // Poll sequencer steps every ~20ms (at 48kHz, 128 frames = 2.67ms, so poll every 8 blocks)
+    this.stepPollCounter += 1
+    if (this.stepPollCounter >= 8 && this.watchedSequencers.length > 0) {
+      this.stepPollCounter = 0
+      const updates: Record<string, number> = {}
+      for (const moduleId of this.watchedSequencers) {
+        const step = this.engine.get_sequencer_step(moduleId)
+        const lastStep = this.lastSteps.get(moduleId) ?? -1
+        if (step !== lastStep && step >= 0) {
+          updates[moduleId] = step
+          this.lastSteps.set(moduleId, step)
+        }
+      }
+      if (Object.keys(updates).length > 0) {
+        this.port.postMessage({ type: 'sequencerSteps', steps: updates })
       }
     }
 

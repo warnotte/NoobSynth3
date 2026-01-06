@@ -77,4 +77,10 @@ impl WasmGraphEngine {
     let data = self.engine.render(frames);
     unsafe { Float32Array::view(data) }
   }
+
+  /// Get current step position for a sequencer module
+  /// Returns -1 if module not found or not a sequencer
+  pub fn get_sequencer_step(&self, module_id: &str) -> i32 {
+    self.engine.get_sequencer_step(module_id)
+  }
 }

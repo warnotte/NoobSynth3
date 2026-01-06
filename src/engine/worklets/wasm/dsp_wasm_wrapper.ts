@@ -20,6 +20,7 @@ type WasmGraphEngineCtor = new (sampleRate: number) => {
   set_external_input(input: Float32Array): void
   clear_external_input(): void
   render(frames: number): Float32Array
+  get_sequencer_step(moduleId: string): number
 }
 
 const WasmGraphEngine = (wasm as unknown as { WasmGraphEngine?: WasmGraphEngineCtor })

@@ -165,6 +165,18 @@ export class WasmGraphEngine {
         wasm.wasmgraphengine_set_param_string(this.__wbg_ptr, ptr0, len0, ptr1, len1, ptr2, len2);
     }
     /**
+     * Get current step position for a sequencer module
+     * Returns -1 if module not found or not a sequencer
+     * @param {string} module_id
+     * @returns {number}
+     */
+    get_sequencer_step(module_id) {
+        const ptr0 = passStringToWasm0(module_id, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.wasmgraphengine_get_sequencer_step(this.__wbg_ptr, ptr0, len0);
+        return ret;
+    }
+    /**
      * @param {Float32Array} input
      */
     set_external_input(input) {

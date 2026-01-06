@@ -859,6 +859,21 @@ impl GraphEngine {
     }
   }
 
+  /// Get current step position for a sequencer module (StepSequencer or DrumSequencer)
+  /// Returns -1 if module not found or not a sequencer
+  pub fn get_sequencer_step(&self, module_id: &str) -> i32 {
+    if let Some(index) = self.module_map.get(module_id).and_then(|list| list.first()) {
+      if let Some(module) = self.modules.get(*index) {
+        match &module.state {
+          ModuleState::StepSequencer(state) => return state.seq.current_step() as i32,
+          ModuleState::DrumSequencer(state) => return state.seq.current_step() as i32,
+          _ => {}
+        }
+      }
+    }
+    -1
+  }
+
   pub fn render(&mut self, frames: usize) -> &[Sample] {
     if frames == 0 {
       return &[];

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties } from 'react'
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react'
 import type { AudioEngine } from '../engine/WasmGraphEngine'
 import type { ModuleSpec } from '../shared/graph'
 import { useComputerKeyboard } from '../hooks/useComputerKeyboard'
@@ -2774,99 +2774,45 @@ export const ModuleControls = ({
       return pitch > 0 ? `+${pitch}` : `${pitch}`
     }
 
-    // Calculate step duration in ms based on rate
-    const getRateMultiplier = (r: number) => {
-      switch (r) {
-        case 6: return 1      // 1/4
-        case 9: return 0.5    // 1/8
-        case 12: return 0.25  // 1/16
-        case 8: return 2/3    // 1/4T
-        case 11: return 1/3   // 1/8T
-        case 14: return 1/6   // 1/16T
-        default: return 0.5
-      }
-    }
-    const stepDurationMs = (60000 / tempo) * getRateMultiplier(rate)
-
-    // Use ref for step grid and interval-based LED animation
+    // Use ref for step grid and engine-synced LED animation
     const gridRef = useRef<HTMLDivElement>(null)
-    const intervalRef = useRef<number | null>(null)
-    const stepRef = useRef({ current: 0, forward: true })
+    const stepRef = useRef(-1)
+
+    // Update playhead from DSP step position
+    const updatePlayhead = useCallback((step: number) => {
+      if (!gridRef.current) return
+      if (step === stepRef.current) return
+
+      // Remove previous playing class
+      gridRef.current.querySelectorAll('.seq-step.playing').forEach(el => {
+        el.classList.remove('playing')
+      })
+
+      // Add playing class to current step
+      const stepEl = gridRef.current.querySelector(`[data-step="${step}"]`)
+      if (stepEl) {
+        stepEl.classList.add('playing')
+      }
+
+      stepRef.current = step
+    }, [])
 
     useEffect(() => {
-      // Clear previous interval
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current)
-        intervalRef.current = null
-      }
-
-      // Clear all playing states
-      if (gridRef.current) {
-        gridRef.current.querySelectorAll('.seq-step.playing').forEach(el => {
-          el.classList.remove('playing')
-        })
-      }
-
-      // Don't animate if not enabled or not running
+      // Clear playhead when not running
       if (!enabled || status !== 'running') {
+        if (gridRef.current) {
+          gridRef.current.querySelectorAll('.seq-step.playing').forEach(el => {
+            el.classList.remove('playing')
+          })
+        }
+        stepRef.current = -1
         return
       }
 
-      // Reset step counter
-      stepRef.current = { current: 0, forward: true }
-
-      // Start interval
-      intervalRef.current = window.setInterval(() => {
-        if (!gridRef.current) return
-
-        // Remove previous playing class
-        gridRef.current.querySelectorAll('.seq-step.playing').forEach(el => {
-          el.classList.remove('playing')
-        })
-
-        // Add playing class to current step
-        const stepEl = gridRef.current.querySelector(`[data-step="${stepRef.current.current}"]`)
-        if (stepEl) {
-          stepEl.classList.add('playing')
-        }
-
-        // Calculate next step based on direction
-        const s = stepRef.current
-        if (direction === 0) {
-          // Forward
-          s.current = (s.current + 1) % length
-        } else if (direction === 1) {
-          // Reverse
-          s.current = s.current - 1
-          if (s.current < 0) s.current = length - 1
-        } else if (direction === 2) {
-          // Ping-pong
-          if (s.forward) {
-            s.current++
-            if (s.current >= length - 1) {
-              s.current = length - 1
-              s.forward = false
-            }
-          } else {
-            s.current--
-            if (s.current <= 0) {
-              s.current = 0
-              s.forward = true
-            }
-          }
-        } else {
-          // Random
-          s.current = Math.floor(Math.random() * length)
-        }
-      }, stepDurationMs)
-
-      return () => {
-        if (intervalRef.current) {
-          clearInterval(intervalRef.current)
-          intervalRef.current = null
-        }
-      }
-    }, [enabled, status, tempo, rate, length, direction, stepDurationMs])
+      // Subscribe to step updates from DSP
+      const unsubscribe = engine.watchSequencer(module.id, updatePlayhead)
+      return unsubscribe
+    }, [enabled, status, module.id, engine, updatePlayhead])
 
     return (
       <>
@@ -3222,64 +3168,44 @@ export const ModuleControls = ({
       { id: 5, label: '1/32' },
     ]
 
-    // Calculate step duration for LED animation
-    const getRateMultiplier = (r: number) => {
-      switch (r) {
-        case 2: return 1      // 1/4
-        case 3: return 0.5    // 1/8
-        case 4: return 0.25   // 1/16
-        case 5: return 0.125  // 1/32
-        default: return 0.25
-      }
-    }
-    const stepDurationMs = (60000 / tempo) * getRateMultiplier(rate)
-
-    // Use ref for grid and interval-based LED animation
+    // Use ref for grid and engine-synced LED animation
     const gridRef = useRef<HTMLDivElement>(null)
-    const intervalRef = useRef<number | null>(null)
-    const stepRef = useRef(0)
+    const stepRef = useRef(-1)
+
+    // Update playhead from DSP step position
+    const updatePlayhead = useCallback((step: number) => {
+      if (!gridRef.current) return
+      if (step === stepRef.current) return
+
+      // Clear previous
+      gridRef.current.querySelectorAll('.drum-step.playing').forEach(el => {
+        el.classList.remove('playing')
+      })
+
+      // Highlight current step column
+      gridRef.current.querySelectorAll(`[data-step="${step}"]`).forEach(el => {
+        el.classList.add('playing')
+      })
+
+      stepRef.current = step
+    }, [])
 
     useEffect(() => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current)
-        intervalRef.current = null
-      }
-
-      if (gridRef.current) {
-        gridRef.current.querySelectorAll('.drum-step.playing').forEach(el => {
-          el.classList.remove('playing')
-        })
-      }
-
+      // Clear playhead when not running
       if (!enabled || status !== 'running') {
+        if (gridRef.current) {
+          gridRef.current.querySelectorAll('.drum-step.playing').forEach(el => {
+            el.classList.remove('playing')
+          })
+        }
+        stepRef.current = -1
         return
       }
 
-      stepRef.current = 0
-
-      intervalRef.current = window.setInterval(() => {
-        if (!gridRef.current) return
-
-        // Clear previous
-        gridRef.current.querySelectorAll('.drum-step.playing').forEach(el => {
-          el.classList.remove('playing')
-        })
-
-        // Highlight current step column
-        gridRef.current.querySelectorAll(`[data-step="${stepRef.current}"]`).forEach(el => {
-          el.classList.add('playing')
-        })
-
-        // Advance
-        stepRef.current = (stepRef.current + 1) % length
-      }, stepDurationMs)
-
-      return () => {
-        if (intervalRef.current) {
-          clearInterval(intervalRef.current)
-        }
-      }
-    }, [enabled, status, tempo, rate, length, stepDurationMs])
+      // Subscribe to step updates from DSP
+      const unsubscribe = engine.watchSequencer(module.id, updatePlayhead)
+      return unsubscribe
+    }, [enabled, status, module.id, engine, updatePlayhead])
 
     return (
       <>

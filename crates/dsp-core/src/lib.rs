@@ -3761,6 +3761,11 @@ impl StepSequencer {
     self.sample_rate = sample_rate.max(1.0);
   }
 
+  /// Get current step position (0-15)
+  pub fn current_step(&self) -> usize {
+    self.current_step
+  }
+
   /// Set step data from parsed values
   pub fn set_step(&mut self, index: usize, pitch: f32, gate: bool, velocity: f32, slide: bool) {
     if index < 16 {
@@ -4319,6 +4324,7 @@ pub struct Kick909 {
   triggered: bool,
   last_trig: f32,
   noise_state: u32,  // For click noise generation
+  latched_accent: f32,  // Accent value captured at trigger
 }
 
 pub struct Kick909Params<'a> {
@@ -4344,6 +4350,7 @@ impl Kick909 {
       triggered: false,
       last_trig: 0.0,
       noise_state: 0x12345678,
+      latched_accent: 0.5,
     }
   }
 
@@ -4366,7 +4373,7 @@ impl Kick909 {
       let drive = params.drive.get(i).copied().unwrap_or(params.drive[0]).clamp(0.0, 1.0);
 
       let trig = inputs.trigger.map_or(0.0, |t| t.get(i).copied().unwrap_or(t[0]));
-      let accent = inputs.accent.map_or(0.5, |a| a.get(i).copied().unwrap_or(a[0])).clamp(0.0, 1.0);
+      let accent_in = inputs.accent.map_or(0.5, |a| a.get(i).copied().unwrap_or(a[0])).clamp(0.0, 1.0);
 
       // Trigger detection (rising edge)
       if trig > 0.5 && self.last_trig <= 0.5 {
@@ -4375,6 +4382,8 @@ impl Kick909 {
         self.amp_env = 1.0;
         self.click_env = 1.0;
         self.phase = 0.0;
+        // Latch accent at trigger time
+        self.latched_accent = accent_in;
       }
       self.last_trig = trig;
 
@@ -4413,8 +4422,8 @@ impl Kick909 {
       // Mix sine + click
       let mut sample = (sine + click) * self.amp_env;
 
-      // Apply accent (louder + more punch)
-      sample *= 0.7 + accent * 0.6;
+      // Apply accent (louder + more punch) - use latched value from trigger
+      sample *= 0.7 + self.latched_accent * 0.6;
 
       // Drive/saturation
       if drive > 0.0 {
@@ -4436,6 +4445,7 @@ pub struct Snare909 {
   amp_env: f32,
   noise_env: f32,
   last_trig: f32,
+  latched_accent: f32,
 }
 
 pub struct Snare909Params<'a> {
@@ -4459,6 +4469,7 @@ impl Snare909 {
       amp_env: 0.0,
       noise_env: 0.0,
       last_trig: 0.0,
+      latched_accent: 0.5,
     }
   }
 
@@ -4489,13 +4500,14 @@ impl Snare909 {
       let decay = params.decay.get(i).copied().unwrap_or(params.decay[0]).clamp(0.05, 1.0);
 
       let trig = inputs.trigger.map_or(0.0, |t| t.get(i).copied().unwrap_or(t[0]));
-      let accent = inputs.accent.map_or(0.5, |a| a.get(i).copied().unwrap_or(a[0])).clamp(0.0, 1.0);
+      let accent_in = inputs.accent.map_or(0.5, |a| a.get(i).copied().unwrap_or(a[0])).clamp(0.0, 1.0);
 
       // Trigger detection
       if trig > 0.5 && self.last_trig <= 0.5 {
         self.amp_env = 1.0;
         self.noise_env = 1.0;
         self.phase = 0.0;
+        self.latched_accent = accent_in;
       }
       self.last_trig = trig;
 
@@ -4527,8 +4539,8 @@ impl Snare909 {
       let noise_amount = noise_signal * (1.0 - tone_mix * 0.3);
       let mut sample = (tone_amount + noise_amount) * 0.7;
 
-      // Apply accent
-      sample *= 0.7 + accent * 0.5;
+      // Apply accent (latched at trigger)
+      sample *= 0.7 + self.latched_accent * 0.5;
 
       output[i] = sample.clamp(-1.0, 1.0);
     }
@@ -4544,6 +4556,7 @@ pub struct HiHat909 {
   amp_env: f32,
   last_trig: f32,
   is_open: bool,
+  latched_accent: f32,
 }
 
 pub struct HiHat909Params<'a> {
@@ -4571,6 +4584,7 @@ impl HiHat909 {
       amp_env: 0.0,
       last_trig: 0.0,
       is_open: false,
+      latched_accent: 0.5,
     }
   }
 
@@ -4593,12 +4607,13 @@ impl HiHat909 {
       let open = params.open.get(i).copied().unwrap_or(params.open[0]);
 
       let trig = inputs.trigger.map_or(0.0, |t| t.get(i).copied().unwrap_or(t[0]));
-      let accent = inputs.accent.map_or(0.5, |a| a.get(i).copied().unwrap_or(a[0])).clamp(0.0, 1.0);
+      let accent_in = inputs.accent.map_or(0.5, |a| a.get(i).copied().unwrap_or(a[0])).clamp(0.0, 1.0);
 
       // Trigger detection
       if trig > 0.5 && self.last_trig <= 0.5 {
         self.amp_env = 1.0;
         self.is_open = open > 0.5;
+        self.latched_accent = accent_in;
       }
       self.last_trig = trig;
 
@@ -4638,8 +4653,8 @@ impl HiHat909 {
 
       let mut sample = bandpass * self.amp_env * 0.8;
 
-      // Apply accent
-      sample *= 0.7 + accent * 0.4;
+      // Apply accent (latched at trigger)
+      sample *= 0.7 + self.latched_accent * 0.4;
 
       output[i] = sample.clamp(-1.0, 1.0);
     }
@@ -4656,6 +4671,7 @@ pub struct Clap909 {
   clap_stage: u8, // 0-3 for multi-trigger effect
   stage_counter: u32,
   last_trig: f32,
+  latched_accent: f32,
 }
 
 pub struct Clap909Params<'a> {
@@ -4675,9 +4691,10 @@ impl Clap909 {
       noise_state: 0xABCDEF01,
       filter_state: [0.0; 2],
       amp_env: 0.0,
-      clap_stage: 0,
+      clap_stage: 3, // Start at 3 to prevent auto-trigger on creation
       stage_counter: 0,
       last_trig: 0.0,
+      latched_accent: 0.5,
     }
   }
 
@@ -4706,13 +4723,14 @@ impl Clap909 {
       let decay = params.decay.get(i).copied().unwrap_or(params.decay[0]).clamp(0.1, 1.0);
 
       let trig = inputs.trigger.map_or(0.0, |t| t.get(i).copied().unwrap_or(t[0]));
-      let accent = inputs.accent.map_or(0.5, |a| a.get(i).copied().unwrap_or(a[0])).clamp(0.0, 1.0);
+      let accent_in = inputs.accent.map_or(0.5, |a| a.get(i).copied().unwrap_or(a[0])).clamp(0.0, 1.0);
 
       // Trigger detection - start multi-clap sequence
       if trig > 0.5 && self.last_trig <= 0.5 {
         self.clap_stage = 0;
         self.stage_counter = 0;
         self.amp_env = 1.0;
+        self.latched_accent = accent_in;
       }
       self.last_trig = trig;
 
@@ -4743,8 +4761,8 @@ impl Clap909 {
 
       let mut sample = bandpass * self.amp_env * 0.7;
 
-      // Apply accent
-      sample *= 0.7 + accent * 0.5;
+      // Apply accent (latched at trigger)
+      sample *= 0.7 + self.latched_accent * 0.5;
 
       output[i] = sample.clamp(-1.0, 1.0);
     }
@@ -4760,6 +4778,7 @@ pub struct Tom909 {
   amp_env: f32,
   noise_state: u32,
   last_trig: f32,
+  latched_accent: f32,
 }
 
 pub struct Tom909Params<'a> {
@@ -4781,6 +4800,7 @@ impl Tom909 {
       amp_env: 0.0,
       noise_state: 0x87654321,
       last_trig: 0.0,
+      latched_accent: 0.5,
     }
   }
 
@@ -4801,13 +4821,14 @@ impl Tom909 {
       let decay = params.decay.get(i).copied().unwrap_or(params.decay[0]).clamp(0.1, 1.5);
 
       let trig = inputs.trigger.map_or(0.0, |t| t.get(i).copied().unwrap_or(t[0]));
-      let accent = inputs.accent.map_or(0.5, |a| a.get(i).copied().unwrap_or(a[0])).clamp(0.0, 1.0);
+      let accent_in = inputs.accent.map_or(0.5, |a| a.get(i).copied().unwrap_or(a[0])).clamp(0.0, 1.0);
 
       // Trigger detection
       if trig > 0.5 && self.last_trig <= 0.5 {
         self.pitch_env = 1.0;
         self.amp_env = 1.0;
         self.phase = 0.0;
+        self.latched_accent = accent_in;
       }
       self.last_trig = trig;
 
@@ -4836,8 +4857,8 @@ impl Tom909 {
 
       let mut sample = (sine + noise * noise_env * 0.1) * self.amp_env * 0.8;
 
-      // Apply accent
-      sample *= 0.7 + accent * 0.5;
+      // Apply accent (latched at trigger)
+      sample *= 0.7 + self.latched_accent * 0.5;
 
       output[i] = sample.clamp(-1.0, 1.0);
     }
@@ -4851,6 +4872,7 @@ pub struct Rimshot909 {
   phases: [f32; 2],
   amp_env: f32,
   last_trig: f32,
+  latched_accent: f32,
 }
 
 pub struct Rimshot909Params<'a> {
@@ -4869,6 +4891,7 @@ impl Rimshot909 {
       phases: [0.0; 2],
       amp_env: 0.0,
       last_trig: 0.0,
+      latched_accent: 0.5,
     }
   }
 
@@ -4888,12 +4911,13 @@ impl Rimshot909 {
       let tune = params.tune.get(i).copied().unwrap_or(params.tune[0]).clamp(200.0, 600.0);
 
       let trig = inputs.trigger.map_or(0.0, |t| t.get(i).copied().unwrap_or(t[0]));
-      let accent = inputs.accent.map_or(0.5, |a| a.get(i).copied().unwrap_or(a[0])).clamp(0.0, 1.0);
+      let accent_in = inputs.accent.map_or(0.5, |a| a.get(i).copied().unwrap_or(a[0])).clamp(0.0, 1.0);
 
       // Trigger detection
       if trig > 0.5 && self.last_trig <= 0.5 {
         self.amp_env = 1.0;
         self.phases = [0.0; 2];
+        self.latched_accent = accent_in;
       }
       self.last_trig = trig;
 
@@ -4919,8 +4943,8 @@ impl Rimshot909 {
 
       let mut sample = (tri1 + tri2 * 0.5) * self.amp_env * 0.6;
 
-      // Apply accent
-      sample *= 0.7 + accent * 0.5;
+      // Apply accent (use latched value from trigger time)
+      sample *= 0.7 + self.latched_accent * 0.5;
 
       output[i] = sample.clamp(-1.0, 1.0);
     }
@@ -5048,6 +5072,11 @@ impl DrumSequencer {
 
   pub fn set_sample_rate(&mut self, sample_rate: f32) {
     self.sample_rate = sample_rate.max(1.0);
+  }
+
+  /// Get current step position (0-15)
+  pub fn current_step(&self) -> usize {
+    self.current_step
   }
 
   /// Set a single step
@@ -5344,6 +5373,7 @@ impl DrumSequencer {
           if self.gate_samples[track] >= self.gate_length_samples {
             self.gate_on[track] = false;
             self.current_gates[track] = 0.0;
+            self.current_accents[track] = 0.0; // Reset accent when gate ends
           }
         }
       }

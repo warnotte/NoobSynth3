@@ -18,6 +18,8 @@ export class AudioEngine {
   private micStream: MediaStream | null = null
   private micAnalyser: AnalyserNode | null = null
   private micMeterData: Uint8Array<ArrayBuffer> | null = null
+  private sequencerStepCallbacks: Map<string, (step: number) => void> = new Map()
+  private watchedSequencers: Set<string> = new Set()
 
   async start(graph: GraphState): Promise<void> {
     await this.init()
@@ -261,6 +263,26 @@ export class AudioEngine {
     })
   }
 
+  watchSequencer(moduleId: string, callback: (step: number) => void): () => void {
+    this.sequencerStepCallbacks.set(moduleId, callback)
+    this.watchedSequencers.add(moduleId)
+    this.syncWatchedSequencers()
+
+    // Return unsubscribe function
+    return () => {
+      this.sequencerStepCallbacks.delete(moduleId)
+      this.watchedSequencers.delete(moduleId)
+      this.syncWatchedSequencers()
+    }
+  }
+
+  private syncWatchedSequencers(): void {
+    this.graphNode?.port.postMessage({
+      type: 'watchSequencers',
+      moduleIds: Array.from(this.watchedSequencers),
+    })
+  }
+
   private async init(): Promise<void> {
     if (this.context) {
       return
@@ -318,6 +340,24 @@ export class AudioEngine {
 
     if (this.micSource) {
       this.micSource.connect(this.graphNode, 0, 0)
+    }
+
+    // Listen for messages from the worklet
+    this.graphNode.port.onmessage = (event) => {
+      const data = event.data as { type: string; steps?: Record<string, number> }
+      if (data.type === 'sequencerSteps' && data.steps) {
+        for (const [moduleId, step] of Object.entries(data.steps)) {
+          const callback = this.sequencerStepCallbacks.get(moduleId)
+          if (callback) {
+            callback(step)
+          }
+        }
+      }
+    }
+
+    // Re-send watched sequencers if any
+    if (this.watchedSequencers.size > 0) {
+      this.syncWatchedSequencers()
     }
 
     this.buildScopeAnalysers()
