@@ -13,6 +13,8 @@
 
 ```powershell
 # Installer Rust
+winget install Rustlang.Rust.MSVC
+or
 winget install Rustlang.Rust.GNU
 
 # Installer wasm-bindgen
