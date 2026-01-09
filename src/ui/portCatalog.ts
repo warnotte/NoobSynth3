@@ -370,4 +370,13 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
       { id: 'step-out', label: 'Step', kind: 'cv', direction: 'out' },
     ],
   },
+  'pitch-shifter': {
+    inputs: [
+      { id: 'in', label: 'In', kind: 'audio', direction: 'in' },
+      { id: 'pitch-cv', label: 'Pitch', kind: 'cv', direction: 'in' },
+    ],
+    outputs: [
+      { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
+    ],
+  },
 }

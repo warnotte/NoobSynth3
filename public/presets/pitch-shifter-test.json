@@ -1,0 +1,65 @@
+{
+  "id": "pitch-shifter-test",
+  "name": "Pitch Shifter",
+  "description": "Real-time pitch shifting with microphone input.",
+  "group": "Mic & Vocoder",
+  "graph": {
+    "modules": [
+      {
+        "id": "audio-in",
+        "type": "audio-in",
+        "name": "Mic",
+        "position": { "x": 50, "y": 150 },
+        "params": {}
+      },
+      {
+        "id": "pitch-shifter",
+        "type": "pitch-shifter",
+        "name": "Pitch",
+        "position": { "x": 200, "y": 150 },
+        "params": {
+          "pitch": 0,
+          "fine": 0,
+          "grain": 50,
+          "mix": 1.0
+        }
+      },
+      {
+        "id": "reverb",
+        "type": "reverb",
+        "name": "Verb",
+        "position": { "x": 350, "y": 150 },
+        "params": {
+          "time": 0.4,
+          "damp": 0.5,
+          "preDelay": 20,
+          "mix": 0.2
+        }
+      },
+      {
+        "id": "output",
+        "type": "output",
+        "name": "Out",
+        "position": { "x": 500, "y": 150 },
+        "params": {}
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "audio-in", "portId": "out" },
+        "to": { "moduleId": "pitch-shifter", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "pitch-shifter", "portId": "out" },
+        "to": { "moduleId": "reverb", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb", "portId": "out" },
+        "to": { "moduleId": "output", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

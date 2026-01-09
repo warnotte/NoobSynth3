@@ -448,6 +448,20 @@
       "description": "Classic house 4-on-the-floor beat with 909 drums and room reverb.",
       "file": "909-house.json",
       "group": "TR-909 / Drums"
+    },
+    {
+      "id": "pitch-shifter-test",
+      "name": "Pitch Shifter",
+      "description": "Real-time pitch shifting with microphone input.",
+      "file": "pitch-shifter-test.json",
+      "group": "Mic & Vocoder"
+    },
+    {
+      "id": "pitch-whammy",
+      "name": "Pitch Whammy",
+      "description": "Synth with LFO-modulated pitch shifting for whammy bar effect.",
+      "file": "pitch-whammy.json",
+      "group": "Module Tests"
     }
   ]
 }

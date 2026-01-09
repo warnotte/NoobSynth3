@@ -1,0 +1,158 @@
+{
+  "id": "pitch-whammy",
+  "name": "Pitch Whammy",
+  "description": "Synth with LFO-modulated pitch shifting for whammy bar effect.",
+  "group": "Module Tests",
+  "graph": {
+    "modules": [
+      {
+        "id": "control",
+        "type": "control",
+        "name": "Ctrl",
+        "position": { "x": 50, "y": 50 },
+        "params": {
+          "octave": 3,
+          "glide": 0,
+          "voices": 1
+        }
+      },
+      {
+        "id": "osc",
+        "type": "oscillator",
+        "name": "VCO",
+        "position": { "x": 50, "y": 250 },
+        "params": {
+          "frequency": 220,
+          "waveform": 1,
+          "pwm": 0.5
+        }
+      },
+      {
+        "id": "adsr",
+        "type": "adsr",
+        "name": "Env",
+        "position": { "x": 200, "y": 50 },
+        "params": {
+          "attack": 0.01,
+          "decay": 0.3,
+          "sustain": 0.6,
+          "release": 0.5
+        }
+      },
+      {
+        "id": "vcf",
+        "type": "vcf",
+        "name": "VCF",
+        "position": { "x": 200, "y": 250 },
+        "params": {
+          "cutoff": 2000,
+          "resonance": 0.3,
+          "envAmount": 0.4
+        }
+      },
+      {
+        "id": "gain",
+        "type": "gain",
+        "name": "VCA",
+        "position": { "x": 350, "y": 250 },
+        "params": {
+          "gain": 0.8
+        }
+      },
+      {
+        "id": "lfo",
+        "type": "lfo",
+        "name": "LFO",
+        "position": { "x": 350, "y": 50 },
+        "params": {
+          "rate": 0.3,
+          "shape": 0,
+          "depth": 0.3
+        }
+      },
+      {
+        "id": "pitch-shifter",
+        "type": "pitch-shifter",
+        "name": "Pitch",
+        "position": { "x": 500, "y": 250 },
+        "params": {
+          "pitch": 0,
+          "fine": 0,
+          "grain": 40,
+          "mix": 1.0
+        }
+      },
+      {
+        "id": "reverb",
+        "type": "reverb",
+        "name": "Verb",
+        "position": { "x": 650, "y": 250 },
+        "params": {
+          "time": 0.5,
+          "damp": 0.4,
+          "preDelay": 15,
+          "mix": 0.25
+        }
+      },
+      {
+        "id": "output",
+        "type": "output",
+        "name": "Out",
+        "position": { "x": 800, "y": 250 },
+        "params": {}
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "control", "portId": "cv" },
+        "to": { "moduleId": "osc", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "control", "portId": "gate" },
+        "to": { "moduleId": "adsr", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "osc", "portId": "out" },
+        "to": { "moduleId": "vcf", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "adsr", "portId": "out" },
+        "to": { "moduleId": "vcf", "portId": "env" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "adsr", "portId": "out" },
+        "to": { "moduleId": "gain", "portId": "cv" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "vcf", "portId": "out" },
+        "to": { "moduleId": "gain", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "gain", "portId": "out" },
+        "to": { "moduleId": "pitch-shifter", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "lfo", "portId": "out" },
+        "to": { "moduleId": "pitch-shifter", "portId": "pitch-cv" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "pitch-shifter", "portId": "out" },
+        "to": { "moduleId": "reverb", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb", "portId": "out" },
+        "to": { "moduleId": "output", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

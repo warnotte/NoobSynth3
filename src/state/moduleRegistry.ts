@@ -49,6 +49,8 @@ export const moduleSizes: Record<ModuleType, string> = {
   '909-rimshot': '1x2',
   // Drum Sequencer
   'drum-sequencer': '5x5',
+  // Effects
+  'pitch-shifter': '2x2',
 }
 
 export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>> = {
@@ -141,6 +143,7 @@ export const moduleCatalog: { type: ModuleType; label: string; category: ModuleC
   { type: 'distortion', label: 'Distortion', category: 'effects' },
   { type: 'wavefolder', label: 'Wavefolder', category: 'effects' },
   { type: 'ring-mod', label: 'Ring Mod', category: 'effects' },
+  { type: 'pitch-shifter', label: 'Pitch Shifter', category: 'effects' },
   // Modulators
   { type: 'adsr', label: 'ADSR', category: 'modulators' },
   { type: 'lfo', label: 'LFO', category: 'modulators' },
@@ -198,6 +201,7 @@ export const modulePrefixes: Record<ModuleType, string> = {
   phaser: 'phaser',
   distortion: 'dist',
   wavefolder: 'fold',
+  'pitch-shifter': 'pitch',
   adsr: 'adsr',
   lfo: 'lfo',
   scope: 'scope',
@@ -249,6 +253,7 @@ export const moduleLabels: Record<ModuleType, string> = {
   phaser: 'Phaser',
   distortion: 'Distortion',
   wavefolder: 'Wavefolder',
+  'pitch-shifter': 'Pitch Shifter',
   adsr: 'ADSR',
   lfo: 'LFO',
   scope: 'Scope',
@@ -358,6 +363,7 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
   phaser: { rate: 0.5, depth: 0.7, feedback: 0.3, mix: 0.5 },
   distortion: { drive: 0.5, tone: 0.5, mix: 1.0, mode: 'soft' },
   wavefolder: { drive: 0.4, fold: 0.5, bias: 0, mix: 0.8 },
+  'pitch-shifter': { pitch: 0, fine: 0, grain: 50, mix: 1.0 },
   supersaw: { frequency: 220, detune: 25, mix: 1.0 },
   'nes-osc': {
     frequency: 220,

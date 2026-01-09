@@ -49,6 +49,8 @@ export type ModuleType =
   | '909-rimshot'
   // Drum Sequencer
   | 'drum-sequencer'
+  // Effects
+  | 'pitch-shifter'
 
 export interface ModuleSpec {
   id: string

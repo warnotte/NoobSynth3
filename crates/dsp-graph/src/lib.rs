@@ -5,15 +5,16 @@ use dsp_core::{
   DrumSequencerInputs, DrumSequencerOutputs, DrumSequencerParams, Ensemble, EnsembleInputs,
   EnsembleParams, GranularDelay, GranularDelayInputs, GranularDelayParams, HiHat909, HiHat909Inputs,
   HiHat909Params, Kick909, Kick909Inputs, Kick909Params, Lfo, LfoInputs, LfoParams, Mixer, NesOsc,
-  NesOscInputs, NesOscParams, Noise, NoiseParams, Phaser, PhaserInputs, PhaserParams, Quantizer,
-  QuantizerInputs, QuantizerParams, Reverb, ReverbInputs, ReverbParams, Rimshot909, Rimshot909Inputs,
-  Rimshot909Params, RingMod, RingModParams, Sample, SampleHold, SampleHoldInputs, SampleHoldParams,
-  SlewInputs, SlewLimiter, SlewParams, Snare909, Snare909Inputs, Snare909Params, SnesOsc,
-  SnesOscInputs, SnesOscParams, SpringReverb, SpringReverbInputs, SpringReverbParams, StepSequencer,
-  StepSequencerInputs, StepSequencerOutputs, StepSequencerParams, Supersaw, SupersawInputs,
-  SupersawParams, TapeDelay, TapeDelayInputs, TapeDelayParams, Tb303, Tb303Inputs, Tb303Outputs,
-  Tb303Params, Tom909, Tom909Inputs, Tom909Params, Vca, Vcf, VcfInputs, VcfParams, Vco, VcoInputs,
-  VcoParams, Vocoder, VocoderInputs, VocoderParams, Wavefolder, WavefolderParams,
+  NesOscInputs, NesOscParams, Noise, NoiseParams, Phaser, PhaserInputs, PhaserParams, PitchShifter,
+  PitchShifterInputs, PitchShifterParams, Quantizer, QuantizerInputs, QuantizerParams, Reverb,
+  ReverbInputs, ReverbParams, Rimshot909, Rimshot909Inputs, Rimshot909Params, RingMod, RingModParams,
+  Sample, SampleHold, SampleHoldInputs, SampleHoldParams, SlewInputs, SlewLimiter, SlewParams,
+  Snare909, Snare909Inputs, Snare909Params, SnesOsc, SnesOscInputs, SnesOscParams, SpringReverb,
+  SpringReverbInputs, SpringReverbParams, StepSequencer, StepSequencerInputs, StepSequencerOutputs,
+  StepSequencerParams, Supersaw, SupersawInputs, SupersawParams, TapeDelay, TapeDelayInputs,
+  TapeDelayParams, Tb303, Tb303Inputs, Tb303Outputs, Tb303Params, Tom909, Tom909Inputs, Tom909Params,
+  Vca, Vcf, VcfInputs, VcfParams, Vco, VcoInputs, VcoParams, Vocoder, VocoderInputs, VocoderParams,
+  Wavefolder, WavefolderParams,
 };
 use serde::Deserialize;
 use std::collections::{HashMap, VecDeque};
@@ -105,6 +106,8 @@ enum ModuleType {
   Rimshot909,
   // Drum Sequencer
   DrumSequencer,
+  // Effects
+  PitchShifter,
 }
 
 #[derive(Clone, Copy)]
@@ -428,6 +431,14 @@ struct GranularDelayState {
   mix: ParamBuffer,
 }
 
+struct PitchShifterState {
+  shifter: PitchShifter,
+  pitch: ParamBuffer,
+  fine: ParamBuffer,
+  grain: ParamBuffer,
+  mix: ParamBuffer,
+}
+
 struct TapeDelayState {
   delay: TapeDelay,
   time: ParamBuffer,
@@ -681,6 +692,7 @@ enum ModuleState {
   Tom909(Tom909State),
   Rimshot909(Rimshot909State),
   DrumSequencer(DrumSequencerState),
+  PitchShifter(PitchShifterState),
 }
 
 struct ModuleNode {
@@ -1456,6 +1468,13 @@ impl ModuleNode {
           length: ParamBuffer::new(param_number(params, "length", 16.0)),
         })
       }
+      ModuleType::PitchShifter => ModuleState::PitchShifter(PitchShifterState {
+        shifter: PitchShifter::new(sample_rate),
+        pitch: ParamBuffer::new(param_number(params, "pitch", 0.0)),
+        fine: ParamBuffer::new(param_number(params, "fine", 0.0)),
+        grain: ParamBuffer::new(param_number(params, "grain", 50.0)),
+        mix: ParamBuffer::new(param_number(params, "mix", 1.0)),
+      }),
     };
 
     Self {
@@ -1820,6 +1839,13 @@ impl ModuleNode {
         "gateLength" => state.gate_length.set(value),
         "swing" => state.swing.set(value),
         "length" => state.length.set(value),
+        _ => {}
+      },
+      ModuleState::PitchShifter(state) => match param {
+        "pitch" => state.pitch.set(value),
+        "fine" => state.fine.set(value),
+        "grain" => state.grain.set(value),
+        "mix" => state.mix.set(value),
         _ => {}
       },
       _ => {}
@@ -2968,6 +2994,26 @@ impl ModuleNode {
         outputs[15].channel_mut(0)[..safe_frames].copy_from_slice(&buf_acc_aux[..safe_frames]);
         outputs[16].channel_mut(0)[..safe_frames].copy_from_slice(&buf_step[..safe_frames]);
       }
+      ModuleState::PitchShifter(state) => {
+        let input = if self.connections[0].is_empty() {
+          None
+        } else {
+          Some(inputs[0].channel(0))
+        };
+        let pitch_cv = if self.connections.len() > 1 && !self.connections[1].is_empty() {
+          Some(inputs[1].channel(0))
+        } else {
+          None
+        };
+        let params = PitchShifterParams {
+          pitch: state.pitch.slice(frames),
+          fine: state.fine.slice(frames),
+          grain_ms: state.grain.slice(frames),
+          mix: state.mix.slice(frames),
+        };
+        let shifter_inputs = PitchShifterInputs { input, pitch_cv };
+        state.shifter.process_block(outputs[0].channel_mut(0), shifter_inputs, params);
+      }
     }
   }
 }
@@ -3021,6 +3067,8 @@ fn normalize_module_type(raw: &str) -> ModuleType {
     "909-rimshot" => ModuleType::Rimshot909,
     // Drum Sequencer
     "drum-sequencer" => ModuleType::DrumSequencer,
+    // Effects
+    "pitch-shifter" => ModuleType::PitchShifter,
     _ => ModuleType::Oscillator,
   }
 }
@@ -3143,6 +3191,11 @@ fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // clock
       PortInfo { channels: 1 },  // reset
     ],
+    // Pitch Shifter - 2 inputs (audio, pitch CV)
+    ModuleType::PitchShifter => vec![
+      PortInfo { channels: 1 },  // audio input
+      PortInfo { channels: 1 },  // pitch CV
+    ],
   }
 }
 
@@ -3247,6 +3300,8 @@ fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // acc-aux
       PortInfo { channels: 1 },  // step-out
     ],
+    // Pitch Shifter - 1 output
+    ModuleType::PitchShifter => vec![PortInfo { channels: 1 }],
   }
 }
 
@@ -3410,6 +3465,12 @@ fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize> {
     ModuleType::DrumSequencer => match port_id {
       "clock" => Some(0),
       "reset" => Some(1),
+      _ => None,
+    },
+    // Pitch Shifter
+    ModuleType::PitchShifter => match port_id {
+      "in" | "input" | "audio" => Some(0),
+      "pitch" | "pitch-cv" => Some(1),
       _ => None,
     },
     _ => None,
@@ -3600,6 +3661,11 @@ fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize> {
       "acc-rim" => Some(14),
       "acc-aux" => Some(15),
       "step-out" => Some(16),
+      _ => None,
+    },
+    // Pitch Shifter - 1 output
+    ModuleType::PitchShifter => match port_id {
+      "out" | "output" => Some(0),
       _ => None,
     },
   }

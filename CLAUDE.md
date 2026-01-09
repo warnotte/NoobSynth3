@@ -53,7 +53,7 @@ oscillator, supersaw, nes-osc, snes-osc, noise, tb-303
 vcf, hpf
 
 ### Effects
-chorus, ensemble, choir, vocoder, delay, granular-delay, tape-delay, spring-reverb, reverb, phaser, distortion, wavefolder, ring-mod
+chorus, ensemble, choir, vocoder, delay, granular-delay, tape-delay, spring-reverb, reverb, phaser, distortion, wavefolder, ring-mod, pitch-shifter
 
 ### Modulators
 adsr, lfo, mod-router, sample-hold, slew, quantizer
@@ -122,6 +122,14 @@ Ces features ont les structures de données en place mais la logique n'est pas c
   - Comportement avec différents nombres de notes
   - Transitions entre modes
   - Mode random (distribution, répétitions)
+
+- **Pitch Shifter:** Module nouveau, nécessite tests approfondis:
+  - Qualité audio avec différentes tailles de grain (10-100ms)
+  - Artefacts aux pitch shifts extrêmes (-24 / +24 semitones)
+  - Latence perçue selon grain size
+  - Modulation CV (stabilité, réponse)
+  - Performance CPU avec plusieurs instances
+  - Presets: `pitch-shifter-test.json`, `pitch-whammy.json`
 
 ---
 
