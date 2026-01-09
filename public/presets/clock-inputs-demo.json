@@ -122,7 +122,7 @@
     "connections": [
       { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "seq-1", "portId": "clock" }, "kind": "sync" },
       { "from": { "moduleId": "clock-1", "portId": "reset" }, "to": { "moduleId": "seq-1", "portId": "reset" }, "kind": "sync" },
-      { "from": { "moduleId": "lfo-reset", "portId": "cv-out" }, "to": { "moduleId": "clock-1", "portId": "reset" }, "kind": "cv" },
+      { "from": { "moduleId": "lfo-reset", "portId": "cv-out" }, "to": { "moduleId": "clock-1", "portId": "rst-in" }, "kind": "cv" },
       { "from": { "moduleId": "seq-1", "portId": "cv-out" }, "to": { "moduleId": "osc-1", "portId": "pitch" }, "kind": "cv" },
       { "from": { "moduleId": "seq-1", "portId": "gate-out" }, "to": { "moduleId": "adsr-1", "portId": "gate" }, "kind": "gate" },
       { "from": { "moduleId": "osc-1", "portId": "out" }, "to": { "moduleId": "vcf-1", "portId": "in" }, "kind": "audio" },

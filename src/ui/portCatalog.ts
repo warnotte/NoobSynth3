@@ -383,7 +383,7 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
     inputs: [
       { id: 'start', label: 'Start', kind: 'gate', direction: 'in' },
       { id: 'stop', label: 'Stop', kind: 'gate', direction: 'in' },
-      { id: 'reset', label: 'Rst', kind: 'gate', direction: 'in' },
+      { id: 'rst-in', label: 'Rst', kind: 'gate', direction: 'in' },
     ],
     outputs: [
       { id: 'clock', label: 'Clk', kind: 'sync', direction: 'out' },

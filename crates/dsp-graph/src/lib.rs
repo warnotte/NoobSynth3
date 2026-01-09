@@ -3564,7 +3564,7 @@ fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize> {
     ModuleType::Clock => match port_id {
       "start" => Some(0),
       "stop" => Some(1),
-      "reset" | "reset-in" => Some(2),
+      "rst-in" => Some(2),
       _ => None,
     },
     _ => None,

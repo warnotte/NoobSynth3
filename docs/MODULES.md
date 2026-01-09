@@ -518,7 +518,7 @@ Horloge centrale pour synchroniser plusieurs séquenceurs. Génère des signaux 
 |------|----|-------------|
 | Start | `start` | Trigger externe pour démarrer la lecture |
 | Stop | `stop` | Trigger externe pour arrêter la lecture |
-| Reset | `reset` | Trigger externe pour reset à step 1 |
+| Reset | `rst-in` | Trigger externe pour reset à step 1 |
 
 **Sorties :**
 | Port | ID | Description |
@@ -544,7 +544,7 @@ Les entrées Start/Stop/Reset sont optionnelles et permettent un contrôle exter
 
 ```
 Control IO (gate) → Clock (start)   # Déclenche lecture via MIDI
-LFO (trigger)     → Clock (reset)   # Reset périodique (pattern loop)
+LFO (trigger)     → Clock (rst-in)  # Reset périodique (pattern loop)
 ```
 
 **Utilisation de la sortie Bar :**
