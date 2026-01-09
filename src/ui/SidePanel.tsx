@@ -115,12 +115,20 @@ export const SidePanel = ({
   const [compactPresets, setCompactPresets] = useState(false)
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({})
   const [presetQuery, setPresetQuery] = useState('')
-  const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({})
+  // All sections collapsed by default
+  const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({
+    library: true,
+    patching: true,
+    presets: true,
+    macros: true,
+    tauri: true,
+  })
   const [moduleQuery, setModuleQuery] = useState('')
+  // All module categories collapsed by default
   const [collapsedModuleCategories, setCollapsedModuleCategories] = useState<Record<ModuleCategory, boolean>>(() => {
     const initial: Record<string, boolean> = {}
     moduleCategoryOrder.forEach((cat) => {
-      initial[cat] = false
+      initial[cat] = true
     })
     return initial as Record<ModuleCategory, boolean>
   })
@@ -385,7 +393,7 @@ export const SidePanel = ({
             {presetStatus === 'ready' && filteredPresets.length > 0 && (
               <div className="preset-groups">
                 {groupedPresets.map(({ group, presets: groupPresets }) => {
-                  const isCollapsed = isSearching ? false : Boolean(collapsedGroups[group])
+                  const isCollapsed = isSearching ? false : collapsedGroups[group] !== false
                   return (
                     <div key={group} className="preset-group">
                       <button
