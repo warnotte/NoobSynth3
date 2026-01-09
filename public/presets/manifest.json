@@ -462,6 +462,20 @@
       "description": "Synth with LFO-modulated pitch shifting for whammy bar effect.",
       "file": "pitch-whammy.json",
       "group": "Module Tests"
+    },
+    {
+      "id": "clock-test",
+      "name": "Clock Test",
+      "description": "Master Clock syncing a Step Sequencer with TB-303 style bass.",
+      "file": "clock-test.json",
+      "group": "Master Clock"
+    },
+    {
+      "id": "clock-multi-seq",
+      "name": "Clock Multi-Seq",
+      "description": "Master Clock syncing 2 Step Sequencers + Drum Sequencer with 909 drums.",
+      "file": "clock-multi-seq.json",
+      "group": "Master Clock"
     }
   ]
 }

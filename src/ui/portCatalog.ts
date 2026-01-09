@@ -379,4 +379,17 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
       { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
     ],
   },
+  clock: {
+    inputs: [
+      { id: 'start', label: 'Start', kind: 'gate', direction: 'in' },
+      { id: 'stop', label: 'Stop', kind: 'gate', direction: 'in' },
+      { id: 'reset', label: 'Rst', kind: 'gate', direction: 'in' },
+    ],
+    outputs: [
+      { id: 'clock', label: 'Clk', kind: 'sync', direction: 'out' },
+      { id: 'reset', label: 'Rst', kind: 'sync', direction: 'out' },
+      { id: 'run', label: 'Run', kind: 'gate', direction: 'out' },
+      { id: 'bar', label: 'Bar', kind: 'sync', direction: 'out' },
+    ],
+  },
 }

@@ -489,6 +489,160 @@ Module de test pour expérimenter.
 
 ---
 
+## Séquenceurs & Clock
+
+### Master Clock
+
+Horloge centrale pour synchroniser plusieurs séquenceurs. Génère des signaux de timing uniformes pour tous les modules connectés.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `running` | true/false | Play/Stop |
+| `tempo` | 40-300 BPM | Tempo global |
+| `rate` | 0-5 | Division de tempo (voir tableau) |
+| `swing` | 0-90 % | Swing sur les steps impairs |
+
+**Divisions de tempo (rate) :**
+
+| Rate | Division | Steps/Beat |
+|------|----------|------------|
+| 0 | 1/1 | 0.25 |
+| 1 | 1/2 | 0.5 |
+| 2 | 1/4 | 1 |
+| 3 | 1/8 | 2 |
+| 4 | 1/16 | 4 (défaut) |
+| 5 | 1/32 | 8 |
+
+**Entrées :**
+| Port | ID | Description |
+|------|----|-------------|
+| Start | `start` | Trigger externe pour démarrer la lecture |
+| Stop | `stop` | Trigger externe pour arrêter la lecture |
+| Reset | `reset` | Trigger externe pour reset à step 1 |
+
+**Sorties :**
+| Port | ID | Description |
+|------|----|-------------|
+| Clock | `clock` | Pulse à chaque step (au rate défini) |
+| Reset | `reset` | Pulse à chaque reset (départ ou trigger reset) |
+| Run | `run` | Gate HIGH tant que le clock tourne |
+| Bar | `bar` | Pulse toutes les 4 beats (mesure) |
+
+**Utilisation type :**
+```
+Master Clock → clock → Step Sequencer (clock)
+            → reset → Step Sequencer (reset)
+            → clock → Drum Sequencer (clock)
+            → reset → Drum Sequencer (reset)
+```
+
+Le Master Clock permet de synchroniser parfaitement plusieurs séquenceurs qui démarrent et s'arrêtent ensemble, avec le même tempo et swing.
+
+**Utilisation des entrées (avancé) :**
+
+Les entrées Start/Stop/Reset sont optionnelles et permettent un contrôle externe du transport :
+
+```
+Control IO (gate) → Clock (start)   # Déclenche lecture via MIDI
+LFO (trigger)     → Clock (reset)   # Reset périodique (pattern loop)
+```
+
+**Utilisation de la sortie Bar :**
+
+La sortie Bar pulse toutes les 4 beats (1 mesure en 4/4). Utile pour :
+- Déclencher un crash/cymbal sur le premier temps
+- Reset d'un LFO toutes les mesures
+- Synchroniser des effets (sidechain, gate)
+
+```
+Clock (bar) → 909 Crash (gate)      # Crash sur beat 1
+Clock (bar) → LFO (sync)            # Reset LFO chaque mesure
+```
+
+### Step Sequencer
+
+Séquenceur 16 steps style TB-303 avec pitch CV, gate, vélocité et slide.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `enabled` | true/false | Lecture active |
+| `tempo` | 40-300 BPM | Tempo (ignoré si clock externe) |
+| `rate` | 0-11 | Division de tempo |
+| `gateLength` | 10-100 % | Durée du gate |
+| `swing` | 0-90 % | Swing sur steps impairs |
+| `slideTime` | 10-200 ms | Durée du glide |
+| `length` | 1-16 | Longueur du pattern |
+| `direction` | 0-3 | 0=Fwd, 1=Rev, 2=PingPong, 3=Random |
+| `stepData` | JSON | Données des 16 steps |
+
+**Step Data (par step) :**
+- `pitch` : -24 à +24 demi-tons
+- `gate` : true/false
+- `velocity` : 0-127
+- `slide` : true/false (portamento vers ce step)
+
+**Entrées :**
+| Port | ID | Description |
+|------|----|-------------|
+| Clock | `clock` | Clock externe (depuis Master Clock) |
+| Reset | `reset` | Reset externe (depuis Master Clock) |
+
+**Sorties :**
+| Port | ID | Description |
+|------|----|-------------|
+| CV Out | `cv-out` | Pitch CV (1V/octave style) |
+| Gate Out | `gate-out` | Gate pour ADSR |
+| Velocity | `vel-out` | Vélocité normalisée (0-1) |
+| Accent | `acc-out` | Accent (vel > 100) |
+| Step | `step-out` | Numéro de step (0-15) |
+
+### Drum Sequencer
+
+Séquenceur de drums style TR-808/909 avec 8 tracks et 16 steps.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `enabled` | true/false | Lecture active |
+| `tempo` | 40-300 BPM | Tempo (ignoré si clock externe) |
+| `rate` | 0-11 | Division de tempo |
+| `gateLength` | 10-100 % | Durée du gate |
+| `swing` | 0-90 % | Swing sur steps impairs |
+| `length` | 4/8/12/16 | Longueur du pattern |
+| `drumData` | JSON | Données des 8 tracks x 16 steps |
+
+**Tracks :**
+1. Kick
+2. Snare
+3. HiHat Closed
+4. HiHat Open
+5. Clap
+6. Tom
+7. Rimshot
+8. Aux
+
+**Entrées :**
+| Port | ID | Description |
+|------|----|-------------|
+| Clock | `clock` | Clock externe (depuis Master Clock) |
+| Reset | `reset` | Reset externe (depuis Master Clock) |
+
+**Sorties (8 Gates + 8 Accents + Step) :**
+| Port | ID | Description |
+|------|----|-------------|
+| Kick Gate | `gate-kick` | Gate pour kick |
+| Snare Gate | `gate-snare` | Gate pour snare |
+| HHC Gate | `gate-hhc` | Gate pour hihat closed |
+| HHO Gate | `gate-hho` | Gate pour hihat open |
+| Clap Gate | `gate-clap` | Gate pour clap |
+| Tom Gate | `gate-tom` | Gate pour tom |
+| Rim Gate | `gate-rim` | Gate pour rimshot |
+| Aux Gate | `gate-aux` | Gate pour aux |
+| Kick Acc | `acc-kick` | Accent kick (CV) |
+| ... | ... | (idem pour les 7 autres) |
+| Step Out | `step-out` | Numéro de step (0-15) |
+
+---
+
 ## Contrôle
 
 ### Control IO

@@ -82,7 +82,11 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
         this.engine = new WasmGraphEngine(sampleRate)
         this.ready = true
         if (this.pendingGraph) {
-          this.engine.set_graph(this.pendingGraph)
+          try {
+            this.engine.set_graph(this.pendingGraph)
+          } catch (error) {
+            console.error('WASM set_graph (pending) error:', error)
+          }
           this.pendingGraph = null
         }
       } else {
@@ -97,7 +101,11 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
   private handleMessage(message: GraphMessage) {
     if (message.type === 'setGraph') {
       if (this.ready && this.engine) {
-        this.engine.set_graph(message.graphJson)
+        try {
+          this.engine.set_graph(message.graphJson)
+        } catch (error) {
+          console.error('WASM set_graph error:', error)
+        }
       } else {
         this.pendingGraph = message.graphJson
       }

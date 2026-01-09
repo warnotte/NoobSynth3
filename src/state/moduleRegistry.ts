@@ -51,6 +51,8 @@ export const moduleSizes: Record<ModuleType, string> = {
   'drum-sequencer': '5x5',
   // Effects
   'pitch-shifter': '2x2',
+  // Master Clock
+  clock: '2x2',
 }
 
 export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>> = {
@@ -79,6 +81,8 @@ export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>>
   '909-rimshot': 'strip',
   // Drum Sequencer
   'drum-sequencer': 'strip',
+  // Master Clock
+  clock: 'strip',
 }
 
 export type ModuleCategory =
@@ -152,6 +156,7 @@ export const moduleCatalog: { type: ModuleType; label: string; category: ModuleC
   { type: 'slew', label: 'Slew', category: 'modulators' },
   { type: 'quantizer', label: 'Quantizer', category: 'modulators' },
   // Sequencers
+  { type: 'clock', label: 'Clock', category: 'sequencers' },
   { type: 'arpeggiator', label: 'Arpeggiator', category: 'sequencers' },
   { type: 'step-sequencer', label: 'Step Seq', category: 'sequencers' },
   { type: 'drum-sequencer', label: 'Drum Seq', category: 'sequencers' },
@@ -221,6 +226,8 @@ export const modulePrefixes: Record<ModuleType, string> = {
   '909-rimshot': 'rim',
   // Drum Sequencer
   'drum-sequencer': 'drumseq',
+  // Master Clock
+  clock: 'clock',
 }
 
 export const moduleLabels: Record<ModuleType, string> = {
@@ -273,6 +280,8 @@ export const moduleLabels: Record<ModuleType, string> = {
   '909-rimshot': '909 Rim',
   // Drum Sequencer
   'drum-sequencer': 'Drum Seq',
+  // Master Clock
+  clock: 'Master Clock',
 }
 
 export const moduleDefaults: Record<ModuleType, Record<string, number | string | boolean>> = {
@@ -526,6 +535,13 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
         [{ g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }],
       ],
     }),
+  },
+  // Master Clock
+  clock: {
+    running: true,
+    tempo: 120,
+    rate: 4,            // 1/16 note (same as sequencers)
+    swing: 0,
   },
 }
 

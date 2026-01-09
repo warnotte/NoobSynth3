@@ -51,6 +51,8 @@ export type ModuleType =
   | 'drum-sequencer'
   // Effects
   | 'pitch-shifter'
+  // Master Clock
+  | 'clock'
 
 export interface ModuleSpec {
   id: string

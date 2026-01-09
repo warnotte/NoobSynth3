@@ -3721,5 +3721,77 @@ export const ModuleControls = ({
     )
   }
 
+  if (module.type === 'clock') {
+    const running = module.params.running !== false
+    const tempo = Number(module.params.tempo ?? 120)
+    const rate = Number(module.params.rate ?? 4)
+    const swing = Number(module.params.swing ?? 0)
+
+    const rateDivisions = [
+      { id: 0, label: '1/1' },
+      { id: 1, label: '1/2' },
+      { id: 2, label: '1/4' },
+      { id: 3, label: '1/8' },
+      { id: 4, label: '1/16' },
+      { id: 5, label: '1/32' },
+    ]
+
+    return (
+      <>
+        {/* Play/Stop Toggle */}
+        <div className="toggle-group">
+          <button
+            type="button"
+            className={`ui-btn ui-btn--pill toggle-btn ${running ? 'active' : ''}`}
+            onClick={() => updateParam(module.id, 'running', !running)}
+          >
+            {running ? 'PLAY' : 'STOP'}
+          </button>
+        </div>
+
+        {/* Tempo & Swing knobs */}
+        <RotaryKnob
+          label="Tempo"
+          min={40}
+          max={300}
+          step={1}
+          unit="BPM"
+          value={tempo}
+          onChange={(value) => updateParam(module.id, 'tempo', value)}
+          format={(value) => Math.round(value).toString()}
+        />
+        <RotaryKnob
+          label="Swing"
+          min={0}
+          max={90}
+          step={1}
+          unit="%"
+          value={swing}
+          onChange={(value) => updateParam(module.id, 'swing', value)}
+          format={(value) => Math.round(value).toString()}
+        />
+
+        {/* Rate selector */}
+        <div className="seq-control-section">
+          <div className="seq-control-box">
+            <span className="seq-control-label">Rate</span>
+            <div className="seq-control-buttons">
+              {rateDivisions.map((r) => (
+                <button
+                  key={r.id}
+                  type="button"
+                  className={`seq-control-btn ${rate === r.id ? 'active' : ''}`}
+                  onClick={() => updateParam(module.id, 'rate', r.id)}
+                >
+                  {r.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </>
+    )
+  }
+
   return null
 }

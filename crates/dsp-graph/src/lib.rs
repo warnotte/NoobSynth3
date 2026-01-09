@@ -4,17 +4,18 @@ use dsp_core::{
   Clap909Params, Delay, DelayInputs, DelayParams, Distortion, DistortionParams, DrumSequencer,
   DrumSequencerInputs, DrumSequencerOutputs, DrumSequencerParams, Ensemble, EnsembleInputs,
   EnsembleParams, GranularDelay, GranularDelayInputs, GranularDelayParams, HiHat909, HiHat909Inputs,
-  HiHat909Params, Kick909, Kick909Inputs, Kick909Params, Lfo, LfoInputs, LfoParams, Mixer, NesOsc,
-  NesOscInputs, NesOscParams, Noise, NoiseParams, Phaser, PhaserInputs, PhaserParams, PitchShifter,
-  PitchShifterInputs, PitchShifterParams, Quantizer, QuantizerInputs, QuantizerParams, Reverb,
-  ReverbInputs, ReverbParams, Rimshot909, Rimshot909Inputs, Rimshot909Params, RingMod, RingModParams,
-  Sample, SampleHold, SampleHoldInputs, SampleHoldParams, SlewInputs, SlewLimiter, SlewParams,
-  Snare909, Snare909Inputs, Snare909Params, SnesOsc, SnesOscInputs, SnesOscParams, SpringReverb,
-  SpringReverbInputs, SpringReverbParams, StepSequencer, StepSequencerInputs, StepSequencerOutputs,
-  StepSequencerParams, Supersaw, SupersawInputs, SupersawParams, TapeDelay, TapeDelayInputs,
-  TapeDelayParams, Tb303, Tb303Inputs, Tb303Outputs, Tb303Params, Tom909, Tom909Inputs, Tom909Params,
-  Vca, Vcf, VcfInputs, VcfParams, Vco, VcoInputs, VcoParams, Vocoder, VocoderInputs, VocoderParams,
-  Wavefolder, WavefolderParams,
+  HiHat909Params, Kick909, Kick909Inputs, Kick909Params, Lfo, LfoInputs, LfoParams, MasterClock,
+  MasterClockInputs, MasterClockOutputs, MasterClockParams, Mixer, NesOsc, NesOscInputs, NesOscParams,
+  Noise, NoiseParams, Phaser, PhaserInputs, PhaserParams, PitchShifter, PitchShifterInputs,
+  PitchShifterParams, Quantizer, QuantizerInputs, QuantizerParams, Reverb, ReverbInputs, ReverbParams,
+  Rimshot909, Rimshot909Inputs, Rimshot909Params, RingMod, RingModParams, Sample, SampleHold,
+  SampleHoldInputs, SampleHoldParams, SlewInputs, SlewLimiter, SlewParams, Snare909, Snare909Inputs,
+  Snare909Params, SnesOsc, SnesOscInputs, SnesOscParams, SpringReverb, SpringReverbInputs,
+  SpringReverbParams, StepSequencer, StepSequencerInputs, StepSequencerOutputs, StepSequencerParams,
+  Supersaw, SupersawInputs, SupersawParams, TapeDelay, TapeDelayInputs, TapeDelayParams, Tb303,
+  Tb303Inputs, Tb303Outputs, Tb303Params, Tom909, Tom909Inputs, Tom909Params, Vca, Vcf, VcfInputs,
+  VcfParams, Vco, VcoInputs, VcoParams, Vocoder, VocoderInputs, VocoderParams, Wavefolder,
+  WavefolderParams,
 };
 use serde::Deserialize;
 use std::collections::{HashMap, VecDeque};
@@ -108,6 +109,8 @@ enum ModuleType {
   DrumSequencer,
   // Effects
   PitchShifter,
+  // Master Clock
+  Clock,
 }
 
 #[derive(Clone, Copy)]
@@ -439,6 +442,14 @@ struct PitchShifterState {
   mix: ParamBuffer,
 }
 
+struct ClockState {
+  clock: MasterClock,
+  running: ParamBuffer,
+  tempo: ParamBuffer,
+  rate: ParamBuffer,
+  swing: ParamBuffer,
+}
+
 struct TapeDelayState {
   delay: TapeDelay,
   time: ParamBuffer,
@@ -693,6 +704,7 @@ enum ModuleState {
   Rimshot909(Rimshot909State),
   DrumSequencer(DrumSequencerState),
   PitchShifter(PitchShifterState),
+  Clock(ClockState),
 }
 
 struct ModuleNode {
@@ -1475,6 +1487,13 @@ impl ModuleNode {
         grain: ParamBuffer::new(param_number(params, "grain", 50.0)),
         mix: ParamBuffer::new(param_number(params, "mix", 1.0)),
       }),
+      ModuleType::Clock => ModuleState::Clock(ClockState {
+        clock: MasterClock::new(sample_rate),
+        running: ParamBuffer::new(param_number(params, "running", 1.0)),
+        tempo: ParamBuffer::new(param_number(params, "tempo", 120.0)),
+        rate: ParamBuffer::new(param_number(params, "rate", 4.0)),
+        swing: ParamBuffer::new(param_number(params, "swing", 0.0)),
+      }),
     };
 
     Self {
@@ -1846,6 +1865,13 @@ impl ModuleNode {
         "fine" => state.fine.set(value),
         "grain" => state.grain.set(value),
         "mix" => state.mix.set(value),
+        _ => {}
+      },
+      ModuleState::Clock(state) => match param {
+        "running" => state.running.set(value),
+        "tempo" => state.tempo.set(value),
+        "rate" => state.rate.set(value),
+        "swing" => state.swing.set(value),
         _ => {}
       },
       _ => {}
@@ -3014,6 +3040,53 @@ impl ModuleNode {
         let shifter_inputs = PitchShifterInputs { input, pitch_cv };
         state.shifter.process_block(outputs[0].channel_mut(0), shifter_inputs, params);
       }
+      ModuleState::Clock(state) => {
+        // Inputs: start, stop, reset_in
+        let start = if !self.connections[0].is_empty() {
+          Some(inputs[0].channel(0))
+        } else {
+          None
+        };
+        let stop = if self.connections.len() > 1 && !self.connections[1].is_empty() {
+          Some(inputs[1].channel(0))
+        } else {
+          None
+        };
+        let reset_in = if self.connections.len() > 2 && !self.connections[2].is_empty() {
+          Some(inputs[2].channel(0))
+        } else {
+          None
+        };
+        let clock_inputs = MasterClockInputs { start, stop, reset_in };
+        let params = MasterClockParams {
+          running: state.running.slice(frames),
+          tempo: state.tempo.slice(frames),
+          rate: state.rate.slice(frames),
+          swing: state.swing.slice(frames),
+        };
+
+        // Use temp buffers to avoid borrow checker issues
+        const CLOCK_BUF_SIZE: usize = 1024;
+        let safe_frames = frames.min(CLOCK_BUF_SIZE);
+        let mut buf_clock: [Sample; CLOCK_BUF_SIZE] = [0.0; CLOCK_BUF_SIZE];
+        let mut buf_reset: [Sample; CLOCK_BUF_SIZE] = [0.0; CLOCK_BUF_SIZE];
+        let mut buf_run: [Sample; CLOCK_BUF_SIZE] = [0.0; CLOCK_BUF_SIZE];
+        let mut buf_bar: [Sample; CLOCK_BUF_SIZE] = [0.0; CLOCK_BUF_SIZE];
+
+        let clock_outputs = MasterClockOutputs {
+          clock: &mut buf_clock[..safe_frames],
+          reset: &mut buf_reset[..safe_frames],
+          run: &mut buf_run[..safe_frames],
+          bar: &mut buf_bar[..safe_frames],
+        };
+        state.clock.process_block(clock_outputs, clock_inputs, params);
+
+        // Copy to actual outputs
+        outputs[0].channel_mut(0)[..safe_frames].copy_from_slice(&buf_clock[..safe_frames]);
+        outputs[1].channel_mut(0)[..safe_frames].copy_from_slice(&buf_reset[..safe_frames]);
+        outputs[2].channel_mut(0)[..safe_frames].copy_from_slice(&buf_run[..safe_frames]);
+        outputs[3].channel_mut(0)[..safe_frames].copy_from_slice(&buf_bar[..safe_frames]);
+      }
     }
   }
 }
@@ -3069,6 +3142,7 @@ fn normalize_module_type(raw: &str) -> ModuleType {
     "drum-sequencer" => ModuleType::DrumSequencer,
     // Effects
     "pitch-shifter" => ModuleType::PitchShifter,
+    "clock" => ModuleType::Clock,
     _ => ModuleType::Oscillator,
   }
 }
@@ -3196,6 +3270,12 @@ fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // audio input
       PortInfo { channels: 1 },  // pitch CV
     ],
+    // Clock - 3 inputs (start, stop, reset)
+    ModuleType::Clock => vec![
+      PortInfo { channels: 1 },  // start trigger
+      PortInfo { channels: 1 },  // stop trigger
+      PortInfo { channels: 1 },  // reset trigger
+    ],
   }
 }
 
@@ -3302,6 +3382,13 @@ fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
     ],
     // Pitch Shifter - 1 output
     ModuleType::PitchShifter => vec![PortInfo { channels: 1 }],
+    // Clock - 4 outputs (clock, reset, run, bar)
+    ModuleType::Clock => vec![
+      PortInfo { channels: 1 },  // clock pulse
+      PortInfo { channels: 1 },  // reset pulse
+      PortInfo { channels: 1 },  // run gate
+      PortInfo { channels: 1 },  // bar pulse
+    ],
   }
 }
 
@@ -3471,6 +3558,13 @@ fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize> {
     ModuleType::PitchShifter => match port_id {
       "in" | "input" | "audio" => Some(0),
       "pitch" | "pitch-cv" => Some(1),
+      _ => None,
+    },
+    // Clock - 3 inputs
+    ModuleType::Clock => match port_id {
+      "start" => Some(0),
+      "stop" => Some(1),
+      "reset" | "reset-in" => Some(2),
       _ => None,
     },
     _ => None,
@@ -3666,6 +3760,14 @@ fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize> {
     // Pitch Shifter - 1 output
     ModuleType::PitchShifter => match port_id {
       "out" | "output" => Some(0),
+      _ => None,
+    },
+    // Clock - 4 outputs
+    ModuleType::Clock => match port_id {
+      "clock" | "clk" => Some(0),
+      "reset" | "rst" => Some(1),
+      "run" => Some(2),
+      "bar" => Some(3),
       _ => None,
     },
   }
