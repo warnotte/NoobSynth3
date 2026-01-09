@@ -476,6 +476,13 @@
       "description": "Master Clock syncing 2 Step Sequencers + Drum Sequencer with 909 drums.",
       "file": "clock-multi-seq.json",
       "group": "Master Clock"
+    },
+    {
+      "id": "clock-inputs-demo",
+      "name": "Clock Inputs Demo",
+      "description": "Demonstrates clock reset input - LFO resets pattern every 4 seconds.",
+      "file": "clock-inputs-demo.json",
+      "group": "Master Clock"
     }
   ]
 }
