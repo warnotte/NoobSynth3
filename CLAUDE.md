@@ -47,7 +47,7 @@ npm run build         # Production build
 ## Module Types
 
 ### Sources
-oscillator, supersaw, nes-osc, snes-osc, noise, tb-303
+oscillator, supersaw, karplus-strong, fm-operator, nes-osc, snes-osc, noise, tb-303
 
 ### Filters
 vcf, hpf
@@ -59,13 +59,13 @@ chorus, ensemble, choir, vocoder, delay, granular-delay, tape-delay, spring-reve
 adsr, lfo, mod-router, sample-hold, slew, quantizer
 
 ### Sequencers
-arpeggiator, step-sequencer, drum-sequencer, mario
+arpeggiator, step-sequencer, drum-sequencer, euclidean-sequencer, master-clock, mario
 
 ### TR-909 Drums
 909-kick, 909-snare, 909-hihat, 909-clap, 909-tom, 909-rimshot
 
-### I/O
-control, output, audio-in, scope, lab
+### I/O & Utilities
+control, output, audio-in, scope, lab, notes
 
 ---
 
@@ -167,6 +167,20 @@ Groupes existants: Basics, Leads, Bass, Pads, FX, Drums, 8-Bit, Experimental
 ## Important Documentation
 
 - **[PERFORMANCE_OPTIMIZATION.md](./PERFORMANCE_OPTIMIZATION.md)** - Guide d'optimisation (SIMD, multi-threading, React)
+
+---
+
+## Known Limitations
+
+| Limitation | Description |
+|------------|-------------|
+| VCF 24dB | Peut distordre à résonance extrême |
+| VCF Ladder | LP uniquement; HP/BP/Notch basculent vers SVF |
+| Voice count | Changer rapidement le nombre de voix peut causer instabilité |
+| VST Scope | Oscilloscope non fonctionnel (taps non connectés via IPC) |
+| VST UI | L'éditeur est un launcher; UI complète dans fenêtre Tauri externe |
+| VST Macros | Les édits UI ne modifient pas l'automation DAW |
+| WASM | `wasm-opt` désactivé (bulk memory mismatch); non optimisé |
 
 ---
 
