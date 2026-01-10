@@ -26,22 +26,20 @@ export function ButtonGroup<T extends string | number>({
   if (!rowSize || options.length <= rowSize) {
     return (
       <div className="filter-row">
-        {label !== undefined && (
-          <div className="filter-group">
-            <span className="filter-label">{label}</span>
+        <div className="filter-group">
+          {label !== undefined && <span className="filter-label">{label}</span>}
+          <div className={`filter-buttons ${widthClass}`}>
+            {options.map((option) => (
+              <button
+                key={String(option.id)}
+                type="button"
+                className={`ui-btn filter-btn ${value === option.id ? 'active' : ''}`}
+                onClick={() => onChange(option.id)}
+              >
+                {option.label}
+              </button>
+            ))}
           </div>
-        )}
-        <div className={`filter-buttons ${widthClass}`}>
-          {options.map((option) => (
-            <button
-              key={String(option.id)}
-              type="button"
-              className={`ui-btn filter-btn ${value === option.id ? 'active' : ''}`}
-              onClick={() => onChange(option.id)}
-            >
-              {option.label}
-            </button>
-          ))}
         </div>
       </div>
     )
