@@ -598,88 +598,22 @@ export const ModuleControls = ({
     )
   }
 
-  if (module.type === 'mixer') {
+  if (module.type === 'mixer' || module.type === 'mixer-1x2') {
+    const levels = module.type === 'mixer' ? ['A', 'B'] : ['A', 'B', 'C', 'D', 'E', 'F']
     return (
       <>
-        <RotaryKnob
-          label="Level A"
-          min={0}
-          max={1}
-          step={0.01}
-          value={Number(module.params.levelA ?? 0.6)}
-          onChange={(value) => updateParam(module.id, 'levelA', value)}
-          format={formatDecimal2}
-        />
-        <RotaryKnob
-          label="Level B"
-          min={0}
-          max={1}
-          step={0.01}
-          value={Number(module.params.levelB ?? 0.6)}
-          onChange={(value) => updateParam(module.id, 'levelB', value)}
-          format={formatDecimal2}
-        />
-      </>
-    )
-  }
-
-  if (module.type === 'mixer-1x2') {
-    return (
-      <>
-        <RotaryKnob
-          label="Level A"
-          min={0}
-          max={1}
-          step={0.01}
-          value={Number(module.params.levelA ?? 0.6)}
-          onChange={(value) => updateParam(module.id, 'levelA', value)}
-          format={formatDecimal2}
-        />
-        <RotaryKnob
-          label="Level B"
-          min={0}
-          max={1}
-          step={0.01}
-          value={Number(module.params.levelB ?? 0.6)}
-          onChange={(value) => updateParam(module.id, 'levelB', value)}
-          format={formatDecimal2}
-        />
-        <RotaryKnob
-          label="Level C"
-          min={0}
-          max={1}
-          step={0.01}
-          value={Number(module.params.levelC ?? 0.6)}
-          onChange={(value) => updateParam(module.id, 'levelC', value)}
-          format={formatDecimal2}
-        />
-        <RotaryKnob
-          label="Level D"
-          min={0}
-          max={1}
-          step={0.01}
-          value={Number(module.params.levelD ?? 0.6)}
-          onChange={(value) => updateParam(module.id, 'levelD', value)}
-          format={formatDecimal2}
-        />
-        <RotaryKnob
-          label="Level E"
-          min={0}
-          max={1}
-          step={0.01}
-          value={Number(module.params.levelE ?? 0.6)}
-          onChange={(value) => updateParam(module.id, 'levelE', value)}
-          format={formatDecimal2}
-        />
-        <RotaryKnob
-          label="Level F"
-          min={0}
-          max={1}
-          step={0.01}
-          value={Number(module.params.levelF ?? 0.6)}
-          onChange={(value) => updateParam(module.id, 'levelF', value)}
-          format={formatDecimal2}
-        />
+        {levels.map((ch) => (
+          <RotaryKnob
+            key={ch}
+            label={`Level ${ch}`}
+            min={0}
+            max={1}
+            step={0.01}
+            value={Number(module.params[`level${ch}`] ?? 0.6)}
+            onChange={(value) => updateParam(module.id, `level${ch}`, value)}
+            format={formatDecimal2}
+          />
+        ))}
       </>
     )
   }
@@ -2826,136 +2760,75 @@ export const ModuleControls = ({
 
         {/* Step Grid with LED indicators */}
         <div className="seq-step-grid" ref={gridRef}>
-          {/* Steps 1-8 */}
-          <div className="seq-step-bank">
-            {steps.slice(0, 8).map((step, i) => (
-              <div key={i} data-step={i} className={`seq-step ${i >= length ? 'disabled' : ''}`}>
-                <div className="seq-step-led" />
-                <div className="seq-step-num">{i + 1}</div>
-                <button
-                  type="button"
-                  className={`seq-step-gate ${step.gate ? 'active' : ''}`}
-                  onClick={() => {
-                    const newSteps = [...steps]
-                    newSteps[i] = { ...newSteps[i], gate: !newSteps[i].gate }
-                    updateSteps(newSteps)
-                  }}
-                >
-                  {step.gate ? 'ON' : '-'}
-                </button>
-                <div
-                  className="seq-step-pitch"
-                  onWheel={(e) => {
-                    e.preventDefault()
-                    const delta = e.deltaY > 0 ? -1 : 1
-                    const newPitch = Math.max(-24, Math.min(24, step.pitch + delta))
-                    const newSteps = [...steps]
-                    newSteps[i] = { ...newSteps[i], pitch: newPitch }
-                    updateSteps(newSteps)
-                  }}
-                  onClick={(e) => {
-                    const delta = e.button === 2 ? -1 : 1
-                    const newPitch = Math.max(-24, Math.min(24, step.pitch + delta))
-                    const newSteps = [...steps]
-                    newSteps[i] = { ...newSteps[i], pitch: newPitch }
-                    updateSteps(newSteps)
-                  }}
-                  onContextMenu={(e) => e.preventDefault()}
-                  title="Scroll or click to change, right-click to decrease"
-                >
-                  {formatPitch(step.pitch)}
-                </div>
-                <div
-                  className="seq-step-vel"
-                  style={{ '--vel': step.velocity } as React.CSSProperties}
-                  onClick={(e) => {
-                    const rect = e.currentTarget.getBoundingClientRect()
-                    const y = e.clientY - rect.top
-                    const velocity = Math.round(100 - (y / rect.height) * 100)
-                    const newSteps = [...steps]
-                    newSteps[i] = { ...newSteps[i], velocity: Math.max(0, Math.min(100, velocity)) }
-                    updateSteps(newSteps)
-                  }}
-                />
-                <button
-                  type="button"
-                  className={`seq-step-slide ${step.slide ? 'active' : ''}`}
-                  onClick={() => {
-                    const newSteps = [...steps]
-                    newSteps[i] = { ...newSteps[i], slide: !newSteps[i].slide }
-                    updateSteps(newSteps)
-                  }}
-                >
-                  S
-                </button>
-              </div>
-            ))}
-          </div>
-          {/* Steps 9-16 */}
-          <div className="seq-step-bank">
-            {steps.slice(8, 16).map((step, i) => (
-              <div key={i + 8} data-step={i + 8} className={`seq-step ${i + 8 >= length ? 'disabled' : ''}`}>
-                <div className="seq-step-led" />
-                <div className="seq-step-num">{i + 9}</div>
-                <button
-                  type="button"
-                  className={`seq-step-gate ${step.gate ? 'active' : ''}`}
-                  onClick={() => {
-                    const newSteps = [...steps]
-                    newSteps[i + 8] = { ...newSteps[i + 8], gate: !newSteps[i + 8].gate }
-                    updateSteps(newSteps)
-                  }}
-                >
-                  {step.gate ? 'ON' : '-'}
-                </button>
-                <div
-                  className="seq-step-pitch"
-                  onWheel={(e) => {
-                    e.preventDefault()
-                    const delta = e.deltaY > 0 ? -1 : 1
-                    const newPitch = Math.max(-24, Math.min(24, step.pitch + delta))
-                    const newSteps = [...steps]
-                    newSteps[i + 8] = { ...newSteps[i + 8], pitch: newPitch }
-                    updateSteps(newSteps)
-                  }}
-                  onClick={(e) => {
-                    const delta = e.button === 2 ? -1 : 1
-                    const newPitch = Math.max(-24, Math.min(24, step.pitch + delta))
-                    const newSteps = [...steps]
-                    newSteps[i + 8] = { ...newSteps[i + 8], pitch: newPitch }
-                    updateSteps(newSteps)
-                  }}
-                  onContextMenu={(e) => e.preventDefault()}
-                  title="Scroll or click to change, right-click to decrease"
-                >
-                  {formatPitch(step.pitch)}
-                </div>
-                <div
-                  className="seq-step-vel"
-                  style={{ '--vel': step.velocity } as React.CSSProperties}
-                  onClick={(e) => {
-                    const rect = e.currentTarget.getBoundingClientRect()
-                    const y = e.clientY - rect.top
-                    const velocity = Math.round(100 - (y / rect.height) * 100)
-                    const newSteps = [...steps]
-                    newSteps[i + 8] = { ...newSteps[i + 8], velocity: Math.max(0, Math.min(100, velocity)) }
-                    updateSteps(newSteps)
-                  }}
-                />
-                <button
-                  type="button"
-                  className={`seq-step-slide ${step.slide ? 'active' : ''}`}
-                  onClick={() => {
-                    const newSteps = [...steps]
-                    newSteps[i + 8] = { ...newSteps[i + 8], slide: !newSteps[i + 8].slide }
-                    updateSteps(newSteps)
-                  }}
-                >
-                  S
-                </button>
-              </div>
-            ))}
-          </div>
+          {[0, 8].map((offset) => (
+            <div key={offset} className="seq-step-bank">
+              {steps.slice(offset, offset + 8).map((step, i) => {
+                const stepIndex = offset + i
+                return (
+                  <div key={stepIndex} data-step={stepIndex} className={`seq-step ${stepIndex >= length ? 'disabled' : ''}`}>
+                    <div className="seq-step-led" />
+                    <div className="seq-step-num">{stepIndex + 1}</div>
+                    <button
+                      type="button"
+                      className={`seq-step-gate ${step.gate ? 'active' : ''}`}
+                      onClick={() => {
+                        const newSteps = [...steps]
+                        newSteps[stepIndex] = { ...newSteps[stepIndex], gate: !newSteps[stepIndex].gate }
+                        updateSteps(newSteps)
+                      }}
+                    >
+                      {step.gate ? 'ON' : '-'}
+                    </button>
+                    <div
+                      className="seq-step-pitch"
+                      onWheel={(e) => {
+                        e.preventDefault()
+                        const delta = e.deltaY > 0 ? -1 : 1
+                        const newPitch = Math.max(-24, Math.min(24, step.pitch + delta))
+                        const newSteps = [...steps]
+                        newSteps[stepIndex] = { ...newSteps[stepIndex], pitch: newPitch }
+                        updateSteps(newSteps)
+                      }}
+                      onClick={(e) => {
+                        const delta = e.button === 2 ? -1 : 1
+                        const newPitch = Math.max(-24, Math.min(24, step.pitch + delta))
+                        const newSteps = [...steps]
+                        newSteps[stepIndex] = { ...newSteps[stepIndex], pitch: newPitch }
+                        updateSteps(newSteps)
+                      }}
+                      onContextMenu={(e) => e.preventDefault()}
+                      title="Scroll or click to change, right-click to decrease"
+                    >
+                      {formatPitch(step.pitch)}
+                    </div>
+                    <div
+                      className="seq-step-vel"
+                      style={{ '--vel': step.velocity } as React.CSSProperties}
+                      onClick={(e) => {
+                        const rect = e.currentTarget.getBoundingClientRect()
+                        const y = e.clientY - rect.top
+                        const velocity = Math.round(100 - (y / rect.height) * 100)
+                        const newSteps = [...steps]
+                        newSteps[stepIndex] = { ...newSteps[stepIndex], velocity: Math.max(0, Math.min(100, velocity)) }
+                        updateSteps(newSteps)
+                      }}
+                    />
+                    <button
+                      type="button"
+                      className={`seq-step-slide ${step.slide ? 'active' : ''}`}
+                      onClick={() => {
+                        const newSteps = [...steps]
+                        newSteps[stepIndex] = { ...newSteps[stepIndex], slide: !newSteps[stepIndex].slide }
+                        updateSteps(newSteps)
+                      }}
+                    >
+                      S
+                    </button>
+                  </div>
+                )
+              })}
+            </div>
+          ))}
         </div>
       </>
     )
