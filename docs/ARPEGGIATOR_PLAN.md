@@ -472,12 +472,15 @@ fn process(&mut self,
 
 ---
 
-## TODO Implementation
+## Implementation Status
 
-1. [ ] Ajouter le type `arpeggiator` dans `shared/graph.ts`
-2. [ ] Créer le DSP Rust dans `crates/dsp-core/src/arpeggiator.rs`
-3. [ ] Ajouter au moteur de graphe (`dsp-graph`)
-4. [ ] Créer le composant UI React
-5. [ ] Ajouter au registre de modules
-6. [ ] Créer les presets de démonstration
-7. [ ] Tests et ajustements sonores
+L'arpégiateur est **implémenté** et disponible dans NoobSynth3.
+
+- [x] Type `arpeggiator` dans `shared/graph.ts`
+- [x] DSP Rust dans `crates/dsp-core/src/`
+- [x] Intégré au moteur de graphe (`dsp-graph`)
+- [x] Composant UI React (`ModuleControls.tsx`)
+- [x] Registre de modules (`moduleRegistry.ts`)
+- [x] Presets de démonstration
+
+**Note** : Certaines fonctionnalités avancées de ce plan (ratcheting, patterns euclidiens intégrés, mutations génératives) sont réservées pour des versions futures.

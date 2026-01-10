@@ -104,6 +104,50 @@ Générateur de bruit.
 
 **Sorties** : out (audio)
 
+### TB-303
+
+Synthèse acid bass style Roland TB-303 avec filtre résonant et enveloppe caractéristique.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `waveform` | 0-1 | 0=Saw, 1=Square |
+| `cutoff` | 40-12000 Hz | Fréquence de coupure |
+| `resonance` | 0-1 | Résonance du filtre |
+| `decay` | 0.01-2 s | Déclin de l'enveloppe |
+| `envmod` | 0-1 | Modulation du filtre par l'enveloppe |
+| `accent` | 0-1 | Intensité de l'accent |
+| `glide` | 0-0.5 s | Portamento |
+
+**Entrées** : pitch (CV), gate (gate), velocity (CV), cutoff-cv (CV)
+**Sorties** : out (audio), env-out (CV)
+
+### FM Op (FM Operator)
+
+Opérateur FM avec enveloppe intégrée. Utilisable comme source ou modulateur FM.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `frequency` | 40-8000 Hz | Fréquence de base |
+| `ratio` | 0.5-16 | Ratio de fréquence |
+| `level` | 0-1 | Niveau de sortie |
+| `feedback` | 0-1 | Auto-feedback |
+| `attack` | 1-5000 ms | Temps d'attaque |
+| `decay` | 1-5000 ms | Temps de décroissance |
+| `sustain` | 0-1 | Niveau de maintien |
+| `release` | 1-5000 ms | Temps de relâchement |
+
+**Entrées** : pitch (CV), gate (gate), fm (audio)
+**Sorties** : out (audio)
+
+**Utilisation type :**
+```
+FM Op (carrier) ← FM Op (modulator)
+                   ↑
+              pitch CV
+```
+
+Connecter plusieurs FM Op en cascade pour créer des algorithmes FM complexes.
+
 ---
 
 ## Filtres
@@ -414,8 +458,27 @@ Wavefolding pour timbres Buchla-style.
 | `bias` | -1 à 1 | Décalage |
 | `mix` | 0-1 | Dry/Wet |
 
-**Entrées** : in (audio)  
+**Entrées** : in (audio)
 **Sorties** : out (audio)
+
+### Pitch Shifter
+
+Pitch shifting granulaire avec contrôle CV.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `pitch` | -24 à +24 | Transposition en demi-tons |
+| `fine` | -100 à +100 | Ajustement fin en cents |
+| `grain` | 10-100 ms | Taille des grains |
+| `mix` | 0-1 | Dry/Wet |
+
+**Entrées** : in (audio), pitch-cv (CV)
+**Sorties** : out (audio)
+
+**Notes** :
+- Des grains plus longs = moins d'artefacts mais plus de latence
+- Des grains courts = meilleure réponse mais plus de granularité audible
+- L'entrée pitch-cv permet une modulation en temps réel du pitch
 
 ---
 
@@ -507,8 +570,18 @@ Module de test pour expérimenter.
 | `bias` | -1 à 1 | Décalage |
 | `shape` | sine/triangle/sawtooth/square | Forme |
 
-**Entrées** : in-a (audio), in-b (audio), cv-1 (CV), gate-1 (gate), sync-1 (sync)  
+**Entrées** : in-a (audio), in-b (audio), cv-1 (CV), gate-1 (gate), sync-1 (sync)
 **Sorties** : out-a (audio), out-b (audio), cv-out (CV), gate-out (gate), sync-out (sync)
+
+### Notes
+
+Module de documentation pour annoter votre patch. Aucun traitement audio.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `text` | string | Texte libre |
+
+Utile pour documenter le fonctionnement d'un patch ou laisser des notes pour plus tard.
 
 ---
 
@@ -772,6 +845,80 @@ Sortie audio principale.
 | `level` | 0-1 | Volume master |
 
 **Entrées** : in (audio)
+
+---
+
+## TR-909 Drums
+
+Émulation des sons de batterie Roland TR-909. Chaque module est déclenché par un trigger externe (typiquement depuis le Drum Sequencer).
+
+**Ports communs à tous les drums :**
+- **Entrées** : trigger (gate), accent (CV)
+- **Sorties** : out (audio)
+
+Le CV d'accent est "latché" au moment du trigger pour éviter les glitches pendant le son.
+
+### 909 Kick
+
+Grosse caisse TR-909 avec click d'attaque.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `tune` | 30-100 Hz | Fréquence de base |
+| `attack` | 0-1 | Intensité du click |
+| `decay` | 0-1 | Durée du son |
+| `drive` | 0-1 | Saturation |
+
+### 909 Snare
+
+Caisse claire avec mix tone/noise.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `tune` | 100-400 Hz | Fréquence du tone |
+| `tone` | 0-1 | Balance tone/noise |
+| `snappy` | 0-1 | Snap du noise |
+| `decay` | 0-1 | Durée du son |
+
+### 909 HiHat
+
+Hi-hat avec mode open/closed.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `tune` | 6000-12000 Hz | Fréquence centrale |
+| `decay` | 0-1 | Durée (open = long) |
+| `tone` | 0-1 | Brillance |
+
+### 909 Clap
+
+Handclap avec multi-trigger caractéristique.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `tone` | 0-1 | Brillance |
+| `decay` | 0-1 | Durée de la réverb |
+| `spread` | 0-1 | Espace entre les claps |
+
+### 909 Tom
+
+Tom basse/haute.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `tune` | 60-300 Hz | Fréquence de base |
+| `decay` | 0-1 | Durée du son |
+| `tone` | 0-1 | Brillance |
+
+### 909 Rimshot
+
+Rimshot/cross-stick.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `tune` | 400-2000 Hz | Fréquence |
+| `decay` | 0-1 | Durée |
+| `snap` | 0-1 | Attaque claquante |
 
 ---
 
