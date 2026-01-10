@@ -9,6 +9,14 @@ import { Oscilloscope } from './Oscilloscope'
 import { RotaryKnob } from './RotaryKnob'
 import { WaveformSelector } from './WaveformSelector'
 import { ButtonGroup } from './ButtonGroup'
+import {
+  formatDecimal1,
+  formatDecimal2,
+  formatInt,
+  formatPercent,
+  formatFreq,
+  formatMs,
+} from './formatters'
 
 type NativeScopeBridge = {
   isActive: boolean
@@ -142,7 +150,7 @@ export const ModuleControls = ({
           unit="Hz"
           value={Number(module.params.frequency ?? 220)}
           onChange={(value) => updateParam(module.id, 'frequency', value)}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
         <RotaryKnob
           label="Detune"
@@ -152,7 +160,7 @@ export const ModuleControls = ({
           unit="ct"
           value={Number(module.params.detune ?? 0)}
           onChange={(value) => updateParam(module.id, 'detune', value)}
-          format={(value) => value.toFixed(1)}
+          format={formatDecimal1}
         />
         <RotaryKnob
           label="PWM"
@@ -161,7 +169,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.pwm ?? 0.5)}
           onChange={(value) => updateParam(module.id, 'pwm', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Sub Mix"
@@ -170,7 +178,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.subMix ?? 0)}
           onChange={(value) => updateParam(module.id, 'subMix', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="FM Lin"
@@ -180,7 +188,7 @@ export const ModuleControls = ({
           unit="Hz"
           value={Number(module.params.fmLin ?? 0)}
           onChange={(value) => updateParam(module.id, 'fmLin', value)}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
         <RotaryKnob
           label="FM Exp"
@@ -190,7 +198,7 @@ export const ModuleControls = ({
           unit="oct"
           value={Number(module.params.fmExp ?? 0)}
           onChange={(value) => updateParam(module.id, 'fmExp', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <WaveformSelector
           label="Wave"
@@ -231,7 +239,7 @@ export const ModuleControls = ({
         step={0.01}
         value={Number(module.params.gain ?? 0.2)}
         onChange={(value) => updateParam(module.id, 'gain', value)}
-        format={(value) => value.toFixed(2)}
+        format={formatDecimal2}
       />
     )
   }
@@ -246,7 +254,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.level ?? 0.4)}
           onChange={(value) => updateParam(module.id, 'level', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <ButtonGroup
           label="Type"
@@ -274,7 +282,7 @@ export const ModuleControls = ({
             step={0.01}
             value={Number(module.params.gain ?? 1)}
             onChange={(value) => updateParam(module.id, 'gain', value)}
-            format={(value) => value.toFixed(2)}
+            format={formatDecimal2}
           />
           <div className="toggle-group">
             <button
@@ -308,7 +316,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.gain ?? 1)}
           onChange={(value) => updateParam(module.id, 'gain', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <div className="toggle-group">
           <button
@@ -339,7 +347,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.depthPitch ?? 0)}
           onChange={(value) => updateParam(module.id, 'depthPitch', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="PWM"
@@ -348,7 +356,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.depthPwm ?? 0)}
           onChange={(value) => updateParam(module.id, 'depthPwm', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="VCF"
@@ -357,7 +365,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.depthVcf ?? 0)}
           onChange={(value) => updateParam(module.id, 'depthVcf', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="VCA"
@@ -366,7 +374,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.depthVca ?? 0)}
           onChange={(value) => updateParam(module.id, 'depthVca', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
       </>
     )
@@ -398,7 +406,7 @@ export const ModuleControls = ({
           unit="s"
           value={Number(module.params.rise ?? 0.05)}
           onChange={(value) => updateParam(module.id, 'rise', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Fall"
@@ -408,7 +416,7 @@ export const ModuleControls = ({
           unit="s"
           value={Number(module.params.fall ?? 0.05)}
           onChange={(value) => updateParam(module.id, 'fall', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
       </>
     )
@@ -457,7 +465,7 @@ export const ModuleControls = ({
         step={0.01}
         value={Number(module.params.level ?? 0.9)}
         onChange={(value) => updateParam(module.id, 'level', value)}
-        format={(value) => value.toFixed(2)}
+        format={formatDecimal2}
       />
     )
   }
@@ -471,7 +479,7 @@ export const ModuleControls = ({
         step={0.01}
         value={Number(module.params.gain ?? 1)}
         onChange={(value) => updateParam(module.id, 'gain', value)}
-        format={(value) => value.toFixed(2)}
+        format={formatDecimal2}
       />
     )
   }
@@ -485,7 +493,7 @@ export const ModuleControls = ({
         step={0.01}
         value={Number(module.params.level ?? 0.8)}
         onChange={(value) => updateParam(module.id, 'level', value)}
-        format={(value) => value.toFixed(2)}
+        format={formatDecimal2}
       />
     )
   }
@@ -502,7 +510,7 @@ export const ModuleControls = ({
           unit="Hz"
           value={Number(module.params.rate ?? 2)}
           onChange={(value) => updateParam(module.id, 'rate', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Depth"
@@ -511,7 +519,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.depth ?? 0.7)}
           onChange={(value) => updateParam(module.id, 'depth', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Offset"
@@ -520,7 +528,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.offset ?? 0)}
           onChange={(value) => updateParam(module.id, 'offset', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <WaveformSelector
           label="Shape"
@@ -557,7 +565,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.levelA ?? 0.6)}
           onChange={(value) => updateParam(module.id, 'levelA', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Level B"
@@ -566,7 +574,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.levelB ?? 0.6)}
           onChange={(value) => updateParam(module.id, 'levelB', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
       </>
     )
@@ -582,7 +590,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.levelA ?? 0.6)}
           onChange={(value) => updateParam(module.id, 'levelA', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Level B"
@@ -591,7 +599,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.levelB ?? 0.6)}
           onChange={(value) => updateParam(module.id, 'levelB', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Level C"
@@ -600,7 +608,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.levelC ?? 0.6)}
           onChange={(value) => updateParam(module.id, 'levelC', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Level D"
@@ -609,7 +617,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.levelD ?? 0.6)}
           onChange={(value) => updateParam(module.id, 'levelD', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Level E"
@@ -618,7 +626,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.levelE ?? 0.6)}
           onChange={(value) => updateParam(module.id, 'levelE', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Level F"
@@ -627,7 +635,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.levelF ?? 0.6)}
           onChange={(value) => updateParam(module.id, 'levelF', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
       </>
     )
@@ -644,7 +652,7 @@ export const ModuleControls = ({
           unit="Hz"
           value={Number(module.params.rate ?? 0.3)}
           onChange={(value) => updateParam(module.id, 'rate', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Depth"
@@ -654,7 +662,7 @@ export const ModuleControls = ({
           unit="ms"
           value={Number(module.params.depth ?? 8)}
           onChange={(value) => updateParam(module.id, 'depth', value)}
-          format={(value) => value.toFixed(1)}
+          format={formatDecimal1}
         />
         <RotaryKnob
           label="Delay"
@@ -664,7 +672,7 @@ export const ModuleControls = ({
           unit="ms"
           value={Number(module.params.delay ?? 18)}
           onChange={(value) => updateParam(module.id, 'delay', value)}
-          format={(value) => value.toFixed(1)}
+          format={formatDecimal1}
         />
         <RotaryKnob
           label="Mix"
@@ -673,7 +681,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.mix ?? 0.45)}
           onChange={(value) => updateParam(module.id, 'mix', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Spread"
@@ -682,7 +690,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.spread ?? 0.6)}
           onChange={(value) => updateParam(module.id, 'spread', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Feedback"
@@ -691,7 +699,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.feedback ?? 0.15)}
           onChange={(value) => updateParam(module.id, 'feedback', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
       </>
     )
@@ -708,7 +716,7 @@ export const ModuleControls = ({
           unit="Hz"
           value={Number(module.params.rate ?? 0.25)}
           onChange={(value) => updateParam(module.id, 'rate', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Depth"
@@ -718,7 +726,7 @@ export const ModuleControls = ({
           unit="ms"
           value={Number(module.params.depth ?? 12)}
           onChange={(value) => updateParam(module.id, 'depth', value)}
-          format={(value) => value.toFixed(1)}
+          format={formatDecimal1}
         />
         <RotaryKnob
           label="Delay"
@@ -728,7 +736,7 @@ export const ModuleControls = ({
           unit="ms"
           value={Number(module.params.delay ?? 12)}
           onChange={(value) => updateParam(module.id, 'delay', value)}
-          format={(value) => value.toFixed(1)}
+          format={formatDecimal1}
         />
         <RotaryKnob
           label="Mix"
@@ -737,7 +745,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.mix ?? 0.6)}
           onChange={(value) => updateParam(module.id, 'mix', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Spread"
@@ -746,7 +754,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.spread ?? 0.7)}
           onChange={(value) => updateParam(module.id, 'spread', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
       </>
     )
@@ -763,7 +771,7 @@ export const ModuleControls = ({
           unit="Hz"
           value={Number(module.params.rate ?? 0.25)}
           onChange={(value) => updateParam(module.id, 'rate', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Depth"
@@ -772,7 +780,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.depth ?? 0.35)}
           onChange={(value) => updateParam(module.id, 'depth', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Mix"
@@ -781,7 +789,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.mix ?? 0.5)}
           onChange={(value) => updateParam(module.id, 'mix', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <ButtonGroup
           label="Vowel"
@@ -811,7 +819,7 @@ export const ModuleControls = ({
           unit="ms"
           value={Number(module.params.attack ?? 25)}
           onChange={(value) => updateParam(module.id, 'attack', value)}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
         <RotaryKnob
           label="Release"
@@ -821,7 +829,7 @@ export const ModuleControls = ({
           unit="ms"
           value={Number(module.params.release ?? 140)}
           onChange={(value) => updateParam(module.id, 'release', value)}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
         <RotaryKnob
           label="Low"
@@ -831,7 +839,7 @@ export const ModuleControls = ({
           unit="Hz"
           value={Number(module.params.low ?? 120)}
           onChange={(value) => updateParam(module.id, 'low', value)}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
         <RotaryKnob
           label="High"
@@ -841,7 +849,7 @@ export const ModuleControls = ({
           unit="Hz"
           value={Number(module.params.high ?? 5000)}
           onChange={(value) => updateParam(module.id, 'high', value)}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
         <RotaryKnob
           label="Q"
@@ -850,7 +858,7 @@ export const ModuleControls = ({
           step={0.1}
           value={Number(module.params.q ?? 2.5)}
           onChange={(value) => updateParam(module.id, 'q', value)}
-          format={(value) => value.toFixed(1)}
+          format={formatDecimal1}
         />
         <RotaryKnob
           label="Formant"
@@ -860,7 +868,7 @@ export const ModuleControls = ({
           unit="st"
           value={Number(module.params.formant ?? 0)}
           onChange={(value) => updateParam(module.id, 'formant', value)}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
         <RotaryKnob
           label="Emphasis"
@@ -869,7 +877,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.emphasis ?? 0.4)}
           onChange={(value) => updateParam(module.id, 'emphasis', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Unvoiced"
@@ -878,7 +886,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.unvoiced ?? 0)}
           onChange={(value) => updateParam(module.id, 'unvoiced', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Mod"
@@ -887,7 +895,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.modGain ?? 1)}
           onChange={(value) => updateParam(module.id, 'modGain', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Carrier"
@@ -896,7 +904,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.carGain ?? 1)}
           onChange={(value) => updateParam(module.id, 'carGain', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Mix"
@@ -905,7 +913,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.mix ?? 0.8)}
           onChange={(value) => updateParam(module.id, 'mix', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
       </>
     )
@@ -923,7 +931,7 @@ export const ModuleControls = ({
           unit="ms"
           value={Number(module.params.time ?? 360)}
           onChange={(value) => updateParam(module.id, 'time', value)}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
         <RotaryKnob
           label="Feedback"
@@ -932,7 +940,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.feedback ?? 0.35)}
           onChange={(value) => updateParam(module.id, 'feedback', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Mix"
@@ -941,7 +949,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.mix ?? 0.25)}
           onChange={(value) => updateParam(module.id, 'mix', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Tone"
@@ -976,7 +984,7 @@ export const ModuleControls = ({
           unit="ms"
           value={Number(module.params.time ?? 420)}
           onChange={(value) => updateParam(module.id, 'time', value)}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
         <RotaryKnob
           label="Size"
@@ -986,7 +994,7 @@ export const ModuleControls = ({
           unit="ms"
           value={Number(module.params.size ?? 120)}
           onChange={(value) => updateParam(module.id, 'size', value)}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
         <RotaryKnob
           label="Density"
@@ -996,7 +1004,7 @@ export const ModuleControls = ({
           unit="Hz"
           value={Number(module.params.density ?? 6)}
           onChange={(value) => updateParam(module.id, 'density', value)}
-          format={(value) => value.toFixed(1)}
+          format={formatDecimal1}
         />
         <RotaryKnob
           label="Pitch"
@@ -1005,7 +1013,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.pitch ?? 1)}
           onChange={(value) => updateParam(module.id, 'pitch', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Feedback"
@@ -1014,7 +1022,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.feedback ?? 0.35)}
           onChange={(value) => updateParam(module.id, 'feedback', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Mix"
@@ -1023,7 +1031,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.mix ?? 0.5)}
           onChange={(value) => updateParam(module.id, 'mix', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
       </>
     )
@@ -1040,7 +1048,7 @@ export const ModuleControls = ({
           unit="ms"
           value={Number(module.params.time ?? 420)}
           onChange={(value) => updateParam(module.id, 'time', value)}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
         <RotaryKnob
           label="Feedback"
@@ -1049,7 +1057,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.feedback ?? 0.35)}
           onChange={(value) => updateParam(module.id, 'feedback', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Mix"
@@ -1058,7 +1066,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.mix ?? 0.35)}
           onChange={(value) => updateParam(module.id, 'mix', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Tone"
@@ -1172,7 +1180,7 @@ export const ModuleControls = ({
           unit="ms"
           value={Number(module.params.preDelay ?? 18)}
           onChange={(value) => updateParam(module.id, 'preDelay', value)}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
         <RotaryKnob
           label="Mix"
@@ -1181,7 +1189,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.mix ?? 0.25)}
           onChange={(value) => updateParam(module.id, 'mix', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
       </>
     )
@@ -1213,7 +1221,7 @@ export const ModuleControls = ({
           unit="Hz"
           value={Number(module.params.cutoff ?? 800)}
           onChange={(value) => updateParam(module.id, 'cutoff', value)}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
         <RotaryKnob
           label="Resonance"
@@ -1222,7 +1230,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.resonance ?? 0.4)}
           onChange={(value) => updateParam(module.id, 'resonance', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Drive"
@@ -1231,7 +1239,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.drive ?? 0.2)}
           onChange={(value) => updateParam(module.id, 'drive', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Env Amt"
@@ -1240,7 +1248,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.envAmount ?? 0)}
           onChange={(value) => updateParam(module.id, 'envAmount', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Mod Amt"
@@ -1249,7 +1257,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.modAmount ?? 0)}
           onChange={(value) => updateParam(module.id, 'modAmount', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Key Track"
@@ -1305,7 +1313,7 @@ export const ModuleControls = ({
         unit="Hz"
         value={Number(module.params.cutoff ?? 280)}
         onChange={(value) => updateParam(module.id, 'cutoff', value)}
-        format={(value) => Math.round(value).toString()}
+        format={formatInt}
       />
     )
   }
@@ -1343,7 +1351,7 @@ export const ModuleControls = ({
           step={0.01}
           value={cvValue}
           onChange={(value) => updateParam(module.id, 'cv', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Vel Out"
@@ -1352,7 +1360,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.velocity ?? 1)}
           onChange={(value) => updateParam(module.id, 'velocity', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Glide"
@@ -1362,7 +1370,7 @@ export const ModuleControls = ({
           unit="s"
           value={Number(module.params.glide ?? 0)}
           onChange={(value) => updateParam(module.id, 'glide', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <div className="toggle-group">
           <button
@@ -1574,7 +1582,7 @@ export const ModuleControls = ({
               unit="BPM"
               value={seqTempo}
               onChange={(value) => updateParam(module.id, 'seqTempo', value)}
-              format={(value) => Math.round(value).toString()}
+              format={formatInt}
             />
             <RotaryKnob
               label="Gate"
@@ -1612,7 +1620,7 @@ export const ModuleControls = ({
           unit="s"
           value={Number(module.params.attack ?? 0.02)}
           onChange={(value) => updateParam(module.id, 'attack', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Decay"
@@ -1622,7 +1630,7 @@ export const ModuleControls = ({
           unit="s"
           value={Number(module.params.decay ?? 0.2)}
           onChange={(value) => updateParam(module.id, 'decay', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Sustain"
@@ -1631,7 +1639,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.sustain ?? 0.65)}
           onChange={(value) => updateParam(module.id, 'sustain', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Release"
@@ -1641,7 +1649,7 @@ export const ModuleControls = ({
           unit="s"
           value={Number(module.params.release ?? 0.4)}
           onChange={(value) => updateParam(module.id, 'release', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
       </div>
     )
@@ -1771,7 +1779,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.level ?? 0.8)}
           onChange={(value) => updateParam(module.id, 'level', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Drive"
@@ -1780,7 +1788,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.drive ?? 0.4)}
           onChange={(value) => updateParam(module.id, 'drive', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Bias"
@@ -1789,7 +1797,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.bias ?? 0)}
           onChange={(value) => updateParam(module.id, 'bias', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <WaveformSelector
           label="Shape"
@@ -1811,7 +1819,7 @@ export const ModuleControls = ({
           unit="Hz"
           value={Number(module.params.frequency ?? 220)}
           onChange={(value) => updateParam(module.id, 'frequency', value)}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
         <RotaryKnob
           label="Detune"
@@ -1821,7 +1829,7 @@ export const ModuleControls = ({
           unit="ct"
           value={Number(module.params.detune ?? 25)}
           onChange={(value) => updateParam(module.id, 'detune', value)}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
         <RotaryKnob
           label="Mix"
@@ -1830,7 +1838,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.mix ?? 1)}
           onChange={(value) => updateParam(module.id, 'mix', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
       </>
     )
@@ -1847,7 +1855,7 @@ export const ModuleControls = ({
           unit="Hz"
           value={Number(module.params.frequency ?? 220)}
           onChange={(value) => updateParam(module.id, 'frequency', value)}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
         <RotaryKnob
           label="Damp"
@@ -1856,7 +1864,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.damping ?? 0.3)}
           onChange={(value) => updateParam(module.id, 'damping', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Decay"
@@ -1874,7 +1882,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.brightness ?? 0.5)}
           onChange={(value) => updateParam(module.id, 'brightness', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Pluck"
@@ -1883,7 +1891,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.pluckPos ?? 0.5)}
           onChange={(value) => updateParam(module.id, 'pluckPos', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
       </>
     )
@@ -1903,7 +1911,7 @@ export const ModuleControls = ({
           unit="Hz"
           value={Number(module.params.frequency ?? 220)}
           onChange={(value) => updateParam(module.id, 'frequency', value)}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
         <RotaryKnob
           label="Fine"
@@ -1913,7 +1921,7 @@ export const ModuleControls = ({
           unit="ct"
           value={Number(module.params.fine ?? 0)}
           onChange={(value) => updateParam(module.id, 'fine', value)}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
         <RotaryKnob
           label="Vol"
@@ -1988,7 +1996,7 @@ export const ModuleControls = ({
           unit="Hz"
           value={Number(module.params.frequency ?? 220)}
           onChange={(value) => updateParam(module.id, 'frequency', value)}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
         <RotaryKnob
           label="Fine"
@@ -1998,7 +2006,7 @@ export const ModuleControls = ({
           unit="ct"
           value={Number(module.params.fine ?? 0)}
           onChange={(value) => updateParam(module.id, 'fine', value)}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
         <RotaryKnob
           label="Vol"
@@ -2068,7 +2076,7 @@ export const ModuleControls = ({
           unit="Hz"
           value={Number(module.params.rate ?? 0.5)}
           onChange={(value) => updateParam(module.id, 'rate', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Depth"
@@ -2077,7 +2085,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.depth ?? 0.7)}
           onChange={(value) => updateParam(module.id, 'depth', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Feedback"
@@ -2086,7 +2094,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.feedback ?? 0.3)}
           onChange={(value) => updateParam(module.id, 'feedback', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Mix"
@@ -2095,7 +2103,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.mix ?? 0.5)}
           onChange={(value) => updateParam(module.id, 'mix', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
       </>
     )
@@ -2111,7 +2119,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.drive ?? 0.5)}
           onChange={(value) => updateParam(module.id, 'drive', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Tone"
@@ -2120,7 +2128,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.tone ?? 0.5)}
           onChange={(value) => updateParam(module.id, 'tone', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Mix"
@@ -2129,7 +2137,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.mix ?? 1)}
           onChange={(value) => updateParam(module.id, 'mix', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <ButtonGroup
           label="Mode"
@@ -2174,7 +2182,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.bias ?? 0)}
           onChange={(value) => updateParam(module.id, 'bias', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="Mix"
@@ -2267,7 +2275,7 @@ export const ModuleControls = ({
             unit="BPM"
             value={tempo}
             onChange={(value) => updateParam(module.id, 'tempo', value)}
-            format={(value) => Math.round(value).toString()}
+            format={formatInt}
           />
         </div>
         <div className="mario-channels">
@@ -2348,7 +2356,7 @@ export const ModuleControls = ({
           unit="BPM"
           value={tempo}
           onChange={(value) => updateParam(module.id, 'tempo', value)}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
         <RotaryKnob
           label="Gate"
@@ -2358,7 +2366,7 @@ export const ModuleControls = ({
           unit="%"
           value={gate}
           onChange={(value) => updateParam(module.id, 'gate', value)}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
         <RotaryKnob
           label="Swing"
@@ -2368,7 +2376,7 @@ export const ModuleControls = ({
           unit="%"
           value={swing}
           onChange={(value) => updateParam(module.id, 'swing', value)}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
 
         {/* Mode */}
@@ -2427,7 +2435,7 @@ export const ModuleControls = ({
           unit="%"
           value={probability}
           onChange={(value) => updateParam(module.id, 'probability', value)}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
 
         {/* Euclidean */}
@@ -2449,7 +2457,7 @@ export const ModuleControls = ({
               step={1}
               value={euclidSteps}
               onChange={(value) => updateParam(module.id, 'euclidSteps', value)}
-              format={(value) => Math.round(value).toString()}
+              format={formatInt}
             />
             <RotaryKnob
               label="Fill"
@@ -2458,7 +2466,7 @@ export const ModuleControls = ({
               step={1}
               value={euclidFill}
               onChange={(value) => updateParam(module.id, 'euclidFill', value)}
-              format={(value) => Math.round(value).toString()}
+              format={formatInt}
             />
             <RotaryKnob
               label="Rotate"
@@ -2467,7 +2475,7 @@ export const ModuleControls = ({
               step={1}
               value={euclidRotate}
               onChange={(value) => updateParam(module.id, 'euclidRotate', value)}
-              format={(value) => Math.round(value).toString()}
+              format={formatInt}
             />
           </>
         )}
@@ -2705,7 +2713,7 @@ export const ModuleControls = ({
           unit="BPM"
           value={tempo}
           onChange={(value) => updateParam(module.id, 'tempo', value)}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
         <RotaryKnob
           label="Gate"
@@ -2715,7 +2723,7 @@ export const ModuleControls = ({
           unit="%"
           value={gateLength}
           onChange={(value) => updateParam(module.id, 'gateLength', value)}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
         <RotaryKnob
           label="Swing"
@@ -2725,7 +2733,7 @@ export const ModuleControls = ({
           unit="%"
           value={swing}
           onChange={(value) => updateParam(module.id, 'swing', value)}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
         <RotaryKnob
           label="Slide"
@@ -2735,7 +2743,7 @@ export const ModuleControls = ({
           unit="ms"
           value={slideTime}
           onChange={(value) => updateParam(module.id, 'slideTime', value)}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
 
         {/* Rate / Direction / Length - 3 separate visual groups */}
@@ -3223,7 +3231,7 @@ export const ModuleControls = ({
           unit="Hz"
           value={cutoff}
           onChange={(value) => updateParam(module.id, 'cutoff', value)}
-          format={(value) => value >= 1000 ? `${(value / 1000).toFixed(1)}k` : Math.round(value).toString()}
+          format={formatFreq}
         />
         <RotaryKnob
           label="Reso"
@@ -3232,7 +3240,7 @@ export const ModuleControls = ({
           step={0.01}
           value={resonance}
           onChange={(value) => updateParam(module.id, 'resonance', value)}
-          format={(value) => Math.round(value * 100).toString()}
+          format={formatPercent}
         />
         <RotaryKnob
           label="Decay"
@@ -3242,7 +3250,7 @@ export const ModuleControls = ({
           unit="s"
           value={decay}
           onChange={(value) => updateParam(module.id, 'decay', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
         <RotaryKnob
           label="EnvMod"
@@ -3251,7 +3259,7 @@ export const ModuleControls = ({
           step={0.01}
           value={envmod}
           onChange={(value) => updateParam(module.id, 'envmod', value)}
-          format={(value) => Math.round(value * 100).toString()}
+          format={formatPercent}
         />
         <RotaryKnob
           label="Accent"
@@ -3260,7 +3268,7 @@ export const ModuleControls = ({
           step={0.01}
           value={accent}
           onChange={(value) => updateParam(module.id, 'accent', value)}
-          format={(value) => Math.round(value * 100).toString()}
+          format={formatPercent}
         />
         <RotaryKnob
           label="Glide"
@@ -3270,7 +3278,7 @@ export const ModuleControls = ({
           unit="s"
           value={glide}
           onChange={(value) => updateParam(module.id, 'glide', value)}
-          format={(value) => (value * 1000).toFixed(0)}
+          format={formatMs}
         />
       </>
     )
@@ -3288,7 +3296,7 @@ export const ModuleControls = ({
           unit="Hz"
           value={Number(module.params.tune ?? 55)}
           onChange={(value) => updateParam(module.id, 'tune', value)}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
         <RotaryKnob
           label="Click"
@@ -3297,7 +3305,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.attack ?? 0.5)}
           onChange={(value) => updateParam(module.id, 'attack', value)}
-          format={(value) => Math.round(value * 100).toString()}
+          format={formatPercent}
         />
         <RotaryKnob
           label="Decay"
@@ -3306,7 +3314,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.decay ?? 0.5)}
           onChange={(value) => updateParam(module.id, 'decay', value)}
-          format={(value) => Math.round(value * 100).toString()}
+          format={formatPercent}
         />
         <RotaryKnob
           label="Drive"
@@ -3315,7 +3323,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.drive ?? 0.3)}
           onChange={(value) => updateParam(module.id, 'drive', value)}
-          format={(value) => Math.round(value * 100).toString()}
+          format={formatPercent}
         />
       </div>
     )
@@ -3332,7 +3340,7 @@ export const ModuleControls = ({
           unit="Hz"
           value={Number(module.params.tune ?? 200)}
           onChange={(value) => updateParam(module.id, 'tune', value)}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
         <RotaryKnob
           label="Tone"
@@ -3341,7 +3349,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.tone ?? 0.5)}
           onChange={(value) => updateParam(module.id, 'tone', value)}
-          format={(value) => Math.round(value * 100).toString()}
+          format={formatPercent}
         />
         <RotaryKnob
           label="Snappy"
@@ -3350,7 +3358,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.snappy ?? 0.5)}
           onChange={(value) => updateParam(module.id, 'snappy', value)}
-          format={(value) => Math.round(value * 100).toString()}
+          format={formatPercent}
         />
         <RotaryKnob
           label="Decay"
@@ -3359,7 +3367,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.decay ?? 0.3)}
           onChange={(value) => updateParam(module.id, 'decay', value)}
-          format={(value) => Math.round(value * 100).toString()}
+          format={formatPercent}
         />
       </div>
     )
@@ -3375,7 +3383,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.openDecay ?? 0.4)}
           onChange={(value) => updateParam(module.id, 'openDecay', value)}
-          format={(value) => Math.round(value * 100).toString()}
+          format={formatPercent}
         />
         <RotaryKnob
           label="Closed"
@@ -3384,7 +3392,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.closedDecay ?? 0.1)}
           onChange={(value) => updateParam(module.id, 'closedDecay', value)}
-          format={(value) => Math.round(value * 100).toString()}
+          format={formatPercent}
         />
         <RotaryKnob
           label="Tone"
@@ -3393,7 +3401,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.tone ?? 0.6)}
           onChange={(value) => updateParam(module.id, 'tone', value)}
-          format={(value) => Math.round(value * 100).toString()}
+          format={formatPercent}
         />
         <RotaryKnob
           label="Mix"
@@ -3402,7 +3410,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.mix ?? 0.5)}
           onChange={(value) => updateParam(module.id, 'mix', value)}
-          format={(value) => Math.round(value * 100).toString()}
+          format={formatPercent}
         />
       </div>
     )
@@ -3418,7 +3426,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.tone ?? 0.5)}
           onChange={(value) => updateParam(module.id, 'tone', value)}
-          format={(value) => Math.round(value * 100).toString()}
+          format={formatPercent}
         />
         <RotaryKnob
           label="Decay"
@@ -3427,7 +3435,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.decay ?? 0.4)}
           onChange={(value) => updateParam(module.id, 'decay', value)}
-          format={(value) => Math.round(value * 100).toString()}
+          format={formatPercent}
         />
         <RotaryKnob
           label="Spread"
@@ -3436,7 +3444,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.spread ?? 0.5)}
           onChange={(value) => updateParam(module.id, 'spread', value)}
-          format={(value) => Math.round(value * 100).toString()}
+          format={formatPercent}
         />
       </div>
     )
@@ -3453,7 +3461,7 @@ export const ModuleControls = ({
           unit="Hz"
           value={Number(module.params.tune ?? 150)}
           onChange={(value) => updateParam(module.id, 'tune', value)}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
         <RotaryKnob
           label="Decay"
@@ -3462,7 +3470,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.decay ?? 0.4)}
           onChange={(value) => updateParam(module.id, 'decay', value)}
-          format={(value) => Math.round(value * 100).toString()}
+          format={formatPercent}
         />
         <RotaryKnob
           label="Pitch"
@@ -3471,7 +3479,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.pitch ?? 0.5)}
           onChange={(value) => updateParam(module.id, 'pitch', value)}
-          format={(value) => Math.round(value * 100).toString()}
+          format={formatPercent}
         />
       </div>
     )
@@ -3488,7 +3496,7 @@ export const ModuleControls = ({
           unit="Hz"
           value={Number(module.params.tune ?? 500)}
           onChange={(value) => updateParam(module.id, 'tune', value)}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
         <RotaryKnob
           label="Tone"
@@ -3497,7 +3505,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.tone ?? 0.6)}
           onChange={(value) => updateParam(module.id, 'tone', value)}
-          format={(value) => Math.round(value * 100).toString()}
+          format={formatPercent}
         />
         <RotaryKnob
           label="Decay"
@@ -3506,7 +3514,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.decay ?? 0.2)}
           onChange={(value) => updateParam(module.id, 'decay', value)}
-          format={(value) => Math.round(value * 100).toString()}
+          format={formatPercent}
         />
       </div>
     )
@@ -3549,7 +3557,7 @@ export const ModuleControls = ({
           unit="ms"
           value={Number(module.params.grain ?? 50)}
           onChange={(value) => updateParam(module.id, 'grain', value)}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
         <RotaryKnob
           label="Mix"
@@ -3558,7 +3566,7 @@ export const ModuleControls = ({
           step={0.01}
           value={Number(module.params.mix ?? 1)}
           onChange={(value) => updateParam(module.id, 'mix', value)}
-          format={(value) => Math.round(value * 100).toString()}
+          format={formatPercent}
         />
       </>
     )
@@ -3605,7 +3613,7 @@ export const ModuleControls = ({
           unit="BPM"
           value={tempo}
           onChange={(value) => updateParam(module.id, 'tempo', value)}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
 
         {/* Rate selector */}
@@ -3635,7 +3643,7 @@ export const ModuleControls = ({
           step={1}
           value={steps}
           onChange={(value) => updateParam(module.id, 'steps', Math.round(value))}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
         <RotaryKnob
           label="Pulses"
@@ -3644,7 +3652,7 @@ export const ModuleControls = ({
           step={1}
           value={pulses}
           onChange={(value) => updateParam(module.id, 'pulses', Math.round(value))}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
         <RotaryKnob
           label="Rotate"
@@ -3653,7 +3661,7 @@ export const ModuleControls = ({
           step={1}
           value={rotation}
           onChange={(value) => updateParam(module.id, 'rotation', Math.round(value))}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
         <RotaryKnob
           label="Gate"
@@ -3663,7 +3671,7 @@ export const ModuleControls = ({
           unit="%"
           value={gateLength}
           onChange={(value) => updateParam(module.id, 'gateLength', value)}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
         <RotaryKnob
           label="Swing"
@@ -3673,7 +3681,7 @@ export const ModuleControls = ({
           unit="%"
           value={swing}
           onChange={(value) => updateParam(module.id, 'swing', value)}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
 
         {/* Pattern display - E(pulses, steps) */}
@@ -3718,7 +3726,7 @@ export const ModuleControls = ({
           unit="Hz"
           value={frequency}
           onChange={(value) => updateParam(module.id, 'frequency', value)}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
 
         {/* Ratio selector */}
@@ -3748,7 +3756,7 @@ export const ModuleControls = ({
           step={0.01}
           value={ratio}
           onChange={(value) => updateParam(module.id, 'ratio', value)}
-          format={(value) => value.toFixed(2)}
+          format={formatDecimal2}
         />
 
         {/* Level (modulation index when used as modulator) */}
@@ -3759,7 +3767,7 @@ export const ModuleControls = ({
           step={0.01}
           value={level}
           onChange={(value) => updateParam(module.id, 'level', value)}
-          format={(value) => Math.round(value * 100).toString()}
+          format={formatPercent}
         />
 
         {/* Feedback */}
@@ -3770,7 +3778,7 @@ export const ModuleControls = ({
           step={0.01}
           value={feedback}
           onChange={(value) => updateParam(module.id, 'feedback', value)}
-          format={(value) => Math.round(value * 100).toString()}
+          format={formatPercent}
         />
 
         {/* ADSR Envelope */}
@@ -3782,7 +3790,7 @@ export const ModuleControls = ({
           unit="ms"
           value={attack}
           onChange={(value) => updateParam(module.id, 'attack', value)}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
         <RotaryKnob
           label="Dec"
@@ -3792,7 +3800,7 @@ export const ModuleControls = ({
           unit="ms"
           value={decay}
           onChange={(value) => updateParam(module.id, 'decay', value)}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
         <RotaryKnob
           label="Sus"
@@ -3801,7 +3809,7 @@ export const ModuleControls = ({
           step={0.01}
           value={sustain}
           onChange={(value) => updateParam(module.id, 'sustain', value)}
-          format={(value) => Math.round(value * 100).toString()}
+          format={formatPercent}
         />
         <RotaryKnob
           label="Rel"
@@ -3811,7 +3819,7 @@ export const ModuleControls = ({
           unit="ms"
           value={release}
           onChange={(value) => updateParam(module.id, 'release', value)}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
       </>
     )
@@ -3893,7 +3901,7 @@ export const ModuleControls = ({
           unit="BPM"
           value={tempo}
           onChange={(value) => updateParam(module.id, 'tempo', value)}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
         <RotaryKnob
           label="Swing"
@@ -3903,7 +3911,7 @@ export const ModuleControls = ({
           unit="%"
           value={swing}
           onChange={(value) => updateParam(module.id, 'swing', value)}
-          format={(value) => Math.round(value).toString()}
+          format={formatInt}
         />
 
         {/* Rate selector */}
