@@ -19,6 +19,54 @@ import {
 } from './formatters'
 import { ToggleButton, ToggleGroup } from './ToggleButton'
 
+// TR-909 Drum knob configurations
+type DrumKnobConfig = {
+  label: string
+  param: string
+  min: number
+  max: number
+  step: number
+  defaultVal: number
+  unit?: string
+  format: (value: number) => string
+}
+
+const drumConfigs: Record<string, DrumKnobConfig[]> = {
+  '909-kick': [
+    { label: 'Tune', param: 'tune', min: 30, max: 100, step: 1, defaultVal: 55, unit: 'Hz', format: formatInt },
+    { label: 'Click', param: 'attack', min: 0, max: 1, step: 0.01, defaultVal: 0.5, format: formatPercent },
+    { label: 'Decay', param: 'decay', min: 0, max: 1, step: 0.01, defaultVal: 0.5, format: formatPercent },
+    { label: 'Drive', param: 'drive', min: 0, max: 1, step: 0.01, defaultVal: 0.3, format: formatPercent },
+  ],
+  '909-snare': [
+    { label: 'Tune', param: 'tune', min: 100, max: 400, step: 1, defaultVal: 200, unit: 'Hz', format: formatInt },
+    { label: 'Tone', param: 'tone', min: 0, max: 1, step: 0.01, defaultVal: 0.5, format: formatPercent },
+    { label: 'Snappy', param: 'snappy', min: 0, max: 1, step: 0.01, defaultVal: 0.5, format: formatPercent },
+    { label: 'Decay', param: 'decay', min: 0, max: 1, step: 0.01, defaultVal: 0.3, format: formatPercent },
+  ],
+  '909-hihat': [
+    { label: 'Open', param: 'openDecay', min: 0, max: 1, step: 0.01, defaultVal: 0.4, format: formatPercent },
+    { label: 'Closed', param: 'closedDecay', min: 0, max: 1, step: 0.01, defaultVal: 0.1, format: formatPercent },
+    { label: 'Tone', param: 'tone', min: 0, max: 1, step: 0.01, defaultVal: 0.6, format: formatPercent },
+    { label: 'Mix', param: 'mix', min: 0, max: 1, step: 0.01, defaultVal: 0.5, format: formatPercent },
+  ],
+  '909-clap': [
+    { label: 'Tone', param: 'tone', min: 0, max: 1, step: 0.01, defaultVal: 0.5, format: formatPercent },
+    { label: 'Decay', param: 'decay', min: 0, max: 1, step: 0.01, defaultVal: 0.4, format: formatPercent },
+    { label: 'Spread', param: 'spread', min: 0, max: 1, step: 0.01, defaultVal: 0.5, format: formatPercent },
+  ],
+  '909-tom': [
+    { label: 'Tune', param: 'tune', min: 60, max: 300, step: 1, defaultVal: 150, unit: 'Hz', format: formatInt },
+    { label: 'Decay', param: 'decay', min: 0, max: 1, step: 0.01, defaultVal: 0.4, format: formatPercent },
+    { label: 'Pitch', param: 'pitch', min: 0, max: 1, step: 0.01, defaultVal: 0.5, format: formatPercent },
+  ],
+  '909-rimshot': [
+    { label: 'Tune', param: 'tune', min: 300, max: 800, step: 1, defaultVal: 500, unit: 'Hz', format: formatInt },
+    { label: 'Tone', param: 'tone', min: 0, max: 1, step: 0.01, defaultVal: 0.6, format: formatPercent },
+    { label: 'Decay', param: 'decay', min: 0, max: 1, step: 0.01, defaultVal: 0.2, format: formatPercent },
+  ],
+}
+
 type NativeScopeBridge = {
   isActive: boolean
   getSampleRate: () => number | null
@@ -536,22 +584,16 @@ export const ModuleControls = ({
           value={String(module.params.shape ?? 'sine')}
           onChange={(value) => updateParam(module.id, 'shape', value)}
         />
-        <div className="toggle-group">
-          <button
-            type="button"
-            className={`ui-btn ui-btn--pill toggle-btn ${bipolar ? 'active' : ''}`}
-            onClick={() => updateParam(module.id, 'bipolar', true)}
-          >
-            Bipolar
-          </button>
-          <button
-            type="button"
-            className={`ui-btn ui-btn--pill toggle-btn ${!bipolar ? 'active' : ''}`}
-            onClick={() => updateParam(module.id, 'bipolar', false)}
-          >
-            Unipolar
-          </button>
-        </div>
+        <ButtonGroup
+          options={[
+            { id: true, label: 'Bipolar' },
+            { id: false, label: 'Unipolar' },
+          ]}
+          value={bipolar}
+          onChange={(value) => updateParam(module.id, 'bipolar', value)}
+          wide
+          inline
+        />
       </>
     )
   }
@@ -1371,22 +1413,16 @@ export const ModuleControls = ({
           onChange={(value) => updateParam(module.id, 'glide', value)}
           format={formatDecimal2}
         />
-        <div className="toggle-group">
-          <button
-            type="button"
-            className={`ui-btn ui-btn--pill toggle-btn ${cvMode === 'bipolar' ? 'active' : ''}`}
-            onClick={() => updateParam(module.id, 'cvMode', 'bipolar')}
-          >
-            Bipolar
-          </button>
-          <button
-            type="button"
-            className={`ui-btn ui-btn--pill toggle-btn ${cvMode === 'unipolar' ? 'active' : ''}`}
-            onClick={() => updateParam(module.id, 'cvMode', 'unipolar')}
-          >
-            Unipolar
-          </button>
-        </div>
+        <ButtonGroup
+          options={[
+            { id: 'bipolar', label: 'Bipolar' },
+            { id: 'unipolar', label: 'Unipolar' },
+          ]}
+          value={cvMode}
+          onChange={(value) => updateParam(module.id, 'cvMode', value)}
+          wide
+          inline
+        />
         <div className="control-buttons">
           <button
             type="button"
@@ -3275,238 +3311,24 @@ export const ModuleControls = ({
     )
   }
 
-  // TR-909 Drum Modules - 2 column layout
-  if (module.type === '909-kick') {
+  // TR-909 Drum Modules - unified handler
+  if (drumConfigs[module.type]) {
+    const knobs = drumConfigs[module.type]
     return (
       <div className="drum-knobs-grid">
-        <RotaryKnob
-          label="Tune"
-          min={30}
-          max={100}
-          step={1}
-          unit="Hz"
-          value={Number(module.params.tune ?? 55)}
-          onChange={(value) => updateParam(module.id, 'tune', value)}
-          format={formatInt}
-        />
-        <RotaryKnob
-          label="Click"
-          min={0}
-          max={1}
-          step={0.01}
-          value={Number(module.params.attack ?? 0.5)}
-          onChange={(value) => updateParam(module.id, 'attack', value)}
-          format={formatPercent}
-        />
-        <RotaryKnob
-          label="Decay"
-          min={0}
-          max={1}
-          step={0.01}
-          value={Number(module.params.decay ?? 0.5)}
-          onChange={(value) => updateParam(module.id, 'decay', value)}
-          format={formatPercent}
-        />
-        <RotaryKnob
-          label="Drive"
-          min={0}
-          max={1}
-          step={0.01}
-          value={Number(module.params.drive ?? 0.3)}
-          onChange={(value) => updateParam(module.id, 'drive', value)}
-          format={formatPercent}
-        />
-      </div>
-    )
-  }
-
-  if (module.type === '909-snare') {
-    return (
-      <div className="drum-knobs-grid">
-        <RotaryKnob
-          label="Tune"
-          min={100}
-          max={400}
-          step={1}
-          unit="Hz"
-          value={Number(module.params.tune ?? 200)}
-          onChange={(value) => updateParam(module.id, 'tune', value)}
-          format={formatInt}
-        />
-        <RotaryKnob
-          label="Tone"
-          min={0}
-          max={1}
-          step={0.01}
-          value={Number(module.params.tone ?? 0.5)}
-          onChange={(value) => updateParam(module.id, 'tone', value)}
-          format={formatPercent}
-        />
-        <RotaryKnob
-          label="Snappy"
-          min={0}
-          max={1}
-          step={0.01}
-          value={Number(module.params.snappy ?? 0.5)}
-          onChange={(value) => updateParam(module.id, 'snappy', value)}
-          format={formatPercent}
-        />
-        <RotaryKnob
-          label="Decay"
-          min={0}
-          max={1}
-          step={0.01}
-          value={Number(module.params.decay ?? 0.3)}
-          onChange={(value) => updateParam(module.id, 'decay', value)}
-          format={formatPercent}
-        />
-      </div>
-    )
-  }
-
-  if (module.type === '909-hihat') {
-    return (
-      <div className="drum-knobs-grid">
-        <RotaryKnob
-          label="Open"
-          min={0}
-          max={1}
-          step={0.01}
-          value={Number(module.params.openDecay ?? 0.4)}
-          onChange={(value) => updateParam(module.id, 'openDecay', value)}
-          format={formatPercent}
-        />
-        <RotaryKnob
-          label="Closed"
-          min={0}
-          max={1}
-          step={0.01}
-          value={Number(module.params.closedDecay ?? 0.1)}
-          onChange={(value) => updateParam(module.id, 'closedDecay', value)}
-          format={formatPercent}
-        />
-        <RotaryKnob
-          label="Tone"
-          min={0}
-          max={1}
-          step={0.01}
-          value={Number(module.params.tone ?? 0.6)}
-          onChange={(value) => updateParam(module.id, 'tone', value)}
-          format={formatPercent}
-        />
-        <RotaryKnob
-          label="Mix"
-          min={0}
-          max={1}
-          step={0.01}
-          value={Number(module.params.mix ?? 0.5)}
-          onChange={(value) => updateParam(module.id, 'mix', value)}
-          format={formatPercent}
-        />
-      </div>
-    )
-  }
-
-  if (module.type === '909-clap') {
-    return (
-      <div className="drum-knobs-grid">
-        <RotaryKnob
-          label="Tone"
-          min={0}
-          max={1}
-          step={0.01}
-          value={Number(module.params.tone ?? 0.5)}
-          onChange={(value) => updateParam(module.id, 'tone', value)}
-          format={formatPercent}
-        />
-        <RotaryKnob
-          label="Decay"
-          min={0}
-          max={1}
-          step={0.01}
-          value={Number(module.params.decay ?? 0.4)}
-          onChange={(value) => updateParam(module.id, 'decay', value)}
-          format={formatPercent}
-        />
-        <RotaryKnob
-          label="Spread"
-          min={0}
-          max={1}
-          step={0.01}
-          value={Number(module.params.spread ?? 0.5)}
-          onChange={(value) => updateParam(module.id, 'spread', value)}
-          format={formatPercent}
-        />
-      </div>
-    )
-  }
-
-  if (module.type === '909-tom') {
-    return (
-      <div className="drum-knobs-grid">
-        <RotaryKnob
-          label="Tune"
-          min={60}
-          max={300}
-          step={1}
-          unit="Hz"
-          value={Number(module.params.tune ?? 150)}
-          onChange={(value) => updateParam(module.id, 'tune', value)}
-          format={formatInt}
-        />
-        <RotaryKnob
-          label="Decay"
-          min={0}
-          max={1}
-          step={0.01}
-          value={Number(module.params.decay ?? 0.4)}
-          onChange={(value) => updateParam(module.id, 'decay', value)}
-          format={formatPercent}
-        />
-        <RotaryKnob
-          label="Pitch"
-          min={0}
-          max={1}
-          step={0.01}
-          value={Number(module.params.pitch ?? 0.5)}
-          onChange={(value) => updateParam(module.id, 'pitch', value)}
-          format={formatPercent}
-        />
-      </div>
-    )
-  }
-
-  if (module.type === '909-rimshot') {
-    return (
-      <div className="drum-knobs-grid">
-        <RotaryKnob
-          label="Tune"
-          min={300}
-          max={800}
-          step={1}
-          unit="Hz"
-          value={Number(module.params.tune ?? 500)}
-          onChange={(value) => updateParam(module.id, 'tune', value)}
-          format={formatInt}
-        />
-        <RotaryKnob
-          label="Tone"
-          min={0}
-          max={1}
-          step={0.01}
-          value={Number(module.params.tone ?? 0.6)}
-          onChange={(value) => updateParam(module.id, 'tone', value)}
-          format={formatPercent}
-        />
-        <RotaryKnob
-          label="Decay"
-          min={0}
-          max={1}
-          step={0.01}
-          value={Number(module.params.decay ?? 0.2)}
-          onChange={(value) => updateParam(module.id, 'decay', value)}
-          format={formatPercent}
-        />
+        {knobs.map((knob) => (
+          <RotaryKnob
+            key={knob.param}
+            label={knob.label}
+            min={knob.min}
+            max={knob.max}
+            step={knob.step}
+            unit={knob.unit}
+            value={Number(module.params[knob.param] ?? knob.defaultVal)}
+            onChange={(value) => updateParam(module.id, knob.param, value)}
+            format={knob.format}
+          />
+        ))}
       </div>
     )
   }

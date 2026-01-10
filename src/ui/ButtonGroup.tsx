@@ -1,9 +1,9 @@
-type ButtonOption<T extends string | number> = {
+type ButtonOption<T extends string | number | boolean> = {
   id: T
   label: string
 }
 
-type ButtonGroupProps<T extends string | number> = {
+type ButtonGroupProps<T extends string | number | boolean> = {
   label?: string
   options: ButtonOption<T>[]
   value: T
@@ -13,7 +13,7 @@ type ButtonGroupProps<T extends string | number> = {
   inline?: boolean // Use inline layout (no filter-group wrapper)
 }
 
-export function ButtonGroup<T extends string | number>({
+export function ButtonGroup<T extends string | number | boolean>({
   label,
   options,
   value,
@@ -22,6 +22,12 @@ export function ButtonGroup<T extends string | number>({
   rowSize,
   inline = false,
 }: ButtonGroupProps<T>) {
+  // Dynamic grid columns based on number of options (or rowSize if splitting rows)
+  const columnsPerRow = rowSize ?? options.length
+  const gridStyle = {
+    flex: 1,
+    gridTemplateColumns: `repeat(${columnsPerRow}, minmax(0, 1fr))`,
+  }
   const widthClass = wide ? 'filter-wide' : ''
 
   // Multiple rows (always inline style)
@@ -40,7 +46,7 @@ export function ButtonGroup<T extends string | number>({
             ) : label !== undefined ? (
               <span className="filter-label" />
             ) : null}
-            <div className={`filter-buttons ${widthClass}`}>
+            <div className={`filter-buttons ${widthClass}`} style={gridStyle}>
               {row.map((option) => (
                 <button
                   key={String(option.id)}
@@ -63,7 +69,7 @@ export function ButtonGroup<T extends string | number>({
     return (
       <div className="filter-row">
         {label !== undefined && <span className="filter-label">{label}</span>}
-        <div className={`filter-buttons ${widthClass}`}>
+        <div className={`filter-buttons ${widthClass}`} style={gridStyle}>
           {options.map((option) => (
             <button
               key={String(option.id)}
@@ -84,7 +90,7 @@ export function ButtonGroup<T extends string | number>({
     <div className="filter-row">
       <div className="filter-group">
         {label !== undefined && <span className="filter-label">{label}</span>}
-        <div className={`filter-buttons ${widthClass}`}>
+        <div className={`filter-buttons ${widthClass}`} style={gridStyle}>
           {options.map((option) => (
             <button
               key={String(option.id)}
