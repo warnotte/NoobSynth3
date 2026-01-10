@@ -3,19 +3,20 @@ use dsp_core::{
   Choir, ChoirInputs, ChoirParams, Chorus, ChorusInputs, ChorusParams, Clap909, Clap909Inputs,
   Clap909Params, Delay, DelayInputs, DelayParams, Distortion, DistortionParams, DrumSequencer,
   DrumSequencerInputs, DrumSequencerOutputs, DrumSequencerParams, Ensemble, EnsembleInputs,
-  EnsembleParams, GranularDelay, GranularDelayInputs, GranularDelayParams, HiHat909, HiHat909Inputs,
-  HiHat909Params, Kick909, Kick909Inputs, Kick909Params, Lfo, LfoInputs, LfoParams, MasterClock,
-  MasterClockInputs, MasterClockOutputs, MasterClockParams, Mixer, NesOsc, NesOscInputs, NesOscParams,
-  Noise, NoiseParams, Phaser, PhaserInputs, PhaserParams, PitchShifter, PitchShifterInputs,
-  PitchShifterParams, Quantizer, QuantizerInputs, QuantizerParams, Reverb, ReverbInputs, ReverbParams,
-  Rimshot909, Rimshot909Inputs, Rimshot909Params, RingMod, RingModParams, Sample, SampleHold,
-  SampleHoldInputs, SampleHoldParams, SlewInputs, SlewLimiter, SlewParams, Snare909, Snare909Inputs,
-  Snare909Params, SnesOsc, SnesOscInputs, SnesOscParams, SpringReverb, SpringReverbInputs,
-  SpringReverbParams, StepSequencer, StepSequencerInputs, StepSequencerOutputs, StepSequencerParams,
-  Supersaw, SupersawInputs, SupersawParams, TapeDelay, TapeDelayInputs, TapeDelayParams, Tb303,
-  Tb303Inputs, Tb303Outputs, Tb303Params, Tom909, Tom909Inputs, Tom909Params, Vca, Vcf, VcfInputs,
-  VcfParams, Vco, VcoInputs, VcoParams, Vocoder, VocoderInputs, VocoderParams, Wavefolder,
-  WavefolderParams,
+  EnsembleParams, EuclideanSequencer, EuclideanInputs, EuclideanParams, FmOperator, FmOperatorInputs,
+  FmOperatorParams, GranularDelay, GranularDelayInputs, GranularDelayParams, HiHat909, HiHat909Inputs,
+  HiHat909Params, KarplusStrong, KarplusInputs, KarplusParams, Kick909, Kick909Inputs, Kick909Params,
+  Lfo, LfoInputs, LfoParams, MasterClock, MasterClockInputs, MasterClockOutputs, MasterClockParams,
+  Mixer, NesOsc, NesOscInputs, NesOscParams, Noise, NoiseParams, Phaser, PhaserInputs, PhaserParams,
+  PitchShifter, PitchShifterInputs, PitchShifterParams, Quantizer, QuantizerInputs, QuantizerParams,
+  Reverb, ReverbInputs, ReverbParams, Rimshot909, Rimshot909Inputs, Rimshot909Params, RingMod,
+  RingModParams, Sample, SampleHold, SampleHoldInputs, SampleHoldParams, SlewInputs, SlewLimiter,
+  SlewParams, Snare909, Snare909Inputs, Snare909Params, SnesOsc, SnesOscInputs, SnesOscParams,
+  SpringReverb, SpringReverbInputs, SpringReverbParams, StepSequencer, StepSequencerInputs,
+  StepSequencerOutputs, StepSequencerParams, Supersaw, SupersawInputs, SupersawParams, TapeDelay,
+  TapeDelayInputs, TapeDelayParams, Tb303, Tb303Inputs, Tb303Outputs, Tb303Params, Tom909,
+  Tom909Inputs, Tom909Params, Vca, Vcf, VcfInputs, VcfParams, Vco, VcoInputs, VcoParams, Vocoder,
+  VocoderInputs, VocoderParams, Wavefolder, WavefolderParams,
 };
 use serde::Deserialize;
 use std::collections::{HashMap, VecDeque};
@@ -61,6 +62,7 @@ struct TapJson {
 enum ModuleType {
   Oscillator,
   Supersaw,
+  Karplus,
   NesOsc,
   SnesOsc,
   Noise,
@@ -107,6 +109,12 @@ enum ModuleType {
   Rimshot909,
   // Drum Sequencer
   DrumSequencer,
+  // Euclidean Sequencer
+  Euclidean,
+  // FM Synthesis
+  FmOp,
+  // Documentation
+  Notes,
   // Effects
   PitchShifter,
   // Master Clock
@@ -450,6 +458,30 @@ struct ClockState {
   swing: ParamBuffer,
 }
 
+struct EuclideanState {
+  euclidean: EuclideanSequencer,
+  enabled: ParamBuffer,
+  tempo: ParamBuffer,
+  rate: ParamBuffer,
+  steps: ParamBuffer,
+  pulses: ParamBuffer,
+  rotation: ParamBuffer,
+  gate_length: ParamBuffer,
+  swing: ParamBuffer,
+}
+
+struct FmOpState {
+  op: FmOperator,
+  frequency: ParamBuffer,
+  ratio: ParamBuffer,
+  level: ParamBuffer,
+  feedback: ParamBuffer,
+  attack: ParamBuffer,
+  decay: ParamBuffer,
+  sustain: ParamBuffer,
+  release: ParamBuffer,
+}
+
 struct TapeDelayState {
   delay: TapeDelay,
   time: ParamBuffer,
@@ -504,6 +536,15 @@ struct SupersawState {
   base_freq: ParamBuffer,
   detune: ParamBuffer,
   mix: ParamBuffer,
+}
+
+struct KarplusState {
+  karplus: KarplusStrong,
+  frequency: ParamBuffer,
+  damping: ParamBuffer,
+  decay: ParamBuffer,
+  brightness: ParamBuffer,
+  pluck_pos: ParamBuffer,
 }
 
 struct NesOscState {
@@ -658,6 +699,7 @@ struct DrumSequencerState {
 enum ModuleState {
   Vco(VcoState),
   Supersaw(SupersawState),
+  Karplus(KarplusState),
   NesOsc(NesOscState),
   SnesOsc(SnesOscState),
   Noise(NoiseState),
@@ -703,6 +745,9 @@ enum ModuleState {
   Tom909(Tom909State),
   Rimshot909(Rimshot909State),
   DrumSequencer(DrumSequencerState),
+  Euclidean(EuclideanState),
+  FmOp(FmOpState),
+  Notes,  // UI-only, no DSP state
   PitchShifter(PitchShifterState),
   Clock(ClockState),
 }
@@ -1335,6 +1380,14 @@ impl ModuleNode {
         detune: ParamBuffer::new(param_number(params, "detune", 25.0)),
         mix: ParamBuffer::new(param_number(params, "mix", 1.0)),
       }),
+      ModuleType::Karplus => ModuleState::Karplus(KarplusState {
+        karplus: KarplusStrong::new(sample_rate),
+        frequency: ParamBuffer::new(param_number(params, "frequency", 220.0)),
+        damping: ParamBuffer::new(param_number(params, "damping", 0.3)),
+        decay: ParamBuffer::new(param_number(params, "decay", 0.995)),
+        brightness: ParamBuffer::new(param_number(params, "brightness", 0.5)),
+        pluck_pos: ParamBuffer::new(param_number(params, "pluckPos", 0.5)),
+      }),
       ModuleType::NesOsc => ModuleState::NesOsc(NesOscState {
         nes_osc: NesOsc::new(sample_rate),
         base_freq: ParamBuffer::new(param_number(params, "frequency", 220.0)),
@@ -1494,6 +1547,29 @@ impl ModuleNode {
         rate: ParamBuffer::new(param_number(params, "rate", 4.0)),
         swing: ParamBuffer::new(param_number(params, "swing", 0.0)),
       }),
+      ModuleType::Euclidean => ModuleState::Euclidean(EuclideanState {
+        euclidean: EuclideanSequencer::new(sample_rate),
+        enabled: ParamBuffer::new(param_number(params, "enabled", 1.0)),
+        tempo: ParamBuffer::new(param_number(params, "tempo", 120.0)),
+        rate: ParamBuffer::new(param_number(params, "rate", 7.0)), // 1/16
+        steps: ParamBuffer::new(param_number(params, "steps", 16.0)),
+        pulses: ParamBuffer::new(param_number(params, "pulses", 4.0)),
+        rotation: ParamBuffer::new(param_number(params, "rotation", 0.0)),
+        gate_length: ParamBuffer::new(param_number(params, "gateLength", 50.0)),
+        swing: ParamBuffer::new(param_number(params, "swing", 0.0)),
+      }),
+      ModuleType::FmOp => ModuleState::FmOp(FmOpState {
+        op: FmOperator::new(sample_rate),
+        frequency: ParamBuffer::new(param_number(params, "frequency", 440.0)),
+        ratio: ParamBuffer::new(param_number(params, "ratio", 1.0)),
+        level: ParamBuffer::new(param_number(params, "level", 1.0)),
+        feedback: ParamBuffer::new(param_number(params, "feedback", 0.0)),
+        attack: ParamBuffer::new(param_number(params, "attack", 10.0)),
+        decay: ParamBuffer::new(param_number(params, "decay", 200.0)),
+        sustain: ParamBuffer::new(param_number(params, "sustain", 0.7)),
+        release: ParamBuffer::new(param_number(params, "release", 300.0)),
+      }),
+      ModuleType::Notes => ModuleState::Notes,  // UI-only, no DSP
     };
 
     Self {
@@ -1724,6 +1800,14 @@ impl ModuleNode {
         "mix" => state.mix.set(value),
         _ => {}
       },
+      ModuleState::Karplus(state) => match param {
+        "frequency" => state.frequency.set(value),
+        "damping" => state.damping.set(value),
+        "decay" => state.decay.set(value),
+        "brightness" => state.brightness.set(value),
+        "pluckPos" => state.pluck_pos.set(value),
+        _ => {}
+      },
       ModuleState::NesOsc(state) => match param {
         "frequency" => state.base_freq.set(value),
         "fine" => state.fine.set(value),
@@ -1872,6 +1956,28 @@ impl ModuleNode {
         "tempo" => state.tempo.set(value),
         "rate" => state.rate.set(value),
         "swing" => state.swing.set(value),
+        _ => {}
+      },
+      ModuleState::Euclidean(state) => match param {
+        "enabled" => state.enabled.set(value),
+        "tempo" => state.tempo.set(value),
+        "rate" => state.rate.set(value),
+        "steps" => state.steps.set(value),
+        "pulses" => state.pulses.set(value),
+        "rotation" => state.rotation.set(value),
+        "gateLength" => state.gate_length.set(value),
+        "swing" => state.swing.set(value),
+        _ => {}
+      },
+      ModuleState::FmOp(state) => match param {
+        "frequency" => state.frequency.set(value),
+        "ratio" => state.ratio.set(value),
+        "level" => state.level.set(value),
+        "feedback" => state.feedback.set(value),
+        "attack" => state.attack.set(value),
+        "decay" => state.decay.set(value),
+        "sustain" => state.sustain.set(value),
+        "release" => state.release.set(value),
         _ => {}
       },
       _ => {}
@@ -2644,6 +2750,28 @@ impl ModuleNode {
         let output = outputs[0].channel_mut(0);
         state.supersaw.process_block(output, inputs, params);
       }
+      ModuleState::Karplus(state) => {
+        let pitch = if self.connections[0].is_empty() {
+          None
+        } else {
+          Some(inputs[0].channel(0))
+        };
+        let gate = if self.connections[1].is_empty() {
+          None
+        } else {
+          Some(inputs[1].channel(0))
+        };
+        let params = KarplusParams {
+          frequency: state.frequency.slice(frames),
+          damping: state.damping.slice(frames),
+          decay: state.decay.slice(frames),
+          brightness: state.brightness.slice(frames),
+          pluck_pos: state.pluck_pos.slice(frames),
+        };
+        let karplus_inputs = KarplusInputs { pitch, gate };
+        let output = outputs[0].channel_mut(0);
+        state.karplus.process_block(output, karplus_inputs, params);
+      }
       ModuleState::NesOsc(state) => {
         let pitch = if self.connections[0].is_empty() {
           None
@@ -3087,6 +3215,82 @@ impl ModuleNode {
         outputs[2].channel_mut(0)[..safe_frames].copy_from_slice(&buf_run[..safe_frames]);
         outputs[3].channel_mut(0)[..safe_frames].copy_from_slice(&buf_bar[..safe_frames]);
       }
+      ModuleState::Euclidean(state) => {
+        let clock = if !self.connections[0].is_empty() {
+          Some(inputs[0].channel(0))
+        } else {
+          None
+        };
+        let reset = if self.connections.len() > 1 && !self.connections[1].is_empty() {
+          Some(inputs[1].channel(0))
+        } else {
+          None
+        };
+        let euc_inputs = EuclideanInputs { clock, reset };
+        let params = EuclideanParams {
+          enabled: state.enabled.slice(frames),
+          tempo: state.tempo.slice(frames),
+          rate: state.rate.slice(frames),
+          steps: state.steps.slice(frames),
+          pulses: state.pulses.slice(frames),
+          rotation: state.rotation.slice(frames),
+          gate_length: state.gate_length.slice(frames),
+          swing: state.swing.slice(frames),
+        };
+
+        // Use temp buffers to avoid borrow checker issues
+        const EUC_BUF_SIZE: usize = 1024;
+        let safe_frames = frames.min(EUC_BUF_SIZE);
+        let mut buf_gate: [Sample; EUC_BUF_SIZE] = [0.0; EUC_BUF_SIZE];
+        let mut buf_step: [Sample; EUC_BUF_SIZE] = [0.0; EUC_BUF_SIZE];
+
+        state.euclidean.process_block(
+          &mut buf_gate[..safe_frames],
+          &mut buf_step[..safe_frames],
+          euc_inputs,
+          params,
+        );
+
+        // Copy to actual outputs
+        outputs[0].channel_mut(0)[..safe_frames].copy_from_slice(&buf_gate[..safe_frames]);
+        outputs[1].channel_mut(0)[..safe_frames].copy_from_slice(&buf_step[..safe_frames]);
+      }
+      ModuleState::FmOp(state) => {
+        // FM Operator: pitch CV, gate, FM input -> audio out
+        let pitch = if !self.connections[0].is_empty() {
+          Some(inputs[0].channel(0))
+        } else {
+          None
+        };
+        let gate = if self.connections.len() > 1 && !self.connections[1].is_empty() {
+          Some(inputs[1].channel(0))
+        } else {
+          None
+        };
+        let fm_in = if self.connections.len() > 2 && !self.connections[2].is_empty() {
+          Some(inputs[2].channel(0))
+        } else {
+          None
+        };
+
+        let fm_inputs = FmOperatorInputs { pitch, gate, fm_in };
+        let params = FmOperatorParams {
+          frequency: state.frequency.slice(frames),
+          ratio: state.ratio.slice(frames),
+          level: state.level.slice(frames),
+          feedback: state.feedback.slice(frames),
+          attack: state.attack.slice(frames),
+          decay: state.decay.slice(frames),
+          sustain: state.sustain.slice(frames),
+          release: state.release.slice(frames),
+        };
+
+        let out = outputs[0].channel_mut(0);
+        state.op.process_block(out, fm_inputs, params);
+      }
+      ModuleState::Notes => {
+        // UI-only module, no audio processing
+      }
     }
   }
 }
@@ -3094,6 +3298,7 @@ fn normalize_module_type(raw: &str) -> ModuleType {
   match raw {
     "oscillator" => ModuleType::Oscillator,
     "supersaw" => ModuleType::Supersaw,
+    "karplus" => ModuleType::Karplus,
     "nes-osc" => ModuleType::NesOsc,
     "snes-osc" => ModuleType::SnesOsc,
     "noise" => ModuleType::Noise,
@@ -3140,6 +3345,11 @@ fn normalize_module_type(raw: &str) -> ModuleType {
     "909-rimshot" => ModuleType::Rimshot909,
     // Drum Sequencer
     "drum-sequencer" => ModuleType::DrumSequencer,
+    "euclidean" => ModuleType::Euclidean,
+    // FM Synthesis
+    "fm-op" => ModuleType::FmOp,
+    // Documentation
+    "notes" => ModuleType::Notes,
     // Effects
     "pitch-shifter" => ModuleType::PitchShifter,
     "clock" => ModuleType::Clock,
@@ -3152,6 +3362,7 @@ fn is_poly_type(module_type: ModuleType) -> bool {
     module_type,
     ModuleType::Oscillator
       | ModuleType::Supersaw
+      | ModuleType::Karplus
       | ModuleType::NesOsc
       | ModuleType::SnesOsc
       | ModuleType::Noise
@@ -3226,6 +3437,10 @@ fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
     ModuleType::Distortion => vec![PortInfo { channels: 1 }],
     ModuleType::Wavefolder => vec![PortInfo { channels: 1 }],
     ModuleType::Supersaw => vec![PortInfo { channels: 1 }],
+    ModuleType::Karplus => vec![
+      PortInfo { channels: 1 },  // pitch input
+      PortInfo { channels: 1 },  // gate input
+    ],
     ModuleType::NesOsc => vec![PortInfo { channels: 1 }],  // pitch input
     ModuleType::SnesOsc => vec![PortInfo { channels: 1 }],  // pitch input
     ModuleType::AudioIn => vec![],
@@ -3265,6 +3480,19 @@ fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // clock
       PortInfo { channels: 1 },  // reset
     ],
+    // Euclidean Sequencer - 2 inputs (clock, reset)
+    ModuleType::Euclidean => vec![
+      PortInfo { channels: 1 },  // clock
+      PortInfo { channels: 1 },  // reset
+    ],
+    // FM Operator - 3 inputs (pitch, gate, fm)
+    ModuleType::FmOp => vec![
+      PortInfo { channels: 1 },  // pitch CV
+      PortInfo { channels: 1 },  // gate
+      PortInfo { channels: 1 },  // FM input
+    ],
+    // Notes - no inputs (UI only)
+    ModuleType::Notes => vec![],
     // Pitch Shifter - 2 inputs (audio, pitch CV)
     ModuleType::PitchShifter => vec![
       PortInfo { channels: 1 },  // audio input
@@ -3321,6 +3549,7 @@ fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
     ModuleType::Distortion => vec![PortInfo { channels: 1 }],
     ModuleType::Wavefolder => vec![PortInfo { channels: 1 }],
     ModuleType::Supersaw => vec![PortInfo { channels: 1 }],
+    ModuleType::Karplus => vec![PortInfo { channels: 1 }],  // audio output
     ModuleType::NesOsc => vec![PortInfo { channels: 1 }],  // audio output
     ModuleType::SnesOsc => vec![PortInfo { channels: 1 }],  // audio output
     ModuleType::AudioIn => vec![PortInfo { channels: 1 }],
@@ -3382,6 +3611,17 @@ fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
     ],
     // Pitch Shifter - 1 output
     ModuleType::PitchShifter => vec![PortInfo { channels: 1 }],
+    // Euclidean Sequencer - 2 outputs (gate, step)
+    ModuleType::Euclidean => vec![
+      PortInfo { channels: 1 },  // gate out
+      PortInfo { channels: 1 },  // step out
+    ],
+    // FM Operator - 1 output (audio)
+    ModuleType::FmOp => vec![
+      PortInfo { channels: 1 },  // audio out
+    ],
+    // Notes - no outputs (UI only)
+    ModuleType::Notes => vec![],
     // Clock - 4 outputs (clock, reset, run, bar)
     ModuleType::Clock => vec![
       PortInfo { channels: 1 },  // clock pulse
@@ -3502,6 +3742,11 @@ fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize> {
       "pitch" => Some(0),
       _ => None,
     },
+    ModuleType::Karplus => match port_id {
+      "pitch" => Some(0),
+      "gate" => Some(1),
+      _ => None,
+    },
     ModuleType::NesOsc => match port_id {
       "pitch" => Some(0),
       _ => None,
@@ -3560,6 +3805,21 @@ fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize> {
       "pitch" | "pitch-cv" => Some(1),
       _ => None,
     },
+    // Euclidean Sequencer - 2 inputs
+    ModuleType::Euclidean => match port_id {
+      "clock" | "clk" => Some(0),
+      "reset" | "rst" => Some(1),
+      _ => None,
+    },
+    // FM Operator - 3 inputs
+    ModuleType::FmOp => match port_id {
+      "pitch" | "1volt" => Some(0),
+      "gate" => Some(1),
+      "fm" | "fm-in" => Some(2),
+      _ => None,
+    },
+    // Notes - no inputs
+    ModuleType::Notes => None,
     // Clock - 3 inputs
     ModuleType::Clock => match port_id {
       "start" => Some(0),
@@ -3671,6 +3931,10 @@ fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize> {
       "out" => Some(0),
       _ => None,
     },
+    ModuleType::Karplus => match port_id {
+      "out" => Some(0),
+      _ => None,
+    },
     ModuleType::NesOsc => match port_id {
       "out" => Some(0),
       _ => None,
@@ -3762,6 +4026,19 @@ fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize> {
       "out" | "output" => Some(0),
       _ => None,
     },
+    // Euclidean Sequencer - 2 outputs
+    ModuleType::Euclidean => match port_id {
+      "gate" | "gate-out" => Some(0),
+      "step" | "step-out" => Some(1),
+      _ => None,
+    },
+    // FM Operator - 1 output
+    ModuleType::FmOp => match port_id {
+      "out" | "output" => Some(0),
+      _ => None,
+    },
+    // Notes - no outputs
+    ModuleType::Notes => None,
     // Clock - 4 outputs
     ModuleType::Clock => match port_id {
       "clock" | "clk" => Some(0),

@@ -1,0 +1,128 @@
+{
+  "graph": {
+    "modules": [
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "FM Guide",
+        "position": { "x": 50, "y": 350 },
+        "params": {
+          "text": "FM BELLS - 3 Operators\n\nMod1 (7) + Mod2 (5) -> Carrier (1)\n\nInharmonic ratios (5, 7) = metallic/bell tones\nHarmonic ratios (1, 2, 3) = organ/flute\n\nFeedback on Mod1 adds grit.\nTry: Change ratios to 1, 2, 4 for organ."
+        }
+      },
+      {
+        "id": "clock-1",
+        "type": "clock",
+        "name": "Clock",
+        "position": { "x": 50, "y": 150 },
+        "params": {
+          "running": true,
+          "tempo": 70,
+          "rate": 3,
+          "swing": 0
+        }
+      },
+      {
+        "id": "seq-1",
+        "type": "step-sequencer",
+        "name": "Bells",
+        "position": { "x": 200, "y": 100 },
+        "params": {
+          "enabled": true,
+          "tempo": 70,
+          "rate": 5,
+          "gateLength": 30,
+          "swing": 0,
+          "slideTime": 0,
+          "length": 8,
+          "direction": 0,
+          "stepData": "[{\"pitch\":12,\"gate\":true,\"velocity\":100,\"slide\":false},{\"pitch\":19,\"gate\":true,\"velocity\":75,\"slide\":false},{\"pitch\":24,\"gate\":true,\"velocity\":90,\"slide\":false},{\"pitch\":16,\"gate\":false,\"velocity\":80,\"slide\":false},{\"pitch\":7,\"gate\":true,\"velocity\":85,\"slide\":false},{\"pitch\":12,\"gate\":true,\"velocity\":70,\"slide\":false},{\"pitch\":19,\"gate\":true,\"velocity\":95,\"slide\":false},{\"pitch\":24,\"gate\":false,\"velocity\":80,\"slide\":false}]"
+        }
+      },
+      {
+        "id": "fmop-1",
+        "type": "fm-op",
+        "name": "Mod 1",
+        "position": { "x": 400, "y": 50 },
+        "params": {
+          "frequency": 440,
+          "ratio": 7,
+          "level": 0.6,
+          "feedback": 0.2,
+          "attack": 1,
+          "decay": 400,
+          "sustain": 0,
+          "release": 200
+        }
+      },
+      {
+        "id": "fmop-2",
+        "type": "fm-op",
+        "name": "Mod 2",
+        "position": { "x": 400, "y": 250 },
+        "params": {
+          "frequency": 440,
+          "ratio": 5,
+          "level": 0.4,
+          "feedback": 0,
+          "attack": 1,
+          "decay": 600,
+          "sustain": 0.1,
+          "release": 300
+        }
+      },
+      {
+        "id": "mixer-1",
+        "type": "mixer",
+        "name": "Mix",
+        "position": { "x": 550, "y": 150 },
+        "params": { "gain-a": 0.5, "gain-b": 0.5 }
+      },
+      {
+        "id": "fmop-3",
+        "type": "fm-op",
+        "name": "Carrier",
+        "position": { "x": 700, "y": 150 },
+        "params": {
+          "frequency": 440,
+          "ratio": 1,
+          "level": 0.9,
+          "feedback": 0,
+          "attack": 1,
+          "decay": 1500,
+          "sustain": 0,
+          "release": 800
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "x": 850, "y": 150 },
+        "params": { "time": 0.85, "damp": 0.3, "preDelay": 30, "mix": 0.5 }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Out",
+        "position": { "x": 1000, "y": 150 },
+        "params": { "level": 0.65 }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "seq-1", "portId": "clock" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "reset" }, "to": { "moduleId": "seq-1", "portId": "reset" }, "kind": "sync" },
+      { "from": { "moduleId": "seq-1", "portId": "cv-out" }, "to": { "moduleId": "fmop-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "seq-1", "portId": "cv-out" }, "to": { "moduleId": "fmop-2", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "seq-1", "portId": "cv-out" }, "to": { "moduleId": "fmop-3", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "seq-1", "portId": "gate-out" }, "to": { "moduleId": "fmop-1", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "seq-1", "portId": "gate-out" }, "to": { "moduleId": "fmop-2", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "seq-1", "portId": "gate-out" }, "to": { "moduleId": "fmop-3", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "fmop-1", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "fmop-2", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-b" }, "kind": "audio" },
+      { "from": { "moduleId": "mixer-1", "portId": "out" }, "to": { "moduleId": "fmop-3", "portId": "fm" }, "kind": "audio" },
+      { "from": { "moduleId": "fmop-3", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}

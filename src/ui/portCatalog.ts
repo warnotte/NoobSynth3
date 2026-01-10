@@ -173,6 +173,13 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
     inputs: [{ id: 'pitch', label: 'Pitch', kind: 'cv', direction: 'in' }],
     outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
   },
+  karplus: {
+    inputs: [
+      { id: 'pitch', label: 'Pitch', kind: 'cv', direction: 'in' },
+      { id: 'gate', label: 'Gate', kind: 'gate', direction: 'in' },
+    ],
+    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
+  },
   'nes-osc': {
     inputs: [{ id: 'pitch', label: 'Pitch', kind: 'cv', direction: 'in' }],
     outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
@@ -378,6 +385,30 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
     outputs: [
       { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
     ],
+  },
+  euclidean: {
+    inputs: [
+      { id: 'clock', label: 'Clk', kind: 'sync', direction: 'in' },
+      { id: 'reset', label: 'Rst', kind: 'sync', direction: 'in' },
+    ],
+    outputs: [
+      { id: 'gate', label: 'Gate', kind: 'gate', direction: 'out' },
+      { id: 'step', label: 'Step', kind: 'cv', direction: 'out' },
+    ],
+  },
+  'fm-op': {
+    inputs: [
+      { id: 'pitch', label: '1V', kind: 'cv', direction: 'in' },
+      { id: 'gate', label: 'Gate', kind: 'gate', direction: 'in' },
+      { id: 'fm', label: 'FM', kind: 'audio', direction: 'in' },
+    ],
+    outputs: [
+      { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
+    ],
+  },
+  notes: {
+    inputs: [],
+    outputs: [],
   },
   clock: {
     inputs: [

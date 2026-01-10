@@ -1,0 +1,104 @@
+{
+  "graph": {
+    "modules": [
+      {
+        "id": "clock-1",
+        "type": "clock",
+        "name": "Clock",
+        "position": { "x": 50, "y": 50 },
+        "params": {
+          "running": true,
+          "tempo": 120,
+          "rate": 4,
+          "swing": 0
+        }
+      },
+      {
+        "id": "seq-1",
+        "type": "step-sequencer",
+        "name": "Guitar Seq",
+        "position": { "x": 200, "y": 50 },
+        "params": {
+          "enabled": true,
+          "tempo": 120,
+          "rate": 4,
+          "gateLength": 30,
+          "swing": 0,
+          "slideTime": 50,
+          "length": 16,
+          "direction": 0,
+          "stepData": "[{\"pitch\":0,\"gate\":true,\"velocity\":100,\"slide\":false},{\"pitch\":4,\"gate\":true,\"velocity\":80,\"slide\":false},{\"pitch\":7,\"gate\":true,\"velocity\":90,\"slide\":false},{\"pitch\":4,\"gate\":true,\"velocity\":70,\"slide\":false},{\"pitch\":0,\"gate\":true,\"velocity\":100,\"slide\":false},{\"pitch\":4,\"gate\":true,\"velocity\":80,\"slide\":false},{\"pitch\":7,\"gate\":true,\"velocity\":90,\"slide\":false},{\"pitch\":12,\"gate\":true,\"velocity\":85,\"slide\":false},{\"pitch\":0,\"gate\":true,\"velocity\":100,\"slide\":false},{\"pitch\":5,\"gate\":true,\"velocity\":80,\"slide\":false},{\"pitch\":9,\"gate\":true,\"velocity\":90,\"slide\":false},{\"pitch\":5,\"gate\":true,\"velocity\":70,\"slide\":false},{\"pitch\":0,\"gate\":true,\"velocity\":100,\"slide\":false},{\"pitch\":7,\"gate\":true,\"velocity\":80,\"slide\":false},{\"pitch\":12,\"gate\":true,\"velocity\":90,\"slide\":false},{\"pitch\":7,\"gate\":true,\"velocity\":75,\"slide\":false}]"
+        }
+      },
+      {
+        "id": "karplus-1",
+        "type": "karplus",
+        "name": "Guitar",
+        "position": { "x": 500, "y": 50 },
+        "params": {
+          "frequency": 220,
+          "damping": 0.25,
+          "decay": 0.996,
+          "brightness": 0.7,
+          "pluckPos": 0.4
+        }
+      },
+      {
+        "id": "chorus-1",
+        "type": "chorus",
+        "name": "Chorus",
+        "position": { "x": 650, "y": 50 },
+        "params": {
+          "rate": 0.8,
+          "depth": 4,
+          "delay": 12,
+          "mix": 0.25,
+          "spread": 0.6,
+          "feedback": 0.1
+        }
+      },
+      {
+        "id": "delay-1",
+        "type": "delay",
+        "name": "Delay",
+        "position": { "x": 800, "y": 50 },
+        "params": {
+          "time": 375,
+          "feedback": 0.35,
+          "mix": 0.25,
+          "tone": 0.6,
+          "pingPong": true
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "x": 950, "y": 50 },
+        "params": {
+          "time": 0.6,
+          "damp": 0.5,
+          "preDelay": 20,
+          "mix": 0.3
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Out",
+        "position": { "x": 1100, "y": 50 },
+        "params": { "level": 0.7 }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "seq-1", "portId": "clock" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "reset" }, "to": { "moduleId": "seq-1", "portId": "reset" }, "kind": "sync" },
+      { "from": { "moduleId": "seq-1", "portId": "cv-out" }, "to": { "moduleId": "karplus-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "seq-1", "portId": "gate-out" }, "to": { "moduleId": "karplus-1", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "karplus-1", "portId": "out" }, "to": { "moduleId": "chorus-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "chorus-1", "portId": "out" }, "to": { "moduleId": "delay-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "delay-1", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}

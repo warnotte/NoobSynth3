@@ -3,6 +3,7 @@ export type PortKind = 'audio' | 'cv' | 'gate' | 'sync'
 export type ModuleType =
   | 'oscillator'
   | 'supersaw'
+  | 'karplus'
   | 'nes-osc'
   | 'snes-osc'
   | 'noise'
@@ -49,6 +50,12 @@ export type ModuleType =
   | '909-rimshot'
   // Drum Sequencer
   | 'drum-sequencer'
+  // Euclidean Sequencer
+  | 'euclidean'
+  // FM Synthesis
+  | 'fm-op'
+  // Documentation
+  | 'notes'
   // Effects
   | 'pitch-shifter'
   // Master Clock

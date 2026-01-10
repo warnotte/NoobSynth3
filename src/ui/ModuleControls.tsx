@@ -1935,6 +1935,59 @@ export const ModuleControls = ({
     )
   }
 
+  if (module.type === 'karplus') {
+    return (
+      <>
+        <RotaryKnob
+          label="Freq"
+          min={40}
+          max={1200}
+          step={1}
+          unit="Hz"
+          value={Number(module.params.frequency ?? 220)}
+          onChange={(value) => updateParam(module.id, 'frequency', value)}
+          format={(value) => Math.round(value).toString()}
+        />
+        <RotaryKnob
+          label="Damp"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.damping ?? 0.3)}
+          onChange={(value) => updateParam(module.id, 'damping', value)}
+          format={(value) => value.toFixed(2)}
+        />
+        <RotaryKnob
+          label="Decay"
+          min={0.9}
+          max={0.999}
+          step={0.001}
+          value={Number(module.params.decay ?? 0.995)}
+          onChange={(value) => updateParam(module.id, 'decay', value)}
+          format={(value) => value.toFixed(3)}
+        />
+        <RotaryKnob
+          label="Bright"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.brightness ?? 0.5)}
+          onChange={(value) => updateParam(module.id, 'brightness', value)}
+          format={(value) => value.toFixed(2)}
+        />
+        <RotaryKnob
+          label="Pluck"
+          min={0.1}
+          max={0.9}
+          step={0.01}
+          value={Number(module.params.pluckPos ?? 0.5)}
+          onChange={(value) => updateParam(module.id, 'pluckPos', value)}
+          format={(value) => value.toFixed(2)}
+        />
+      </>
+    )
+  }
+
   if (module.type === 'nes-osc') {
     const nesMode = Number(module.params.mode ?? 0)
     const nesDuty = Number(module.params.duty ?? 1)
@@ -3718,6 +3771,298 @@ export const ModuleControls = ({
           format={(value) => Math.round(value * 100).toString()}
         />
       </>
+    )
+  }
+
+  if (module.type === 'euclidean') {
+    const enabled = module.params.enabled !== false
+    const tempo = Number(module.params.tempo ?? 120)
+    const rate = Number(module.params.rate ?? 7)
+    const steps = Number(module.params.steps ?? 16)
+    const pulses = Number(module.params.pulses ?? 4)
+    const rotation = Number(module.params.rotation ?? 0)
+    const gateLength = Number(module.params.gateLength ?? 50)
+    const swing = Number(module.params.swing ?? 0)
+
+    const rateDivisions = [
+      { id: 0, label: '1/1' },
+      { id: 1, label: '1/2' },
+      { id: 3, label: '1/4' },
+      { id: 5, label: '1/8' },
+      { id: 7, label: '1/16' },
+      { id: 9, label: '1/32' },
+    ]
+
+    return (
+      <>
+        {/* Play/Stop Toggle */}
+        <div className="toggle-group">
+          <button
+            type="button"
+            className={`ui-btn ui-btn--pill toggle-btn ${enabled ? 'active' : ''}`}
+            onClick={() => updateParam(module.id, 'enabled', !enabled)}
+          >
+            {enabled ? 'PLAY' : 'STOP'}
+          </button>
+        </div>
+
+        {/* Tempo knob */}
+        <RotaryKnob
+          label="Tempo"
+          min={40}
+          max={300}
+          step={1}
+          unit="BPM"
+          value={tempo}
+          onChange={(value) => updateParam(module.id, 'tempo', value)}
+          format={(value) => Math.round(value).toString()}
+        />
+
+        {/* Rate selector */}
+        <div className="seq-control-section">
+          <div className="seq-control-box">
+            <span className="seq-control-label">Rate</span>
+            <div className="seq-control-buttons">
+              {rateDivisions.map((r) => (
+                <button
+                  key={r.id}
+                  type="button"
+                  className={`seq-control-btn ${rate === r.id ? 'active' : ''}`}
+                  onClick={() => updateParam(module.id, 'rate', r.id)}
+                >
+                  {r.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Euclidean params */}
+        <RotaryKnob
+          label="Steps"
+          min={2}
+          max={32}
+          step={1}
+          value={steps}
+          onChange={(value) => updateParam(module.id, 'steps', Math.round(value))}
+          format={(value) => Math.round(value).toString()}
+        />
+        <RotaryKnob
+          label="Pulses"
+          min={0}
+          max={steps}
+          step={1}
+          value={pulses}
+          onChange={(value) => updateParam(module.id, 'pulses', Math.round(value))}
+          format={(value) => Math.round(value).toString()}
+        />
+        <RotaryKnob
+          label="Rotate"
+          min={0}
+          max={steps - 1}
+          step={1}
+          value={rotation}
+          onChange={(value) => updateParam(module.id, 'rotation', Math.round(value))}
+          format={(value) => Math.round(value).toString()}
+        />
+        <RotaryKnob
+          label="Gate"
+          min={10}
+          max={100}
+          step={1}
+          unit="%"
+          value={gateLength}
+          onChange={(value) => updateParam(module.id, 'gateLength', value)}
+          format={(value) => Math.round(value).toString()}
+        />
+        <RotaryKnob
+          label="Swing"
+          min={0}
+          max={90}
+          step={1}
+          unit="%"
+          value={swing}
+          onChange={(value) => updateParam(module.id, 'swing', value)}
+          format={(value) => Math.round(value).toString()}
+        />
+
+        {/* Pattern display - E(pulses, steps) */}
+        <div className="seq-control-section">
+          <div className="seq-control-box">
+            <span className="seq-control-label">E({pulses},{steps})</span>
+          </div>
+        </div>
+      </>
+    )
+  }
+
+  if (module.type === 'fm-op') {
+    const frequency = Number(module.params.frequency ?? 440)
+    const ratio = Number(module.params.ratio ?? 1)
+    const level = Number(module.params.level ?? 1)
+    const feedback = Number(module.params.feedback ?? 0)
+    const attack = Number(module.params.attack ?? 10)
+    const decay = Number(module.params.decay ?? 200)
+    const sustain = Number(module.params.sustain ?? 0.7)
+    const release = Number(module.params.release ?? 300)
+
+    // Common frequency ratios for FM synthesis
+    const ratioPresets = [
+      { id: 0.5, label: '0.5' },
+      { id: 1, label: '1' },
+      { id: 2, label: '2' },
+      { id: 3, label: '3' },
+      { id: 4, label: '4' },
+      { id: 5, label: '5' },
+      { id: 7, label: '7' },
+    ]
+
+    return (
+      <>
+        {/* Frequency knob */}
+        <RotaryKnob
+          label="Freq"
+          min={20}
+          max={2000}
+          step={1}
+          unit="Hz"
+          value={frequency}
+          onChange={(value) => updateParam(module.id, 'frequency', value)}
+          format={(value) => Math.round(value).toString()}
+        />
+
+        {/* Ratio selector */}
+        <div className="seq-control-section">
+          <div className="seq-control-box">
+            <span className="seq-control-label">Ratio</span>
+            <div className="seq-control-buttons">
+              {ratioPresets.map((r) => (
+                <button
+                  key={r.id}
+                  type="button"
+                  className={`seq-control-btn ${ratio === r.id ? 'active' : ''}`}
+                  onClick={() => updateParam(module.id, 'ratio', r.id)}
+                >
+                  {r.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Fine ratio knob */}
+        <RotaryKnob
+          label="Ratio"
+          min={0.1}
+          max={16}
+          step={0.01}
+          value={ratio}
+          onChange={(value) => updateParam(module.id, 'ratio', value)}
+          format={(value) => value.toFixed(2)}
+        />
+
+        {/* Level (modulation index when used as modulator) */}
+        <RotaryKnob
+          label="Level"
+          min={0}
+          max={1}
+          step={0.01}
+          value={level}
+          onChange={(value) => updateParam(module.id, 'level', value)}
+          format={(value) => Math.round(value * 100).toString()}
+        />
+
+        {/* Feedback */}
+        <RotaryKnob
+          label="FB"
+          min={0}
+          max={1}
+          step={0.01}
+          value={feedback}
+          onChange={(value) => updateParam(module.id, 'feedback', value)}
+          format={(value) => Math.round(value * 100).toString()}
+        />
+
+        {/* ADSR Envelope */}
+        <RotaryKnob
+          label="Atk"
+          min={0.1}
+          max={2000}
+          step={1}
+          unit="ms"
+          value={attack}
+          onChange={(value) => updateParam(module.id, 'attack', value)}
+          format={(value) => Math.round(value).toString()}
+        />
+        <RotaryKnob
+          label="Dec"
+          min={1}
+          max={3000}
+          step={1}
+          unit="ms"
+          value={decay}
+          onChange={(value) => updateParam(module.id, 'decay', value)}
+          format={(value) => Math.round(value).toString()}
+        />
+        <RotaryKnob
+          label="Sus"
+          min={0}
+          max={1}
+          step={0.01}
+          value={sustain}
+          onChange={(value) => updateParam(module.id, 'sustain', value)}
+          format={(value) => Math.round(value * 100).toString()}
+        />
+        <RotaryKnob
+          label="Rel"
+          min={1}
+          max={5000}
+          step={1}
+          unit="ms"
+          value={release}
+          onChange={(value) => updateParam(module.id, 'release', value)}
+          format={(value) => Math.round(value).toString()}
+        />
+      </>
+    )
+  }
+
+  if (module.type === 'notes') {
+    const text = String(module.params.text ?? '')
+
+    return (
+      <div
+        className="notes-module"
+        style={{
+          position: 'absolute',
+          top: '28px',
+          left: '4px',
+          right: '4px',
+          bottom: '4px',
+          display: 'flex',
+        }}
+      >
+        <textarea
+          className="notes-textarea"
+          placeholder="Add notes about this patch..."
+          value={text}
+          onChange={(e) => updateParam(module.id, 'text', e.target.value)}
+          style={{
+            flex: 1,
+            width: '100%',
+            resize: 'none',
+            backgroundColor: 'var(--panel-bg, #1a1a2e)',
+            color: 'var(--text-color, #e0e0e0)',
+            border: '1px solid var(--border-color, #444)',
+            borderRadius: '4px',
+            padding: '8px',
+            fontSize: '11px',
+            fontFamily: 'monospace',
+            lineHeight: '1.4',
+            outline: 'none',
+          }}
+        />
+      </div>
     )
   }
 

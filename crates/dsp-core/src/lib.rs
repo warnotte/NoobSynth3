@@ -5812,6 +5812,638 @@ impl MasterClock {
   }
 }
 
+// ============================================================================
+// Karplus-Strong Synthesis (Physical Modeling - Plucked Strings)
+// ============================================================================
+
+const KARPLUS_MAX_DELAY: usize = 2048; // Supports down to ~23 Hz at 48kHz
+
+pub struct KarplusStrong {
+  sample_rate: f32,
+  delay_line: [f32; KARPLUS_MAX_DELAY],
+  write_pos: usize,
+  delay_length: f32,
+  last_output: f32,
+  prev_gate: f32,
+  noise_state: u32,
+  is_active: bool,
+  // Fractional delay interpolation
+  frac_delay: f32,
+}
+
+pub struct KarplusParams<'a> {
+  pub frequency: &'a [Sample],
+  pub damping: &'a [Sample],    // 0 = bright/long, 1 = dull/short
+  pub decay: &'a [Sample],      // 0.9-0.999 feedback
+  pub brightness: &'a [Sample], // Initial noise brightness
+  pub pluck_pos: &'a [Sample],  // Pluck position (affects harmonics)
+}
+
+pub struct KarplusInputs<'a> {
+  pub pitch: Option<&'a [Sample]>,
+  pub gate: Option<&'a [Sample]>,
+}
+
+impl KarplusStrong {
+  pub fn new(sample_rate: f32) -> Self {
+    Self {
+      sample_rate: sample_rate.max(1.0),
+      delay_line: [0.0; KARPLUS_MAX_DELAY],
+      write_pos: 0,
+      delay_length: 100.0,
+      last_output: 0.0,
+      prev_gate: 0.0,
+      noise_state: 12345,
+      is_active: false,
+      frac_delay: 0.0,
+    }
+  }
+
+  pub fn set_sample_rate(&mut self, sample_rate: f32) {
+    self.sample_rate = sample_rate.max(1.0);
+  }
+
+  // Simple LCG noise generator
+  fn next_noise(&mut self) -> f32 {
+    self.noise_state = self.noise_state.wrapping_mul(1103515245).wrapping_add(12345);
+    ((self.noise_state >> 16) as f32 / 32768.0) - 1.0
+  }
+
+  // Fill delay line with filtered noise (pluck excitation)
+  fn pluck(&mut self, delay_samples: usize, brightness: f32, pluck_pos: f32) {
+    // Generate noise burst
+    let mut noise_buf = [0.0f32; KARPLUS_MAX_DELAY];
+    for i in 0..delay_samples {
+      noise_buf[i] = self.next_noise();
+    }
+
+    // Apply brightness filter (simple lowpass)
+    let coeff = (1.0 - brightness).clamp(0.0, 0.99);
+    let mut prev = 0.0f32;
+    for i in 0..delay_samples {
+      noise_buf[i] = noise_buf[i] * (1.0 - coeff) + prev * coeff;
+      prev = noise_buf[i];
+    }
+
+    // Apply pluck position comb filter (simulates where string is plucked)
+    // Pluck at position p creates a notch at frequency f/p
+    let pluck_delay = ((pluck_pos.clamp(0.1, 0.9) * delay_samples as f32) as usize).max(1);
+    for i in pluck_delay..delay_samples {
+      noise_buf[i] -= noise_buf[i - pluck_delay] * 0.5;
+    }
+
+    // Copy to delay line
+    for i in 0..delay_samples.min(KARPLUS_MAX_DELAY) {
+      self.delay_line[i] = noise_buf[i] * 0.8; // Scale to avoid clipping
+    }
+
+    // Start writing after the filled portion so we read from position 0
+    self.write_pos = delay_samples % KARPLUS_MAX_DELAY;
+    self.last_output = 0.0;
+    self.is_active = true;
+  }
+
+  pub fn process_block(
+    &mut self,
+    output: &mut [Sample],
+    inputs: KarplusInputs,
+    params: KarplusParams,
+  ) {
+    let frames = output.len();
+
+    for i in 0..frames {
+      // Get parameters
+      let freq_param = params.frequency.get(i).copied().unwrap_or(params.frequency[0]);
+      let damping = params.damping.get(i).copied().unwrap_or(params.damping[0]).clamp(0.0, 1.0);
+      let decay = params.decay.get(i).copied().unwrap_or(params.decay[0]).clamp(0.5, 0.9999);
+      let brightness = params.brightness.get(i).copied().unwrap_or(params.brightness[0]).clamp(0.0, 1.0);
+      let pluck_pos = params.pluck_pos.get(i).copied().unwrap_or(params.pluck_pos[0]).clamp(0.1, 0.9);
+
+      // Apply pitch CV (1V/octave style, 1 unit = 1 semitone)
+      let pitch_cv = inputs.pitch.map(|p| p.get(i).copied().unwrap_or(0.0)).unwrap_or(0.0);
+      let freq = freq_param * (2.0_f32).powf(pitch_cv / 12.0);
+      let freq_clamped = freq.clamp(20.0, self.sample_rate / 2.0);
+
+      // Calculate delay length in samples
+      let delay_samples_f = self.sample_rate / freq_clamped;
+      let delay_samples = (delay_samples_f as usize).min(KARPLUS_MAX_DELAY - 1).max(2);
+      self.frac_delay = delay_samples_f - delay_samples as f32;
+
+      // Check for gate trigger (rising edge)
+      let gate = inputs.gate.map(|g| g.get(i).copied().unwrap_or(0.0)).unwrap_or(0.0);
+      if gate > 0.5 && self.prev_gate <= 0.5 {
+        self.pluck(delay_samples, brightness, pluck_pos);
+      }
+      self.prev_gate = gate;
+
+      // Process Karplus-Strong algorithm
+      let out = if self.is_active {
+        // Read from delay line with linear interpolation
+        let read_pos = (self.write_pos + KARPLUS_MAX_DELAY - delay_samples) % KARPLUS_MAX_DELAY;
+        let read_pos_next = (read_pos + 1) % KARPLUS_MAX_DELAY;
+
+        let sample_a = self.delay_line[read_pos];
+        let sample_b = self.delay_line[read_pos_next];
+        let current = sample_a + (sample_b - sample_a) * self.frac_delay;
+
+        // Apply lowpass filter (averaging filter with damping control)
+        // Higher damping = more filtering = duller/shorter sound
+        let filter_coeff = 0.5 + damping * 0.4; // 0.5 to 0.9
+        let filtered = current * (1.0 - filter_coeff) + self.last_output * filter_coeff;
+
+        // Apply decay feedback
+        let feedback = filtered * decay;
+
+        // Write back to delay line
+        self.delay_line[self.write_pos] = feedback;
+        self.write_pos = (self.write_pos + 1) % KARPLUS_MAX_DELAY;
+
+        self.last_output = filtered;
+
+        // Check if sound has decayed
+        if filtered.abs() < 0.0001 {
+          self.is_active = false;
+        }
+
+        filtered
+      } else {
+        0.0
+      };
+
+      output[i] = out;
+    }
+  }
+}
+
+// =============================================================================
+// Euclidean Sequencer - Distributes triggers evenly using Bjorklund's algorithm
+// =============================================================================
+
+pub const EUCLIDEAN_MAX_STEPS: usize = 32;
+
+pub struct EuclideanSequencer {
+  sample_rate: f32,
+
+  // Pattern state (computed from pulses/steps)
+  pattern: [bool; EUCLIDEAN_MAX_STEPS],
+  pattern_length: usize,
+
+  // Playback state
+  current_step: usize,
+  phase: f64,
+  samples_per_step: f64,
+
+  // Gate timing
+  gate_on: bool,
+  gate_samples: usize,
+  gate_length_samples: usize,
+
+  // Swing state
+  swing_pending: bool,
+  swing_delay_remaining: usize,
+
+  // Edge detection
+  prev_clock: f32,
+  prev_reset: f32,
+
+  // Cached params to detect changes
+  cached_steps: usize,
+  cached_pulses: usize,
+  cached_rotation: usize,
+
+  // Output
+  current_gate: f32,
+}
+
+pub struct EuclideanInputs<'a> {
+  pub clock: Option<&'a [Sample]>,
+  pub reset: Option<&'a [Sample]>,
+}
+
+pub struct EuclideanParams<'a> {
+  pub enabled: &'a [Sample],
+  pub tempo: &'a [Sample],        // 40-300 BPM
+  pub rate: &'a [Sample],         // Rate division index
+  pub steps: &'a [Sample],        // 2-32 total steps
+  pub pulses: &'a [Sample],       // 1-steps number of triggers
+  pub rotation: &'a [Sample],     // 0-steps offset
+  pub gate_length: &'a [Sample],  // 10-100%
+  pub swing: &'a [Sample],        // 0-90%
+}
+
+impl EuclideanSequencer {
+  pub fn new(sample_rate: f32) -> Self {
+    let mut seq = Self {
+      sample_rate: sample_rate.max(1.0),
+      pattern: [false; EUCLIDEAN_MAX_STEPS],
+      pattern_length: 16,
+      current_step: 0,
+      phase: 0.0,
+      samples_per_step: sample_rate as f64 * 0.5,
+      gate_on: false,
+      gate_samples: 0,
+      gate_length_samples: 0,
+      swing_pending: false,
+      swing_delay_remaining: 0,
+      prev_clock: 0.0,
+      prev_reset: 0.0,
+      cached_steps: 16,
+      cached_pulses: 4,
+      cached_rotation: 0,
+      current_gate: 0.0,
+    };
+    seq.compute_pattern(16, 4, 0);
+    seq
+  }
+
+  pub fn set_sample_rate(&mut self, sample_rate: f32) {
+    self.sample_rate = sample_rate.max(1.0);
+  }
+
+  /// Simple Euclidean rhythm using Bresenham-style distribution
+  fn compute_pattern(&mut self, steps: usize, pulses: usize, rotation: usize) {
+    let steps = steps.clamp(2, EUCLIDEAN_MAX_STEPS);
+    let pulses = pulses.clamp(0, steps);
+
+    // Clear pattern
+    for i in 0..EUCLIDEAN_MAX_STEPS {
+      self.pattern[i] = false;
+    }
+
+    self.pattern_length = steps;
+
+    if pulses == 0 {
+      // All off - already cleared
+      self.cached_steps = steps;
+      self.cached_pulses = pulses;
+      self.cached_rotation = rotation;
+      return;
+    }
+
+    if pulses >= steps {
+      // All on
+      for i in 0..steps {
+        self.pattern[i] = true;
+      }
+      self.cached_steps = steps;
+      self.cached_pulses = pulses;
+      self.cached_rotation = rotation;
+      return;
+    }
+
+    // Bresenham-style Euclidean distribution
+    // This distributes pulses as evenly as possible across steps
+    let mut bucket: i32 = 0;
+    let rot = rotation % steps;
+
+    for i in 0..steps {
+      bucket += pulses as i32;
+      if bucket >= steps as i32 {
+        bucket -= steps as i32;
+        // Apply rotation
+        let pos = (i + steps - rot) % steps;
+        self.pattern[pos] = true;
+      }
+    }
+
+    self.cached_steps = steps;
+    self.cached_pulses = pulses;
+    self.cached_rotation = rotation;
+  }
+
+  /// Get current pattern for UI display
+  pub fn get_pattern(&self) -> &[bool] {
+    &self.pattern[..self.pattern_length]
+  }
+
+  /// Get current step position
+  pub fn current_step(&self) -> usize {
+    self.current_step
+  }
+
+  pub fn process_block(
+    &mut self,
+    gate_out: &mut [Sample],
+    step_out: &mut [Sample],
+    inputs: EuclideanInputs,
+    params: EuclideanParams,
+  ) {
+    let frames = gate_out.len();
+    let enabled = params.enabled[0] > 0.5;
+
+    if !enabled {
+      for i in 0..frames {
+        gate_out[i] = 0.0;
+        step_out[i] = self.current_step as f32;
+      }
+      self.current_gate = 0.0;
+      self.gate_on = false;
+      return;
+    }
+
+    let tempo = params.tempo[0].clamp(40.0, 300.0);
+    let rate_idx = params.rate[0] as usize;
+    let steps = params.steps[0] as usize;
+    let pulses = params.pulses[0] as usize;
+    let rotation = params.rotation[0] as usize;
+    let gate_len_pct = params.gate_length[0].clamp(10.0, 100.0);
+    let swing_pct = params.swing[0].clamp(0.0, 90.0);
+
+    // Recompute pattern if params changed
+    if steps != self.cached_steps || pulses != self.cached_pulses || rotation != self.cached_rotation {
+      self.compute_pattern(steps, pulses, rotation);
+    }
+
+    // Rate divisions
+    let rate_mult = match rate_idx {
+      0 => 0.25,   // 1/1
+      1 => 0.5,    // 1/2
+      2 => 0.75,   // 1/2T
+      3 => 1.0,    // 1/4
+      4 => 1.5,    // 1/4T
+      5 => 2.0,    // 1/8
+      6 => 3.0,    // 1/8T
+      7 => 4.0,    // 1/16
+      8 => 6.0,    // 1/16T
+      9 => 8.0,    // 1/32
+      10 => 12.0,  // 1/32T
+      11 => 16.0,  // 1/64
+      _ => 4.0,
+    };
+
+    let beats_per_second = tempo / 60.0;
+    let steps_per_second = beats_per_second * rate_mult;
+    self.samples_per_step = self.sample_rate as f64 / steps_per_second as f64;
+    self.gate_length_samples = ((self.samples_per_step * (gate_len_pct as f64 / 100.0)) as usize).max(1);
+
+    let has_external_clock = inputs.clock.is_some();
+
+    for i in 0..frames {
+      // Handle reset
+      if let Some(reset) = inputs.reset {
+        let reset_val = reset[i.min(reset.len() - 1)];
+        if reset_val > 0.5 && self.prev_reset <= 0.5 {
+          self.current_step = 0;
+          self.phase = 0.0;
+          self.swing_pending = false;
+          self.swing_delay_remaining = 0;
+        }
+        self.prev_reset = reset_val;
+      }
+
+      // Handle swing delay
+      if self.swing_pending {
+        if self.swing_delay_remaining > 0 {
+          self.swing_delay_remaining -= 1;
+        } else {
+          // Execute delayed trigger (we already determined it should trigger)
+          self.swing_pending = false;
+          self.gate_on = true;
+          self.gate_samples = 0;
+          self.current_gate = 1.0;
+        }
+      }
+
+      // Advance step
+      let should_advance = if has_external_clock {
+        let clock = inputs.clock.unwrap();
+        let clock_val = clock[i.min(clock.len() - 1)];
+        let rising = clock_val > 0.5 && self.prev_clock <= 0.5;
+        self.prev_clock = clock_val;
+        rising
+      } else {
+        self.phase += 1.0;
+        if self.phase >= self.samples_per_step {
+          self.phase -= self.samples_per_step;
+          true
+        } else {
+          false
+        }
+      };
+
+      if should_advance && !self.swing_pending {
+        // Check CURRENT step for trigger BEFORE advancing
+        let trigger_step = self.current_step;
+        let should_trigger = trigger_step < self.pattern_length && self.pattern[trigger_step];
+
+        // Now advance to next step
+        self.current_step = (self.current_step + 1) % self.pattern_length;
+
+        // Swing on odd steps (of the trigger step)
+        let is_odd_step = trigger_step % 2 == 1;
+        if is_odd_step && swing_pct > 0.0 && should_trigger {
+          let swing_samples = (self.samples_per_step * (swing_pct as f64 / 200.0)) as usize;
+          if swing_samples > 0 {
+            self.swing_pending = true;
+            self.swing_delay_remaining = swing_samples;
+          } else {
+            // Trigger immediately
+            self.gate_on = true;
+            self.gate_samples = 0;
+            self.current_gate = 1.0;
+          }
+        } else if should_trigger {
+          // Trigger immediately
+          self.gate_on = true;
+          self.gate_samples = 0;
+          self.current_gate = 1.0;
+        }
+      }
+
+      // Update gate
+      if self.gate_on {
+        self.gate_samples += 1;
+        if self.gate_samples >= self.gate_length_samples {
+          self.gate_on = false;
+          self.current_gate = 0.0;
+        }
+      }
+
+      gate_out[i] = self.current_gate;
+      step_out[i] = self.current_step as f32;
+    }
+  }
+}
+
+// =============================================================================
+// FM Operator - Single operator for FM synthesis (DX7-style)
+// =============================================================================
+
+#[derive(Clone, Copy, PartialEq)]
+enum FmEnvStage {
+  Idle,
+  Attack,
+  Decay,
+  Sustain,
+  Release,
+}
+
+pub struct FmOperator {
+  sample_rate: f32,
+  phase: f64,
+
+  // Envelope state
+  env_stage: FmEnvStage,
+  env_level: f32,
+  env_time: f32,
+
+  // Feedback (2-sample buffer for stability)
+  feedback_out: [f32; 2],
+  feedback_idx: usize,
+
+  // Gate edge detection
+  prev_gate: f32,
+}
+
+pub struct FmOperatorInputs<'a> {
+  pub pitch: Option<&'a [Sample]>,   // Pitch CV (semitones from base)
+  pub gate: Option<&'a [Sample]>,    // Gate for envelope
+  pub fm_in: Option<&'a [Sample]>,   // FM input (audio rate modulation)
+}
+
+pub struct FmOperatorParams<'a> {
+  pub frequency: &'a [Sample],  // Base frequency in Hz
+  pub ratio: &'a [Sample],      // Frequency ratio (1.0 = unison, 2.0 = octave)
+  pub level: &'a [Sample],      // Output level (0-1, also mod index when modulator)
+  pub feedback: &'a [Sample],   // Self-feedback amount (0-1)
+  pub attack: &'a [Sample],     // Attack time in ms
+  pub decay: &'a [Sample],      // Decay time in ms
+  pub sustain: &'a [Sample],    // Sustain level (0-1)
+  pub release: &'a [Sample],    // Release time in ms
+}
+
+impl FmOperator {
+  pub fn new(sample_rate: f32) -> Self {
+    Self {
+      sample_rate: sample_rate.max(1.0),
+      phase: 0.0,
+      env_stage: FmEnvStage::Idle,
+      env_level: 0.0,
+      env_time: 0.0,
+      feedback_out: [0.0; 2],
+      feedback_idx: 0,
+      prev_gate: 0.0,
+    }
+  }
+
+  pub fn set_sample_rate(&mut self, sample_rate: f32) {
+    self.sample_rate = sample_rate.max(1.0);
+  }
+
+  pub fn process_block(
+    &mut self,
+    output: &mut [Sample],
+    inputs: FmOperatorInputs,
+    params: FmOperatorParams,
+  ) {
+    let frames = output.len();
+    let two_pi = std::f64::consts::TAU;
+
+    for i in 0..frames {
+      // Get parameters
+      let base_freq = params.frequency[0].max(1.0);
+      let ratio = params.ratio[0].max(0.01);
+      let level = params.level[0].clamp(0.0, 1.0);
+      let feedback = params.feedback[0].clamp(0.0, 1.0);
+      let attack_ms = params.attack[0].max(0.1);
+      let decay_ms = params.decay[0].max(0.1);
+      let sustain = params.sustain[0].clamp(0.0, 1.0);
+      let release_ms = params.release[0].max(0.1);
+
+      // Get pitch CV (semitones offset)
+      let pitch_cv = inputs.pitch.map_or(0.0, |p| p[i.min(p.len() - 1)]);
+
+      // Calculate frequency: base * ratio * 2^(pitch/12)
+      let freq = base_freq * ratio * (2.0_f32).powf(pitch_cv / 12.0);
+
+      // Get gate and detect edges
+      let gate = inputs.gate.map_or(0.0, |g| g[i.min(g.len() - 1)]);
+      let gate_on = gate > 0.5;
+      let gate_rising = gate > 0.5 && self.prev_gate <= 0.5;
+      let gate_falling = gate <= 0.5 && self.prev_gate > 0.5;
+      self.prev_gate = gate;
+
+      // Envelope state machine
+      if gate_rising {
+        self.env_stage = FmEnvStage::Attack;
+        self.env_time = 0.0;
+      } else if gate_falling && self.env_stage != FmEnvStage::Idle {
+        self.env_stage = FmEnvStage::Release;
+        self.env_time = 0.0;
+      }
+
+      // Calculate envelope
+      let dt = 1000.0 / self.sample_rate; // time step in ms
+      match self.env_stage {
+        FmEnvStage::Idle => {
+          self.env_level = 0.0;
+        }
+        FmEnvStage::Attack => {
+          self.env_time += dt;
+          let attack_rate = 1.0 / attack_ms;
+          self.env_level += attack_rate * dt;
+          if self.env_level >= 1.0 {
+            self.env_level = 1.0;
+            self.env_stage = FmEnvStage::Decay;
+            self.env_time = 0.0;
+          }
+        }
+        FmEnvStage::Decay => {
+          self.env_time += dt;
+          let decay_rate = (1.0 - sustain) / decay_ms;
+          self.env_level -= decay_rate * dt;
+          if self.env_level <= sustain {
+            self.env_level = sustain;
+            self.env_stage = FmEnvStage::Sustain;
+          }
+        }
+        FmEnvStage::Sustain => {
+          self.env_level = sustain;
+          if !gate_on {
+            self.env_stage = FmEnvStage::Release;
+            self.env_time = 0.0;
+          }
+        }
+        FmEnvStage::Release => {
+          self.env_time += dt;
+          let release_rate = self.env_level / release_ms.max(0.1);
+          self.env_level -= release_rate * dt;
+          if self.env_level <= 0.001 {
+            self.env_level = 0.0;
+            self.env_stage = FmEnvStage::Idle;
+          }
+        }
+      }
+
+      // Get FM input
+      let fm_mod = inputs.fm_in.map_or(0.0, |fm| fm[i.min(fm.len() - 1)]);
+
+      // Get feedback (average of last 2 samples for stability)
+      let fb = (self.feedback_out[0] + self.feedback_out[1]) * 0.5 * feedback * std::f32::consts::PI;
+
+      // Calculate phase increment with FM
+      let phase_inc = (freq as f64 / self.sample_rate as f64) * two_pi;
+      let fm_amount = (fm_mod + fb) as f64;
+
+      // Generate sine with FM
+      let out = (self.phase + fm_amount).sin() as f32;
+
+      // Update phase
+      self.phase += phase_inc;
+      if self.phase >= two_pi {
+        self.phase -= two_pi;
+      }
+
+      // Store for feedback
+      self.feedback_out[self.feedback_idx] = out;
+      self.feedback_idx = (self.feedback_idx + 1) % 2;
+
+      // Apply envelope and level
+      output[i] = out * self.env_level * level;
+    }
+  }
+}
+
 #[cfg(test)]
 mod tests {
   use super::*;

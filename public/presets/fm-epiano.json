@@ -1,0 +1,116 @@
+{
+  "graph": {
+    "modules": [
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "FM Guide",
+        "position": { "x": 50, "y": 300 },
+        "params": {
+          "text": "FM SYNTHESIS - E.PIANO\n\nModulator (ratio 3.5) -> Carrier (ratio 1)\n\nThe Modulator's output goes into the Carrier's FM input.\nModulator Level = brightness/harmonics\nRatio = frequency multiplier\n\nTry: Change Modulator Level (0.1-0.8)"
+        }
+      },
+      {
+        "id": "clock-1",
+        "type": "clock",
+        "name": "Clock",
+        "position": { "x": 50, "y": 150 },
+        "params": {
+          "running": true,
+          "tempo": 90,
+          "rate": 3,
+          "swing": 10
+        }
+      },
+      {
+        "id": "seq-1",
+        "type": "step-sequencer",
+        "name": "Melody",
+        "position": { "x": 200, "y": 100 },
+        "params": {
+          "enabled": true,
+          "tempo": 90,
+          "rate": 5,
+          "gateLength": 70,
+          "swing": 10,
+          "slideTime": 20,
+          "length": 8,
+          "direction": 0,
+          "stepData": "[{\"pitch\":0,\"gate\":true,\"velocity\":100,\"slide\":false},{\"pitch\":4,\"gate\":true,\"velocity\":85,\"slide\":false},{\"pitch\":7,\"gate\":true,\"velocity\":90,\"slide\":false},{\"pitch\":12,\"gate\":true,\"velocity\":80,\"slide\":false},{\"pitch\":7,\"gate\":true,\"velocity\":75,\"slide\":false},{\"pitch\":4,\"gate\":true,\"velocity\":85,\"slide\":false},{\"pitch\":0,\"gate\":true,\"velocity\":90,\"slide\":false},{\"pitch\":-5,\"gate\":true,\"velocity\":80,\"slide\":false}]"
+        }
+      },
+      {
+        "id": "fmop-1",
+        "type": "fm-op",
+        "name": "Modulator",
+        "position": { "x": 400, "y": 50 },
+        "params": {
+          "frequency": 220,
+          "ratio": 3.5,
+          "level": 0.35,
+          "feedback": 0,
+          "attack": 1,
+          "decay": 800,
+          "sustain": 0.2,
+          "release": 400
+        }
+      },
+      {
+        "id": "fmop-2",
+        "type": "fm-op",
+        "name": "Carrier",
+        "position": { "x": 550, "y": 150 },
+        "params": {
+          "frequency": 220,
+          "ratio": 1,
+          "level": 0.85,
+          "feedback": 0,
+          "attack": 1,
+          "decay": 1200,
+          "sustain": 0.4,
+          "release": 600
+        }
+      },
+      {
+        "id": "chorus-1",
+        "type": "chorus",
+        "name": "Chorus",
+        "position": { "x": 700, "y": 150 },
+        "params": {
+          "rate": 0.3,
+          "depth": 2,
+          "delay": 7,
+          "mix": 0.25,
+          "spread": 0.5,
+          "feedback": 0.1
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "x": 850, "y": 150 },
+        "params": { "time": 0.6, "damp": 0.4, "preDelay": 20, "mix": 0.3 }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Out",
+        "position": { "x": 1000, "y": 150 },
+        "params": { "level": 0.7 }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "seq-1", "portId": "clock" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "reset" }, "to": { "moduleId": "seq-1", "portId": "reset" }, "kind": "sync" },
+      { "from": { "moduleId": "seq-1", "portId": "cv-out" }, "to": { "moduleId": "fmop-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "seq-1", "portId": "cv-out" }, "to": { "moduleId": "fmop-2", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "seq-1", "portId": "gate-out" }, "to": { "moduleId": "fmop-1", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "seq-1", "portId": "gate-out" }, "to": { "moduleId": "fmop-2", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "fmop-1", "portId": "out" }, "to": { "moduleId": "fmop-2", "portId": "fm" }, "kind": "audio" },
+      { "from": { "moduleId": "fmop-2", "portId": "out" }, "to": { "moduleId": "chorus-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "chorus-1", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}

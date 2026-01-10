@@ -5,6 +5,11 @@ export class WasmGraphEngine {
   free(): void;
   [Symbol.dispose](): void;
   set_param_string(module_id: string, param_id: string, value: string): void;
+  /**
+   * Get current step position for a sequencer module
+   * Returns -1 if module not found or not a sequencer
+   */
+  get_sequencer_step(module_id: string): number;
   set_external_input(input: Float32Array): void;
   clear_external_input(): void;
   set_control_voice_cv(module_id: string, voice: number, value: number): void;
@@ -26,6 +31,7 @@ export interface InitOutput {
   readonly memory: WebAssembly.Memory;
   readonly __wbg_wasmgraphengine_free: (a: number, b: number) => void;
   readonly wasmgraphengine_clear_external_input: (a: number) => void;
+  readonly wasmgraphengine_get_sequencer_step: (a: number, b: number, c: number) => number;
   readonly wasmgraphengine_new: (a: number) => number;
   readonly wasmgraphengine_render: (a: number, b: number) => number;
   readonly wasmgraphengine_set_control_voice_cv: (a: number, b: number, c: number, d: number, e: number) => void;

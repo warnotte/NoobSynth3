@@ -483,6 +483,76 @@
       "description": "Demonstrates clock reset input - LFO resets pattern every 4 seconds.",
       "file": "clock-inputs-demo.json",
       "group": "Master Clock"
+    },
+    {
+      "id": "karplus-guitar",
+      "name": "Karplus Guitar",
+      "description": "Plucked guitar arpeggios using Karplus-Strong physical modeling.",
+      "file": "karplus-guitar.json",
+      "group": "Karplus-Strong"
+    },
+    {
+      "id": "karplus-harp",
+      "name": "Karplus Harp",
+      "description": "Ethereal harp glissandos with lush reverb.",
+      "file": "karplus-harp.json",
+      "group": "Karplus-Strong"
+    },
+    {
+      "id": "karplus-bass",
+      "name": "Karplus Bass",
+      "description": "Funky plucked bass line with swing and slides.",
+      "file": "karplus-bass.json",
+      "group": "Karplus-Strong"
+    },
+    {
+      "id": "euclidean-bass",
+      "name": "Euclidean Bass",
+      "description": "Bass synth driven by E(5,16) Euclidean rhythm.",
+      "file": "euclidean-bass.json",
+      "group": "Euclidean Rhythms"
+    },
+    {
+      "id": "euclidean-poly",
+      "name": "Polyrhythmic Drums",
+      "description": "Three Euclidean sequencers driving 909 drums: E(3,8), E(5,16), E(7,12).",
+      "file": "euclidean-poly.json",
+      "group": "Euclidean Rhythms"
+    },
+    {
+      "id": "euclidean-plucks",
+      "name": "Euclidean Plucks",
+      "description": "Karplus harp melody filtered by E(5,8) rhythm - ambient arpeggios.",
+      "file": "euclidean-plucks.json",
+      "group": "Euclidean Rhythms"
+    },
+    {
+      "id": "euclidean-acid",
+      "name": "Euclidean Acid",
+      "description": "TB-303 acid line with E(11,16) gate pattern - slides and distortion.",
+      "file": "euclidean-acid.json",
+      "group": "Euclidean Rhythms"
+    },
+    {
+      "id": "fm-epiano",
+      "name": "FM Electric Piano",
+      "description": "DX7-style electric piano with 2 operators and chorus.",
+      "file": "fm-epiano.json",
+      "group": "FM Synthesis"
+    },
+    {
+      "id": "fm-bells",
+      "name": "FM Bells",
+      "description": "Metallic bell tones using 3-operator FM with inharmonic ratios.",
+      "file": "fm-bells.json",
+      "group": "FM Synthesis"
+    },
+    {
+      "id": "fm-bass",
+      "name": "FM Bass",
+      "description": "Punchy FM bass with step sequencer and distortion.",
+      "file": "fm-bass.json",
+      "group": "FM Synthesis"
     }
   ]
 }

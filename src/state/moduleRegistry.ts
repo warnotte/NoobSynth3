@@ -3,6 +3,7 @@ import type { ModuleSpec, ModuleType } from '../shared/graph'
 export const moduleSizes: Record<ModuleType, string> = {
   oscillator: '2x3',
   supersaw: '2x2',
+  karplus: '2x2',
   'nes-osc': '2x3',
   'snes-osc': '2x3',
   noise: '2x1',
@@ -49,6 +50,12 @@ export const moduleSizes: Record<ModuleType, string> = {
   '909-rimshot': '1x2',
   // Drum Sequencer
   'drum-sequencer': '5x5',
+  // Euclidean Sequencer
+  euclidean: '2x2',
+  // FM Synthesis
+  'fm-op': '2x3',
+  // Documentation
+  notes: '3x2',
   // Effects
   'pitch-shifter': '2x2',
   // Master Clock
@@ -57,6 +64,7 @@ export const moduleSizes: Record<ModuleType, string> = {
 
 export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>> = {
   oscillator: 'strip',
+  karplus: 'strip',
   'nes-osc': 'strip',
   'snes-osc': 'strip',
   vcf: 'strip',
@@ -81,6 +89,12 @@ export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>>
   '909-rimshot': 'strip',
   // Drum Sequencer
   'drum-sequencer': 'strip',
+  // Euclidean Sequencer
+  euclidean: 'strip',
+  // FM Synthesis
+  'fm-op': 'strip',
+  // Documentation (no ports)
+  notes: 'strip',
   // Master Clock
   clock: 'strip',
 }
@@ -121,10 +135,12 @@ export const moduleCatalog: { type: ModuleType; label: string; category: ModuleC
   // Sources
   { type: 'oscillator', label: 'VCO', category: 'sources' },
   { type: 'supersaw', label: 'Supersaw', category: 'sources' },
+  { type: 'karplus', label: 'Karplus', category: 'sources' },
   { type: 'nes-osc', label: 'NES Osc', category: 'sources' },
   { type: 'snes-osc', label: 'SNES Osc', category: 'sources' },
   { type: 'noise', label: 'Noise', category: 'sources' },
   { type: 'tb-303', label: 'TB-303', category: 'sources' },
+  { type: 'fm-op', label: 'FM Op', category: 'sources' },
   // Filters
   { type: 'vcf', label: 'VCF', category: 'filters' },
   { type: 'hpf', label: 'HPF', category: 'filters' },
@@ -159,6 +175,7 @@ export const moduleCatalog: { type: ModuleType; label: string; category: ModuleC
   { type: 'clock', label: 'Clock', category: 'sequencers' },
   { type: 'arpeggiator', label: 'Arpeggiator', category: 'sequencers' },
   { type: 'step-sequencer', label: 'Step Seq', category: 'sequencers' },
+  { type: 'euclidean', label: 'Euclidean', category: 'sequencers' },
   { type: 'drum-sequencer', label: 'Drum Seq', category: 'sequencers' },
   { type: 'mario', label: 'Mario IO', category: 'sequencers' },
   // TR-909 Drums
@@ -174,11 +191,13 @@ export const moduleCatalog: { type: ModuleType; label: string; category: ModuleC
   { type: 'audio-in', label: 'Audio In', category: 'io' },
   { type: 'scope', label: 'Scope', category: 'io' },
   { type: 'lab', label: 'Lab', category: 'io' },
+  { type: 'notes', label: 'Notes', category: 'io' },
 ]
 
 export const modulePrefixes: Record<ModuleType, string> = {
   oscillator: 'osc',
   supersaw: 'ssaw',
+  karplus: 'karp',
   'nes-osc': 'nes',
   'snes-osc': 'snes',
   noise: 'noise',
@@ -226,6 +245,12 @@ export const modulePrefixes: Record<ModuleType, string> = {
   '909-rimshot': 'rim',
   // Drum Sequencer
   'drum-sequencer': 'drumseq',
+  // Euclidean Sequencer
+  euclidean: 'euclid',
+  // FM Synthesis
+  'fm-op': 'fmop',
+  // Documentation
+  notes: 'notes',
   // Master Clock
   clock: 'clock',
 }
@@ -233,6 +258,7 @@ export const modulePrefixes: Record<ModuleType, string> = {
 export const moduleLabels: Record<ModuleType, string> = {
   oscillator: 'VCO',
   supersaw: 'Supersaw',
+  karplus: 'Karplus',
   'nes-osc': 'NES Osc',
   'snes-osc': 'SNES Osc',
   noise: 'Noise',
@@ -280,6 +306,12 @@ export const moduleLabels: Record<ModuleType, string> = {
   '909-rimshot': '909 Rim',
   // Drum Sequencer
   'drum-sequencer': 'Drum Seq',
+  // Euclidean Sequencer
+  euclidean: 'Euclidean',
+  // FM Synthesis
+  'fm-op': 'FM Op',
+  // Documentation
+  notes: 'Notes',
   // Master Clock
   clock: 'Master Clock',
 }
@@ -374,6 +406,13 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
   wavefolder: { drive: 0.4, fold: 0.5, bias: 0, mix: 0.8 },
   'pitch-shifter': { pitch: 0, fine: 0, grain: 50, mix: 1.0 },
   supersaw: { frequency: 220, detune: 25, mix: 1.0 },
+  karplus: {
+    frequency: 220,
+    damping: 0.3,
+    decay: 0.995,
+    brightness: 0.5,
+    pluckPos: 0.5,
+  },
   'nes-osc': {
     frequency: 220,
     fine: 0,
@@ -535,6 +574,32 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
         [{ g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }, { g: 0, a: 0 }],
       ],
     }),
+  },
+  // Euclidean Sequencer
+  euclidean: {
+    enabled: true,
+    tempo: 120,
+    rate: 7,            // 1/16 note
+    steps: 16,
+    pulses: 4,          // E(4,16) - classic tresillo
+    rotation: 0,
+    gateLength: 50,
+    swing: 0,
+  },
+  // FM Operator
+  'fm-op': {
+    frequency: 440,
+    ratio: 1,
+    level: 1,
+    feedback: 0,
+    attack: 10,
+    decay: 200,
+    sustain: 0.7,
+    release: 300,
+  },
+  // Notes (documentation)
+  notes: {
+    text: '',
   },
   // Master Clock
   clock: {

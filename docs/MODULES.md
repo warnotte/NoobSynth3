@@ -33,8 +33,31 @@ Oscillateur principal avec anti-aliasing polyBLEP.
 | `detune` | 0-100 cents | Spread entre les 7 voix |
 | `mix` | 0-1 | Balance centre/côtés |
 
-**Entrées** : pitch (CV)  
+**Entrées** : pitch (CV)
 **Sorties** : out (audio)
+
+### Karplus-Strong
+
+Synthèse physique par modélisation de cordes pincées. Idéal pour guitares, harpes, clavecins et basses.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `frequency` | 40-1200 Hz | Fréquence de base (hauteur) |
+| `damping` | 0-1 | Amortissement (0=brillant/long, 1=mat/court) |
+| `decay` | 0.9-0.999 | Durée de résonance |
+| `brightness` | 0-1 | Brillance du "pluck" initial |
+| `pluckPos` | 0.1-0.9 | Position du pincement (affecte les harmoniques) |
+
+**Entrées** : pitch (CV), gate (gate - déclenche le pluck)
+**Sorties** : out (audio)
+
+**Conseils son :**
+- **Guitare** : damping 0.2-0.3, brightness 0.6-0.8, pluckPos 0.3-0.5
+- **Harpe** : damping 0.3-0.5, brightness 0.3-0.5, decay élevé
+- **Basse** : frequency basse, damping faible, decay très élevé (0.998+)
+- **Clavecin** : damping élevé, brightness élevé, decay court
+
+> **TODO**: Revoir la synthèse Karplus-Strong - algorithme à affiner pour un son plus authentique.
 
 ### NES Osc (2A03)
 
@@ -595,6 +618,59 @@ Séquenceur 16 steps style TB-303 avec pitch CV, gate, vélocité et slide.
 | Velocity | `vel-out` | Vélocité normalisée (0-1) |
 | Accent | `acc-out` | Accent (vel > 100) |
 | Step | `step-out` | Numéro de step (0-15) |
+
+### Euclidean Sequencer
+
+Séquenceur de rythmes euclidiens utilisant l'algorithme de Bjorklund. Distribue N triggers de manière uniforme sur M steps.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `enabled` | true/false | Lecture active |
+| `tempo` | 40-300 BPM | Tempo (ignoré si clock externe) |
+| `rate` | 0-11 | Division de tempo |
+| `steps` | 2-32 | Nombre total de steps |
+| `pulses` | 0-steps | Nombre de triggers à distribuer |
+| `rotation` | 0-steps-1 | Offset du pattern |
+| `gateLength` | 10-100 % | Durée du gate |
+| `swing` | 0-90 % | Swing sur steps impairs |
+
+**Entrées :**
+| Port | ID | Description |
+|------|----|-------------|
+| Clock | `clock` | Clock externe (depuis Master Clock) |
+| Reset | `reset` | Reset externe (depuis Master Clock) |
+
+**Sorties :**
+| Port | ID | Description |
+|------|----|-------------|
+| Gate | `gate` | Gate trigger |
+| Step | `step` | Numéro de step actuel |
+
+**Patterns euclidiens classiques :**
+
+| Notation | Description |
+|----------|-------------|
+| E(3,8) | Tresillo cubain |
+| E(5,8) | Cinquillo cubain |
+| E(5,16) | Bossa nova |
+| E(7,12) | Afro-cubain |
+| E(4,16) | Four-on-the-floor |
+| E(7,16) | Brazilian samba |
+
+**Utilisation type :**
+```
+Clock → clock → Euclidean (clock)
+      → reset → Euclidean (reset)
+
+Euclidean (gate) → 909 Kick (trigger)   # Rythme euclidien sur kick
+Euclidean (gate) → ADSR (gate)          # Déclenche synthé
+```
+
+**Astuce polyrhythme :**
+Utiliser plusieurs séquenceurs euclidiens avec différents ratios pour créer des polyrhythmes complexes :
+- E(3,8) pour le kick
+- E(5,16) pour la snare
+- E(7,12) pour les hi-hats
 
 ### Drum Sequencer
 
