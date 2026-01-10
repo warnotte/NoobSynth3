@@ -1939,67 +1939,45 @@ export const ModuleControls = ({
           onChange={(value) => updateParam(module.id, 'volume', value)}
           format={(value) => `${Math.round(value * 100)}%`}
         />
-        <div className="filter-row">
-          <span className="filter-label">Mode</span>
-          <div className="filter-buttons filter-wide">
-            {[
-              { value: 0, label: 'PLS1' },
-              { value: 1, label: 'PLS2' },
-              { value: 2, label: 'TRI' },
-              { value: 3, label: 'NSE' },
-            ].map((m) => (
-              <button
-                key={m.value}
-                type="button"
-                className={`ui-btn filter-btn ${nesMode === m.value ? 'active' : ''}`}
-                onClick={() => updateParam(module.id, 'mode', m.value)}
-              >
-                {m.label}
-              </button>
-            ))}
-          </div>
-        </div>
+        <ButtonGroup
+          label="Mode"
+          options={[
+            { id: 0, label: 'PLS1' },
+            { id: 1, label: 'PLS2' },
+            { id: 2, label: 'TRI' },
+            { id: 3, label: 'NSE' },
+          ]}
+          value={nesMode}
+          onChange={(value) => updateParam(module.id, 'mode', value)}
+          wide
+          inline
+        />
         {nesMode < 2 && (
-          <div className="filter-row">
-            <span className="filter-label">Duty</span>
-            <div className="filter-buttons filter-wide">
-              {[
-                { value: 0, label: '12%' },
-                { value: 1, label: '25%' },
-                { value: 2, label: '50%' },
-                { value: 3, label: '75%' },
-              ].map((d) => (
-                <button
-                  key={d.value}
-                  type="button"
-                  className={`ui-btn filter-btn ${nesDuty === d.value ? 'active' : ''}`}
-                  onClick={() => updateParam(module.id, 'duty', d.value)}
-                >
-                  {d.label}
-                </button>
-              ))}
-            </div>
-          </div>
+          <ButtonGroup
+            label="Duty"
+            options={[
+              { id: 0, label: '12%' },
+              { id: 1, label: '25%' },
+              { id: 2, label: '50%' },
+              { id: 3, label: '75%' },
+            ]}
+            value={nesDuty}
+            onChange={(value) => updateParam(module.id, 'duty', value)}
+            wide
+            inline
+          />
         )}
         {nesMode === 3 && (
-          <div className="filter-row">
-            <span className="filter-label">Noise</span>
-            <div className="filter-buttons">
-              {[
-                { value: 0, label: 'RAND' },
-                { value: 1, label: 'LOOP' },
-              ].map((n) => (
-                <button
-                  key={n.value}
-                  type="button"
-                  className={`ui-btn filter-btn ${nesNoiseMode === n.value ? 'active' : ''}`}
-                  onClick={() => updateParam(module.id, 'noiseMode', n.value)}
-                >
-                  {n.label}
-                </button>
-              ))}
-            </div>
-          </div>
+          <ButtonGroup
+            label="Noise"
+            options={[
+              { id: 0, label: 'RAND' },
+              { id: 1, label: 'LOOP' },
+            ]}
+            value={nesNoiseMode}
+            onChange={(value) => updateParam(module.id, 'noiseMode', value)}
+            inline
+          />
         )}
         <RotaryKnob
           label="Crush"
@@ -2015,8 +1993,6 @@ export const ModuleControls = ({
   }
 
   if (module.type === 'snes-osc') {
-    const snesWave = Number(module.params.wave ?? 0)
-    const waveLabels = ['SQR', 'SAW', 'STR', 'BEL', 'ORG', 'PAD', 'BAS', 'SYN']
     return (
       <>
         <RotaryKnob
@@ -2048,36 +2024,23 @@ export const ModuleControls = ({
           onChange={(value) => updateParam(module.id, 'volume', value)}
           format={(value) => `${Math.round(value * 100)}%`}
         />
-        <div className="filter-row">
-          <span className="filter-label">Wave</span>
-          <div className="filter-buttons filter-wide">
-            {waveLabels.slice(0, 4).map((label, idx) => (
-              <button
-                key={idx}
-                type="button"
-                className={`ui-btn filter-btn ${snesWave === idx ? 'active' : ''}`}
-                onClick={() => updateParam(module.id, 'wave', idx)}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="filter-row">
-          <span className="filter-label" />
-          <div className="filter-buttons filter-wide">
-            {waveLabels.slice(4, 8).map((label, idx) => (
-              <button
-                key={idx + 4}
-                type="button"
-                className={`ui-btn filter-btn ${snesWave === idx + 4 ? 'active' : ''}`}
-                onClick={() => updateParam(module.id, 'wave', idx + 4)}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
+        <ButtonGroup
+          label="Wave"
+          options={[
+            { id: 0, label: 'SQR' },
+            { id: 1, label: 'SAW' },
+            { id: 2, label: 'STR' },
+            { id: 3, label: 'BEL' },
+            { id: 4, label: 'ORG' },
+            { id: 5, label: 'PAD' },
+            { id: 6, label: 'BAS' },
+            { id: 7, label: 'SYN' },
+          ]}
+          value={Number(module.params.wave ?? 0)}
+          onChange={(value) => updateParam(module.id, 'wave', value)}
+          wide
+          rowSize={4}
+        />
         <RotaryKnob
           label="Gauss"
           min={0}
