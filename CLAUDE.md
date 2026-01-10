@@ -44,27 +44,51 @@ npm run dev           # Start dev server
 npm run build         # Production build
 ```
 
-## Module Types
+## New Module Checklist
 
-### Sources
-oscillator, supersaw, karplus-strong, fm-operator, nes-osc, snes-osc, noise, tb-303
+Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 
-### Filters
+### Code (obligatoire)
+- [ ] `crates/dsp-core/src/lib.rs` - Implémentation DSP Rust
+- [ ] `crates/dsp-graph/src/lib.rs` - ModuleType enum + instantiation
+- [ ] `src/shared/graph.ts` - Type TypeScript
+- [ ] `src/state/moduleRegistry.ts` - Taille, labels, defaults, catégorie
+- [ ] `src/ui/portCatalog.ts` - Définition des ports
+- [ ] `src/ui/ModuleControls.tsx` - Interface utilisateur
+
+### Documentation (obligatoire)
+- [ ] `docs/MODULES.md` - Documentation complète du module
+- [ ] `README.md` - Mettre à jour le compte de modules (actuellement 52)
+- [ ] `CLAUDE.md` - Ajouter à la liste "Module Types" si pertinent
+
+### Optionnel
+- [ ] `public/presets/` - Preset de démonstration
+- [ ] `npm run build:wasm` - Rebuild WASM après modifs Rust
+
+## Module Types (52 total)
+
+### Sources (8)
+oscillator, supersaw, karplus, fm-op, nes-osc, snes-osc, noise, tb-303
+
+### Filters (2)
 vcf, hpf
 
-### Effects
+### Amplifiers (4)
+gain, cv-vca, mixer, mixer-1x2
+
+### Effects (14)
 chorus, ensemble, choir, vocoder, delay, granular-delay, tape-delay, spring-reverb, reverb, phaser, distortion, wavefolder, ring-mod, pitch-shifter
 
-### Modulators
+### Modulators (6)
 adsr, lfo, mod-router, sample-hold, slew, quantizer
 
-### Sequencers
-arpeggiator, step-sequencer, drum-sequencer, euclidean-sequencer, master-clock, mario
+### Sequencers (6)
+clock, arpeggiator, step-sequencer, euclidean, drum-sequencer, mario
 
-### TR-909 Drums
+### TR-909 Drums (6)
 909-kick, 909-snare, 909-hihat, 909-clap, 909-tom, 909-rimshot
 
-### I/O & Utilities
+### I/O & Utilities (6)
 control, output, audio-in, scope, lab, notes
 
 ---
