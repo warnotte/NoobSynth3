@@ -197,42 +197,27 @@ export const ModuleControls = ({
           value={String(module.params.type ?? 'sawtooth')}
           onChange={(value) => updateParam(module.id, 'type', value)}
         />
-        <div className="filter-row">
-          <div className="filter-group">
-            <span className="filter-label">Sub Oct</span>
-            <div className="filter-buttons">
-              {[1, 2].map((octave) => (
-                <button
-                  key={octave}
-                  type="button"
-                  className={`ui-btn filter-btn ${subOct === octave ? 'active' : ''}`}
-                  onClick={() => updateParam(module.id, 'subOct', octave)}
-                >
-                  -{octave}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-        <div className="filter-row">
-          <div className="filter-group">
-            <span className="filter-label">Unison</span>
-            <div className="filter-buttons filter-wide">
-              {[1, 2, 3, 4].map((count) => (
-                <button
-                  key={count}
-                  type="button"
-                  className={`ui-btn filter-btn ${
-                    Number(module.params.unison ?? 1) === count ? 'active' : ''
-                  }`}
-                  onClick={() => updateParam(module.id, 'unison', count)}
-                >
-                  {count}x
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
+        <ButtonGroup
+          label="Sub Oct"
+          options={[
+            { id: 1, label: '-1' },
+            { id: 2, label: '-2' },
+          ]}
+          value={subOct}
+          onChange={(value) => updateParam(module.id, 'subOct', value)}
+        />
+        <ButtonGroup
+          label="Unison"
+          options={[
+            { id: 1, label: '1x' },
+            { id: 2, label: '2x' },
+            { id: 3, label: '3x' },
+            { id: 4, label: '4x' },
+          ]}
+          value={Number(module.params.unison ?? 1)}
+          onChange={(value) => updateParam(module.id, 'unison', value)}
+          wide
+        />
       </>
     )
   }
@@ -2387,102 +2372,52 @@ export const ModuleControls = ({
         />
 
         {/* Mode */}
-        <div className="filter-row">
-          <span className="filter-label">Mode</span>
-          <div className="filter-buttons filter-wide">
-            {arpModes.slice(0, 5).map((m) => (
-              <button
-                key={m.id}
-                type="button"
-                className={`ui-btn filter-btn ${mode === m.id ? 'active' : ''}`}
-                onClick={() => updateParam(module.id, 'mode', m.id)}
-              >
-                {m.label}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="filter-row">
-          <span className="filter-label" />
-          <div className="filter-buttons filter-wide">
-            {arpModes.slice(5, 10).map((m) => (
-              <button
-                key={m.id}
-                type="button"
-                className={`ui-btn filter-btn ${mode === m.id ? 'active' : ''}`}
-                onClick={() => updateParam(module.id, 'mode', m.id)}
-              >
-                {m.label}
-              </button>
-            ))}
-          </div>
-        </div>
+        <ButtonGroup
+          label="Mode"
+          options={arpModes}
+          value={mode}
+          onChange={(value) => updateParam(module.id, 'mode', value)}
+          wide
+          rowSize={5}
+        />
 
         {/* Rate */}
-        <div className="filter-row">
-          <span className="filter-label">Rate</span>
-          <div className="filter-buttons filter-wide">
-            {rateDivisions.slice(0, 3).map((r) => (
-              <button
-                key={r.id}
-                type="button"
-                className={`ui-btn filter-btn ${rate === r.id ? 'active' : ''}`}
-                onClick={() => updateParam(module.id, 'rate', r.id)}
-              >
-                {r.label}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="filter-row">
-          <span className="filter-label" />
-          <div className="filter-buttons filter-wide">
-            {rateDivisions.slice(3, 6).map((r) => (
-              <button
-                key={r.id}
-                type="button"
-                className={`ui-btn filter-btn ${rate === r.id ? 'active' : ''}`}
-                onClick={() => updateParam(module.id, 'rate', r.id)}
-              >
-                {r.label}
-              </button>
-            ))}
-          </div>
-        </div>
+        <ButtonGroup
+          label="Rate"
+          options={rateDivisions}
+          value={rate}
+          onChange={(value) => updateParam(module.id, 'rate', value)}
+          wide
+          rowSize={3}
+        />
 
         {/* Octaves */}
-        <div className="filter-row">
-          <span className="filter-label">Oct</span>
-          <div className="filter-buttons">
-            {[1, 2, 3, 4].map((o) => (
-              <button
-                key={o}
-                type="button"
-                className={`ui-btn filter-btn ${octaves === o ? 'active' : ''}`}
-                onClick={() => updateParam(module.id, 'octaves', o)}
-              >
-                {o}
-              </button>
-            ))}
-          </div>
-        </div>
+        <ButtonGroup
+          label="Oct"
+          options={[
+            { id: 1, label: '1' },
+            { id: 2, label: '2' },
+            { id: 3, label: '3' },
+            { id: 4, label: '4' },
+          ]}
+          value={octaves}
+          onChange={(value) => updateParam(module.id, 'octaves', value)}
+          inline
+        />
 
         {/* Ratchet */}
-        <div className="filter-row">
-          <span className="filter-label">Ratchet</span>
-          <div className="filter-buttons">
-            {[1, 2, 3, 4].map((r) => (
-              <button
-                key={r}
-                type="button"
-                className={`ui-btn filter-btn ${ratchet === r ? 'active' : ''}`}
-                onClick={() => updateParam(module.id, 'ratchet', r)}
-              >
-                {r}x
-              </button>
-            ))}
-          </div>
-        </div>
+        <ButtonGroup
+          label="Ratchet"
+          options={[
+            { id: 1, label: '1x' },
+            { id: 2, label: '2x' },
+            { id: 3, label: '3x' },
+            { id: 4, label: '4x' },
+          ]}
+          value={ratchet}
+          onChange={(value) => updateParam(module.id, 'ratchet', value)}
+          inline
+        />
 
         <RotaryKnob
           label="Prob"
@@ -3270,27 +3205,15 @@ export const ModuleControls = ({
     return (
       <>
         {/* Waveform selector */}
-        <div className="filter-row">
-          <div className="filter-group">
-            <span className="filter-label">Wave</span>
-            <div className="filter-buttons">
-              <button
-                type="button"
-                className={`ui-btn filter-btn ${waveform < 0.5 ? 'active' : ''}`}
-                onClick={() => updateParam(module.id, 'waveform', 0)}
-              >
-                SAW
-              </button>
-              <button
-                type="button"
-                className={`ui-btn filter-btn ${waveform >= 0.5 ? 'active' : ''}`}
-                onClick={() => updateParam(module.id, 'waveform', 1)}
-              >
-                SQ
-              </button>
-            </div>
-          </div>
-        </div>
+        <ButtonGroup
+          label="Wave"
+          options={[
+            { id: 0, label: 'SAW' },
+            { id: 1, label: 'SQ' },
+          ]}
+          value={waveform < 0.5 ? 0 : 1}
+          onChange={(value) => updateParam(module.id, 'waveform', value)}
+        />
         {/* Main knobs */}
         <RotaryKnob
           label="Cutoff"
