@@ -768,14 +768,6 @@ export const ModuleControls = ({
   }
 
   if (module.type === 'choir') {
-    const vowel = Number(module.params.vowel ?? 0)
-    const vowels = [
-      { id: 0, label: 'A' },
-      { id: 1, label: 'E' },
-      { id: 2, label: 'I' },
-      { id: 3, label: 'O' },
-      { id: 4, label: 'U' },
-    ]
     return (
       <>
         <RotaryKnob
@@ -806,23 +798,19 @@ export const ModuleControls = ({
           onChange={(value) => updateParam(module.id, 'mix', value)}
           format={(value) => value.toFixed(2)}
         />
-        <div className="filter-row">
-          <div className="filter-group">
-            <span className="filter-label">Vowel</span>
-            <div className="filter-buttons filter-wide">
-              {vowels.map((option) => (
-                <button
-                  key={option.id}
-                  type="button"
-                  className={`ui-btn filter-btn ${vowel === option.id ? 'active' : ''}`}
-                  onClick={() => updateParam(module.id, 'vowel', option.id)}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
+        <ButtonGroup
+          label="Vowel"
+          options={[
+            { id: 0, label: 'A' },
+            { id: 1, label: 'E' },
+            { id: 2, label: 'I' },
+            { id: 3, label: 'O' },
+            { id: 4, label: 'U' },
+          ]}
+          value={Number(module.params.vowel ?? 0)}
+          onChange={(value) => updateParam(module.id, 'vowel', value)}
+          wide
+        />
       </>
     )
   }
@@ -1288,60 +1276,36 @@ export const ModuleControls = ({
           unit="%"
           format={(value) => `${Math.round(value * 100)}`}
         />
-        <div className="filter-row">
-          <div className="filter-group">
-            <span className="filter-label">Model</span>
-            <div className="filter-buttons">
-              {[
-                { id: 'svf', label: 'SVF' },
-                { id: 'ladder', label: 'LAD' },
-              ].map((option) => (
-                <button
-                  key={option.id}
-                  type="button"
-                  className={`ui-btn filter-btn ${model === option.id ? 'active' : ''}`}
-                  onClick={() => handleModelChange(option.id)}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-        <div className="filter-row">
-          <div className="filter-group">
-            <span className="filter-label">Mode</span>
-            <div className="filter-buttons filter-wide">
-              {['lp', 'hp', 'bp', 'notch'].map((option) => (
-                <button
-                  key={option}
-                  type="button"
-                  className={`ui-btn filter-btn ${mode === option ? 'active' : ''}`}
-                  onClick={() => handleModeChange(option)}
-                >
-                  {option.toUpperCase()}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-        <div className="filter-row">
-          <div className="filter-group">
-            <span className="filter-label">Slope</span>
-            <div className="filter-buttons">
-              {[12, 24].map((option) => (
-                <button
-                  key={option}
-                  type="button"
-                  className={`ui-btn filter-btn ${slope === option ? 'active' : ''}`}
-                  onClick={() => updateParam(module.id, 'slope', option)}
-                >
-                  {option}dB
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
+        <ButtonGroup
+          label="Model"
+          options={[
+            { id: 'svf', label: 'SVF' },
+            { id: 'ladder', label: 'LAD' },
+          ]}
+          value={model}
+          onChange={handleModelChange}
+        />
+        <ButtonGroup
+          label="Mode"
+          options={[
+            { id: 'lp', label: 'LP' },
+            { id: 'hp', label: 'HP' },
+            { id: 'bp', label: 'BP' },
+            { id: 'notch', label: 'NOTCH' },
+          ]}
+          value={mode}
+          onChange={handleModeChange}
+          wide
+        />
+        <ButtonGroup
+          label="Slope"
+          options={[
+            { id: 12, label: '12dB' },
+            { id: 24, label: '24dB' },
+          ]}
+          value={slope}
+          onChange={(value) => updateParam(module.id, 'slope', value)}
+        />
       </>
     )
   }
@@ -2190,12 +2154,6 @@ export const ModuleControls = ({
   }
 
   if (module.type === 'distortion') {
-    const mode = String(module.params.mode ?? 'soft')
-    const modes = [
-      { id: 'soft', label: 'SOFT' },
-      { id: 'hard', label: 'HARD' },
-      { id: 'fold', label: 'FOLD' },
-    ]
     return (
       <>
         <RotaryKnob
@@ -2225,23 +2183,17 @@ export const ModuleControls = ({
           onChange={(value) => updateParam(module.id, 'mix', value)}
           format={(value) => value.toFixed(2)}
         />
-        <div className="filter-row">
-          <div className="filter-group">
-            <span className="filter-label">Mode</span>
-            <div className="filter-buttons filter-wide">
-              {modes.map((option) => (
-                <button
-                  key={option.id}
-                  type="button"
-                  className={`ui-btn filter-btn ${mode === option.id ? 'active' : ''}`}
-                  onClick={() => updateParam(module.id, 'mode', option.id)}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
+        <ButtonGroup
+          label="Mode"
+          options={[
+            { id: 'soft', label: 'SOFT' },
+            { id: 'hard', label: 'HARD' },
+            { id: 'fold', label: 'FOLD' },
+          ]}
+          value={String(module.params.mode ?? 'soft')}
+          onChange={(value) => updateParam(module.id, 'mode', value)}
+          wide
+        />
       </>
     )
   }
