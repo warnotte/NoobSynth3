@@ -8,6 +8,7 @@ import { DEFAULT_SEQUENCER_PATTERN } from '../state/sequencerPattern'
 import { Oscilloscope } from './Oscilloscope'
 import { RotaryKnob } from './RotaryKnob'
 import { WaveformSelector } from './WaveformSelector'
+import { ButtonGroup } from './ButtonGroup'
 
 type NativeScopeBridge = {
   isActive: boolean
@@ -251,12 +252,6 @@ export const ModuleControls = ({
   }
 
   if (module.type === 'noise') {
-    const noiseType = String(module.params.noiseType ?? 'white')
-    const noiseTypes: Array<{ id: string; label: string }> = [
-      { id: 'white', label: 'WHT' },
-      { id: 'pink', label: 'PNK' },
-      { id: 'brown', label: 'BRN' },
-    ]
     return (
       <>
         <RotaryKnob
@@ -268,23 +263,17 @@ export const ModuleControls = ({
           onChange={(value) => updateParam(module.id, 'level', value)}
           format={(value) => value.toFixed(2)}
         />
-        <div className="filter-row">
-          <div className="filter-group">
-            <span className="filter-label">Type</span>
-            <div className="filter-buttons filter-wide">
-              {noiseTypes.map((option) => (
-                <button
-                  key={option.id}
-                  type="button"
-                  className={`ui-btn filter-btn ${noiseType === option.id ? 'active' : ''}`}
-                  onClick={() => updateParam(module.id, 'noiseType', option.id)}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
+        <ButtonGroup
+          label="Type"
+          options={[
+            { id: 'white', label: 'WHT' },
+            { id: 'pink', label: 'PNK' },
+            { id: 'brown', label: 'BRN' },
+          ]}
+          value={String(module.params.noiseType ?? 'white')}
+          onChange={(value) => updateParam(module.id, 'noiseType', value)}
+          wide
+        />
       </>
     )
   }
@@ -399,29 +388,17 @@ export const ModuleControls = ({
   }
 
   if (module.type === 'sample-hold') {
-    const mode = Number(module.params.mode ?? 0)
+    const mode = Number(module.params.mode ?? 0) < 0.5 ? 0 : 1
     return (
-      <div className="filter-row">
-        <div className="filter-group">
-          <span className="filter-label">Mode</span>
-          <div className="filter-buttons">
-            <button
-              type="button"
-              className={`ui-btn filter-btn ${mode < 0.5 ? 'active' : ''}`}
-              onClick={() => updateParam(module.id, 'mode', 0)}
-            >
-              Sample
-            </button>
-            <button
-              type="button"
-              className={`ui-btn filter-btn ${mode >= 0.5 ? 'active' : ''}`}
-              onClick={() => updateParam(module.id, 'mode', 1)}
-            >
-              Random
-            </button>
-          </div>
-        </div>
-      </div>
+      <ButtonGroup
+        label="Mode"
+        options={[
+          { id: 0, label: 'Sample' },
+          { id: 1, label: 'Random' },
+        ]}
+        value={mode}
+        onChange={(value) => updateParam(module.id, 'mode', value)}
+      />
     )
   }
 
@@ -453,19 +430,7 @@ export const ModuleControls = ({
   }
 
   if (module.type === 'quantizer') {
-    const root = Number(module.params.root ?? 0)
-    const scale = Number(module.params.scale ?? 0)
     const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
-    const scales = [
-      { id: 0, label: 'CHR' },
-      { id: 1, label: 'MAJ' },
-      { id: 2, label: 'MIN' },
-      { id: 3, label: 'DOR' },
-      { id: 4, label: 'LYD' },
-      { id: 5, label: 'MIX' },
-      { id: 6, label: 'PMJ' },
-      { id: 7, label: 'PMN' },
-    ]
     return (
       <>
         <RotaryKnob
@@ -473,40 +438,27 @@ export const ModuleControls = ({
           min={0}
           max={11}
           step={1}
-          value={root}
+          value={Number(module.params.root ?? 0)}
           onChange={(value) => updateParam(module.id, 'root', Math.round(value))}
           format={(value) => notes[Math.round(value) % notes.length] ?? 'C'}
         />
-        <div className="filter-row">
-          <span className="filter-label">Scale</span>
-          <div className="filter-buttons filter-wide">
-            {scales.slice(0, 4).map((option) => (
-              <button
-                key={option.id}
-                type="button"
-                className={`ui-btn filter-btn ${scale === option.id ? 'active' : ''}`}
-                onClick={() => updateParam(module.id, 'scale', option.id)}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="filter-row">
-          <span className="filter-label" />
-          <div className="filter-buttons filter-wide">
-            {scales.slice(4).map((option) => (
-              <button
-                key={option.id}
-                type="button"
-                className={`ui-btn filter-btn ${scale === option.id ? 'active' : ''}`}
-                onClick={() => updateParam(module.id, 'scale', option.id)}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
-        </div>
+        <ButtonGroup
+          label="Scale"
+          options={[
+            { id: 0, label: 'CHR' },
+            { id: 1, label: 'MAJ' },
+            { id: 2, label: 'MIN' },
+            { id: 3, label: 'DOR' },
+            { id: 4, label: 'LYD' },
+            { id: 5, label: 'MIX' },
+            { id: 6, label: 'PMJ' },
+            { id: 7, label: 'PMN' },
+          ]}
+          value={Number(module.params.scale ?? 0)}
+          onChange={(value) => updateParam(module.id, 'scale', value)}
+          wide
+          rowSize={4}
+        />
       </>
     )
   }
