@@ -17,6 +17,7 @@ import {
   formatFreq,
   formatMs,
 } from './formatters'
+import { ToggleButton, ToggleGroup } from './ToggleButton'
 
 type NativeScopeBridge = {
   isActive: boolean
@@ -960,15 +961,13 @@ export const ModuleControls = ({
           onChange={(value) => updateParam(module.id, 'tone', value)}
           format={(value) => `${Math.round(value * 100)}%`}
         />
-        <div className="toggle-group">
-          <button
-            type="button"
-            className={`ui-btn ui-btn--pill toggle-btn ${pingPong ? 'active' : ''}`}
-            onClick={() => updateParam(module.id, 'pingPong', !pingPong)}
-          >
-            Ping Pong
-          </button>
-        </div>
+        <ToggleGroup>
+          <ToggleButton
+            label="Ping Pong"
+            value={pingPong}
+            onChange={(value) => updateParam(module.id, 'pingPong', value)}
+          />
+        </ToggleGroup>
       </>
     )
   }
@@ -1407,16 +1406,14 @@ export const ModuleControls = ({
             Sync
           </button>
         </div>
-        <div className="toggle-group">
-          <button
-            type="button"
-            className={`ui-btn ui-btn--pill toggle-btn ${keyboardEnabled ? 'active' : ''}`}
-            onClick={() => updateParam(module.id, 'keyboardEnabled', !keyboardEnabled)}
+        <ToggleGroup>
+          <ToggleButton
+            label="PC Keyboard"
+            value={keyboardEnabled}
+            onChange={(value) => updateParam(module.id, 'keyboardEnabled', value)}
             title="Use computer keyboard as piano (Z-M = lower octave, Q-U = upper octave)"
-          >
-            PC Keyboard
-          </button>
-        </div>
+          />
+        </ToggleGroup>
         {keyboardEnabled && (
           <div className="keyboard-hint" style={{ fontSize: 10, color: '#8af', marginBottom: 8, textAlign: 'center', lineHeight: 1.4 }}>
             <div>QWERTY: Z X C V B N M | Q W E R T Y U</div>
@@ -2330,22 +2327,19 @@ export const ModuleControls = ({
     return (
       <>
         {/* ON/OFF and HOLD */}
-        <div className="toggle-group">
-          <button
-            type="button"
-            className={`ui-btn ui-btn--pill toggle-btn ${enabled ? 'active' : ''}`}
-            onClick={() => updateParam(module.id, 'enabled', !enabled)}
-          >
-            {enabled ? 'ON' : 'OFF'}
-          </button>
-          <button
-            type="button"
-            className={`ui-btn ui-btn--pill toggle-btn ${hold ? 'active' : ''}`}
-            onClick={() => updateParam(module.id, 'hold', !hold)}
-          >
-            HOLD
-          </button>
-        </div>
+        <ToggleGroup>
+          <ToggleButton
+            label="ON"
+            value={enabled}
+            onChange={(value) => updateParam(module.id, 'enabled', value)}
+            onOff
+          />
+          <ToggleButton
+            label="HOLD"
+            value={hold}
+            onChange={(value) => updateParam(module.id, 'hold', value)}
+          />
+        </ToggleGroup>
 
         {/* Knobs row */}
         <RotaryKnob
@@ -2439,15 +2433,13 @@ export const ModuleControls = ({
         />
 
         {/* Euclidean */}
-        <div className="toggle-group">
-          <button
-            type="button"
-            className={`ui-btn ui-btn--pill toggle-btn ${euclidEnabled ? 'active' : ''}`}
-            onClick={() => updateParam(module.id, 'euclidEnabled', !euclidEnabled)}
-          >
-            Euclidean
-          </button>
-        </div>
+        <ToggleGroup>
+          <ToggleButton
+            label="Euclidean"
+            value={euclidEnabled}
+            onChange={(value) => updateParam(module.id, 'euclidEnabled', value)}
+          />
+        </ToggleGroup>
         {euclidEnabled && (
           <>
             <RotaryKnob
@@ -2680,15 +2672,14 @@ export const ModuleControls = ({
     return (
       <>
         {/* ON/OFF */}
-        <div className="toggle-group">
-          <button
-            type="button"
-            className={`ui-btn ui-btn--pill toggle-btn ${enabled ? 'active' : ''}`}
-            onClick={() => updateParam(module.id, 'enabled', !enabled)}
-          >
-            {enabled ? 'ON' : 'OFF'}
-          </button>
-        </div>
+        <ToggleGroup>
+          <ToggleButton
+            label="ON"
+            value={enabled}
+            onChange={(value) => updateParam(module.id, 'enabled', value)}
+            onOff
+          />
+        </ToggleGroup>
 
         {/* Pattern Presets - All in one row */}
         <div className="seq-pattern-row">
@@ -3594,15 +3585,15 @@ export const ModuleControls = ({
     return (
       <>
         {/* Play/Stop Toggle */}
-        <div className="toggle-group">
-          <button
-            type="button"
-            className={`ui-btn ui-btn--pill toggle-btn ${enabled ? 'active' : ''}`}
-            onClick={() => updateParam(module.id, 'enabled', !enabled)}
-          >
-            {enabled ? 'PLAY' : 'STOP'}
-          </button>
-        </div>
+        <ToggleGroup>
+          <ToggleButton
+            label="PLAY"
+            value={enabled}
+            onChange={(value) => updateParam(module.id, 'enabled', value)}
+            onLabel="PLAY"
+            offLabel="STOP"
+          />
+        </ToggleGroup>
 
         {/* Tempo knob */}
         <RotaryKnob
@@ -3882,15 +3873,15 @@ export const ModuleControls = ({
     return (
       <>
         {/* Play/Stop Toggle */}
-        <div className="toggle-group">
-          <button
-            type="button"
-            className={`ui-btn ui-btn--pill toggle-btn ${running ? 'active' : ''}`}
-            onClick={() => updateParam(module.id, 'running', !running)}
-          >
-            {running ? 'PLAY' : 'STOP'}
-          </button>
-        </div>
+        <ToggleGroup>
+          <ToggleButton
+            label="PLAY"
+            value={running}
+            onChange={(value) => updateParam(module.id, 'running', value)}
+            onLabel="PLAY"
+            offLabel="STOP"
+          />
+        </ToggleGroup>
 
         {/* Tempo & Swing knobs */}
         <RotaryKnob
