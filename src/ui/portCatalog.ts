@@ -14,6 +14,33 @@ export type ModulePorts = {
   outputs: PortDefinition[]
 }
 
+// Helper for simple audio effects (in -> out)
+const simpleAudioEffect = (): ModulePorts => ({
+  inputs: [{ id: 'in', label: 'In', kind: 'audio', direction: 'in' }],
+  outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
+})
+
+// Helper for TR-909 drum modules (trigger + accent -> out)
+const drum909Ports = (): ModulePorts => ({
+  inputs: [
+    { id: 'trigger', label: 'Trig', kind: 'gate', direction: 'in' },
+    { id: 'accent', label: 'Acc', kind: 'cv', direction: 'in' },
+  ],
+  outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
+})
+
+// Helper for simple CV processors (cv in -> cv out)
+const simpleCvProcessor = (): ModulePorts => ({
+  inputs: [{ id: 'in', label: 'In', kind: 'cv', direction: 'in' }],
+  outputs: [{ id: 'out', label: 'Out', kind: 'cv', direction: 'out' }],
+})
+
+// Helper for simple oscillators (pitch in -> audio out)
+const pitchToAudio = (): ModulePorts => ({
+  inputs: [{ id: 'pitch', label: 'Pitch', kind: 'cv', direction: 'in' }],
+  outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
+})
+
 export const modulePorts: Record<ModuleType, ModulePorts> = {
   oscillator: {
     inputs: [
@@ -50,14 +77,8 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
     ],
     outputs: [{ id: 'out', label: 'Out', kind: 'cv', direction: 'out' }],
   },
-  slew: {
-    inputs: [{ id: 'in', label: 'In', kind: 'cv', direction: 'in' }],
-    outputs: [{ id: 'out', label: 'Out', kind: 'cv', direction: 'out' }],
-  },
-  quantizer: {
-    inputs: [{ id: 'in', label: 'In', kind: 'cv', direction: 'in' }],
-    outputs: [{ id: 'out', label: 'Out', kind: 'cv', direction: 'out' }],
-  },
+  slew: simpleCvProcessor(),
+  quantizer: simpleCvProcessor(),
   'ring-mod': {
     inputs: [
       { id: 'in-a', label: 'In A', kind: 'audio', direction: 'in' },
@@ -92,10 +113,7 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
     ],
     outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
   },
-  hpf: {
-    inputs: [{ id: 'in', label: 'In', kind: 'audio', direction: 'in' }],
-    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
-  },
+  hpf: simpleAudioEffect(),
   mixer: {
     inputs: [
       { id: 'in-a', label: 'In A', kind: 'audio', direction: 'in' },
@@ -114,18 +132,9 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
     ],
     outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
   },
-  chorus: {
-    inputs: [{ id: 'in', label: 'In', kind: 'audio', direction: 'in' }],
-    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
-  },
-  ensemble: {
-    inputs: [{ id: 'in', label: 'In', kind: 'audio', direction: 'in' }],
-    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
-  },
-  choir: {
-    inputs: [{ id: 'in', label: 'In', kind: 'audio', direction: 'in' }],
-    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
-  },
+  chorus: simpleAudioEffect(),
+  ensemble: simpleAudioEffect(),
+  choir: simpleAudioEffect(),
   'audio-in': {
     inputs: [],
     outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
@@ -137,42 +146,15 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
     ],
     outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
   },
-  delay: {
-    inputs: [{ id: 'in', label: 'In', kind: 'audio', direction: 'in' }],
-    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
-  },
-  'granular-delay': {
-    inputs: [{ id: 'in', label: 'In', kind: 'audio', direction: 'in' }],
-    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
-  },
-  'tape-delay': {
-    inputs: [{ id: 'in', label: 'In', kind: 'audio', direction: 'in' }],
-    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
-  },
-  'spring-reverb': {
-    inputs: [{ id: 'in', label: 'In', kind: 'audio', direction: 'in' }],
-    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
-  },
-  reverb: {
-    inputs: [{ id: 'in', label: 'In', kind: 'audio', direction: 'in' }],
-    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
-  },
-  phaser: {
-    inputs: [{ id: 'in', label: 'In', kind: 'audio', direction: 'in' }],
-    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
-  },
-  distortion: {
-    inputs: [{ id: 'in', label: 'In', kind: 'audio', direction: 'in' }],
-    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
-  },
-  wavefolder: {
-    inputs: [{ id: 'in', label: 'In', kind: 'audio', direction: 'in' }],
-    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
-  },
-  supersaw: {
-    inputs: [{ id: 'pitch', label: 'Pitch', kind: 'cv', direction: 'in' }],
-    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
-  },
+  delay: simpleAudioEffect(),
+  'granular-delay': simpleAudioEffect(),
+  'tape-delay': simpleAudioEffect(),
+  'spring-reverb': simpleAudioEffect(),
+  reverb: simpleAudioEffect(),
+  phaser: simpleAudioEffect(),
+  distortion: simpleAudioEffect(),
+  wavefolder: simpleAudioEffect(),
+  supersaw: pitchToAudio(),
   karplus: {
     inputs: [
       { id: 'pitch', label: 'Pitch', kind: 'cv', direction: 'in' },
@@ -180,14 +162,8 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
     ],
     outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
   },
-  'nes-osc': {
-    inputs: [{ id: 'pitch', label: 'Pitch', kind: 'cv', direction: 'in' }],
-    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
-  },
-  'snes-osc': {
-    inputs: [{ id: 'pitch', label: 'Pitch', kind: 'cv', direction: 'in' }],
-    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
-  },
+  'nes-osc': pitchToAudio(),
+  'snes-osc': pitchToAudio(),
   lfo: {
     inputs: [
       { id: 'rate', label: 'Rate', kind: 'cv', direction: 'in' },
@@ -294,60 +270,12 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
     ],
   },
   // TR-909 Drums
-  '909-kick': {
-    inputs: [
-      { id: 'trigger', label: 'Trig', kind: 'gate', direction: 'in' },
-      { id: 'accent', label: 'Acc', kind: 'cv', direction: 'in' },
-    ],
-    outputs: [
-      { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
-    ],
-  },
-  '909-snare': {
-    inputs: [
-      { id: 'trigger', label: 'Trig', kind: 'gate', direction: 'in' },
-      { id: 'accent', label: 'Acc', kind: 'cv', direction: 'in' },
-    ],
-    outputs: [
-      { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
-    ],
-  },
-  '909-hihat': {
-    inputs: [
-      { id: 'trigger', label: 'Trig', kind: 'gate', direction: 'in' },
-      { id: 'accent', label: 'Acc', kind: 'cv', direction: 'in' },
-    ],
-    outputs: [
-      { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
-    ],
-  },
-  '909-clap': {
-    inputs: [
-      { id: 'trigger', label: 'Trig', kind: 'gate', direction: 'in' },
-      { id: 'accent', label: 'Acc', kind: 'cv', direction: 'in' },
-    ],
-    outputs: [
-      { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
-    ],
-  },
-  '909-tom': {
-    inputs: [
-      { id: 'trigger', label: 'Trig', kind: 'gate', direction: 'in' },
-      { id: 'accent', label: 'Acc', kind: 'cv', direction: 'in' },
-    ],
-    outputs: [
-      { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
-    ],
-  },
-  '909-rimshot': {
-    inputs: [
-      { id: 'trigger', label: 'Trig', kind: 'gate', direction: 'in' },
-      { id: 'accent', label: 'Acc', kind: 'cv', direction: 'in' },
-    ],
-    outputs: [
-      { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
-    ],
-  },
+  '909-kick': drum909Ports(),
+  '909-snare': drum909Ports(),
+  '909-hihat': drum909Ports(),
+  '909-clap': drum909Ports(),
+  '909-tom': drum909Ports(),
+  '909-rimshot': drum909Ports(),
   // Drum Sequencer
   'drum-sequencer': {
     inputs: [

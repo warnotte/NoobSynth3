@@ -8,6 +8,7 @@ import {
   type ModuleCategory,
 } from '../state/moduleRegistry'
 import { MacroPanel } from './MacroPanel'
+import { PanelSection } from './PanelSection'
 
 type SidePanelProps = {
   gridError: string | null
@@ -209,26 +210,14 @@ export const SidePanel = ({
 
   return (
     <aside className="side-panel">
-      <div className={`panel-section ${collapsedSections.library ? 'collapsed' : ''}`}>
-        <div className="panel-section-header">
-          <button
-            type="button"
-            className={`panel-section-toggle ${
-              collapsedSections.library ? 'is-collapsed' : ''
-            }`}
-            onClick={() => toggleSection('library')}
-            aria-expanded={!collapsedSections.library}
-            aria-label={collapsedSections.library ? 'Expand Module Library' : 'Collapse Module Library'}
-          >
-            <span className="panel-toggle-glyph" aria-hidden="true" />
-            <span className="panel-title">Module Library</span>
-          </button>
-        </div>
-        {!collapsedSections.library && (
-          <div className="panel-section-body">
-            <p className="muted">
-              Click a module to add it to the rack. Use New Rack to clear everything.
-            </p>
+      <PanelSection
+        title="Module Library"
+        collapsed={collapsedSections.library}
+        onToggle={() => toggleSection('library')}
+      >
+        <p className="muted">
+          Click a module to add it to the rack. Use New Rack to clear everything.
+        </p>
             <div className="library-actions">
               <button
                 type="button"
@@ -298,51 +287,23 @@ export const SidePanel = ({
                 )
               })}
             </div>
-          </div>
-        )}
-      </div>
-      <div className={`panel-section ${collapsedSections.patching ? 'collapsed' : ''}`}>
-        <div className="panel-section-header">
-          <button
-            type="button"
-            className={`panel-section-toggle ${
-              collapsedSections.patching ? 'is-collapsed' : ''
-            }`}
-            onClick={() => toggleSection('patching')}
-            aria-expanded={!collapsedSections.patching}
-            aria-label={collapsedSections.patching ? 'Expand Patching' : 'Collapse Patching'}
-          >
-            <span className="panel-toggle-glyph" aria-hidden="true" />
-            <span className="panel-title">Patching</span>
-          </button>
-        </div>
-        {!collapsedSections.patching && (
-          <div className="panel-section-body">
-            <p className="muted">
-              Drag from any jack to connect. Drag from a connected input to empty
-              space to unplug. Colors indicate signal type.
-            </p>
-          </div>
-        )}
-      </div>
-      <div className={`panel-section ${collapsedSections.presets ? 'collapsed' : ''}`}>
-        <div className="panel-section-header">
-          <button
-            type="button"
-            className={`panel-section-toggle ${
-              collapsedSections.presets ? 'is-collapsed' : ''
-            }`}
-            onClick={() => toggleSection('presets')}
-            aria-expanded={!collapsedSections.presets}
-            aria-label={collapsedSections.presets ? 'Expand Presets' : 'Collapse Presets'}
-          >
-            <span className="panel-toggle-glyph" aria-hidden="true" />
-            <span className="panel-title">Presets</span>
-          </button>
-        </div>
-        {!collapsedSections.presets && (
-          <div className="panel-section-body">
-            <p className="muted">Pick a curated patch to audition the synth.</p>
+      </PanelSection>
+      <PanelSection
+        title="Patching"
+        collapsed={collapsedSections.patching}
+        onToggle={() => toggleSection('patching')}
+      >
+        <p className="muted">
+          Drag from any jack to connect. Drag from a connected input to empty
+          space to unplug. Colors indicate signal type.
+        </p>
+      </PanelSection>
+      <PanelSection
+        title="Presets"
+        collapsed={collapsedSections.presets}
+        onToggle={() => toggleSection('presets')}
+      >
+        <p className="muted">Pick a curated patch to audition the synth.</p>
             <input
               className="preset-search"
               type="search"
@@ -434,27 +395,13 @@ export const SidePanel = ({
                 })}
               </div>
             )}
-          </div>
-        )}
-      </div>
-      <div className={`panel-section ${collapsedSections.macros ? 'collapsed' : ''}`}>
-        <div className="panel-section-header">
-          <button
-            type="button"
-            className={`panel-section-toggle ${
-              collapsedSections.macros ? 'is-collapsed' : ''
-            }`}
-            onClick={() => toggleSection('macros')}
-            aria-expanded={!collapsedSections.macros}
-            aria-label={collapsedSections.macros ? 'Expand Macros' : 'Collapse Macros'}
-          >
-            <span className="panel-toggle-glyph" aria-hidden="true" />
-            <span className="panel-title">Macros</span>
-          </button>
-        </div>
-        {!collapsedSections.macros && (
-          <div className="panel-section-body">
-            <MacroPanel
+      </PanelSection>
+      <PanelSection
+        title="Macros"
+        collapsed={collapsedSections.macros}
+        onToggle={() => toggleSection('macros')}
+      >
+        <MacroPanel
               macros={macros}
               macroValues={macroValues}
               macroOverride={macroOverride}
@@ -467,27 +414,13 @@ export const SidePanel = ({
               onAddMacroTarget={onAddMacroTarget}
               onRemoveMacroTarget={onRemoveMacroTarget}
             />
-          </div>
-        )}
-      </div>
-      <div className={`panel-section ${collapsedSections.tauri ? 'collapsed' : ''}`}>
-        <div className="panel-section-header">
-          <button
-            type="button"
-            className={`panel-section-toggle ${
-              collapsedSections.tauri ? 'is-collapsed' : ''
-            }`}
-            onClick={() => toggleSection('tauri')}
-            aria-expanded={!collapsedSections.tauri}
-            aria-label={collapsedSections.tauri ? 'Expand Tauri Bridge' : 'Collapse Tauri Bridge'}
-          >
-            <span className="panel-toggle-glyph" aria-hidden="true" />
-            <span className="panel-title">Tauri Bridge</span>
-          </button>
-        </div>
-        {!collapsedSections.tauri && (
-          <div className="panel-section-body">
-            <p className="muted">Check native audio/MIDI when running the desktop app.</p>
+      </PanelSection>
+      <PanelSection
+        title="Tauri Bridge"
+        collapsed={collapsedSections.tauri}
+        onToggle={() => toggleSection('tauri')}
+      >
+        <p className="muted">Check native audio/MIDI when running the desktop app.</p>
             {!tauriAvailable && <div className="preset-status">Web mode detected.</div>}
             {tauriAvailable && (
               <>
@@ -645,9 +578,7 @@ export const SidePanel = ({
                 )}
               </>
             )}
-          </div>
-        )}
-      </div>
+      </PanelSection>
     </aside>
   )
 }
