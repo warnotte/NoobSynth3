@@ -2577,6 +2577,7 @@ export const ModuleControls = ({
       }))},
     ]
 
+    // TODO: Bug - 1/4 and 1/8 seem to run at the same speed. Check DSP rate calculation in Rust.
     const rateDivisions = [
       { id: 6, label: '1/4' },
       { id: 9, label: '1/8' },
