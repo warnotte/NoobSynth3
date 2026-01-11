@@ -3,6 +3,7 @@
 //! This module provides various filter types for shaping audio:
 //!
 //! - [`Vcf`]: Voltage Controlled Filter with SVF and Ladder models
+//! - [`Hpf`]: Simple High-Pass Filter (Vcf wrapper)
 //!
 //! # Filter Models
 //!
@@ -36,5 +37,7 @@
 //! ```
 
 pub mod vcf;
+pub mod hpf;
 
 pub use vcf::{LadderState, SvfState, Vcf, VcfInputs, VcfParams};
+pub use hpf::{Hpf, HpfParams, HpfInputs};

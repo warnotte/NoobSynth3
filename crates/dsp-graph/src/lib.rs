@@ -5,18 +5,19 @@ use dsp_core::{
   DrumSequencerInputs, DrumSequencerOutputs, DrumSequencerParams, Ensemble, EnsembleInputs,
   EnsembleParams, EuclideanSequencer, EuclideanInputs, EuclideanParams, FmOperator, FmOperatorInputs,
   FmOperatorParams, GranularDelay, GranularDelayInputs, GranularDelayParams, HiHat909, HiHat909Inputs,
-  HiHat909Params, KarplusStrong, KarplusInputs, KarplusParams, Kick909, Kick909Inputs, Kick909Params,
-  Lfo, LfoInputs, LfoParams, MasterClock, MasterClockInputs, MasterClockOutputs, MasterClockParams,
-  Mixer, NesOsc, NesOscInputs, NesOscParams, Noise, NoiseParams, Phaser, PhaserInputs, PhaserParams,
-  PitchShifter, PitchShifterInputs, PitchShifterParams, Quantizer, QuantizerInputs, QuantizerParams,
-  Reverb, ReverbInputs, ReverbParams, Rimshot909, Rimshot909Inputs, Rimshot909Params, RingMod,
-  RingModParams, Sample, SampleHold, SampleHoldInputs, SampleHoldParams, SlewInputs, SlewLimiter,
-  SlewParams, Snare909, Snare909Inputs, Snare909Params, SnesOsc, SnesOscInputs, SnesOscParams,
-  SpringReverb, SpringReverbInputs, SpringReverbParams, StepSequencer, StepSequencerInputs,
-  StepSequencerOutputs, StepSequencerParams, Supersaw, SupersawInputs, SupersawParams, TapeDelay,
-  TapeDelayInputs, TapeDelayParams, Tb303, Tb303Inputs, Tb303Outputs, Tb303Params, Tom909,
-  Tom909Inputs, Tom909Params, Vca, Vcf, VcfInputs, VcfParams, Vco, VcoInputs, VcoParams, Vocoder,
-  VocoderInputs, VocoderParams, Wavefolder, WavefolderParams,
+  HiHat909Params, Hpf, HpfInputs, HpfParams, KarplusStrong, KarplusInputs, KarplusParams, Kick909,
+  Kick909Inputs, Kick909Params, Lfo, LfoInputs, LfoParams, Mario, MasterClock,
+  MasterClockInputs, MasterClockOutputs, MasterClockParams, Mixer, NesOsc, NesOscInputs, NesOscParams,
+  Noise, NoiseParams, Phaser, PhaserInputs, PhaserParams, PitchShifter, PitchShifterInputs,
+  PitchShifterParams, Quantizer, QuantizerInputs, QuantizerParams, Reverb, ReverbInputs, ReverbParams,
+  Rimshot909, Rimshot909Inputs, Rimshot909Params, RingMod, RingModParams, Sample, SampleHold,
+  SampleHoldInputs, SampleHoldParams, SlewInputs, SlewLimiter, SlewParams, Snare909, Snare909Inputs,
+  Snare909Params, SnesOsc, SnesOscInputs, SnesOscParams, SpringReverb, SpringReverbInputs,
+  SpringReverbParams, StepSequencer, StepSequencerInputs, StepSequencerOutputs, StepSequencerParams,
+  Supersaw, SupersawInputs, SupersawParams, TapeDelay, TapeDelayInputs, TapeDelayParams, Tb303,
+  Tb303Inputs, Tb303Outputs, Tb303Params, Tom909, Tom909Inputs, Tom909Params, Vca, Vcf, VcfInputs,
+  VcfParams, Vco, VcoInputs, VcoParams, Vocoder, VocoderInputs, VocoderParams, Wavefolder,
+  WavefolderParams, MARIO_CHANNELS,
 };
 use serde::Deserialize;
 use std::collections::{HashMap, VecDeque};
@@ -359,7 +360,7 @@ struct VcfState {
 }
 
 struct HpfState {
-  hpf: Vcf,
+  hpf: Hpf,
   cutoff: ParamBuffer,
 }
 
@@ -595,8 +596,7 @@ struct ControlState {
 }
 
 struct MarioState {
-  cv: [f32; 5],
-  gate: [f32; 5],
+  mario: Mario,
 }
 
 struct ArpeggiatorState {
@@ -906,23 +906,23 @@ impl GraphEngine {
   }
 
   pub fn set_mario_channel_cv(&mut self, module_id: &str, channel: usize, value: f32) {
-    if channel == 0 || channel > 5 {
+    if channel == 0 || channel > MARIO_CHANNELS {
       return;
     }
     if let Some(index) = self.module_map.get(module_id).and_then(|list| list.first()) {
       if let Some(ModuleState::Mario(state)) = self.modules.get_mut(*index).map(|m| &mut m.state) {
-        state.cv[channel - 1] = value;
+        state.mario.set_cv(channel - 1, value);
       }
     }
   }
 
   pub fn set_mario_channel_gate(&mut self, module_id: &str, channel: usize, value: f32) {
-    if channel == 0 || channel > 5 {
+    if channel == 0 || channel > MARIO_CHANNELS {
       return;
     }
     if let Some(index) = self.module_map.get(module_id).and_then(|list| list.first()) {
       if let Some(ModuleState::Mario(state)) = self.modules.get_mut(*index).map(|m| &mut m.state) {
-        state.gate[channel - 1] = value;
+        state.mario.set_gate(channel - 1, value);
       }
     }
   }
@@ -1258,7 +1258,7 @@ impl ModuleNode {
         slope: ParamBuffer::new(param_number(params, "slope", 1.0)),
       }),
       ModuleType::Hpf => ModuleState::Hpf(HpfState {
-        hpf: Vcf::new(sample_rate),
+        hpf: Hpf::new(sample_rate),
         cutoff: ParamBuffer::new(param_number(params, "cutoff", 280.0)),
       }),
       ModuleType::Mixer => ModuleState::Mixer(MixerState {
@@ -1425,8 +1425,7 @@ impl ModuleNode {
       }),
       ModuleType::Scope => ModuleState::Scope,
       ModuleType::Mario => ModuleState::Mario(MarioState {
-        cv: [0.0; 5],
-        gate: [0.0; 5],
+        mario: Mario::new(),
       }),
       ModuleType::Arpeggiator => ModuleState::Arpeggiator(ArpeggiatorState {
         arp: Arpeggiator::new(sample_rate),
@@ -2323,27 +2322,12 @@ impl ModuleNode {
         } else {
           Some(inputs[0].channel(0))
         };
-        let zero = [0.0_f32];
-        let one = [1.0_f32];
-        let params = VcfParams {
+        let params = HpfParams {
           cutoff: state.cutoff.slice(frames),
-          resonance: &zero,
-          drive: &zero,
-          env_amount: &zero,
-          mod_amount: &zero,
-          key_track: &zero,
-          model: &zero,
-          mode: &one,
-          slope: &zero,
         };
-        let inputs = VcfInputs {
-          audio,
-          mod_in: None,
-          env: None,
-          key: None,
-        };
+        let hpf_inputs = HpfInputs { audio };
         let output = outputs[0].channel_mut(0);
-        state.hpf.process_block(output, inputs, params);
+        state.hpf.process_block(output, hpf_inputs, params);
       }
       ModuleState::Mixer(state) => {
         let input_a = if self.connections[0].is_empty() {
@@ -2862,14 +2846,18 @@ impl ModuleNode {
         }
       }
       ModuleState::Mario(state) => {
-        for channel in 0..5 {
-          let split_index = channel * 2 + 1;
-          let (before, after) = outputs.split_at_mut(split_index);
-          let cv_out = before[channel * 2].channel_mut(0);
-          let gate_out = after[0].channel_mut(0);
+        for channel in 0..MARIO_CHANNELS {
+          let cv_value = state.mario.cv(channel);
+          let gate_value = state.mario.gate(channel);
+          // Use split_at_mut to avoid borrow checker issues
+          let cv_idx = channel * 2;
+          let gate_idx = channel * 2 + 1;
+          let (left, right) = outputs.split_at_mut(gate_idx);
+          let cv_out = left[cv_idx].channel_mut(0);
+          let gate_out = right[0].channel_mut(0);
           for i in 0..frames {
-            cv_out[i] = state.cv[channel];
-            gate_out[i] = state.gate[channel];
+            cv_out[i] = cv_value;
+            gate_out[i] = gate_value;
           }
         }
       }

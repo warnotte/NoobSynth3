@@ -48,6 +48,7 @@ pub use oscillators::{
 pub use filters::{
     Vcf, VcfParams, VcfInputs,
     SvfState, LadderState,
+    Hpf, HpfParams, HpfInputs,
 };
 
 // Re-export effects
@@ -89,6 +90,7 @@ pub use sequencers::{
     DrumStep, DRUM_TRACKS, DRUM_STEPS, DRUM_TRACK_NAMES,
     EuclideanSequencer, EuclideanParams, EuclideanInputs,
     EUCLIDEAN_MAX_STEPS,
+    Mario, MarioOutputs, MARIO_CHANNELS,
 };
 
 // Re-export drums

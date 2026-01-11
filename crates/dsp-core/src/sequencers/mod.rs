@@ -13,6 +13,9 @@
 //! - [`DrumSequencer`] - 8-track, 16-step drum pattern sequencer
 //! - [`EuclideanSequencer`] - Euclidean rhythm generator
 //!
+//! ## Special
+//! - [`Mario`] - Mario song player (host-controlled CV/gate holder)
+//!
 //! # Typical Usage
 //!
 //! Sequencers generate control signals (CV, gate, accent) that drive
@@ -52,6 +55,7 @@ pub mod arpeggiator;
 pub mod step_sequencer;
 pub mod drum_sequencer;
 pub mod euclidean;
+pub mod mario;
 
 pub use clock::{MasterClock, MasterClockInputs, MasterClockParams, MasterClockOutputs};
 pub use arpeggiator::{
@@ -70,3 +74,4 @@ pub use euclidean::{
     EuclideanSequencer, EuclideanInputs, EuclideanParams,
     EUCLIDEAN_MAX_STEPS,
 };
+pub use mario::{Mario, MarioOutputs, MARIO_CHANNELS};
