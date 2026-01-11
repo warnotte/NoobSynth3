@@ -155,8 +155,21 @@ NoobSynth3/
 │   └── src/lib.rs          # Commandes Tauri
 │
 ├── crates/                 # Workspace Rust
-│   ├── dsp-core/           # DSP partagé (oscillateurs, filtres...)
-│   ├── dsp-graph/          # Moteur de graphe
+│   ├── dsp-core/           # DSP partagé (~9200 lignes, 48 fichiers)
+│   │   ├── lib.rs          # Exports publics
+│   │   ├── common.rs       # Utilitaires partagés
+│   │   ├── oscillators/    # VCO, Supersaw, FM, TB-303, NES, SNES...
+│   │   ├── filters/        # VCF (SVF/Ladder), HPF
+│   │   ├── modulators/     # ADSR, LFO, S&H, Slew, Quantizer
+│   │   ├── effects/        # Chorus, Delay, Reverb, Distortion...
+│   │   ├── drums/          # TR-909 (Kick, Snare, HiHat, Clap...)
+│   │   └── sequencers/     # Clock, Arp, Step, Drum, Euclidean
+│   ├── dsp-graph/          # Moteur de graphe (modulaire)
+│   │   ├── lib.rs          # GraphEngine, routing
+│   │   ├── process.rs      # Traitement DSP
+│   │   ├── instantiate.rs  # Création modules
+│   │   ├── state.rs        # Structs d'état
+│   │   └── ports.rs        # Ports I/O
 │   ├── dsp-wasm/           # Bindings WASM
 │   ├── dsp-standalone/     # Host audio natif
 │   ├── dsp-plugin/         # Plugin VST3/CLAP

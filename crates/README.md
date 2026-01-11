@@ -39,15 +39,18 @@ crates/
 
 ## dsp-core
 
-Bibliothèque de traitement audio sans dépendance externe.
+Bibliothèque de traitement audio sans dépendance externe (~9200 lignes, 48 fichiers).
 
-**Modules** :
-- Oscillateurs : VCO (polyBLEP), Supersaw, NES Osc, SNES Osc, Noise
-- Filtres : VCF (SVF/Ladder), HPF
-- Modulation : LFO, ADSR, Sample & Hold, Slew, Quantizer
-- Effets : Chorus, Ensemble, Choir, Delay, Tape Delay, Granular Delay, Spring Reverb, Reverb, Phaser
-- Waveshaping : Distortion, Wavefolder
-- Utilitaires : VCA, Ring Mod, Mixer
+**Structure modulaire :**
+| Dossier | Contenu |
+|---------|---------|
+| `oscillators/` | VCO, Supersaw, Karplus, FM, TB-303, NES, SNES, Noise |
+| `filters/` | VCF (SVF/Ladder, multi-mode), HPF |
+| `modulators/` | ADSR, LFO, Sample & Hold, Slew, Quantizer |
+| `effects/` | Chorus, Ensemble, Choir, Vocoder, Delays, Reverbs, Phaser, Distortion |
+| `drums/` | TR-909 (Kick, Snare, HiHat, Clap, Tom, Rimshot) |
+| `sequencers/` | Clock, Arpeggiator, Step, Drum, Euclidean, Mario |
+
 Note: Arpeggiator gate handling ignores short retrigger dips; when HOLD is off and no notes remain, Control IO forces gates low to avoid stuck arp.
 
 [Voir dsp-core/README.md](dsp-core/README.md)
@@ -60,6 +63,15 @@ Moteur d'exécution du graphe modulaire.
 - Tri topologique des modules
 - Exécution par buffer
 - Gestion de la polyphonie
+
+**Structure modulaire :**
+| Fichier | Rôle |
+|---------|------|
+| `lib.rs` | GraphEngine, routing |
+| `process.rs` | Traitement DSP |
+| `instantiate.rs` | Création modules |
+| `state.rs` | Structs d'état |
+| `ports.rs` | Ports I/O |
 
 [Voir dsp-graph/README.md](dsp-graph/README.md)
 

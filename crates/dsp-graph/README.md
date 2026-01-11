@@ -10,6 +10,29 @@ Moteur d'exécution du graphe modulaire. Parse le JSON et exécute les modules D
 - Gestion de la polyphonie (1-8 voix)
 - Routage des connexions audio/CV/gate/sync
 
+## Structure des fichiers
+
+```
+src/
+├── lib.rs          # GraphEngine, routing, ModuleType enum (737 lignes)
+├── process.rs      # Traitement DSP de tous les modules (1118 lignes)
+├── instantiate.rs  # Création des modules et paramètres (835 lignes)
+├── state.rs        # Structs d'état pour chaque module (535 lignes)
+├── ports.rs        # Définitions des ports I/O (675 lignes)
+├── types.rs        # Types de base (ModuleType, PortKind) (132 lignes)
+└── buffer.rs       # Gestion des buffers audio (127 lignes)
+```
+
+| Fichier | Responsabilité |
+|---------|----------------|
+| `lib.rs` | Point d'entrée, GraphEngine, tri topologique, routage |
+| `process.rs` | `process_module()` - logique DSP pour chaque type de module |
+| `instantiate.rs` | `create_state()`, `apply_param()`, `apply_param_str()` |
+| `state.rs` | Structs `*State` (VcoState, VcfState, etc.) |
+| `ports.rs` | `module_ports()` - définition entrées/sorties par module |
+| `types.rs` | Enums `ModuleType`, `PortKind`, `ConnectionEdge` |
+| `buffer.rs` | `Buffer`, `mix_buffers()`, `downmix_to_mono()` |
+
 ## Architecture
 
 ```

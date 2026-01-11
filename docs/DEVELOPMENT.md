@@ -156,13 +156,19 @@ crates/
 
 ### Ajouter un module DSP
 
-1. **Rust** : Créer le module dans `crates/dsp-core/src/`
-2. **Rust** : L'enregistrer dans `crates/dsp-graph/src/lib.rs`
+1. **Rust DSP** : Créer le module dans `crates/dsp-core/src/`
+2. **Rust Graph** (dsp-graph) :
+   - `src/types.rs` : Ajouter variante à l'enum `ModuleType`
+   - `src/state.rs` : Créer struct `*State` pour le module
+   - `src/instantiate.rs` : Ajouter création dans `create_state()` + `apply_param()`
+   - `src/process.rs` : Ajouter traitement DSP dans `process_module()`
+   - `src/ports.rs` : Définir les ports dans `module_ports()`
 3. **WASM** : Rebuild avec `npm run build:wasm`
-4. **TypeScript** : Ajouter le rendu UI dans `src/ui/controls/[Category]Controls.tsx`
-5. **TypeScript** : Déclarer le type dans `src/shared/graph.ts`
-6. **TypeScript** : Ajouter taille/labels/défauts dans `src/state/moduleRegistry.ts`
-7. **TypeScript** : Déclarer les ports dans `src/ui/portCatalog.ts`
+4. **TypeScript** :
+   - `src/shared/graph.ts` : Déclarer le type
+   - `src/state/moduleRegistry.ts` : Ajouter taille/labels/défauts
+   - `src/ui/portCatalog.ts` : Déclarer les ports
+   - `src/ui/controls/[Category]Controls.tsx` : Ajouter le rendu UI
 
 ### Ajouter un preset
 

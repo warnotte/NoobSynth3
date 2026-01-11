@@ -88,7 +88,11 @@ Voir `src/hooks/HOOKS.md` pour la documentation détaillée.
 | File | Description |
 |------|-------------|
 | `crates/dsp-core/src/lib.rs` | All DSP module implementations |
-| `crates/dsp-graph/src/lib.rs` | Graph engine, ModuleType enum, processing |
+| `crates/dsp-graph/src/lib.rs` | Graph engine, ModuleType enum, routing |
+| `crates/dsp-graph/src/process.rs` | DSP processing for all module types |
+| `crates/dsp-graph/src/instantiate.rs` | Module creation and parameter updates |
+| `crates/dsp-graph/src/state.rs` | State structs for each module type |
+| `crates/dsp-graph/src/ports.rs` | Port definitions per module |
 | `src/ui/controls/` | UI controls split by category (see controls/ARCHITECTURE.md) |
 | `src/state/moduleRegistry.ts` | Module catalog, defaults, categories |
 | `src/ui/portCatalog.ts` | Port definitions for each module |
@@ -109,10 +113,14 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 
 ### Code (obligatoire)
 - [ ] `crates/dsp-core/src/lib.rs` - Implémentation DSP Rust
-- [ ] `crates/dsp-graph/src/lib.rs` - ModuleType enum + instantiation
+- [ ] `crates/dsp-graph/src/types.rs` - Ajouter variante à `ModuleType` enum
+- [ ] `crates/dsp-graph/src/state.rs` - Struct d'état du module
+- [ ] `crates/dsp-graph/src/instantiate.rs` - `create_state()` + `apply_param()`
+- [ ] `crates/dsp-graph/src/process.rs` - Logique DSP dans `process_module()`
+- [ ] `crates/dsp-graph/src/ports.rs` - Définition des ports I/O
 - [ ] `src/shared/graph.ts` - Type TypeScript
 - [ ] `src/state/moduleRegistry.ts` - Taille, labels, defaults, catégorie
-- [ ] `src/ui/portCatalog.ts` - Définition des ports
+- [ ] `src/ui/portCatalog.ts` - Définition des ports UI
 - [ ] `src/ui/controls/[Category]Controls.tsx` - Interface utilisateur
 
 ### Documentation (obligatoire)
