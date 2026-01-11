@@ -1,24 +1,29 @@
-pub type Sample = f32;
+// =============================================================================
+// DSP Core Library
+// =============================================================================
+//
+// This crate provides digital signal processing modules for audio synthesis.
+// All modules are designed to be sample-rate agnostic and work across
+// Web (WASM), Standalone (Tauri), and Plugin (VST/CLAP) targets.
+//
+// ## Module Organization
+//
+// - `common` - Shared types (Sample, ProcessContext) and utilities
+// - Oscillators: Vco, Supersaw, Karplus, NesOsc, SnesOsc, Tb303, FmOperator
+// - Filters: Vcf (SVF/Ladder), Hpf
+// - Effects: Delay, Reverb, Chorus, Ensemble, Phaser, Distortion, etc.
+// - Modulators: Lfo, Adsr, SampleHold, SlewLimiter, Quantizer
+// - Sequencers: StepSequencer, DrumSequencer, Arpeggiator, Euclidean, Clock
+// - Drums: TR-909 emulations (Kick, Snare, HiHat, Clap, Tom, Rimshot)
 
-#[derive(Debug, Clone, Copy)]
-pub struct ProcessContext {
-  pub sample_rate: f32,
-  pub block_size: usize,
-}
+pub mod common;
 
-impl ProcessContext {
-  pub fn new(sample_rate: f32, block_size: usize) -> Self {
-    Self {
-      sample_rate,
-      block_size,
-    }
-  }
-}
-
-pub trait Node {
-  fn reset(&mut self, sample_rate: f32);
-  fn process(&mut self, output: &mut [Sample]);
-}
+// Re-export common types at crate root for convenience
+pub use common::{
+    clamp, input_at, midi_to_freq, poly_blep, sample_at, saturate, freq_to_midi,
+    Node, ProcessContext, Sample,
+    A4_FREQ, A4_MIDI, SEMITONES_PER_OCTAVE,
+};
 
 pub struct Vco {
   sample_rate: f32,
@@ -50,21 +55,6 @@ pub struct VcoInputs<'a> {
   pub fm_exp: Option<&'a [Sample]>,
   pub pwm: Option<&'a [Sample]>,
   pub sync: Option<&'a [Sample]>,
-}
-
-fn poly_blep(phase: f32, dt: f32) -> f32 {
-  if dt <= 0.0 {
-    return 0.0;
-  }
-  if phase < dt {
-    let x = phase / dt;
-    return x + x - x * x - 1.0;
-  }
-  if phase > 1.0 - dt {
-    let x = (phase - 1.0) / dt;
-    return x * x + x + 1.0;
-  }
-  0.0
 }
 
 impl Vco {
@@ -2037,43 +2027,6 @@ impl Vcf {
       };
     }
   }
-}
-
-fn clamp(value: f32, min: f32, max: f32) -> f32 {
-  if value < min {
-    min
-  } else if value > max {
-    max
-  } else {
-    value
-  }
-}
-
-fn sample_at(values: &[Sample], index: usize, fallback: Sample) -> Sample {
-  if values.is_empty() {
-    return fallback;
-  }
-  if values.len() > 1 {
-    return values[index];
-  }
-  values[0]
-}
-
-fn input_at(values: Option<&[Sample]>, index: usize) -> Sample {
-  match values {
-    Some(values) if !values.is_empty() => {
-      if values.len() > 1 {
-        values[index]
-      } else {
-        values[0]
-      }
-    }
-    _ => 0.0,
-  }
-}
-
-fn saturate(value: f32) -> f32 {
-  value.tanh()
 }
 
 pub struct SineOsc {
