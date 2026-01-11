@@ -7,11 +7,11 @@ import type {
 import type { GraphState, ModuleSpec } from '../shared/graph'
 import type { ModuleSpan } from '../state/gridLayout'
 import type { PortDefinition } from './portCatalog'
-import type { ModuleControlsProps } from './ModuleControls'
+import type { ModuleControlsProps } from './controls'
 import { buildGridStyle } from '../state/gridLayout'
 import { modulePortLayouts, moduleSizes } from '../state/moduleRegistry'
 import { ModuleCard } from './ModuleCard'
-import { ModuleControls } from './ModuleControls'
+import { ModuleControls } from './controls'
 import { modulePorts } from './portCatalog'
 
 type ModuleDragPreview = {
