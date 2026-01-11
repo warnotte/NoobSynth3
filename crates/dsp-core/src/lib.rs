@@ -22,6 +22,7 @@ pub mod filters;
 pub mod effects;
 pub mod modulators;
 pub mod sequencers;
+pub mod drums;
 
 // Re-export common types at crate root for convenience
 pub use common::{
