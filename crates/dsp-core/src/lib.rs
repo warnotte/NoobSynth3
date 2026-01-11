@@ -17,6 +17,7 @@
 // - Drums: TR-909 emulations (Kick, Snare, HiHat, Clap, Tom, Rimshot)
 
 pub mod common;
+pub mod oscillators;
 
 // Re-export common types at crate root for convenience
 pub use common::{

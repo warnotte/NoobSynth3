@@ -1,0 +1,33 @@
+//! Oscillator modules for audio synthesis.
+//!
+//! This module contains various oscillator implementations:
+//!
+//! - [`Vco`] - Main VCO with multiple waveforms, unison, FM, sync
+//! - [`Supersaw`] - 7-voice detuned sawtooth (JP-8000 style)
+//! - [`Noise`] - White, pink, and brown noise generator
+//! - [`SineOsc`] - Simple sine oscillator (implements Node trait)
+//! - [`NesOsc`] - NES 2A03 APU emulation
+//! - [`SnesOsc`] - SNES S-DSP wavetable emulation
+//! - [`Tb303`] - Roland TB-303 bass synthesizer emulation
+//! - [`KarplusStrong`] - Physical modeling string synthesis
+//! - [`FmOperator`] - FM synthesis operator with ADSR envelope
+
+mod vco;
+mod supersaw;
+mod noise;
+mod sine_osc;
+mod nes_osc;
+mod snes_osc;
+mod tb303;
+mod karplus;
+mod fm_op;
+
+pub use vco::{Vco, VcoParams, VcoInputs};
+pub use supersaw::{Supersaw, SupersawParams, SupersawInputs};
+pub use noise::{Noise, NoiseParams};
+pub use sine_osc::SineOsc;
+pub use nes_osc::{NesOsc, NesOscParams, NesOscInputs};
+pub use snes_osc::{SnesOsc, SnesOscParams, SnesOscInputs};
+pub use tb303::{Tb303, Tb303Params, Tb303Inputs, Tb303Outputs};
+pub use karplus::{KarplusStrong, KarplusParams, KarplusInputs};
+pub use fm_op::{FmOperator, FmOperatorParams, FmOperatorInputs};
