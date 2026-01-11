@@ -20,6 +20,7 @@ pub mod common;
 pub mod oscillators;
 pub mod filters;
 pub mod effects;
+pub mod modulators;
 
 // Re-export common types at crate root for convenience
 pub use common::{
