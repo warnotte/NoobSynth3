@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=Sora:wght@400;500;600&display=swap');
 
 :root {
+  /* Typography */
   --font-ui: 'Sora', 'Segoe UI', sans-serif;
   --font-display: 'Cormorant Garamond', 'Times New Roman', serif;
   font-family: var(--font-ui);
@@ -11,6 +12,28 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* Font sizes */
+  --text-3xs: 0.5rem;
+  --text-2xs: 0.55rem;
+  --text-xs: 0.6rem;
+  --text-sm: 0.65rem;
+  --text-md: 0.7rem;
+  --text-base: 0.75rem;
+  --text-lg: 0.85rem;
+
+  /* Border radius */
+  --radius-xs: 2px;
+  --radius-sm: 3px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --radius-xl: 8px;
+  --radius-2xl: 10px;
+  --radius-3xl: 12px;
+  --radius-4xl: 14px;
+  --radius-pill: 999px;
+
+  /* Backgrounds */
   --bg-0: #0a0c10;
   --bg-1: #0f1319;
   --steel-0: #161c23;
@@ -19,18 +42,50 @@
   --glass-0: rgba(15, 20, 28, 0.62);
   --glass-1: rgba(24, 32, 42, 0.78);
   --glass-2: rgba(12, 16, 22, 0.7);
+  --glass-3: rgba(12, 16, 22, 0.9);
+  --glass-4: rgba(30, 40, 55, 0.8);
+  --glass-5: rgba(30, 40, 55, 0.9);
+  --glass-panel: rgba(50, 65, 85, 0.9);
+  --glass-overlay: rgba(0, 0, 0, 0.3);
+  --glass-dark: rgba(8, 12, 18, 0.7);
+
+  /* Borders */
   --border-soft: rgba(255, 255, 255, 0.08);
   --border-strong: rgba(255, 255, 255, 0.18);
+
+  /* Text colors */
   --text-strong: #f2f6fb;
   --text-muted: rgba(214, 224, 238, 0.72);
   --text-dim: rgba(214, 224, 238, 0.45);
+
+  /* Accent colors */
   --accent-cool: #5bb6ff;
   --accent-mint: #42e2b1;
+  --accent-mint-dark: #2eb88d;
   --accent-warm: #f0b06b;
   --accent-rose: #ff6fae;
   --accent-ink: #0b1115;
+
+  /* Jack/Port colors (aliases) */
+  --jack-audio: var(--accent-cool);
+  --jack-cv: var(--accent-mint);
+  --jack-gate: var(--accent-warm);
+  --jack-sync: var(--accent-rose);
+
+  /* Knob default color */
+  --knob-color: var(--accent-mint);
+
+  /* Shadows */
   --shadow-soft: 0 12px 24px rgba(0, 0, 0, 0.32);
   --shadow-deep: 0 30px 60px rgba(0, 0, 0, 0.55);
+  --shadow-inset: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+  --shadow-glow-mint: 0 0 8px var(--accent-mint);
+  --shadow-glow-cool: 0 0 8px var(--accent-cool);
+
+  /* Transitions */
+  --transition-fast: all 0.1s ease;
+  --transition-normal: all 0.15s ease;
+  --transition-slow: all 0.2s ease;
 }
 
 *,
