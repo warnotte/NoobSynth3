@@ -479,7 +479,7 @@ L'arpégiateur est **implémenté** et disponible dans NoobSynth3.
 - [x] Type `arpeggiator` dans `shared/graph.ts`
 - [x] DSP Rust dans `crates/dsp-core/src/`
 - [x] Intégré au moteur de graphe (`dsp-graph`)
-- [x] Composant UI React (`ModuleControls.tsx`)
+- [x] Composant UI React (`src/ui/controls/SequencerControls.tsx`)
 - [x] Registre de modules (`moduleRegistry.ts`)
 - [x] Presets de démonstration
 

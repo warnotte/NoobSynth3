@@ -129,7 +129,7 @@ src/
 │   ├── useMidi.ts            # Web MIDI
 │   └── useMarioSequencer.ts  # Séquenceur Mario IO
 ├── ui/
-│   ├── ModuleControls.tsx    # Rendu des modules
+│   ├── controls/             # Contrôles modules (par catégorie)
 │   ├── TopBar.tsx            # Barre supérieure
 │   ├── RackView.tsx          # Vue du rack
 │   ├── SidePanel.tsx         # Panneaux latéraux
@@ -159,7 +159,7 @@ crates/
 1. **Rust** : Créer le module dans `crates/dsp-core/src/`
 2. **Rust** : L'enregistrer dans `crates/dsp-graph/src/lib.rs`
 3. **WASM** : Rebuild avec `npm run build:wasm`
-4. **TypeScript** : Ajouter le rendu UI dans `src/ui/ModuleControls.tsx`
+4. **TypeScript** : Ajouter le rendu UI dans `src/ui/controls/[Category]Controls.tsx`
 5. **TypeScript** : Déclarer le type dans `src/shared/graph.ts`
 6. **TypeScript** : Ajouter taille/labels/défauts dans `src/state/moduleRegistry.ts`
 7. **TypeScript** : Déclarer les ports dans `src/ui/portCatalog.ts`

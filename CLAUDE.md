@@ -11,7 +11,8 @@ NoobSynth3 is a modular synthesizer built with:
 
 ```
 src/                    # React frontend
-  ui/                   # UI components (ModuleControls, SidePanel, etc.)
+  ui/                   # UI components (SidePanel, ModuleCard, etc.)
+    controls/           # Module controls split by category
   engine/               # Audio engine (WasmGraphEngine, worklets)
   state/                # State management (moduleRegistry, presets)
   shared/               # Shared types (graph.ts)
@@ -30,7 +31,7 @@ public/presets/         # Preset JSON files
 |------|-------------|
 | `crates/dsp-core/src/lib.rs` | All DSP module implementations |
 | `crates/dsp-graph/src/lib.rs` | Graph engine, ModuleType enum, processing |
-| `src/ui/ModuleControls.tsx` | UI controls for each module type |
+| `src/ui/controls/` | UI controls split by category (see controls/ARCHITECTURE.md) |
 | `src/state/moduleRegistry.ts` | Module catalog, defaults, categories |
 | `src/ui/portCatalog.ts` | Port definitions for each module |
 | `src/engine/WasmGraphEngine.ts` | WASM engine wrapper, sequencer sync |
@@ -54,7 +55,7 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 - [ ] `src/shared/graph.ts` - Type TypeScript
 - [ ] `src/state/moduleRegistry.ts` - Taille, labels, defaults, catégorie
 - [ ] `src/ui/portCatalog.ts` - Définition des ports
-- [ ] `src/ui/ModuleControls.tsx` - Interface utilisateur
+- [ ] `src/ui/controls/[Category]Controls.tsx` - Interface utilisateur
 
 ### Documentation (obligatoire)
 - [ ] `docs/MODULES.md` - Documentation complète du module
