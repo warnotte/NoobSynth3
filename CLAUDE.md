@@ -25,6 +25,64 @@ crates/
 public/presets/         # Preset JSON files
 ```
 
+## UI Component Structure
+
+```
+App.tsx                          # Root component, state management
+├── TopBar.tsx                   # Header (power, presets, audio mode)
+├── SidePanel.tsx                # Left panel (module library) + Right panel (presets)
+├── RackView.tsx                 # Main rack container
+│   ├── ModuleCard.tsx           # Single module frame (header, ports, body)
+│   │   └── controls/            # Module-specific controls
+│   │       ├── index.tsx        # Router → category files
+│   │       ├── SourceControls.tsx
+│   │       ├── FilterControls.tsx
+│   │       ├── AmplifierControls.tsx
+│   │       ├── EffectControls.tsx
+│   │       ├── ModulatorControls.tsx
+│   │       ├── SequencerControls.tsx
+│   │       ├── DrumControls.tsx
+│   │       └── IOControls.tsx
+│   └── PatchLayer.tsx           # SVG cable rendering
+└── MacroPanel.tsx               # VST macro controls (optional)
+
+Shared UI components:
+├── RotaryKnob.tsx               # Rotary knob with drag
+├── ControlKnob.tsx              # Knob + label wrapper
+├── ButtonGroup.tsx              # Radio button group
+├── ToggleButton.tsx             # On/off toggle
+├── WaveformSelector.tsx         # Waveform picker
+├── PanelSection.tsx             # Collapsible section
+└── Oscilloscope.tsx             # Scope display
+```
+
+## React Hooks
+
+| Hook | Rôle | Fichier |
+|------|------|---------|
+| `usePatching` | Gestion des câbles (drag & drop) | `hooks/usePatching.tsx` |
+| `useModuleDrag` | Déplacement des modules | `hooks/useModuleDrag.ts` |
+| `useControlVoices` | Polyphonie, voice stealing | `hooks/useControlVoices.ts` |
+| `useMidi` | Web MIDI input | `hooks/useMidi.ts` |
+| `useComputerKeyboard` | Clavier AZERTY/QWERTY | `hooks/useComputerKeyboard.ts` |
+| `useMarioSequencer` | Séquenceur module Mario | `hooks/useMarioSequencer.ts` |
+
+Voir `src/hooks/HOOKS.md` pour la documentation détaillée.
+
+## State Management
+
+| Fichier | Rôle |
+|---------|------|
+| `state/moduleRegistry.ts` | Catalogue des modules (tailles, defaults, labels) |
+| `state/portCatalog.ts` | Définitions des ports par module |
+| `state/gridLayout.ts` | Calculs de grille, collision detection |
+| `state/graphUtils.ts` | Helpers pour manipuler le graphe |
+| `state/presets.ts` | Chargement/parsing des presets |
+| `state/defaultGraph.ts` | Graphe initial au démarrage |
+| `state/midiUtils.ts` | Conversions note/fréquence |
+| `state/sequencerPattern.ts` | Pattern par défaut du séquenceur |
+| `state/marioSongs.ts` | Mélodies pour le module Mario |
+
 ## Key Files
 
 | File | Description |
@@ -191,7 +249,28 @@ Groupes existants: Basics, Leads, Bass, Pads, FX, Drums, 8-Bit, Experimental
 
 ## Important Documentation
 
-- **[PERFORMANCE_OPTIMIZATION.md](./PERFORMANCE_OPTIMIZATION.md)** - Guide d'optimisation (SIMD, multi-threading, React)
+### Documentation principale
+| Document | Description |
+|----------|-------------|
+| [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) | Vue d'ensemble des 3 modes (Web, Tauri, VST) |
+| [docs/DEVELOPMENT.md](./docs/DEVELOPMENT.md) | Guide de build, workflow, contribution |
+| [docs/MODULES.md](./docs/MODULES.md) | Référence complète des modules DSP |
+| [docs/VST.md](./docs/VST.md) | Documentation plugin DAW |
+| [PERFORMANCE_OPTIMIZATION.md](./PERFORMANCE_OPTIMIZATION.md) | Guide d'optimisation |
+
+### Documentation locale (dans le code)
+| Document | Description |
+|----------|-------------|
+| [src/ui/controls/ARCHITECTURE.md](./src/ui/controls/ARCHITECTURE.md) | Structure du refactor ModuleControls |
+| [src/hooks/HOOKS.md](./src/hooks/HOOKS.md) | Documentation des React hooks |
+
+### Crates Rust
+| Document | Description |
+|----------|-------------|
+| [crates/README.md](./crates/README.md) | Vue d'ensemble du workspace Rust |
+| [crates/dsp-core/README.md](./crates/dsp-core/README.md) | Modules DSP |
+| [crates/dsp-graph/README.md](./crates/dsp-graph/README.md) | Moteur de graphe |
+| [crates/dsp-ipc/README.md](./crates/dsp-ipc/README.md) | IPC pour VST |
 
 ---
 
