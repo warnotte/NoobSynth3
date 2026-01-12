@@ -71,8 +71,8 @@ export const RATE_PRESETS = {
   /** Arpeggiator rates: 1/4, 1/8, 1/16 + triplets */
   arpeggiator: [2, 3, 4, 7, 8, 9] as const,
 
-  /** Clock rates: all straight divisions */
-  clock: [0, 1, 2, 3, 4, 5] as const,
+  /** Clock rates: straight divisions + triplets */
+  clock: [0, 1, 2, 3, 4, 5, 7, 8, 9] as const,
 
   /** Drum sequencer rates: 1/4, 1/8, 1/16, 1/32 */
   drums: [2, 3, 4, 5] as const,
