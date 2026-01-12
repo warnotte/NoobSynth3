@@ -2,6 +2,12 @@
 //!
 //! This module provides various sequencer implementations:
 //!
+//! ## Shared Rate Divisions
+//!
+//! All sequencers use the shared [`RATE_DIVISIONS`] constant for consistent
+//! tempo-synced timing. Values are in beats (1.0 = quarter note).
+//!
+//!
 //! ## Clock
 //! - [`MasterClock`] - Global transport/clock generator
 //!
@@ -57,14 +63,84 @@ pub mod drum_sequencer;
 pub mod euclidean;
 pub mod mario;
 
+// ============================================================================
+// Shared Rate Divisions
+// ============================================================================
+
+/// Unified rate division values (in beats, where 1.0 = quarter note).
+///
+/// All sequencer modules use this shared table for consistent behavior.
+/// The value represents the duration in quarter-note beats.
+///
+/// # Index Layout
+///
+/// | Index | Label | Beats | Description |
+/// |-------|-------|-------|-------------|
+/// | 0 | 1/1 | 4.0 | Whole note |
+/// | 1 | 1/2 | 2.0 | Half note |
+/// | 2 | 1/4 | 1.0 | Quarter note |
+/// | 3 | 1/8 | 0.5 | Eighth note |
+/// | 4 | 1/16 | 0.25 | Sixteenth note |
+/// | 5 | 1/32 | 0.125 | Thirty-second note |
+/// | 6 | 1/2T | 1.333 | Half triplet (3 in time of 2 halves) |
+/// | 7 | 1/4T | 0.667 | Quarter triplet |
+/// | 8 | 1/8T | 0.333 | Eighth triplet |
+/// | 9 | 1/16T | 0.167 | Sixteenth triplet |
+/// | 10 | 1/32T | 0.083 | Thirty-second triplet |
+/// | 11 | 1/2. | 3.0 | Dotted half |
+/// | 12 | 1/4. | 1.5 | Dotted quarter |
+/// | 13 | 1/8. | 0.75 | Dotted eighth |
+/// | 14 | 1/16. | 0.375 | Dotted sixteenth |
+/// | 15 | 1/32. | 0.1875 | Dotted thirty-second |
+///
+/// # Triplet Math
+///
+/// A triplet means 3 notes in the time of 2 normal notes of the same type:
+/// - 1/4T = 2 quarter notes / 3 = 2/3 beat ≈ 0.667
+/// - 1/8T = 2 eighth notes / 3 = 1/3 beat ≈ 0.333
+///
+/// # Dotted Note Math
+///
+/// A dotted note is 1.5x the normal duration:
+/// - 1/4. = 1.0 × 1.5 = 1.5 beats
+/// - 1/8. = 0.5 × 1.5 = 0.75 beats
+pub const RATE_DIVISIONS: [f64; 16] = [
+    4.0,    // 0: 1/1 (whole note)
+    2.0,    // 1: 1/2 (half note)
+    1.0,    // 2: 1/4 (quarter note)
+    0.5,    // 3: 1/8 (eighth note)
+    0.25,   // 4: 1/16 (sixteenth note)
+    0.125,  // 5: 1/32 (thirty-second note)
+    1.333,  // 6: 1/2T (half triplet)
+    0.667,  // 7: 1/4T (quarter triplet)
+    0.333,  // 8: 1/8T (eighth triplet)
+    0.167,  // 9: 1/16T (sixteenth triplet)
+    0.083,  // 10: 1/32T (thirty-second triplet)
+    3.0,    // 11: 1/2. (dotted half)
+    1.5,    // 12: 1/4. (dotted quarter)
+    0.75,   // 13: 1/8. (dotted eighth)
+    0.375,  // 14: 1/16. (dotted sixteenth)
+    0.1875, // 15: 1/32. (dotted thirty-second)
+];
+
+/// Get beat duration for a rate index (clamped to valid range).
+#[inline]
+pub fn rate_to_beats(rate_index: usize) -> f64 {
+    RATE_DIVISIONS.get(rate_index).copied().unwrap_or(1.0)
+}
+
+// ============================================================================
+// Re-exports
+// ============================================================================
+
 pub use clock::{MasterClock, MasterClockInputs, MasterClockParams, MasterClockOutputs};
 pub use arpeggiator::{
     Arpeggiator, ArpeggiatorInputs, ArpeggiatorParams, ArpeggiatorOutputs,
-    ArpMode, RATE_DIVISIONS,
+    ArpMode,
 };
 pub use step_sequencer::{
     StepSequencer, StepSequencerInputs, StepSequencerParams, StepSequencerOutputs,
-    SeqStep, SEQ_RATE_DIVISIONS,
+    SeqStep,
 };
 pub use drum_sequencer::{
     DrumSequencer, DrumSequencerInputs, DrumSequencerParams, DrumSequencerOutputs,

@@ -3,6 +3,7 @@
 //! Distributes triggers evenly using Bjorklund's algorithm.
 
 use crate::common::Sample;
+use super::RATE_DIVISIONS;
 
 /// Maximum number of steps.
 pub const EUCLIDEAN_MAX_STEPS: usize = 32;
@@ -233,26 +234,12 @@ impl EuclideanSequencer {
             self.compute_pattern(steps, pulses, rotation);
         }
 
-        // Rate divisions
-        let rate_mult = match rate_idx {
-            0 => 0.25,   // 1/1
-            1 => 0.5,    // 1/2
-            2 => 0.75,   // 1/2T
-            3 => 1.0,    // 1/4
-            4 => 1.5,    // 1/4T
-            5 => 2.0,    // 1/8
-            6 => 3.0,    // 1/8T
-            7 => 4.0,    // 1/16
-            8 => 6.0,    // 1/16T
-            9 => 8.0,    // 1/32
-            10 => 12.0,  // 1/32T
-            11 => 16.0,  // 1/64
-            _ => 4.0,
-        };
-
-        let beats_per_second = tempo / 60.0;
-        let steps_per_second = beats_per_second * rate_mult;
-        self.samples_per_step = self.sample_rate as f64 / steps_per_second as f64;
+        // Use shared rate divisions (same formula as other sequencers)
+        let rate_idx = rate_idx.min(RATE_DIVISIONS.len() - 1);
+        let rate_mult = RATE_DIVISIONS[rate_idx];
+        let beats_per_second = tempo as f64 / 60.0;
+        let step_duration_seconds = rate_mult / beats_per_second;
+        self.samples_per_step = step_duration_seconds * self.sample_rate as f64;
         self.gate_length_samples = ((self.samples_per_step * (gate_len_pct as f64 / 100.0)) as usize).max(1);
 
         let has_external_clock = inputs.clock.is_some();

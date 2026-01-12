@@ -595,19 +595,12 @@ Horloge centrale pour synchroniser plusieurs séquenceurs. Génère des signaux 
 |-----------|-------|-------------|
 | `running` | true/false | Play/Stop |
 | `tempo` | 40-300 BPM | Tempo global |
-| `rate` | 0-5 | Division de tempo (voir tableau) |
+| `rate` | 0-15 | Division de tempo (voir Unified Rate Divisions) |
 | `swing` | 0-90 % | Swing sur les steps impairs |
 
-**Divisions de tempo (rate) :**
+**Divisions de tempo (rate) - UI Clock :** 0=1/1, 1=1/2, 2=1/4, 3=1/8, 4=1/16 (défaut), 5=1/32
 
-| Rate | Division | Steps/Beat |
-|------|----------|------------|
-| 0 | 1/1 | 0.25 |
-| 1 | 1/2 | 0.5 |
-| 2 | 1/4 | 1 |
-| 3 | 1/8 | 2 |
-| 4 | 1/16 | 4 (défaut) |
-| 5 | 1/32 | 8 |
+> **Note:** Tous les séquenceurs utilisent le système de rate unifié (indices 0-15). Voir CLAUDE.md section "Unified Rate Divisions" pour la table complète incluant triplets (6-10) et dotted (11-15).
 
 **Entrées :**
 | Port | ID | Description |
@@ -663,7 +656,7 @@ Séquenceur 16 steps style TB-303 avec pitch CV, gate, vélocité et slide.
 |-----------|-------|-------------|
 | `enabled` | true/false | Lecture active |
 | `tempo` | 40-300 BPM | Tempo (ignoré si clock externe) |
-| `rate` | 0-11 | Division de tempo |
+| `rate` | 0-15 | Division de tempo (UI: 2=1/4, 3=1/8, 4=1/16, 7-9=triplets) |
 | `gateLength` | 10-100 % | Durée du gate |
 | `swing` | 0-90 % | Swing sur steps impairs |
 | `slideTime` | 10-200 ms | Durée du glide |
@@ -700,7 +693,7 @@ Séquenceur de rythmes euclidiens utilisant l'algorithme de Bjorklund. Distribue
 |-----------|-------|-------------|
 | `enabled` | true/false | Lecture active |
 | `tempo` | 40-300 BPM | Tempo (ignoré si clock externe) |
-| `rate` | 0-11 | Division de tempo |
+| `rate` | 0-15 | Division de tempo (UI: 2=1/4, 3=1/8, 4=1/16, 7-9=triplets) |
 | `steps` | 2-32 | Nombre total de steps |
 | `pulses` | 0-steps | Nombre de triggers à distribuer |
 | `rotation` | 0-steps-1 | Offset du pattern |
@@ -753,7 +746,7 @@ Séquenceur de drums style TR-808/909 avec 8 tracks et 16 steps.
 |-----------|-------|-------------|
 | `enabled` | true/false | Lecture active |
 | `tempo` | 40-300 BPM | Tempo (ignoré si clock externe) |
-| `rate` | 0-11 | Division de tempo |
+| `rate` | 0-15 | Division de tempo (UI drums: 2=1/4, 3=1/8, 4=1/16, 5=1/32) |
 | `gateLength` | 10-100 % | Durée du gate |
 | `swing` | 0-90 % | Swing sur steps impairs |
 | `length` | 4/8/12/16 | Longueur du pattern |
@@ -821,6 +814,33 @@ Module central pour le contrôle du synthé.
 ### Arpeggiator
 
 Arpeggiateur CV/Gate synchronisable (tempo interne ou clock externe).
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `enabled` | true/false | Lecture active |
+| `hold` | true/false | Maintenir les notes après relâchement |
+| `mode` | 0-5 | Up/Down/UpDown/Random/Order/Chord |
+| `octaves` | 1-4 | Étalement en octaves |
+| `tempo` | 40-300 BPM | Tempo (ignoré si clock externe) |
+| `rate` | 0-15 | Division de tempo (UI: 2=1/4, 3=1/8, 4=1/16, 7-9=triplets) |
+| `gate` | 10-100 % | Durée du gate |
+| `swing` | 0-90 % | Swing sur steps impairs |
+| `probability` | 0-100 % | Probabilité de déclenchement |
+| `ratchet` | 1-4 | Ratcheting (répétitions rapides) |
+
+**Entrées :**
+| Port | ID | Description |
+|------|----|-------------|
+| CV | `cv-in` | Pitch CV depuis Control IO |
+| Gate | `gate-in` | Gate depuis Control IO |
+| Clock | `clock` | Clock externe |
+| Reset | `reset` | Reset externe |
+
+**Sorties :**
+| Port | ID | Description |
+|------|----|-------------|
+| CV Out | `cv-out` | Pitch CV arpégié |
+| Gate Out | `gate-out` | Gate arpégié |
 
 **Note** : les micro-coupures de gate (retrigger) sont ignorees ; avec HOLD desactive, l'arp s'arrete quand aucune note n'est tenue.
 

@@ -27,7 +27,7 @@
           "hold": true,
           "mode": 4,
           "octaves": 3,
-          "rate": 10,
+          "rate": 4,
           "gate": 70,
           "swing": 0,
           "tempo": 110,

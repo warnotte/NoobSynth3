@@ -12,6 +12,12 @@ import { ButtonGroup } from '../ButtonGroup'
 import { ToggleButton, ToggleGroup } from '../ToggleButton'
 import { formatInt } from '../formatters'
 import { marioSongs } from '../../state/marioSongs'
+import { getRateOptions, DEFAULT_RATES } from '../../shared/rates'
+
+// Shared rate options for sequencers
+const seqRateOptions = getRateOptions('sequencer')
+const clockRateOptions = getRateOptions('clock')
+const drumRateOptions = getRateOptions('drums')
 
 export function renderSequencerControls(props: ControlProps): React.ReactElement | null {
   const { module, engine, status, updateParam, marioStep } = props
@@ -21,7 +27,7 @@ export function renderSequencerControls(props: ControlProps): React.ReactElement
     const hold = Boolean(module.params.hold)
     const mode = Number(module.params.mode ?? 0)
     const octaves = Number(module.params.octaves ?? 1)
-    const rate = Number(module.params.rate ?? 7)
+    const rate = Number(module.params.rate ?? DEFAULT_RATES.arpeggiator)
     const gate = Number(module.params.gate ?? 75)
     const swing = Number(module.params.swing ?? 0)
     const tempo = Number(module.params.tempo ?? 120)
@@ -45,14 +51,8 @@ export function renderSequencerControls(props: ControlProps): React.ReactElement
       { id: 9, label: 'Chord' },
     ]
 
-    const rateDivisions = [
-      { id: 4, label: '1/4' },
-      { id: 7, label: '1/8' },
-      { id: 10, label: '1/16' },
-      { id: 5, label: '1/4T' },
-      { id: 8, label: '1/8T' },
-      { id: 11, label: '1/16T' },
-    ]
+    // Use shared rate options (unified indices)
+    const rateDivisions = seqRateOptions
 
     return (
       <>
@@ -209,21 +209,15 @@ export function renderSequencerControls(props: ControlProps): React.ReactElement
   if (module.type === 'euclidean') {
     const enabled = module.params.enabled !== false
     const tempo = Number(module.params.tempo ?? 120)
-    const rate = Number(module.params.rate ?? 7)
+    const rate = Number(module.params.rate ?? DEFAULT_RATES.euclidean)
     const steps = Number(module.params.steps ?? 16)
     const pulses = Number(module.params.pulses ?? 4)
     const rotation = Number(module.params.rotation ?? 0)
     const gateLength = Number(module.params.gateLength ?? 50)
     const swing = Number(module.params.swing ?? 0)
 
-    const rateDivisions = [
-      { id: 0, label: '1/1' },
-      { id: 1, label: '1/2' },
-      { id: 3, label: '1/4' },
-      { id: 5, label: '1/8' },
-      { id: 7, label: '1/16' },
-      { id: 9, label: '1/32' },
-    ]
+    // Use shared rate options (straight divisions)
+    const rateDivisions = clockRateOptions
 
     return (
       <>
@@ -326,17 +320,11 @@ export function renderSequencerControls(props: ControlProps): React.ReactElement
   if (module.type === 'clock') {
     const running = module.params.running !== false
     const tempo = Number(module.params.tempo ?? 120)
-    const rate = Number(module.params.rate ?? 4)
+    const rate = Number(module.params.rate ?? DEFAULT_RATES.clock)
     const swing = Number(module.params.swing ?? 0)
 
-    const rateDivisions = [
-      { id: 0, label: '1/1' },
-      { id: 1, label: '1/2' },
-      { id: 2, label: '1/4' },
-      { id: 3, label: '1/8' },
-      { id: 4, label: '1/16' },
-      { id: 5, label: '1/32' },
-    ]
+    // Use shared rate options (straight divisions)
+    const rateDivisions = clockRateOptions
 
     return (
       <>
@@ -489,7 +477,7 @@ export function renderSequencerControls(props: ControlProps): React.ReactElement
 function StepSequencerUI({ module, engine, status, updateParam }: Pick<ControlProps, 'module' | 'engine' | 'status' | 'updateParam'>) {
   const enabled = module.params.enabled !== false
   const tempo = Number(module.params.tempo ?? 120)
-  const rate = Number(module.params.rate ?? 3)
+  const rate = Number(module.params.rate ?? DEFAULT_RATES.stepSequencer)
   const gateLength = Number(module.params.gateLength ?? 50)
   const swing = Number(module.params.swing ?? 0)
   const slideTime = Number(module.params.slideTime ?? 50)
@@ -554,14 +542,8 @@ function StepSequencerUI({ module, engine, status, updateParam }: Pick<ControlPr
     }))},
   ]
 
-  const rateDivisions = [
-    { id: 2, label: '1/4' },
-    { id: 3, label: '1/8' },
-    { id: 4, label: '1/16' },
-    { id: 6, label: '1/4T' },
-    { id: 7, label: '1/8T' },
-    { id: 8, label: '1/16T' },
-  ]
+  // Use shared rate options (unified indices)
+  const rateDivisions = seqRateOptions
 
   const directions = [
     { id: 0, label: 'FWD' },
@@ -803,7 +785,7 @@ function StepSequencerUI({ module, engine, status, updateParam }: Pick<ControlPr
 function DrumSequencerUI({ module, engine, status, updateParam }: Pick<ControlProps, 'module' | 'engine' | 'status' | 'updateParam'>) {
   const enabled = module.params.enabled !== false
   const tempo = Number(module.params.tempo ?? 120)
-  const rate = Number(module.params.rate ?? 4)
+  const rate = Number(module.params.rate ?? DEFAULT_RATES.drumSequencer)
   const swing = Number(module.params.swing ?? 0)
   const length = Number(module.params.length ?? 16)
 
@@ -874,12 +856,8 @@ function DrumSequencerUI({ module, engine, status, updateParam }: Pick<ControlPr
     updateDrumData(newTracks)
   }
 
-  const rateDivisions = [
-    { id: 2, label: '1/4' },
-    { id: 3, label: '1/8' },
-    { id: 4, label: '1/16' },
-    { id: 5, label: '1/32' },
-  ]
+  // Use shared rate options (drum divisions)
+  const rateDivisions = drumRateOptions
 
   const gridRef = useRef<HTMLDivElement>(null)
   const stepRef = useRef(-1)

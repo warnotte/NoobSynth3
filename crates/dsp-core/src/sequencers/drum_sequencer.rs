@@ -4,7 +4,7 @@
 
 use crate::common::{sample_at, Sample};
 
-use super::step_sequencer::SEQ_RATE_DIVISIONS;
+use super::RATE_DIVISIONS;
 
 /// Number of drum tracks.
 pub const DRUM_TRACKS: usize = 8;
@@ -329,14 +329,14 @@ impl DrumSequencer {
         // Read params
         let enabled = sample_at(params.enabled, 0, 1.0) > 0.5;
         let tempo = sample_at(params.tempo, 0, 120.0).clamp(40.0, 300.0);
-        let rate_idx = (sample_at(params.rate, 0, 4.0) as usize).min(SEQ_RATE_DIVISIONS.len() - 1);
+        let rate_idx = (sample_at(params.rate, 0, 4.0) as usize).min(RATE_DIVISIONS.len() - 1);
         let gate_pct = sample_at(params.gate_length, 0, 50.0).clamp(10.0, 100.0) / 100.0;
         let swing = sample_at(params.swing, 0, 0.0).clamp(0.0, 90.0) / 100.0;
         let length = (sample_at(params.length, 0, 16.0) as usize).clamp(4, 16);
 
         // Calculate timing
         let beats_per_second = tempo as f64 / 60.0;
-        let rate_mult = SEQ_RATE_DIVISIONS[rate_idx];
+        let rate_mult = RATE_DIVISIONS[rate_idx];
         let step_duration_seconds = rate_mult / beats_per_second;
         let step_duration_samples = step_duration_seconds * self.sample_rate as f64;
         self.samples_per_step = step_duration_samples;

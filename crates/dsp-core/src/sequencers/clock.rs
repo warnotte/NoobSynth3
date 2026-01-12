@@ -3,6 +3,7 @@
 //! Global transport/clock generator for syncing sequencers.
 
 use crate::common::{sample_at, Sample};
+use super::RATE_DIVISIONS;
 
 /// Master Clock - Global transport/clock generator.
 ///
@@ -88,7 +89,7 @@ pub struct MasterClockParams<'a> {
     pub running: &'a [Sample],
     /// Tempo in BPM (40-300)
     pub tempo: &'a [Sample],
-    /// Rate division: 0=1/1, 1=1/2, 2=1/4, 3=1/8, 4=1/16, 5=1/32
+    /// Rate division index (see RATE_DIVISIONS in mod.rs)
     pub rate: &'a [Sample],
     /// Swing amount (0-90%)
     pub swing: &'a [Sample],
@@ -141,18 +142,6 @@ impl MasterClock {
         }
     }
 
-    fn rate_divisor(rate: f32) -> f64 {
-        // 0=1/1 (whole), 1=1/2 (half), 2=1/4 (quarter), 3=1/8, 4=1/16, 5=1/32
-        match rate.round() as i32 {
-            0 => 4.0,   // 1/1 = 4 beats
-            1 => 2.0,   // 1/2 = 2 beats
-            2 => 1.0,   // 1/4 = 1 beat
-            3 => 0.5,   // 1/8 = half beat
-            4 => 0.25,  // 1/16 = quarter beat
-            5 => 0.125, // 1/32 = eighth beat
-            _ => 0.25,  // default 1/16
-        }
-    }
 
     /// Process a block of samples.
     pub fn process_block(
@@ -216,7 +205,8 @@ impl MasterClock {
             }
 
             // Update tempo
-            let rate_div = Self::rate_divisor(rate);
+            let rate_idx = (rate.round() as usize).min(RATE_DIVISIONS.len() - 1);
+            let rate_div = RATE_DIVISIONS[rate_idx];
             self.samples_per_beat = (self.sample_rate as f64) * 60.0 / (tempo as f64) * rate_div;
 
             // Process clock if running

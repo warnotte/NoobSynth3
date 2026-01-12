@@ -3,6 +3,7 @@
 //! 16-step sequencer with pitch/gate/velocity/slide per step.
 
 use crate::common::{sample_at, Sample};
+use super::RATE_DIVISIONS;
 
 /// Single step in the sequence.
 #[derive(Clone, Copy)]
@@ -28,21 +29,7 @@ impl Default for SeqStep {
     }
 }
 
-/// Rate divisions for tempo sync.
-pub const SEQ_RATE_DIVISIONS: [f64; 12] = [
-    4.0,    // 0: 1 bar
-    2.0,    // 1: 1/2
-    1.0,    // 2: 1/4
-    0.5,    // 3: 1/8
-    0.25,   // 4: 1/16
-    0.125,  // 5: 1/32
-    1.333,  // 6: 1/4 triplet (1/4 * 2/3)
-    0.667,  // 7: 1/8 triplet
-    0.333,  // 8: 1/16 triplet
-    1.5,    // 9: 1/4 dotted
-    0.75,   // 10: 1/8 dotted
-    0.375,  // 11: 1/16 dotted
-];
+// Rate divisions now imported from super::RATE_DIVISIONS
 
 /// Simple xorshift32 RNG.
 struct Xorshift32 {
@@ -370,7 +357,7 @@ impl StepSequencer {
         // Read params
         let enabled = sample_at(params.enabled, 0, 1.0) > 0.5;
         let tempo = sample_at(params.tempo, 0, 120.0).clamp(40.0, 300.0);
-        let rate_idx = (sample_at(params.rate, 0, 3.0) as usize).min(SEQ_RATE_DIVISIONS.len() - 1);
+        let rate_idx = (sample_at(params.rate, 0, 3.0) as usize).min(RATE_DIVISIONS.len() - 1);
         let gate_pct = sample_at(params.gate_length, 0, 50.0).clamp(10.0, 100.0) / 100.0;
         let swing = sample_at(params.swing, 0, 0.0).clamp(0.0, 90.0) / 100.0;
         let slide_time_ms = sample_at(params.slide_time, 0, 50.0).clamp(0.0, 500.0);
@@ -379,7 +366,7 @@ impl StepSequencer {
 
         // Calculate timing
         let beats_per_second = tempo as f64 / 60.0;
-        let rate_mult = SEQ_RATE_DIVISIONS[rate_idx];
+        let rate_mult = RATE_DIVISIONS[rate_idx];
         let step_duration_seconds = rate_mult / beats_per_second;
         let step_duration_samples = step_duration_seconds * self.sample_rate as f64;
         self.samples_per_beat = step_duration_samples;

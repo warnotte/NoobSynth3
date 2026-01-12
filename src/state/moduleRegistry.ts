@@ -459,7 +459,7 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     hold: false,
     mode: 0,           // 0=UP, 1=DOWN, 2=UP_DOWN, etc.
     octaves: 1,
-    rate: 7,           // 1/8 note (index 7 in arp RATE_DIVISIONS)
+    rate: 3,           // 1/8 note (unified RATE_DIVISIONS index)
     gate: 75,          // 75% gate length
     swing: 0,
     tempo: 120,
@@ -579,7 +579,7 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
   euclidean: {
     enabled: true,
     tempo: 120,
-    rate: 7,            // 1/16 note
+    rate: 4,            // 1/16 note (unified RATE_DIVISIONS index)
     steps: 16,
     pulses: 4,          // E(4,16) - classic tresillo
     rotation: 0,

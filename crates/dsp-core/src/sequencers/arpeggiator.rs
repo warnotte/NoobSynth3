@@ -3,6 +3,7 @@
 //! MIDI-style arpeggiator with multiple modes and patterns.
 
 use crate::common::{sample_at, Sample};
+use super::RATE_DIVISIONS;
 
 /// Arpeggiator playback modes.
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -41,25 +42,7 @@ impl ArpMode {
     }
 }
 
-/// Rate divisions (tempo-synced).
-pub const RATE_DIVISIONS: [f32; 16] = [
-    1.0,      // 1/1
-    0.5,      // 1/2
-    0.333,    // 1/2T (triplet)
-    0.75,     // 1/2. (dotted)
-    0.25,     // 1/4
-    0.167,    // 1/4T
-    0.375,    // 1/4.
-    0.125,    // 1/8
-    0.083,    // 1/8T
-    0.1875,   // 1/8.
-    0.0625,   // 1/16
-    0.042,    // 1/16T
-    0.09375,  // 1/16.
-    0.03125,  // 1/32
-    0.021,    // 1/32T
-    0.015625, // 1/64
-];
+// Rate divisions now imported from super::RATE_DIVISIONS
 
 /// Simple xorshift32 RNG.
 struct Xorshift32 {
@@ -536,10 +519,10 @@ impl Arpeggiator {
         let gate_release_threshold = (self.sample_rate * 0.001).max(1.0) as usize;
 
         // Calculate timing
-        let beats_per_second = tempo / 60.0;
+        let beats_per_second = tempo as f64 / 60.0;
         let rate_mult = RATE_DIVISIONS[rate_idx];
         let step_duration_seconds = rate_mult / beats_per_second;
-        let step_duration_samples = step_duration_seconds as f64 * self.sample_rate as f64;
+        let step_duration_samples = step_duration_seconds * self.sample_rate as f64;
         self.samples_per_beat = step_duration_samples;
 
         // Update euclidean pattern if needed

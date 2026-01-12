@@ -85,7 +85,7 @@ pub use sequencers::{
     Arpeggiator, ArpeggiatorParams, ArpeggiatorInputs, ArpeggiatorOutputs,
     ArpMode, RATE_DIVISIONS,
     StepSequencer, StepSequencerParams, StepSequencerInputs, StepSequencerOutputs,
-    SeqStep, SEQ_RATE_DIVISIONS,
+    SeqStep,
     DrumSequencer, DrumSequencerParams, DrumSequencerInputs, DrumSequencerOutputs,
     DrumStep, DRUM_TRACKS, DRUM_STEPS, DRUM_TRACK_NAMES,
     EuclideanSequencer, EuclideanParams, EuclideanInputs,

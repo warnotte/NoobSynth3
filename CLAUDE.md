@@ -15,7 +15,7 @@ src/                    # React frontend
     controls/           # Module controls split by category
   engine/               # Audio engine (WasmGraphEngine, worklets)
   state/                # State management (moduleRegistry, presets)
-  shared/               # Shared types (graph.ts)
+  shared/               # Shared types (graph.ts, rates.ts)
 
 crates/
   dsp-core/             # Rust DSP modules (oscillators, filters, effects)
@@ -111,6 +111,8 @@ Voir `src/hooks/HOOKS.md` pour la documentation détaillée.
 | `src/ui/portCatalog.ts` | Port definitions for each module |
 | `src/engine/WasmGraphEngine.ts` | WASM engine wrapper, sequencer sync |
 | `src/engine/worklets/wasm-graph-processor.ts` | AudioWorklet processor |
+| `src/shared/rates.ts` | Unified rate divisions constants (TS) |
+| `crates/dsp-core/src/sequencers/mod.rs` | Unified rate divisions constants (Rust) |
 
 ## Build Commands
 
@@ -193,6 +195,34 @@ Les drums 909 utilisent un mécanisme de "latching" pour l'accent:
 - L'AudioWorklet poll `get_sequencer_step()` toutes les ~20ms
 - Les updates sont envoyées via `postMessage` au main thread
 - L'UI utilise `engine.watchSequencer()` pour s'abonner
+
+### Unified Rate Divisions
+Tous les séquenceurs utilisent un système de rate divisions unifié défini dans:
+- **Rust:** `crates/dsp-core/src/sequencers/mod.rs` → `RATE_DIVISIONS[16]`
+- **TypeScript:** `src/shared/rates.ts` → `RATE_DIVISIONS`, `RATE_PRESETS`, `DEFAULT_RATES`
+
+| Index | Label | Beats | Description |
+|-------|-------|-------|-------------|
+| 0 | 1/1 | 4.0 | Whole note |
+| 1 | 1/2 | 2.0 | Half note |
+| 2 | 1/4 | 1.0 | Quarter note |
+| 3 | 1/8 | 0.5 | Eighth note |
+| 4 | 1/16 | 0.25 | Sixteenth note |
+| 5 | 1/32 | 0.125 | Thirty-second note |
+| 6 | 1/2T | 1.333 | Half triplet |
+| 7 | 1/4T | 0.667 | Quarter triplet |
+| 8 | 1/8T | 0.333 | Eighth triplet |
+| 9 | 1/16T | 0.167 | Sixteenth triplet |
+| 10 | 1/32T | 0.083 | Thirty-second triplet |
+| 11 | 1/2. | 3.0 | Dotted half |
+| 12 | 1/4. | 1.5 | Dotted quarter |
+| 13 | 1/8. | 0.75 | Dotted eighth |
+| 14 | 1/16. | 0.375 | Dotted sixteenth |
+| 15 | 1/32. | 0.1875 | Dotted thirty-second |
+
+**Modules utilisant ce système:** Clock, Arpeggiator, Step Sequencer, Drum Sequencer, Euclidean
+
+**Formule de timing:** `step_duration = rate_mult / beats_per_second` (où beats = tempo/60)
 
 ### Clap909 Fix
 - `clap_stage` doit être initialisé à 3 (pas 0)
