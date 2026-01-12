@@ -553,6 +553,13 @@
       "description": "Punchy FM bass with step sequencer and distortion.",
       "file": "fm-bass.json",
       "group": "FM Synthesis"
+    },
+    {
+      "id": "synthwave-nightdrive",
+      "name": "Synthwave Nightdrive",
+      "description": "Complex fully sequenced synthwave anthem with layered bass, lead, pad, and 909 groove. Step patterns derived from CC0 MIDI 'movin-on.mid' (m-malandro/CC0-midis).",
+      "file": "synthwave-nightdrive.json",
+      "group": "Synthwave"
     }
   ]
 }
