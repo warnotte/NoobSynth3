@@ -459,7 +459,7 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     hold: false,
     mode: 0,           // 0=UP, 1=DOWN, 2=UP_DOWN, etc.
     octaves: 1,
-    rate: 7,           // 1/8 note
+    rate: 7,           // 1/8 note (index 7 in arp RATE_DIVISIONS)
     gate: 75,          // 75% gate length
     swing: 0,
     tempo: 120,
@@ -478,7 +478,7 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
   'step-sequencer': {
     enabled: true,
     tempo: 120,
-    rate: 9,           // 1/16 note
+    rate: 3,           // 1/8 note
     gateLength: 50,    // 50% gate
     swing: 0,
     slideTime: 50,     // 50ms slide

@@ -29,7 +29,7 @@
           "hold": true,
           "mode": 0,
           "octaves": 3,
-          "rate": 12,
+          "rate": 10,
           "gate": 50,
           "swing": 0,
           "tempo": 130,

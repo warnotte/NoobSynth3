@@ -27,7 +27,7 @@
         "params": {
           "enabled": true,
           "tempo": 80,
-          "rate": 9,
+          "rate": 3,
           "gateLength": 90,
           "swing": 15,
           "slideTime": 100,

@@ -21,7 +21,7 @@ export function renderSequencerControls(props: ControlProps): React.ReactElement
     const hold = Boolean(module.params.hold)
     const mode = Number(module.params.mode ?? 0)
     const octaves = Number(module.params.octaves ?? 1)
-    const rate = Number(module.params.rate ?? 9)
+    const rate = Number(module.params.rate ?? 7)
     const gate = Number(module.params.gate ?? 75)
     const swing = Number(module.params.swing ?? 0)
     const tempo = Number(module.params.tempo ?? 120)
@@ -46,12 +46,12 @@ export function renderSequencerControls(props: ControlProps): React.ReactElement
     ]
 
     const rateDivisions = [
-      { id: 6, label: '1/4' },
-      { id: 9, label: '1/8' },
-      { id: 12, label: '1/16' },
-      { id: 8, label: '1/4T' },
-      { id: 11, label: '1/8T' },
-      { id: 14, label: '1/16T' },
+      { id: 4, label: '1/4' },
+      { id: 7, label: '1/8' },
+      { id: 10, label: '1/16' },
+      { id: 5, label: '1/4T' },
+      { id: 8, label: '1/8T' },
+      { id: 11, label: '1/16T' },
     ]
 
     return (
@@ -489,7 +489,7 @@ export function renderSequencerControls(props: ControlProps): React.ReactElement
 function StepSequencerUI({ module, engine, status, updateParam }: Pick<ControlProps, 'module' | 'engine' | 'status' | 'updateParam'>) {
   const enabled = module.params.enabled !== false
   const tempo = Number(module.params.tempo ?? 120)
-  const rate = Number(module.params.rate ?? 9)
+  const rate = Number(module.params.rate ?? 3)
   const gateLength = Number(module.params.gateLength ?? 50)
   const swing = Number(module.params.swing ?? 0)
   const slideTime = Number(module.params.slideTime ?? 50)
@@ -555,12 +555,12 @@ function StepSequencerUI({ module, engine, status, updateParam }: Pick<ControlPr
   ]
 
   const rateDivisions = [
-    { id: 6, label: '1/4' },
-    { id: 9, label: '1/8' },
-    { id: 12, label: '1/16' },
-    { id: 8, label: '1/4T' },
-    { id: 11, label: '1/8T' },
-    { id: 14, label: '1/16T' },
+    { id: 2, label: '1/4' },
+    { id: 3, label: '1/8' },
+    { id: 4, label: '1/16' },
+    { id: 6, label: '1/4T' },
+    { id: 7, label: '1/8T' },
+    { id: 8, label: '1/16T' },
   ]
 
   const directions = [
