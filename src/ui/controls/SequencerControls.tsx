@@ -8,8 +8,9 @@ import type React from 'react'
 import { useCallback, useEffect, useRef } from 'react'
 import type { ControlProps } from './types'
 import { RotaryKnob } from '../RotaryKnob'
-import { ButtonGroup } from '../ButtonGroup'
 import { ToggleButton, ToggleGroup } from '../ToggleButton'
+import { ControlBox, ControlBoxRow } from '../ControlBox'
+import { ControlButtons } from '../ControlButtons'
 import { formatInt } from '../formatters'
 import { marioSongs } from '../../state/marioSongs'
 import { getRateOptions, DEFAULT_RATES } from '../../shared/rates'
@@ -54,6 +55,20 @@ export function renderSequencerControls(props: ControlProps): React.ReactElement
     // Use shared rate options (unified indices)
     const rateDivisions = seqRateOptions
 
+    const octaveOptions = [
+      { id: 1, label: '1' },
+      { id: 2, label: '2' },
+      { id: 3, label: '3' },
+      { id: 4, label: '4' },
+    ]
+
+    const ratchetOptions = [
+      { id: 1, label: '1x' },
+      { id: 2, label: '2x' },
+      { id: 3, label: '3x' },
+      { id: 4, label: '4x' },
+    ]
+
     return (
       <>
         <ToggleGroup>
@@ -70,130 +85,125 @@ export function renderSequencerControls(props: ControlProps): React.ReactElement
           />
         </ToggleGroup>
 
-        <RotaryKnob
-          label="Tempo"
-          min={40}
-          max={300}
-          step={1}
-          unit="BPM"
-          value={tempo}
-          onChange={(value) => updateParam(module.id, 'tempo', value)}
-          format={formatInt}
-        />
-        <RotaryKnob
-          label="Gate"
-          min={10}
-          max={100}
-          step={1}
-          unit="%"
-          value={gate}
-          onChange={(value) => updateParam(module.id, 'gate', value)}
-          format={formatInt}
-        />
-        <RotaryKnob
-          label="Swing"
-          min={0}
-          max={90}
-          step={1}
-          unit="%"
-          value={swing}
-          onChange={(value) => updateParam(module.id, 'swing', value)}
-          format={formatInt}
-        />
+        <ControlBoxRow>
+          <ControlBox label="Timing" horizontal>
+            <RotaryKnob
+              label="Tempo"
+              min={40}
+              max={300}
+              step={1}
+              unit="BPM"
+              value={tempo}
+              onChange={(value) => updateParam(module.id, 'tempo', value)}
+              format={formatInt}
+            />
+            <RotaryKnob
+              label="Gate"
+              min={10}
+              max={100}
+              step={1}
+              unit="%"
+              value={gate}
+              onChange={(value) => updateParam(module.id, 'gate', value)}
+              format={formatInt}
+            />
+            <RotaryKnob
+              label="Swing"
+              min={0}
+              max={90}
+              step={1}
+              unit="%"
+              value={swing}
+              onChange={(value) => updateParam(module.id, 'swing', value)}
+              format={formatInt}
+            />
+            <RotaryKnob
+              label="Prob"
+              min={0}
+              max={100}
+              step={1}
+              unit="%"
+              value={probability}
+              onChange={(value) => updateParam(module.id, 'probability', value)}
+              format={formatInt}
+            />
+          </ControlBox>
+        </ControlBoxRow>
 
-        <ButtonGroup
-          label="Mode"
-          options={arpModes}
-          value={mode}
-          onChange={(value) => updateParam(module.id, 'mode', value)}
-          wide
-          rowSize={5}
-        />
+        <ControlBox label="Mode">
+          <ControlButtons
+            options={arpModes}
+            value={mode}
+            onChange={(value) => updateParam(module.id, 'mode', value)}
+            columns={4}
+          />
+        </ControlBox>
 
-        <ButtonGroup
-          label="Rate"
-          options={rateDivisions}
-          value={rate}
-          onChange={(value) => updateParam(module.id, 'rate', value)}
-          wide
-          rowSize={3}
-        />
+        <ControlBox label="Rate">
+          <ControlButtons
+            options={rateDivisions}
+            value={rate}
+            onChange={(value) => updateParam(module.id, 'rate', value)}
+            columns={3}
+          />
+        </ControlBox>
 
-        <ButtonGroup
-          label="Oct"
-          options={[
-            { id: 1, label: '1' },
-            { id: 2, label: '2' },
-            { id: 3, label: '3' },
-            { id: 4, label: '4' },
-          ]}
-          value={octaves}
-          onChange={(value) => updateParam(module.id, 'octaves', value)}
-          inline
-        />
+        <ControlBoxRow>
+          <ControlBox label="Oct">
+            <ControlButtons
+              options={octaveOptions}
+              value={octaves}
+              onChange={(value) => updateParam(module.id, 'octaves', value)}
+            />
+          </ControlBox>
+          <ControlBox label="Ratchet">
+            <ControlButtons
+              options={ratchetOptions}
+              value={ratchet}
+              onChange={(value) => updateParam(module.id, 'ratchet', value)}
+            />
+          </ControlBox>
+        </ControlBoxRow>
 
-        <ButtonGroup
-          label="Ratchet"
-          options={[
-            { id: 1, label: '1x' },
-            { id: 2, label: '2x' },
-            { id: 3, label: '3x' },
-            { id: 4, label: '4x' },
-          ]}
-          value={ratchet}
-          onChange={(value) => updateParam(module.id, 'ratchet', value)}
-          inline
-        />
-
-        <RotaryKnob
-          label="Prob"
-          min={0}
-          max={100}
-          step={1}
-          unit="%"
-          value={probability}
-          onChange={(value) => updateParam(module.id, 'probability', value)}
-          format={formatInt}
-        />
-
-        <ToggleGroup>
+        <ControlBox label="Euclidean" horizontal>
           <ToggleButton
-            label="Euclidean"
+            label="ON"
             value={euclidEnabled}
             onChange={(value) => updateParam(module.id, 'euclidEnabled', value)}
+            onOff
           />
-        </ToggleGroup>
-        {euclidEnabled && (
-          <>
-            <RotaryKnob
-              label="Steps"
-              min={2}
-              max={16}
-              step={1}
-              value={euclidSteps}
-              onChange={(value) => updateParam(module.id, 'euclidSteps', value)}
-              format={formatInt}
-            />
-            <RotaryKnob
-              label="Fill"
-              min={1}
-              max={euclidSteps}
-              step={1}
-              value={euclidFill}
-              onChange={(value) => updateParam(module.id, 'euclidFill', value)}
-              format={formatInt}
-            />
-            <RotaryKnob
-              label="Rotate"
-              min={0}
-              max={euclidSteps - 1}
-              step={1}
-              value={euclidRotate}
-              onChange={(value) => updateParam(module.id, 'euclidRotate', value)}
-              format={formatInt}
-            />
-          </>
-        )}
+          {euclidEnabled && (
+            <>
+              <RotaryKnob
+                label="Steps"
+                min={2}
+                max={16}
+                step={1}
+                value={euclidSteps}
+                onChange={(value) => updateParam(module.id, 'euclidSteps', value)}
+                format={formatInt}
+              />
+              <RotaryKnob
+                label="Fill"
+                min={1}
+                max={euclidSteps}
+                step={1}
+                value={euclidFill}
+                onChange={(value) => updateParam(module.id, 'euclidFill', value)}
+                format={formatInt}
+              />
+              <RotaryKnob
+                label="Rotate"
+                min={0}
+                max={euclidSteps - 1}
+                step={1}
+                value={euclidRotate}
+                onChange={(value) => updateParam(module.id, 'euclidRotate', value)}
+                format={formatInt}
+              />
+            </>
+          )}
+        </ControlBox>
       </>
     )
   }
@@ -216,9 +226,6 @@ export function renderSequencerControls(props: ControlProps): React.ReactElement
     const gateLength = Number(module.params.gateLength ?? 50)
     const swing = Number(module.params.swing ?? 0)
 
-    // Use shared rate options (straight divisions)
-    const rateDivisions = clockRateOptions
-
     return (
       <>
         <ToggleGroup>
@@ -231,88 +238,82 @@ export function renderSequencerControls(props: ControlProps): React.ReactElement
           />
         </ToggleGroup>
 
-        <RotaryKnob
-          label="Tempo"
-          min={40}
-          max={300}
-          step={1}
-          unit="BPM"
-          value={tempo}
-          onChange={(value) => updateParam(module.id, 'tempo', value)}
-          format={formatInt}
-        />
+        <ControlBoxRow>
+          <ControlBox label="Timing" horizontal>
+            <RotaryKnob
+              label="Tempo"
+              min={40}
+              max={300}
+              step={1}
+              unit="BPM"
+              value={tempo}
+              onChange={(value) => updateParam(module.id, 'tempo', value)}
+              format={formatInt}
+            />
+            <RotaryKnob
+              label="Gate"
+              min={10}
+              max={100}
+              step={1}
+              unit="%"
+              value={gateLength}
+              onChange={(value) => updateParam(module.id, 'gateLength', value)}
+              format={formatInt}
+            />
+            <RotaryKnob
+              label="Swing"
+              min={0}
+              max={90}
+              step={1}
+              unit="%"
+              value={swing}
+              onChange={(value) => updateParam(module.id, 'swing', value)}
+              format={formatInt}
+            />
+          </ControlBox>
+        </ControlBoxRow>
 
-        <div className="seq-control-section">
-          <div className="seq-control-box">
-            <span className="seq-control-label">Rate</span>
-            <div className="seq-control-buttons">
-              {rateDivisions.map((r) => (
-                <button
-                  key={r.id}
-                  type="button"
-                  className={`seq-control-btn ${rate === r.id ? 'active' : ''}`}
-                  onClick={() => updateParam(module.id, 'rate', r.id)}
-                >
-                  {r.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
+        <ControlBox label="Rate">
+          <ControlButtons
+            options={clockRateOptions}
+            value={rate}
+            onChange={(value) => updateParam(module.id, 'rate', value)}
+            columns={5}
+          />
+        </ControlBox>
 
-        <RotaryKnob
-          label="Steps"
-          min={2}
-          max={32}
-          step={1}
-          value={steps}
-          onChange={(value) => updateParam(module.id, 'steps', Math.round(value))}
-          format={formatInt}
-        />
-        <RotaryKnob
-          label="Pulses"
-          min={0}
-          max={steps}
-          step={1}
-          value={pulses}
-          onChange={(value) => updateParam(module.id, 'pulses', Math.round(value))}
-          format={formatInt}
-        />
-        <RotaryKnob
-          label="Rotate"
-          min={0}
-          max={steps - 1}
-          step={1}
-          value={rotation}
-          onChange={(value) => updateParam(module.id, 'rotation', Math.round(value))}
-          format={formatInt}
-        />
-        <RotaryKnob
-          label="Gate"
-          min={10}
-          max={100}
-          step={1}
-          unit="%"
-          value={gateLength}
-          onChange={(value) => updateParam(module.id, 'gateLength', value)}
-          format={formatInt}
-        />
-        <RotaryKnob
-          label="Swing"
-          min={0}
-          max={90}
-          step={1}
-          unit="%"
-          value={swing}
-          onChange={(value) => updateParam(module.id, 'swing', value)}
-          format={formatInt}
-        />
-
-        <div className="seq-control-section">
-          <div className="seq-control-box">
-            <span className="seq-control-label">E({pulses},{steps})</span>
-          </div>
-        </div>
+        <ControlBoxRow>
+          <ControlBox label="Pattern" horizontal>
+            <RotaryKnob
+              label="Steps"
+              min={2}
+              max={32}
+              step={1}
+              value={steps}
+              onChange={(value) => updateParam(module.id, 'steps', Math.round(value))}
+              format={formatInt}
+            />
+            <RotaryKnob
+              label="Pulses"
+              min={0}
+              max={steps}
+              step={1}
+              value={pulses}
+              onChange={(value) => updateParam(module.id, 'pulses', Math.round(value))}
+              format={formatInt}
+            />
+            <RotaryKnob
+              label="Rotate"
+              min={0}
+              max={steps - 1}
+              step={1}
+              value={rotation}
+              onChange={(value) => updateParam(module.id, 'rotation', Math.round(value))}
+              format={formatInt}
+            />
+            <span className="control-box-display">E({pulses},{steps})</span>
+          </ControlBox>
+        </ControlBoxRow>
       </>
     )
   }
@@ -322,9 +323,6 @@ export function renderSequencerControls(props: ControlProps): React.ReactElement
     const tempo = Number(module.params.tempo ?? 120)
     const rate = Number(module.params.rate ?? DEFAULT_RATES.clock)
     const swing = Number(module.params.swing ?? 0)
-
-    // Use shared rate options (straight divisions)
-    const rateDivisions = clockRateOptions
 
     return (
       <>
@@ -359,23 +357,14 @@ export function renderSequencerControls(props: ControlProps): React.ReactElement
           format={formatInt}
         />
 
-        <div className="seq-control-section">
-          <div className="seq-control-box">
-            <span className="seq-control-label">Rate</span>
-            <div className="seq-control-buttons">
-              {rateDivisions.map((r) => (
-                <button
-                  key={r.id}
-                  type="button"
-                  className={`seq-control-btn ${rate === r.id ? 'active' : ''}`}
-                  onClick={() => updateParam(module.id, 'rate', r.id)}
-                >
-                  {r.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
+        <ControlBox label="Rate">
+          <ControlButtons
+            options={clockRateOptions}
+            value={rate}
+            onChange={(value) => updateParam(module.id, 'rate', value)}
+            columns={5}
+          />
+        </ControlBox>
       </>
     )
   }
@@ -656,55 +645,35 @@ function StepSequencerUI({ module, engine, status, updateParam }: Pick<ControlPr
         format={formatInt}
       />
 
-      <div className="seq-control-section">
-        <div className="seq-control-box">
-          <span className="seq-control-label">Rate</span>
-          <div className="seq-control-buttons">
-            {rateDivisions.map((r) => (
-              <button
-                key={r.id}
-                type="button"
-                className={`seq-control-btn ${rate === r.id ? 'active' : ''}`}
-                onClick={() => updateParam(module.id, 'rate', r.id)}
-              >
-                {r.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="seq-control-box">
-          <span className="seq-control-label">Direction</span>
-          <div className="seq-control-buttons">
-            {directions.map((d) => (
-              <button
-                key={d.id}
-                type="button"
-                className={`seq-control-btn ${direction === d.id ? 'active' : ''}`}
-                onClick={() => updateParam(module.id, 'direction', d.id)}
-              >
-                {d.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="seq-control-box">
-          <span className="seq-control-label">Length</span>
-          <div className="seq-control-buttons">
-            {[4, 8, 12, 16].map((l) => (
-              <button
-                key={l}
-                type="button"
-                className={`seq-control-btn ${length === l ? 'active' : ''}`}
-                onClick={() => updateParam(module.id, 'length', l)}
-              >
-                {l}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
+      <ControlBoxRow>
+        <ControlBox label="Rate" flex={1.5}>
+          <ControlButtons
+            options={rateDivisions}
+            value={rate}
+            onChange={(value) => updateParam(module.id, 'rate', value)}
+            columns={3}
+          />
+        </ControlBox>
+        <ControlBox label="Direction">
+          <ControlButtons
+            options={directions}
+            value={direction}
+            onChange={(value) => updateParam(module.id, 'direction', value)}
+          />
+        </ControlBox>
+        <ControlBox label="Length">
+          <ControlButtons
+            options={[
+              { id: 4, label: '4' },
+              { id: 8, label: '8' },
+              { id: 12, label: '12' },
+              { id: 16, label: '16' },
+            ]}
+            value={length}
+            onChange={(value) => updateParam(module.id, 'length', value)}
+          />
+        </ControlBox>
+      </ControlBoxRow>
 
       <div className="seq-step-grid" ref={gridRef}>
         {[0, 8].map((offset) => (
@@ -915,52 +884,38 @@ function DrumSequencerUI({ module, engine, status, updateParam }: Pick<ControlPr
         </div>
       </div>
 
-      <div className="drum-seq-row2">
-        <div className="drum-seq-box">
-          <span className="drum-seq-label">Rate</span>
-          <div className="drum-seq-btns">
-            {rateDivisions.map((r) => (
-              <button
-                key={r.id}
-                type="button"
-                className={`drum-seq-btn ${rate === r.id ? 'active' : ''}`}
-                onClick={() => updateParam(module.id, 'rate', r.id)}
-              >
-                {r.label}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="drum-seq-box">
-          <span className="drum-seq-label">Swing</span>
-          <div className="drum-seq-swing">
-            <input
-              type="range"
-              min={0}
-              max={90}
-              value={swing}
-              onChange={(e) => updateParam(module.id, 'swing', Number(e.target.value))}
-              className="drum-seq-slider"
-            />
-            <span className="drum-seq-value">{swing}%</span>
-          </div>
-        </div>
-        <div className="drum-seq-box">
-          <span className="drum-seq-label">Len</span>
-          <div className="drum-seq-btns">
-            {[8, 12, 16].map((l) => (
-              <button
-                key={l}
-                type="button"
-                className={`drum-seq-btn ${length === l ? 'active' : ''}`}
-                onClick={() => updateParam(module.id, 'length', l)}
-              >
-                {l}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
+      <ControlBoxRow>
+        <ControlBox label="Rate" flex={1.5}>
+          <ControlButtons
+            options={rateDivisions}
+            value={rate}
+            onChange={(value) => updateParam(module.id, 'rate', value)}
+          />
+        </ControlBox>
+        <ControlBox horizontal>
+          <RotaryKnob
+            label="Swing"
+            min={0}
+            max={90}
+            step={1}
+            unit="%"
+            value={swing}
+            onChange={(value) => updateParam(module.id, 'swing', value)}
+            format={formatInt}
+          />
+        </ControlBox>
+        <ControlBox label="Len">
+          <ControlButtons
+            options={[
+              { id: 8, label: '8' },
+              { id: 12, label: '12' },
+              { id: 16, label: '16' },
+            ]}
+            value={length}
+            onChange={(value) => updateParam(module.id, 'length', value)}
+          />
+        </ControlBox>
+      </ControlBoxRow>
 
       <div className="drum-seq-row3">
         <span className="drum-seq-label">Pattern</span>

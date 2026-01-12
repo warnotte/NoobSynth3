@@ -104,7 +104,7 @@ export type ControlProps = {
 1. **Nommage** : `render[Category]Controls` pour les fonctions de rendu
 2. **Retour** : `JSX.Element | null` - retourne `null` si le module n'appartient pas à cette catégorie
 3. **Props** : Utiliser le type `ControlProps` de `types.ts`
-4. **Imports UI** : Les composants communs (RotaryKnob, ButtonGroup, etc.) sont importés dans chaque fichier
+4. **Imports UI** : Les composants communs (RotaryKnob, ControlBox, ControlButtons, etc.) sont importés dans chaque fichier
 
 ## Ajout d'un nouveau module
 

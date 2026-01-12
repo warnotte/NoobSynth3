@@ -49,7 +49,8 @@ App.tsx                          # Root component, state management
 Shared UI components:
 ├── RotaryKnob.tsx               # Rotary knob with drag
 ├── ControlKnob.tsx              # Knob + label wrapper
-├── ButtonGroup.tsx              # Radio button group
+├── ControlBox.tsx               # Bordered container (horizontal, compact, flex)
+├── ControlButtons.tsx           # Button grid with columns prop
 ├── ToggleButton.tsx             # On/off toggle
 ├── WaveformSelector.tsx         # Waveform picker
 ├── PanelSection.tsx             # Collapsible section

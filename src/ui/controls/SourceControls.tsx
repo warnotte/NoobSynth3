@@ -8,7 +8,8 @@ import type React from 'react'
 import type { ControlProps } from './types'
 import { RotaryKnob } from '../RotaryKnob'
 import { WaveformSelector } from '../WaveformSelector'
-import { ButtonGroup } from '../ButtonGroup'
+import { ControlBox, ControlBoxRow } from '../ControlBox'
+import { ControlButtons } from '../ControlButtons'
 import {
   formatDecimal1,
   formatDecimal2,
@@ -88,27 +89,30 @@ export function renderSourceControls(props: ControlProps): React.ReactElement | 
           value={String(module.params.type ?? 'sawtooth')}
           onChange={(value) => updateParam(module.id, 'type', value)}
         />
-        <ButtonGroup
-          label="Sub Oct"
-          options={[
-            { id: 1, label: '-1' },
-            { id: 2, label: '-2' },
-          ]}
-          value={subOct}
-          onChange={(value) => updateParam(module.id, 'subOct', value)}
-        />
-        <ButtonGroup
-          label="Unison"
-          options={[
-            { id: 1, label: '1x' },
-            { id: 2, label: '2x' },
-            { id: 3, label: '3x' },
-            { id: 4, label: '4x' },
-          ]}
-          value={Number(module.params.unison ?? 1)}
-          onChange={(value) => updateParam(module.id, 'unison', value)}
-          wide
-        />
+        <ControlBoxRow>
+          <ControlBox label="Sub Oct" compact>
+            <ControlButtons
+              options={[
+                { id: 1, label: '-1' },
+                { id: 2, label: '-2' },
+              ]}
+              value={subOct}
+              onChange={(value) => updateParam(module.id, 'subOct', value)}
+            />
+          </ControlBox>
+          <ControlBox label="Unison" compact>
+            <ControlButtons
+              options={[
+                { id: 1, label: '1x' },
+                { id: 2, label: '2x' },
+                { id: 3, label: '3x' },
+                { id: 4, label: '4x' },
+              ]}
+              value={Number(module.params.unison ?? 1)}
+              onChange={(value) => updateParam(module.id, 'unison', value)}
+            />
+          </ControlBox>
+        </ControlBoxRow>
       </>
     )
   }
@@ -125,17 +129,17 @@ export function renderSourceControls(props: ControlProps): React.ReactElement | 
           onChange={(value) => updateParam(module.id, 'level', value)}
           format={formatDecimal2}
         />
-        <ButtonGroup
-          label="Type"
-          options={[
-            { id: 'white', label: 'WHT' },
-            { id: 'pink', label: 'PNK' },
-            { id: 'brown', label: 'BRN' },
-          ]}
-          value={String(module.params.noiseType ?? 'white')}
-          onChange={(value) => updateParam(module.id, 'noiseType', value)}
-          wide
-        />
+        <ControlBox label="Type" compact>
+          <ControlButtons
+            options={[
+              { id: 'white', label: 'WHT' },
+              { id: 'pink', label: 'PNK' },
+              { id: 'brown', label: 'BRN' },
+            ]}
+            value={String(module.params.noiseType ?? 'white')}
+            onChange={(value) => updateParam(module.id, 'noiseType', value)}
+          />
+        </ControlBox>
       </>
     )
   }
@@ -264,45 +268,43 @@ export function renderSourceControls(props: ControlProps): React.ReactElement | 
           onChange={(value) => updateParam(module.id, 'volume', value)}
           format={(value) => `${Math.round(value * 100)}%`}
         />
-        <ButtonGroup
-          label="Mode"
-          options={[
-            { id: 0, label: 'PLS1' },
-            { id: 1, label: 'PLS2' },
-            { id: 2, label: 'TRI' },
-            { id: 3, label: 'NSE' },
-          ]}
-          value={nesMode}
-          onChange={(value) => updateParam(module.id, 'mode', value)}
-          wide
-          inline
-        />
-        {nesMode < 2 && (
-          <ButtonGroup
-            label="Duty"
+        <ControlBox label="Mode" compact>
+          <ControlButtons
             options={[
-              { id: 0, label: '12%' },
-              { id: 1, label: '25%' },
-              { id: 2, label: '50%' },
-              { id: 3, label: '75%' },
+              { id: 0, label: 'PLS1' },
+              { id: 1, label: 'PLS2' },
+              { id: 2, label: 'TRI' },
+              { id: 3, label: 'NSE' },
             ]}
-            value={nesDuty}
-            onChange={(value) => updateParam(module.id, 'duty', value)}
-            wide
-            inline
+            value={nesMode}
+            onChange={(value) => updateParam(module.id, 'mode', value)}
           />
+        </ControlBox>
+        {nesMode < 2 && (
+          <ControlBox label="Duty" compact>
+            <ControlButtons
+              options={[
+                { id: 0, label: '12%' },
+                { id: 1, label: '25%' },
+                { id: 2, label: '50%' },
+                { id: 3, label: '75%' },
+              ]}
+              value={nesDuty}
+              onChange={(value) => updateParam(module.id, 'duty', value)}
+            />
+          </ControlBox>
         )}
         {nesMode === 3 && (
-          <ButtonGroup
-            label="Noise"
-            options={[
-              { id: 0, label: 'RAND' },
-              { id: 1, label: 'LOOP' },
-            ]}
-            value={nesNoiseMode}
-            onChange={(value) => updateParam(module.id, 'noiseMode', value)}
-            inline
-          />
+          <ControlBox label="Noise" compact>
+            <ControlButtons
+              options={[
+                { id: 0, label: 'RAND' },
+                { id: 1, label: 'LOOP' },
+              ]}
+              value={nesNoiseMode}
+              onChange={(value) => updateParam(module.id, 'noiseMode', value)}
+            />
+          </ControlBox>
         )}
         <RotaryKnob
           label="Crush"
@@ -349,23 +351,23 @@ export function renderSourceControls(props: ControlProps): React.ReactElement | 
           onChange={(value) => updateParam(module.id, 'volume', value)}
           format={(value) => `${Math.round(value * 100)}%`}
         />
-        <ButtonGroup
-          label="Wave"
-          options={[
-            { id: 0, label: 'SQR' },
-            { id: 1, label: 'SAW' },
-            { id: 2, label: 'STR' },
-            { id: 3, label: 'BEL' },
-            { id: 4, label: 'ORG' },
-            { id: 5, label: 'PAD' },
-            { id: 6, label: 'BAS' },
-            { id: 7, label: 'SYN' },
-          ]}
-          value={Number(module.params.wave ?? 0)}
-          onChange={(value) => updateParam(module.id, 'wave', value)}
-          wide
-          rowSize={4}
-        />
+        <ControlBox label="Wave" compact>
+          <ControlButtons
+            options={[
+              { id: 0, label: 'SQR' },
+              { id: 1, label: 'SAW' },
+              { id: 2, label: 'STR' },
+              { id: 3, label: 'BEL' },
+              { id: 4, label: 'ORG' },
+              { id: 5, label: 'PAD' },
+              { id: 6, label: 'BAS' },
+              { id: 7, label: 'SYN' },
+            ]}
+            value={Number(module.params.wave ?? 0)}
+            onChange={(value) => updateParam(module.id, 'wave', value)}
+            columns={4}
+          />
+        </ControlBox>
         <RotaryKnob
           label="Gauss"
           min={0}
@@ -408,15 +410,16 @@ export function renderSourceControls(props: ControlProps): React.ReactElement | 
 
     return (
       <>
-        <ButtonGroup
-          label="Wave"
-          options={[
-            { id: 0, label: 'SAW' },
-            { id: 1, label: 'SQ' },
-          ]}
-          value={waveform < 0.5 ? 0 : 1}
-          onChange={(value) => updateParam(module.id, 'waveform', value)}
-        />
+        <ControlBox label="Wave" compact>
+          <ControlButtons
+            options={[
+              { id: 0, label: 'SAW' },
+              { id: 1, label: 'SQ' },
+            ]}
+            value={waveform < 0.5 ? 0 : 1}
+            onChange={(value) => updateParam(module.id, 'waveform', value)}
+          />
+        </ControlBox>
         <RotaryKnob
           label="Cutoff"
           min={40}
@@ -510,23 +513,13 @@ export function renderSourceControls(props: ControlProps): React.ReactElement | 
           onChange={(value) => updateParam(module.id, 'frequency', value)}
           format={formatInt}
         />
-        <div className="seq-control-section">
-          <div className="seq-control-box">
-            <span className="seq-control-label">Ratio</span>
-            <div className="seq-control-buttons">
-              {ratioPresets.map((r) => (
-                <button
-                  key={r.id}
-                  type="button"
-                  className={`seq-control-btn ${ratio === r.id ? 'active' : ''}`}
-                  onClick={() => updateParam(module.id, 'ratio', r.id)}
-                >
-                  {r.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
+        <ControlBox label="Ratio" compact>
+          <ControlButtons
+            options={ratioPresets}
+            value={ratio}
+            onChange={(value) => updateParam(module.id, 'ratio', value)}
+          />
+        </ControlBox>
         <RotaryKnob
           label="Ratio"
           min={0.1}

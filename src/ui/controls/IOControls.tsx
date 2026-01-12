@@ -8,9 +8,9 @@ import type React from 'react'
 import { useEffect, useState, type CSSProperties } from 'react'
 import type { ControlProps } from './types'
 import { RotaryKnob } from '../RotaryKnob'
-import { WaveformSelector } from '../WaveformSelector'
-import { ButtonGroup } from '../ButtonGroup'
 import { ToggleButton, ToggleGroup } from '../ToggleButton'
+import { ControlBox, ControlBoxRow } from '../ControlBox'
+import { ControlButtons } from '../ControlButtons'
 import { Oscilloscope } from '../Oscilloscope'
 import { formatDecimal2, formatInt } from '../formatters'
 import { clampMidiNote, clampVoiceCount, formatMidiNote } from '../../state/midiUtils'
@@ -196,174 +196,150 @@ export function renderIOControls(props: ControlProps): React.ReactElement | null
   }
 
   if (module.type === 'lab') {
+    // ═══════════════════════════════════════════════════════════════
+    // LAB PANEL - UI Component Test Bed
+    // This module showcases all UI patterns for validation
+    // ═══════════════════════════════════════════════════════════════
+
     const setTestParam = (paramId: string, value: number | string | boolean) => {
       updateParam(module.id, paramId, value, { skipEngine: true })
     }
-    const knobA = Number(module.params.testA ?? 0.3)
-    const knobB = Number(module.params.testB ?? 0.6)
-    const knobC = Number(module.params.testC ?? 0.2)
-    const knobD = Number(module.params.testD ?? 0.8)
-    const knobE = Number(module.params.testE ?? 0.35)
-    const knobF = Number(module.params.testF ?? 0.55)
-    const knobG = Number(module.params.testG ?? 0.4)
-    const knobH = Number(module.params.testH ?? 0.7)
-    const knobI = Number(module.params.testI ?? 0.5)
-    const mode = String(module.params.testMode ?? 'A')
-    const waveform = String(module.params.testWave ?? 'sine')
-    const toggleA = Boolean(module.params.testToggleA)
-    const toggleB = Boolean(module.params.testToggleB)
-    const scale = String(module.params.testScale ?? 'major')
+
+    // Test state values
+    const btn2 = String(module.params.btn2 ?? 'A')
+    const btn3 = String(module.params.btn3 ?? 'A')
+    const btn4 = Number(module.params.btn4 ?? 1)
+    const btn6 = Number(module.params.btn6 ?? 3)
+    const btn9 = Number(module.params.btn9 ?? 4)
+    const btn10 = Number(module.params.btn10 ?? 0)
+    const knobA = Number(module.params.knobA ?? 0.5)
+    const knobB = Number(module.params.knobB ?? 0.3)
+    const knobC = Number(module.params.knobC ?? 0.7)
+    const knobD = Number(module.params.knobD ?? 0.4)
+    const steps = Number(module.params.steps ?? 16)
+    const pulses = Number(module.params.pulses ?? 4)
+    const rotation = Number(module.params.rotation ?? 0)
+
+    // Test options
+    const opts2 = [
+      { id: 'A', label: 'A' },
+      { id: 'B', label: 'B' },
+    ]
+    const opts3 = [
+      { id: 'A', label: 'Lo' },
+      { id: 'B', label: 'Mid' },
+      { id: 'C', label: 'Hi' },
+    ]
+    const opts4 = [
+      { id: 1, label: '1' },
+      { id: 2, label: '2' },
+      { id: 3, label: '3' },
+      { id: 4, label: '4' },
+    ]
+    const opts6Rate = [
+      { id: 2, label: '1/4' },
+      { id: 3, label: '1/8' },
+      { id: 4, label: '1/16' },
+      { id: 7, label: '1/4T' },
+      { id: 8, label: '1/8T' },
+      { id: 9, label: '1/16T' },
+    ]
+    const opts9Clock = [
+      { id: 0, label: '1/1' },
+      { id: 1, label: '1/2' },
+      { id: 2, label: '1/4' },
+      { id: 3, label: '1/8' },
+      { id: 4, label: '1/16' },
+      { id: 5, label: '1/32' },
+      { id: 7, label: '1/4T' },
+      { id: 8, label: '1/8T' },
+      { id: 9, label: '1/16T' },
+    ]
+    const opts10Arp = [
+      { id: 0, label: 'Up' },
+      { id: 1, label: 'Down' },
+      { id: 2, label: 'Up/Dn' },
+      { id: 3, label: 'Dn/Up' },
+      { id: 4, label: 'Conv' },
+      { id: 5, label: 'Div' },
+      { id: 6, label: 'Rand' },
+      { id: 7, label: 'RndOnce' },
+      { id: 8, label: 'Order' },
+      { id: 9, label: 'Chord' },
+    ]
 
     return (
-      <div className="layout-lab">
-        <div className="layout-lab-section">
-          <span className="layout-lab-title">Osc</span>
-          <div className="layout-lab-grid">
-            <RotaryKnob
-              label="Freq"
-              min={0}
-              max={1}
-              step={0.01}
-              value={knobA}
-              onChange={(value) => setTestParam('testA', value)}
-              format={formatDecimal2}
-            />
-            <RotaryKnob
-              label="Fine"
-              min={0}
-              max={1}
-              step={0.01}
-              value={knobB}
-              onChange={(value) => setTestParam('testB', value)}
-              format={formatDecimal2}
-            />
-            <RotaryKnob
-              label="Drive"
-              min={0}
-              max={1}
-              step={0.01}
-              value={knobC}
-              onChange={(value) => setTestParam('testC', value)}
-              format={formatDecimal2}
-            />
-          </div>
-        </div>
-        <div className="layout-lab-section">
-          <span className="layout-lab-title">Env</span>
-          <div className="layout-lab-grid">
-            <RotaryKnob
-              label="Atk"
-              min={0}
-              max={1}
-              step={0.01}
-              value={knobD}
-              onChange={(value) => setTestParam('testD', value)}
-              format={formatDecimal2}
-            />
-            <RotaryKnob
-              label="Dec"
-              min={0}
-              max={1}
-              step={0.01}
-              value={knobE}
-              onChange={(value) => setTestParam('testE', value)}
-              format={formatDecimal2}
-            />
-            <RotaryKnob
-              label="Sus"
-              min={0}
-              max={1}
-              step={0.01}
-              value={knobF}
-              onChange={(value) => setTestParam('testF', value)}
-              format={formatDecimal2}
-            />
-            <RotaryKnob
-              label="Rel"
-              min={0}
-              max={1}
-              step={0.01}
-              value={knobG}
-              onChange={(value) => setTestParam('testG', value)}
-              format={formatDecimal2}
-            />
-          </div>
-        </div>
-        <div className="layout-lab-section">
-          <span className="layout-lab-title">Mod</span>
-          <div className="layout-lab-grid">
-            <RotaryKnob
-              label="Rate"
-              min={0}
-              max={1}
-              step={0.01}
-              value={knobH}
-              onChange={(value) => setTestParam('testH', value)}
-              format={formatDecimal2}
-            />
-            <RotaryKnob
-              label="Depth"
-              min={0}
-              max={1}
-              step={0.01}
-              value={knobI}
-              onChange={(value) => setTestParam('testI', value)}
-              format={formatDecimal2}
-            />
-          </div>
-          <div className="layout-lab-stack">
-            <ButtonGroup
-              label="Mode"
-              value={mode}
-              onChange={(value) => setTestParam('testMode', value)}
-              rowSize={3}
+      <div className="lab-test-bed">
+        {/* ═══ SECTION: Buttons - Small quantities ═══ */}
+        <ControlBoxRow>
+          <ControlBox label="2 opts">
+            <ControlButtons options={opts2} value={btn2} onChange={(v) => setTestParam('btn2', v)} />
+          </ControlBox>
+          <ControlBox label="3 opts">
+            <ControlButtons options={opts3} value={btn3} onChange={(v) => setTestParam('btn3', v)} />
+          </ControlBox>
+          <ControlBox label="4 opts (Oct)">
+            <ControlButtons options={opts4} value={btn4} onChange={(v) => setTestParam('btn4', v)} />
+          </ControlBox>
+        </ControlBoxRow>
+
+        {/* ═══ SECTION: Buttons - Multi-row layouts ═══ */}
+        <ControlBox label="6 opts - Rate style (3+3)">
+          <ControlButtons options={opts6Rate} value={btn6} onChange={(v) => setTestParam('btn6', v)} columns={3} />
+        </ControlBox>
+
+        <ControlBox label="9 opts - Clock style (5+4)">
+          <ControlButtons options={opts9Clock} value={btn9} onChange={(v) => setTestParam('btn9', v)} columns={5} />
+        </ControlBox>
+
+        <ControlBox label="10 opts - Arp Mode (5+5)">
+          <ControlButtons options={opts10Arp} value={btn10} onChange={(v) => setTestParam('btn10', v)} columns={5} />
+        </ControlBox>
+
+        {/* ═══ SECTION: Knobs - Grouped ═══ */}
+        <ControlBoxRow>
+          <ControlBox label="2 Knobs" horizontal>
+            <RotaryKnob label="A" min={0} max={1} step={0.01} value={knobA} onChange={(v) => setTestParam('knobA', v)} format={formatDecimal2} />
+            <RotaryKnob label="B" min={0} max={1} step={0.01} value={knobB} onChange={(v) => setTestParam('knobB', v)} format={formatDecimal2} />
+          </ControlBox>
+          <ControlBox label="ADSR (4)" horizontal>
+            <RotaryKnob label="A" min={0} max={1} step={0.01} value={knobA} onChange={(v) => setTestParam('knobA', v)} format={formatDecimal2} />
+            <RotaryKnob label="D" min={0} max={1} step={0.01} value={knobB} onChange={(v) => setTestParam('knobB', v)} format={formatDecimal2} />
+            <RotaryKnob label="S" min={0} max={1} step={0.01} value={knobC} onChange={(v) => setTestParam('knobC', v)} format={formatDecimal2} />
+            <RotaryKnob label="R" min={0} max={1} step={0.01} value={knobD} onChange={(v) => setTestParam('knobD', v)} format={formatDecimal2} />
+          </ControlBox>
+        </ControlBoxRow>
+
+        {/* ═══ SECTION: Mixed - Knobs + Display (Euclidean style) ═══ */}
+        <ControlBox label="Pattern (Euclidean)" horizontal>
+          <RotaryKnob label="Steps" min={2} max={32} step={1} value={steps} onChange={(v) => setTestParam('steps', Math.round(v))} format={formatInt} />
+          <RotaryKnob label="Pulses" min={0} max={steps} step={1} value={pulses} onChange={(v) => setTestParam('pulses', Math.round(v))} format={formatInt} />
+          <RotaryKnob label="Rotate" min={0} max={steps - 1} step={1} value={rotation} onChange={(v) => setTestParam('rotation', Math.round(v))} format={formatInt} />
+          <span className="control-box-display">E({pulses},{steps})</span>
+        </ControlBox>
+
+        {/* ═══ SECTION: Side-by-side boxes (Arp style) ═══ */}
+        <ControlBoxRow>
+          <ControlBox label="Rate" flex={1.5}>
+            <ControlButtons options={opts6Rate} value={btn6} onChange={(v) => setTestParam('btn6', v)} columns={3} />
+          </ControlBox>
+          <ControlBox label="Oct">
+            <ControlButtons options={opts4} value={btn4} onChange={(v) => setTestParam('btn4', v)} columns={2} />
+          </ControlBox>
+          <ControlBox label="Ratchet">
+            <ControlButtons
               options={[
-                { id: 'A', label: 'A' },
-                { id: 'B', label: 'B' },
-                { id: 'C', label: 'C' },
-                { id: 'D', label: 'D' },
-                { id: 'E', label: 'E' },
-                { id: 'F', label: 'F' },
+                { id: 1, label: '1x' },
+                { id: 2, label: '2x' },
+                { id: 3, label: '3x' },
+                { id: 4, label: '4x' },
               ]}
+              value={btn4}
+              onChange={(v) => setTestParam('btn4', v)}
+              columns={2}
             />
-            <ToggleGroup>
-              <ToggleButton
-                label="Gate"
-                value={toggleA}
-                onChange={(value) => setTestParam('testToggleA', value)}
-                onOff
-              />
-              <ToggleButton
-                label="Sync"
-                value={toggleB}
-                onChange={(value) => setTestParam('testToggleB', value)}
-                onOff
-              />
-            </ToggleGroup>
-          </div>
-        </div>
-        <div className="layout-lab-section">
-          <span className="layout-lab-title">Util</span>
-          <div className="layout-lab-stack">
-            <WaveformSelector
-              label="Wave"
-              value={waveform}
-              onChange={(value) => setTestParam('testWave', value)}
-            />
-            <div className="select-field layout-lab-full">
-              <span>Scale</span>
-              <select
-                value={scale}
-                onChange={(event) => setTestParam('testScale', event.target.value)}
-              >
-                <option value="major">Major</option>
-                <option value="minor">Minor</option>
-                <option value="dorian">Dorian</option>
-                <option value="mixolydian">Mixolydian</option>
-              </select>
-            </div>
-          </div>
-        </div>
+          </ControlBox>
+        </ControlBoxRow>
       </div>
     )
   }
@@ -587,16 +563,16 @@ function ControlModuleUI({
         onChange={(value) => updateParam(module.id, 'glide', value)}
         format={formatDecimal2}
       />
-      <ButtonGroup
-        options={[
-          { id: 'bipolar', label: 'Bipolar' },
-          { id: 'unipolar', label: 'Unipolar' },
-        ]}
-        value={cvMode}
-        onChange={(value) => updateParam(module.id, 'cvMode', value)}
-        wide
-        inline
-      />
+      <ControlBox label="CV Mode" compact>
+        <ControlButtons
+          options={[
+            { id: 'bipolar', label: 'Bipolar' },
+            { id: 'unipolar', label: 'Unipolar' },
+          ]}
+          value={cvMode}
+          onChange={(value) => updateParam(module.id, 'cvMode', value)}
+        />
+      </ControlBox>
       <div className="control-buttons">
         <button
           type="button"

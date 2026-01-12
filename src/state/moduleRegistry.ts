@@ -1,7 +1,7 @@
 import type { ModuleSpec, ModuleType } from '../shared/graph'
 
 export const moduleSizes: Record<ModuleType, string> = {
-  oscillator: '2x3',
+  oscillator: '2x2',
   supersaw: '2x2',
   karplus: '2x2',
   'nes-osc': '2x3',
@@ -18,8 +18,8 @@ export const moduleSizes: Record<ModuleType, string> = {
   scope: '2x3',
   adsr: '1x2',
   lfo: '2x2',
-  chorus: '2x2',
-  delay: '2x2',
+  chorus: '1x2',
+  delay: '2x1',
   'granular-delay': '2x2',
   'tape-delay': '2x2',
   'spring-reverb': '2x1',

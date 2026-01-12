@@ -8,7 +8,8 @@ import type React from 'react'
 import type { ControlProps } from './types'
 import { RotaryKnob } from '../RotaryKnob'
 import { WaveformSelector } from '../WaveformSelector'
-import { ButtonGroup } from '../ButtonGroup'
+import { ControlBox } from '../ControlBox'
+import { ControlButtons } from '../ControlButtons'
 import { formatDecimal2 } from '../formatters'
 
 export function renderModulatorControls(props: ControlProps): React.ReactElement | null {
@@ -97,16 +98,16 @@ export function renderModulatorControls(props: ControlProps): React.ReactElement
           value={String(module.params.shape ?? 'sine')}
           onChange={(value) => updateParam(module.id, 'shape', value)}
         />
-        <ButtonGroup
-          options={[
-            { id: true, label: 'Bipolar' },
-            { id: false, label: 'Unipolar' },
-          ]}
-          value={bipolar}
-          onChange={(value) => updateParam(module.id, 'bipolar', value)}
-          wide
-          inline
-        />
+        <ControlBox label="Mode">
+          <ControlButtons
+            options={[
+              { id: true, label: 'Bipolar' },
+              { id: false, label: 'Unipolar' },
+            ]}
+            value={bipolar}
+            onChange={(value) => updateParam(module.id, 'bipolar', value)}
+          />
+        </ControlBox>
       </>
     )
   }
@@ -157,15 +158,16 @@ export function renderModulatorControls(props: ControlProps): React.ReactElement
   if (module.type === 'sample-hold') {
     const mode = Number(module.params.mode ?? 0) < 0.5 ? 0 : 1
     return (
-      <ButtonGroup
-        label="Mode"
-        options={[
-          { id: 0, label: 'Sample' },
-          { id: 1, label: 'Random' },
-        ]}
-        value={mode}
-        onChange={(value) => updateParam(module.id, 'mode', value)}
-      />
+      <ControlBox label="Mode">
+        <ControlButtons
+          options={[
+            { id: 0, label: 'Sample' },
+            { id: 1, label: 'Random' },
+          ]}
+          value={mode}
+          onChange={(value) => updateParam(module.id, 'mode', value)}
+        />
+      </ControlBox>
     )
   }
 
@@ -209,23 +211,23 @@ export function renderModulatorControls(props: ControlProps): React.ReactElement
           onChange={(value) => updateParam(module.id, 'root', Math.round(value))}
           format={(value) => notes[Math.round(value) % notes.length] ?? 'C'}
         />
-        <ButtonGroup
-          label="Scale"
-          options={[
-            { id: 0, label: 'CHR' },
-            { id: 1, label: 'MAJ' },
-            { id: 2, label: 'MIN' },
-            { id: 3, label: 'DOR' },
-            { id: 4, label: 'LYD' },
-            { id: 5, label: 'MIX' },
-            { id: 6, label: 'PMJ' },
-            { id: 7, label: 'PMN' },
-          ]}
-          value={Number(module.params.scale ?? 0)}
-          onChange={(value) => updateParam(module.id, 'scale', value)}
-          wide
-          rowSize={4}
-        />
+        <ControlBox label="Scale">
+          <ControlButtons
+            options={[
+              { id: 0, label: 'CHR' },
+              { id: 1, label: 'MAJ' },
+              { id: 2, label: 'MIN' },
+              { id: 3, label: 'DOR' },
+              { id: 4, label: 'LYD' },
+              { id: 5, label: 'MIX' },
+              { id: 6, label: 'PMJ' },
+              { id: 7, label: 'PMN' },
+            ]}
+            value={Number(module.params.scale ?? 0)}
+            onChange={(value) => updateParam(module.id, 'scale', value)}
+            columns={4}
+          />
+        </ControlBox>
       </>
     )
   }

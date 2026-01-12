@@ -2277,6 +2277,20 @@
   gap: 8px;
 }
 
+/* Lab test bed - UI component showcase */
+.lab-test-bed {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 4px;
+}
+
+/* Control boxes inside lab-test-bed are full width by nature of flex column */
+.lab-test-bed > .control-box {
+  width: 100%;
+}
+
 .layout-lab-section {
   display: grid;
   gap: 6px;
@@ -2652,21 +2666,21 @@
 }
 
 /* ============================================
-   STEP SEQUENCER - Rate/Dir/Len Controls
+   CONTROL BOX - Unified bordered box component
    ============================================ */
 
-/* Container for all 3 control boxes */
-.seq-control-section {
+/* Row of control boxes side by side */
+.control-box-row {
   grid-column: 1 / -1;
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
 }
 
-/* Individual box with its own background */
-.seq-control-box {
+/* Individual control box with border */
+.control-box {
   flex: 1;
-  min-width: 100px;
+  min-width: 80px;
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -2676,70 +2690,108 @@
   border: 1px solid rgba(60, 80, 100, 0.25);
 }
 
-/* Rate box is wider due to more buttons */
-.seq-control-box:first-child {
-  flex: 1.8;
-  min-width: 200px;
-}
-
-/* Legacy support for old class names */
-.seq-controls-row {
-  grid-column: 1 / -1;
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  align-items: stretch;
-}
-
-.seq-control-group {
-  flex: 1;
-  min-width: 80px;
-  display: flex;
-  flex-direction: column;
+/* Compact variant: keep border, reduce padding and font */
+.control-box.control-box-compact {
+  padding: 4px 6px;
   gap: 4px;
+  min-width: auto;
 }
 
-.seq-control-group--rate {
-  flex: 1.5;
-  min-width: 180px;
+.control-box.control-box-compact .control-box-label {
+  font-size: 7px;
 }
 
-.seq-control-label {
+.control-box.control-box-compact .control-btn {
+  font-size: 8px;
+  padding: 3px 4px;
+}
+
+/* Standalone control box spans full grid width */
+.module-controls > .control-box {
+  grid-column: 1 / -1;
+}
+
+/* Label at top of box */
+.control-box-label {
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.15em;
   text-transform: uppercase;
   color: rgba(198, 212, 228, 0.7);
-  text-align: center;
 }
 
-.seq-control-buttons {
+/* Content container inside box */
+.control-box-content {
   display: flex;
-  gap: 3px;
-  flex: 1;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.seq-control-btn {
-  flex: 1;
-  padding: 8px 4px;
-  border: 1px solid rgba(80, 100, 130, 0.5);
+/* Horizontal layout for content inside ControlBox (use horizontal prop) */
+.control-box-horizontal {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.control-box-horizontal > .rotary {
+  flex: 0 0 auto;
+}
+
+/* Display text inside control box (e.g., E(4,16)) */
+.control-box-display {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--accent-mint);
+  padding: 4px;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: var(--radius-sm);
+}
+
+/* ============================================
+   CONTROL BUTTONS - Button grid component
+   ============================================ */
+
+/* Container for multiple rows of buttons */
+.control-buttons-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Single row of buttons (grid) */
+.control-buttons {
+  display: grid;
+  gap: 4px;
+}
+
+/* Individual button */
+.control-btn {
+  padding: 5px 6px;
+  border: 1px solid rgba(80, 100, 130, 0.4);
   border-radius: var(--radius-md);
-  background: var(--glass-5);
-  color: rgba(198, 212, 228, 0.85);
-  font-size: 10px;
+  background: var(--glass-4);
+  color: rgba(198, 212, 228, 0.9);
+  font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.08em;
   cursor: pointer;
   transition: var(--transition-normal);
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
-.seq-control-btn:hover {
+.control-btn:hover {
   background: var(--glass-panel);
   border-color: rgba(100, 130, 170, 0.6);
 }
 
-.seq-control-btn.active {
+.control-btn.active {
   background: linear-gradient(180deg, var(--accent-mint) 0%, var(--accent-mint-dark) 100%);
   border-color: var(--accent-mint);
   color: #0a0a0a;
@@ -3033,89 +3085,6 @@
   outline: none;
   border-color: var(--accent-mint);
   box-shadow: 0 0 6px rgba(66, 226, 177, 0.3);
-}
-
-/* Row 2: Rate + Swing + Length */
-.drum-seq-row2 {
-  grid-column: 1 / -1;
-  display: flex;
-  gap: 8px;
-  margin-bottom: 6px;
-}
-
-.drum-seq-box {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 8px 10px;
-  background: var(--glass-overlay);
-  border-radius: var(--radius-lg);
-  border: 1px solid rgba(60, 80, 100, 0.2);
-}
-
-.drum-seq-btns {
-  display: flex;
-  gap: 4px;
-}
-
-.drum-seq-btn {
-  flex: 1;
-  padding: 8px 6px;
-  border: 1px solid rgba(80, 100, 130, 0.5);
-  border-radius: var(--radius-md);
-  background: var(--glass-5);
-  color: rgba(198, 212, 228, 0.85);
-  font-size: 10px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: var(--transition-normal);
-}
-
-.drum-seq-btn:hover {
-  background: var(--glass-panel);
-  border-color: rgba(100, 130, 170, 0.6);
-}
-
-.drum-seq-btn.active {
-  background: linear-gradient(180deg, var(--accent-mint) 0%, var(--accent-mint-dark) 100%);
-  border-color: var(--accent-mint);
-  color: #0a0a0a;
-  box-shadow: 0 2px 8px rgba(66, 226, 177, 0.4);
-}
-
-.drum-seq-swing {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.drum-seq-slider {
-  flex: 1;
-  height: 6px;
-  -webkit-appearance: none;
-  background: rgba(60, 80, 100, 0.4);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-}
-
-.drum-seq-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: var(--accent-mint);
-  cursor: pointer;
-  box-shadow: 0 1px 4px var(--glass-overlay);
-}
-
-.drum-seq-value {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--accent-mint);
-  min-width: 32px;
-  text-align: right;
-  font-family: 'JetBrains Mono', monospace;
 }
 
 /* Row 3: Pattern presets */

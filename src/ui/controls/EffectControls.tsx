@@ -8,7 +8,8 @@
 import type React from 'react'
 import type { ControlProps } from './types'
 import { RotaryKnob } from '../RotaryKnob'
-import { ButtonGroup } from '../ButtonGroup'
+import { ControlBox } from '../ControlBox'
+import { ControlButtons } from '../ControlButtons'
 import { ToggleButton, ToggleGroup } from '../ToggleButton'
 import { formatDecimal1, formatDecimal2, formatInt, formatPercent } from '../formatters'
 
@@ -165,19 +166,19 @@ export function renderEffectControls(props: ControlProps): React.ReactElement | 
           onChange={(value) => updateParam(module.id, 'mix', value)}
           format={formatDecimal2}
         />
-        <ButtonGroup
-          label="Vowel"
-          options={[
-            { id: 0, label: 'A' },
-            { id: 1, label: 'E' },
-            { id: 2, label: 'I' },
-            { id: 3, label: 'O' },
-            { id: 4, label: 'U' },
-          ]}
-          value={Number(module.params.vowel ?? 0)}
-          onChange={(value) => updateParam(module.id, 'vowel', value)}
-          wide
-        />
+        <ControlBox label="Vowel" compact>
+          <ControlButtons
+            options={[
+              { id: 0, label: 'A' },
+              { id: 1, label: 'E' },
+              { id: 2, label: 'I' },
+              { id: 3, label: 'O' },
+              { id: 4, label: 'U' },
+            ]}
+            value={Number(module.params.vowel ?? 0)}
+            onChange={(value) => updateParam(module.id, 'vowel', value)}
+          />
+        </ControlBox>
       </>
     )
   }
@@ -641,17 +642,17 @@ export function renderEffectControls(props: ControlProps): React.ReactElement | 
           onChange={(value) => updateParam(module.id, 'mix', value)}
           format={formatDecimal2}
         />
-        <ButtonGroup
-          label="Mode"
-          options={[
-            { id: 'soft', label: 'SOFT' },
-            { id: 'hard', label: 'HARD' },
-            { id: 'fold', label: 'FOLD' },
-          ]}
-          value={String(module.params.mode ?? 'soft')}
-          onChange={(value) => updateParam(module.id, 'mode', value)}
-          wide
-        />
+        <ControlBox label="Mode" compact>
+          <ControlButtons
+            options={[
+              { id: 'soft', label: 'SOFT' },
+              { id: 'hard', label: 'HARD' },
+              { id: 'fold', label: 'FOLD' },
+            ]}
+            value={String(module.params.mode ?? 'soft')}
+            onChange={(value) => updateParam(module.id, 'mode', value)}
+          />
+        </ControlBox>
       </>
     )
   }

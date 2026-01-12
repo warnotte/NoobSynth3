@@ -8,7 +8,8 @@ import type React from 'react'
 import { useEffect } from 'react'
 import type { ControlProps } from './types'
 import { RotaryKnob } from '../RotaryKnob'
-import { ButtonGroup } from '../ButtonGroup'
+import { ControlBox, ControlBoxRow } from '../ControlBox'
+import { ControlButtons } from '../ControlButtons'
 import { formatDecimal2, formatInt } from '../formatters'
 
 export function renderFilterControls(props: ControlProps): React.ReactElement | null {
@@ -104,36 +105,40 @@ export function renderFilterControls(props: ControlProps): React.ReactElement | 
           unit="%"
           format={(value) => `${Math.round(value * 100)}`}
         />
-        <ButtonGroup
-          label="Model"
-          options={[
-            { id: 'svf', label: 'SVF' },
-            { id: 'ladder', label: 'LAD' },
-          ]}
-          value={model}
-          onChange={handleModelChange}
-        />
-        <ButtonGroup
-          label="Mode"
-          options={[
-            { id: 'lp', label: 'LP' },
-            { id: 'hp', label: 'HP' },
-            { id: 'bp', label: 'BP' },
-            { id: 'notch', label: 'NOTCH' },
-          ]}
-          value={mode}
-          onChange={handleModeChange}
-          wide
-        />
-        <ButtonGroup
-          label="Slope"
-          options={[
-            { id: 12, label: '12dB' },
-            { id: 24, label: '24dB' },
-          ]}
-          value={slope}
-          onChange={(value) => updateParam(module.id, 'slope', value)}
-        />
+        <ControlBoxRow>
+          <ControlBox label="Model" compact>
+            <ControlButtons
+              options={[
+                { id: 'svf', label: 'SVF' },
+                { id: 'ladder', label: 'LAD' },
+              ]}
+              value={model}
+              onChange={handleModelChange}
+            />
+          </ControlBox>
+          <ControlBox label="Mode" flex={2} compact>
+            <ControlButtons
+              options={[
+                { id: 'lp', label: 'LP' },
+                { id: 'hp', label: 'HP' },
+                { id: 'bp', label: 'BP' },
+                { id: 'notch', label: 'NOT' },
+              ]}
+              value={mode}
+              onChange={handleModeChange}
+            />
+          </ControlBox>
+          <ControlBox label="Slope" compact>
+            <ControlButtons
+              options={[
+                { id: 12, label: '12dB' },
+                { id: 24, label: '24dB' },
+              ]}
+              value={slope}
+              onChange={(value) => updateParam(module.id, 'slope', value)}
+            />
+          </ControlBox>
+        </ControlBoxRow>
       </>
     )
   }
