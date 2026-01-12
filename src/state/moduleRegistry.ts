@@ -32,7 +32,7 @@ export const moduleSizes: Record<ModuleType, string> = {
   gain: '1x1',
   'cv-vca': '1x1',
   output: '1x1',
-  lab: '2x2',
+  lab: '2x4',
   mario: '2x4',
   ensemble: '2x1',
   choir: '2x2',

@@ -196,41 +196,175 @@ export function renderIOControls(props: ControlProps): React.ReactElement | null
   }
 
   if (module.type === 'lab') {
+    const setTestParam = (paramId: string, value: number | string | boolean) => {
+      updateParam(module.id, paramId, value, { skipEngine: true })
+    }
+    const knobA = Number(module.params.testA ?? 0.3)
+    const knobB = Number(module.params.testB ?? 0.6)
+    const knobC = Number(module.params.testC ?? 0.2)
+    const knobD = Number(module.params.testD ?? 0.8)
+    const knobE = Number(module.params.testE ?? 0.35)
+    const knobF = Number(module.params.testF ?? 0.55)
+    const knobG = Number(module.params.testG ?? 0.4)
+    const knobH = Number(module.params.testH ?? 0.7)
+    const knobI = Number(module.params.testI ?? 0.5)
+    const mode = String(module.params.testMode ?? 'A')
+    const waveform = String(module.params.testWave ?? 'sine')
+    const toggleA = Boolean(module.params.testToggleA)
+    const toggleB = Boolean(module.params.testToggleB)
+    const scale = String(module.params.testScale ?? 'major')
+
     return (
-      <>
-        <RotaryKnob
-          label="Level"
-          min={0}
-          max={1}
-          step={0.01}
-          value={Number(module.params.level ?? 0.8)}
-          onChange={(value) => updateParam(module.id, 'level', value)}
-          format={formatDecimal2}
-        />
-        <RotaryKnob
-          label="Drive"
-          min={0}
-          max={1}
-          step={0.01}
-          value={Number(module.params.drive ?? 0.4)}
-          onChange={(value) => updateParam(module.id, 'drive', value)}
-          format={formatDecimal2}
-        />
-        <RotaryKnob
-          label="Bias"
-          min={-1}
-          max={1}
-          step={0.01}
-          value={Number(module.params.bias ?? 0)}
-          onChange={(value) => updateParam(module.id, 'bias', value)}
-          format={formatDecimal2}
-        />
-        <WaveformSelector
-          label="Shape"
-          value={String(module.params.shape ?? 'triangle')}
-          onChange={(value) => updateParam(module.id, 'shape', value)}
-        />
-      </>
+      <div className="layout-lab">
+        <div className="layout-lab-section">
+          <span className="layout-lab-title">Osc</span>
+          <div className="layout-lab-grid">
+            <RotaryKnob
+              label="Freq"
+              min={0}
+              max={1}
+              step={0.01}
+              value={knobA}
+              onChange={(value) => setTestParam('testA', value)}
+              format={formatDecimal2}
+            />
+            <RotaryKnob
+              label="Fine"
+              min={0}
+              max={1}
+              step={0.01}
+              value={knobB}
+              onChange={(value) => setTestParam('testB', value)}
+              format={formatDecimal2}
+            />
+            <RotaryKnob
+              label="Drive"
+              min={0}
+              max={1}
+              step={0.01}
+              value={knobC}
+              onChange={(value) => setTestParam('testC', value)}
+              format={formatDecimal2}
+            />
+          </div>
+        </div>
+        <div className="layout-lab-section">
+          <span className="layout-lab-title">Env</span>
+          <div className="layout-lab-grid">
+            <RotaryKnob
+              label="Atk"
+              min={0}
+              max={1}
+              step={0.01}
+              value={knobD}
+              onChange={(value) => setTestParam('testD', value)}
+              format={formatDecimal2}
+            />
+            <RotaryKnob
+              label="Dec"
+              min={0}
+              max={1}
+              step={0.01}
+              value={knobE}
+              onChange={(value) => setTestParam('testE', value)}
+              format={formatDecimal2}
+            />
+            <RotaryKnob
+              label="Sus"
+              min={0}
+              max={1}
+              step={0.01}
+              value={knobF}
+              onChange={(value) => setTestParam('testF', value)}
+              format={formatDecimal2}
+            />
+            <RotaryKnob
+              label="Rel"
+              min={0}
+              max={1}
+              step={0.01}
+              value={knobG}
+              onChange={(value) => setTestParam('testG', value)}
+              format={formatDecimal2}
+            />
+          </div>
+        </div>
+        <div className="layout-lab-section">
+          <span className="layout-lab-title">Mod</span>
+          <div className="layout-lab-grid">
+            <RotaryKnob
+              label="Rate"
+              min={0}
+              max={1}
+              step={0.01}
+              value={knobH}
+              onChange={(value) => setTestParam('testH', value)}
+              format={formatDecimal2}
+            />
+            <RotaryKnob
+              label="Depth"
+              min={0}
+              max={1}
+              step={0.01}
+              value={knobI}
+              onChange={(value) => setTestParam('testI', value)}
+              format={formatDecimal2}
+            />
+          </div>
+          <div className="layout-lab-stack">
+            <ButtonGroup
+              label="Mode"
+              value={mode}
+              onChange={(value) => setTestParam('testMode', value)}
+              rowSize={3}
+              options={[
+                { id: 'A', label: 'A' },
+                { id: 'B', label: 'B' },
+                { id: 'C', label: 'C' },
+                { id: 'D', label: 'D' },
+                { id: 'E', label: 'E' },
+                { id: 'F', label: 'F' },
+              ]}
+            />
+            <ToggleGroup>
+              <ToggleButton
+                label="Gate"
+                value={toggleA}
+                onChange={(value) => setTestParam('testToggleA', value)}
+                onOff
+              />
+              <ToggleButton
+                label="Sync"
+                value={toggleB}
+                onChange={(value) => setTestParam('testToggleB', value)}
+                onOff
+              />
+            </ToggleGroup>
+          </div>
+        </div>
+        <div className="layout-lab-section">
+          <span className="layout-lab-title">Util</span>
+          <div className="layout-lab-stack">
+            <WaveformSelector
+              label="Wave"
+              value={waveform}
+              onChange={(value) => setTestParam('testWave', value)}
+            />
+            <div className="select-field layout-lab-full">
+              <span>Scale</span>
+              <select
+                value={scale}
+                onChange={(event) => setTestParam('testScale', event.target.value)}
+              >
+                <option value="major">Major</option>
+                <option value="minor">Minor</option>
+                <option value="dorian">Dorian</option>
+                <option value="mixolydian">Mixolydian</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
     )
   }
 

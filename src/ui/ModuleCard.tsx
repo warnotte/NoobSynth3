@@ -15,6 +15,11 @@ type ModuleCardProps = {
     moduleId: string,
     event: React.PointerEvent<HTMLDivElement>,
   ) => void
+  showResizeHandle?: boolean
+  onResizeHandlePointerDown?: (
+    moduleId: string,
+    event: React.PointerEvent<HTMLDivElement>,
+  ) => void
   selectedPortKey?: string | null
   connectedInputs?: Set<string>
   validTargets?: Set<string> | null
@@ -37,6 +42,8 @@ export const ModuleCard = ({
   removable = true,
   onRemove,
   onHeaderPointerDown,
+  showResizeHandle = false,
+  onResizeHandlePointerDown,
   selectedPortKey,
   connectedInputs,
   validTargets,
@@ -68,7 +75,7 @@ export const ModuleCard = ({
         ) : null}
       </div>
     </div>
-    <div className="module-body">
+      <div className="module-body">
       {/* Left side - Input ports */}
       <div className="ports-side ports-side--left">
         {inputs.map((port) => {
@@ -131,5 +138,17 @@ export const ModuleCard = ({
         })}
       </div>
     </div>
+    {showResizeHandle ? (
+      <div
+        className="module-resize-handle"
+        role="button"
+        aria-label={`Resize ${module.name}`}
+        title="Resize (dev only)"
+        onPointerDown={(event) => {
+          event.stopPropagation()
+          onResizeHandlePointerDown?.(module.id, event)
+        }}
+      />
+    ) : null}
   </div>
 )

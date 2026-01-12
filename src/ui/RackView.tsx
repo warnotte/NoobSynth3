@@ -9,7 +9,7 @@ import type { ModuleSpan } from '../state/gridLayout'
 import type { PortDefinition } from './portCatalog'
 import type { ModuleControlsProps } from './controls'
 import { buildGridStyle } from '../state/gridLayout'
-import { modulePortLayouts, moduleSizes } from '../state/moduleRegistry'
+import { modulePortLayouts } from '../state/moduleRegistry'
 import { ModuleCard } from './ModuleCard'
 import { ModuleControls } from './controls'
 import { modulePorts } from './portCatalog'
@@ -31,6 +31,9 @@ type RackViewProps = {
   getModuleGridStyle: (module: ModuleSpec) => CSSProperties
   onRemoveModule: (moduleId: string) => void
   onHeaderPointerDown: (moduleId: string, event: ReactPointerEvent<HTMLDivElement>) => void
+  getModuleSize: (module: ModuleSpec) => string
+  showResizeHandles?: boolean
+  onResizeHandlePointerDown?: (moduleId: string, event: ReactPointerEvent<HTMLDivElement>) => void
   selectedPortKey: string | null
   connectedInputs: Set<string>
   validTargets: Set<string> | null
@@ -41,6 +44,7 @@ type RackViewProps = {
     event: ReactPointerEvent<HTMLButtonElement>,
   ) => void
   moduleDragPreview: ModuleDragPreview | null
+  moduleResizePreview?: ModuleDragPreview | null
   moduleControls: Omit<ModuleControlsProps, 'module'>
 }
 
@@ -54,12 +58,16 @@ export const RackView = ({
   getModuleGridStyle,
   onRemoveModule,
   onHeaderPointerDown,
+  getModuleSize,
+  showResizeHandles = false,
+  onResizeHandlePointerDown,
   selectedPortKey,
   connectedInputs,
   validTargets,
   hoverTargetKey,
   onPortPointerDown,
   moduleDragPreview,
+  moduleResizePreview,
   moduleControls,
 }: RackViewProps) => (
   <section className="rack" ref={rackRef} onDoubleClick={onRackDoubleClick}>
@@ -83,17 +91,20 @@ export const RackView = ({
     </div>
     {!collapsed && (
       <div className="modules" ref={modulesRef}>
+        <div className="rack-grid-overlay" aria-hidden="true" />
         {graph.modules.map((module) => (
           <ModuleCard
             key={module.id}
             module={module}
             inputs={modulePorts[module.type].inputs}
             outputs={modulePorts[module.type].outputs}
-            size={moduleSizes[module.type] ?? '1x1'}
+            size={getModuleSize(module)}
             portLayout={modulePortLayouts[module.type] ?? 'stacked'}
             style={getModuleGridStyle(module)}
             onRemove={onRemoveModule}
             onHeaderPointerDown={onHeaderPointerDown}
+            showResizeHandle={showResizeHandles}
+            onResizeHandlePointerDown={onResizeHandlePointerDown}
             selectedPortKey={selectedPortKey}
             connectedInputs={connectedInputs}
             validTargets={validTargets}
@@ -110,6 +121,17 @@ export const RackView = ({
               moduleDragPreview.col,
               moduleDragPreview.row,
               moduleDragPreview.span,
+            )}
+            aria-hidden="true"
+          />
+        )}
+        {moduleResizePreview && (
+          <div
+            className={`module-resize-ghost${moduleResizePreview.valid ? '' : ' invalid'}`}
+            style={buildGridStyle(
+              moduleResizePreview.col,
+              moduleResizePreview.row,
+              moduleResizePreview.span,
             )}
             aria-hidden="true"
           />

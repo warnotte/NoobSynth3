@@ -213,6 +213,12 @@ interface Connection {
 3. Les buffers sont passés entre modules via les connexions
 4. Les modules polyphoniques sont dupliqués par voix
 
+## UI tooling
+
+- **Grille de rack** : overlay toujours actif pour visualiser l’alignement (CSS dans `src/styles.css`).
+- **Dev Resize** : bouton TopBar en mode dev pour activer les poignées de redimensionnement et le ghost preview.
+- **Lab Panel** : module de test UI (layout complet Osc/Env/Mod/Util) dans `src/ui/controls/IOControls.tsx`.
+
 ## Technologies
 
 | Couche | Technologies |

@@ -119,13 +119,15 @@ export const buildOccupiedGrid = (
   modules: GraphState['modules'],
   moduleSizes: Record<string, string>,
   excludeId?: string,
+  getModuleSize?: (module: GraphState['modules'][number]) => string | undefined,
 ) => {
   const occupied = new Set<string>()
   modules.forEach((module) => {
     if (excludeId && module.id === excludeId) {
       return
     }
-    const span = parseModuleSpan(moduleSizes[module.type] ?? '1x1')
+    const resolvedSize = getModuleSize?.(module) ?? moduleSizes[module.type] ?? '1x1'
+    const span = parseModuleSpan(resolvedSize)
     const col = normalizeGridCoord(module.position.x)
     const row = normalizeGridCoord(module.position.y)
     markOccupied(col, row, span, occupied)
@@ -163,7 +165,10 @@ export const layoutGraph = (
   graph: GraphState,
   moduleSizes: Record<string, string>,
   metrics: GridMetrics,
-  options?: { force?: boolean },
+  options?: {
+    force?: boolean
+    getModuleSize?: (module: GraphState['modules'][number]) => string | undefined
+  },
 ): GraphState => {
   const columns = Math.max(1, metrics.columns)
   const useStoredPositions = !options?.force && !hasLegacyPositions(graph.modules)
@@ -172,7 +177,8 @@ export const layoutGraph = (
   const occupied = new Set<string>()
   let maxRow = 0
   const nextModules = graph.modules.map((module) => {
-    const span = parseModuleSpan(moduleSizes[module.type] ?? '1x1')
+    const resolvedSize = options?.getModuleSize?.(module) ?? moduleSizes[module.type] ?? '1x1'
+    const span = parseModuleSpan(resolvedSize)
     const desired = useStoredPositions
       ? { col: normalizeGridCoord(module.position.x), row: normalizeGridCoord(module.position.y) }
       : options?.force

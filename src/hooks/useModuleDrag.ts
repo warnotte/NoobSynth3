@@ -45,6 +45,7 @@ type UseModuleDragParams = {
   setGraph: Dispatch<SetStateAction<GraphState>>
   modulesRef: RefObject<HTMLDivElement | null>
   gridMetricsRef: MutableRefObject<GridMetrics>
+  getModuleSize?: (module: GraphState['modules'][number]) => string | undefined
 }
 
 export const useModuleDrag = ({
@@ -52,6 +53,7 @@ export const useModuleDrag = ({
   setGraph,
   modulesRef,
   gridMetricsRef,
+  getModuleSize,
 }: UseModuleDragParams) => {
   const [moduleDragPreview, setModuleDragPreview] = useState<ModuleDragPreview | null>(null)
   const moduleDragRef = useRef<ModuleDragState | null>(null)
@@ -84,8 +86,14 @@ export const useModuleDrag = ({
       const metrics = gridMetricsRef.current
       const cellX = metrics.unitX + metrics.gapX
       const cellY = metrics.unitY + metrics.gapY
-      const span = parseModuleSpan(moduleSizes[module.type] ?? '1x1')
-      const occupied = buildOccupiedGrid(graphRef.current.modules, moduleSizes, moduleId)
+      const resolvedSize = getModuleSize?.(module) ?? moduleSizes[module.type] ?? '1x1'
+      const span = parseModuleSpan(resolvedSize)
+      const occupied = buildOccupiedGrid(
+        graphRef.current.modules,
+        moduleSizes,
+        moduleId,
+        getModuleSize,
+      )
       const startCol = normalizeGridCoord(module.position.x)
       const startRow = normalizeGridCoord(module.position.y)
 
@@ -233,7 +241,7 @@ export const useModuleDrag = ({
       window.addEventListener('keydown', handleKeyDown)
       event.preventDefault()
     },
-    [graphRef, gridMetricsRef, modulesRef, setGraph],
+    [getModuleSize, graphRef, gridMetricsRef, modulesRef, setGraph],
   )
 
   return { handleModulePointerDown, moduleDragPreview }

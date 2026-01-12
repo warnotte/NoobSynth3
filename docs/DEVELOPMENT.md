@@ -201,6 +201,12 @@ Sections principales :
 - Câbles
 - Responsive
 
+### Outils UI (debug layout)
+
+- **Grille du rack** : toujours visible via `.rack-grid-overlay` (géré dans `src/styles.css`).
+- **Dev Resize** : bouton en haut (TopBar) en mode dev, active les poignées de redimensionnement des modules.
+- **Lab Panel** : module de test UI qui affiche un layout complet (Osc/Env/Mod/Util) pour tester la réactivité.
+
 ## Tests
 
 ### TypeScript (types)

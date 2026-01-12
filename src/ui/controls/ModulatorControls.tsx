@@ -16,7 +16,7 @@ export function renderModulatorControls(props: ControlProps): React.ReactElement
 
   if (module.type === 'adsr') {
     return (
-      <div className="adsr-grid">
+      <div className="control-grid">
         <RotaryKnob
           label="Attack"
           min={0.001}

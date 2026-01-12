@@ -7,6 +7,9 @@ type TopBarProps = {
   isRunning: boolean
   onStart: () => void
   onStop: () => void
+  showDevTools?: boolean
+  devResizeEnabled?: boolean
+  onToggleDevResize?: () => void
 }
 
 export const TopBar = ({
@@ -18,6 +21,9 @@ export const TopBar = ({
   isRunning,
   onStart,
   onStop,
+  showDevTools = false,
+  devResizeEnabled = false,
+  onToggleDevResize = () => {},
 }: TopBarProps) => (
   <header className="topbar">
     <div className="topbar-head">
@@ -58,6 +64,22 @@ export const TopBar = ({
           </button>
         </div>
       </div>
+      {showDevTools && (
+        <div className="dev-tools">
+          <span className="action-label">Dev Tools</span>
+          <div className="dev-toggles">
+            <button
+              type="button"
+              className={`ui-btn ui-btn--pill dev-toggle ${devResizeEnabled ? 'active' : ''}`}
+              onClick={onToggleDevResize}
+              aria-pressed={devResizeEnabled}
+              title="Toggle dev resize handles"
+            >
+              Resize
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   </header>
 )

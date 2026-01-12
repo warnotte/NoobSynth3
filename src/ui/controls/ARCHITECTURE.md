@@ -23,6 +23,12 @@ src/ui/controls/
 └── IOControls.tsx           # control, output, audio-in, scope, lab, notes
 ```
 
+## Lab Panel (layout test)
+
+Le module `lab` sert de banc d’essai UI : il affiche un layout complet (Osc/Env/Mod/Util)
+dans `IOControls.tsx` afin de tester la responsivité des grilles, knobs et groupes de boutons.
+Les paramètres UI utilisent `updateParam(..., { skipEngine: true })`.
+
 ## Pattern d'implémentation
 
 Chaque fichier de catégorie exporte une fonction `render[Category]Controls` :
