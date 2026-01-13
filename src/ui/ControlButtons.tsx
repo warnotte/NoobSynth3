@@ -1,9 +1,9 @@
-type ButtonOption<T extends string | number> = {
+type ButtonOption<T extends string | number | boolean> = {
   id: T
   label: string
 }
 
-type ControlButtonsProps<T extends string | number> = {
+type ControlButtonsProps<T extends string | number | boolean> = {
   /** Available options */
   options: ButtonOption<T>[]
   /** Currently selected value */
@@ -41,7 +41,7 @@ type ControlButtonsProps<T extends string | number> = {
  *   columns={5}
  * />
  */
-export function ControlButtons<T extends string | number>({
+export function ControlButtons<T extends string | number | boolean>({
   options,
   value,
   onChange,
