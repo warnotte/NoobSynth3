@@ -483,3 +483,81 @@ type UndoableStateReturn<T> = {
 - [ ] Undo restaure le son, pas juste l'UI
 - [ ] Fonctionne en mode Web, Native et VST
 - [ ] Pas de régression sur les fonctionnalités existantes
+
+---
+
+## 9. Leçons de la première tentative (v1)
+
+### 9.1 Bugs découverts pendant l'implémentation
+
+| Bug | Cause | Solution requise |
+|-----|-------|------------------|
+| **Double undo sur chaque action** | React StrictMode appelle setState callback 2x en dev | Guard avec `lastPushedRef` pour skip si même `prev` |
+| **4 undos au refresh** | `clearHistory()` appelé APRÈS `setGraph()`, mais push via `setTimeout` | Passer `skipHistory: true` à setGraph avant clearHistory |
+| **Undo patterns Step/Drum cassé** | `applyGraphParams` utilisait `setParam` pour strings | Utiliser `setParamString` pour `stepData`/`drumData` |
+| **Transaction zombie (mobile)** | `useModuleDrag` ne gérait pas `lostpointercapture` | Ajouter handler `lostpointercapture` |
+| **Escape crée entrée vide** | `endTransaction` compare par référence, restore crée nouvel objet | Ajouter `cancelTransaction()` pour Escape |
+
+### 9.2 Appels setGraph nécessitant skipHistory
+
+Ces appels ne sont PAS des actions utilisateur et doivent skip l'historique :
+
+| Fichier | Ligne | Contexte | Raison |
+|---------|-------|----------|--------|
+| `App.tsx` | applyPreset | `setGraph(layouted)` | Suivi de clearHistory |
+| `App.tsx` | handleClearRack | `applyGraphUpdate(...)` | Suivi de clearHistory |
+| `App.tsx` | useEffect gridMetrics | `applyGraphUpdate(normalized)` | Normalisation auto, pas action user |
+
+### 9.3 Architecture révisée
+
+Le problème fondamental : **side effects dans le callback setState**.
+
+```typescript
+// PROBLÈME : StrictMode appelle ce callback 2x
+setStateInternal((prev) => {
+  // ❌ Side effect dans callback = double exécution
+  pastRef.current = [...pastRef.current, prev]
+  return next
+})
+```
+
+**Solutions possibles :**
+
+1. **Guard par référence** (simple mais fragile)
+   ```typescript
+   if (lastPushedRef.current === prev) return next
+   lastPushedRef.current = prev
+   ```
+
+2. **Déplacer push hors du callback** (plus propre)
+   ```typescript
+   // Calculer next dans callback (pur)
+   setStateInternal((prev) => computeNext(prev))
+   // Push dans useEffect séparé
+   useEffect(() => { pushToHistory(prevState) }, [state])
+   ```
+
+3. **Utiliser useReducer** (pattern recommandé React)
+   ```typescript
+   const [state, dispatch] = useReducer(reducer, initialState)
+   // Actions: SET, UNDO, REDO, BEGIN_TRANSACTION, etc.
+   ```
+
+### 9.4 Recommandation pour v2
+
+Privilégier l'approche **useReducer** :
+- Pas de side effects dans les callbacks
+- Actions explicites et testables
+- Compatible StrictMode nativement
+- Historique géré dans le reducer lui-même
+
+```typescript
+type Action<T> =
+  | { type: 'SET'; payload: T; skipHistory?: boolean }
+  | { type: 'UNDO' }
+  | { type: 'REDO' }
+  | { type: 'BEGIN_TRANSACTION' }
+  | { type: 'END_TRANSACTION' }
+  | { type: 'CANCEL_TRANSACTION' }
+  | { type: 'CLEAR_HISTORY' }
+```
