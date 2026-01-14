@@ -316,6 +316,11 @@ Groupes existants: Basics, Leads, Bass, Pads, FX, Drums, 8-Bit, Experimental
 | [src/ui/controls/ARCHITECTURE.md](./src/ui/controls/ARCHITECTURE.md) | Structure du refactor ModuleControls |
 | [src/hooks/HOOKS.md](./src/hooks/HOOKS.md) | Documentation des React hooks |
 
+### Roadmaps (features en attente)
+| Document | Description |
+|----------|-------------|
+| [docs/UNDO_REDO_ROADMAP.md](./docs/UNDO_REDO_ROADMAP.md) | Plan d'implémentation Undo/Redo |
+
 ### Crates Rust
 | Document | Description |
 |----------|-------------|
