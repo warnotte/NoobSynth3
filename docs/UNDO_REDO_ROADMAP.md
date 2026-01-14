@@ -53,6 +53,35 @@ useUndoableState(graph) ─── setGraph() ───▶ History Stack ──�
 | Step position | Séquenceurs | Runtime, pas config |
 | Mario channel CV/gate | `useMarioSequencer` | Runtime, pas config |
 
+### 2.3 Audit des hooks utilisant updateParam
+
+#### Résultat de l'audit (hooks uniquement)
+
+| Hook | Ligne | Param | skipHistory ? | Justification |
+|------|-------|-------|---------------|---------------|
+| `useControlVoices.ts` | 149 | `cv` | ✓ **Oui** | Runtime séquenceur |
+| `useControlVoices.ts` | 151 | `velocity` | ✓ **Oui** | Runtime séquenceur |
+| `useControlVoices.ts` | 209 | `gate` | ✓ **Oui** | Runtime (bouton momentané) |
+| `useControlVoices.ts` | 218 | `sync` | ✓ **Oui** | Runtime (trigger momentané) |
+| `useMidi.ts` | 47 | `seqOn` | ✗ Non | Effet secondaire visible de l'activation MIDI |
+| `useMidi.ts` | 61 | `midiInputId` | ⚠️ **Oui** | Auto-fallback système, pas action user |
+| `useMidi.ts` | 72 | `midiEnabled` | ✗ Non | Action utilisateur (désactiver MIDI) |
+| `useMidi.ts` | 87 | `midiEnabled` | ✗ Non | Action utilisateur (activer MIDI) |
+| `useMarioSequencer.ts` | - | - | N/A | N'utilise pas updateParam |
+
+#### Résumé
+
+**Nécessitent `skipHistory: true`** (6 appels) :
+- `useControlVoices.ts` : cv, velocity, gate, sync (4)
+- `useMidi.ts` : midiInputId (1) - auto-fallback
+
+**Gardent l'historique** (3 appels) :
+- `useMidi.ts` : seqOn, midiEnabled (toggle on/off)
+
+#### Note sur les composants UI
+
+Les ~100+ appels `updateParam()` dans `src/ui/controls/*.tsx` sont tous des **actions utilisateur directes** (tourner knob, cliquer bouton) et doivent rester dans l'historique. Le debouncing sera géré par les transactions sur les knobs.
+
 ---
 
 ## 3. Problèmes identifiés et solutions
@@ -71,6 +100,28 @@ onPointerUp   → endTransaction()    // Commit une seule entrée
 **Fichiers impactés** :
 - `src/ui/RotaryKnob.tsx` - Knobs rotatifs
 - `src/hooks/useModuleDrag.ts` - Déplacement modules
+
+**⚠️ Edge case critique : interruption du drag**
+
+Sur mobile ou si le drag quitte la fenêtre, `pointerup` peut ne jamais être appelé.
+Sans gestion explicite, la transaction reste ouverte indéfiniment.
+
+```typescript
+// OBLIGATOIRE : gérer pointercancel et perte de capture
+onPointerCancel → endTransaction()
+onLostPointerCapture → endTransaction()
+
+// Fallback : timeout de sécurité (optionnel)
+// Si aucun événement pendant 5s en transaction → auto-commit
+```
+
+**Événements à gérer** :
+| Événement | Cause | Action |
+|-----------|-------|--------|
+| `pointerup` | Fin normale du drag | `endTransaction()` |
+| `pointercancel` | Interruption système (appel entrant, gesture OS) | `endTransaction()` |
+| `lostpointercapture` | Perte de capture (fenêtre perd focus) | `endTransaction()` |
+| `blur` sur window | Changement d'onglet/app | `endTransaction()` si en cours |
 
 ### 3.2 Pollution par le séquenceur
 
@@ -124,6 +175,178 @@ onHistoryChange: (newGraph, prevGraph) => {
 }
 ```
 
+**Stratégie de diff** :
+
+La fonction `hasSameModuleShape()` existe déjà dans `graphUtils.ts`. Elle compare :
+- Nombre de modules
+- IDs des modules
+- Types des modules
+
+Elle ne fait PAS de deep compare des params (ce qui serait coûteux).
+
+```typescript
+// Existant - performant car ne compare que la structure
+export const hasSameModuleShape = (a: GraphState, b: GraphState): boolean => {
+  if (a.modules.length !== b.modules.length) return false
+  return a.modules.every((mod, i) =>
+    mod.id === b.modules[i].id && mod.type === b.modules[i].type
+  )
+}
+```
+
+**⚠️ Guard contre boucle infinie restart/sync**
+
+Risque : `undo → queueEngineRestart → graph change → useEffect → sync → ...`
+
+Protection nécessaire :
+```typescript
+// Flag pour éviter la boucle
+const isUndoRedoInProgress = useRef(false)
+
+const undo = () => {
+  isUndoRedoInProgress.current = true
+  // ... restore state
+  // ... sync engine
+  isUndoRedoInProgress.current = false
+}
+
+// Dans useEffect de sync
+useEffect(() => {
+  if (isUndoRedoInProgress.current) return // Skip pendant undo/redo
+  // ... normal sync logic
+}, [graphStructureSignature])
+```
+
+### 3.5 Raccourcis clavier et focus input
+
+**Problème** : Quand l'utilisateur édite une valeur dans un input (ex: double-clic sur un knob pour saisir une valeur), Ctrl+Z devrait annuler la saisie en cours, pas déclencher l'undo global.
+
+**Solution** : Filtrer les événements clavier selon le focus
+
+```typescript
+const handleKeyDown = (event: KeyboardEvent) => {
+  // Ne pas intercepter si on est dans un input/textarea
+  const target = event.target as HTMLElement
+  if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+    return // Laisser le comportement natif du navigateur
+  }
+
+  // Undo/Redo global
+  if ((event.ctrlKey || event.metaKey) && event.key === 'z') {
+    event.preventDefault()
+    if (event.shiftKey) {
+      redo()
+    } else {
+      undo()
+    }
+  }
+}
+```
+
+**Éléments input dans NoobSynth3** :
+- `RotaryKnob` : input numérique sur double-clic
+- `NotesModule` : textarea pour les notes
+- Futurs : champs de recherche preset, renommage module, etc.
+
+### 3.7 Reset historique sur nouveau contexte
+
+**Principe** : Charger un preset ou créer un nouveau patch = nouveau contexte. L'historique précédent n'a plus de sens et doit être effacé.
+
+**Actions qui reset l'historique** :
+| Action | Fonction | Reset ? |
+|--------|----------|---------|
+| Charger un preset | `applyPreset()` | ✓ Oui |
+| Importer un fichier | `handlePresetFileChange()` | ✓ Oui |
+| Clear rack (New) | `handleClearRack()` | ✓ Oui |
+
+**Implémentation** :
+```typescript
+type UndoableStateReturn<T> = {
+  // ... existing
+  clearHistory: () => void  // Nouveau
+}
+
+// Dans App.tsx
+const applyPreset = (graph) => {
+  setGraph(graph)
+  clearHistory()  // Reset après chargement
+}
+```
+
+**Avantages** :
+1. **UX cohérente** : Undo ne ramène pas à un patch précédent complètement différent
+2. **Mémoire** : Évite d'accumuler des snapshots de différents presets
+3. **Simplicité** : Moins d'edge cases à gérer
+
+---
+
+### 3.8 Indicateur visuel du stack undo/redo
+
+**Objectif** : Donner un feedback visuel à l'utilisateur sur l'état de l'historique.
+
+**Affichage proposé** (dans TopBar) :
+```
+┌─────────────────────────────────────────┐
+│  ↶ 5  │  ↷ 2  │  Live  │  Web Audio    │
+└─────────────────────────────────────────┘
+    │       │
+    │       └── Nombre de redo disponibles
+    └────────── Nombre de undo disponibles
+```
+
+**Comportement** :
+| Action | Effet sur affichage |
+|--------|---------------------|
+| Modifier un param | ↶ s'incrémente, ↷ reset à 0 |
+| Undo | ↶ décrémente, ↷ s'incrémente |
+| Redo | ↶ s'incrémente, ↷ décrémente |
+| Charger preset | ↶ et ↷ reset à 0 |
+
+**Implémentation** :
+```typescript
+// Dans TopBar.tsx
+type TopBarProps = {
+  // ... existing
+  undoCount?: number   // Nombre d'undos disponibles
+  redoCount?: number   // Nombre de redos disponibles
+  onUndo?: () => void  // Optionnel: clic sur le compteur
+  onRedo?: () => void
+}
+
+// Affichage conditionnel (masquer si 0)
+{undoCount > 0 && <span className="undo-indicator">↶ {undoCount}</span>}
+{redoCount > 0 && <span className="redo-indicator">↷ {redoCount}</span>}
+```
+
+**Style suggéré** :
+- Discret (petit, grisé) quand disponible
+- Invisible quand à 0
+- Animation subtile sur changement (flash ou pulse)
+
+---
+
+### 3.6 Mémoire et gros presets
+
+**Problème** : Chaque entrée dans l'historique est un snapshot complet du graph. Avec `maxHistory: 50` et un graph complexe, la consommation mémoire peut devenir significative.
+
+**Facteurs de risque** :
+- Charger plusieurs presets successifs
+- Graphs avec beaucoup de modules (20+)
+- Params volumineux (`stepData`, `drumData` sont des strings encodées)
+
+**Mitigations** :
+1. **maxHistory raisonnable** : 50 par défaut, configurable si nécessaire
+2. **Immutabilité existante** : React utilise déjà des shallow copies, seuls les objets modifiés sont dupliqués
+3. **Garbage collection** : Les anciennes entrées sont supprimées quand on dépasse maxHistory
+4. **Monitoring** (optionnel) : Log de warning si `historyLength * estimatedGraphSize > threshold`
+
+**Estimation mémoire** :
+```
+Graph typique : ~10-50 KB (JSON stringifié)
+Historique 50 : ~500 KB - 2.5 MB
+Acceptable pour une app desktop/web moderne
+```
+
 ---
 
 ## 4. API du hook useUndoableState
@@ -145,8 +368,11 @@ type UndoableStateReturn<T> = {
   redo: () => void
   canUndo: boolean
   canRedo: boolean
+  undoCount: number         // Pour affichage indicateur
+  redoCount: number         // Pour affichage indicateur
   beginTransaction: () => void
   endTransaction: () => void
+  clearHistory: () => void  // Reset sur nouveau preset/clear
 }
 ```
 
@@ -158,6 +384,7 @@ type UndoableStateReturn<T> = {
 - [ ] Créer `src/hooks/useUndoableState.ts`
 - [ ] Implémenter : state, setState, undo, redo, canUndo, canRedo
 - [ ] Implémenter : maxHistory (limite de l'historique)
+- [ ] Implémenter : clearHistory (reset sur preset/clear)
 - [ ] Tests unitaires basiques
 
 ### Phase 2 : Transactions (debouncing)
@@ -183,7 +410,10 @@ type UndoableStateReturn<T> = {
 - [ ] Remplacer `useState(graph)` par `useUndoableState(graph)`
 - [ ] Ajouter `UndoProvider` wrapper
 - [ ] Ajouter raccourcis clavier (Ctrl+Z, Ctrl+Shift+Z, Ctrl+Y)
-- [ ] Optionnel : boutons Undo/Redo dans TopBar
+- [ ] **Filtrer les raccourcis quand un input est focus** (voir section 3.5)
+- [ ] Appeler `clearHistory()` dans : applyPreset, handleClearRack, handlePresetFileChange
+- [ ] Afficher indicateur undo/redo dans TopBar (voir section 3.8)
+- [ ] Optionnel : boutons Undo/Redo cliquables
 
 ### Phase 6 : Tests et edge cases
 - [ ] Tester : knob drag → undo = 1 step
@@ -193,6 +423,11 @@ type UndoableStateReturn<T> = {
 - [ ] Tester : undo connexion câble → câble disparaît
 - [ ] Tester : mode Native → sync fonctionne
 - [ ] Tester : mode VST → sync fonctionne
+- [ ] Tester : **mobile** - pointercancel pendant drag knob → transaction fermée
+- [ ] Tester : **mobile** - quitter app pendant drag → pas de transaction zombie
+- [ ] Tester : Ctrl+Z dans input knob → annule saisie, pas undo global
+- [ ] Tester : charger 10 presets → mémoire stable
+- [ ] Tester : undo/redo rapide (spam) → pas de boucle infinie
 
 ---
 
@@ -216,9 +451,13 @@ type UndoableStateReturn<T> = {
 |--------|--------|------------|
 | Performance avec gros historique | Lag UI | Limiter maxHistory à 50 |
 | Memory avec clones de graph | RAM | Shallow clone + immutabilité existante |
-| Oubli d'un appel skipHistory | Historique pollué | Revue de code systématique |
+| Oubli d'un appel skipHistory | Historique pollué | Audit hooks + revue de code |
 | Race condition setState | State incohérent | Utiliser refs pour transactions |
 | Undo pendant séquenceur actif | Comportement bizarre | Tester explicitement |
+| Transaction jamais fermée (mobile) | Undo bloqué | Gérer pointercancel + timeout fallback |
+| Boucle restart/sync infinie | Crash/freeze | Guard `isUndoRedoInProgress` |
+| Ctrl+Z dans input | UX confuse | Filtrer par `event.target.tagName` |
+| Gros presets × historique | RAM excessive | Monitoring + maxHistory adaptatif |
 
 ---
 
