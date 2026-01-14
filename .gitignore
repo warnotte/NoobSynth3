@@ -23,3 +23,7 @@ target
 *.njsproj
 *.sln
 *.sw?
+
+# Build artifacts (WASM)
+src/engine/worklets/wasm/*.wasm
+src/engine/worklets/wasm/*.js
