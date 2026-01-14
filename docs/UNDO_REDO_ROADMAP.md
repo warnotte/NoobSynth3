@@ -39,8 +39,8 @@ useUndoableState(graph) ─── setGraph() ───▶ History Stack ──�
 | Supprimer un module | `handleRemoveModule()` | Ponctuelle |
 | Connecter des câbles | `setGraph()` via usePatching | Ponctuelle |
 | Déplacer un module | `setGraph()` via useModuleDrag | Continue (drag) |
-| Charger un preset | `applyPreset()` | Ponctuelle |
-| Clear rack | `handleClearRack()` | Ponctuelle |
+| ~~Charger un preset~~ | ~~`applyPreset()`~~ | ~~Ponctuelle~~ → **Reset history** (voir section 3.6) |
+| ~~Clear rack~~ | ~~`handleClearRack()`~~ | ~~Ponctuelle~~ → **Reset history** (voir section 3.6) |
 
 ### 2.2 Modifications automatiques (NE DOIT PAS être dans l'historique)
 
@@ -63,7 +63,7 @@ useUndoableState(graph) ─── setGraph() ───▶ History Stack ──�
 | `useControlVoices.ts` | 151 | `velocity` | ✓ **Oui** | Runtime séquenceur |
 | `useControlVoices.ts` | 209 | `gate` | ✓ **Oui** | Runtime (bouton momentané) |
 | `useControlVoices.ts` | 218 | `sync` | ✓ **Oui** | Runtime (trigger momentané) |
-| `useMidi.ts` | 47 | `seqOn` | ✗ Non | Effet secondaire visible de l'activation MIDI |
+| `useMidi.ts` | 47 | `seqOn` | ⚠️ **Oui** | Effet secondaire auto, undo ne doit pas ré-activer le seq |
 | `useMidi.ts` | 61 | `midiInputId` | ⚠️ **Oui** | Auto-fallback système, pas action user |
 | `useMidi.ts` | 72 | `midiEnabled` | ✗ Non | Action utilisateur (désactiver MIDI) |
 | `useMidi.ts` | 87 | `midiEnabled` | ✗ Non | Action utilisateur (activer MIDI) |
@@ -74,9 +74,10 @@ useUndoableState(graph) ─── setGraph() ───▶ History Stack ──�
 **Nécessitent `skipHistory: true`** (6 appels) :
 - `useControlVoices.ts` : cv, velocity, gate, sync (4)
 - `useMidi.ts` : midiInputId (1) - auto-fallback
+- `useMidi.ts` : seqOn (1) - effet secondaire auto
 
-**Gardent l'historique** (3 appels) :
-- `useMidi.ts` : seqOn, midiEnabled (toggle on/off)
+**Gardent l'historique** (2 appels) :
+- `useMidi.ts` : midiEnabled (toggle on/off - action user explicite)
 
 #### Note sur les composants UI
 
@@ -248,7 +249,7 @@ const handleKeyDown = (event: KeyboardEvent) => {
 - `NotesModule` : textarea pour les notes
 - Futurs : champs de recherche preset, renommage module, etc.
 
-### 3.7 Reset historique sur nouveau contexte
+### 3.6 Reset historique sur nouveau contexte
 
 **Principe** : Charger un preset ou créer un nouveau patch = nouveau contexte. L'historique précédent n'a plus de sens et doit être effacé.
 
@@ -278,9 +279,22 @@ const applyPreset = (graph) => {
 2. **Mémoire** : Évite d'accumuler des snapshots de différents presets
 3. **Simplicité** : Moins d'edge cases à gérer
 
+**⚠️ Note UX importante pour Clear rack** :
+
+Le reset d'historique sur Clear rack implique une perte potentielle de travail non sauvegardé.
+Pour éviter les frustrations utilisateur, **une friction explicite est nécessaire** :
+
+| Option | Description |
+|--------|-------------|
+| Confirmation dialog | "Tu vas perdre ton patch. As-tu sauvegardé ?" |
+| Indicateur UI | Badge "unsaved changes" avant Clear |
+| Tooltip | "Clear = nouveau patch, undo non disponible après" |
+
+**Choix de design** : Clear rack = "New patch" (nouveau contexte), pas "Sélectionner tout + Supprimer" (action réversible).
+
 ---
 
-### 3.8 Indicateur visuel du stack undo/redo
+### 3.7 Indicateur visuel du stack undo/redo
 
 **Objectif** : Donner un feedback visuel à l'utilisateur sur l'état de l'historique.
 
@@ -325,7 +339,7 @@ type TopBarProps = {
 
 ---
 
-### 3.6 Mémoire et gros presets
+### 3.8 Mémoire et gros presets
 
 **Problème** : Chaque entrée dans l'historique est un snapshot complet du graph. Avec `maxHistory: 50` et un graph complexe, la consommation mémoire peut devenir significative.
 
@@ -412,7 +426,7 @@ type UndoableStateReturn<T> = {
 - [ ] Ajouter raccourcis clavier (Ctrl+Z, Ctrl+Shift+Z, Ctrl+Y)
 - [ ] **Filtrer les raccourcis quand un input est focus** (voir section 3.5)
 - [ ] Appeler `clearHistory()` dans : applyPreset, handleClearRack, handlePresetFileChange
-- [ ] Afficher indicateur undo/redo dans TopBar (voir section 3.8)
+- [ ] Afficher indicateur undo/redo dans TopBar (voir section 3.7)
 - [ ] Optionnel : boutons Undo/Redo cliquables
 
 ### Phase 6 : Tests et edge cases
