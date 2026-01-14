@@ -19,8 +19,11 @@ Synthétiseur modulaire inspiré de VCV Rack, construit avec React + Rust/WASM.
 
 ```bash
 npm install
+npm run build:wasm   # Requis après le premier clone
 npm run dev
 ```
+
+> **Note** : `build:wasm` nécessite Rust et wasm-bindgen. Voir [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) pour les prérequis.
 
 Ouvrir l'app, cliquer **Power On**, puis jouer avec le clavier ou lancer le séquenceur.
 

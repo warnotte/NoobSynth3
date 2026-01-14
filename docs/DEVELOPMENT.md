@@ -41,6 +41,7 @@ cargo install wasm-bindgen-cli tauri-cli
 git clone https://github.com/warnotte/NoobSynth3.git
 cd NoobSynth3
 npm install
+npm run build:wasm   # Obligatoire - compile le DSP Rust en WASM
 ```
 
 ## Développement
@@ -61,9 +62,9 @@ npm run tauri:dev
 
 Lance l'app desktop avec hot reload. Le backend Rust recompile automatiquement.
 
-### Rebuild WASM
+### Build WASM
 
-Nécessaire uniquement après modification du code Rust DSP :
+**Obligatoire après le premier clone** et après toute modification du code Rust DSP :
 
 ```bash
 npm run build:wasm
@@ -71,7 +72,9 @@ npm run build:wasm
 
 Génère `src/engine/worklets/wasm/dsp_wasm.js` + `dsp_wasm_bg.wasm`.
 
-Note : même en mode `npm run dev`, le WASM n'est pas rebâti automatiquement. Après un changement DSP,
+> **Note** : Les fichiers WASM ne sont pas inclus dans le repo git. Le build est obligatoire avant de pouvoir lancer `npm run dev`.
+
+En mode développement, le WASM n'est pas rebâti automatiquement. Après un changement DSP,
 relance `npm run build:wasm` puis recharge la page (Ctrl+F5).
 
 ## Build de production
