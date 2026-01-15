@@ -104,6 +104,30 @@ Générateur de bruit.
 
 **Sorties** : out (audio)
 
+### Shepard
+
+Générateur de ton Shepard - illusion auditive d'une montée ou descente infinie.
+
+Le module utilise plusieurs oscillateurs sinusoïdaux espacés d'une octave. Chaque voix monte (ou descend) progressivement en fréquence, avec une amplitude contrôlée par une courbe gaussienne : forte au centre du spectre, quasi-nulle aux extrêmes. Quand une voix atteint le haut, elle réapparaît en bas à amplitude quasi-nulle, créant l'illusion de continuité.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `voices` | 2-12 | Nombre de voix (octaves superposées) |
+| `rate` | -4 à +4 Hz | Vitesse de montée/descente (négatif = descend) |
+| `baseFreq` | 55-880 Hz | Fréquence centrale |
+| `spread` | 0.5-2 | Largeur de l'enveloppe gaussienne |
+| `mix` | 0-1 | Niveau de sortie |
+
+**Entrées** : rate-cv (CV), sync (sync - reset des voix)
+**Sorties** : out (audio)
+
+**Conseils :**
+- **Rate lent** (0.05-0.2) : effet hypnotique, idéal pour ambiances
+- **Rate rapide** (1-4) : effet plus dramatique, tension
+- **Spread bas** (0.5-0.8) : spectre plus concentré, effet plus net
+- **Spread haut** (1.5-2) : spectre plus large, effet plus diffus
+- **Sync** : connecter une clock pour resynchroniser périodiquement
+
 ### TB-303
 
 Synthèse acid bass style Roland TB-303 avec filtre résonant et enveloppe caractéristique.

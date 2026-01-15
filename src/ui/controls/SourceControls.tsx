@@ -1,7 +1,7 @@
 /**
  * Source module controls (oscillators, noise generators)
  *
- * Modules: oscillator, supersaw, karplus, nes-osc, snes-osc, noise, tb-303, fm-op
+ * Modules: oscillator, supersaw, karplus, nes-osc, snes-osc, noise, tb-303, fm-op, shepard
  */
 
 import type React from 'react'
@@ -585,6 +585,66 @@ export function renderSourceControls(props: ControlProps): React.ReactElement | 
           value={release}
           onChange={(value) => updateParam(module.id, 'release', value)}
           format={formatInt}
+        />
+      </>
+    )
+  }
+
+  if (module.type === 'shepard') {
+    const voices = Number(module.params.voices ?? 8)
+    const rate = Number(module.params.rate ?? 0.1)
+    const baseFreq = Number(module.params.baseFreq ?? 220)
+    const spread = Number(module.params.spread ?? 1.0)
+    const mix = Number(module.params.mix ?? 1.0)
+
+    return (
+      <>
+        <RotaryKnob
+          label="Voices"
+          min={2}
+          max={12}
+          step={1}
+          value={voices}
+          onChange={(value) => updateParam(module.id, 'voices', value)}
+          format={formatInt}
+        />
+        <RotaryKnob
+          label="Rate"
+          min={-4}
+          max={4}
+          step={0.05}
+          unit="Hz"
+          value={rate}
+          onChange={(value) => updateParam(module.id, 'rate', value)}
+          format={(v) => v >= 0 ? `+${formatDecimal2(v)}` : formatDecimal2(v)}
+        />
+        <RotaryKnob
+          label="Freq"
+          min={55}
+          max={880}
+          step={1}
+          unit="Hz"
+          value={baseFreq}
+          onChange={(value) => updateParam(module.id, 'baseFreq', value)}
+          format={formatInt}
+        />
+        <RotaryKnob
+          label="Spread"
+          min={0.5}
+          max={2}
+          step={0.01}
+          value={spread}
+          onChange={(value) => updateParam(module.id, 'spread', value)}
+          format={formatDecimal2}
+        />
+        <RotaryKnob
+          label="Mix"
+          min={0}
+          max={1}
+          step={0.01}
+          value={mix}
+          onChange={(value) => updateParam(module.id, 'mix', value)}
+          format={formatPercent}
         />
       </>
     )

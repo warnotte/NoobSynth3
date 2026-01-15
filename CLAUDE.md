@@ -141,17 +141,17 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 
 ### Documentation (obligatoire)
 - [ ] `docs/MODULES.md` - Documentation complète du module
-- [ ] `README.md` - Mettre à jour le compte de modules (actuellement 52)
+- [ ] `README.md` - Mettre à jour le compte de modules (actuellement 53)
 - [ ] `CLAUDE.md` - Ajouter à la liste "Module Types" si pertinent
 
 ### Optionnel
 - [ ] `public/presets/` - Preset de démonstration
 - [ ] `npm run build:wasm` - Rebuild WASM après modifs Rust
 
-## Module Types (52 total)
+## Module Types (53 total)
 
-### Sources (8)
-oscillator, supersaw, karplus, fm-op, nes-osc, snes-osc, noise, tb-303
+### Sources (9)
+oscillator, supersaw, karplus, fm-op, nes-osc, snes-osc, noise, tb-303, shepard
 
 ### Filters (2)
 vcf, hpf

@@ -6,7 +6,7 @@ use dsp_core::{
   Adsr, Arpeggiator, Choir, Chorus, Clap909, Delay, DrumSequencer, Ensemble,
   EuclideanSequencer, FmOperator, GranularDelay, HiHat909, Hpf, KarplusStrong,
   Kick909, Lfo, Mario, MasterClock, NesOsc, Noise, Phaser, PitchShifter,
-  Reverb, Rimshot909, SampleHold, SlewLimiter, Snare909, SnesOsc, SpringReverb,
+  Reverb, Rimshot909, SampleHold, Shepard, SlewLimiter, Snare909, SnesOsc, SpringReverb,
   StepSequencer, Supersaw, TapeDelay, Tb303, Tom909, Vcf, Vco, Vocoder,
 };
 
@@ -410,6 +410,14 @@ pub(crate) fn create_state(
       sustain: ParamBuffer::new(param_number(params, "sustain", 0.7)),
       release: ParamBuffer::new(param_number(params, "release", 300.0)),
     }),
+    ModuleType::Shepard => ModuleState::Shepard(ShepardState {
+      shepard: Shepard::new(sample_rate),
+      voices: ParamBuffer::new(param_number(params, "voices", 8.0)),
+      rate: ParamBuffer::new(param_number(params, "rate", 0.1)),
+      base_freq: ParamBuffer::new(param_number(params, "baseFreq", 220.0)),
+      spread: ParamBuffer::new(param_number(params, "spread", 1.0)),
+      mix: ParamBuffer::new(param_number(params, "mix", 1.0)),
+    }),
     ModuleType::Notes => ModuleState::Notes,  // UI-only, no DSP
   }
 }
@@ -811,6 +819,14 @@ pub(crate) fn apply_param(state: &mut ModuleState, param: &str, value: f32) {
       "decay" => state.decay.set(value),
       "sustain" => state.sustain.set(value),
       "release" => state.release.set(value),
+      _ => {}
+    },
+    ModuleState::Shepard(state) => match param {
+      "voices" => state.voices.set(value),
+      "rate" => state.rate.set(value),
+      "baseFreq" => state.base_freq.set(value),
+      "spread" => state.spread.set(value),
+      "mix" => state.mix.set(value),
       _ => {}
     },
     _ => {}

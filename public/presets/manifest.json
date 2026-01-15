@@ -560,6 +560,13 @@
       "description": "Complex fully sequenced synthwave anthem with layered bass, lead, pad, and 909 groove. Step patterns derived from CC0 MIDI 'movin-on.mid' (m-malandro/CC0-midis).",
       "file": "synthwave-nightdrive.json",
       "group": "Synthwave"
+    },
+    {
+      "id": "shepard-test",
+      "name": "Shepard Test",
+      "description": "Shepard tone generator with spectrogram scope for testing.",
+      "file": "shepard-test.json",
+      "group": "Shepard"
     }
   ]
 }

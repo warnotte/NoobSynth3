@@ -334,6 +334,15 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
       { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
     ],
   },
+  shepard: {
+    inputs: [
+      { id: 'rate-cv', label: 'Rate', kind: 'cv', direction: 'in' },
+      { id: 'sync', label: 'Sync', kind: 'sync', direction: 'in' },
+    ],
+    outputs: [
+      { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
+    ],
+  },
   notes: {
     inputs: [],
     outputs: [],

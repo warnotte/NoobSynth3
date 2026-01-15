@@ -125,6 +125,11 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // stop trigger
       PortInfo { channels: 1 },  // reset trigger
     ],
+    // Shepard tone generator - 2 inputs (rate CV, sync)
+    ModuleType::Shepard => vec![
+      PortInfo { channels: 1 },  // rate CV
+      PortInfo { channels: 1 },  // sync
+    ],
   }
 }
 
@@ -250,6 +255,10 @@ pub fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // reset pulse
       PortInfo { channels: 1 },  // run gate
       PortInfo { channels: 1 },  // bar pulse
+    ],
+    // Shepard tone generator - 1 output (audio)
+    ModuleType::Shepard => vec![
+      PortInfo { channels: 1 },  // audio out
     ],
   }
 }
@@ -448,6 +457,12 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
       "start" => Some(0),
       "stop" => Some(1),
       "rst-in" => Some(2),
+      _ => None,
+    },
+    // Shepard - 2 inputs
+    ModuleType::Shepard => match port_id {
+      "rate-cv" | "rate" => Some(0),
+      "sync" => Some(1),
       _ => None,
     },
     _ => None,
@@ -669,6 +684,11 @@ pub fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize
       "reset" | "rst" => Some(1),
       "run" => Some(2),
       "bar" => Some(3),
+      _ => None,
+    },
+    // Shepard - 1 output
+    ModuleType::Shepard => match port_id {
+      "out" | "output" => Some(0),
       _ => None,
     },
   }

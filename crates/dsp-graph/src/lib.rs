@@ -556,6 +556,7 @@ fn normalize_module_type(raw: &str) -> ModuleType {
     "euclidean" => ModuleType::Euclidean,
     // FM Synthesis
     "fm-op" => ModuleType::FmOp,
+    "shepard" => ModuleType::Shepard,
     // Documentation
     "notes" => ModuleType::Notes,
     // Effects

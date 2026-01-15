@@ -4,7 +4,7 @@ use dsp_core::{
     Adsr, Arpeggiator, Choir, Chorus, Clap909, Delay, DrumSequencer, Ensemble,
     EuclideanSequencer, FmOperator, GranularDelay, HiHat909, Hpf, KarplusStrong,
     Kick909, Lfo, Mario, MasterClock, NesOsc, Noise, Phaser, PitchShifter,
-    Reverb, Rimshot909, SampleHold, SlewLimiter, Snare909, SnesOsc, SpringReverb,
+    Reverb, Rimshot909, SampleHold, Shepard, SlewLimiter, Snare909, SnesOsc, SpringReverb,
     StepSequencer, Supersaw, TapeDelay, Tb303, Tom909, Vcf, Vco, Vocoder,
 };
 
@@ -92,6 +92,15 @@ pub struct FmOpState {
     pub decay: ParamBuffer,
     pub sustain: ParamBuffer,
     pub release: ParamBuffer,
+}
+
+pub struct ShepardState {
+    pub shepard: Shepard,
+    pub voices: ParamBuffer,
+    pub rate: ParamBuffer,
+    pub base_freq: ParamBuffer,
+    pub spread: ParamBuffer,
+    pub mix: ParamBuffer,
 }
 
 // =============================================================================
@@ -473,6 +482,7 @@ pub enum ModuleState {
     Noise(NoiseState),
     Tb303(Tb303State),
     FmOp(FmOpState),
+    Shepard(ShepardState),
 
     // Filters
     Vcf(VcfState),

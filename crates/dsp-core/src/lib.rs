@@ -42,6 +42,7 @@ pub use oscillators::{
     Tb303, Tb303Params, Tb303Inputs, Tb303Outputs,
     KarplusStrong, KarplusParams, KarplusInputs,
     FmOperator, FmOperatorParams, FmOperatorInputs,
+    Shepard, ShepardParams, ShepardInputs,
 };
 
 // Re-export filters

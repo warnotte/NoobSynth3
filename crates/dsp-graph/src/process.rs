@@ -20,7 +20,7 @@ use dsp_core::{
     Quantizer, QuantizerInputs, QuantizerParams,
     ReverbInputs, ReverbParams, RingMod, RingModParams,
     Rimshot909Inputs, Rimshot909Params, Sample,
-    SampleHoldInputs, SampleHoldParams, SlewInputs, SlewParams,
+    SampleHoldInputs, SampleHoldParams, ShepardInputs, ShepardParams, SlewInputs, SlewParams,
     Snare909Inputs, Snare909Params, SnesOscInputs, SnesOscParams,
     SpringReverbInputs, SpringReverbParams,
     StepSequencerInputs, StepSequencerOutputs, StepSequencerParams,
@@ -1110,6 +1110,26 @@ pub(crate) fn process_module(
 
             let out = outputs[0].channel_mut(0);
             state.op.process_block(out, fm_inputs, params);
+        }
+        ModuleState::Shepard(state) => {
+            let rate_cv = if !connections[0].is_empty() { Some(inputs[0].channel(0)) } else { None };
+            let sync = if connections.len() > 1 && !connections[1].is_empty() {
+                Some(inputs[1].channel(0))
+            } else {
+                None
+            };
+
+            let shepard_inputs = ShepardInputs { rate_cv, sync };
+            let params = ShepardParams {
+                voices: state.voices.slice(frames),
+                rate: state.rate.slice(frames),
+                base_freq: state.base_freq.slice(frames),
+                spread: state.spread.slice(frames),
+                mix: state.mix.slice(frames),
+            };
+
+            let out = outputs[0].channel_mut(0);
+            state.shepard.process_block(out, shepard_inputs, params);
         }
         ModuleState::Notes => {
             // UI-only module, no audio processing

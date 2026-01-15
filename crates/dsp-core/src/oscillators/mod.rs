@@ -11,6 +11,7 @@
 //! - [`Tb303`] - Roland TB-303 bass synthesizer emulation
 //! - [`KarplusStrong`] - Physical modeling string synthesis
 //! - [`FmOperator`] - FM synthesis operator with ADSR envelope
+//! - [`Shepard`] - Shepard tone generator (endless rising/falling pitch illusion)
 
 mod vco;
 mod supersaw;
@@ -21,6 +22,7 @@ mod snes_osc;
 mod tb303;
 mod karplus;
 mod fm_op;
+mod shepard;
 
 pub use vco::{Vco, VcoParams, VcoInputs};
 pub use supersaw::{Supersaw, SupersawParams, SupersawInputs};
@@ -31,3 +33,4 @@ pub use snes_osc::{SnesOsc, SnesOscParams, SnesOscInputs};
 pub use tb303::{Tb303, Tb303Params, Tb303Inputs, Tb303Outputs};
 pub use karplus::{KarplusStrong, KarplusParams, KarplusInputs};
 pub use fm_op::{FmOperator, FmOperatorParams, FmOperatorInputs};
+pub use shepard::{Shepard, ShepardParams, ShepardInputs};

@@ -7,6 +7,7 @@ export const moduleSizes: Record<ModuleType, string> = {
   'nes-osc': '2x3',
   'snes-osc': '2x3',
   noise: '2x1',
+  shepard: '2x2',
   'mod-router': '2x2',
   'sample-hold': '1x1',
   slew: '1x2',
@@ -67,6 +68,7 @@ export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>>
   karplus: 'strip',
   'nes-osc': 'strip',
   'snes-osc': 'strip',
+  shepard: 'strip',
   vcf: 'strip',
   control: 'strip',
   lab: 'strip',
@@ -141,6 +143,7 @@ export const moduleCatalog: { type: ModuleType; label: string; category: ModuleC
   { type: 'noise', label: 'Noise', category: 'sources' },
   { type: 'tb-303', label: 'TB-303', category: 'sources' },
   { type: 'fm-op', label: 'FM Op', category: 'sources' },
+  { type: 'shepard', label: 'Shepard', category: 'sources' },
   // Filters
   { type: 'vcf', label: 'VCF', category: 'filters' },
   { type: 'hpf', label: 'HPF', category: 'filters' },
@@ -201,6 +204,7 @@ export const modulePrefixes: Record<ModuleType, string> = {
   'nes-osc': 'nes',
   'snes-osc': 'snes',
   noise: 'noise',
+  shepard: 'shep',
   'mod-router': 'modr',
   'sample-hold': 'sh',
   slew: 'slew',
@@ -262,6 +266,7 @@ export const moduleLabels: Record<ModuleType, string> = {
   'nes-osc': 'NES Osc',
   'snes-osc': 'SNES Osc',
   noise: 'Noise',
+  shepard: 'Shepard',
   'mod-router': 'Mod Router',
   'sample-hold': 'S&H',
   slew: 'Slew',
@@ -329,6 +334,13 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     subOct: 1,
   },
   noise: { level: 0.4, noiseType: 'white' },
+  shepard: {
+    voices: 8,        // Number of octave-spaced voices (2-12)
+    rate: 0.1,        // Climb rate (-1 to 1, cycles/second)
+    baseFreq: 220,    // Center frequency Hz
+    spread: 1.0,      // Gaussian spread (0.5-2)
+    mix: 1.0,         // Output level
+  },
   'mod-router': { depthPitch: 0, depthPwm: 0, depthVcf: 0, depthVca: 0 },
   'sample-hold': { mode: 0 },
   slew: { rise: 0.05, fall: 0.05 },
