@@ -125,9 +125,10 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // stop trigger
       PortInfo { channels: 1 },  // reset trigger
     ],
-    // Shepard tone generator - 2 inputs (rate CV, sync)
+    // Shepard tone generator - 3 inputs (rate CV, pitch CV, sync)
     ModuleType::Shepard => vec![
       PortInfo { channels: 1 },  // rate CV
+      PortInfo { channels: 1 },  // pitch CV
       PortInfo { channels: 1 },  // sync
     ],
   }
@@ -256,9 +257,9 @@ pub fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // run gate
       PortInfo { channels: 1 },  // bar pulse
     ],
-    // Shepard tone generator - 1 output (audio)
+    // Shepard tone generator - 1 stereo output
     ModuleType::Shepard => vec![
-      PortInfo { channels: 1 },  // audio out
+      PortInfo { channels: 2 },  // stereo audio out
     ],
   }
 }
@@ -459,10 +460,11 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
       "rst-in" => Some(2),
       _ => None,
     },
-    // Shepard - 2 inputs
+    // Shepard - 3 inputs
     ModuleType::Shepard => match port_id {
       "rate-cv" | "rate" => Some(0),
-      "sync" => Some(1),
+      "pitch-cv" | "pitch" | "1volt" => Some(1),
+      "sync" => Some(2),
       _ => None,
     },
     _ => None,

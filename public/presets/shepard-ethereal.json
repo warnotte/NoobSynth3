@@ -1,0 +1,110 @@
+{
+  "id": "shepard-ethereal",
+  "name": "Shepard Ethereal",
+  "description": "Dreamy ascending Shepard with phase spread and treble emphasis - ambient texture",
+  "group": "Shepard",
+  "graph": {
+    "modules": [
+      {
+        "id": "shep1",
+        "type": "shepard",
+        "params": {
+          "voices": 10,
+          "rate": 0.04,
+          "baseFreq": 330,
+          "spread": 1.3,
+          "mix": 1.0,
+          "waveform": 0,
+          "stereo": 0.9,
+          "detune": 0.03,
+          "direction": 0,
+          "risset": false,
+          "phaseSpread": 0.8,
+          "interval": 2,
+          "tilt": 0.4,
+          "feedback": 0.15,
+          "vibrato": 0.1,
+          "shimmer": 0.2
+        },
+        "position": { "col": 1, "row": 1 }
+      },
+      {
+        "id": "hpf1",
+        "type": "hpf",
+        "params": {
+          "cutoff": 200
+        },
+        "position": { "col": 3, "row": 1 }
+      },
+      {
+        "id": "ensemble1",
+        "type": "ensemble",
+        "params": {
+          "rate": 0.4,
+          "depth": 0.5,
+          "delay": 12,
+          "mix": 0.4,
+          "spread": 1.0
+        },
+        "position": { "col": 5, "row": 1 }
+      },
+      {
+        "id": "reverb1",
+        "type": "reverb",
+        "params": {
+          "time": 6.0,
+          "damp": 0.4,
+          "preDelay": 0.08,
+          "mix": 0.5
+        },
+        "position": { "col": 7, "row": 1 }
+      },
+      {
+        "id": "scope1",
+        "type": "scope",
+        "params": {
+          "mode": "spectrogram",
+          "timeScale": 1,
+          "gain": 1
+        },
+        "position": { "col": 9, "row": 1 },
+        "size": "3x3"
+      },
+      {
+        "id": "out1",
+        "type": "output",
+        "params": {
+          "level": 0.4
+        },
+        "position": { "col": 12, "row": 1 }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "shep1", "portId": "out" },
+        "to": { "moduleId": "hpf1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "hpf1", "portId": "out" },
+        "to": { "moduleId": "ensemble1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "ensemble1", "portId": "out" },
+        "to": { "moduleId": "reverb1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb1", "portId": "out" },
+        "to": { "moduleId": "scope1", "portId": "in-a" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "scope1", "portId": "out-a" },
+        "to": { "moduleId": "out1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

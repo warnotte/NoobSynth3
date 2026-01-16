@@ -1,0 +1,198 @@
+{
+  "id": "shepard-cathedral",
+  "name": "Shepard Cathedral",
+  "description": "Four Shepards in contrary motion - ascending and descending voices create an infinite cathedral organ",
+  "group": "Shepard",
+  "graph": {
+    "modules": [
+      {
+        "id": "shep-sub",
+        "type": "shepard",
+        "params": {
+          "voices": 5,
+          "rate": 0.02,
+          "baseFreq": 32,
+          "spread": 1.5,
+          "mix": 1.0,
+          "waveform": 0,
+          "stereo": 0.2,
+          "detune": 2,
+          "direction": 1,
+          "risset": false,
+          "phaseSpread": 0.1,
+          "interval": 0,
+          "tilt": -0.7,
+          "feedback": 0.2,
+          "vibrato": 0.05,
+          "shimmer": 0.1
+        },
+        "position": { "col": 1, "row": 1 }
+      },
+      {
+        "id": "shep-low",
+        "type": "shepard",
+        "params": {
+          "voices": 6,
+          "rate": 0.04,
+          "baseFreq": 82,
+          "spread": 1.2,
+          "mix": 1.0,
+          "waveform": 0,
+          "stereo": 0.4,
+          "detune": 4,
+          "direction": 0,
+          "risset": false,
+          "phaseSpread": 0.25,
+          "interval": 1,
+          "tilt": -0.3,
+          "feedback": 0.15,
+          "vibrato": 0.15,
+          "shimmer": 0.2
+        },
+        "position": { "col": 1, "row": 2 }
+      },
+      {
+        "id": "shep-mid",
+        "type": "shepard",
+        "params": {
+          "voices": 8,
+          "rate": 0.06,
+          "baseFreq": 262,
+          "spread": 1.0,
+          "mix": 1.0,
+          "waveform": 0,
+          "stereo": 0.7,
+          "detune": 6,
+          "direction": 1,
+          "risset": false,
+          "phaseSpread": 0.5,
+          "interval": 1,
+          "tilt": 0,
+          "feedback": 0.1,
+          "vibrato": 0.3,
+          "shimmer": 0.35
+        },
+        "position": { "col": 1, "row": 3 }
+      },
+      {
+        "id": "shep-air",
+        "type": "shepard",
+        "params": {
+          "voices": 10,
+          "rate": 0.1,
+          "baseFreq": 880,
+          "spread": 0.9,
+          "mix": 1.0,
+          "waveform": 1,
+          "stereo": 1.0,
+          "detune": 10,
+          "direction": 0,
+          "risset": false,
+          "phaseSpread": 0.8,
+          "interval": 2,
+          "tilt": 0.5,
+          "feedback": 0.05,
+          "vibrato": 0.4,
+          "shimmer": 0.7
+        },
+        "position": { "col": 1, "row": 4 }
+      },
+      {
+        "id": "mix1",
+        "type": "mixer-1x2",
+        "params": {
+          "levelA": 0.45,
+          "levelB": 0.4,
+          "levelC": 0.35,
+          "levelD": 0.25,
+          "levelE": 0.3,
+          "levelF": 0.3
+        },
+        "position": { "col": 3, "row": 1 }
+      },
+      {
+        "id": "spring1",
+        "type": "spring-reverb",
+        "params": {
+          "decay": 0.7,
+          "tone": 0.5,
+          "mix": 0.15,
+          "drive": 0.1
+        },
+        "position": { "col": 5, "row": 1 }
+      },
+      {
+        "id": "reverb1",
+        "type": "reverb",
+        "params": {
+          "time": 9.0,
+          "damp": 0.3,
+          "preDelay": 0.1,
+          "mix": 0.55
+        },
+        "position": { "col": 7, "row": 1 }
+      },
+      {
+        "id": "scope1",
+        "type": "scope",
+        "params": {
+          "mode": "spectrogram",
+          "timeScale": 1,
+          "gain": 1
+        },
+        "position": { "col": 9, "row": 1 },
+        "size": "3x3"
+      },
+      {
+        "id": "out1",
+        "type": "output",
+        "params": {
+          "level": 0.35
+        },
+        "position": { "col": 12, "row": 1 }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "shep-sub", "portId": "out" },
+        "to": { "moduleId": "mix1", "portId": "in-a" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "shep-low", "portId": "out" },
+        "to": { "moduleId": "mix1", "portId": "in-b" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "shep-mid", "portId": "out" },
+        "to": { "moduleId": "mix1", "portId": "in-c" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "shep-air", "portId": "out" },
+        "to": { "moduleId": "mix1", "portId": "in-d" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "mix1", "portId": "out" },
+        "to": { "moduleId": "spring1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "spring1", "portId": "out" },
+        "to": { "moduleId": "reverb1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb1", "portId": "out" },
+        "to": { "moduleId": "scope1", "portId": "in-a" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "scope1", "portId": "out-a" },
+        "to": { "moduleId": "out1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

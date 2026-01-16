@@ -1,0 +1,283 @@
+{
+  "id": "shepard-morphing",
+  "name": "Shepard Morphing",
+  "description": "Low and high Shepards crossfading via LFOs - spectrum that breathes and evolves",
+  "group": "Shepard",
+  "graph": {
+    "modules": [
+      {
+        "id": "shep-sub",
+        "type": "shepard",
+        "params": {
+          "voices": 6,
+          "rate": 0.025,
+          "baseFreq": 41,
+          "spread": 1.4,
+          "mix": 1.0,
+          "waveform": 0,
+          "stereo": 0.2,
+          "detune": 3,
+          "direction": 1,
+          "risset": false,
+          "phaseSpread": 0.15,
+          "interval": 0,
+          "tilt": -0.6,
+          "feedback": 0.2,
+          "vibrato": 0.08,
+          "shimmer": 0.1
+        },
+        "position": { "col": 1, "row": 1 }
+      },
+      {
+        "id": "shep-bass",
+        "type": "shepard",
+        "params": {
+          "voices": 7,
+          "rate": 0.04,
+          "baseFreq": 82,
+          "spread": 1.2,
+          "mix": 1.0,
+          "waveform": 0,
+          "stereo": 0.4,
+          "detune": 4,
+          "direction": 0,
+          "risset": false,
+          "phaseSpread": 0.25,
+          "interval": 1,
+          "tilt": -0.4,
+          "feedback": 0.15,
+          "vibrato": 0.12,
+          "shimmer": 0.15
+        },
+        "position": { "col": 1, "row": 2 }
+      },
+      {
+        "id": "shep-high",
+        "type": "shepard",
+        "params": {
+          "voices": 10,
+          "rate": 0.08,
+          "baseFreq": 660,
+          "spread": 0.9,
+          "mix": 1.0,
+          "waveform": 1,
+          "stereo": 0.9,
+          "detune": 8,
+          "direction": 1,
+          "risset": false,
+          "phaseSpread": 0.7,
+          "interval": 2,
+          "tilt": 0.5,
+          "feedback": 0.08,
+          "vibrato": 0.35,
+          "shimmer": 0.6
+        },
+        "position": { "col": 1, "row": 3 }
+      },
+      {
+        "id": "shep-crystal",
+        "type": "shepard",
+        "params": {
+          "voices": 12,
+          "rate": 0.12,
+          "baseFreq": 1320,
+          "spread": 0.8,
+          "mix": 1.0,
+          "waveform": 0,
+          "stereo": 1.0,
+          "detune": 10,
+          "direction": 0,
+          "risset": false,
+          "phaseSpread": 0.9,
+          "interval": 1,
+          "tilt": 0.7,
+          "feedback": 0.05,
+          "vibrato": 0.45,
+          "shimmer": 0.8
+        },
+        "position": { "col": 1, "row": 4 }
+      },
+      {
+        "id": "mix-low",
+        "type": "mixer",
+        "params": {
+          "levelA": 0.5,
+          "levelB": 0.5
+        },
+        "position": { "col": 3, "row": 1 }
+      },
+      {
+        "id": "mix-high",
+        "type": "mixer",
+        "params": {
+          "levelA": 0.5,
+          "levelB": 0.5
+        },
+        "position": { "col": 3, "row": 3 }
+      },
+      {
+        "id": "lfo-low",
+        "type": "lfo",
+        "params": {
+          "rate": 0.07,
+          "shape": 0,
+          "depth": 0.8,
+          "offset": 0.5,
+          "bipolar": false
+        },
+        "position": { "col": 5, "row": 2 }
+      },
+      {
+        "id": "lfo-high",
+        "type": "lfo",
+        "params": {
+          "rate": 0.11,
+          "shape": 0,
+          "depth": 0.8,
+          "offset": 0.5,
+          "bipolar": false
+        },
+        "position": { "col": 5, "row": 4 }
+      },
+      {
+        "id": "vca-low",
+        "type": "gain",
+        "params": {
+          "gain": 1
+        },
+        "position": { "col": 5, "row": 1 }
+      },
+      {
+        "id": "vca-high",
+        "type": "gain",
+        "params": {
+          "gain": 1
+        },
+        "position": { "col": 5, "row": 3 }
+      },
+      {
+        "id": "mix-main",
+        "type": "mixer",
+        "params": {
+          "levelA": 0.6,
+          "levelB": 0.5
+        },
+        "position": { "col": 7, "row": 1 }
+      },
+      {
+        "id": "ensemble1",
+        "type": "ensemble",
+        "params": {
+          "rate": 0.25,
+          "depth": 0.35,
+          "delay": 15,
+          "mix": 0.25,
+          "spread": 1.0
+        },
+        "position": { "col": 9, "row": 1 }
+      },
+      {
+        "id": "reverb1",
+        "type": "reverb",
+        "params": {
+          "time": 7.0,
+          "damp": 0.3,
+          "preDelay": 0.08,
+          "mix": 0.5
+        },
+        "position": { "col": 11, "row": 1 }
+      },
+      {
+        "id": "scope1",
+        "type": "scope",
+        "params": {
+          "mode": "spectrogram",
+          "timeScale": 1,
+          "gain": 1
+        },
+        "position": { "col": 13, "row": 1 },
+        "size": "3x3"
+      },
+      {
+        "id": "out1",
+        "type": "output",
+        "params": {
+          "level": 0.4
+        },
+        "position": { "col": 16, "row": 1 }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "shep-sub", "portId": "out" },
+        "to": { "moduleId": "mix-low", "portId": "in-a" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "shep-bass", "portId": "out" },
+        "to": { "moduleId": "mix-low", "portId": "in-b" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "shep-high", "portId": "out" },
+        "to": { "moduleId": "mix-high", "portId": "in-a" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "shep-crystal", "portId": "out" },
+        "to": { "moduleId": "mix-high", "portId": "in-b" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "mix-low", "portId": "out" },
+        "to": { "moduleId": "vca-low", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "mix-high", "portId": "out" },
+        "to": { "moduleId": "vca-high", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "lfo-low", "portId": "cv-out" },
+        "to": { "moduleId": "vca-low", "portId": "cv" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "lfo-high", "portId": "cv-out" },
+        "to": { "moduleId": "vca-high", "portId": "cv" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "vca-low", "portId": "out" },
+        "to": { "moduleId": "mix-main", "portId": "in-a" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "vca-high", "portId": "out" },
+        "to": { "moduleId": "mix-main", "portId": "in-b" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "mix-main", "portId": "out" },
+        "to": { "moduleId": "ensemble1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "ensemble1", "portId": "out" },
+        "to": { "moduleId": "reverb1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb1", "portId": "out" },
+        "to": { "moduleId": "scope1", "portId": "in-a" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "scope1", "portId": "out-a" },
+        "to": { "moduleId": "out1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

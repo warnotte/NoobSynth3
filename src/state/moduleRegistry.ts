@@ -7,7 +7,7 @@ export const moduleSizes: Record<ModuleType, string> = {
   'nes-osc': '2x3',
   'snes-osc': '2x3',
   noise: '2x1',
-  shepard: '2x2',
+  shepard: '2x5',
   'mod-router': '2x2',
   'sample-hold': '1x1',
   slew: '1x2',
@@ -336,10 +336,21 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
   noise: { level: 0.4, noiseType: 'white' },
   shepard: {
     voices: 8,        // Number of octave-spaced voices (2-12)
-    rate: 0.1,        // Climb rate (-1 to 1, cycles/second)
+    rate: 0.1,        // Climb rate (-4 to 4, cycles/second)
     baseFreq: 220,    // Center frequency Hz
     spread: 1.0,      // Gaussian spread (0.5-2)
     mix: 1.0,         // Output level
+    waveform: 0,      // 0=sine, 1=tri, 2=saw, 3=square
+    stereo: 0.5,      // Stereo spread (0=mono, 1=full)
+    detune: 0,        // Detune amount in cents (0-50)
+    direction: 0,     // 0=up, 1=down, 2=alternate, 3=random
+    risset: false,    // Risset mode (discrete semitone steps)
+    phaseSpread: 0,   // Phase randomization (0=coherent, 1=random)
+    interval: 0,      // 0=octave, 1=fifth, 2=fourth, 3=third
+    tilt: 0,          // Spectral tilt (-1=bass, 0=neutral, 1=treble)
+    feedback: 0,      // Feedback amount (0-0.9)
+    vibrato: 0,       // Vibrato depth in semitones (0-1)
+    shimmer: 0,       // Random amplitude shimmer (0-1)
   },
   'mod-router': { depthPitch: 0, depthPwm: 0, depthVcf: 0, depthVca: 0 },
   'sample-hold': { mode: 0 },

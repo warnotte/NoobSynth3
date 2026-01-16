@@ -1113,23 +1113,41 @@ pub(crate) fn process_module(
         }
         ModuleState::Shepard(state) => {
             let rate_cv = if !connections[0].is_empty() { Some(inputs[0].channel(0)) } else { None };
-            let sync = if connections.len() > 1 && !connections[1].is_empty() {
+            let pitch_cv = if connections.len() > 1 && !connections[1].is_empty() {
                 Some(inputs[1].channel(0))
             } else {
                 None
             };
+            let sync = if connections.len() > 2 && !connections[2].is_empty() {
+                Some(inputs[2].channel(0))
+            } else {
+                None
+            };
 
-            let shepard_inputs = ShepardInputs { rate_cv, sync };
+            let shepard_inputs = ShepardInputs { rate_cv, pitch_cv, sync };
             let params = ShepardParams {
                 voices: state.voices.slice(frames),
                 rate: state.rate.slice(frames),
                 base_freq: state.base_freq.slice(frames),
                 spread: state.spread.slice(frames),
                 mix: state.mix.slice(frames),
+                waveform: state.waveform.slice(frames),
+                stereo: state.stereo.slice(frames),
+                detune: state.detune.slice(frames),
+                direction: state.direction.slice(frames),
+                risset: state.risset.slice(frames),
+                phase_spread: state.phase_spread.slice(frames),
+                interval: state.interval.slice(frames),
+                tilt: state.tilt.slice(frames),
+                feedback: state.feedback.slice(frames),
+                vibrato: state.vibrato.slice(frames),
+                shimmer: state.shimmer.slice(frames),
             };
 
-            let out = outputs[0].channel_mut(0);
-            state.shepard.process_block(out, shepard_inputs, params);
+            let (left, right) = outputs[0].channels.split_at_mut(1);
+            let out_l = &mut left[0];
+            let out_r = &mut right[0];
+            state.shepard.process_block_stereo(out_l, out_r, shepard_inputs, params);
         }
         ModuleState::Notes => {
             // UI-only module, no audio processing

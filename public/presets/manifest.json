@@ -563,9 +563,121 @@
     },
     {
       "id": "shepard-test",
-      "name": "Shepard Test",
-      "description": "Shepard tone generator with spectrogram scope for testing.",
+      "name": "Shepard Basic",
+      "description": "Classic Shepard tone - endless rising/falling pitch illusion.",
       "file": "shepard-test.json",
+      "group": "Shepard"
+    },
+    {
+      "id": "shepard-fifths",
+      "name": "Shepard Fifths",
+      "description": "Shepard tone using perfect fifth intervals - more harmonic and musical.",
+      "file": "shepard-fifths.json",
+      "group": "Shepard"
+    },
+    {
+      "id": "shepard-barber",
+      "name": "Barber Pole",
+      "description": "Intense barber pole effect with feedback and fast rate - hypnotic spiral.",
+      "file": "shepard-barber.json",
+      "group": "Shepard"
+    },
+    {
+      "id": "shepard-dark",
+      "name": "Shepard Dark",
+      "description": "Deep descending Shepard with bass emphasis - ominous and cinematic.",
+      "file": "shepard-dark.json",
+      "group": "Shepard"
+    },
+    {
+      "id": "shepard-ethereal",
+      "name": "Shepard Ethereal",
+      "description": "Dreamy ascending Shepard with phase spread - ambient texture.",
+      "file": "shepard-ethereal.json",
+      "group": "Shepard"
+    },
+    {
+      "id": "shepard-organic",
+      "name": "Shepard Organic",
+      "description": "Living, breathing Shepard with vibrato and shimmer.",
+      "file": "shepard-organic.json",
+      "group": "Shepard"
+    },
+    {
+      "id": "shepard-cosmic",
+      "name": "Shepard Cosmic",
+      "description": "Deep space ambience with fifth intervals and shimmering stars.",
+      "file": "shepard-cosmic.json",
+      "group": "Shepard"
+    },
+    {
+      "id": "shepard-horror",
+      "name": "Shepard Horror",
+      "description": "Dissonant, unsettling atmosphere with third intervals.",
+      "file": "shepard-horror.json",
+      "group": "Shepard"
+    },
+    {
+      "id": "shepard-glitter",
+      "name": "Shepard Glitter",
+      "description": "Sparkling crystalline texture with maximum shimmer.",
+      "file": "shepard-glitter.json",
+      "group": "Shepard"
+    },
+    {
+      "id": "shepard-meditation",
+      "name": "Shepard Meditation",
+      "description": "Slow, calming drone with gentle vibrato for relaxation.",
+      "file": "shepard-meditation.json",
+      "group": "Shepard"
+    },
+    {
+      "id": "shepard-orchestra",
+      "name": "Shepard Orchestra",
+      "description": "Three layered Shepards (bass/mid/treble) - infinite orchestral ascension.",
+      "file": "shepard-orchestra.json",
+      "group": "Shepard"
+    },
+    {
+      "id": "shepard-cathedral",
+      "name": "Shepard Cathedral",
+      "description": "Four Shepards in contrary motion - infinite cathedral organ.",
+      "file": "shepard-cathedral.json",
+      "group": "Shepard"
+    },
+    {
+      "id": "shepard-universe",
+      "name": "Shepard Universe",
+      "description": "Five Shepards (Earth/Water/Fire/Air/Ether) - cosmic symphony.",
+      "file": "shepard-universe.json",
+      "group": "Shepard"
+    },
+    {
+      "id": "shepard-celestial",
+      "name": "Shepard Celestial",
+      "description": "Three high-frequency Shepards - angelic, crystalline atmosphere.",
+      "file": "shepard-celestial.json",
+      "group": "Shepard"
+    },
+    {
+      "id": "shepard-morphing",
+      "name": "Shepard Morphing",
+      "description": "Low and high Shepards crossfading via LFOs - spectrum that breathes.",
+      "file": "shepard-morphing.json",
+      "group": "Shepard"
+    },
+    {
+      "id": "shepard-chaos",
+      "name": "Shepard Chaos",
+      "description": "Sample & Hold driven crossfade - unpredictable spectral shifts.",
+      "file": "shepard-chaos.json",
+      "group": "Shepard"
+    },
+    {
+      "id": "shepard-infinity",
+      "name": "Shepard Infinity",
+      "description": "Five Shepards with cross-modulation, sweeping filter, and granular chaos.",
+      "file": "shepard-infinity.json",
       "group": "Shepard"
     }
   ]

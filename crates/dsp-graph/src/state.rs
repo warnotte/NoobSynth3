@@ -101,6 +101,17 @@ pub struct ShepardState {
     pub base_freq: ParamBuffer,
     pub spread: ParamBuffer,
     pub mix: ParamBuffer,
+    pub waveform: ParamBuffer,
+    pub stereo: ParamBuffer,
+    pub detune: ParamBuffer,
+    pub direction: ParamBuffer,
+    pub risset: ParamBuffer,
+    pub phase_spread: ParamBuffer,
+    pub interval: ParamBuffer,
+    pub tilt: ParamBuffer,
+    pub feedback: ParamBuffer,
+    pub vibrato: ParamBuffer,
+    pub shimmer: ParamBuffer,
 }
 
 // =============================================================================

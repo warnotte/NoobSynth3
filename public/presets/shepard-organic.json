@@ -1,0 +1,98 @@
+{
+  "id": "shepard-organic",
+  "name": "Shepard Organic",
+  "description": "Living, breathing Shepard with vibrato and shimmer - like a choir in motion",
+  "group": "Shepard",
+  "graph": {
+    "modules": [
+      {
+        "id": "shep1",
+        "type": "shepard",
+        "params": {
+          "voices": 10,
+          "rate": 0.05,
+          "baseFreq": 165,
+          "spread": 1.2,
+          "mix": 1.0,
+          "waveform": 0,
+          "stereo": 0.8,
+          "detune": 8,
+          "direction": 0,
+          "risset": false,
+          "phaseSpread": 0.4,
+          "interval": 0,
+          "tilt": 0,
+          "feedback": 0.15,
+          "vibrato": 0.3,
+          "shimmer": 0.5
+        },
+        "position": { "col": 1, "row": 1 }
+      },
+      {
+        "id": "chorus1",
+        "type": "chorus",
+        "params": {
+          "rate": 0.5,
+          "depth": 0.3,
+          "delay": 12,
+          "mix": 0.25,
+          "feedback": 0.1,
+          "spread": 0.9
+        },
+        "position": { "col": 3, "row": 1 }
+      },
+      {
+        "id": "reverb1",
+        "type": "reverb",
+        "params": {
+          "time": 3.5,
+          "damp": 0.5,
+          "preDelay": 0.04,
+          "mix": 0.35
+        },
+        "position": { "col": 5, "row": 1 }
+      },
+      {
+        "id": "scope1",
+        "type": "scope",
+        "params": {
+          "mode": "spectrogram",
+          "timeScale": 1,
+          "gain": 1
+        },
+        "position": { "col": 7, "row": 1 },
+        "size": "3x3"
+      },
+      {
+        "id": "out1",
+        "type": "output",
+        "params": {
+          "level": 0.45
+        },
+        "position": { "col": 10, "row": 1 }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "shep1", "portId": "out" },
+        "to": { "moduleId": "chorus1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "chorus1", "portId": "out" },
+        "to": { "moduleId": "reverb1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb1", "portId": "out" },
+        "to": { "moduleId": "scope1", "portId": "in-a" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "scope1", "portId": "out-a" },
+        "to": { "moduleId": "out1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "id": "shepard-cosmic",
+  "name": "Shepard Cosmic",
+  "description": "Deep space ambience with fifth intervals and shimmering stars",
+  "group": "Shepard",
+  "graph": {
+    "modules": [
+      {
+        "id": "shep1",
+        "type": "shepard",
+        "params": {
+          "voices": 12,
+          "rate": 0.03,
+          "baseFreq": 82,
+          "spread": 1.5,
+          "mix": 1.0,
+          "waveform": 0,
+          "stereo": 1.0,
+          "detune": 5,
+          "direction": 2,
+          "risset": false,
+          "phaseSpread": 0.7,
+          "interval": 1,
+          "tilt": -0.3,
+          "feedback": 0.25,
+          "vibrato": 0.15,
+          "shimmer": 0.7
+        },
+        "position": { "col": 1, "row": 1 }
+      },
+      {
+        "id": "delay1",
+        "type": "delay",
+        "params": {
+          "time": 0.35,
+          "feedback": 0.4,
+          "mix": 0.2,
+          "tone": 0.4,
+          "pingPong": 1
+        },
+        "position": { "col": 3, "row": 1 }
+      },
+      {
+        "id": "reverb1",
+        "type": "reverb",
+        "params": {
+          "time": 8.0,
+          "damp": 0.3,
+          "preDelay": 0.1,
+          "mix": 0.55
+        },
+        "position": { "col": 5, "row": 1 }
+      },
+      {
+        "id": "scope1",
+        "type": "scope",
+        "params": {
+          "mode": "spectrogram",
+          "timeScale": 1,
+          "gain": 1
+        },
+        "position": { "col": 7, "row": 1 },
+        "size": "3x3"
+      },
+      {
+        "id": "out1",
+        "type": "output",
+        "params": {
+          "level": 0.4
+        },
+        "position": { "col": 10, "row": 1 }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "shep1", "portId": "out" },
+        "to": { "moduleId": "delay1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "delay1", "portId": "out" },
+        "to": { "moduleId": "reverb1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb1", "portId": "out" },
+        "to": { "moduleId": "scope1", "portId": "in-a" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "scope1", "portId": "out-a" },
+        "to": { "moduleId": "out1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

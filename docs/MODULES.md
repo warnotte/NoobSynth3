@@ -106,9 +106,9 @@ Générateur de bruit.
 
 ### Shepard
 
-Générateur de ton Shepard - illusion auditive d'une montée ou descente infinie.
+Générateur de ton Shepard/Risset - illusion auditive d'une montée ou descente infinie.
 
-Le module utilise plusieurs oscillateurs sinusoïdaux espacés d'une octave. Chaque voix monte (ou descend) progressivement en fréquence, avec une amplitude contrôlée par une courbe gaussienne : forte au centre du spectre, quasi-nulle aux extrêmes. Quand une voix atteint le haut, elle réapparaît en bas à amplitude quasi-nulle, créant l'illusion de continuité.
+Le module utilise plusieurs oscillateurs espacés d'une octave (ou autre intervalle). Chaque voix monte (ou descend) progressivement en fréquence, avec une amplitude contrôlée par une courbe gaussienne : forte au centre du spectre, quasi-nulle aux extrêmes. Quand une voix atteint le haut, elle réapparaît en bas à amplitude quasi-nulle, créant l'illusion de continuité.
 
 | Paramètre | Range | Description |
 |-----------|-------|-------------|
@@ -117,16 +117,56 @@ Le module utilise plusieurs oscillateurs sinusoïdaux espacés d'une octave. Cha
 | `baseFreq` | 55-880 Hz | Fréquence centrale |
 | `spread` | 0.5-2 | Largeur de l'enveloppe gaussienne |
 | `mix` | 0-1 | Niveau de sortie |
+| `waveform` | 0-3 | Forme d'onde (0=sine, 1=tri, 2=saw, 3=square) |
+| `stereo` | 0-1 | Écart stéréo (0=mono, 1=full) |
+| `detune` | 0-50 ct | Désaccord entre les voix (cents) |
+| `direction` | 0-3 | Mode (0=up, 1=down, 2=alternate, 3=random) |
+| `risset` | bool | Mode Risset (quantifié en demi-tons) |
+| `phaseSpread` | 0-1 | Décalage de phase entre voix (0=cohérent, 1=random) |
+| `interval` | 0-3 | Intervalle harmonique (0=octave, 1=quinte, 2=quarte, 3=tierce) |
+| `tilt` | -1 à +1 | Emphase spectrale (-1=basses, 0=neutre, +1=aigus) |
+| `feedback` | 0-0.9 | Rétroaction interne (effet barber pole) |
+| `vibrato` | 0-1 | Profondeur du vibrato par voix (en demi-tons) |
+| `shimmer` | 0-1 | Variations d'amplitude aléatoires (scintillement) |
 
-**Entrées** : rate-cv (CV), sync (sync - reset des voix)
-**Sorties** : out (audio)
+**Entrées** : rate-cv (CV), pitch-cv (1V/oct), sync (sync - reset des voix)
+**Sorties** : out (audio stéréo)
+
+**Modes de direction :**
+- **UP** : toutes les voix montent ensemble (Shepard classique)
+- **DOWN** : toutes les voix descendent
+- **ALTERNATE** : voix paires montent, impaires descendent
+- **RANDOM** : direction aléatoire par voix
+
+**Modes d'intervalle :**
+- **Octave** : espacement classique x2 (Shepard traditionnel)
+- **Quinte** : espacement x1.5 (son plus harmonique/musical)
+- **Quarte** : espacement x1.333 (couleur différente)
+- **Tierce** : espacement x1.25 (plus dissonant, idéal pour ambiances sombres)
+
+**Mode Risset :**
+Quantifie les positions en demi-tons pour un effet de glissando discret au lieu d'un glissement continu. Produit un effet "escalier infini" plus prononcé.
 
 **Conseils :**
 - **Rate lent** (0.05-0.2) : effet hypnotique, idéal pour ambiances
 - **Rate rapide** (1-4) : effet plus dramatique, tension
 - **Spread bas** (0.5-0.8) : spectre plus concentré, effet plus net
 - **Spread haut** (1.5-2) : spectre plus large, effet plus diffus
+- **Detune** : ajoute du "chorus" entre les voix, plus riche
+- **Stereo** : répartit les voix dans le champ stéréo (stable par index de voix)
 - **Sync** : connecter une clock pour resynchroniser périodiquement
+- **Phase Spread** : décorrèle les phases pour un son plus riche/large
+- **Tilt** : sculpter le spectre (négatif = basses profondes, positif = brillant)
+- **Feedback** : ajoute de la résonance et de la densité
+- **Vibrato** : rend le son plus organique et vivant
+- **Shimmer** : ajoute du scintillement, idéal pour textures cristallines
+
+**Presets Shepard (18 au total) :**
+- **Basic, Fifths, Barber** - Presets fondamentaux
+- **Dark, Ethereal, Meditation** - Atmosphères
+- **Organic, Cosmic, Glitter, Horror** - Textures
+- **Orchestra, Cathedral, Universe, Celestial** - Multi-couches (3-5 Shepards)
+- **Morphing, Chaos, Infinity** - Modulation dynamique via LFO/S&H
 
 ### TB-303
 
