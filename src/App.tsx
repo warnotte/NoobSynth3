@@ -430,7 +430,8 @@ function App() {
       if (!isTauri || !tauriNativeRunning) {
         return
       }
-      if (nativeGraphSyncRef.current.lastSignature === signature) {
+      // Skip signature check when immediate (preset load) - params may differ with same structure
+      if (!options?.immediate && nativeGraphSyncRef.current.lastSignature === signature) {
         return
       }
       const runSync = () => {
@@ -481,7 +482,8 @@ function App() {
         vstGraphSyncRef.current.lastSignature = signature
         return
       }
-      if (vstGraphSyncRef.current.lastSignature === signature) {
+      // Skip signature check when immediate (preset load) - params may differ with same structure
+      if (!options?.immediate && vstGraphSyncRef.current.lastSignature === signature) {
         return
       }
       const runSync = () => {

@@ -284,7 +284,80 @@ Presets stockés dans `public/presets/` avec structure:
 }
 ```
 
-Groupes existants: Basics, Leads, Bass, Pads, FX, Drums, 8-Bit, Experimental
+Groupes existants: Basics, Leads, Bass, Pads, FX, Drums, 8-Bit, Experimental, Shepard
+
+### Preset Creation Guidelines
+
+**Module Definition Requirements:**
+```json
+{
+  "id": "unique-module-id",
+  "type": "module-type",
+  "name": "Display Name",       // REQUIRED: Shown in module header
+  "params": { ... },
+  "position": { "col": 1, "row": 1 }
+}
+```
+
+**Parameter Value Types (IMPORTANT):**
+
+Ces paramètres utilisent des **valeurs string**, pas des nombres :
+
+| Module | Paramètre | Valeurs acceptées |
+|--------|-----------|-------------------|
+| LFO | `shape` | `"sine"`, `"triangle"`, `"sawtooth"`, `"square"` |
+| VCF | `model` | `"svf"`, `"ladder"` |
+| VCF | `mode` | `"lp"`, `"hp"`, `"bp"`, `"notch"` |
+
+Ces paramètres utilisent des **valeurs numériques** :
+
+| Module | Paramètre | Valeurs acceptées |
+|--------|-----------|-------------------|
+| VCF | `slope` | `12` ou `24` (dB/oct) |
+
+**Exemple VCF correct :**
+```json
+{
+  "id": "vcf1",
+  "type": "vcf",
+  "name": "VCF",
+  "params": {
+    "cutoff": 2000,
+    "resonance": 0.3,
+    "drive": 0.1,
+    "model": "svf",      // String, pas 0
+    "mode": "lp",        // String, pas 0
+    "slope": 24          // Number
+  }
+}
+```
+
+**Exemple LFO correct :**
+```json
+{
+  "id": "lfo1",
+  "type": "lfo",
+  "name": "LFO",
+  "params": {
+    "rate": 0.5,
+    "shape": "sine",     // String, pas 0
+    "depth": 1,
+    "offset": 0,
+    "bipolar": true
+  }
+}
+```
+
+### Routing Best Practices
+
+**Oscilloscope :** Utiliser comme tap de monitoring, pas dans la chaîne audio :
+
+```
+✅ Correct: reverb → output  AND  reverb → scope (tap parallèle)
+❌ Incorrect: reverb → scope → output (scope dans la chaîne)
+```
+
+**Output Level :** Mettre `"level": 1` pour volume maximum par défaut
 
 ---
 
