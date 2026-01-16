@@ -13,7 +13,7 @@
           "rate": 0.06,
           "baseFreq": 55,
           "spread": 1.5,
-          "mix": 1.0,
+          "mix": 1,
           "waveform": 2,
           "stereo": 0.4,
           "detune": 0.01,
@@ -26,7 +26,10 @@
           "vibrato": 0,
           "shimmer": 0
         },
-        "position": { "col": 1, "row": 1 }
+        "position": {
+          "col": 1,
+          "row": 1
+        }
       },
       {
         "id": "vcf1",
@@ -42,18 +45,24 @@
           "mode": 0,
           "slope": 1
         },
-        "position": { "col": 3, "row": 1 }
+        "position": {
+          "col": 3,
+          "row": 1
+        }
       },
       {
         "id": "reverb1",
         "type": "reverb",
         "params": {
-          "time": 4.0,
+          "time": 4,
           "damp": 0.6,
           "preDelay": 0.05,
           "mix": 0.4
         },
-        "position": { "col": 5, "row": 1 }
+        "position": {
+          "col": 5,
+          "row": 1
+        }
       },
       {
         "id": "scope1",
@@ -63,37 +72,67 @@
           "timeScale": 1,
           "gain": 1
         },
-        "position": { "col": 7, "row": 1 },
+        "position": {
+          "col": 7,
+          "row": 1
+        },
         "size": "3x3"
       },
       {
         "id": "out1",
         "type": "output",
         "params": {
-          "level": 0.55
+          "level": 1
         },
-        "position": { "col": 10, "row": 1 }
+        "position": {
+          "col": 10,
+          "row": 1
+        }
       }
     ],
     "connections": [
       {
-        "from": { "moduleId": "shep1", "portId": "out" },
-        "to": { "moduleId": "vcf1", "portId": "in" },
+        "from": {
+          "moduleId": "shep1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "vcf1",
+          "portId": "in"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "vcf1", "portId": "out" },
-        "to": { "moduleId": "reverb1", "portId": "in" },
+        "from": {
+          "moduleId": "vcf1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "reverb1",
+          "portId": "in"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "reverb1", "portId": "out" },
-        "to": { "moduleId": "scope1", "portId": "in-a" },
+        "from": {
+          "moduleId": "reverb1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "scope1",
+          "portId": "in-a"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "scope1", "portId": "out-a" },
-        "to": { "moduleId": "out1", "portId": "in" },
+        "from": {
+          "moduleId": "reverb1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "out1",
+          "portId": "in"
+        },
         "kind": "audio"
       }
     ]

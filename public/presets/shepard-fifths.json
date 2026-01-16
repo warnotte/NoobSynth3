@@ -13,7 +13,7 @@
           "rate": 0.08,
           "baseFreq": 110,
           "spread": 1.2,
-          "mix": 1.0,
+          "mix": 1,
           "waveform": 0,
           "stereo": 0.7,
           "detune": 0.02,
@@ -26,7 +26,10 @@
           "vibrato": 0,
           "shimmer": 0
         },
-        "position": { "col": 1, "row": 1 }
+        "position": {
+          "col": 1,
+          "row": 1
+        }
       },
       {
         "id": "chorus1",
@@ -39,7 +42,10 @@
           "feedback": 0.1,
           "spread": 0.8
         },
-        "position": { "col": 3, "row": 1 }
+        "position": {
+          "col": 3,
+          "row": 1
+        }
       },
       {
         "id": "scope1",
@@ -49,32 +55,56 @@
           "timeScale": 1,
           "gain": 1
         },
-        "position": { "col": 5, "row": 1 },
+        "position": {
+          "col": 5,
+          "row": 1
+        },
         "size": "3x3"
       },
       {
         "id": "out1",
         "type": "output",
         "params": {
-          "level": 0.5
+          "level": 1
         },
-        "position": { "col": 8, "row": 1 }
+        "position": {
+          "col": 8,
+          "row": 1
+        }
       }
     ],
     "connections": [
       {
-        "from": { "moduleId": "shep1", "portId": "out" },
-        "to": { "moduleId": "chorus1", "portId": "in" },
+        "from": {
+          "moduleId": "shep1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "chorus1",
+          "portId": "in"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "chorus1", "portId": "out" },
-        "to": { "moduleId": "scope1", "portId": "in-a" },
+        "from": {
+          "moduleId": "chorus1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "scope1",
+          "portId": "in-a"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "scope1", "portId": "out-a" },
-        "to": { "moduleId": "out1", "portId": "in" },
+        "from": {
+          "moduleId": "chorus1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "out1",
+          "portId": "in"
+        },
         "kind": "audio"
       }
     ]

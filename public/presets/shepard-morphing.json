@@ -13,7 +13,7 @@
           "rate": 0.025,
           "baseFreq": 41,
           "spread": 1.4,
-          "mix": 1.0,
+          "mix": 1,
           "waveform": 0,
           "stereo": 0.2,
           "detune": 3,
@@ -26,7 +26,10 @@
           "vibrato": 0.08,
           "shimmer": 0.1
         },
-        "position": { "col": 1, "row": 1 }
+        "position": {
+          "col": 1,
+          "row": 1
+        }
       },
       {
         "id": "shep-bass",
@@ -36,7 +39,7 @@
           "rate": 0.04,
           "baseFreq": 82,
           "spread": 1.2,
-          "mix": 1.0,
+          "mix": 1,
           "waveform": 0,
           "stereo": 0.4,
           "detune": 4,
@@ -49,7 +52,10 @@
           "vibrato": 0.12,
           "shimmer": 0.15
         },
-        "position": { "col": 1, "row": 2 }
+        "position": {
+          "col": 1,
+          "row": 2
+        }
       },
       {
         "id": "shep-high",
@@ -59,7 +65,7 @@
           "rate": 0.08,
           "baseFreq": 660,
           "spread": 0.9,
-          "mix": 1.0,
+          "mix": 1,
           "waveform": 1,
           "stereo": 0.9,
           "detune": 8,
@@ -72,7 +78,10 @@
           "vibrato": 0.35,
           "shimmer": 0.6
         },
-        "position": { "col": 1, "row": 3 }
+        "position": {
+          "col": 1,
+          "row": 3
+        }
       },
       {
         "id": "shep-crystal",
@@ -82,9 +91,9 @@
           "rate": 0.12,
           "baseFreq": 1320,
           "spread": 0.8,
-          "mix": 1.0,
+          "mix": 1,
           "waveform": 0,
-          "stereo": 1.0,
+          "stereo": 1,
           "detune": 10,
           "direction": 0,
           "risset": false,
@@ -95,7 +104,10 @@
           "vibrato": 0.45,
           "shimmer": 0.8
         },
-        "position": { "col": 1, "row": 4 }
+        "position": {
+          "col": 1,
+          "row": 4
+        }
       },
       {
         "id": "mix-low",
@@ -104,7 +116,10 @@
           "levelA": 0.5,
           "levelB": 0.5
         },
-        "position": { "col": 3, "row": 1 }
+        "position": {
+          "col": 3,
+          "row": 1
+        }
       },
       {
         "id": "mix-high",
@@ -113,7 +128,10 @@
           "levelA": 0.5,
           "levelB": 0.5
         },
-        "position": { "col": 3, "row": 3 }
+        "position": {
+          "col": 3,
+          "row": 3
+        }
       },
       {
         "id": "lfo-low",
@@ -125,7 +143,10 @@
           "offset": 0.5,
           "bipolar": false
         },
-        "position": { "col": 5, "row": 2 }
+        "position": {
+          "col": 5,
+          "row": 2
+        }
       },
       {
         "id": "lfo-high",
@@ -137,7 +158,10 @@
           "offset": 0.5,
           "bipolar": false
         },
-        "position": { "col": 5, "row": 4 }
+        "position": {
+          "col": 5,
+          "row": 4
+        }
       },
       {
         "id": "vca-low",
@@ -145,7 +169,10 @@
         "params": {
           "gain": 1
         },
-        "position": { "col": 5, "row": 1 }
+        "position": {
+          "col": 5,
+          "row": 1
+        }
       },
       {
         "id": "vca-high",
@@ -153,7 +180,10 @@
         "params": {
           "gain": 1
         },
-        "position": { "col": 5, "row": 3 }
+        "position": {
+          "col": 5,
+          "row": 3
+        }
       },
       {
         "id": "mix-main",
@@ -162,7 +192,10 @@
           "levelA": 0.6,
           "levelB": 0.5
         },
-        "position": { "col": 7, "row": 1 }
+        "position": {
+          "col": 7,
+          "row": 1
+        }
       },
       {
         "id": "ensemble1",
@@ -172,20 +205,26 @@
           "depth": 0.35,
           "delay": 15,
           "mix": 0.25,
-          "spread": 1.0
+          "spread": 1
         },
-        "position": { "col": 9, "row": 1 }
+        "position": {
+          "col": 9,
+          "row": 1
+        }
       },
       {
         "id": "reverb1",
         "type": "reverb",
         "params": {
-          "time": 7.0,
+          "time": 7,
           "damp": 0.3,
           "preDelay": 0.08,
           "mix": 0.5
         },
-        "position": { "col": 11, "row": 1 }
+        "position": {
+          "col": 11,
+          "row": 1
+        }
       },
       {
         "id": "scope1",
@@ -195,87 +234,177 @@
           "timeScale": 1,
           "gain": 1
         },
-        "position": { "col": 13, "row": 1 },
+        "position": {
+          "col": 13,
+          "row": 1
+        },
         "size": "3x3"
       },
       {
         "id": "out1",
         "type": "output",
         "params": {
-          "level": 0.4
+          "level": 1
         },
-        "position": { "col": 16, "row": 1 }
+        "position": {
+          "col": 16,
+          "row": 1
+        }
       }
     ],
     "connections": [
       {
-        "from": { "moduleId": "shep-sub", "portId": "out" },
-        "to": { "moduleId": "mix-low", "portId": "in-a" },
+        "from": {
+          "moduleId": "shep-sub",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mix-low",
+          "portId": "in-a"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "shep-bass", "portId": "out" },
-        "to": { "moduleId": "mix-low", "portId": "in-b" },
+        "from": {
+          "moduleId": "shep-bass",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mix-low",
+          "portId": "in-b"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "shep-high", "portId": "out" },
-        "to": { "moduleId": "mix-high", "portId": "in-a" },
+        "from": {
+          "moduleId": "shep-high",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mix-high",
+          "portId": "in-a"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "shep-crystal", "portId": "out" },
-        "to": { "moduleId": "mix-high", "portId": "in-b" },
+        "from": {
+          "moduleId": "shep-crystal",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mix-high",
+          "portId": "in-b"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "mix-low", "portId": "out" },
-        "to": { "moduleId": "vca-low", "portId": "in" },
+        "from": {
+          "moduleId": "mix-low",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "vca-low",
+          "portId": "in"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "mix-high", "portId": "out" },
-        "to": { "moduleId": "vca-high", "portId": "in" },
+        "from": {
+          "moduleId": "mix-high",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "vca-high",
+          "portId": "in"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "lfo-low", "portId": "cv-out" },
-        "to": { "moduleId": "vca-low", "portId": "cv" },
+        "from": {
+          "moduleId": "lfo-low",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "vca-low",
+          "portId": "cv"
+        },
         "kind": "cv"
       },
       {
-        "from": { "moduleId": "lfo-high", "portId": "cv-out" },
-        "to": { "moduleId": "vca-high", "portId": "cv" },
+        "from": {
+          "moduleId": "lfo-high",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "vca-high",
+          "portId": "cv"
+        },
         "kind": "cv"
       },
       {
-        "from": { "moduleId": "vca-low", "portId": "out" },
-        "to": { "moduleId": "mix-main", "portId": "in-a" },
+        "from": {
+          "moduleId": "vca-low",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mix-main",
+          "portId": "in-a"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "vca-high", "portId": "out" },
-        "to": { "moduleId": "mix-main", "portId": "in-b" },
+        "from": {
+          "moduleId": "vca-high",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mix-main",
+          "portId": "in-b"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "mix-main", "portId": "out" },
-        "to": { "moduleId": "ensemble1", "portId": "in" },
+        "from": {
+          "moduleId": "mix-main",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "ensemble1",
+          "portId": "in"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "ensemble1", "portId": "out" },
-        "to": { "moduleId": "reverb1", "portId": "in" },
+        "from": {
+          "moduleId": "ensemble1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "reverb1",
+          "portId": "in"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "reverb1", "portId": "out" },
-        "to": { "moduleId": "scope1", "portId": "in-a" },
+        "from": {
+          "moduleId": "reverb1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "scope1",
+          "portId": "in-a"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "scope1", "portId": "out-a" },
-        "to": { "moduleId": "out1", "portId": "in" },
+        "from": {
+          "moduleId": "reverb1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "out1",
+          "portId": "in"
+        },
         "kind": "audio"
       }
     ]

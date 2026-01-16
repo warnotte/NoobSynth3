@@ -73,7 +73,7 @@
         "id": "out1",
         "type": "output",
         "params": {
-          "level": 0.45
+          "level": 1.0
         },
         "position": { "col": 9, "row": 1 }
       }

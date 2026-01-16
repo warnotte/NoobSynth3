@@ -13,7 +13,7 @@
           "rate": 0.02,
           "baseFreq": 32,
           "spread": 1.5,
-          "mix": 1.0,
+          "mix": 1,
           "waveform": 0,
           "stereo": 0.2,
           "detune": 2,
@@ -26,7 +26,10 @@
           "vibrato": 0.05,
           "shimmer": 0.1
         },
-        "position": { "col": 1, "row": 1 }
+        "position": {
+          "col": 1,
+          "row": 1
+        }
       },
       {
         "id": "shep-low",
@@ -36,7 +39,7 @@
           "rate": 0.04,
           "baseFreq": 82,
           "spread": 1.2,
-          "mix": 1.0,
+          "mix": 1,
           "waveform": 0,
           "stereo": 0.4,
           "detune": 4,
@@ -49,7 +52,10 @@
           "vibrato": 0.15,
           "shimmer": 0.2
         },
-        "position": { "col": 1, "row": 2 }
+        "position": {
+          "col": 1,
+          "row": 2
+        }
       },
       {
         "id": "shep-mid",
@@ -58,8 +64,8 @@
           "voices": 8,
           "rate": 0.06,
           "baseFreq": 262,
-          "spread": 1.0,
-          "mix": 1.0,
+          "spread": 1,
+          "mix": 1,
           "waveform": 0,
           "stereo": 0.7,
           "detune": 6,
@@ -72,7 +78,10 @@
           "vibrato": 0.3,
           "shimmer": 0.35
         },
-        "position": { "col": 1, "row": 3 }
+        "position": {
+          "col": 1,
+          "row": 3
+        }
       },
       {
         "id": "shep-air",
@@ -82,9 +91,9 @@
           "rate": 0.1,
           "baseFreq": 880,
           "spread": 0.9,
-          "mix": 1.0,
+          "mix": 1,
           "waveform": 1,
-          "stereo": 1.0,
+          "stereo": 1,
           "detune": 10,
           "direction": 0,
           "risset": false,
@@ -95,7 +104,10 @@
           "vibrato": 0.4,
           "shimmer": 0.7
         },
-        "position": { "col": 1, "row": 4 }
+        "position": {
+          "col": 1,
+          "row": 4
+        }
       },
       {
         "id": "mix1",
@@ -108,7 +120,10 @@
           "levelE": 0.3,
           "levelF": 0.3
         },
-        "position": { "col": 3, "row": 1 }
+        "position": {
+          "col": 3,
+          "row": 1
+        }
       },
       {
         "id": "spring1",
@@ -119,18 +134,24 @@
           "mix": 0.15,
           "drive": 0.1
         },
-        "position": { "col": 5, "row": 1 }
+        "position": {
+          "col": 5,
+          "row": 1
+        }
       },
       {
         "id": "reverb1",
         "type": "reverb",
         "params": {
-          "time": 9.0,
+          "time": 9,
           "damp": 0.3,
           "preDelay": 0.1,
           "mix": 0.55
         },
-        "position": { "col": 7, "row": 1 }
+        "position": {
+          "col": 7,
+          "row": 1
+        }
       },
       {
         "id": "scope1",
@@ -140,57 +161,111 @@
           "timeScale": 1,
           "gain": 1
         },
-        "position": { "col": 9, "row": 1 },
+        "position": {
+          "col": 9,
+          "row": 1
+        },
         "size": "3x3"
       },
       {
         "id": "out1",
         "type": "output",
         "params": {
-          "level": 0.35
+          "level": 1
         },
-        "position": { "col": 12, "row": 1 }
+        "position": {
+          "col": 12,
+          "row": 1
+        }
       }
     ],
     "connections": [
       {
-        "from": { "moduleId": "shep-sub", "portId": "out" },
-        "to": { "moduleId": "mix1", "portId": "in-a" },
+        "from": {
+          "moduleId": "shep-sub",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mix1",
+          "portId": "in-a"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "shep-low", "portId": "out" },
-        "to": { "moduleId": "mix1", "portId": "in-b" },
+        "from": {
+          "moduleId": "shep-low",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mix1",
+          "portId": "in-b"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "shep-mid", "portId": "out" },
-        "to": { "moduleId": "mix1", "portId": "in-c" },
+        "from": {
+          "moduleId": "shep-mid",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mix1",
+          "portId": "in-c"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "shep-air", "portId": "out" },
-        "to": { "moduleId": "mix1", "portId": "in-d" },
+        "from": {
+          "moduleId": "shep-air",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mix1",
+          "portId": "in-d"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "mix1", "portId": "out" },
-        "to": { "moduleId": "spring1", "portId": "in" },
+        "from": {
+          "moduleId": "mix1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "spring1",
+          "portId": "in"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "spring1", "portId": "out" },
-        "to": { "moduleId": "reverb1", "portId": "in" },
+        "from": {
+          "moduleId": "spring1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "reverb1",
+          "portId": "in"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "reverb1", "portId": "out" },
-        "to": { "moduleId": "scope1", "portId": "in-a" },
+        "from": {
+          "moduleId": "reverb1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "scope1",
+          "portId": "in-a"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "scope1", "portId": "out-a" },
-        "to": { "moduleId": "out1", "portId": "in" },
+        "from": {
+          "moduleId": "reverb1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "out1",
+          "portId": "in"
+        },
         "kind": "audio"
       }
     ]

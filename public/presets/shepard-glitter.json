@@ -12,21 +12,24 @@
           "voices": 12,
           "rate": 0.15,
           "baseFreq": 440,
-          "spread": 1.0,
-          "mix": 1.0,
+          "spread": 1,
+          "mix": 1,
           "waveform": 1,
-          "stereo": 1.0,
+          "stereo": 1,
           "detune": 3,
           "direction": 0,
           "risset": false,
-          "phaseSpread": 1.0,
+          "phaseSpread": 1,
           "interval": 2,
           "tilt": 0.5,
           "feedback": 0.1,
           "vibrato": 0.2,
           "shimmer": 0.9
         },
-        "position": { "col": 1, "row": 1 }
+        "position": {
+          "col": 1,
+          "row": 1
+        }
       },
       {
         "id": "hpf1",
@@ -34,7 +37,10 @@
         "params": {
           "cutoff": 400
         },
-        "position": { "col": 3, "row": 1 }
+        "position": {
+          "col": 3,
+          "row": 1
+        }
       },
       {
         "id": "phaser1",
@@ -45,7 +51,10 @@
           "feedback": 0.4,
           "mix": 0.4
         },
-        "position": { "col": 5, "row": 1 }
+        "position": {
+          "col": 5,
+          "row": 1
+        }
       },
       {
         "id": "reverb1",
@@ -56,7 +65,10 @@
           "preDelay": 0.03,
           "mix": 0.5
         },
-        "position": { "col": 7, "row": 1 }
+        "position": {
+          "col": 7,
+          "row": 1
+        }
       },
       {
         "id": "scope1",
@@ -66,42 +78,78 @@
           "timeScale": 1,
           "gain": 1
         },
-        "position": { "col": 9, "row": 1 },
+        "position": {
+          "col": 9,
+          "row": 1
+        },
         "size": "3x3"
       },
       {
         "id": "out1",
         "type": "output",
         "params": {
-          "level": 0.35
+          "level": 1
         },
-        "position": { "col": 12, "row": 1 }
+        "position": {
+          "col": 12,
+          "row": 1
+        }
       }
     ],
     "connections": [
       {
-        "from": { "moduleId": "shep1", "portId": "out" },
-        "to": { "moduleId": "hpf1", "portId": "in" },
+        "from": {
+          "moduleId": "shep1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "hpf1",
+          "portId": "in"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "hpf1", "portId": "out" },
-        "to": { "moduleId": "phaser1", "portId": "in" },
+        "from": {
+          "moduleId": "hpf1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "phaser1",
+          "portId": "in"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "phaser1", "portId": "out" },
-        "to": { "moduleId": "reverb1", "portId": "in" },
+        "from": {
+          "moduleId": "phaser1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "reverb1",
+          "portId": "in"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "reverb1", "portId": "out" },
-        "to": { "moduleId": "scope1", "portId": "in-a" },
+        "from": {
+          "moduleId": "reverb1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "scope1",
+          "portId": "in-a"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "scope1", "portId": "out-a" },
-        "to": { "moduleId": "out1", "portId": "in" },
+        "from": {
+          "moduleId": "reverb1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "out1",
+          "portId": "in"
+        },
         "kind": "audio"
       }
     ]

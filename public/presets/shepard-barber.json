@@ -13,9 +13,9 @@
           "rate": 0.25,
           "baseFreq": 165,
           "spread": 0.9,
-          "mix": 1.0,
+          "mix": 1,
           "waveform": 1,
-          "stereo": 1.0,
+          "stereo": 1,
           "detune": 0,
           "direction": 0,
           "risset": true,
@@ -26,7 +26,10 @@
           "vibrato": 0,
           "shimmer": 0
         },
-        "position": { "col": 1, "row": 1 }
+        "position": {
+          "col": 1,
+          "row": 1
+        }
       },
       {
         "id": "delay1",
@@ -38,7 +41,10 @@
           "tone": 0.6,
           "pingPong": 1
         },
-        "position": { "col": 3, "row": 1 }
+        "position": {
+          "col": 3,
+          "row": 1
+        }
       },
       {
         "id": "scope1",
@@ -48,32 +54,56 @@
           "timeScale": 1,
           "gain": 1
         },
-        "position": { "col": 5, "row": 1 },
+        "position": {
+          "col": 5,
+          "row": 1
+        },
         "size": "3x3"
       },
       {
         "id": "out1",
         "type": "output",
         "params": {
-          "level": 0.45
+          "level": 1
         },
-        "position": { "col": 8, "row": 1 }
+        "position": {
+          "col": 8,
+          "row": 1
+        }
       }
     ],
     "connections": [
       {
-        "from": { "moduleId": "shep1", "portId": "out" },
-        "to": { "moduleId": "delay1", "portId": "in" },
+        "from": {
+          "moduleId": "shep1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "delay1",
+          "portId": "in"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "delay1", "portId": "out" },
-        "to": { "moduleId": "scope1", "portId": "in-a" },
+        "from": {
+          "moduleId": "delay1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "scope1",
+          "portId": "in-a"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "scope1", "portId": "out-a" },
-        "to": { "moduleId": "out1", "portId": "in" },
+        "from": {
+          "moduleId": "delay1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "out1",
+          "portId": "in"
+        },
         "kind": "audio"
       }
     ]
