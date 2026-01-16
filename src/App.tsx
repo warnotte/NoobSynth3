@@ -5,6 +5,12 @@ import { useModuleDrag } from './hooks/useModuleDrag'
 import { useMarioSequencer } from './hooks/useMarioSequencer'
 import { useMidi } from './hooks/useMidi'
 import { usePatching } from './hooks/usePatching'
+import { useUrlPreset } from './hooks/useUrlPreset'
+import {
+  generatePresetUrl,
+  setUrlPreset,
+  clearUrlShareParams,
+} from './utils/urlSharing'
 import { defaultGraph } from './state/defaultGraph'
 import { loadPresets, type PresetSpec } from './state/presets'
 import { marioSongs } from './state/marioSongs'
@@ -318,6 +324,7 @@ function App() {
   const [presets, setPresets] = useState<PresetSpec[]>([])
   const [presetStatus, setPresetStatus] = useState<'loading' | 'ready' | 'error'>('loading')
   const [presetError, setPresetError] = useState<string | null>(null)
+  const [currentPresetId, setCurrentPresetId] = useState<string | null>(null)
   const [importError, setImportError] = useState<string | null>(null)
   const [gridError, setGridError] = useState<string | null>(null)
   const [tauriStatus, setTauriStatus] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle')
@@ -381,7 +388,15 @@ function App() {
     renderGhostCable,
     resetPatching,
     selectedPortKey,
-  } = usePatching({ graph, rackRef, setGraph })
+  } = usePatching({
+    graph,
+    rackRef,
+    setGraph,
+    onGraphChange: useCallback(() => {
+      setCurrentPresetId(null)
+      clearUrlShareParams()
+    }, []),
+  })
   const isTauri = useMemo(() => {
     if (typeof window === 'undefined') {
       return false
@@ -896,6 +911,11 @@ function App() {
         graphRef.current = next
         return next
       })
+      // Clear preset tracking when params change
+      if (currentPresetId) {
+        setCurrentPresetId(null)
+        clearUrlShareParams()
+      }
 
       if (status === 'running' && !options?.skipEngine) {
         // String params like stepData/drumData go through setParamString
@@ -924,7 +944,7 @@ function App() {
         }
       }
     },
-    [engine, isTauri, isVst, status, tauriNativeRunning, vstConnected],
+    [currentPresetId, engine, isTauri, isVst, status, tauriNativeRunning, vstConnected],
   )
 
   const applyMacroSpecs = useCallback(
@@ -1453,6 +1473,12 @@ function App() {
     updateParam,
   })
 
+  // URL preset/patch sharing
+  const { urlGraph, urlPresetId, clearUrlGraph } = useUrlPreset({
+    presets,
+    presetsReady: presetStatus === 'ready',
+  })
+
   const applyGraphParams = (nextGraph: GraphState) => {
     if (statusRef.current !== 'running') {
       return
@@ -1496,7 +1522,7 @@ function App() {
     void run()
   }
 
-  const applyPreset = (nextGraph: GraphState, options?: { skipVstSync?: boolean }) => {
+  const applyPreset = (nextGraph: GraphState, options?: { skipVstSync?: boolean; presetId?: string }) => {
     const cloned = cloneGraph(nextGraph)
     // Force sequencer OFF when loading presets (prevents auto-start from preset data)
     const controlModule = cloned.modules.find((m) => m.type === 'control')
@@ -1512,6 +1538,14 @@ function App() {
     resetPatching()
     setGridError(null)
     setGraph(layouted)
+    // Update URL and track current preset
+    if (options?.presetId) {
+      setCurrentPresetId(options.presetId)
+      setUrlPreset(options.presetId)
+    } else {
+      setCurrentPresetId(null)
+      clearUrlShareParams()
+    }
     const shouldRestart =
       statusRef.current === 'running' &&
       (!hasSameModuleShape(graphRef.current, layouted) ||
@@ -1538,6 +1572,14 @@ function App() {
       }
     }
   }
+
+  // Apply graph from URL parameters (preset or custom patch)
+  useEffect(() => {
+    if (urlGraph) {
+      applyPreset(urlGraph, { presetId: urlPresetId ?? undefined })
+      clearUrlGraph()
+    }
+  }, [urlGraph, urlPresetId])
 
   const handleExportPreset = useCallback(() => {
     const payload = { version: 1, graph: graphRef.current }
@@ -1893,6 +1935,10 @@ function App() {
   const modeLabel = audioMode === 'vst' ? 'VST Mode' : audioMode === 'native' ? 'Native Audio' : 'Web Audio'
   const unifiedBooting = audioMode === 'native' ? tauriNativeBooting : isBooting
 
+  // Compute share URL - only for loaded presets
+  const shareUrl = currentPresetId ? generatePresetUrl(currentPresetId) : null
+  const shareError = shareUrl === null ? 'Load a preset to share' : null
+
   const handleUnifiedStart = async () => {
     if (audioMode === 'vst') {
       // In VST mode, just sync the graph - audio is handled by DAW
@@ -1957,6 +2003,11 @@ function App() {
     graphRef.current = nextGraph
     setGraph(nextGraph)
     queueEngineRestart(nextGraph)
+    // Clear preset tracking when graph is modified
+    if (currentPresetId) {
+      setCurrentPresetId(null)
+      clearUrlShareParams()
+    }
   }
 
   const handleAddModule = (type: ModuleType) => {
@@ -2059,6 +2110,8 @@ function App() {
           showDevTools={isDev}
           devResizeEnabled={devResizeEnabled}
           onToggleDevResize={() => setDevResizeEnabled((prev) => !prev)}
+          shareUrl={shareUrl}
+          shareError={shareError}
         />
       <main className="workbench">
         <RackView
@@ -2098,7 +2151,7 @@ function App() {
           importError={importError}
           presetStatus={presetStatus}
           presets={presets}
-          onApplyPreset={applyPreset}
+          onApplyPreset={(g, presetId) => applyPreset(g, { presetId })}
           macros={macroSpecs}
           macroValues={macroValues}
           macroOverride={macroOverride}

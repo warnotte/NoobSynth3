@@ -31,9 +31,10 @@ type UsePatchingParams = {
   graph: GraphState
   setGraph: Dispatch<SetStateAction<GraphState>>
   rackRef: RefObject<HTMLDivElement | null>
+  onGraphChange?: () => void
 }
 
-export const usePatching = ({ graph, setGraph, rackRef }: UsePatchingParams) => {
+export const usePatching = ({ graph, setGraph, rackRef, onGraphChange }: UsePatchingParams) => {
   const [selectedPort, setSelectedPort] = useState<PortHandle | null>(null)
   const [portPositions, setPortPositions] = useState<Record<string, PortPosition>>({})
   const [ghostCable, setGhostCable] = useState<GhostCable | null>(null)
@@ -214,8 +215,9 @@ export const usePatching = ({ graph, setGraph, rackRef }: UsePatchingParams) => 
           ],
         }
       })
+      onGraphChange?.()
     },
-    [setGraph],
+    [setGraph, onGraphChange],
   )
 
   const removeConnection = useCallback(
@@ -232,8 +234,9 @@ export const usePatching = ({ graph, setGraph, rackRef }: UsePatchingParams) => 
             ),
         ),
       }))
+      onGraphChange?.()
     },
-    [setGraph],
+    [setGraph, onGraphChange],
   )
 
   const removeConnectionAtInput = useCallback(
@@ -251,9 +254,12 @@ export const usePatching = ({ graph, setGraph, rackRef }: UsePatchingParams) => 
         })
         return { ...prev, connections: nextConnections }
       })
+      if (removed) {
+        onGraphChange?.()
+      }
       return removed
     },
-    [setGraph],
+    [setGraph, onGraphChange],
   )
 
   const connectedInputs = useMemo(

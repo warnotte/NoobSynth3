@@ -1,3 +1,7 @@
+import { useCallback, useState } from 'react'
+
+type ShareStatus = 'idle' | 'copied' | 'error'
+
 type TopBarProps = {
   status: 'idle' | 'running' | 'error'
   statusLabel: string
@@ -10,6 +14,10 @@ type TopBarProps = {
   showDevTools?: boolean
   devResizeEnabled?: boolean
   onToggleDevResize?: () => void
+  /** Current shareable URL (null if patch is too large) */
+  shareUrl: string | null
+  /** Error message if share URL can't be generated */
+  shareError?: string | null
 }
 
 export const TopBar = ({
@@ -24,7 +32,31 @@ export const TopBar = ({
   showDevTools = false,
   devResizeEnabled = false,
   onToggleDevResize = () => {},
-}: TopBarProps) => (
+  shareUrl,
+  shareError,
+}: TopBarProps) => {
+  const [shareStatus, setShareStatus] = useState<ShareStatus>('idle')
+
+  const handleShare = useCallback(async () => {
+    if (!shareUrl) {
+      setShareStatus('error')
+      setTimeout(() => setShareStatus('idle'), 2000)
+      return
+    }
+    try {
+      await navigator.clipboard.writeText(shareUrl)
+      setShareStatus('copied')
+      setTimeout(() => setShareStatus('idle'), 2000)
+    } catch {
+      setShareStatus('error')
+      setTimeout(() => setShareStatus('idle'), 2000)
+    }
+  }, [shareUrl])
+
+  const shareLabel = shareStatus === 'copied' ? 'Copied!' : shareStatus === 'error' ? 'Error' : 'Share'
+  const shareTitle = shareError || (shareUrl ? 'Copy shareable URL' : 'Patch too large to share')
+
+  return (
   <header className="topbar">
     <div className="topbar-head">
       <div className="brand">NoobSynth Workbench</div>
@@ -64,6 +96,18 @@ export const TopBar = ({
           </button>
         </div>
       </div>
+      <div className="share-block">
+        <span className="action-label">Patch</span>
+        <button
+          type="button"
+          className={`button power-toggle-btn ${shareStatus !== 'idle' ? shareStatus : ''}`}
+          onClick={handleShare}
+          disabled={shareStatus === 'copied'}
+          title={shareTitle}
+        >
+          {shareLabel}
+        </button>
+      </div>
       {showDevTools && (
         <div className="dev-tools">
           <span className="action-label">Dev Tools</span>
@@ -82,4 +126,4 @@ export const TopBar = ({
       )}
     </div>
   </header>
-)
+)}

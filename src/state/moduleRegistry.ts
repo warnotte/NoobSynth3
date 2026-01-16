@@ -9,7 +9,7 @@ export const moduleSizes: Record<ModuleType, string> = {
   noise: '2x1',
   shepard: '2x5',
   'mod-router': '2x2',
-  'sample-hold': '1x1',
+  'sample-hold': '2x1',
   slew: '1x2',
   quantizer: '2x2',
   'ring-mod': '1x1',

@@ -25,7 +25,7 @@ type SidePanelProps = {
   importError: string | null
   presetStatus: 'loading' | 'ready' | 'error'
   presets: PresetSpec[]
-  onApplyPreset: (graph: GraphState) => void
+  onApplyPreset: (graph: GraphState, presetId?: string) => void
   macros: MacroSpec[]
   macroValues: number[]
   macroOverride: boolean
@@ -382,7 +382,7 @@ export const SidePanel = ({
                               <button
                                 type="button"
                                 className="ui-btn ui-btn--pill preset-load"
-                                onClick={() => onApplyPreset(preset.graph)}
+                                onClick={() => onApplyPreset(preset.graph, preset.id)}
                               >
                                 Load
                               </button>
