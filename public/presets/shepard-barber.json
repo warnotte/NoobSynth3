@@ -29,7 +29,8 @@
         "position": {
           "col": 1,
           "row": 1
-        }
+        },
+        "name": "Shepard"
       },
       {
         "id": "delay1",
@@ -44,7 +45,8 @@
         "position": {
           "col": 3,
           "row": 1
-        }
+        },
+        "name": "Delay"
       },
       {
         "id": "scope1",
@@ -58,7 +60,8 @@
           "col": 5,
           "row": 1
         },
-        "size": "3x3"
+        "size": "3x3",
+        "name": "Scope"
       },
       {
         "id": "out1",
@@ -69,7 +72,8 @@
         "position": {
           "col": 8,
           "row": 1
-        }
+        },
+        "name": "Output"
       }
     ],
     "connections": [

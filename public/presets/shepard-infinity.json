@@ -29,7 +29,8 @@
         "position": {
           "col": 1,
           "row": 1
-        }
+        },
+        "name": "Shepard"
       },
       {
         "id": "shep-earth",
@@ -55,7 +56,8 @@
         "position": {
           "col": 1,
           "row": 2
-        }
+        },
+        "name": "Shepard 2"
       },
       {
         "id": "shep-soul",
@@ -81,7 +83,8 @@
         "position": {
           "col": 1,
           "row": 3
-        }
+        },
+        "name": "Shepard 3"
       },
       {
         "id": "shep-spirit",
@@ -107,7 +110,8 @@
         "position": {
           "col": 1,
           "row": 4
-        }
+        },
+        "name": "Shepard 4"
       },
       {
         "id": "shep-divine",
@@ -133,14 +137,15 @@
         "position": {
           "col": 1,
           "row": 5
-        }
+        },
+        "name": "Shepard 5"
       },
       {
         "id": "lfo-1",
         "type": "lfo",
         "params": {
           "rate": 0.05,
-          "shape": 0,
+          "shape": "sine",
           "depth": 0.5,
           "offset": 0.5,
           "bipolar": false
@@ -148,14 +153,15 @@
         "position": {
           "col": 3,
           "row": 1
-        }
+        },
+        "name": "LFO"
       },
       {
         "id": "lfo-2",
         "type": "lfo",
         "params": {
           "rate": 0.08,
-          "shape": 0,
+          "shape": "sine",
           "depth": 0.5,
           "offset": 0.5,
           "bipolar": false
@@ -163,14 +169,15 @@
         "position": {
           "col": 3,
           "row": 2
-        }
+        },
+        "name": "LFO 2"
       },
       {
         "id": "lfo-3",
         "type": "lfo",
         "params": {
           "rate": 0.13,
-          "shape": 0,
+          "shape": "sine",
           "depth": 0.5,
           "offset": 0.5,
           "bipolar": false
@@ -178,14 +185,15 @@
         "position": {
           "col": 3,
           "row": 3
-        }
+        },
+        "name": "LFO 3"
       },
       {
         "id": "lfo-4",
         "type": "lfo",
         "params": {
           "rate": 0.21,
-          "shape": 0,
+          "shape": "sine",
           "depth": 0.5,
           "offset": 0.5,
           "bipolar": false
@@ -193,14 +201,15 @@
         "position": {
           "col": 3,
           "row": 4
-        }
+        },
+        "name": "LFO 4"
       },
       {
         "id": "lfo-5",
         "type": "lfo",
         "params": {
           "rate": 0.34,
-          "shape": 0,
+          "shape": "sine",
           "depth": 0.5,
           "offset": 0.5,
           "bipolar": false
@@ -208,14 +217,15 @@
         "position": {
           "col": 3,
           "row": 5
-        }
+        },
+        "name": "LFO 5"
       },
       {
         "id": "lfo-filter",
         "type": "lfo",
         "params": {
           "rate": 0.03,
-          "shape": 0,
+          "shape": "sine",
           "depth": 1,
           "offset": 0,
           "bipolar": false
@@ -223,7 +233,8 @@
         "position": {
           "col": 3,
           "row": 6
-        }
+        },
+        "name": "LFO 6"
       },
       {
         "id": "gain-1",
@@ -234,7 +245,8 @@
         "position": {
           "col": 5,
           "row": 1
-        }
+        },
+        "name": "Gain"
       },
       {
         "id": "gain-2",
@@ -245,7 +257,8 @@
         "position": {
           "col": 5,
           "row": 2
-        }
+        },
+        "name": "Gain 2"
       },
       {
         "id": "gain-3",
@@ -256,7 +269,8 @@
         "position": {
           "col": 5,
           "row": 3
-        }
+        },
+        "name": "Gain 3"
       },
       {
         "id": "gain-4",
@@ -267,7 +281,8 @@
         "position": {
           "col": 5,
           "row": 4
-        }
+        },
+        "name": "Gain 4"
       },
       {
         "id": "gain-5",
@@ -278,7 +293,8 @@
         "position": {
           "col": 5,
           "row": 5
-        }
+        },
+        "name": "Gain 5"
       },
       {
         "id": "mix1",
@@ -294,7 +310,8 @@
         "position": {
           "col": 7,
           "row": 1
-        }
+        },
+        "name": "Mixer"
       },
       {
         "id": "vcf1",
@@ -306,14 +323,15 @@
           "envAmount": 0,
           "modAmount": 0.7,
           "keyTrack": 0,
-          "model": 0,
-          "mode": 0,
-          "slope": 1
+          "model": "svf",
+          "mode": "lp",
+          "slope": 24
         },
         "position": {
           "col": 9,
           "row": 1
-        }
+        },
+        "name": "VCF"
       },
       {
         "id": "granular1",
@@ -329,7 +347,8 @@
         "position": {
           "col": 11,
           "row": 1
-        }
+        },
+        "name": "Granular"
       },
       {
         "id": "chorus1",
@@ -345,7 +364,8 @@
         "position": {
           "col": 13,
           "row": 1
-        }
+        },
+        "name": "Chorus"
       },
       {
         "id": "reverb1",
@@ -359,7 +379,8 @@
         "position": {
           "col": 15,
           "row": 1
-        }
+        },
+        "name": "Reverb"
       },
       {
         "id": "scope1",
@@ -373,7 +394,8 @@
           "col": 17,
           "row": 1
         },
-        "size": "3x3"
+        "size": "3x3",
+        "name": "Scope"
       },
       {
         "id": "out1",
@@ -384,7 +406,8 @@
         "position": {
           "col": 20,
           "row": 1
-        }
+        },
+        "name": "Output"
       }
     ],
     "connections": [

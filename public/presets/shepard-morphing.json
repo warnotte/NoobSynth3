@@ -29,7 +29,8 @@
         "position": {
           "col": 1,
           "row": 1
-        }
+        },
+        "name": "Shepard"
       },
       {
         "id": "shep-bass",
@@ -55,7 +56,8 @@
         "position": {
           "col": 1,
           "row": 2
-        }
+        },
+        "name": "Shepard 2"
       },
       {
         "id": "shep-high",
@@ -81,7 +83,8 @@
         "position": {
           "col": 1,
           "row": 3
-        }
+        },
+        "name": "Shepard 3"
       },
       {
         "id": "shep-crystal",
@@ -107,7 +110,8 @@
         "position": {
           "col": 1,
           "row": 4
-        }
+        },
+        "name": "Shepard 4"
       },
       {
         "id": "mix-low",
@@ -119,7 +123,8 @@
         "position": {
           "col": 3,
           "row": 1
-        }
+        },
+        "name": "Mixer"
       },
       {
         "id": "mix-high",
@@ -131,14 +136,15 @@
         "position": {
           "col": 3,
           "row": 3
-        }
+        },
+        "name": "Mixer 2"
       },
       {
         "id": "lfo-low",
         "type": "lfo",
         "params": {
           "rate": 0.07,
-          "shape": 0,
+          "shape": "sine",
           "depth": 0.8,
           "offset": 0.5,
           "bipolar": false
@@ -146,14 +152,15 @@
         "position": {
           "col": 5,
           "row": 2
-        }
+        },
+        "name": "LFO"
       },
       {
         "id": "lfo-high",
         "type": "lfo",
         "params": {
           "rate": 0.11,
-          "shape": 0,
+          "shape": "sine",
           "depth": 0.8,
           "offset": 0.5,
           "bipolar": false
@@ -161,7 +168,8 @@
         "position": {
           "col": 5,
           "row": 4
-        }
+        },
+        "name": "LFO 2"
       },
       {
         "id": "vca-low",
@@ -172,7 +180,8 @@
         "position": {
           "col": 5,
           "row": 1
-        }
+        },
+        "name": "Gain"
       },
       {
         "id": "vca-high",
@@ -183,7 +192,8 @@
         "position": {
           "col": 5,
           "row": 3
-        }
+        },
+        "name": "Gain 2"
       },
       {
         "id": "mix-main",
@@ -195,7 +205,8 @@
         "position": {
           "col": 7,
           "row": 1
-        }
+        },
+        "name": "Mixer 3"
       },
       {
         "id": "ensemble1",
@@ -210,7 +221,8 @@
         "position": {
           "col": 9,
           "row": 1
-        }
+        },
+        "name": "Ensemble"
       },
       {
         "id": "reverb1",
@@ -224,7 +236,8 @@
         "position": {
           "col": 11,
           "row": 1
-        }
+        },
+        "name": "Reverb"
       },
       {
         "id": "scope1",
@@ -238,7 +251,8 @@
           "col": 13,
           "row": 1
         },
-        "size": "3x3"
+        "size": "3x3",
+        "name": "Scope"
       },
       {
         "id": "out1",
@@ -249,7 +263,8 @@
         "position": {
           "col": 16,
           "row": 1
-        }
+        },
+        "name": "Output"
       }
     ],
     "connections": [

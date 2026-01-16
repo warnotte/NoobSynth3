@@ -29,7 +29,8 @@
         "position": {
           "col": 1,
           "row": 1
-        }
+        },
+        "name": "Shepard"
       },
       {
         "id": "vcf1",
@@ -41,14 +42,15 @@
           "envAmount": 0,
           "modAmount": 0,
           "keyTrack": 0,
-          "model": 0,
-          "mode": 0,
-          "slope": 1
+          "model": "svf",
+          "mode": "lp",
+          "slope": 24
         },
         "position": {
           "col": 3,
           "row": 1
-        }
+        },
+        "name": "VCF"
       },
       {
         "id": "reverb1",
@@ -62,7 +64,8 @@
         "position": {
           "col": 5,
           "row": 1
-        }
+        },
+        "name": "Reverb"
       },
       {
         "id": "scope1",
@@ -76,7 +79,8 @@
           "col": 7,
           "row": 1
         },
-        "size": "3x3"
+        "size": "3x3",
+        "name": "Scope"
       },
       {
         "id": "out1",
@@ -87,7 +91,8 @@
         "position": {
           "col": 10,
           "row": 1
-        }
+        },
+        "name": "Output"
       }
     ],
     "connections": [

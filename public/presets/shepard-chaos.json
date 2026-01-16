@@ -29,7 +29,8 @@
         "position": {
           "col": 1,
           "row": 1
-        }
+        },
+        "name": "Shepard"
       },
       {
         "id": "shep-bright",
@@ -55,14 +56,15 @@
         "position": {
           "col": 1,
           "row": 3
-        }
+        },
+        "name": "Shepard 2"
       },
       {
         "id": "lfo-rand-low",
         "type": "lfo",
         "params": {
           "rate": 0.13,
-          "shape": 0,
+          "shape": "sine",
           "depth": 0.5,
           "offset": 0.5,
           "bipolar": false
@@ -70,14 +72,15 @@
         "position": {
           "col": 3,
           "row": 1
-        }
+        },
+        "name": "LFO"
       },
       {
         "id": "lfo-rand-high",
         "type": "lfo",
         "params": {
           "rate": 0.21,
-          "shape": 0,
+          "shape": "sine",
           "depth": 0.5,
           "offset": 0.5,
           "bipolar": false
@@ -85,14 +88,15 @@
         "position": {
           "col": 3,
           "row": 3
-        }
+        },
+        "name": "LFO 2"
       },
       {
         "id": "lfo-clock",
         "type": "lfo",
         "params": {
           "rate": 0.25,
-          "shape": 3,
+          "shape": "square",
           "depth": 1,
           "offset": 0,
           "bipolar": false
@@ -100,7 +104,8 @@
         "position": {
           "col": 3,
           "row": 5
-        }
+        },
+        "name": "LFO 3"
       },
       {
         "id": "sh-low",
@@ -111,7 +116,8 @@
         "position": {
           "col": 5,
           "row": 1
-        }
+        },
+        "name": "S&H"
       },
       {
         "id": "sh-high",
@@ -122,7 +128,8 @@
         "position": {
           "col": 5,
           "row": 3
-        }
+        },
+        "name": "S&H 2"
       },
       {
         "id": "slew-low",
@@ -134,7 +141,8 @@
         "position": {
           "col": 7,
           "row": 1
-        }
+        },
+        "name": "slew"
       },
       {
         "id": "slew-high",
@@ -146,7 +154,8 @@
         "position": {
           "col": 7,
           "row": 3
-        }
+        },
+        "name": "slew 2"
       },
       {
         "id": "vca-low",
@@ -157,7 +166,8 @@
         "position": {
           "col": 9,
           "row": 1
-        }
+        },
+        "name": "Gain"
       },
       {
         "id": "vca-high",
@@ -168,7 +178,8 @@
         "position": {
           "col": 9,
           "row": 3
-        }
+        },
+        "name": "Gain 2"
       },
       {
         "id": "mix-main",
@@ -180,7 +191,8 @@
         "position": {
           "col": 11,
           "row": 1
-        }
+        },
+        "name": "Mixer"
       },
       {
         "id": "tape1",
@@ -197,7 +209,8 @@
         "position": {
           "col": 13,
           "row": 1
-        }
+        },
+        "name": "Tape Delay"
       },
       {
         "id": "reverb1",
@@ -211,7 +224,8 @@
         "position": {
           "col": 15,
           "row": 1
-        }
+        },
+        "name": "Reverb"
       },
       {
         "id": "scope1",
@@ -225,7 +239,8 @@
           "col": 17,
           "row": 1
         },
-        "size": "3x3"
+        "size": "3x3",
+        "name": "Scope"
       },
       {
         "id": "out1",
@@ -236,7 +251,8 @@
         "position": {
           "col": 20,
           "row": 1
-        }
+        },
+        "name": "Output"
       }
     ],
     "connections": [
