@@ -120,7 +120,12 @@ export function serializeMidiData(data: MidiFileData): string {
  * Load a MIDI preset from the built-in presets directory
  */
 export async function loadMidiPreset(presetId: string): Promise<MidiFileData> {
-  const response = await fetch(`/midi-presets/${presetId}.mid`)
+  // Load manifest to get the actual file name
+  const manifest = await loadMidiPresetManifest()
+  const preset = manifest.presets.find(p => p.id === presetId)
+  const fileName = preset?.file ?? `${presetId}.mid`
+
+  const response = await fetch(`/midi-presets/${fileName}`)
   if (!response.ok) {
     throw new Error(`Failed to load MIDI preset: ${presetId}`)
   }

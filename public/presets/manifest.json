@@ -721,6 +721,13 @@
       "description": "Zelda ALTTP style using SNES oscillators for authentic 16-bit sound.",
       "file": "midi-snes-zelda.json",
       "group": "MIDI Sequencer"
+    },
+    {
+      "id": "midi-full-organ",
+      "name": "MIDI Full Organ (8 tracks)",
+      "description": "Full 8-track MIDI setup with Pipe Organs. All tracks connected and ready.",
+      "file": "midi-full-organ.json",
+      "group": "MIDI Sequencer"
     }
   ]
 }

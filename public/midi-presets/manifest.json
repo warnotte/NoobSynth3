@@ -7,6 +7,21 @@
       "file": "bach-toccata.mid"
     },
     {
+      "id": "bach-invention",
+      "name": "Bach - Invention BWV 772 (2 voix)",
+      "file": "bach-invention-bwv772.mid"
+    },
+    {
+      "id": "bach-sinfonia",
+      "name": "Bach - Sinfonia BWV 787 (3 voix)",
+      "file": "bach-sinfonia-bwv787.mid"
+    },
+    {
+      "id": "bach-wtc",
+      "name": "Bach - Prélude & Fugue BWV 846",
+      "file": "bach-wtc-bwv846.mid"
+    },
+    {
       "id": "zelda-kakariko",
       "name": "Zelda - Kakariko Village",
       "file": "zelda-kakariko.mid"
