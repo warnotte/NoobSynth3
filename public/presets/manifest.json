@@ -717,8 +717,8 @@
     },
     {
       "id": "midi-snes-zelda",
-      "name": "SNES Zelda",
-      "description": "Zelda ALTTP style using SNES oscillators for authentic 16-bit sound.",
+      "name": "SNES Zelda (8 tracks)",
+      "description": "Full 8-track Zelda ALTTP style using SNES oscillators. All tracks connected and ready.",
       "file": "midi-snes-zelda.json",
       "group": "MIDI Sequencer"
     },

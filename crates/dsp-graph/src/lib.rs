@@ -368,6 +368,19 @@ impl GraphEngine {
   fn set_graph(&mut self, graph: GraphPayload) {
     let voice_count = resolve_voice_count(&graph.modules);
     self.voice_count = voice_count;
+
+    // Preserve sequencer state before clearing (keyed by module_id + voice_index)
+    let mut saved_sequencer_ticks: HashMap<(String, Option<usize>), f64> = HashMap::new();
+    for (module_id, indices) in &self.module_map {
+      for &idx in indices {
+        if let ModuleState::MidiFileSequencer(ref state) = self.modules[idx].state {
+          let voice = self.modules[idx].voice_index;
+          let tick = state.seq.current_tick_precise();
+          saved_sequencer_ticks.insert((module_id.clone(), voice), tick);
+        }
+      }
+    }
+
     self.modules.clear();
     self.input_buffers.clear();
     self.output_buffers.clear();
@@ -383,12 +396,21 @@ impl GraphEngine {
       let is_poly = is_poly_type(module_type);
       let instance_count = if is_poly { voice_count } else { 1 };
       for voice_index in 0..instance_count {
-        let node = ModuleNode::new(
+        let mut node = ModuleNode::new(
           module_type,
           if is_poly { Some(voice_index) } else { None },
           &params,
           self.sample_rate,
         );
+
+        // Restore sequencer state if we have saved state for this module
+        if let ModuleState::MidiFileSequencer(ref mut state) = node.state {
+          let voice = if is_poly { Some(voice_index) } else { None };
+          if let Some(&tick) = saved_sequencer_ticks.get(&(module.id.clone(), voice)) {
+            state.seq.set_current_tick_precise(tick);
+          }
+        }
+
         let index = modules.len();
         modules.push(node);
         module_map.entry(module.id.clone()).or_default().push(index);

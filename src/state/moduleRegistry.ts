@@ -5,10 +5,10 @@ export const moduleSizes: Record<ModuleType, string> = {
   supersaw: '2x2',
   karplus: '2x2',
   'nes-osc': '2x3',
-  'snes-osc': '2x3',
+  'snes-osc': '2x2',
   noise: '2x1',
   shepard: '2x5',
-  'pipe-organ': '3x4',
+  'pipe-organ': '2x3',
   'mod-router': '2x2',
   'sample-hold': '2x1',
   slew: '1x2',
@@ -63,7 +63,7 @@ export const moduleSizes: Record<ModuleType, string> = {
   // Master Clock
   clock: '2x2',
   // MIDI File Sequencer
-  'midi-file-sequencer': '5x6',
+  'midi-file-sequencer': '2x5',
 }
 
 export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>> = {

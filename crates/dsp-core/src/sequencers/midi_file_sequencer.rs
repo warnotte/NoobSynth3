@@ -295,6 +295,17 @@ impl MidiFileSequencer {
         self.current_tick as u32
     }
 
+    /// Get current tick position with full precision (for state preservation).
+    pub fn current_tick_precise(&self) -> f64 {
+        self.current_tick
+    }
+
+    /// Set current tick position with full precision (for state restoration).
+    /// Note: This only sets the tick, use seek_to_tick for full state reset.
+    pub fn set_current_tick_precise(&mut self, tick: f64) {
+        self.current_tick = tick;
+    }
+
     /// Get total ticks (for progress display).
     pub fn total_ticks(&self) -> u32 {
         self.total_ticks
