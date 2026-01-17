@@ -700,6 +700,13 @@
       "description": "Two-voice baroque organ for Bach Inventions. Track 1: Right hand (8'+4'), Track 2: Left hand (8'+4').",
       "file": "midi-bach-organ.json",
       "group": "MIDI Sequencer"
+    },
+    {
+      "id": "midi-bach-pipe-organ",
+      "name": "Bach Pipe Organ",
+      "description": "Full pipe organ with 5 footages (16', 8', 4', 2-2/3', 2') and cathedral reverb for Bach works.",
+      "file": "midi-bach-pipe-organ.json",
+      "group": "MIDI Sequencer"
     }
   ]
 }
