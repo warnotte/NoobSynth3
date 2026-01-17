@@ -59,6 +59,7 @@ type GraphMessage =
   | { type: 'marioGate'; moduleId: string; channel: number; value: number }
   | { type: 'watchSequencers'; moduleIds: string[] }
   | { type: 'watchMidiSeq'; moduleId: string | null }
+  | { type: 'seekMidiSeq'; moduleId: string; tick: number }
 
 class WasmGraphProcessor extends AudioWorkletProcessor {
   private engine: InstanceType<NonNullable<typeof WasmGraphEngine>> | null = null
@@ -156,6 +157,9 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
         break
       case 'watchMidiSeq':
         this.watchedMidiSeq = message.moduleId
+        break
+      case 'seekMidiSeq':
+        this.engine.seek_midi_sequencer(message.moduleId, message.tick)
         break
       default:
         break

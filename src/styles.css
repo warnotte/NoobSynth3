@@ -3177,7 +3177,7 @@
   top: 0;
   left: 0;
   height: 100%;
-  background: linear-gradient(90deg, var(--accent-blue), var(--accent-mint));
+  background: linear-gradient(90deg, var(--accent-cool), var(--accent-mint));
   transition: width 0.05s linear;
 }
 
@@ -3214,7 +3214,7 @@
 
 .midi-seq-load-btn:hover {
   background: rgba(60, 80, 110, 0.8);
-  border-color: var(--accent-blue);
+  border-color: var(--accent-cool);
   color: #fff;
 }
 
@@ -3231,7 +3231,7 @@
 }
 
 .midi-seq-preset-select:hover {
-  border-color: var(--accent-blue);
+  border-color: var(--accent-cool);
 }
 
 .midi-seq-preset-select:focus {
@@ -3289,7 +3289,7 @@
 }
 
 .midi-track.active .midi-track-num {
-  background: var(--accent-blue);
+  background: var(--accent-cool);
   color: #fff;
 }
 

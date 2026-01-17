@@ -257,6 +257,17 @@ impl GraphEngine {
     0
   }
 
+  /// Seek MIDI file sequencer to a specific tick position
+  pub fn seek_midi_sequencer(&mut self, module_id: &str, tick: u32) {
+    if let Some(index) = self.module_map.get(module_id).and_then(|list| list.first().copied()) {
+      if let Some(module) = self.modules.get_mut(index) {
+        if let ModuleState::MidiFileSequencer(ref mut state) = module.state {
+          state.seq.seek_to_tick(tick);
+        }
+      }
+    }
+  }
+
   /// Drain MIDI events from a sequencer. Returns flat array: [track, note, velocity, is_on, ...]
   pub fn drain_midi_events(&mut self, module_id: &str) -> Vec<u8> {
     if let Some(index) = self.module_map.get(module_id).and_then(|list| list.first().copied()) {

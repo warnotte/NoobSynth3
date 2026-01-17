@@ -1112,8 +1112,21 @@ function MidiFileSequencerUI({ module, engine, status, updateParam }: Pick<Contr
           {selectedFile || 'No file loaded'}
         </div>
 
-        {/* Progress bar */}
-        <div className="midi-seq-progress">
+        {/* Progress bar - clickable to seek */}
+        <div
+          className="midi-seq-progress"
+          onClick={(e) => {
+            if (totalTicks <= 0) return
+            const rect = e.currentTarget.getBoundingClientRect()
+            const x = e.clientX - rect.left
+            const ratio = Math.max(0, Math.min(1, x / rect.width))
+            const targetTick = Math.floor(ratio * totalTicks)
+            engine.seekMidiSequencer(module.id, targetTick)
+            setCurrentTick(targetTick)
+          }}
+          style={{ cursor: totalTicks > 0 ? 'pointer' : 'default' }}
+          title={totalTicks > 0 ? 'Click to seek' : undefined}
+        >
           <div
             className="midi-seq-progress-bar"
             style={{ width: totalTicks > 0 ? `${(currentTick / totalTicks) * 100}%` : '0%' }}

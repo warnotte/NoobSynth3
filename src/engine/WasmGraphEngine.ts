@@ -301,6 +301,10 @@ export class AudioEngine {
     }
   }
 
+  seekMidiSequencer(moduleId: string, tick: number): void {
+    this.graphNode?.port.postMessage({ type: 'seekMidiSeq', moduleId, tick })
+  }
+
   private async init(): Promise<void> {
     if (this.context) {
       return

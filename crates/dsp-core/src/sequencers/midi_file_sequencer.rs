@@ -293,6 +293,35 @@ impl MidiFileSequencer {
         self.total_ticks
     }
 
+    /// Seek to a specific tick position.
+    pub fn seek_to_tick(&mut self, tick: u32) {
+        self.current_tick = tick as f64;
+
+        // Reset all track note indices to find correct position
+        for track in &mut self.tracks {
+            track.note_index = 0;
+            track.active_note = None;
+            track.note_remaining = 0;
+
+            // Advance note_index to the correct position
+            while track.note_index < track.notes.len() {
+                if track.notes[track.note_index].tick > tick {
+                    break;
+                }
+                track.note_index += 1;
+            }
+        }
+
+        // Clear all gates
+        for i in 0..MIDI_TRACKS {
+            self.gate_on[i] = false;
+            self.gate_samples[i] = 0;
+            self.current_gate[i] = 0.0;
+        }
+
+        self.reset_voices();
+    }
+
     /// Parse JSON MIDI data and load into tracks.
     ///
     /// Expected format:

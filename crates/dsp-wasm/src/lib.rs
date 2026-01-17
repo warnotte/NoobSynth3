@@ -90,6 +90,11 @@ impl WasmGraphEngine {
     self.engine.get_midi_total_ticks(module_id)
   }
 
+  /// Seek MIDI file sequencer to a specific tick position
+  pub fn seek_midi_sequencer(&mut self, module_id: &str, tick: u32) {
+    self.engine.seek_midi_sequencer(module_id, tick);
+  }
+
   /// Drain MIDI events from a sequencer. Returns [track, note, velocity, is_on, ...]
   pub fn drain_midi_events(&mut self, module_id: &str) -> Uint8Array {
     let data = self.engine.drain_midi_events(module_id);
