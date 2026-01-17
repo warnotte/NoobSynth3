@@ -257,6 +257,26 @@ impl GraphEngine {
     0
   }
 
+  /// Drain MIDI events from a sequencer. Returns flat array: [track, note, velocity, is_on, ...]
+  pub fn drain_midi_events(&mut self, module_id: &str) -> Vec<u8> {
+    if let Some(index) = self.module_map.get(module_id).and_then(|list| list.first().copied()) {
+      if let Some(module) = self.modules.get_mut(index) {
+        if let ModuleState::MidiFileSequencer(ref mut state) = module.state {
+          let events = state.seq.drain_events();
+          let mut out = Vec::with_capacity(events.len() * 4);
+          for e in events {
+            out.push(e.track);
+            out.push(e.note);
+            out.push(e.velocity);
+            out.push(if e.is_note_on { 1 } else { 0 });
+          }
+          return out;
+        }
+      }
+    }
+    Vec::new()
+  }
+
   pub fn render(&mut self, frames: usize) -> &[Sample] {
     if frames == 0 {
       return &[];
@@ -363,6 +383,7 @@ impl GraphEngine {
         module_map.entry(module.id.clone()).or_default().push(index);
       }
     }
+
 
     let mut input_buffers = Vec::new();
     let mut output_buffers = Vec::new();
@@ -616,9 +637,11 @@ fn resolve_voice_count(modules: &[ModuleSpecJson]) -> usize {
   for module in modules {
     if module.kind == "control" {
       if let Some(params) = &module.params {
-        voice_count = param_number(params, "voices", 1.0);
+        let v = param_number(params, "voices", 1.0);
+        if v > voice_count {
+          voice_count = v;
+        }
       }
-      break;
     }
   }
   let rounded = voice_count.round().clamp(1.0, 8.0) as usize;

@@ -7,6 +7,21 @@ use crate::common::{sample_at, Sample, A4_MIDI};
 /// Number of output tracks.
 pub const MIDI_TRACKS: usize = 8;
 
+/// Maximum events in queue.
+const EVENT_QUEUE_SIZE: usize = 256;
+
+/// Maximum polyphonic voices.
+pub const MAX_POLY_VOICES: usize = 8;
+
+/// A MIDI event for polyphonic voice routing.
+#[derive(Clone, Copy, Default)]
+pub struct MidiEvent {
+    pub track: u8,
+    pub note: u8,
+    pub velocity: u8,
+    pub is_note_on: bool,
+}
+
 /// Maximum notes per track.
 pub const MAX_NOTES_PER_TRACK: usize = 8192;
 
@@ -21,6 +36,8 @@ pub struct MidiNote {
     pub velocity: u8,
     /// Duration in ticks
     pub duration: u32,
+    /// Pre-allocated voice index (0 to voice_count-1)
+    pub voice: u8,
 }
 
 /// A MIDI track containing notes.
@@ -92,6 +109,17 @@ pub struct MidiFileSequencer {
 
     // State
     playing: bool,
+
+    // Event queue for polyphonic routing
+    events: [MidiEvent; EVENT_QUEUE_SIZE],
+    event_head: usize,
+    event_tail: usize,
+
+    // Polyphonic voice allocation state
+    // voice_notes[i] = Some((note, velocity, age)) if voice i is playing
+    voice_notes: [Option<(u8, u8, u32)>; MAX_POLY_VOICES],
+    voice_clock: u32, // For LRU tracking
+    voice_count: usize, // Total number of voices (set by graph engine)
 }
 
 /// Input signals for MidiFileSequencer.
@@ -165,7 +193,89 @@ impl MidiFileSequencer {
             current_velocity: [0.0; MIDI_TRACKS],
             prev_reset: 0.0,
             playing: false,
+            events: [MidiEvent::default(); EVENT_QUEUE_SIZE],
+            event_head: 0,
+            event_tail: 0,
+            voice_notes: [None; MAX_POLY_VOICES],
+            voice_clock: 0,
+            voice_count: 1,
         }
+    }
+
+    /// Set the total number of polyphonic voices.
+    pub fn set_voice_count(&mut self, count: usize) {
+        self.voice_count = count.max(1).min(MAX_POLY_VOICES);
+    }
+
+    /// Allocate a voice for a new note. Returns the voice index.
+    /// Uses deterministic round-robin so all instances compute the same allocation.
+    #[allow(dead_code)]
+    fn allocate_voice(&mut self, note: u8, velocity: u8) -> usize {
+        self.voice_clock += 1;
+        let age = self.voice_clock;
+        let vc = self.voice_count.max(1).min(MAX_POLY_VOICES);
+
+        // Deterministic allocation: use voice_clock % voice_count
+        // This ensures all instances assign the same voice to the same note
+        let voice_idx = ((self.voice_clock - 1) as usize) % vc;
+
+        // Store the note in the voice slot (may override existing)
+        self.voice_notes[voice_idx] = Some((note, velocity, age));
+        voice_idx
+    }
+
+    /// Release a voice playing a specific note. Returns the voice index if found.
+    #[allow(dead_code)]
+    fn release_voice(&mut self, note: u8) -> Option<usize> {
+        for (i, slot) in self.voice_notes.iter_mut().enumerate() {
+            if let Some((n, _, _)) = slot {
+                if *n == note {
+                    *slot = None;
+                    return Some(i);
+                }
+            }
+        }
+        None
+    }
+
+    /// Get current voice state for a given voice index.
+    pub fn get_voice_state(&self, voice_index: usize) -> (f32, f32, f32) {
+        if voice_index >= MAX_POLY_VOICES {
+            return (0.0, 0.0, 0.0);
+        }
+        match self.voice_notes[voice_index] {
+            Some((note, velocity, _)) => {
+                let cv = Self::note_to_cv(note);
+                let vel = velocity as f32 / 127.0;
+                (cv, 1.0, vel) // cv, gate, velocity
+            }
+            None => (0.0, 0.0, 0.0),
+        }
+    }
+
+    /// Reset all voice allocations.
+    fn reset_voices(&mut self) {
+        self.voice_notes = [None; MAX_POLY_VOICES];
+        self.voice_clock = 0;
+    }
+
+    /// Push an event to the queue.
+    fn push_event(&mut self, track: u8, note: u8, velocity: u8, is_note_on: bool) {
+        let next = (self.event_head + 1) % EVENT_QUEUE_SIZE;
+        if next != self.event_tail {
+            self.events[self.event_head] = MidiEvent { track, note, velocity, is_note_on };
+            self.event_head = next;
+        }
+    }
+
+    /// Drain all events from the queue.
+    pub fn drain_events(&mut self) -> Vec<MidiEvent> {
+        let mut out = Vec::new();
+        while self.event_tail != self.event_head {
+            out.push(self.events[self.event_tail]);
+            self.event_tail = (self.event_tail + 1) % EVENT_QUEUE_SIZE;
+        }
+        out
     }
 
     /// Update sample rate.
@@ -288,6 +398,25 @@ impl MidiFileSequencer {
                 }
                 _ => {}
             }
+        }
+
+        // Pre-allocate voices based on note order across all tracks
+        // Collect all notes with their track index
+        let mut all_notes: Vec<(usize, usize, u32)> = Vec::new(); // (track_idx, note_idx, tick)
+        for (track_idx, track) in self.tracks.iter().enumerate() {
+            for (note_idx, note) in track.notes.iter().enumerate() {
+                all_notes.push((track_idx, note_idx, note.tick));
+            }
+        }
+
+        // Sort by tick (stable sort preserves order for same tick)
+        all_notes.sort_by_key(|&(_, _, tick)| tick);
+
+        // Assign voices using round-robin
+        let vc = self.voice_count.max(1).min(MAX_POLY_VOICES);
+        for (i, &(track_idx, note_idx, _)) in all_notes.iter().enumerate() {
+            let voice = (i % vc) as u8;
+            self.tracks[track_idx].notes[note_idx].voice = voice;
         }
 
         // Reset playback state
@@ -511,6 +640,7 @@ impl MidiFileSequencer {
                     self.gate_on[track] = false;
                     self.current_gate[track] = 0.0;
                 }
+                self.reset_voices();
                 self.playing = true;
             }
 
@@ -525,12 +655,19 @@ impl MidiFileSequencer {
                     for track in &mut self.tracks {
                         track.note_index = 0;
                     }
+                    self.reset_voices();
                 } else {
                     self.playing = false;
                 }
             }
 
             let current_tick_int = self.current_tick as u32;
+
+            // Collect triggered notes first (to avoid borrow conflicts)
+            let mut triggered: [(u8, u8, u8); MIDI_TRACKS] = [(0, 0, 0); MIDI_TRACKS]; // (note, velocity, voice)
+            let mut has_trigger = [false; MIDI_TRACKS];
+            let mut note_off: [(u8, u8); MIDI_TRACKS] = [(0, 0); MIDI_TRACKS]; // (note, voice)
+            let mut has_note_off = [false; MIDI_TRACKS];
 
             // Process each track
             for track_idx in 0..MIDI_TRACKS {
@@ -555,6 +692,12 @@ impl MidiFileSequencer {
                         self.current_velocity[track_idx] = note.velocity as f32 / 127.0;
                         self.current_gate[track_idx] = 1.0;
 
+                        // Mark for event push (after borrow ends)
+                        if !track_muted[track_idx] {
+                            triggered[track_idx] = (note.note, note.velocity, note.voice);
+                            has_trigger[track_idx] = true;
+                        }
+
                         track.note_index += 1;
                     } else {
                         break; // Notes are sorted, no more to trigger yet
@@ -565,6 +708,13 @@ impl MidiFileSequencer {
                 if self.gate_on[track_idx] {
                     self.gate_samples[track_idx] += 1;
                     if self.gate_samples[track_idx] >= self.gate_length_samples[track_idx] {
+                        // Mark note off before clearing gate
+                        if !track_muted[track_idx] {
+                            if let Some(active) = track.active_note {
+                                note_off[track_idx] = (active.note, active.voice);
+                                has_note_off[track_idx] = true;
+                            }
+                        }
                         self.gate_on[track_idx] = false;
                         self.current_gate[track_idx] = 0.0;
                     }
@@ -579,6 +729,25 @@ impl MidiFileSequencer {
                     out_cv[track_idx][i] = self.current_cv[track_idx];
                     out_gate[track_idx][i] = self.current_gate[track_idx];
                     out_vel[track_idx][i] = self.current_velocity[track_idx];
+                }
+            }
+
+            // Push events and update voice allocation (after track borrows are released)
+            for track_idx in 0..MIDI_TRACKS {
+                if has_trigger[track_idx] {
+                    let (note, vel, voice) = triggered[track_idx];
+                    self.push_event(track_idx as u8, note, vel, true);
+                    // Use pre-allocated voice for polyphonic output
+                    let voice_idx = (voice as usize).min(MAX_POLY_VOICES - 1);
+                    self.voice_clock += 1;
+                    self.voice_notes[voice_idx] = Some((note, vel, self.voice_clock));
+                }
+                if has_note_off[track_idx] {
+                    let (note, voice) = note_off[track_idx];
+                    self.push_event(track_idx as u8, note, 0, false);
+                    // Release the pre-allocated voice
+                    let voice_idx = (voice as usize).min(MAX_POLY_VOICES - 1);
+                    self.voice_notes[voice_idx] = None;
                 }
             }
 

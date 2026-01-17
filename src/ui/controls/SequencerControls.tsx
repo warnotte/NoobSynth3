@@ -992,6 +992,23 @@ function MidiFileSequencerUI({ module, engine, status, updateParam }: Pick<Contr
   // State for playhead position
   const [currentTick, setCurrentTick] = useState(0)
 
+  // State for MIDI presets
+  const [midiPresets, setMidiPresets] = useState<Array<{ id: string; name: string }>>([])
+
+  // Load MIDI presets manifest on mount
+  useEffect(() => {
+    const loadPresets = async () => {
+      try {
+        const { loadMidiPresetManifest } = await import('../../utils/midiParser')
+        const manifest = await loadMidiPresetManifest()
+        setMidiPresets(manifest.presets.map(p => ({ id: p.id, name: p.name })))
+      } catch (err) {
+        console.error('Failed to load MIDI preset manifest:', err)
+      }
+    }
+    loadPresets()
+  }, [])
+
   // Watch sequencer for playhead updates
   useEffect(() => {
     if (!enabled || status !== 'running') {
@@ -999,11 +1016,21 @@ function MidiFileSequencerUI({ module, engine, status, updateParam }: Pick<Contr
       return
     }
 
+    // Debug: log subscription
+    console.log('[MidiFileSeq] Subscribing to', module.id, 'totalTicks:', totalTicks)
+
     const unsubscribe = engine.watchSequencer(module.id, (tick: number) => {
+      // Debug: log tick updates (throttled)
+      if (tick % 100 === 0) {
+        console.log('[MidiFileSeq] tick:', tick, '/', totalTicks)
+      }
       setCurrentTick(tick)
     })
-    return unsubscribe
-  }, [enabled, status, module.id, engine])
+    return () => {
+      console.log('[MidiFileSeq] Unsubscribing from', module.id)
+      unsubscribe()
+    }
+  }, [enabled, status, module.id, engine, totalTicks])
 
   const handleFileLoad = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -1030,6 +1057,7 @@ function MidiFileSequencerUI({ module, engine, status, updateParam }: Pick<Contr
       const midiData = await loadMidiPreset(presetId)
       const serialized = serializeMidiData(midiData)
 
+      console.log('[MidiFileSeq] Loaded preset:', presetId, 'totalTicks:', midiData.totalTicks, 'tracks:', midiData.tracks.length)
       updateParam(module.id, 'midiData', serialized)
       updateParam(module.id, 'selectedFile', `${presetId}.mid`)
     } catch (err) {
@@ -1112,7 +1140,9 @@ function MidiFileSequencerUI({ module, engine, status, updateParam }: Pick<Contr
             onChange={(e) => handlePresetLoad(e.target.value)}
           >
             <option value="">Presets...</option>
-            <option value="bach-toccata">Bach - Toccata BWV 565</option>
+            {midiPresets.map(preset => (
+              <option key={preset.id} value={preset.id}>{preset.name}</option>
+            ))}
           </select>
         </div>
       </div>

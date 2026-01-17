@@ -12,7 +12,7 @@ Synthétiseur modulaire inspiré de VCV Rack, construit avec React + Rust/WASM.
 - **54 modules** : VCO, Supersaw, Karplus-Strong, NES/SNES Osc, TB-303, FM Op, Shepard Tone, TR-909 Drums (Kick/Snare/HiHat/Clap/Tom/Rimshot), Drum Sequencer (8-track), Euclidean Sequencer, MIDI File Sequencer, Noise, Audio In, Sample & Hold, Slew, Quantizer, VCF (SVF/Ladder), LFO, ADSR, Step Sequencer, Arpeggiator, Ensemble/Choir, Delay/Tape/Granular, Spring/Reverb, Pitch Shifter, Wavefolder...
 - **Polyphonie** : 1/2/4/8 voix avec voice stealing
 - **MIDI** : Entrée Web MIDI avec vélocité
-- **Presets** : 70+ patches inclus (Jupiter, Juno, Moog, Prophet, Jarre, Acid, Moroder, 909, Shepard...)
+- **Presets** : 100+ patches inclus (Jupiter, Juno, Moog, Prophet, Jarre, Acid, Moroder, 909, Shepard, MIDI Organ...)
 - **3 modes** : Web, Standalone (Tauri), VST3/CLAP plugin
 
 ## Démarrage rapide

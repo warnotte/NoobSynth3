@@ -58,6 +58,7 @@ type GraphMessage =
   | { type: 'marioCv'; moduleId: string; channel: number; value: number }
   | { type: 'marioGate'; moduleId: string; channel: number; value: number }
   | { type: 'watchSequencers'; moduleIds: string[] }
+  | { type: 'watchMidiSeq'; moduleId: string | null }
 
 class WasmGraphProcessor extends AudioWorkletProcessor {
   private engine: InstanceType<NonNullable<typeof WasmGraphEngine>> | null = null
@@ -67,6 +68,8 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
   private watchedSequencers: string[] = []
   private lastSteps: Map<string, number> = new Map()
   private stepPollCounter = 0
+  private watchedMidiSeq: string | null = null
+  private debugCounter = 0
 
   constructor() {
     super()
@@ -151,6 +154,9 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
         this.watchedSequencers = message.moduleIds
         this.lastSteps.clear()
         break
+      case 'watchMidiSeq':
+        this.watchedMidiSeq = message.moduleId
+        break
       default:
         break
     }
@@ -223,6 +229,12 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
       for (const moduleId of this.watchedSequencers) {
         const step = this.engine.get_sequencer_step(moduleId)
         const lastStep = this.lastSteps.get(moduleId) ?? -1
+        // Debug: send periodic debug info (every ~2 seconds = 100 polls)
+        this.debugCounter++
+        if (this.debugCounter % 100 === 0) {
+          const rustTotalTicks = this.engine.get_midi_total_ticks(moduleId)
+          this.port.postMessage({ type: 'debug', info: { moduleId, step, lastStep, rustTotalTicks, watched: this.watchedSequencers.length } })
+        }
         if (step !== lastStep && step >= 0) {
           updates[moduleId] = step
           this.lastSteps.set(moduleId, step)
@@ -230,6 +242,14 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
       }
       if (Object.keys(updates).length > 0) {
         this.port.postMessage({ type: 'sequencerSteps', steps: updates })
+      }
+    }
+
+    // Poll MIDI events every block
+    if (this.watchedMidiSeq) {
+      const events = this.engine.drain_midi_events(this.watchedMidiSeq)
+      if (events.length > 0) {
+        this.port.postMessage({ type: 'midiEvents', data: Array.from(events) })
       }
     }
 

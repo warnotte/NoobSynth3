@@ -686,6 +686,20 @@
       "description": "Test preset for MIDI File Sequencer debugging - CV/Gate outputs to scope.",
       "file": "midi-test.json",
       "group": "MIDI Sequencer"
+    },
+    {
+      "id": "midi-organ-poly",
+      "name": "MIDI Organ",
+      "description": "Organ sound with 3 footages (8', 4', 2'), chorus and spring reverb.",
+      "file": "midi-organ-poly.json",
+      "group": "MIDI Sequencer"
+    },
+    {
+      "id": "midi-bach-organ",
+      "name": "Bach 2-Voice Organ",
+      "description": "Two-voice baroque organ for Bach Inventions. Track 1: Right hand (8'+4'), Track 2: Left hand (8'+4').",
+      "file": "midi-bach-organ.json",
+      "group": "MIDI Sequencer"
     }
   ]
 }

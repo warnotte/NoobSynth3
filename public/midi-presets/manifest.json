@@ -5,6 +5,21 @@
       "id": "bach-toccata",
       "name": "Bach - Toccata BWV 565",
       "file": "bach-toccata.mid"
+    },
+    {
+      "id": "zelda-kakariko",
+      "name": "Zelda - Kakariko Village",
+      "file": "zelda-kakariko.mid"
+    },
+    {
+      "id": "zelda-fairy",
+      "name": "Zelda - Fairy Fountain",
+      "file": "zelda-fairy.mid"
+    },
+    {
+      "id": "zelda-dark-world",
+      "name": "Zelda - Dark World",
+      "file": "zelda-dark-world.mid"
     }
   ]
 }

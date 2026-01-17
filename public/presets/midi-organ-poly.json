@@ -1,0 +1,194 @@
+{
+  "id": "midi-organ-poly",
+  "name": "MIDI Organ",
+  "description": "Organ sound using MIDI File Sequencer",
+  "group": "MIDI Sequencer",
+  "graph": {
+    "modules": [
+      {
+        "id": "midiseq-1",
+        "type": "midi-file-sequencer",
+        "name": "MIDI File Seq",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "enabled": true,
+          "tempo": 80,
+          "gateLength": 95,
+          "loop": true,
+          "midiData": "",
+          "selectedFile": ""
+        }
+      },
+      {
+        "id": "osc-8ft",
+        "type": "oscillator",
+        "name": "8' Principal",
+        "position": { "x": 5, "y": 0 },
+        "params": {
+          "frequency": 220,
+          "type": "sine",
+          "pwm": 0.5,
+          "unison": 1,
+          "detune": 0
+        }
+      },
+      {
+        "id": "osc-4ft",
+        "type": "oscillator",
+        "name": "4' Octave",
+        "position": { "x": 5, "y": 2 },
+        "params": {
+          "frequency": 440,
+          "type": "sine",
+          "pwm": 0.5,
+          "unison": 1,
+          "detune": 0
+        }
+      },
+      {
+        "id": "osc-2ft",
+        "type": "oscillator",
+        "name": "2' Fifteenth",
+        "position": { "x": 5, "y": 4 },
+        "params": {
+          "frequency": 880,
+          "type": "triangle",
+          "pwm": 0.5,
+          "unison": 1,
+          "detune": 0
+        }
+      },
+      {
+        "id": "mixer-1",
+        "type": "mixer-1x2",
+        "name": "Drawbars",
+        "position": { "x": 7, "y": 1 },
+        "params": {
+          "ch1": 0.8,
+          "ch2": 0.5,
+          "ch3": 0.3,
+          "ch4": 0,
+          "ch5": 0,
+          "ch6": 0,
+          "master": 0.7
+        }
+      },
+      {
+        "id": "adsr-1",
+        "type": "adsr",
+        "name": "Env",
+        "position": { "x": 7, "y": 4 },
+        "params": {
+          "attack": 0.005,
+          "decay": 0.1,
+          "sustain": 0.9,
+          "release": 0.15
+        }
+      },
+      {
+        "id": "vca-1",
+        "type": "gain",
+        "name": "VCA",
+        "position": { "x": 9, "y": 1 },
+        "params": {
+          "gain": 0.6
+        }
+      },
+      {
+        "id": "chorus-1",
+        "type": "chorus",
+        "name": "Chorus",
+        "position": { "x": 11, "y": 1 },
+        "params": {
+          "rate": 1.5,
+          "depth": 0.3,
+          "mix": 0.3
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "spring-reverb",
+        "name": "Spring",
+        "position": { "x": 13, "y": 1 },
+        "params": {
+          "mix": 0.25,
+          "decay": 2.0,
+          "tension": 0.6,
+          "damping": 0.4,
+          "drive": 0.1
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Main Out",
+        "position": { "x": 15, "y": 1 },
+        "params": {
+          "level": 0.7
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "midiseq-1", "portId": "cv-1" },
+        "to": { "moduleId": "osc-8ft", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "midiseq-1", "portId": "cv-1" },
+        "to": { "moduleId": "osc-4ft", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "midiseq-1", "portId": "cv-1" },
+        "to": { "moduleId": "osc-2ft", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "midiseq-1", "portId": "gate-1" },
+        "to": { "moduleId": "adsr-1", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "osc-8ft", "portId": "out" },
+        "to": { "moduleId": "mixer-1", "portId": "in-a" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "osc-4ft", "portId": "out" },
+        "to": { "moduleId": "mixer-1", "portId": "in-b" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "osc-2ft", "portId": "out" },
+        "to": { "moduleId": "mixer-1", "portId": "in-c" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "mixer-1", "portId": "out" },
+        "to": { "moduleId": "vca-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "adsr-1", "portId": "env" },
+        "to": { "moduleId": "vca-1", "portId": "cv" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "vca-1", "portId": "out" },
+        "to": { "moduleId": "chorus-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "chorus-1", "portId": "out" },
+        "to": { "moduleId": "reverb-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb-1", "portId": "out" },
+        "to": { "moduleId": "out-1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

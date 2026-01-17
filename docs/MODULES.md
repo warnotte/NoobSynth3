@@ -947,8 +947,11 @@ Séquenceur capable de charger et jouer des fichiers MIDI standards avec 8 piste
 | Velocity | `vel-1` à `vel-8` | Vélocité (0-1) |
 | Tick | `tick-out` | Position de lecture |
 
-**Presets inclus :**
+**Presets MIDI inclus :**
 - Bach - Toccata et Fugue en ré mineur BWV 565 (arrangement Busoni)
+- Zelda - Kakariko Village
+- Zelda - Fairy Fountain
+- Zelda - Dark World
 
 **Usage typique :**
 ```

@@ -1,5 +1,5 @@
 use dsp_graph::GraphEngine;
-use js_sys::Float32Array;
+use js_sys::{Float32Array, Uint8Array};
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
@@ -88,5 +88,11 @@ impl WasmGraphEngine {
   /// Returns 0 if module not found or not a MIDI file sequencer
   pub fn get_midi_total_ticks(&self, module_id: &str) -> i32 {
     self.engine.get_midi_total_ticks(module_id)
+  }
+
+  /// Drain MIDI events from a sequencer. Returns [track, note, velocity, is_on, ...]
+  pub fn drain_midi_events(&mut self, module_id: &str) -> Uint8Array {
+    let data = self.engine.drain_midi_events(module_id);
+    Uint8Array::from(&data[..])
   }
 }

@@ -1,0 +1,306 @@
+{
+  "id": "midi-bach-organ",
+  "name": "Bach 2-Voice Organ",
+  "description": "Two-voice baroque organ for Bach Inventions. Track 1: Soprano (8'+4'+2'), Track 2: Bass (16'+8')",
+  "group": "MIDI Sequencer",
+  "graph": {
+    "modules": [
+      {
+        "id": "midiseq-1",
+        "type": "midi-file-sequencer",
+        "name": "MIDI File Seq",
+        "position": { "x": 0, "y": 2 },
+        "params": {
+          "enabled": true,
+          "tempo": 72,
+          "gateLength": 88,
+          "loop": true,
+          "midiData": "",
+          "selectedFile": ""
+        }
+      },
+      {
+        "id": "osc-s8",
+        "type": "oscillator",
+        "name": "S 8'",
+        "position": { "x": 4, "y": 0 },
+        "params": {
+          "frequency": 220,
+          "type": "sine",
+          "pwm": 0.5,
+          "unison": 1,
+          "detune": 0
+        }
+      },
+      {
+        "id": "osc-s4",
+        "type": "oscillator",
+        "name": "S 4'",
+        "position": { "x": 4, "y": 1 },
+        "params": {
+          "frequency": 440,
+          "type": "sine",
+          "pwm": 0.5,
+          "unison": 1,
+          "detune": 0
+        }
+      },
+      {
+        "id": "osc-s2",
+        "type": "oscillator",
+        "name": "S 2'",
+        "position": { "x": 4, "y": 2 },
+        "params": {
+          "frequency": 880,
+          "type": "triangle",
+          "pwm": 0.5,
+          "unison": 1,
+          "detune": 0
+        }
+      },
+      {
+        "id": "osc-b16",
+        "type": "oscillator",
+        "name": "B 16'",
+        "position": { "x": 4, "y": 4 },
+        "params": {
+          "frequency": 55,
+          "type": "sine",
+          "pwm": 0.5,
+          "unison": 1,
+          "detune": 0
+        }
+      },
+      {
+        "id": "osc-b8",
+        "type": "oscillator",
+        "name": "B 8'",
+        "position": { "x": 4, "y": 5 },
+        "params": {
+          "frequency": 110,
+          "type": "triangle",
+          "pwm": 0.5,
+          "unison": 1,
+          "detune": 0
+        }
+      },
+      {
+        "id": "mix-s",
+        "type": "mixer-1x2",
+        "name": "Soprano",
+        "position": { "x": 6, "y": 0 },
+        "params": {
+          "ch1": 0.7,
+          "ch2": 0.4,
+          "ch3": 0.25,
+          "ch4": 0,
+          "ch5": 0,
+          "ch6": 0,
+          "master": 0.7
+        }
+      },
+      {
+        "id": "mix-b",
+        "type": "mixer",
+        "name": "Bass",
+        "position": { "x": 6, "y": 4 },
+        "params": {
+          "ch1": 0.6,
+          "ch2": 0.5,
+          "master": 0.65
+        }
+      },
+      {
+        "id": "adsr-s",
+        "type": "adsr",
+        "name": "Env S",
+        "position": { "x": 6, "y": 2 },
+        "params": {
+          "attack": 0.005,
+          "decay": 0.1,
+          "sustain": 0.9,
+          "release": 0.12
+        }
+      },
+      {
+        "id": "adsr-b",
+        "type": "adsr",
+        "name": "Env B",
+        "position": { "x": 6, "y": 5 },
+        "params": {
+          "attack": 0.008,
+          "decay": 0.15,
+          "sustain": 0.85,
+          "release": 0.2
+        }
+      },
+      {
+        "id": "vca-s",
+        "type": "gain",
+        "name": "VCA S",
+        "position": { "x": 8, "y": 0 },
+        "params": {
+          "gain": 0.55
+        }
+      },
+      {
+        "id": "vca-b",
+        "type": "gain",
+        "name": "VCA B",
+        "position": { "x": 8, "y": 4 },
+        "params": {
+          "gain": 0.5
+        }
+      },
+      {
+        "id": "mixer-main",
+        "type": "mixer",
+        "name": "Main",
+        "position": { "x": 10, "y": 2 },
+        "params": {
+          "ch1": 0.6,
+          "ch2": 0.6,
+          "master": 0.8
+        }
+      },
+      {
+        "id": "chorus-1",
+        "type": "chorus",
+        "name": "Chorus",
+        "position": { "x": 12, "y": 2 },
+        "params": {
+          "rate": 1.2,
+          "depth": 0.2,
+          "mix": 0.25
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Hall",
+        "position": { "x": 14, "y": 2 },
+        "params": {
+          "mix": 0.3,
+          "decay": 2.5,
+          "damping": 0.5
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Main Out",
+        "position": { "x": 16, "y": 2 },
+        "params": {
+          "level": 0.7
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "midiseq-1", "portId": "cv-1" },
+        "to": { "moduleId": "osc-s8", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "midiseq-1", "portId": "cv-1" },
+        "to": { "moduleId": "osc-s4", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "midiseq-1", "portId": "cv-1" },
+        "to": { "moduleId": "osc-s2", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "midiseq-1", "portId": "gate-1" },
+        "to": { "moduleId": "adsr-s", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "midiseq-1", "portId": "cv-2" },
+        "to": { "moduleId": "osc-b16", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "midiseq-1", "portId": "cv-2" },
+        "to": { "moduleId": "osc-b8", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "midiseq-1", "portId": "gate-2" },
+        "to": { "moduleId": "adsr-b", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "osc-s8", "portId": "out" },
+        "to": { "moduleId": "mix-s", "portId": "in-a" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "osc-s4", "portId": "out" },
+        "to": { "moduleId": "mix-s", "portId": "in-b" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "osc-s2", "portId": "out" },
+        "to": { "moduleId": "mix-s", "portId": "in-c" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "osc-b16", "portId": "out" },
+        "to": { "moduleId": "mix-b", "portId": "in-a" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "osc-b8", "portId": "out" },
+        "to": { "moduleId": "mix-b", "portId": "in-b" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "mix-s", "portId": "out" },
+        "to": { "moduleId": "vca-s", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "adsr-s", "portId": "env" },
+        "to": { "moduleId": "vca-s", "portId": "cv" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "mix-b", "portId": "out" },
+        "to": { "moduleId": "vca-b", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "adsr-b", "portId": "env" },
+        "to": { "moduleId": "vca-b", "portId": "cv" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "vca-s", "portId": "out" },
+        "to": { "moduleId": "mixer-main", "portId": "in-a" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "vca-b", "portId": "out" },
+        "to": { "moduleId": "mixer-main", "portId": "in-b" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "mixer-main", "portId": "out" },
+        "to": { "moduleId": "chorus-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "chorus-1", "portId": "out" },
+        "to": { "moduleId": "reverb-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb-1", "portId": "out" },
+        "to": { "moduleId": "out-1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

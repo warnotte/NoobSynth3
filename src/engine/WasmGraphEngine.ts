@@ -20,6 +20,8 @@ export class AudioEngine {
   private micMeterData: Uint8Array<ArrayBuffer> | null = null
   private sequencerStepCallbacks: Map<string, (step: number) => void> = new Map()
   private watchedSequencers: Set<string> = new Set()
+  private midiEventCallback: ((events: Array<{track: number, note: number, velocity: number, isNoteOn: boolean}>) => void) | null = null
+  private watchedMidiSeq: string | null = null
 
   async start(graph: GraphState): Promise<void> {
     await this.init()
@@ -264,12 +266,14 @@ export class AudioEngine {
   }
 
   watchSequencer(moduleId: string, callback: (step: number) => void): () => void {
+    console.log('[Engine] watchSequencer called for:', moduleId)
     this.sequencerStepCallbacks.set(moduleId, callback)
     this.watchedSequencers.add(moduleId)
     this.syncWatchedSequencers()
 
     // Return unsubscribe function
     return () => {
+      console.log('[Engine] unwatch sequencer:', moduleId)
       this.sequencerStepCallbacks.delete(moduleId)
       this.watchedSequencers.delete(moduleId)
       this.syncWatchedSequencers()
@@ -281,6 +285,20 @@ export class AudioEngine {
       type: 'watchSequencers',
       moduleIds: Array.from(this.watchedSequencers),
     })
+  }
+
+  watchMidiSequencer(
+    moduleId: string,
+    callback: (events: Array<{track: number, note: number, velocity: number, isNoteOn: boolean}>) => void
+  ): () => void {
+    this.midiEventCallback = callback
+    this.watchedMidiSeq = moduleId
+    this.graphNode?.port.postMessage({ type: 'watchMidiSeq', moduleId })
+    return () => {
+      this.midiEventCallback = null
+      this.watchedMidiSeq = null
+      this.graphNode?.port.postMessage({ type: 'watchMidiSeq', moduleId: null })
+    }
   }
 
   private async init(): Promise<void> {
@@ -344,20 +362,47 @@ export class AudioEngine {
 
     // Listen for messages from the worklet
     this.graphNode.port.onmessage = (event) => {
-      const data = event.data as { type: string; steps?: Record<string, number> }
+      const data = event.data as { type: string; steps?: Record<string, number>; data?: number[] }
       if (data.type === 'sequencerSteps' && data.steps) {
-        for (const [moduleId, step] of Object.entries(data.steps)) {
+        // Debug: log incoming step updates (throttled)
+        const stepEntries = Object.entries(data.steps)
+        if (stepEntries.length > 0 && stepEntries[0][1] % 200 === 0) {
+          console.log('[Engine] Received sequencerSteps:', data.steps)
+        }
+        for (const [moduleId, step] of stepEntries) {
           const callback = this.sequencerStepCallbacks.get(moduleId)
           if (callback) {
             callback(step)
+          } else {
+            // Debug: log if callback not found
+            console.warn('[Engine] No callback for moduleId:', moduleId, 'watched:', Array.from(this.sequencerStepCallbacks.keys()))
           }
         }
+      } else if (data.type === 'debug') {
+        // Debug message from worklet
+        console.log('[Worklet Debug]', (data as { type: string; info: unknown }).info)
+      } else if (data.type === 'midiEvents' && data.data && this.midiEventCallback) {
+        const events: Array<{track: number, note: number, velocity: number, isNoteOn: boolean}> = []
+        for (let i = 0; i < data.data.length; i += 4) {
+          events.push({
+            track: data.data[i],
+            note: data.data[i + 1],
+            velocity: data.data[i + 2],
+            isNoteOn: data.data[i + 3] === 1,
+          })
+        }
+        this.midiEventCallback(events)
       }
     }
 
     // Re-send watched sequencers if any
     if (this.watchedSequencers.size > 0) {
       this.syncWatchedSequencers()
+    }
+
+    // Re-sync watched MIDI sequencer if any
+    if (this.watchedMidiSeq) {
+      this.graphNode.port.postMessage({ type: 'watchMidiSeq', moduleId: this.watchedMidiSeq })
     }
 
     this.buildScopeAnalysers()
