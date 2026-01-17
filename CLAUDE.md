@@ -185,6 +185,18 @@ control, output, audio-in, scope, lab, notes
 - Swing support
 - 17 outputs: 8 gates + 8 accents + step position
 
+### MIDI File Sequencer Polyphony
+Le MIDI File Sequencer supporte la polyphonie par piste via le système de voix du graph engine:
+- Marqué comme `is_poly_type()` → N instances créées (une par voix)
+- Contribue à `resolve_voice_count()` via le param `voices` (défaut: 4)
+- Allocation de voix par piste (notes simultanées d'une piste → voix différentes)
+- Chaque instance n'output que les notes où `note.voice == voice_index`
+- Fonctionne comme Control: 1 CV/Gate par piste, mais N instances poly
+
+**Fichiers clés:**
+- `crates/dsp-core/src/sequencers/midi_file_sequencer.rs` - DSP avec voice_index
+- `crates/dsp-graph/src/lib.rs` - is_poly_type() et resolve_voice_count()
+
 ### TR-909 Drums - Accent Latching
 Les drums 909 utilisent un mécanisme de "latching" pour l'accent:
 - L'accent CV est capturé au moment du trigger (front montant du gate)

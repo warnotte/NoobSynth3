@@ -668,6 +668,7 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     tempo: 120,
     gateLength: 90,     // 90% gate
     loop: true,
+    voices: 4,          // Polyphony per track
     midiData: '',       // JSON string, set when loading MIDI file
     selectedFile: '',   // Current file name for display
     mute1: false,

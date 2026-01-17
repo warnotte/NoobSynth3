@@ -524,7 +524,7 @@ impl ModuleNode {
     let inputs = input_ports(module_type);
     let outputs = output_ports(module_type);
     let connections = (0..inputs.len()).map(|_| Vec::new()).collect();
-    let state = instantiate::create_state(module_type, params, sample_rate);
+    let state = instantiate::create_state(module_type, params, sample_rate, voice_index);
 
     Self {
       voice_index,
@@ -641,6 +641,7 @@ fn is_poly_type(module_type: ModuleType) -> bool {
       | ModuleType::Distortion
       | ModuleType::Wavefolder
       | ModuleType::Control
+      | ModuleType::MidiFileSequencer
   )
 }
 
@@ -648,7 +649,7 @@ fn is_poly_type(module_type: ModuleType) -> bool {
 fn resolve_voice_count(modules: &[ModuleSpecJson]) -> usize {
   let mut voice_count = 1.0;
   for module in modules {
-    if module.kind == "control" {
+    if module.kind == "control" || module.kind == "midi-file-sequencer" {
       if let Some(params) = &module.params {
         let v = param_number(params, "voices", 1.0);
         if v > voice_count {

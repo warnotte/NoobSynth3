@@ -922,7 +922,7 @@ Séquenceur thématique avec chansons NES/SNES.
 
 ### MIDI File Sequencer
 
-Séquenceur capable de charger et jouer des fichiers MIDI standards avec 8 pistes de sortie.
+Séquenceur capable de charger et jouer des fichiers MIDI standards avec 8 pistes de sortie et polyphonie par piste.
 
 | Paramètre | Range | Description |
 |-----------|-------|-------------|
@@ -930,6 +930,7 @@ Séquenceur capable de charger et jouer des fichiers MIDI standards avec 8 piste
 | `tempo` | 40-300 BPM | Tempo de lecture |
 | `gateLength` | 10-100 % | Durée du gate (% de la durée note MIDI) |
 | `loop` | true/false | Bouclage du fichier |
+| `voices` | 1-8 | Nombre de voix polyphoniques par piste |
 | `midiData` | string (JSON) | Données MIDI parsées |
 | `selectedFile` | string | Nom du fichier chargé |
 
@@ -947,6 +948,9 @@ Séquenceur capable de charger et jouer des fichiers MIDI standards avec 8 piste
 | Velocity | `vel-1` à `vel-8` | Vélocité (0-1) |
 | Tick | `tick-out` | Position de lecture |
 
+**Polyphonie :**
+Le séquenceur supporte la polyphonie par piste. Quand `voices > 1`, les notes simultanées d'une même piste sont distribuées aux différentes voix. Les modules poly connectés (VCO, Pipe Organ, etc.) sont automatiquement instanciés pour chaque voix.
+
 **Presets MIDI inclus :**
 - Bach - Toccata et Fugue en ré mineur BWV 565 (arrangement Busoni)
 - Zelda - Kakariko Village
@@ -955,9 +959,9 @@ Séquenceur capable de charger et jouer des fichiers MIDI standards avec 8 piste
 
 **Usage typique :**
 ```
-MIDI File Seq → cv-1 → VCO (pitch)
-             → gate-1 → ADSR (gate)
-             → vel-1 → VCA (cv) ou VCF (env)
+MIDI File Seq → cv-1 → Pipe Organ (pitch)
+             → gate-1 → Pipe Organ (gate)
+             → vel-1 → VCA (cv)
 ```
 
 **Note** : Le fichier MIDI est parsé en JavaScript et les données sont transmises au DSP sous forme JSON. Jusqu'à 8192 notes par piste sont supportées.

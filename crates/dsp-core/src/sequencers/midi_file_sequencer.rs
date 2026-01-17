@@ -120,6 +120,7 @@ pub struct MidiFileSequencer {
     voice_notes: [Option<(u8, u8, u32)>; MAX_POLY_VOICES],
     voice_clock: u32, // For LRU tracking
     voice_count: usize, // Total number of voices (set by graph engine)
+    voice_index: usize, // This instance's voice index (for poly output filtering)
 }
 
 /// Input signals for MidiFileSequencer.
@@ -199,12 +200,18 @@ impl MidiFileSequencer {
             voice_notes: [None; MAX_POLY_VOICES],
             voice_clock: 0,
             voice_count: 1,
+            voice_index: 0,
         }
     }
 
     /// Set the total number of polyphonic voices.
     pub fn set_voice_count(&mut self, count: usize) {
         self.voice_count = count.max(1).min(MAX_POLY_VOICES);
+    }
+
+    /// Set this instance's voice index (for polyphonic output filtering).
+    pub fn set_voice_index(&mut self, index: usize) {
+        self.voice_index = index;
     }
 
     /// Allocate a voice for a new note. Returns the voice index.
@@ -429,23 +436,34 @@ impl MidiFileSequencer {
             }
         }
 
-        // Pre-allocate voices based on note order across all tracks
-        // Collect all notes with their track index
-        let mut all_notes: Vec<(usize, usize, u32)> = Vec::new(); // (track_idx, note_idx, tick)
-        for (track_idx, track) in self.tracks.iter().enumerate() {
-            for (note_idx, note) in track.notes.iter().enumerate() {
-                all_notes.push((track_idx, note_idx, note.tick));
-            }
-        }
-
-        // Sort by tick (stable sort preserves order for same tick)
-        all_notes.sort_by_key(|&(_, _, tick)| tick);
-
-        // Assign voices using round-robin
+        // Pre-allocate voices PER TRACK (not globally)
+        // This ensures each track has independent polyphony
         let vc = self.voice_count.max(1).min(MAX_POLY_VOICES);
-        for (i, &(track_idx, note_idx, _)) in all_notes.iter().enumerate() {
-            let voice = (i % vc) as u8;
-            self.tracks[track_idx].notes[note_idx].voice = voice;
+
+        for track in &mut self.tracks {
+            if track.notes.is_empty() {
+                continue;
+            }
+
+            // Sort notes by tick, then by pitch for deterministic ordering
+            track.notes.sort_by(|a, b| {
+                a.tick.cmp(&b.tick).then_with(|| a.note.cmp(&b.note))
+            });
+
+            // Assign voices: notes at same tick get different voices (round-robin)
+            // Notes at different ticks can reuse voices
+            let mut current_tick = track.notes[0].tick;
+            let mut voice_at_tick = 0usize;
+
+            for note in &mut track.notes {
+                if note.tick != current_tick {
+                    // New tick, reset voice counter
+                    current_tick = note.tick;
+                    voice_at_tick = 0;
+                }
+                note.voice = (voice_at_tick % vc) as u8;
+                voice_at_tick += 1;
+            }
         }
 
         // Reset playback state
@@ -706,25 +724,28 @@ impl MidiFileSequencer {
                 while track.note_index < track.notes.len() {
                     let note = &track.notes[track.note_index];
                     if note.tick <= current_tick_int {
-                        // Trigger this note
-                        track.active_note = Some(*note);
+                        // Only trigger if this note is assigned to our voice
+                        if note.voice as usize == self.voice_index {
+                            // Trigger this note for our voice
+                            track.active_note = Some(*note);
 
-                        // Calculate gate length in samples based on note duration and gate %
-                        let note_duration_samples =
-                            (note.duration as f64 * self.samples_per_tick) as usize;
-                        self.gate_length_samples[track_idx] =
-                            ((note_duration_samples as f64 * gate_pct as f64) as usize).max(1);
+                            // Calculate gate length in samples based on note duration and gate %
+                            let note_duration_samples =
+                                (note.duration as f64 * self.samples_per_tick) as usize;
+                            self.gate_length_samples[track_idx] =
+                                ((note_duration_samples as f64 * gate_pct as f64) as usize).max(1);
 
-                        self.gate_on[track_idx] = true;
-                        self.gate_samples[track_idx] = 0;
-                        self.current_cv[track_idx] = Self::note_to_cv(note.note);
-                        self.current_velocity[track_idx] = note.velocity as f32 / 127.0;
-                        self.current_gate[track_idx] = 1.0;
+                            self.gate_on[track_idx] = true;
+                            self.gate_samples[track_idx] = 0;
+                            self.current_cv[track_idx] = Self::note_to_cv(note.note);
+                            self.current_velocity[track_idx] = note.velocity as f32 / 127.0;
+                            self.current_gate[track_idx] = 1.0;
 
-                        // Mark for event push (after borrow ends)
-                        if !track_muted[track_idx] {
-                            triggered[track_idx] = (note.note, note.velocity, note.voice);
-                            has_trigger[track_idx] = true;
+                            // Mark for event push (after borrow ends)
+                            if !track_muted[track_idx] {
+                                triggered[track_idx] = (note.note, note.velocity, note.voice);
+                                has_trigger[track_idx] = true;
+                            }
                         }
 
                         track.note_index += 1;

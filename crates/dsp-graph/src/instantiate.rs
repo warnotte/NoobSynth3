@@ -19,6 +19,7 @@ pub(crate) fn create_state(
   module_type: ModuleType,
   params: &HashMap<String, serde_json::Value>,
   sample_rate: f32,
+  voice_index: Option<usize>,
 ) -> ModuleState {
   match module_type {
     ModuleType::Oscillator => ModuleState::Vco(VcoState {
@@ -376,6 +377,11 @@ pub(crate) fn create_state(
     }
     ModuleType::MidiFileSequencer => {
       let mut seq = MidiFileSequencer::new(sample_rate);
+      // Set voice count from params
+      let voice_count = param_number(params, "voices", 4.0) as usize;
+      seq.set_voice_count(voice_count);
+      // Set voice index for this instance
+      seq.set_voice_index(voice_index.unwrap_or(0));
       // Parse initial MIDI data if provided
       if let Some(midi_data) = params.get("midiData") {
         if let Some(s) = midi_data.as_str() {
@@ -384,6 +390,7 @@ pub(crate) fn create_state(
       }
       ModuleState::MidiFileSequencer(MidiFileSequencerState {
         seq,
+        voice_index: voice_index.unwrap_or(0),
         enabled: ParamBuffer::new(param_number(params, "enabled", 1.0)),
         tempo: ParamBuffer::new(param_number(params, "tempo", 120.0)),
         gate_length: ParamBuffer::new(param_number(params, "gateLength", 90.0)),

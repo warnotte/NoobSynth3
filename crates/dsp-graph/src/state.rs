@@ -421,6 +421,7 @@ pub struct MarioState {
 
 pub struct MidiFileSequencerState {
     pub seq: MidiFileSequencer,
+    pub voice_index: usize,
     pub enabled: ParamBuffer,
     pub tempo: ParamBuffer,
     pub gate_length: ParamBuffer,

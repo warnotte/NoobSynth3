@@ -15,6 +15,7 @@
           "tempo": 120,
           "gateLength": 90,
           "loop": true,
+          "voices": 4,
           "midiData": "",
           "selectedFile": ""
         }
