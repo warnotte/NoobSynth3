@@ -1,0 +1,158 @@
+{
+  "id": "midi-snes-zelda",
+  "name": "SNES Zelda",
+  "description": "Zelda ALTTP style using SNES oscillators. Track 1: Lead, Track 2: Bass/Harmony",
+  "group": "MIDI Sequencer",
+  "graph": {
+    "modules": [
+      {
+        "id": "midiseq-1",
+        "type": "midi-file-sequencer",
+        "name": "MIDI File",
+        "position": { "x": 0, "y": 2 },
+        "params": {
+          "enabled": true,
+          "tempo": 120,
+          "gateLength": 90,
+          "loop": true,
+          "midiData": "",
+          "selectedFile": ""
+        }
+      },
+      {
+        "id": "snes-1",
+        "type": "snes-osc",
+        "name": "Lead",
+        "position": { "x": 4, "y": 0 },
+        "params": {
+          "frequency": 220,
+          "fine": 0,
+          "volume": 1.0,
+          "wave": 2,
+          "gauss": 0.6,
+          "color": 0.6,
+          "lofi": 0.4
+        }
+      },
+      {
+        "id": "snes-2",
+        "type": "snes-osc",
+        "name": "Bass",
+        "position": { "x": 4, "y": 3 },
+        "params": {
+          "frequency": 110,
+          "fine": 0,
+          "volume": 1.0,
+          "wave": 0,
+          "gauss": 0.7,
+          "color": 0.4,
+          "lofi": 0.5
+        }
+      },
+      {
+        "id": "adsr-1",
+        "type": "adsr",
+        "name": "Env 1",
+        "position": { "x": 4, "y": 2 },
+        "params": {
+          "attack": 0.01,
+          "decay": 0.15,
+          "sustain": 0.7,
+          "release": 0.2
+        }
+      },
+      {
+        "id": "adsr-2",
+        "type": "adsr",
+        "name": "Env 2",
+        "position": { "x": 4, "y": 5 },
+        "params": {
+          "attack": 0.005,
+          "decay": 0.1,
+          "sustain": 0.8,
+          "release": 0.15
+        }
+      },
+      {
+        "id": "vca-1",
+        "type": "gain",
+        "name": "VCA 1",
+        "position": { "x": 6, "y": 0 },
+        "params": {
+          "gain": 0.7
+        }
+      },
+      {
+        "id": "vca-2",
+        "type": "gain",
+        "name": "VCA 2",
+        "position": { "x": 6, "y": 3 },
+        "params": {
+          "gain": 0.6
+        }
+      },
+      {
+        "id": "mixer-1",
+        "type": "mixer",
+        "name": "Mix",
+        "position": { "x": 8, "y": 1 },
+        "params": {
+          "ch1": 0.7,
+          "ch2": 0.5,
+          "master": 0.8
+        }
+      },
+      {
+        "id": "delay-1",
+        "type": "delay",
+        "name": "Echo",
+        "position": { "x": 10, "y": 1 },
+        "params": {
+          "time": 0.25,
+          "feedback": 0.3,
+          "mix": 0.25
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Room",
+        "position": { "x": 12, "y": 1 },
+        "params": {
+          "mix": 0.2,
+          "decay": 1.5,
+          "damping": 0.5
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Main Out",
+        "position": { "x": 14, "y": 1 },
+        "params": {
+          "level": 0.7
+        }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "midiseq-1", "portId": "cv-1" }, "to": { "moduleId": "snes-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "midiseq-1", "portId": "gate-1" }, "to": { "moduleId": "adsr-1", "portId": "gate" }, "kind": "gate" },
+
+      { "from": { "moduleId": "midiseq-1", "portId": "cv-2" }, "to": { "moduleId": "snes-2", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "midiseq-1", "portId": "gate-2" }, "to": { "moduleId": "adsr-2", "portId": "gate" }, "kind": "gate" },
+
+      { "from": { "moduleId": "snes-1", "portId": "out" }, "to": { "moduleId": "vca-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-1", "portId": "env" }, "to": { "moduleId": "vca-1", "portId": "cv" }, "kind": "cv" },
+
+      { "from": { "moduleId": "snes-2", "portId": "out" }, "to": { "moduleId": "vca-2", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-2", "portId": "env" }, "to": { "moduleId": "vca-2", "portId": "cv" }, "kind": "cv" },
+
+      { "from": { "moduleId": "vca-1", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "vca-2", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-b" }, "kind": "audio" },
+
+      { "from": { "moduleId": "mixer-1", "portId": "out" }, "to": { "moduleId": "delay-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "delay-1", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}

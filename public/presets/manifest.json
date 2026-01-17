@@ -707,6 +707,13 @@
       "description": "Full pipe organ with 5 footages (16', 8', 4', 2-2/3', 2') and cathedral reverb for Bach works.",
       "file": "midi-bach-pipe-organ.json",
       "group": "MIDI Sequencer"
+    },
+    {
+      "id": "midi-snes-zelda",
+      "name": "SNES Zelda",
+      "description": "Zelda ALTTP style using SNES oscillators for authentic 16-bit sound.",
+      "file": "midi-snes-zelda.json",
+      "group": "MIDI Sequencer"
     }
   ]
 }
