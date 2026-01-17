@@ -982,6 +982,7 @@ function MidiFileSequencerUI({ module, engine, status, updateParam }: Pick<Contr
   const loopEnabled = module.params.loop !== false
   const tempo = Number(module.params.tempo ?? 120)
   const gateLength = Number(module.params.gateLength ?? 90)
+  const voices = Number(module.params.voices ?? 4)
   const selectedFile = String(module.params.selectedFile ?? '')
   const midiDataStr = String(module.params.midiData ?? '')
 
@@ -1102,6 +1103,15 @@ function MidiFileSequencerUI({ module, engine, status, updateParam }: Pick<Contr
             unit="%"
             value={gateLength}
             onChange={(value) => updateParam(module.id, 'gateLength', value)}
+            format={formatInt}
+          />
+          <RotaryKnob
+            label="Voices"
+            min={1}
+            max={8}
+            step={1}
+            value={voices}
+            onChange={(value) => updateParam(module.id, 'voices', value)}
             format={formatInt}
           />
         </ControlBox>
