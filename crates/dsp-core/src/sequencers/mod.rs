@@ -14,6 +14,7 @@
 //! ## Note Sequencers
 //! - [`Arpeggiator`] - Arpeggiator with multiple modes and patterns
 //! - [`StepSequencer`] - 16-step CV/gate sequencer with slide
+//! - [`MidiFileSequencer`] - MIDI file playback with 8 tracks
 //!
 //! ## Rhythm Sequencers
 //! - [`DrumSequencer`] - 8-track, 16-step drum pattern sequencer
@@ -62,6 +63,7 @@ pub mod step_sequencer;
 pub mod drum_sequencer;
 pub mod euclidean;
 pub mod mario;
+pub mod midi_file_sequencer;
 
 // ============================================================================
 // Shared Rate Divisions
@@ -151,3 +153,7 @@ pub use euclidean::{
     EUCLIDEAN_MAX_STEPS,
 };
 pub use mario::{Mario, MarioOutputs, MARIO_CHANNELS};
+pub use midi_file_sequencer::{
+    MidiFileSequencer, MidiFileSequencerInputs, MidiFileSequencerParams, MidiFileSequencerOutputs,
+    MidiNote, MidiTrack, MIDI_TRACKS, MAX_NOTES_PER_TRACK,
+};

@@ -1,11 +1,11 @@
 /**
  * Sequencer module controls
  *
- * Modules: arpeggiator, step-sequencer, drum-sequencer, euclidean, clock, mario
+ * Modules: arpeggiator, step-sequencer, drum-sequencer, euclidean, clock, mario, midi-file-sequencer
  */
 
 import type React from 'react'
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { ControlProps } from './types'
 import { RotaryKnob } from '../RotaryKnob'
 import { ToggleButton, ToggleGroup } from '../ToggleButton'
@@ -457,6 +457,10 @@ export function renderSequencerControls(props: ControlProps): React.ReactElement
         </div>
       </>
     )
+  }
+
+  if (module.type === 'midi-file-sequencer') {
+    return <MidiFileSequencerUI module={module} engine={engine} status={status} updateParam={updateParam} />
   }
 
   return null
@@ -970,4 +974,211 @@ function DrumSequencerUI({ module, engine, status, updateParam }: Pick<ControlPr
       </div>
     </>
   )
+}
+
+// MIDI File Sequencer sub-component
+function MidiFileSequencerUI({ module, engine, status, updateParam }: Pick<ControlProps, 'module' | 'engine' | 'status' | 'updateParam'>) {
+  const enabled = module.params.enabled !== false
+  const loopEnabled = module.params.loop !== false
+  const tempo = Number(module.params.tempo ?? 120)
+  const gateLength = Number(module.params.gateLength ?? 90)
+  const selectedFile = String(module.params.selectedFile ?? '')
+  const midiDataStr = String(module.params.midiData ?? '')
+
+  // Parse track info and total ticks from stored MIDI data
+  const trackInfo = useMidiTrackInfo(midiDataStr)
+  const totalTicks = useMidiTotalTicks(midiDataStr)
+
+  // State for playhead position
+  const [currentTick, setCurrentTick] = useState(0)
+
+  // Watch sequencer for playhead updates
+  useEffect(() => {
+    if (!enabled || status !== 'running') {
+      setCurrentTick(0)
+      return
+    }
+
+    const unsubscribe = engine.watchSequencer(module.id, (tick: number) => {
+      setCurrentTick(tick)
+    })
+    return unsubscribe
+  }, [enabled, status, module.id, engine])
+
+  const handleFileLoad = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    try {
+      // Dynamic import to avoid bundling @tonejs/midi when not needed
+      const { parseMidiFile, serializeMidiData } = await import('../../utils/midiParser')
+      const midiData = await parseMidiFile(file)
+      const serialized = serializeMidiData(midiData)
+
+      updateParam(module.id, 'midiData', serialized)
+      updateParam(module.id, 'selectedFile', file.name)
+    } catch (err) {
+      console.error('Failed to parse MIDI file:', err)
+    }
+  }, [module.id, updateParam])
+
+  const handlePresetLoad = useCallback(async (presetId: string) => {
+    if (!presetId) return
+
+    try {
+      const { loadMidiPreset, serializeMidiData } = await import('../../utils/midiParser')
+      const midiData = await loadMidiPreset(presetId)
+      const serialized = serializeMidiData(midiData)
+
+      updateParam(module.id, 'midiData', serialized)
+      updateParam(module.id, 'selectedFile', `${presetId}.mid`)
+    } catch (err) {
+      console.error('Failed to load MIDI preset:', err)
+    }
+  }, [module.id, updateParam])
+
+  return (
+    <>
+      <ToggleGroup>
+        <ToggleButton
+          label="PLAY"
+          value={enabled}
+          onChange={(value) => updateParam(module.id, 'enabled', value)}
+          onLabel="STOP"
+          offLabel="PLAY"
+        />
+        <ToggleButton
+          label="LOOP"
+          value={loopEnabled}
+          onChange={(value) => updateParam(module.id, 'loop', value)}
+        />
+      </ToggleGroup>
+
+      <ControlBoxRow>
+        <ControlBox label="Timing" horizontal>
+          <RotaryKnob
+            label="Tempo"
+            min={40}
+            max={300}
+            step={1}
+            unit="BPM"
+            value={tempo}
+            onChange={(value) => updateParam(module.id, 'tempo', value)}
+            format={formatInt}
+          />
+          <RotaryKnob
+            label="Gate"
+            min={10}
+            max={100}
+            step={1}
+            unit="%"
+            value={gateLength}
+            onChange={(value) => updateParam(module.id, 'gateLength', value)}
+            format={formatInt}
+          />
+        </ControlBox>
+      </ControlBoxRow>
+
+      <div className="midi-seq-file-section">
+        <div className="midi-seq-file-name">
+          {selectedFile || 'No file loaded'}
+        </div>
+
+        {/* Progress bar */}
+        <div className="midi-seq-progress">
+          <div
+            className="midi-seq-progress-bar"
+            style={{ width: totalTicks > 0 ? `${(currentTick / totalTicks) * 100}%` : '0%' }}
+          />
+          <span className="midi-seq-progress-text">
+            {totalTicks > 0 ? `${Math.floor((currentTick / totalTicks) * 100)}%` : '-'}
+          </span>
+        </div>
+
+        <div className="midi-seq-file-buttons">
+          <label className="midi-seq-load-btn">
+            Load File
+            <input
+              type="file"
+              accept=".mid,.midi"
+              onChange={handleFileLoad}
+              style={{ display: 'none' }}
+            />
+          </label>
+
+          <select
+            className="midi-seq-preset-select"
+            value=""
+            onChange={(e) => handlePresetLoad(e.target.value)}
+          >
+            <option value="">Presets...</option>
+            <option value="bach-toccata">Bach - Toccata BWV 565</option>
+          </select>
+        </div>
+      </div>
+
+      <div className="midi-seq-tracks">
+        {trackInfo.map((track, idx) => {
+          const muteParam = `mute${idx + 1}` as const
+          const isMuted = module.params[muteParam] === true || module.params[muteParam] === 1
+          return (
+            <div key={idx} className={`midi-track ${track.hasNotes ? 'active' : ''} ${isMuted ? 'muted' : ''}`}>
+              <span className="midi-track-num">{idx + 1}</span>
+              <div className="midi-track-btns">
+                <button
+                  className={`midi-track-btn mute ${isMuted ? 'on' : ''}`}
+                  onClick={() => updateParam(module.id, muteParam, isMuted ? 0 : 1)}
+                  title={isMuted ? 'Unmute track' : 'Mute track'}
+                >
+                  M
+                </button>
+              </div>
+              <span className="midi-track-name">{track.name || `Track ${idx + 1}`}</span>
+              <span className="midi-track-notes">{track.noteCount > 0 ? `${track.noteCount}` : '-'}</span>
+            </div>
+          )
+        })}
+      </div>
+    </>
+  )
+}
+
+// Helper hook to parse track info from MIDI data string
+function useMidiTrackInfo(midiDataStr: string): Array<{ name: string; noteCount: number; hasNotes: boolean }> {
+  const emptyTracks = Array.from({ length: 8 }, (_, i) => ({
+    name: `Track ${i + 1}`,
+    noteCount: 0,
+    hasNotes: false,
+  }))
+
+  if (!midiDataStr) return emptyTracks
+
+  try {
+    const data = JSON.parse(midiDataStr)
+    if (!data.tracks) return emptyTracks
+
+    return Array.from({ length: 8 }, (_, i) => {
+      const track = data.tracks[i]
+      if (!track) return { name: `Track ${i + 1}`, noteCount: 0, hasNotes: false }
+      return {
+        name: track.name || `Track ${i + 1}`,
+        noteCount: track.notes?.length ?? 0,
+        hasNotes: (track.notes?.length ?? 0) > 0,
+      }
+    })
+  } catch {
+    return emptyTracks
+  }
+}
+
+// Helper hook to get total ticks from MIDI data string
+function useMidiTotalTicks(midiDataStr: string): number {
+  if (!midiDataStr) return 0
+
+  try {
+    const data = JSON.parse(midiDataStr)
+    return data.totalTicks ?? 0
+  } catch {
+    return 0
+  }
 }

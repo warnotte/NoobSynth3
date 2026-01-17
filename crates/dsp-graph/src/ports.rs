@@ -131,6 +131,11 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // pitch CV
       PortInfo { channels: 1 },  // sync
     ],
+    // MIDI File Sequencer - 2 inputs (clock, reset)
+    ModuleType::MidiFileSequencer => vec![
+      PortInfo { channels: 1 },  // clock
+      PortInfo { channels: 1 },  // reset
+    ],
   }
 }
 
@@ -260,6 +265,34 @@ pub fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
     // Shepard tone generator - 1 stereo output
     ModuleType::Shepard => vec![
       PortInfo { channels: 2 },  // stereo audio out
+    ],
+    // MIDI File Sequencer - 25 outputs (8 CV + 8 Gate + 8 Velocity + 1 Tick)
+    ModuleType::MidiFileSequencer => vec![
+      PortInfo { channels: 1 },  // cv-1
+      PortInfo { channels: 1 },  // cv-2
+      PortInfo { channels: 1 },  // cv-3
+      PortInfo { channels: 1 },  // cv-4
+      PortInfo { channels: 1 },  // cv-5
+      PortInfo { channels: 1 },  // cv-6
+      PortInfo { channels: 1 },  // cv-7
+      PortInfo { channels: 1 },  // cv-8
+      PortInfo { channels: 1 },  // gate-1
+      PortInfo { channels: 1 },  // gate-2
+      PortInfo { channels: 1 },  // gate-3
+      PortInfo { channels: 1 },  // gate-4
+      PortInfo { channels: 1 },  // gate-5
+      PortInfo { channels: 1 },  // gate-6
+      PortInfo { channels: 1 },  // gate-7
+      PortInfo { channels: 1 },  // gate-8
+      PortInfo { channels: 1 },  // vel-1
+      PortInfo { channels: 1 },  // vel-2
+      PortInfo { channels: 1 },  // vel-3
+      PortInfo { channels: 1 },  // vel-4
+      PortInfo { channels: 1 },  // vel-5
+      PortInfo { channels: 1 },  // vel-6
+      PortInfo { channels: 1 },  // vel-7
+      PortInfo { channels: 1 },  // vel-8
+      PortInfo { channels: 1 },  // tick-out
     ],
   }
 }
@@ -465,6 +498,12 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
       "rate-cv" | "rate" => Some(0),
       "pitch-cv" | "pitch" | "1volt" => Some(1),
       "sync" => Some(2),
+      _ => None,
+    },
+    // MIDI File Sequencer - 2 inputs
+    ModuleType::MidiFileSequencer => match port_id {
+      "clock" | "clk" => Some(0),
+      "reset" | "rst" => Some(1),
       _ => None,
     },
     _ => None,
@@ -691,6 +730,35 @@ pub fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize
     // Shepard - 1 output
     ModuleType::Shepard => match port_id {
       "out" | "output" => Some(0),
+      _ => None,
+    },
+    // MIDI File Sequencer - 25 outputs
+    ModuleType::MidiFileSequencer => match port_id {
+      "cv-1" => Some(0),
+      "cv-2" => Some(1),
+      "cv-3" => Some(2),
+      "cv-4" => Some(3),
+      "cv-5" => Some(4),
+      "cv-6" => Some(5),
+      "cv-7" => Some(6),
+      "cv-8" => Some(7),
+      "gate-1" => Some(8),
+      "gate-2" => Some(9),
+      "gate-3" => Some(10),
+      "gate-4" => Some(11),
+      "gate-5" => Some(12),
+      "gate-6" => Some(13),
+      "gate-7" => Some(14),
+      "gate-8" => Some(15),
+      "vel-1" => Some(16),
+      "vel-2" => Some(17),
+      "vel-3" => Some(18),
+      "vel-4" => Some(19),
+      "vel-5" => Some(20),
+      "vel-6" => Some(21),
+      "vel-7" => Some(22),
+      "vel-8" => Some(23),
+      "tick-out" => Some(24),
       _ => None,
     },
   }

@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use dsp_core::{
   Adsr, Arpeggiator, Choir, Chorus, Clap909, Delay, DrumSequencer, Ensemble,
   EuclideanSequencer, FmOperator, GranularDelay, HiHat909, Hpf, KarplusStrong,
-  Kick909, Lfo, Mario, MasterClock, NesOsc, Noise, Phaser, PitchShifter,
+  Kick909, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, Phaser, PitchShifter,
   Reverb, Rimshot909, SampleHold, Shepard, SlewLimiter, Snare909, SnesOsc, SpringReverb,
   StepSequencer, Supersaw, TapeDelay, Tb303, Tom909, Vcf, Vco, Vocoder,
 };
@@ -372,6 +372,30 @@ pub(crate) fn create_state(
         gate_length: ParamBuffer::new(param_number(params, "gateLength", 50.0)),
         swing: ParamBuffer::new(param_number(params, "swing", 0.0)),
         length: ParamBuffer::new(param_number(params, "length", 16.0)),
+      })
+    }
+    ModuleType::MidiFileSequencer => {
+      let mut seq = MidiFileSequencer::new(sample_rate);
+      // Parse initial MIDI data if provided
+      if let Some(midi_data) = params.get("midiData") {
+        if let Some(s) = midi_data.as_str() {
+          seq.parse_midi_data(s);
+        }
+      }
+      ModuleState::MidiFileSequencer(MidiFileSequencerState {
+        seq,
+        enabled: ParamBuffer::new(param_number(params, "enabled", 1.0)),
+        tempo: ParamBuffer::new(param_number(params, "tempo", 120.0)),
+        gate_length: ParamBuffer::new(param_number(params, "gateLength", 90.0)),
+        loop_enabled: ParamBuffer::new(param_number(params, "loop", 1.0)),
+        mute1: ParamBuffer::new(param_number(params, "mute1", 0.0)),
+        mute2: ParamBuffer::new(param_number(params, "mute2", 0.0)),
+        mute3: ParamBuffer::new(param_number(params, "mute3", 0.0)),
+        mute4: ParamBuffer::new(param_number(params, "mute4", 0.0)),
+        mute5: ParamBuffer::new(param_number(params, "mute5", 0.0)),
+        mute6: ParamBuffer::new(param_number(params, "mute6", 0.0)),
+        mute7: ParamBuffer::new(param_number(params, "mute7", 0.0)),
+        mute8: ParamBuffer::new(param_number(params, "mute8", 0.0)),
       })
     }
     ModuleType::PitchShifter => ModuleState::PitchShifter(PitchShifterState {
@@ -796,6 +820,21 @@ pub(crate) fn apply_param(state: &mut ModuleState, param: &str, value: f32) {
       "length" => state.length.set(value),
       _ => {}
     },
+    ModuleState::MidiFileSequencer(state) => match param {
+      "enabled" => state.enabled.set(value),
+      "tempo" => state.tempo.set(value),
+      "gateLength" => state.gate_length.set(value),
+      "loop" => state.loop_enabled.set(value),
+      "mute1" => state.mute1.set(value),
+      "mute2" => state.mute2.set(value),
+      "mute3" => state.mute3.set(value),
+      "mute4" => state.mute4.set(value),
+      "mute5" => state.mute5.set(value),
+      "mute6" => state.mute6.set(value),
+      "mute7" => state.mute7.set(value),
+      "mute8" => state.mute8.set(value),
+      _ => {}
+    },
     ModuleState::PitchShifter(state) => match param {
       "pitch" => state.pitch.set(value),
       "fine" => state.fine.set(value),
@@ -866,6 +905,11 @@ pub(crate) fn apply_param_str(state: &mut ModuleState, param: &str, value: &str)
     ModuleState::DrumSequencer(state) => {
       if param == "drumData" {
         state.seq.parse_drum_data(value);
+      }
+    }
+    ModuleState::MidiFileSequencer(state) => {
+      if param == "midiData" {
+        state.seq.parse_midi_data(value);
       }
     }
     _ => {}

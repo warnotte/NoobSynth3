@@ -1,0 +1,119 @@
+{
+  "id": "midi-test",
+  "name": "MIDI File Test",
+  "description": "Test preset for MIDI File Sequencer debugging",
+  "group": "MIDI Sequencer",
+  "graph": {
+    "modules": [
+      {
+        "id": "midiseq-1",
+        "type": "midi-file-sequencer",
+        "name": "MIDI File Seq",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "enabled": true,
+          "tempo": 120,
+          "gateLength": 90,
+          "loop": true,
+          "midiData": "",
+          "selectedFile": ""
+        }
+      },
+      {
+        "id": "osc-1",
+        "type": "oscillator",
+        "name": "VCO 1",
+        "position": { "x": 5, "y": 0 },
+        "params": {
+          "frequency": 220,
+          "type": "sawtooth",
+          "pwm": 0.5,
+          "unison": 1,
+          "detune": 0
+        }
+      },
+      {
+        "id": "adsr-1",
+        "type": "adsr",
+        "name": "ADSR 1",
+        "position": { "x": 5, "y": 2 },
+        "params": {
+          "attack": 0.01,
+          "decay": 0.2,
+          "sustain": 0.5,
+          "release": 0.3
+        }
+      },
+      {
+        "id": "gain-1",
+        "type": "gain",
+        "name": "VCA",
+        "position": { "x": 7, "y": 0 },
+        "params": {
+          "gain": 0.8
+        }
+      },
+      {
+        "id": "scope-1",
+        "type": "scope",
+        "name": "Scope",
+        "position": { "x": 7, "y": 2 },
+        "params": {
+          "time": 1,
+          "gain": 1
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Main Out",
+        "position": { "x": 9, "y": 0 },
+        "params": {
+          "level": 0.7
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "midiseq-1", "portId": "cv-1" },
+        "to": { "moduleId": "osc-1", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "midiseq-1", "portId": "gate-1" },
+        "to": { "moduleId": "adsr-1", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "midiseq-1", "portId": "cv-1" },
+        "to": { "moduleId": "scope-1", "portId": "in-c" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "midiseq-1", "portId": "gate-1" },
+        "to": { "moduleId": "scope-1", "portId": "in-d" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "osc-1", "portId": "out" },
+        "to": { "moduleId": "gain-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "adsr-1", "portId": "env" },
+        "to": { "moduleId": "gain-1", "portId": "cv" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "gain-1", "portId": "out" },
+        "to": { "moduleId": "scope-1", "portId": "in-a" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "gain-1", "portId": "out" },
+        "to": { "moduleId": "out-1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

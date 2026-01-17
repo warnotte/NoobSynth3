@@ -92,6 +92,8 @@ pub use sequencers::{
     EuclideanSequencer, EuclideanParams, EuclideanInputs,
     EUCLIDEAN_MAX_STEPS,
     Mario, MarioOutputs, MARIO_CHANNELS,
+    MidiFileSequencer, MidiFileSequencerParams, MidiFileSequencerInputs, MidiFileSequencerOutputs,
+    MidiNote, MidiTrack, MIDI_TRACKS, MAX_NOTES_PER_TRACK,
 };
 
 // Re-export drums

@@ -61,6 +61,8 @@ export const moduleSizes: Record<ModuleType, string> = {
   'pitch-shifter': '2x2',
   // Master Clock
   clock: '2x2',
+  // MIDI File Sequencer
+  'midi-file-sequencer': '5x6',
 }
 
 export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>> = {
@@ -99,6 +101,8 @@ export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>>
   notes: 'strip',
   // Master Clock
   clock: 'strip',
+  // MIDI File Sequencer
+  'midi-file-sequencer': 'strip',
 }
 
 export type ModuleCategory =
@@ -180,6 +184,7 @@ export const moduleCatalog: { type: ModuleType; label: string; category: ModuleC
   { type: 'step-sequencer', label: 'Step Seq', category: 'sequencers' },
   { type: 'euclidean', label: 'Euclidean', category: 'sequencers' },
   { type: 'drum-sequencer', label: 'Drum Seq', category: 'sequencers' },
+  { type: 'midi-file-sequencer', label: 'MIDI File', category: 'sequencers' },
   { type: 'mario', label: 'Mario IO', category: 'sequencers' },
   // TR-909 Drums
   { type: '909-kick', label: 'Kick', category: 'drums' },
@@ -257,6 +262,8 @@ export const modulePrefixes: Record<ModuleType, string> = {
   notes: 'notes',
   // Master Clock
   clock: 'clock',
+  // MIDI File Sequencer
+  'midi-file-sequencer': 'midiseq',
 }
 
 export const moduleLabels: Record<ModuleType, string> = {
@@ -319,6 +326,8 @@ export const moduleLabels: Record<ModuleType, string> = {
   notes: 'Notes',
   // Master Clock
   clock: 'Master Clock',
+  // MIDI File Sequencer
+  'midi-file-sequencer': 'MIDI File Seq',
 }
 
 export const moduleDefaults: Record<ModuleType, Record<string, number | string | boolean>> = {
@@ -630,6 +639,23 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     tempo: 120,
     rate: 4,            // 1/16 note (same as sequencers)
     swing: 0,
+  },
+  // MIDI File Sequencer
+  'midi-file-sequencer': {
+    enabled: true,
+    tempo: 120,
+    gateLength: 90,     // 90% gate
+    loop: true,
+    midiData: '',       // JSON string, set when loading MIDI file
+    selectedFile: '',   // Current file name for display
+    mute1: false,
+    mute2: false,
+    mute3: false,
+    mute4: false,
+    mute5: false,
+    mute6: false,
+    mute7: false,
+    mute8: false,
   },
 }
 

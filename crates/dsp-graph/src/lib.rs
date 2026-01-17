@@ -228,7 +228,7 @@ impl GraphEngine {
     }
   }
 
-  /// Get current step position for a sequencer module (StepSequencer or DrumSequencer)
+  /// Get current step position for a sequencer module (StepSequencer, DrumSequencer, MidiFileSequencer)
   /// Returns -1 if module not found or not a sequencer
   pub fn get_sequencer_step(&self, module_id: &str) -> i32 {
     if let Some(index) = self.module_map.get(module_id).and_then(|list| list.first()) {
@@ -236,11 +236,25 @@ impl GraphEngine {
         match &module.state {
           ModuleState::StepSequencer(state) => return state.seq.current_step() as i32,
           ModuleState::DrumSequencer(state) => return state.seq.current_step() as i32,
+          ModuleState::MidiFileSequencer(state) => return state.seq.current_tick() as i32,
           _ => {}
         }
       }
     }
     -1
+  }
+
+  /// Get total ticks for a MIDI file sequencer module
+  /// Returns 0 if module not found or not a MIDI file sequencer
+  pub fn get_midi_total_ticks(&self, module_id: &str) -> i32 {
+    if let Some(index) = self.module_map.get(module_id).and_then(|list| list.first()) {
+      if let Some(module) = self.modules.get(*index) {
+        if let ModuleState::MidiFileSequencer(state) = &module.state {
+          return state.seq.total_ticks() as i32;
+        }
+      }
+    }
+    0
   }
 
   pub fn render(&mut self, frames: usize) -> &[Sample] {
@@ -554,6 +568,8 @@ fn normalize_module_type(raw: &str) -> ModuleType {
     // Drum Sequencer
     "drum-sequencer" => ModuleType::DrumSequencer,
     "euclidean" => ModuleType::Euclidean,
+    // MIDI File Sequencer
+    "midi-file-sequencer" => ModuleType::MidiFileSequencer,
     // FM Synthesis
     "fm-op" => ModuleType::FmOp,
     "shepard" => ModuleType::Shepard,

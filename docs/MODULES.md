@@ -920,6 +920,45 @@ Séquenceur thématique avec chansons NES/SNES.
 
 **Sorties** : 5 canaux CV+Gate (cv-1/gate-1 à cv-5/gate-5)
 
+### MIDI File Sequencer
+
+Séquenceur capable de charger et jouer des fichiers MIDI standards avec 8 pistes de sortie.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `enabled` | true/false | Lecture active |
+| `tempo` | 40-300 BPM | Tempo de lecture |
+| `gateLength` | 10-100 % | Durée du gate (% de la durée note MIDI) |
+| `loop` | true/false | Bouclage du fichier |
+| `midiData` | string (JSON) | Données MIDI parsées |
+| `selectedFile` | string | Nom du fichier chargé |
+
+**Entrées :**
+| Port | ID | Description |
+|------|----|-------------|
+| Clock | `clock` | Clock externe (optionnel) |
+| Reset | `reset` | Retour au début |
+
+**Sorties (par piste x8) :**
+| Port | ID | Description |
+|------|----|-------------|
+| CV | `cv-1` à `cv-8` | Pitch CV (1V/octave) |
+| Gate | `gate-1` à `gate-8` | Gate de note |
+| Velocity | `vel-1` à `vel-8` | Vélocité (0-1) |
+| Tick | `tick-out` | Position de lecture |
+
+**Presets inclus :**
+- Bach - Toccata et Fugue en ré mineur BWV 565 (arrangement Busoni)
+
+**Usage typique :**
+```
+MIDI File Seq → cv-1 → VCO (pitch)
+             → gate-1 → ADSR (gate)
+             → vel-1 → VCA (cv) ou VCF (env)
+```
+
+**Note** : Le fichier MIDI est parsé en JavaScript et les données sont transmises au DSP sous forme JSON. Jusqu'à 8192 notes par piste sont supportées.
+
 ### Main Out
 
 Sortie audio principale.

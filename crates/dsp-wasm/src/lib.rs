@@ -83,4 +83,10 @@ impl WasmGraphEngine {
   pub fn get_sequencer_step(&self, module_id: &str) -> i32 {
     self.engine.get_sequencer_step(module_id)
   }
+
+  /// Get total ticks for a MIDI file sequencer module
+  /// Returns 0 if module not found or not a MIDI file sequencer
+  pub fn get_midi_total_ticks(&self, module_id: &str) -> i32 {
+    self.engine.get_midi_total_ticks(module_id)
+  }
 }

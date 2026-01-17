@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "presets": [
+    {
+      "id": "bach-toccata",
+      "name": "Bach - Toccata BWV 565",
+      "file": "bach-toccata.mid"
+    }
+  ]
+}

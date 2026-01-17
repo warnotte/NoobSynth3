@@ -15,6 +15,7 @@ use dsp_core::{
     KarplusInputs, KarplusParams, Kick909Inputs, Kick909Params,
     LfoInputs, LfoParams,
     MasterClockInputs, MasterClockOutputs, MasterClockParams,
+    MidiFileSequencerInputs, MidiFileSequencerOutputs, MidiFileSequencerParams,
     Mixer, NesOscInputs, NesOscParams, NoiseParams,
     PhaserInputs, PhaserParams, PitchShifterInputs, PitchShifterParams,
     Quantizer, QuantizerInputs, QuantizerParams,
@@ -992,6 +993,115 @@ pub(crate) fn process_module(
             outputs[14].channel_mut(0)[..safe_frames].copy_from_slice(&buf_acc_rim[..safe_frames]);
             outputs[15].channel_mut(0)[..safe_frames].copy_from_slice(&buf_acc_aux[..safe_frames]);
             outputs[16].channel_mut(0)[..safe_frames].copy_from_slice(&buf_step[..safe_frames]);
+        }
+        ModuleState::MidiFileSequencer(state) => {
+            let clock = if connections[0].is_empty() { None } else { Some(inputs[0].channel(0)) };
+            let reset = if connections[1].is_empty() { None } else { Some(inputs[1].channel(0)) };
+
+            const MIDI_BUF_SIZE: usize = 1024;
+            let safe_frames = frames.min(MIDI_BUF_SIZE);
+
+            // Individual buffers for each track to satisfy borrow checker
+            let mut buf_cv_1: [Sample; MIDI_BUF_SIZE] = [0.0; MIDI_BUF_SIZE];
+            let mut buf_cv_2: [Sample; MIDI_BUF_SIZE] = [0.0; MIDI_BUF_SIZE];
+            let mut buf_cv_3: [Sample; MIDI_BUF_SIZE] = [0.0; MIDI_BUF_SIZE];
+            let mut buf_cv_4: [Sample; MIDI_BUF_SIZE] = [0.0; MIDI_BUF_SIZE];
+            let mut buf_cv_5: [Sample; MIDI_BUF_SIZE] = [0.0; MIDI_BUF_SIZE];
+            let mut buf_cv_6: [Sample; MIDI_BUF_SIZE] = [0.0; MIDI_BUF_SIZE];
+            let mut buf_cv_7: [Sample; MIDI_BUF_SIZE] = [0.0; MIDI_BUF_SIZE];
+            let mut buf_cv_8: [Sample; MIDI_BUF_SIZE] = [0.0; MIDI_BUF_SIZE];
+            let mut buf_gate_1: [Sample; MIDI_BUF_SIZE] = [0.0; MIDI_BUF_SIZE];
+            let mut buf_gate_2: [Sample; MIDI_BUF_SIZE] = [0.0; MIDI_BUF_SIZE];
+            let mut buf_gate_3: [Sample; MIDI_BUF_SIZE] = [0.0; MIDI_BUF_SIZE];
+            let mut buf_gate_4: [Sample; MIDI_BUF_SIZE] = [0.0; MIDI_BUF_SIZE];
+            let mut buf_gate_5: [Sample; MIDI_BUF_SIZE] = [0.0; MIDI_BUF_SIZE];
+            let mut buf_gate_6: [Sample; MIDI_BUF_SIZE] = [0.0; MIDI_BUF_SIZE];
+            let mut buf_gate_7: [Sample; MIDI_BUF_SIZE] = [0.0; MIDI_BUF_SIZE];
+            let mut buf_gate_8: [Sample; MIDI_BUF_SIZE] = [0.0; MIDI_BUF_SIZE];
+            let mut buf_vel_1: [Sample; MIDI_BUF_SIZE] = [0.0; MIDI_BUF_SIZE];
+            let mut buf_vel_2: [Sample; MIDI_BUF_SIZE] = [0.0; MIDI_BUF_SIZE];
+            let mut buf_vel_3: [Sample; MIDI_BUF_SIZE] = [0.0; MIDI_BUF_SIZE];
+            let mut buf_vel_4: [Sample; MIDI_BUF_SIZE] = [0.0; MIDI_BUF_SIZE];
+            let mut buf_vel_5: [Sample; MIDI_BUF_SIZE] = [0.0; MIDI_BUF_SIZE];
+            let mut buf_vel_6: [Sample; MIDI_BUF_SIZE] = [0.0; MIDI_BUF_SIZE];
+            let mut buf_vel_7: [Sample; MIDI_BUF_SIZE] = [0.0; MIDI_BUF_SIZE];
+            let mut buf_vel_8: [Sample; MIDI_BUF_SIZE] = [0.0; MIDI_BUF_SIZE];
+            let mut buf_tick: [Sample; MIDI_BUF_SIZE] = [0.0; MIDI_BUF_SIZE];
+
+            let seq_inputs = MidiFileSequencerInputs { clock, reset };
+            let seq_params = MidiFileSequencerParams {
+                enabled: state.enabled.slice(safe_frames),
+                tempo: state.tempo.slice(safe_frames),
+                gate_length: state.gate_length.slice(safe_frames),
+                loop_enabled: state.loop_enabled.slice(safe_frames),
+                mute: [
+                    state.mute1.slice(safe_frames),
+                    state.mute2.slice(safe_frames),
+                    state.mute3.slice(safe_frames),
+                    state.mute4.slice(safe_frames),
+                    state.mute5.slice(safe_frames),
+                    state.mute6.slice(safe_frames),
+                    state.mute7.slice(safe_frames),
+                    state.mute8.slice(safe_frames),
+                ],
+            };
+
+            let seq_outputs = MidiFileSequencerOutputs {
+                cv_1: &mut buf_cv_1[..safe_frames],
+                cv_2: &mut buf_cv_2[..safe_frames],
+                cv_3: &mut buf_cv_3[..safe_frames],
+                cv_4: &mut buf_cv_4[..safe_frames],
+                cv_5: &mut buf_cv_5[..safe_frames],
+                cv_6: &mut buf_cv_6[..safe_frames],
+                cv_7: &mut buf_cv_7[..safe_frames],
+                cv_8: &mut buf_cv_8[..safe_frames],
+                gate_1: &mut buf_gate_1[..safe_frames],
+                gate_2: &mut buf_gate_2[..safe_frames],
+                gate_3: &mut buf_gate_3[..safe_frames],
+                gate_4: &mut buf_gate_4[..safe_frames],
+                gate_5: &mut buf_gate_5[..safe_frames],
+                gate_6: &mut buf_gate_6[..safe_frames],
+                gate_7: &mut buf_gate_7[..safe_frames],
+                gate_8: &mut buf_gate_8[..safe_frames],
+                vel_1: &mut buf_vel_1[..safe_frames],
+                vel_2: &mut buf_vel_2[..safe_frames],
+                vel_3: &mut buf_vel_3[..safe_frames],
+                vel_4: &mut buf_vel_4[..safe_frames],
+                vel_5: &mut buf_vel_5[..safe_frames],
+                vel_6: &mut buf_vel_6[..safe_frames],
+                vel_7: &mut buf_vel_7[..safe_frames],
+                vel_8: &mut buf_vel_8[..safe_frames],
+                tick_out: &mut buf_tick[..safe_frames],
+            };
+
+            state.seq.process_block(seq_outputs, seq_inputs, seq_params);
+
+            // Copy to outputs: CV (0-7), Gate (8-15), Velocity (16-23), Tick (24)
+            outputs[0].channel_mut(0)[..safe_frames].copy_from_slice(&buf_cv_1[..safe_frames]);
+            outputs[1].channel_mut(0)[..safe_frames].copy_from_slice(&buf_cv_2[..safe_frames]);
+            outputs[2].channel_mut(0)[..safe_frames].copy_from_slice(&buf_cv_3[..safe_frames]);
+            outputs[3].channel_mut(0)[..safe_frames].copy_from_slice(&buf_cv_4[..safe_frames]);
+            outputs[4].channel_mut(0)[..safe_frames].copy_from_slice(&buf_cv_5[..safe_frames]);
+            outputs[5].channel_mut(0)[..safe_frames].copy_from_slice(&buf_cv_6[..safe_frames]);
+            outputs[6].channel_mut(0)[..safe_frames].copy_from_slice(&buf_cv_7[..safe_frames]);
+            outputs[7].channel_mut(0)[..safe_frames].copy_from_slice(&buf_cv_8[..safe_frames]);
+            outputs[8].channel_mut(0)[..safe_frames].copy_from_slice(&buf_gate_1[..safe_frames]);
+            outputs[9].channel_mut(0)[..safe_frames].copy_from_slice(&buf_gate_2[..safe_frames]);
+            outputs[10].channel_mut(0)[..safe_frames].copy_from_slice(&buf_gate_3[..safe_frames]);
+            outputs[11].channel_mut(0)[..safe_frames].copy_from_slice(&buf_gate_4[..safe_frames]);
+            outputs[12].channel_mut(0)[..safe_frames].copy_from_slice(&buf_gate_5[..safe_frames]);
+            outputs[13].channel_mut(0)[..safe_frames].copy_from_slice(&buf_gate_6[..safe_frames]);
+            outputs[14].channel_mut(0)[..safe_frames].copy_from_slice(&buf_gate_7[..safe_frames]);
+            outputs[15].channel_mut(0)[..safe_frames].copy_from_slice(&buf_gate_8[..safe_frames]);
+            outputs[16].channel_mut(0)[..safe_frames].copy_from_slice(&buf_vel_1[..safe_frames]);
+            outputs[17].channel_mut(0)[..safe_frames].copy_from_slice(&buf_vel_2[..safe_frames]);
+            outputs[18].channel_mut(0)[..safe_frames].copy_from_slice(&buf_vel_3[..safe_frames]);
+            outputs[19].channel_mut(0)[..safe_frames].copy_from_slice(&buf_vel_4[..safe_frames]);
+            outputs[20].channel_mut(0)[..safe_frames].copy_from_slice(&buf_vel_5[..safe_frames]);
+            outputs[21].channel_mut(0)[..safe_frames].copy_from_slice(&buf_vel_6[..safe_frames]);
+            outputs[22].channel_mut(0)[..safe_frames].copy_from_slice(&buf_vel_7[..safe_frames]);
+            outputs[23].channel_mut(0)[..safe_frames].copy_from_slice(&buf_vel_8[..safe_frames]);
+            outputs[24].channel_mut(0)[..safe_frames].copy_from_slice(&buf_tick[..safe_frames]);
         }
         ModuleState::PitchShifter(state) => {
             let input = if connections[0].is_empty() { None } else { Some(inputs[0].channel(0)) };

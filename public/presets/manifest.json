@@ -679,6 +679,13 @@
       "description": "Five Shepards with cross-modulation, sweeping filter, and granular chaos.",
       "file": "shepard-infinity.json",
       "group": "Shepard"
+    },
+    {
+      "id": "midi-test",
+      "name": "MIDI File Test",
+      "description": "Test preset for MIDI File Sequencer debugging - CV/Gate outputs to scope.",
+      "file": "midi-test.json",
+      "group": "MIDI Sequencer"
     }
   ]
 }

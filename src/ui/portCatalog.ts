@@ -361,4 +361,41 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
       { id: 'bar', label: 'Bar', kind: 'sync', direction: 'out' },
     ],
   },
+  'midi-file-sequencer': {
+    inputs: [
+      { id: 'clock', label: 'Clk', kind: 'sync', direction: 'in' },
+      { id: 'reset', label: 'Rst', kind: 'sync', direction: 'in' },
+    ],
+    outputs: [
+      // 8 CV outputs (pitch)
+      { id: 'cv-1', label: 'CV1', kind: 'cv', direction: 'out' },
+      { id: 'cv-2', label: 'CV2', kind: 'cv', direction: 'out' },
+      { id: 'cv-3', label: 'CV3', kind: 'cv', direction: 'out' },
+      { id: 'cv-4', label: 'CV4', kind: 'cv', direction: 'out' },
+      { id: 'cv-5', label: 'CV5', kind: 'cv', direction: 'out' },
+      { id: 'cv-6', label: 'CV6', kind: 'cv', direction: 'out' },
+      { id: 'cv-7', label: 'CV7', kind: 'cv', direction: 'out' },
+      { id: 'cv-8', label: 'CV8', kind: 'cv', direction: 'out' },
+      // 8 Gate outputs
+      { id: 'gate-1', label: 'G1', kind: 'gate', direction: 'out' },
+      { id: 'gate-2', label: 'G2', kind: 'gate', direction: 'out' },
+      { id: 'gate-3', label: 'G3', kind: 'gate', direction: 'out' },
+      { id: 'gate-4', label: 'G4', kind: 'gate', direction: 'out' },
+      { id: 'gate-5', label: 'G5', kind: 'gate', direction: 'out' },
+      { id: 'gate-6', label: 'G6', kind: 'gate', direction: 'out' },
+      { id: 'gate-7', label: 'G7', kind: 'gate', direction: 'out' },
+      { id: 'gate-8', label: 'G8', kind: 'gate', direction: 'out' },
+      // 8 Velocity outputs
+      { id: 'vel-1', label: 'V1', kind: 'cv', direction: 'out' },
+      { id: 'vel-2', label: 'V2', kind: 'cv', direction: 'out' },
+      { id: 'vel-3', label: 'V3', kind: 'cv', direction: 'out' },
+      { id: 'vel-4', label: 'V4', kind: 'cv', direction: 'out' },
+      { id: 'vel-5', label: 'V5', kind: 'cv', direction: 'out' },
+      { id: 'vel-6', label: 'V6', kind: 'cv', direction: 'out' },
+      { id: 'vel-7', label: 'V7', kind: 'cv', direction: 'out' },
+      { id: 'vel-8', label: 'V8', kind: 'cv', direction: 'out' },
+      // Tick position output
+      { id: 'tick-out', label: 'Tick', kind: 'cv', direction: 'out' },
+    ],
+  },
 }

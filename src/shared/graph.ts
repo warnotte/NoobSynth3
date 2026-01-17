@@ -53,6 +53,8 @@ export type ModuleType =
   | 'drum-sequencer'
   // Euclidean Sequencer
   | 'euclidean'
+  // MIDI File Sequencer
+  | 'midi-file-sequencer'
   // FM Synthesis
   | 'fm-op'
   // Documentation

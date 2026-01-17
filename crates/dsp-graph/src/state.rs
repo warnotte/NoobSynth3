@@ -3,7 +3,7 @@
 use dsp_core::{
     Adsr, Arpeggiator, Choir, Chorus, Clap909, Delay, DrumSequencer, Ensemble,
     EuclideanSequencer, FmOperator, GranularDelay, HiHat909, Hpf, KarplusStrong,
-    Kick909, Lfo, Mario, MasterClock, NesOsc, Noise, Phaser, PitchShifter,
+    Kick909, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, Phaser, PitchShifter,
     Reverb, Rimshot909, SampleHold, Shepard, SlewLimiter, Snare909, SnesOsc, SpringReverb,
     StepSequencer, Supersaw, TapeDelay, Tb303, Tom909, Vcf, Vco, Vocoder,
 };
@@ -400,6 +400,22 @@ pub struct MarioState {
     pub mario: Mario,
 }
 
+pub struct MidiFileSequencerState {
+    pub seq: MidiFileSequencer,
+    pub enabled: ParamBuffer,
+    pub tempo: ParamBuffer,
+    pub gate_length: ParamBuffer,
+    pub loop_enabled: ParamBuffer,
+    pub mute1: ParamBuffer,
+    pub mute2: ParamBuffer,
+    pub mute3: ParamBuffer,
+    pub mute4: ParamBuffer,
+    pub mute5: ParamBuffer,
+    pub mute6: ParamBuffer,
+    pub mute7: ParamBuffer,
+    pub mute8: ParamBuffer,
+}
+
 // =============================================================================
 // TR-909 Drum States
 // =============================================================================
@@ -536,6 +552,7 @@ pub enum ModuleState {
     DrumSequencer(DrumSequencerState),
     Euclidean(EuclideanState),
     Mario(MarioState),
+    MidiFileSequencer(MidiFileSequencerState),
 
     // TR-909 Drums
     Kick909(Kick909State),
