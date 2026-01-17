@@ -148,10 +148,10 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 - [ ] `public/presets/` - Preset de démonstration
 - [ ] `npm run build:wasm` - Rebuild WASM après modifs Rust
 
-## Module Types (54 total)
+## Module Types (55 total)
 
-### Sources (9)
-oscillator, supersaw, karplus, fm-op, nes-osc, snes-osc, noise, tb-303, shepard
+### Sources (10)
+oscillator, supersaw, karplus, fm-op, nes-osc, snes-osc, noise, tb-303, shepard, pipe-organ
 
 ### Filters (2)
 vcf, hpf

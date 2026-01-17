@@ -43,6 +43,7 @@ pub use oscillators::{
     KarplusStrong, KarplusParams, KarplusInputs,
     FmOperator, FmOperatorParams, FmOperatorInputs,
     Shepard, ShepardParams, ShepardInputs,
+    PipeOrgan, PipeOrganParams, PipeOrganInputs, OrganVoicing, ORGAN_DRAWBARS, DRAWBAR_NAMES,
 };
 
 // Re-export filters

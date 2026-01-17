@@ -8,6 +8,7 @@ export type ModuleType =
   | 'snes-osc'
   | 'noise'
   | 'shepard'
+  | 'pipe-organ'
   | 'mod-router'
   | 'sample-hold'
   | 'slew'

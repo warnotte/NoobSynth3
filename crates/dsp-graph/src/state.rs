@@ -3,7 +3,7 @@
 use dsp_core::{
     Adsr, Arpeggiator, Choir, Chorus, Clap909, Delay, DrumSequencer, Ensemble,
     EuclideanSequencer, FmOperator, GranularDelay, HiHat909, Hpf, KarplusStrong,
-    Kick909, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, Phaser, PitchShifter,
+    Kick909, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, Phaser, PipeOrgan, PitchShifter,
     Reverb, Rimshot909, SampleHold, Shepard, SlewLimiter, Snare909, SnesOsc, SpringReverb,
     StepSequencer, Supersaw, TapeDelay, Tb303, Tom909, Vcf, Vco, Vocoder,
 };
@@ -112,6 +112,25 @@ pub struct ShepardState {
     pub feedback: ParamBuffer,
     pub vibrato: ParamBuffer,
     pub shimmer: ParamBuffer,
+}
+
+pub struct PipeOrganState {
+    pub organ: PipeOrgan,
+    pub frequency: ParamBuffer,
+    pub drawbar_16: ParamBuffer,
+    pub drawbar_8: ParamBuffer,
+    pub drawbar_4: ParamBuffer,
+    pub drawbar_223: ParamBuffer,
+    pub drawbar_2: ParamBuffer,
+    pub drawbar_135: ParamBuffer,
+    pub drawbar_113: ParamBuffer,
+    pub drawbar_1: ParamBuffer,
+    pub voicing: ParamBuffer,
+    pub chiff: ParamBuffer,
+    pub tremulant: ParamBuffer,
+    pub trem_rate: ParamBuffer,
+    pub wind: ParamBuffer,
+    pub brightness: ParamBuffer,
 }
 
 // =============================================================================
@@ -510,6 +529,7 @@ pub enum ModuleState {
     Tb303(Tb303State),
     FmOp(FmOpState),
     Shepard(ShepardState),
+    PipeOrgan(PipeOrganState),
 
     // Filters
     Vcf(VcfState),

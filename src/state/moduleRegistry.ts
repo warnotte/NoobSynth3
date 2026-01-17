@@ -8,6 +8,7 @@ export const moduleSizes: Record<ModuleType, string> = {
   'snes-osc': '2x3',
   noise: '2x1',
   shepard: '2x5',
+  'pipe-organ': '3x4',
   'mod-router': '2x2',
   'sample-hold': '2x1',
   slew: '1x2',
@@ -71,6 +72,7 @@ export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>>
   'nes-osc': 'strip',
   'snes-osc': 'strip',
   shepard: 'strip',
+  'pipe-organ': 'strip',
   vcf: 'strip',
   control: 'strip',
   lab: 'strip',
@@ -148,6 +150,7 @@ export const moduleCatalog: { type: ModuleType; label: string; category: ModuleC
   { type: 'tb-303', label: 'TB-303', category: 'sources' },
   { type: 'fm-op', label: 'FM Op', category: 'sources' },
   { type: 'shepard', label: 'Shepard', category: 'sources' },
+  { type: 'pipe-organ', label: 'Pipe Organ', category: 'sources' },
   // Filters
   { type: 'vcf', label: 'VCF', category: 'filters' },
   { type: 'hpf', label: 'HPF', category: 'filters' },
@@ -210,6 +213,7 @@ export const modulePrefixes: Record<ModuleType, string> = {
   'snes-osc': 'snes',
   noise: 'noise',
   shepard: 'shep',
+  'pipe-organ': 'organ',
   'mod-router': 'modr',
   'sample-hold': 'sh',
   slew: 'slew',
@@ -274,6 +278,7 @@ export const moduleLabels: Record<ModuleType, string> = {
   'snes-osc': 'SNES Osc',
   noise: 'Noise',
   shepard: 'Shepard',
+  'pipe-organ': 'Pipe Organ',
   'mod-router': 'Mod Router',
   'sample-hold': 'S&H',
   slew: 'Slew',
@@ -360,6 +365,23 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     feedback: 0,      // Feedback amount (0-0.9)
     vibrato: 0,       // Vibrato depth in semitones (0-1)
     shimmer: 0,       // Random amplitude shimmer (0-1)
+  },
+  'pipe-organ': {
+    frequency: 220,   // Base frequency Hz
+    drawbar16: 0.5,   // 16' (sub bass)
+    drawbar8: 0.8,    // 8' (unison/fundamental)
+    drawbar4: 0.6,    // 4' (octave)
+    drawbar223: 0.0,  // 2⅔' (twelfth/quint)
+    drawbar2: 0.4,    // 2' (fifteenth)
+    drawbar135: 0.0,  // 1⅗' (seventeenth/tierce)
+    drawbar113: 0.0,  // 1⅓' (nineteenth)
+    drawbar1: 0.2,    // 1' (twenty-second)
+    voicing: 0,       // 0=Diapason, 1=Flute, 2=String
+    chiff: 0.3,       // Initial air noise (0-1)
+    tremulant: 0.0,   // Tremulant depth (0-1)
+    tremRate: 6.0,    // Tremulant rate Hz (4-8)
+    wind: 0.1,        // Wind instability (0-1)
+    brightness: 0.7,  // Brightness/filter (0-1)
   },
   'mod-router': { depthPitch: 0, depthPwm: 0, depthVcf: 0, depthVca: 0 },
   'sample-hold': { mode: 0 },

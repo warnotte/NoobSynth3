@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use dsp_core::{
   Adsr, Arpeggiator, Choir, Chorus, Clap909, Delay, DrumSequencer, Ensemble,
   EuclideanSequencer, FmOperator, GranularDelay, HiHat909, Hpf, KarplusStrong,
-  Kick909, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, Phaser, PitchShifter,
+  Kick909, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, Phaser, PipeOrgan, PitchShifter,
   Reverb, Rimshot909, SampleHold, Shepard, SlewLimiter, Snare909, SnesOsc, SpringReverb,
   StepSequencer, Supersaw, TapeDelay, Tb303, Tom909, Vcf, Vco, Vocoder,
 };
@@ -453,6 +453,24 @@ pub(crate) fn create_state(
       vibrato: ParamBuffer::new(param_number(params, "vibrato", 0.0)),
       shimmer: ParamBuffer::new(param_number(params, "shimmer", 0.0)),
     }),
+    ModuleType::PipeOrgan => ModuleState::PipeOrgan(PipeOrganState {
+      organ: PipeOrgan::new(sample_rate),
+      frequency: ParamBuffer::new(param_number(params, "frequency", 220.0)),
+      drawbar_16: ParamBuffer::new(param_number(params, "drawbar16", 0.5)),
+      drawbar_8: ParamBuffer::new(param_number(params, "drawbar8", 0.8)),
+      drawbar_4: ParamBuffer::new(param_number(params, "drawbar4", 0.6)),
+      drawbar_223: ParamBuffer::new(param_number(params, "drawbar223", 0.0)),
+      drawbar_2: ParamBuffer::new(param_number(params, "drawbar2", 0.4)),
+      drawbar_135: ParamBuffer::new(param_number(params, "drawbar135", 0.0)),
+      drawbar_113: ParamBuffer::new(param_number(params, "drawbar113", 0.0)),
+      drawbar_1: ParamBuffer::new(param_number(params, "drawbar1", 0.2)),
+      voicing: ParamBuffer::new(param_number(params, "voicing", 0.0)),
+      chiff: ParamBuffer::new(param_number(params, "chiff", 0.3)),
+      tremulant: ParamBuffer::new(param_number(params, "tremulant", 0.0)),
+      trem_rate: ParamBuffer::new(param_number(params, "tremRate", 6.0)),
+      wind: ParamBuffer::new(param_number(params, "wind", 0.1)),
+      brightness: ParamBuffer::new(param_number(params, "brightness", 0.7)),
+    }),
     ModuleType::Notes => ModuleState::Notes,  // UI-only, no DSP
   }
 }
@@ -888,6 +906,24 @@ pub(crate) fn apply_param(state: &mut ModuleState, param: &str, value: f32) {
       "feedback" => state.feedback.set(value),
       "vibrato" => state.vibrato.set(value),
       "shimmer" => state.shimmer.set(value),
+      _ => {}
+    },
+    ModuleState::PipeOrgan(state) => match param {
+      "frequency" => state.frequency.set(value),
+      "drawbar16" => state.drawbar_16.set(value),
+      "drawbar8" => state.drawbar_8.set(value),
+      "drawbar4" => state.drawbar_4.set(value),
+      "drawbar223" => state.drawbar_223.set(value),
+      "drawbar2" => state.drawbar_2.set(value),
+      "drawbar135" => state.drawbar_135.set(value),
+      "drawbar113" => state.drawbar_113.set(value),
+      "drawbar1" => state.drawbar_1.set(value),
+      "voicing" => state.voicing.set(value),
+      "chiff" => state.chiff.set(value),
+      "tremulant" => state.tremulant.set(value),
+      "tremRate" => state.trem_rate.set(value),
+      "wind" => state.wind.set(value),
+      "brightness" => state.brightness.set(value),
       _ => {}
     },
     _ => {}

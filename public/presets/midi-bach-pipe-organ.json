@@ -1,7 +1,7 @@
 {
   "id": "midi-bach-pipe-organ",
-  "name": "Bach Pipe Organ",
-  "description": "Full pipe organ with 5 footages (16', 8', 4', 2-2/3', 2') for Bach works. Track 1: Manual I, Track 2: Manual II/Pedal",
+  "name": "Bach Cathedral Organ",
+  "description": "Authentic pipe organ with drawbars for Bach works. Manual I: Full Diapason, Manual II: Soft Flute with tremulant.",
   "group": "MIDI Sequencer",
   "graph": {
     "modules": [
@@ -12,7 +12,7 @@
         "position": { "x": 0, "y": 3 },
         "params": {
           "enabled": true,
-          "tempo": 60,
+          "tempo": 72,
           "gateLength": 95,
           "loop": true,
           "midiData": "",
@@ -20,255 +20,115 @@
         }
       },
       {
-        "id": "osc-1-16",
-        "type": "oscillator",
-        "name": "I 16'",
+        "id": "organ-1",
+        "type": "pipe-organ",
+        "name": "Manual I",
         "position": { "x": 4, "y": 0 },
         "params": {
-          "frequency": 55,
-          "type": "sine",
-          "pwm": 0.5,
-          "unison": 1,
-          "detune": 0
-        }
-      },
-      {
-        "id": "osc-1-8",
-        "type": "oscillator",
-        "name": "I 8'",
-        "position": { "x": 4, "y": 1 },
-        "params": {
-          "frequency": 110,
-          "type": "sine",
-          "pwm": 0.5,
-          "unison": 1,
-          "detune": 0
-        }
-      },
-      {
-        "id": "osc-1-4",
-        "type": "oscillator",
-        "name": "I 4'",
-        "position": { "x": 4, "y": 2 },
-        "params": {
           "frequency": 220,
-          "type": "sine",
-          "pwm": 0.5,
-          "unison": 1,
-          "detune": 0
+          "drawbar16": 0.6,
+          "drawbar8": 1.0,
+          "drawbar4": 0.7,
+          "drawbar223": 0.3,
+          "drawbar2": 0.5,
+          "drawbar135": 0.2,
+          "drawbar113": 0.15,
+          "drawbar1": 0.3,
+          "voicing": 0,
+          "chiff": 0.25,
+          "tremulant": 0.0,
+          "tremRate": 6.0,
+          "wind": 0.08,
+          "brightness": 0.75
         }
       },
       {
-        "id": "osc-1-223",
-        "type": "oscillator",
-        "name": "I 2⅔'",
-        "position": { "x": 4, "y": 3 },
-        "params": {
-          "frequency": 330,
-          "type": "triangle",
-          "pwm": 0.5,
-          "unison": 1,
-          "detune": 0
-        }
-      },
-      {
-        "id": "osc-1-2",
-        "type": "oscillator",
-        "name": "I 2'",
+        "id": "organ-2",
+        "type": "pipe-organ",
+        "name": "Manual II",
         "position": { "x": 4, "y": 4 },
         "params": {
-          "frequency": 440,
-          "type": "triangle",
-          "pwm": 0.5,
-          "unison": 1,
-          "detune": 0
-        }
-      },
-      {
-        "id": "osc-2-16",
-        "type": "oscillator",
-        "name": "II 16'",
-        "position": { "x": 4, "y": 6 },
-        "params": {
-          "frequency": 55,
-          "type": "sine",
-          "pwm": 0.5,
-          "unison": 1,
-          "detune": 0
-        }
-      },
-      {
-        "id": "osc-2-8",
-        "type": "oscillator",
-        "name": "II 8'",
-        "position": { "x": 4, "y": 7 },
-        "params": {
-          "frequency": 110,
-          "type": "sine",
-          "pwm": 0.5,
-          "unison": 1,
-          "detune": 0
-        }
-      },
-      {
-        "id": "osc-2-4",
-        "type": "oscillator",
-        "name": "II 4'",
-        "position": { "x": 4, "y": 8 },
-        "params": {
           "frequency": 220,
-          "type": "triangle",
-          "pwm": 0.5,
-          "unison": 1,
-          "detune": 0
-        }
-      },
-      {
-        "id": "mix-1",
-        "type": "mixer-1x2",
-        "name": "Manual I",
-        "position": { "x": 6, "y": 1 },
-        "params": {
-          "ch1": 0.5,
-          "ch2": 0.8,
-          "ch3": 0.6,
-          "ch4": 0.3,
-          "ch5": 0.4,
-          "ch6": 0,
-          "master": 0.7
-        }
-      },
-      {
-        "id": "mix-2",
-        "type": "mixer",
-        "name": "Manual II",
-        "position": { "x": 6, "y": 7 },
-        "params": {
-          "ch1": 0.6,
-          "ch2": 0.8,
-          "ch3": 0.5,
-          "master": 0.6
-        }
-      },
-      {
-        "id": "adsr-1",
-        "type": "adsr",
-        "name": "Env I",
-        "position": { "x": 6, "y": 4 },
-        "params": {
-          "attack": 0.008,
-          "decay": 0.05,
-          "sustain": 0.95,
-          "release": 0.08
-        }
-      },
-      {
-        "id": "adsr-2",
-        "type": "adsr",
-        "name": "Env II",
-        "position": { "x": 6, "y": 9 },
-        "params": {
-          "attack": 0.01,
-          "decay": 0.08,
-          "sustain": 0.9,
-          "release": 0.12
+          "drawbar16": 0.3,
+          "drawbar8": 0.9,
+          "drawbar4": 0.5,
+          "drawbar223": 0.0,
+          "drawbar2": 0.3,
+          "drawbar135": 0.0,
+          "drawbar113": 0.0,
+          "drawbar1": 0.15,
+          "voicing": 1,
+          "chiff": 0.15,
+          "tremulant": 0.25,
+          "tremRate": 5.5,
+          "wind": 0.1,
+          "brightness": 0.6
         }
       },
       {
         "id": "vca-1",
         "type": "gain",
         "name": "VCA I",
-        "position": { "x": 8, "y": 1 },
+        "position": { "x": 7, "y": 0 },
         "params": {
-          "gain": 0.6
+          "gain": 0.7
         }
       },
       {
         "id": "vca-2",
         "type": "gain",
         "name": "VCA II",
-        "position": { "x": 8, "y": 7 },
+        "position": { "x": 7, "y": 4 },
         "params": {
           "gain": 0.5
         }
       },
       {
-        "id": "mixer-main",
+        "id": "mixer-1",
         "type": "mixer",
         "name": "Manuals",
-        "position": { "x": 10, "y": 4 },
+        "position": { "x": 9, "y": 2 },
         "params": {
-          "ch1": 0.6,
+          "ch1": 0.7,
           "ch2": 0.5,
-          "master": 0.75
-        }
-      },
-      {
-        "id": "chorus-1",
-        "type": "chorus",
-        "name": "Ensemble",
-        "position": { "x": 12, "y": 4 },
-        "params": {
-          "rate": 0.8,
-          "depth": 0.15,
-          "mix": 0.2
+          "master": 0.8
         }
       },
       {
         "id": "reverb-1",
         "type": "reverb",
         "name": "Cathedral",
-        "position": { "x": 14, "y": 4 },
+        "position": { "x": 11, "y": 2 },
         "params": {
-          "mix": 0.35,
-          "decay": 3.5,
-          "damping": 0.4
+          "mix": 0.4,
+          "decay": 4.0,
+          "damping": 0.35
         }
       },
       {
         "id": "out-1",
         "type": "output",
         "name": "Main Out",
-        "position": { "x": 16, "y": 4 },
+        "position": { "x": 13, "y": 2 },
         "params": {
-          "level": 0.7
+          "level": 0.65
         }
       }
     ],
     "connections": [
-      { "from": { "moduleId": "midiseq-1", "portId": "cv-1" }, "to": { "moduleId": "osc-1-16", "portId": "pitch" }, "kind": "cv" },
-      { "from": { "moduleId": "midiseq-1", "portId": "cv-1" }, "to": { "moduleId": "osc-1-8", "portId": "pitch" }, "kind": "cv" },
-      { "from": { "moduleId": "midiseq-1", "portId": "cv-1" }, "to": { "moduleId": "osc-1-4", "portId": "pitch" }, "kind": "cv" },
-      { "from": { "moduleId": "midiseq-1", "portId": "cv-1" }, "to": { "moduleId": "osc-1-223", "portId": "pitch" }, "kind": "cv" },
-      { "from": { "moduleId": "midiseq-1", "portId": "cv-1" }, "to": { "moduleId": "osc-1-2", "portId": "pitch" }, "kind": "cv" },
-      { "from": { "moduleId": "midiseq-1", "portId": "gate-1" }, "to": { "moduleId": "adsr-1", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "midiseq-1", "portId": "cv-1" }, "to": { "moduleId": "organ-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "midiseq-1", "portId": "gate-1" }, "to": { "moduleId": "organ-1", "portId": "gate" }, "kind": "gate" },
 
-      { "from": { "moduleId": "midiseq-1", "portId": "cv-2" }, "to": { "moduleId": "osc-2-16", "portId": "pitch" }, "kind": "cv" },
-      { "from": { "moduleId": "midiseq-1", "portId": "cv-2" }, "to": { "moduleId": "osc-2-8", "portId": "pitch" }, "kind": "cv" },
-      { "from": { "moduleId": "midiseq-1", "portId": "cv-2" }, "to": { "moduleId": "osc-2-4", "portId": "pitch" }, "kind": "cv" },
-      { "from": { "moduleId": "midiseq-1", "portId": "gate-2" }, "to": { "moduleId": "adsr-2", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "midiseq-1", "portId": "cv-2" }, "to": { "moduleId": "organ-2", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "midiseq-1", "portId": "gate-2" }, "to": { "moduleId": "organ-2", "portId": "gate" }, "kind": "gate" },
 
-      { "from": { "moduleId": "osc-1-16", "portId": "out" }, "to": { "moduleId": "mix-1", "portId": "in-a" }, "kind": "audio" },
-      { "from": { "moduleId": "osc-1-8", "portId": "out" }, "to": { "moduleId": "mix-1", "portId": "in-b" }, "kind": "audio" },
-      { "from": { "moduleId": "osc-1-4", "portId": "out" }, "to": { "moduleId": "mix-1", "portId": "in-c" }, "kind": "audio" },
-      { "from": { "moduleId": "osc-1-223", "portId": "out" }, "to": { "moduleId": "mix-1", "portId": "in-d" }, "kind": "audio" },
-      { "from": { "moduleId": "osc-1-2", "portId": "out" }, "to": { "moduleId": "mix-1", "portId": "in-e" }, "kind": "audio" },
+      { "from": { "moduleId": "organ-1", "portId": "out" }, "to": { "moduleId": "vca-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "organ-2", "portId": "out" }, "to": { "moduleId": "vca-2", "portId": "in" }, "kind": "audio" },
 
-      { "from": { "moduleId": "osc-2-16", "portId": "out" }, "to": { "moduleId": "mix-2", "portId": "in-a" }, "kind": "audio" },
-      { "from": { "moduleId": "osc-2-8", "portId": "out" }, "to": { "moduleId": "mix-2", "portId": "in-b" }, "kind": "audio" },
-      { "from": { "moduleId": "osc-2-4", "portId": "out" }, "to": { "moduleId": "mix-2", "portId": "in-c" }, "kind": "audio" },
+      { "from": { "moduleId": "vca-1", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "vca-2", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-b" }, "kind": "audio" },
 
-      { "from": { "moduleId": "mix-1", "portId": "out" }, "to": { "moduleId": "vca-1", "portId": "in" }, "kind": "audio" },
-      { "from": { "moduleId": "adsr-1", "portId": "env" }, "to": { "moduleId": "vca-1", "portId": "cv" }, "kind": "cv" },
-
-      { "from": { "moduleId": "mix-2", "portId": "out" }, "to": { "moduleId": "vca-2", "portId": "in" }, "kind": "audio" },
-      { "from": { "moduleId": "adsr-2", "portId": "env" }, "to": { "moduleId": "vca-2", "portId": "cv" }, "kind": "cv" },
-
-      { "from": { "moduleId": "vca-1", "portId": "out" }, "to": { "moduleId": "mixer-main", "portId": "in-a" }, "kind": "audio" },
-      { "from": { "moduleId": "vca-2", "portId": "out" }, "to": { "moduleId": "mixer-main", "portId": "in-b" }, "kind": "audio" },
-
-      { "from": { "moduleId": "mixer-main", "portId": "out" }, "to": { "moduleId": "chorus-1", "portId": "in" }, "kind": "audio" },
-      { "from": { "moduleId": "chorus-1", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "mixer-1", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
       { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
     ]
   }

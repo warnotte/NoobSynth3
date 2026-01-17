@@ -131,6 +131,11 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // pitch CV
       PortInfo { channels: 1 },  // sync
     ],
+    // Pipe Organ - 2 inputs (pitch CV, gate)
+    ModuleType::PipeOrgan => vec![
+      PortInfo { channels: 1 },  // pitch CV
+      PortInfo { channels: 1 },  // gate
+    ],
     // MIDI File Sequencer - 2 inputs (clock, reset)
     ModuleType::MidiFileSequencer => vec![
       PortInfo { channels: 1 },  // clock
@@ -265,6 +270,10 @@ pub fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
     // Shepard tone generator - 1 stereo output
     ModuleType::Shepard => vec![
       PortInfo { channels: 2 },  // stereo audio out
+    ],
+    // Pipe Organ - 1 mono output
+    ModuleType::PipeOrgan => vec![
+      PortInfo { channels: 1 },  // audio out
     ],
     // MIDI File Sequencer - 25 outputs (8 CV + 8 Gate + 8 Velocity + 1 Tick)
     ModuleType::MidiFileSequencer => vec![
@@ -500,6 +509,12 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
       "sync" => Some(2),
       _ => None,
     },
+    // Pipe Organ - 2 inputs
+    ModuleType::PipeOrgan => match port_id {
+      "pitch" | "pitch-cv" | "1volt" => Some(0),
+      "gate" => Some(1),
+      _ => None,
+    },
     // MIDI File Sequencer - 2 inputs
     ModuleType::MidiFileSequencer => match port_id {
       "clock" | "clk" => Some(0),
@@ -729,6 +744,11 @@ pub fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize
     },
     // Shepard - 1 output
     ModuleType::Shepard => match port_id {
+      "out" | "output" => Some(0),
+      _ => None,
+    },
+    // Pipe Organ - 1 output
+    ModuleType::PipeOrgan => match port_id {
       "out" | "output" => Some(0),
       _ => None,
     },

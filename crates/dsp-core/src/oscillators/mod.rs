@@ -12,6 +12,7 @@
 //! - [`KarplusStrong`] - Physical modeling string synthesis
 //! - [`FmOperator`] - FM synthesis operator with ADSR envelope
 //! - [`Shepard`] - Shepard tone generator (endless rising/falling pitch illusion)
+//! - [`PipeOrgan`] - Pipe organ emulation with drawbars and voicings
 
 mod vco;
 mod supersaw;
@@ -23,6 +24,7 @@ mod tb303;
 mod karplus;
 mod fm_op;
 mod shepard;
+mod pipe_organ;
 
 pub use vco::{Vco, VcoParams, VcoInputs};
 pub use supersaw::{Supersaw, SupersawParams, SupersawInputs};
@@ -34,3 +36,4 @@ pub use tb303::{Tb303, Tb303Params, Tb303Inputs, Tb303Outputs};
 pub use karplus::{KarplusStrong, KarplusParams, KarplusInputs};
 pub use fm_op::{FmOperator, FmOperatorParams, FmOperatorInputs};
 pub use shepard::{Shepard, ShepardParams, ShepardInputs};
+pub use pipe_organ::{PipeOrgan, PipeOrganParams, PipeOrganInputs, OrganVoicing, ORGAN_DRAWBARS, DRAWBAR_NAMES};

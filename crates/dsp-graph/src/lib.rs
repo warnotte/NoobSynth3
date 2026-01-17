@@ -605,6 +605,7 @@ fn normalize_module_type(raw: &str) -> ModuleType {
     // FM Synthesis
     "fm-op" => ModuleType::FmOp,
     "shepard" => ModuleType::Shepard,
+    "pipe-organ" => ModuleType::PipeOrgan,
     // Documentation
     "notes" => ModuleType::Notes,
     // Effects
@@ -623,6 +624,7 @@ fn is_poly_type(module_type: ModuleType) -> bool {
       | ModuleType::NesOsc
       | ModuleType::SnesOsc
       | ModuleType::Noise
+      | ModuleType::PipeOrgan
       | ModuleType::ModRouter
       | ModuleType::SampleHold
       | ModuleType::Slew

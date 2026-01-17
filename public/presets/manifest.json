@@ -464,6 +464,13 @@
       "group": "Module Tests"
     },
     {
+      "id": "test-pipe-organ",
+      "name": "Pipe Organ Test",
+      "description": "Test preset for Pipe Organ polyphony with Control module.",
+      "file": "test-pipe-organ.json",
+      "group": "Module Tests"
+    },
+    {
       "id": "clock-test",
       "name": "Clock Test",
       "description": "Master Clock syncing a Step Sequencer with TB-303 style bass.",

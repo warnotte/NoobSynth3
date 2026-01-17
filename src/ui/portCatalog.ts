@@ -344,6 +344,15 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
       { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
     ],
   },
+  'pipe-organ': {
+    inputs: [
+      { id: 'pitch', label: '1V/Oct', kind: 'cv', direction: 'in' },
+      { id: 'gate', label: 'Gate', kind: 'gate', direction: 'in' },
+    ],
+    outputs: [
+      { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
+    ],
+  },
   notes: {
     inputs: [],
     outputs: [],

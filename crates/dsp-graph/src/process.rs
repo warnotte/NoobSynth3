@@ -17,7 +17,7 @@ use dsp_core::{
     MasterClockInputs, MasterClockOutputs, MasterClockParams,
     MidiFileSequencerInputs, MidiFileSequencerOutputs, MidiFileSequencerParams,
     Mixer, NesOscInputs, NesOscParams, NoiseParams,
-    PhaserInputs, PhaserParams, PitchShifterInputs, PitchShifterParams,
+    PhaserInputs, PhaserParams, PipeOrganInputs, PipeOrganParams, PitchShifterInputs, PitchShifterParams,
     Quantizer, QuantizerInputs, QuantizerParams,
     ReverbInputs, ReverbParams, RingMod, RingModParams,
     Rimshot909Inputs, Rimshot909Params, Sample,
@@ -1258,6 +1258,41 @@ pub(crate) fn process_module(
             let out_l = &mut left[0];
             let out_r = &mut right[0];
             state.shepard.process_block_stereo(out_l, out_r, shepard_inputs, params);
+        }
+        ModuleState::PipeOrgan(state) => {
+            // Input 0: pitch CV, Input 1: gate
+            let pitch_cv = if !connections[0].is_empty() {
+                Some(inputs[0].channel(0))
+            } else {
+                None
+            };
+            let gate = if connections.len() > 1 && !connections[1].is_empty() {
+                Some(inputs[1].channel(0))
+            } else {
+                None
+            };
+
+            let organ_inputs = PipeOrganInputs { pitch: pitch_cv, gate };
+            let params = PipeOrganParams {
+                frequency: state.frequency.slice(frames),
+                drawbar_16: state.drawbar_16.slice(frames),
+                drawbar_8: state.drawbar_8.slice(frames),
+                drawbar_4: state.drawbar_4.slice(frames),
+                drawbar_223: state.drawbar_223.slice(frames),
+                drawbar_2: state.drawbar_2.slice(frames),
+                drawbar_135: state.drawbar_135.slice(frames),
+                drawbar_113: state.drawbar_113.slice(frames),
+                drawbar_1: state.drawbar_1.slice(frames),
+                voicing: state.voicing.slice(frames),
+                chiff: state.chiff.slice(frames),
+                tremulant: state.tremulant.slice(frames),
+                trem_rate: state.trem_rate.slice(frames),
+                wind: state.wind.slice(frames),
+                brightness: state.brightness.slice(frames),
+            };
+
+            let out = outputs[0].channel_mut(0);
+            state.organ.process_block(out, organ_inputs, params);
         }
         ModuleState::Notes => {
             // UI-only module, no audio processing

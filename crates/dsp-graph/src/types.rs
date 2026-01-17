@@ -15,6 +15,7 @@ pub enum ModuleType {
     Tb303,
     FmOp,
     Shepard,
+    PipeOrgan,
 
     // Filters
     Vcf,
