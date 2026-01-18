@@ -1,0 +1,221 @@
+{
+  "graph": {
+    "modules": [
+      {
+        "id": "ctrl-1",
+        "type": "control",
+        "name": "Control",
+        "position": { "x": 50, "y": 50 },
+        "params": {
+          "octave": 3,
+          "glide": 0.15
+        }
+      },
+      {
+        "id": "lfo-pos",
+        "type": "lfo",
+        "name": "Position",
+        "position": { "x": 50, "y": 200 },
+        "params": {
+          "rate": 0.05,
+          "shape": "sine",
+          "depth": 0.8,
+          "offset": 0.5,
+          "bipolar": false
+        }
+      },
+      {
+        "id": "lfo-filter",
+        "type": "lfo",
+        "name": "Filter",
+        "position": { "x": 200, "y": 200 },
+        "params": {
+          "rate": 0.08,
+          "shape": "triangle",
+          "depth": 0.5,
+          "offset": 0,
+          "bipolar": true
+        }
+      },
+      {
+        "id": "wt-1",
+        "type": "wavetable",
+        "name": "Pad",
+        "position": { "x": 250, "y": 50 },
+        "params": {
+          "frequency": 130.8,
+          "bank": 3,
+          "position": 0.5,
+          "unison": 7,
+          "detune": 25,
+          "spread": 1.0,
+          "morphSpeed": 0,
+          "subMix": 0.3,
+          "attack": 0.8,
+          "release": 2.0
+        }
+      },
+      {
+        "id": "res-1",
+        "type": "resonator",
+        "name": "Resonator",
+        "position": { "x": 450, "y": 200 },
+        "params": {
+          "frequency": 220,
+          "decay": 3.0,
+          "brightness": 0.4,
+          "damping": 0.3,
+          "position": 0.5,
+          "spread": 0.7,
+          "voices": 4,
+          "inharmonic": 0.15,
+          "mode": 1,
+          "exciterType": 0,
+          "mix": 0.3
+        }
+      },
+      {
+        "id": "vcf-1",
+        "type": "vcf",
+        "name": "Filter",
+        "position": { "x": 450, "y": 50 },
+        "params": {
+          "cutoff": 1800,
+          "resonance": 0.2,
+          "drive": 0.1,
+          "envAmount": 0,
+          "modAmount": 0.4,
+          "keyTrack": 0.3,
+          "model": "svf",
+          "mode": "lp",
+          "slope": 12
+        }
+      },
+      {
+        "id": "chorus-1",
+        "type": "chorus",
+        "name": "Chorus",
+        "position": { "x": 650, "y": 50 },
+        "params": {
+          "rate": 0.3,
+          "depth": 8,
+          "delay": 15,
+          "mix": 0.4,
+          "spread": 1.0,
+          "feedback": 0.15
+        }
+      },
+      {
+        "id": "delay-1",
+        "type": "granular-delay",
+        "name": "Granular",
+        "position": { "x": 850, "y": 50 },
+        "params": {
+          "time": 400,
+          "feedback": 0.5,
+          "mix": 0.35,
+          "pitch": 7,
+          "grainSize": 80,
+          "density": 0.7,
+          "spread": 0.8
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "x": 1050, "y": 50 },
+        "params": {
+          "time": 0.85,
+          "damp": 0.3,
+          "preDelay": 40,
+          "mix": 0.5
+        }
+      },
+      {
+        "id": "main-mix",
+        "type": "mixer",
+        "name": "Mix",
+        "position": { "x": 650, "y": 200 },
+        "params": {
+          "levelA": 0.7,
+          "levelB": 0.4
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Out",
+        "position": { "x": 1250, "y": 50 },
+        "params": { "level": 1 }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "cv-out" },
+        "to": { "moduleId": "wt-1", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "gate-out" },
+        "to": { "moduleId": "wt-1", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "cv-out" },
+        "to": { "moduleId": "res-1", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "gate-out" },
+        "to": { "moduleId": "res-1", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "lfo-pos", "portId": "cv-out" },
+        "to": { "moduleId": "wt-1", "portId": "position" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "lfo-filter", "portId": "cv-out" },
+        "to": { "moduleId": "vcf-1", "portId": "mod" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "wt-1", "portId": "out" },
+        "to": { "moduleId": "vcf-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "vcf-1", "portId": "out" },
+        "to": { "moduleId": "main-mix", "portId": "in-a" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "res-1", "portId": "out" },
+        "to": { "moduleId": "main-mix", "portId": "in-b" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "main-mix", "portId": "out" },
+        "to": { "moduleId": "chorus-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "chorus-1", "portId": "out" },
+        "to": { "moduleId": "delay-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "delay-1", "portId": "out" },
+        "to": { "moduleId": "reverb-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb-1", "portId": "out" },
+        "to": { "moduleId": "out-1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

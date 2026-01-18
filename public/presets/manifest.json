@@ -896,6 +896,27 @@
       "description": "Full session: 909 drums + wavetable bass + arpeggiated lead with all effects.",
       "file": "ultimate-session.json",
       "group": "Demos & Fun"
+    },
+    {
+      "id": "retro-arcade",
+      "name": "Retro Arcade",
+      "description": "Chiptune jam with NES oscillators, dual sequencers and euclidean drums.",
+      "file": "retro-arcade.json",
+      "group": "Demos & Fun"
+    },
+    {
+      "id": "acid-techno-jam",
+      "name": "Acid Techno Jam",
+      "description": "Dirty acid techno: TB-303 + 909 drums + distortion. Rave approved!",
+      "file": "acid-techno-jam.json",
+      "group": "Demos & Fun"
+    },
+    {
+      "id": "ambient-space",
+      "name": "Ambient Space",
+      "description": "Ethereal soundscape: wavetable pad + resonator + granular delay + big reverb.",
+      "file": "ambient-space.json",
+      "group": "Demos & Fun"
     }
   ]
 }
