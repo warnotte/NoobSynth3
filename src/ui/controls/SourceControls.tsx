@@ -811,7 +811,6 @@ export function renderSourceControls(props: ControlProps): React.ReactElement | 
             value={drawbar16}
             onChange={(value) => updateParam(module.id, 'drawbar16', value)}
             format={formatPercent}
-            size="small"
           />
           <RotaryKnob
             label="8'"
@@ -821,7 +820,6 @@ export function renderSourceControls(props: ControlProps): React.ReactElement | 
             value={drawbar8}
             onChange={(value) => updateParam(module.id, 'drawbar8', value)}
             format={formatPercent}
-            size="small"
           />
           <RotaryKnob
             label="4'"
@@ -831,7 +829,6 @@ export function renderSourceControls(props: ControlProps): React.ReactElement | 
             value={drawbar4}
             onChange={(value) => updateParam(module.id, 'drawbar4', value)}
             format={formatPercent}
-            size="small"
           />
           <RotaryKnob
             label="2⅔'"
@@ -841,7 +838,6 @@ export function renderSourceControls(props: ControlProps): React.ReactElement | 
             value={drawbar223}
             onChange={(value) => updateParam(module.id, 'drawbar223', value)}
             format={formatPercent}
-            size="small"
           />
         </ControlBoxRow>
         <ControlBoxRow>
@@ -853,7 +849,6 @@ export function renderSourceControls(props: ControlProps): React.ReactElement | 
             value={drawbar2}
             onChange={(value) => updateParam(module.id, 'drawbar2', value)}
             format={formatPercent}
-            size="small"
           />
           <RotaryKnob
             label="1⅗'"
@@ -863,7 +858,6 @@ export function renderSourceControls(props: ControlProps): React.ReactElement | 
             value={drawbar135}
             onChange={(value) => updateParam(module.id, 'drawbar135', value)}
             format={formatPercent}
-            size="small"
           />
           <RotaryKnob
             label="1⅓'"
@@ -873,7 +867,6 @@ export function renderSourceControls(props: ControlProps): React.ReactElement | 
             value={drawbar113}
             onChange={(value) => updateParam(module.id, 'drawbar113', value)}
             format={formatPercent}
-            size="small"
           />
           <RotaryKnob
             label="1'"
@@ -883,7 +876,6 @@ export function renderSourceControls(props: ControlProps): React.ReactElement | 
             value={drawbar1}
             onChange={(value) => updateParam(module.id, 'drawbar1', value)}
             format={formatPercent}
-            size="small"
           />
         </ControlBoxRow>
         <ControlBox label="Voice" compact>
@@ -1167,7 +1159,6 @@ export function renderSourceControls(props: ControlProps): React.ReactElement | 
             value={attackLow}
             onChange={(value) => updateParam(module.id, 'attackLow', value)}
             format={formatDecimal1}
-            size="small"
           />
           <RotaryKnob
             label="Atk Hi"
@@ -1177,7 +1168,6 @@ export function renderSourceControls(props: ControlProps): React.ReactElement | 
             value={attackHigh}
             onChange={(value) => updateParam(module.id, 'attackHigh', value)}
             format={formatDecimal1}
-            size="small"
           />
         </ControlBoxRow>
         <ControlBoxRow>
@@ -1189,7 +1179,6 @@ export function renderSourceControls(props: ControlProps): React.ReactElement | 
             value={releaseLow}
             onChange={(value) => updateParam(module.id, 'releaseLow', value)}
             format={formatDecimal1}
-            size="small"
           />
           <RotaryKnob
             label="Rel Hi"
@@ -1199,7 +1188,6 @@ export function renderSourceControls(props: ControlProps): React.ReactElement | 
             value={releaseHigh}
             onChange={(value) => updateParam(module.id, 'releaseHigh', value)}
             format={formatDecimal1}
-            size="small"
           />
         </ControlBoxRow>
       </>

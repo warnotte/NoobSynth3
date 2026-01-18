@@ -10,6 +10,19 @@ export class WasmGraphEngine {
    * Returns -1 if module not found or not a sequencer
    */
   get_sequencer_step(module_id: string): number;
+  /**
+   * Get total ticks for a MIDI file sequencer module
+   * Returns 0 if module not found or not a MIDI file sequencer
+   */
+  get_midi_total_ticks(module_id: string): number;
+  /**
+   * Seek MIDI file sequencer to a specific tick position
+   */
+  seek_midi_sequencer(module_id: string, tick: number): void;
+  /**
+   * Drain MIDI events from a sequencer. Returns [track, note, velocity, is_on, ...]
+   */
+  drain_midi_events(module_id: string): Uint8Array;
   set_external_input(input: Float32Array): void;
   clear_external_input(): void;
   set_control_voice_cv(module_id: string, voice: number, value: number): void;
