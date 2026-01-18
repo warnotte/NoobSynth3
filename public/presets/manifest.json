@@ -744,6 +744,13 @@
       "group": "Drones"
     },
     {
+      "id": "deep-note-rise",
+      "name": "Deep Note Rise",
+      "description": "Slowly rising swarm cluster inspired by the cinema deep-note.",
+      "file": "deep-note-rise.json",
+      "group": "Drones"
+    },
+    {
       "id": "swarm-bells",
       "name": "Spectral Bells",
       "description": "Bell-like inharmonic swarm with metallic overtones.",

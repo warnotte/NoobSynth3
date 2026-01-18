@@ -1,0 +1,238 @@
+{
+  "id": "deep-note-rise",
+  "name": "Deep Note Rise",
+  "description": "Slowly rising swarm cluster inspired by the cinema deep-note.",
+  "group": "Drones",
+  "graph": {
+    "modules": [
+      {
+        "id": "clock1",
+        "type": "clock",
+        "params": {
+          "running": true,
+          "tempo": 60,
+          "rate": 4,
+          "swing": 0
+        },
+        "position": {
+          "col": 1,
+          "row": 1
+        },
+        "name": "Clock"
+      },
+      {
+        "id": "lfo1",
+        "type": "lfo",
+        "params": {
+          "rate": 0.02,
+          "shape": "sawtooth",
+          "depth": 0.9,
+          "offset": 0,
+          "bipolar": false
+        },
+        "position": {
+          "col": 1,
+          "row": 7
+        },
+        "name": "Rise LFO"
+      },
+      {
+        "id": "swarm-low",
+        "type": "spectral-swarm",
+        "params": {
+          "frequency": 55,
+          "partials": 26,
+          "waveform": "triangle",
+          "detune": 12,
+          "drift": 0.15,
+          "density": 1,
+          "evolution": 6,
+          "inharmonic": 0,
+          "tilt": -4,
+          "spread": 1,
+          "chorus": 0.2,
+          "shimmer": 0.05,
+          "attack": 2.2,
+          "release": 5
+        },
+        "position": {
+          "col": 4,
+          "row": 1
+        },
+        "name": "Swarm Low"
+      },
+      {
+        "id": "swarm-mid",
+        "type": "spectral-swarm",
+        "params": {
+          "frequency": 82.4,
+          "partials": 24,
+          "waveform": "triangle",
+          "detune": 10,
+          "drift": 0.12,
+          "density": 0.95,
+          "evolution": 7,
+          "inharmonic": 0,
+          "tilt": -3,
+          "spread": 1,
+          "chorus": 0.2,
+          "shimmer": 0.07,
+          "attack": 2.5,
+          "release": 5.5
+        },
+        "position": {
+          "col": 6,
+          "row": 1
+        },
+        "name": "Swarm Mid"
+      },
+      {
+        "id": "swarm-high",
+        "type": "spectral-swarm",
+        "params": {
+          "frequency": 110,
+          "partials": 22,
+          "waveform": "triangle",
+          "detune": 8,
+          "drift": 0.1,
+          "density": 0.9,
+          "evolution": 8,
+          "inharmonic": 0,
+          "tilt": -2,
+          "spread": 1,
+          "chorus": 0.2,
+          "shimmer": 0.08,
+          "attack": 2.8,
+          "release": 6
+        },
+        "position": {
+          "col": 8,
+          "row": 1
+        },
+        "name": "Swarm High"
+      },
+      {
+        "id": "mix1",
+        "type": "mixer-1x2",
+        "params": {
+          "levelA": 0.55,
+          "levelB": 0.55,
+          "levelC": 0.55,
+          "levelD": 0,
+          "levelE": 0,
+          "levelF": 0
+        },
+        "position": {
+          "col": 10,
+          "row": 1
+        },
+        "name": "Swarm Mix"
+      },
+      {
+        "id": "ensemble1",
+        "type": "ensemble",
+        "params": {
+          "rate": 0.2,
+          "depth": 12,
+          "delay": 12,
+          "mix": 0.5,
+          "spread": 0.7
+        },
+        "position": {
+          "col": 12,
+          "row": 1
+        },
+        "name": "Ensemble"
+      },
+      {
+        "id": "reverb1",
+        "type": "reverb",
+        "params": {
+          "time": 8,
+          "damp": 0.3,
+          "preDelay": 0.08,
+          "mix": 0.6
+        },
+        "position": {
+          "col": 14,
+          "row": 1
+        },
+        "name": "Reverb"
+      },
+      {
+        "id": "out1",
+        "type": "output",
+        "params": {
+          "level": 1
+        },
+        "position": {
+          "col": 16,
+          "row": 1
+        },
+        "name": "Output"
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "lfo1", "portId": "cv-out" },
+        "to": { "moduleId": "swarm-low", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "lfo1", "portId": "cv-out" },
+        "to": { "moduleId": "swarm-mid", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "lfo1", "portId": "cv-out" },
+        "to": { "moduleId": "swarm-high", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "clock1", "portId": "run" },
+        "to": { "moduleId": "swarm-low", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "clock1", "portId": "run" },
+        "to": { "moduleId": "swarm-mid", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "clock1", "portId": "run" },
+        "to": { "moduleId": "swarm-high", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "swarm-low", "portId": "out" },
+        "to": { "moduleId": "mix1", "portId": "in-a" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "swarm-mid", "portId": "out" },
+        "to": { "moduleId": "mix1", "portId": "in-b" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "swarm-high", "portId": "out" },
+        "to": { "moduleId": "mix1", "portId": "in-c" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "mix1", "portId": "out" },
+        "to": { "moduleId": "ensemble1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "ensemble1", "portId": "out" },
+        "to": { "moduleId": "reverb1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb1", "portId": "out" },
+        "to": { "moduleId": "out1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}
