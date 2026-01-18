@@ -861,6 +861,34 @@
       "description": "Aggressive lead with digital bank, ladder filter, distortion and delay.",
       "file": "wavetable-screamer.json",
       "group": "Wavetable"
+    },
+    {
+      "id": "wavetable-arpeggiated",
+      "name": "Wavetable Arpeggio",
+      "description": "Evolving arpeggio with LFO position modulation, chorus and delay.",
+      "file": "wavetable-arpeggiated.json",
+      "group": "Wavetable"
+    },
+    {
+      "id": "wavetable-euclidean",
+      "name": "Wavetable Euclidean",
+      "description": "Euclidean bass with S&H pitch and evolving position modulation.",
+      "file": "wavetable-euclidean.json",
+      "group": "Wavetable"
+    },
+    {
+      "id": "wavetable-sequence",
+      "name": "Wavetable Sequence",
+      "description": "Step sequenced lead with phaser, delay and reverb.",
+      "file": "wavetable-sequence.json",
+      "group": "Wavetable"
+    },
+    {
+      "id": "wavetable-drums",
+      "name": "Wavetable + 909",
+      "description": "Full performance patch: 909 drums + wavetable bass with step sequencer.",
+      "file": "wavetable-drums.json",
+      "group": "Wavetable"
     }
   ]
 }

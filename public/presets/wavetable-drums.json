@@ -1,0 +1,312 @@
+{
+  "graph": {
+    "modules": [
+      {
+        "id": "drumseq-1",
+        "type": "drum-sequencer",
+        "name": "Drum Seq",
+        "position": { "x": 50, "y": 50 },
+        "params": {
+          "enabled": 1,
+          "tempo": 124,
+          "rate": 4,
+          "gateLength": 50,
+          "swing": 10,
+          "length": 16,
+          "drumData": "{\"tracks\":[[{\"g\":1,\"a\":1},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":1},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":1},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":1},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":1},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}]]}"
+        }
+      },
+      {
+        "id": "kick-1",
+        "type": "909-kick",
+        "name": "Kick",
+        "position": { "x": 50, "y": 200 },
+        "params": {
+          "tune": 52,
+          "attack": 0.55,
+          "decay": 0.65,
+          "drive": 0.35
+        }
+      },
+      {
+        "id": "snare-1",
+        "type": "909-snare",
+        "name": "Snare",
+        "position": { "x": 150, "y": 200 },
+        "params": {
+          "tune": 190,
+          "tone": 0.5,
+          "snappy": 0.55,
+          "decay": 0.35
+        }
+      },
+      {
+        "id": "hh-1",
+        "type": "909-hihat",
+        "name": "HiHat",
+        "position": { "x": 250, "y": 200 },
+        "params": {
+          "openDecay": 0.35,
+          "closedDecay": 0.08,
+          "tone": 0.55,
+          "mix": 0.6
+        }
+      },
+      {
+        "id": "clap-1",
+        "type": "909-clap",
+        "name": "Clap",
+        "position": { "x": 350, "y": 200 },
+        "params": {
+          "tone": 0.55,
+          "decay": 0.35,
+          "spread": 0.4
+        }
+      },
+      {
+        "id": "seq-1",
+        "type": "step-sequencer",
+        "name": "Bass Seq",
+        "position": { "x": 500, "y": 50 },
+        "params": {
+          "enabled": true,
+          "tempo": 124,
+          "rate": 8,
+          "gateLength": 50,
+          "swing": 10,
+          "slideTime": 35,
+          "length": 16,
+          "direction": 0,
+          "stepData": "[{\"pitch\":0,\"gate\":true,\"velocity\":100,\"slide\":false},{\"pitch\":0,\"gate\":true,\"velocity\":80,\"slide\":false},{\"pitch\":0,\"gate\":false,\"velocity\":70,\"slide\":false},{\"pitch\":12,\"gate\":true,\"velocity\":90,\"slide\":true},{\"pitch\":0,\"gate\":true,\"velocity\":100,\"slide\":false},{\"pitch\":7,\"gate\":true,\"velocity\":85,\"slide\":false},{\"pitch\":0,\"gate\":true,\"velocity\":75,\"slide\":false},{\"pitch\":5,\"gate\":true,\"velocity\":90,\"slide\":true},{\"pitch\":0,\"gate\":true,\"velocity\":100,\"slide\":false},{\"pitch\":0,\"gate\":true,\"velocity\":80,\"slide\":false},{\"pitch\":3,\"gate\":true,\"velocity\":85,\"slide\":false},{\"pitch\":7,\"gate\":true,\"velocity\":80,\"slide\":true},{\"pitch\":0,\"gate\":true,\"velocity\":100,\"slide\":false},{\"pitch\":0,\"gate\":false,\"velocity\":70,\"slide\":false},{\"pitch\":10,\"gate\":true,\"velocity\":90,\"slide\":true},{\"pitch\":12,\"gate\":true,\"velocity\":85,\"slide\":false}]"
+        }
+      },
+      {
+        "id": "lfo-1",
+        "type": "lfo",
+        "name": "Position",
+        "position": { "x": 500, "y": 200 },
+        "params": {
+          "rate": 0.2,
+          "shape": "triangle",
+          "depth": 0.6,
+          "offset": 0.2,
+          "bipolar": false
+        }
+      },
+      {
+        "id": "wt-1",
+        "type": "wavetable",
+        "name": "Bass",
+        "position": { "x": 700, "y": 50 },
+        "params": {
+          "frequency": 65.4,
+          "bank": 2,
+          "position": 0.3,
+          "unison": 3,
+          "detune": 10,
+          "spread": 0.5,
+          "morphSpeed": 0,
+          "subMix": 0.6,
+          "attack": 0.005,
+          "release": 0.15
+        }
+      },
+      {
+        "id": "adsr-1",
+        "type": "adsr",
+        "name": "Filter Env",
+        "position": { "x": 700, "y": 200 },
+        "params": {
+          "attack": 0.003,
+          "decay": 0.18,
+          "sustain": 0.25,
+          "release": 0.12
+        }
+      },
+      {
+        "id": "vcf-1",
+        "type": "vcf",
+        "name": "Filter",
+        "position": { "x": 900, "y": 50 },
+        "params": {
+          "cutoff": 800,
+          "resonance": 0.5,
+          "drive": 0.35,
+          "envAmount": 0.65,
+          "modAmount": 0,
+          "keyTrack": 0.5,
+          "model": "ladder",
+          "mode": "lp",
+          "slope": 24
+        }
+      },
+      {
+        "id": "dist-1",
+        "type": "distortion",
+        "name": "Distortion",
+        "position": { "x": 1100, "y": 50 },
+        "params": {
+          "drive": 0.25,
+          "tone": 0.55,
+          "mix": 0.3,
+          "output": 0.75
+        }
+      },
+      {
+        "id": "mixer-1",
+        "type": "mixer",
+        "name": "Mixer",
+        "position": { "x": 1300, "y": 50 },
+        "params": {
+          "ch1": 0.75,
+          "ch2": 0.7,
+          "ch3": 0.5,
+          "ch4": 0.6,
+          "main": 0.85
+        }
+      },
+      {
+        "id": "delay-1",
+        "type": "delay",
+        "name": "Delay",
+        "position": { "x": 1500, "y": 50 },
+        "params": {
+          "time": 242,
+          "feedback": 0.3,
+          "mix": 0.2,
+          "tone": 0.5,
+          "pingPong": true
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Out",
+        "position": { "x": 1700, "y": 50 },
+        "params": { "level": 1 }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "drumseq-1", "portId": "gate-0" },
+        "to": { "moduleId": "kick-1", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "drumseq-1", "portId": "accent-0" },
+        "to": { "moduleId": "kick-1", "portId": "accent" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "drumseq-1", "portId": "gate-1" },
+        "to": { "moduleId": "snare-1", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "drumseq-1", "portId": "accent-1" },
+        "to": { "moduleId": "snare-1", "portId": "accent" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "drumseq-1", "portId": "gate-2" },
+        "to": { "moduleId": "hh-1", "portId": "gate-closed" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "drumseq-1", "portId": "gate-3" },
+        "to": { "moduleId": "hh-1", "portId": "gate-open" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "drumseq-1", "portId": "gate-4" },
+        "to": { "moduleId": "clap-1", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "drumseq-1", "portId": "clock" },
+        "to": { "moduleId": "seq-1", "portId": "clock" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "drumseq-1", "portId": "reset" },
+        "to": { "moduleId": "seq-1", "portId": "reset" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "seq-1", "portId": "cv-out" },
+        "to": { "moduleId": "wt-1", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "seq-1", "portId": "gate-out" },
+        "to": { "moduleId": "wt-1", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "seq-1", "portId": "gate-out" },
+        "to": { "moduleId": "wt-1", "portId": "sync" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "seq-1", "portId": "gate-out" },
+        "to": { "moduleId": "adsr-1", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "lfo-1", "portId": "cv-out" },
+        "to": { "moduleId": "wt-1", "portId": "position" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "wt-1", "portId": "out" },
+        "to": { "moduleId": "vcf-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "adsr-1", "portId": "env" },
+        "to": { "moduleId": "vcf-1", "portId": "mod" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "vcf-1", "portId": "out" },
+        "to": { "moduleId": "dist-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "kick-1", "portId": "out" },
+        "to": { "moduleId": "mixer-1", "portId": "in1" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "snare-1", "portId": "out" },
+        "to": { "moduleId": "mixer-1", "portId": "in2" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "hh-1", "portId": "out" },
+        "to": { "moduleId": "mixer-1", "portId": "in3" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "clap-1", "portId": "out" },
+        "to": { "moduleId": "mixer-1", "portId": "in4" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "dist-1", "portId": "out" },
+        "to": { "moduleId": "delay-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "mixer-1", "portId": "out" },
+        "to": { "moduleId": "delay-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "delay-1", "portId": "out" },
+        "to": { "moduleId": "out-1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

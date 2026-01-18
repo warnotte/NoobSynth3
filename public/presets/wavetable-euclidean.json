@@ -1,0 +1,220 @@
+{
+  "graph": {
+    "modules": [
+      {
+        "id": "clock-1",
+        "type": "clock",
+        "name": "Clock",
+        "position": { "x": 50, "y": 50 },
+        "params": {
+          "running": true,
+          "tempo": 118,
+          "rate": 4,
+          "swing": 0
+        }
+      },
+      {
+        "id": "euclid-1",
+        "type": "euclidean",
+        "name": "Euclidean",
+        "position": { "x": 200, "y": 50 },
+        "params": {
+          "enabled": true,
+          "tempo": 118,
+          "rate": 6,
+          "steps": 16,
+          "pulses": 7,
+          "rotation": 2,
+          "gateLength": 45,
+          "swing": 15
+        }
+      },
+      {
+        "id": "lfo-1",
+        "type": "lfo",
+        "name": "Position",
+        "position": { "x": 50, "y": 250 },
+        "params": {
+          "rate": 0.08,
+          "shape": "triangle",
+          "depth": 0.7,
+          "offset": 0.2,
+          "bipolar": false
+        }
+      },
+      {
+        "id": "lfo-2",
+        "type": "lfo",
+        "name": "Pitch Mod",
+        "position": { "x": 200, "y": 250 },
+        "params": {
+          "rate": 0.05,
+          "shape": "sine",
+          "depth": 0.12,
+          "offset": 0,
+          "bipolar": true
+        }
+      },
+      {
+        "id": "sh-1",
+        "type": "sample-hold",
+        "name": "S&H",
+        "position": { "x": 350, "y": 250 },
+        "params": {
+          "slew": 0.02
+        }
+      },
+      {
+        "id": "wt-1",
+        "type": "wavetable",
+        "name": "Wavetable",
+        "position": { "x": 400, "y": 50 },
+        "params": {
+          "frequency": 65.4,
+          "bank": 3,
+          "position": 0.5,
+          "unison": 3,
+          "detune": 12,
+          "spread": 0.6,
+          "morphSpeed": 0,
+          "subMix": 0.5,
+          "attack": 0.005,
+          "release": 0.4
+        }
+      },
+      {
+        "id": "adsr-1",
+        "type": "adsr",
+        "name": "Filter Env",
+        "position": { "x": 500, "y": 250 },
+        "params": {
+          "attack": 0.005,
+          "decay": 0.3,
+          "sustain": 0.2,
+          "release": 0.4
+        }
+      },
+      {
+        "id": "vcf-1",
+        "type": "vcf",
+        "name": "Filter",
+        "position": { "x": 600, "y": 50 },
+        "params": {
+          "cutoff": 600,
+          "resonance": 0.45,
+          "drive": 0.25,
+          "envAmount": 0.7,
+          "modAmount": 0.3,
+          "keyTrack": 0.4,
+          "model": "ladder",
+          "mode": "lp",
+          "slope": 24
+        }
+      },
+      {
+        "id": "dist-1",
+        "type": "distortion",
+        "name": "Distortion",
+        "position": { "x": 800, "y": 50 },
+        "params": {
+          "drive": 0.25,
+          "tone": 0.5,
+          "mix": 0.3,
+          "output": 0.8
+        }
+      },
+      {
+        "id": "delay-1",
+        "type": "delay",
+        "name": "Delay",
+        "position": { "x": 1000, "y": 50 },
+        "params": {
+          "time": 254,
+          "feedback": 0.45,
+          "mix": 0.3,
+          "tone": 0.45,
+          "pingPong": true
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Out",
+        "position": { "x": 1200, "y": 50 },
+        "params": { "level": 1 }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "clock-1", "portId": "clock" },
+        "to": { "moduleId": "euclid-1", "portId": "clock" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "clock-1", "portId": "reset" },
+        "to": { "moduleId": "euclid-1", "portId": "reset" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "euclid-1", "portId": "gate" },
+        "to": { "moduleId": "wt-1", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "euclid-1", "portId": "gate" },
+        "to": { "moduleId": "wt-1", "portId": "sync" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "euclid-1", "portId": "gate" },
+        "to": { "moduleId": "adsr-1", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "euclid-1", "portId": "gate" },
+        "to": { "moduleId": "sh-1", "portId": "trigger" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "lfo-2", "portId": "cv-out" },
+        "to": { "moduleId": "sh-1", "portId": "in" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "sh-1", "portId": "out" },
+        "to": { "moduleId": "wt-1", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "lfo-1", "portId": "cv-out" },
+        "to": { "moduleId": "wt-1", "portId": "position" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "wt-1", "portId": "out" },
+        "to": { "moduleId": "vcf-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "adsr-1", "portId": "env" },
+        "to": { "moduleId": "vcf-1", "portId": "mod" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "vcf-1", "portId": "out" },
+        "to": { "moduleId": "dist-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "dist-1", "portId": "out" },
+        "to": { "moduleId": "delay-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "delay-1", "portId": "out" },
+        "to": { "moduleId": "out-1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}
