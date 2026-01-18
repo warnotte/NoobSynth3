@@ -22,7 +22,7 @@
           "enabled": true,
           "tempo": 72,
           "rate": 4,
-          "gateLength": 85,
+          "gateLength": 60,
           "swing": 15,
           "slideTime": 60,
           "length": 8,
@@ -76,33 +76,32 @@
         }
       },
       {
-        "id": "res-1",
-        "type": "resonator",
-        "name": "Resonator",
+        "id": "wt-1",
+        "type": "wavetable",
+        "name": "Pad",
         "position": { "x": 450, "y": 50 },
         "params": {
           "frequency": 130.8,
-          "decay": 4.0,
-          "brightness": 0.35,
-          "damping": 0.25,
+          "bank": 3,
           "position": 0.4,
-          "spread": 0.8,
-          "voices": 4,
-          "inharmonic": 0.1,
-          "mode": 1,
-          "exciterType": 0,
-          "mix": 1.0
+          "unison": 3,
+          "detune": 15,
+          "spread": 0.7,
+          "morphSpeed": 0,
+          "subMix": 0.2,
+          "attack": 0.3,
+          "release": 1.5
         }
       },
       {
-        "id": "lfo-res",
+        "id": "lfo-pos",
         "type": "lfo",
-        "name": "Res Mod",
+        "name": "Position",
         "position": { "x": 450, "y": 200 },
         "params": {
-          "rate": 0.03,
+          "rate": 0.05,
           "shape": "sine",
-          "depth": 0.3,
+          "depth": 0.5,
           "offset": 0.4,
           "bipolar": false
         }
@@ -128,7 +127,7 @@
         "position": { "x": 700, "y": 200 },
         "params": {
           "levelA": 0.55,
-          "levelB": 0.5
+          "levelB": 0.45
         }
       },
       {
@@ -146,17 +145,15 @@
       },
       {
         "id": "delay-1",
-        "type": "tape-delay",
-        "name": "Tape",
+        "type": "delay",
+        "name": "Delay",
         "position": { "x": 1000, "y": 200 },
         "params": {
-          "time": 600,
-          "feedback": 0.5,
-          "mix": 0.3,
-          "tone": 0.4,
-          "wow": 0.15,
-          "flutter": 0.1,
-          "drive": 0.2
+          "time": 400,
+          "feedback": 0.35,
+          "mix": 0.25,
+          "tone": 0.5,
+          "pingPong": true
         }
       },
       {
@@ -165,10 +162,10 @@
         "name": "Reverb",
         "position": { "x": 1150, "y": 200 },
         "params": {
-          "time": 0.95,
-          "damp": 0.2,
-          "preDelay": 60,
-          "mix": 0.6
+          "time": 0.7,
+          "damp": 0.35,
+          "preDelay": 40,
+          "mix": 0.45
         }
       },
       {
@@ -192,17 +189,17 @@
       },
       {
         "from": { "moduleId": "seq-1", "portId": "cv-out" },
-        "to": { "moduleId": "res-1", "portId": "pitch" },
+        "to": { "moduleId": "wt-1", "portId": "pitch" },
         "kind": "cv"
       },
       {
         "from": { "moduleId": "seq-1", "portId": "gate-out" },
-        "to": { "moduleId": "res-1", "portId": "gate" },
+        "to": { "moduleId": "wt-1", "portId": "gate" },
         "kind": "gate"
       },
       {
-        "from": { "moduleId": "lfo-res", "portId": "cv-out" },
-        "to": { "moduleId": "res-1", "portId": "position" },
+        "from": { "moduleId": "lfo-pos", "portId": "cv-out" },
+        "to": { "moduleId": "wt-1", "portId": "position" },
         "kind": "cv"
       },
       {
@@ -226,7 +223,7 @@
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "res-1", "portId": "out" },
+        "from": { "moduleId": "wt-1", "portId": "out" },
         "to": { "moduleId": "main-mix", "portId": "in-b" },
         "kind": "audio"
       },
