@@ -21,7 +21,7 @@
           "tempo": 130,
           "rate": 8,
           "octaves": 2,
-          "mode": "up-down",
+          "mode": 2,
           "gateLength": 60,
           "swing": 10
         }

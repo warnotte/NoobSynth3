@@ -29,7 +29,7 @@ export const moduleSizes: Record<ModuleType, string> = {
   'tape-delay': '2x2',
   'spring-reverb': '2x1',
   reverb: '2x1',
-  phaser: '2x2',
+  phaser: '2x1',
   distortion: '2x2',
   wavefolder: '2x2',
   mixer: '1x1',

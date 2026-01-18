@@ -188,37 +188,37 @@
     ],
     "connections": [
       {
-        "from": { "moduleId": "drumseq-1", "portId": "gate-0" },
+        "from": { "moduleId": "drumseq-1", "portId": "gate-kick" },
         "to": { "moduleId": "kick-1", "portId": "gate" },
         "kind": "gate"
       },
       {
-        "from": { "moduleId": "drumseq-1", "portId": "accent-0" },
+        "from": { "moduleId": "drumseq-1", "portId": "acc-kick" },
         "to": { "moduleId": "kick-1", "portId": "accent" },
         "kind": "cv"
       },
       {
-        "from": { "moduleId": "drumseq-1", "portId": "gate-1" },
+        "from": { "moduleId": "drumseq-1", "portId": "gate-snare" },
         "to": { "moduleId": "snare-1", "portId": "gate" },
         "kind": "gate"
       },
       {
-        "from": { "moduleId": "drumseq-1", "portId": "accent-1" },
+        "from": { "moduleId": "drumseq-1", "portId": "acc-snare" },
         "to": { "moduleId": "snare-1", "portId": "accent" },
         "kind": "cv"
       },
       {
-        "from": { "moduleId": "drumseq-1", "portId": "gate-2" },
+        "from": { "moduleId": "drumseq-1", "portId": "gate-hhc" },
         "to": { "moduleId": "hh-1", "portId": "gate-closed" },
         "kind": "gate"
       },
       {
-        "from": { "moduleId": "drumseq-1", "portId": "gate-3" },
+        "from": { "moduleId": "drumseq-1", "portId": "gate-hho" },
         "to": { "moduleId": "hh-1", "portId": "gate-open" },
         "kind": "gate"
       },
       {
-        "from": { "moduleId": "drumseq-1", "portId": "gate-4" },
+        "from": { "moduleId": "drumseq-1", "portId": "gate-clap" },
         "to": { "moduleId": "clap-1", "portId": "gate" },
         "kind": "gate"
       },
