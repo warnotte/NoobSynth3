@@ -2,10 +2,22 @@
   "graph": {
     "modules": [
       {
+        "id": "clock-1",
+        "type": "clock",
+        "name": "Clock",
+        "position": { "x": 50, "y": 50 },
+        "params": {
+          "running": true,
+          "tempo": 124,
+          "rate": 4,
+          "swing": 10
+        }
+      },
+      {
         "id": "drumseq-1",
         "type": "drum-sequencer",
         "name": "Drum Seq",
-        "position": { "x": 50, "y": 50 },
+        "position": { "x": 200, "y": 50 },
         "params": {
           "enabled": 1,
           "tempo": 124,
@@ -20,7 +32,7 @@
         "id": "kick-1",
         "type": "909-kick",
         "name": "Kick",
-        "position": { "x": 50, "y": 200 },
+        "position": { "x": 50, "y": 250 },
         "params": {
           "tune": 52,
           "attack": 0.55,
@@ -32,7 +44,7 @@
         "id": "snare-1",
         "type": "909-snare",
         "name": "Snare",
-        "position": { "x": 150, "y": 200 },
+        "position": { "x": 150, "y": 250 },
         "params": {
           "tune": 190,
           "tone": 0.5,
@@ -44,7 +56,7 @@
         "id": "hh-1",
         "type": "909-hihat",
         "name": "HiHat",
-        "position": { "x": 250, "y": 200 },
+        "position": { "x": 250, "y": 250 },
         "params": {
           "openDecay": 0.35,
           "closedDecay": 0.08,
@@ -56,7 +68,7 @@
         "id": "clap-1",
         "type": "909-clap",
         "name": "Clap",
-        "position": { "x": 350, "y": 200 },
+        "position": { "x": 350, "y": 250 },
         "params": {
           "tone": 0.55,
           "decay": 0.35,
@@ -67,7 +79,7 @@
         "id": "seq-1",
         "type": "step-sequencer",
         "name": "Bass Seq",
-        "position": { "x": 500, "y": 50 },
+        "position": { "x": 550, "y": 50 },
         "params": {
           "enabled": true,
           "tempo": 124,
@@ -84,7 +96,7 @@
         "id": "lfo-1",
         "type": "lfo",
         "name": "Position",
-        "position": { "x": 500, "y": 200 },
+        "position": { "x": 550, "y": 250 },
         "params": {
           "rate": 0.2,
           "shape": "triangle",
@@ -97,7 +109,7 @@
         "id": "wt-1",
         "type": "wavetable",
         "name": "Bass",
-        "position": { "x": 700, "y": 50 },
+        "position": { "x": 800, "y": 50 },
         "params": {
           "frequency": 65.4,
           "bank": 2,
@@ -115,7 +127,7 @@
         "id": "adsr-1",
         "type": "adsr",
         "name": "Filter Env",
-        "position": { "x": 700, "y": 200 },
+        "position": { "x": 800, "y": 250 },
         "params": {
           "attack": 0.003,
           "decay": 0.18,
@@ -127,7 +139,7 @@
         "id": "vcf-1",
         "type": "vcf",
         "name": "Filter",
-        "position": { "x": 900, "y": 50 },
+        "position": { "x": 1000, "y": 50 },
         "params": {
           "cutoff": 800,
           "resonance": 0.5,
@@ -144,7 +156,7 @@
         "id": "dist-1",
         "type": "distortion",
         "name": "Distortion",
-        "position": { "x": 1100, "y": 50 },
+        "position": { "x": 1200, "y": 50 },
         "params": {
           "drive": 0.25,
           "tone": 0.55,
@@ -155,10 +167,10 @@
       {
         "id": "mixer-1",
         "type": "mixer",
-        "name": "Mixer",
-        "position": { "x": 1300, "y": 50 },
+        "name": "Drums Mix",
+        "position": { "x": 450, "y": 250 },
         "params": {
-          "ch1": 0.75,
+          "ch1": 0.8,
           "ch2": 0.7,
           "ch3": 0.5,
           "ch4": 0.6,
@@ -166,10 +178,23 @@
         }
       },
       {
+        "id": "mixer-2",
+        "type": "mixer",
+        "name": "Main Mix",
+        "position": { "x": 1400, "y": 50 },
+        "params": {
+          "ch1": 0.75,
+          "ch2": 0.8,
+          "ch3": 0,
+          "ch4": 0,
+          "main": 1.0
+        }
+      },
+      {
         "id": "delay-1",
         "type": "delay",
         "name": "Delay",
-        "position": { "x": 1500, "y": 50 },
+        "position": { "x": 1600, "y": 50 },
         "params": {
           "time": 242,
           "feedback": 0.3,
@@ -182,11 +207,31 @@
         "id": "out-1",
         "type": "output",
         "name": "Out",
-        "position": { "x": 1700, "y": 50 },
+        "position": { "x": 1800, "y": 50 },
         "params": { "level": 1 }
       }
     ],
     "connections": [
+      {
+        "from": { "moduleId": "clock-1", "portId": "clock" },
+        "to": { "moduleId": "drumseq-1", "portId": "clock" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "clock-1", "portId": "reset" },
+        "to": { "moduleId": "drumseq-1", "portId": "reset" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "clock-1", "portId": "clock" },
+        "to": { "moduleId": "seq-1", "portId": "clock" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "clock-1", "portId": "reset" },
+        "to": { "moduleId": "seq-1", "portId": "reset" },
+        "kind": "sync"
+      },
       {
         "from": { "moduleId": "drumseq-1", "portId": "gate-kick" },
         "to": { "moduleId": "kick-1", "portId": "gate" },
@@ -221,16 +266,6 @@
         "from": { "moduleId": "drumseq-1", "portId": "gate-clap" },
         "to": { "moduleId": "clap-1", "portId": "gate" },
         "kind": "gate"
-      },
-      {
-        "from": { "moduleId": "drumseq-1", "portId": "clock" },
-        "to": { "moduleId": "seq-1", "portId": "clock" },
-        "kind": "sync"
-      },
-      {
-        "from": { "moduleId": "drumseq-1", "portId": "reset" },
-        "to": { "moduleId": "seq-1", "portId": "reset" },
-        "kind": "sync"
       },
       {
         "from": { "moduleId": "seq-1", "portId": "cv-out" },
@@ -293,12 +328,17 @@
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "dist-1", "portId": "out" },
-        "to": { "moduleId": "delay-1", "portId": "in" },
+        "from": { "moduleId": "mixer-1", "portId": "out" },
+        "to": { "moduleId": "mixer-2", "portId": "in1" },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "mixer-1", "portId": "out" },
+        "from": { "moduleId": "dist-1", "portId": "out" },
+        "to": { "moduleId": "mixer-2", "portId": "in2" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "mixer-2", "portId": "out" },
         "to": { "moduleId": "delay-1", "portId": "in" },
         "kind": "audio"
       },
