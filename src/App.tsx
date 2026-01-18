@@ -350,6 +350,7 @@ function App() {
   const [rackCollapsed, setRackCollapsed] = useState(false)
   const [gridMetrics, setGridMetrics] = useState<GridMetrics>(DEFAULT_GRID_METRICS)
   const [devResizeEnabled, setDevResizeEnabled] = useState(() => isDev)
+  const [cablesVisible, setCablesVisible] = useState(true)
   const [moduleSizeOverrides, setModuleSizeOverrides] = useState<Record<string, string>>({})
   const [moduleResizePreview, setModuleResizePreview] = useState<ModuleResizePreview | null>(null)
   const rackRef = useRef<HTMLDivElement | null>(null)
@@ -2109,6 +2110,8 @@ function App() {
           isRunning={audioRunning}
           onStart={handleUnifiedStart}
           onStop={handleUnifiedStop}
+          showCables={cablesVisible}
+          onToggleCables={() => setCablesVisible((prev) => !prev)}
           showDevTools={isDev}
           devResizeEnabled={devResizeEnabled}
           onToggleDevResize={() => setDevResizeEnabled((prev) => !prev)}
@@ -2191,7 +2194,7 @@ function App() {
         />
       </main>
       <PatchLayer
-        connections={graph.connections}
+        connections={cablesVisible ? graph.connections : []}
         renderCable={renderCable}
         renderGhostCable={renderGhostCable}
       />

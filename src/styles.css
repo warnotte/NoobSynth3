@@ -89,12 +89,32 @@
   gap: 6px;
 }
 
+.view-tools {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
 .dev-toggles {
   display: flex;
   gap: 6px;
 }
 
+.view-toggles {
+  display: flex;
+  gap: 6px;
+}
+
 .dev-toggle {
+  --ui-btn-padding: 6px 12px;
+  --ui-btn-font: 0.55rem;
+  --ui-btn-letter: 0.18em;
+  --ui-btn-bg: rgba(20, 26, 34, 0.9);
+  --ui-btn-border: rgba(100, 114, 136, 0.8);
+}
+
+.view-toggle {
   --ui-btn-padding: 6px 12px;
   --ui-btn-font: 0.55rem;
   --ui-btn-letter: 0.18em;
@@ -3419,6 +3439,14 @@ textarea:focus-visible,
   }
 
   .dev-toggles {
+    flex-wrap: wrap;
+  }
+
+  .view-tools {
+    align-items: flex-start;
+  }
+
+  .view-toggles {
     flex-wrap: wrap;
   }
 

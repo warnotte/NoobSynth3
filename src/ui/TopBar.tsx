@@ -11,6 +11,8 @@ type TopBarProps = {
   isRunning: boolean
   onStart: () => void
   onStop: () => void
+  showCables?: boolean
+  onToggleCables?: () => void
   showDevTools?: boolean
   devResizeEnabled?: boolean
   onToggleDevResize?: () => void
@@ -29,6 +31,8 @@ export const TopBar = ({
   isRunning,
   onStart,
   onStop,
+  showCables = true,
+  onToggleCables = () => {},
   showDevTools = false,
   devResizeEnabled = false,
   onToggleDevResize = () => {},
@@ -107,6 +111,20 @@ export const TopBar = ({
         >
           {shareLabel}
         </button>
+      </div>
+      <div className="view-tools">
+        <span className="action-label">View</span>
+        <div className="view-toggles">
+          <button
+            type="button"
+            className={`ui-btn ui-btn--pill view-toggle ${showCables ? 'active' : ''}`}
+            onClick={onToggleCables}
+            aria-pressed={showCables}
+            title="Toggle patch cables"
+          >
+            Cables
+          </button>
+        </div>
       </div>
       {showDevTools && (
         <div className="dev-tools">
