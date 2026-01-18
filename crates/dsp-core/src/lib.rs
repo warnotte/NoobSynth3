@@ -45,6 +45,8 @@ pub use oscillators::{
     Shepard, ShepardParams, ShepardInputs,
     PipeOrgan, PipeOrganParams, PipeOrganInputs, OrganVoicing, ORGAN_DRAWBARS, DRAWBAR_NAMES,
     SpectralSwarm, SpectralSwarmParams, SpectralSwarmInputs,
+    Resonator, ResonatorParams, ResonatorInputs,
+    Wavetable, WavetableParams, WavetableInputs,
 };
 
 // Re-export filters

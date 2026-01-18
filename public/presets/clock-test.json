@@ -5,7 +5,10 @@
         "id": "clock-1",
         "type": "clock",
         "name": "Master Clock",
-        "position": { "x": 50, "y": 50 },
+        "position": {
+          "x": 50,
+          "y": 50
+        },
         "params": {
           "running": true,
           "tempo": 120,
@@ -17,7 +20,10 @@
         "id": "seq-1",
         "type": "step-sequencer",
         "name": "Step Seq",
-        "position": { "x": 250, "y": 50 },
+        "position": {
+          "x": 250,
+          "y": 50
+        },
         "params": {
           "enabled": true,
           "tempo": 120,
@@ -34,7 +40,10 @@
         "id": "osc-1",
         "type": "oscillator",
         "name": "VCO",
-        "position": { "x": 550, "y": 50 },
+        "position": {
+          "x": 550,
+          "y": 50
+        },
         "params": {
           "frequency": 110,
           "type": "sawtooth",
@@ -51,7 +60,10 @@
         "id": "vcf-1",
         "type": "vcf",
         "name": "VCF",
-        "position": { "x": 700, "y": 50 },
+        "position": {
+          "x": 700,
+          "y": 50
+        },
         "params": {
           "cutoff": 800,
           "resonance": 0.4,
@@ -68,7 +80,10 @@
         "id": "adsr-1",
         "type": "adsr",
         "name": "ADSR",
-        "position": { "x": 700, "y": 200 },
+        "position": {
+          "x": 700,
+          "y": 200
+        },
         "params": {
           "attack": 0.005,
           "decay": 0.3,
@@ -80,7 +95,10 @@
         "id": "gain-1",
         "type": "gain",
         "name": "VCA",
-        "position": { "x": 850, "y": 50 },
+        "position": {
+          "x": 850,
+          "y": 50
+        },
         "params": {
           "gain": 0.7
         }
@@ -89,7 +107,10 @@
         "id": "delay-1",
         "type": "delay",
         "name": "Delay",
-        "position": { "x": 1000, "y": 50 },
+        "position": {
+          "x": 1000,
+          "y": 50
+        },
         "params": {
           "time": 375,
           "feedback": 0.3,
@@ -102,23 +123,126 @@
         "id": "out-1",
         "type": "output",
         "name": "Main Out",
-        "position": { "x": 1150, "y": 50 },
+        "position": {
+          "x": 1150,
+          "y": 50
+        },
         "params": {
-          "level": 0.8
+          "level": 1
         }
       }
     ],
     "connections": [
-      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "seq-1", "portId": "clock" }, "kind": "sync" },
-      { "from": { "moduleId": "clock-1", "portId": "reset" }, "to": { "moduleId": "seq-1", "portId": "reset" }, "kind": "sync" },
-      { "from": { "moduleId": "seq-1", "portId": "cv-out" }, "to": { "moduleId": "osc-1", "portId": "pitch" }, "kind": "cv" },
-      { "from": { "moduleId": "seq-1", "portId": "gate-out" }, "to": { "moduleId": "adsr-1", "portId": "gate" }, "kind": "gate" },
-      { "from": { "moduleId": "osc-1", "portId": "out" }, "to": { "moduleId": "vcf-1", "portId": "in" }, "kind": "audio" },
-      { "from": { "moduleId": "adsr-1", "portId": "env" }, "to": { "moduleId": "vcf-1", "portId": "env" }, "kind": "cv" },
-      { "from": { "moduleId": "adsr-1", "portId": "env" }, "to": { "moduleId": "gain-1", "portId": "cv" }, "kind": "cv" },
-      { "from": { "moduleId": "vcf-1", "portId": "out" }, "to": { "moduleId": "gain-1", "portId": "in" }, "kind": "audio" },
-      { "from": { "moduleId": "gain-1", "portId": "out" }, "to": { "moduleId": "delay-1", "portId": "in" }, "kind": "audio" },
-      { "from": { "moduleId": "delay-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+      {
+        "from": {
+          "moduleId": "clock-1",
+          "portId": "clock"
+        },
+        "to": {
+          "moduleId": "seq-1",
+          "portId": "clock"
+        },
+        "kind": "sync"
+      },
+      {
+        "from": {
+          "moduleId": "clock-1",
+          "portId": "reset"
+        },
+        "to": {
+          "moduleId": "seq-1",
+          "portId": "reset"
+        },
+        "kind": "sync"
+      },
+      {
+        "from": {
+          "moduleId": "seq-1",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "osc-1",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "seq-1",
+          "portId": "gate-out"
+        },
+        "to": {
+          "moduleId": "adsr-1",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "osc-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "vcf-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "adsr-1",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "vcf-1",
+          "portId": "env"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "adsr-1",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "gain-1",
+          "portId": "cv"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "vcf-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "gain-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "gain-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "delay-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "delay-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "out-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      }
     ]
   }
 }

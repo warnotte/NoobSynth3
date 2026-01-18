@@ -9,7 +9,10 @@
         "id": "ctrl-1",
         "type": "control",
         "name": "Control IO",
-        "position": { "x": 0, "y": 0 },
+        "position": {
+          "x": 0,
+          "y": 0
+        },
         "params": {
           "cv": 0,
           "midiEnabled": true,
@@ -21,7 +24,10 @@
         "id": "arp-1",
         "type": "arpeggiator",
         "name": "Arpeggiator",
-        "position": { "x": 0, "y": 0 },
+        "position": {
+          "x": 0,
+          "y": 0
+        },
         "params": {
           "enabled": true,
           "hold": true,
@@ -39,7 +45,10 @@
         "id": "osc-1",
         "type": "oscillator",
         "name": "VCO",
-        "position": { "x": 0, "y": 0 },
+        "position": {
+          "x": 0,
+          "y": 0
+        },
         "params": {
           "frequency": 110,
           "type": "pulse",
@@ -52,28 +61,52 @@
         "id": "lfo-1",
         "type": "lfo",
         "name": "PWM LFO",
-        "position": { "x": 0, "y": 0 },
-        "params": { "rate": 0.4, "depth": 0.3, "shape": "triangle", "bipolar": true }
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "params": {
+          "rate": 0.4,
+          "depth": 0.3,
+          "shape": "triangle",
+          "bipolar": true
+        }
       },
       {
         "id": "mod-1",
         "type": "cv-vca",
         "name": "PWM Mod",
-        "position": { "x": 0, "y": 0 },
-        "params": { "gain": 0.2 }
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "params": {
+          "gain": 0.2
+        }
       },
       {
         "id": "adsr-1",
         "type": "adsr",
         "name": "Amp ADSR",
-        "position": { "x": 0, "y": 0 },
-        "params": { "attack": 0.001, "decay": 0.06, "sustain": 0.2, "release": 0.06 }
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "params": {
+          "attack": 0.001,
+          "decay": 0.06,
+          "sustain": 0.2,
+          "release": 0.06
+        }
       },
       {
         "id": "vcf-1",
         "type": "vcf",
         "name": "VCF",
-        "position": { "x": 0, "y": 0 },
+        "position": {
+          "x": 0,
+          "y": 0
+        },
         "params": {
           "cutoff": 2400,
           "resonance": 0.2,
@@ -88,44 +121,190 @@
         "id": "gain-1",
         "type": "gain",
         "name": "VCA",
-        "position": { "x": 0, "y": 0 },
-        "params": { "gain": 0.8 }
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "params": {
+          "gain": 0.8
+        }
       },
       {
         "id": "phaser-1",
         "type": "phaser",
         "name": "Phaser",
-        "position": { "x": 0, "y": 0 },
-        "params": { "rate": 0.3, "depth": 0.6, "feedback": 0.4, "mix": 0.35 }
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "params": {
+          "rate": 0.3,
+          "depth": 0.6,
+          "feedback": 0.4,
+          "mix": 0.35
+        }
       },
       {
         "id": "reverb-1",
         "type": "reverb",
         "name": "Reverb",
-        "position": { "x": 0, "y": 0 },
-        "params": { "time": 0.5, "damp": 0.5, "preDelay": 20, "mix": 0.2 }
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "params": {
+          "time": 0.5,
+          "damp": 0.5,
+          "preDelay": 20,
+          "mix": 0.2
+        }
       },
       {
         "id": "out-1",
         "type": "output",
         "name": "Main Out",
-        "position": { "x": 0, "y": 0 },
-        "params": { "level": 0.7 }
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "params": {
+          "level": 1
+        }
       }
     ],
     "connections": [
-      { "from": { "moduleId": "ctrl-1", "portId": "cv-out" }, "to": { "moduleId": "arp-1", "portId": "cv-in" }, "kind": "cv" },
-      { "from": { "moduleId": "ctrl-1", "portId": "gate-out" }, "to": { "moduleId": "arp-1", "portId": "gate-in" }, "kind": "gate" },
-      { "from": { "moduleId": "arp-1", "portId": "cv-out" }, "to": { "moduleId": "osc-1", "portId": "pitch" }, "kind": "cv" },
-      { "from": { "moduleId": "arp-1", "portId": "gate-out" }, "to": { "moduleId": "adsr-1", "portId": "gate" }, "kind": "gate" },
-      { "from": { "moduleId": "lfo-1", "portId": "cv-out" }, "to": { "moduleId": "mod-1", "portId": "in" }, "kind": "cv" },
-      { "from": { "moduleId": "mod-1", "portId": "out" }, "to": { "moduleId": "osc-1", "portId": "pwm" }, "kind": "cv" },
-      { "from": { "moduleId": "osc-1", "portId": "out" }, "to": { "moduleId": "vcf-1", "portId": "in" }, "kind": "audio" },
-      { "from": { "moduleId": "vcf-1", "portId": "out" }, "to": { "moduleId": "gain-1", "portId": "in" }, "kind": "audio" },
-      { "from": { "moduleId": "adsr-1", "portId": "env" }, "to": { "moduleId": "gain-1", "portId": "cv" }, "kind": "cv" },
-      { "from": { "moduleId": "gain-1", "portId": "out" }, "to": { "moduleId": "phaser-1", "portId": "in" }, "kind": "audio" },
-      { "from": { "moduleId": "phaser-1", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
-      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+      {
+        "from": {
+          "moduleId": "ctrl-1",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "arp-1",
+          "portId": "cv-in"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "ctrl-1",
+          "portId": "gate-out"
+        },
+        "to": {
+          "moduleId": "arp-1",
+          "portId": "gate-in"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "arp-1",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "osc-1",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "arp-1",
+          "portId": "gate-out"
+        },
+        "to": {
+          "moduleId": "adsr-1",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "lfo-1",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "mod-1",
+          "portId": "in"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "mod-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "osc-1",
+          "portId": "pwm"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "osc-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "vcf-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "vcf-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "gain-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "adsr-1",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "gain-1",
+          "portId": "cv"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "gain-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "phaser-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "phaser-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "reverb-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "reverb-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "out-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      }
     ]
   }
 }

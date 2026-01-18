@@ -19,6 +19,7 @@ use dsp_core::{
     Mixer, NesOscInputs, NesOscParams, NoiseParams,
     PhaserInputs, PhaserParams, PipeOrganInputs, PipeOrganParams, PitchShifterInputs, PitchShifterParams,
     Quantizer, QuantizerInputs, QuantizerParams,
+    ResonatorInputs, ResonatorParams,
     ReverbInputs, ReverbParams, RingMod, RingModParams,
     Rimshot909Inputs, Rimshot909Params, Sample,
     SampleHoldInputs, SampleHoldParams, ShepardInputs, ShepardParams, SlewInputs, SlewParams,
@@ -31,6 +32,7 @@ use dsp_core::{
     Tom909Inputs, Tom909Params,
     Vca, VcfInputs, VcfParams, VcoInputs, VcoParams,
     VocoderInputs, VocoderParams, Wavefolder, WavefolderParams,
+    WavetableInputs, WavetableParams,
     MARIO_CHANNELS,
 };
 
@@ -1343,6 +1345,126 @@ pub(crate) fn process_module(
             // Stereo output
             let (out_l, out_r) = outputs[0].channels_mut_2();
             state.swarm.process_block_stereo(out_l, out_r, swarm_inputs, params);
+        }
+        ModuleState::Resonator(state) => {
+            // Input 0: audio in, Input 1: pitch CV, Input 2: gate, Input 3: strum, Input 4: damp
+            let audio_in = if !connections[0].is_empty() {
+                inputs[0].channel(0)
+            } else {
+                &[0.0; 128][..frames]
+            };
+            let pitch_cv = if connections.len() > 1 && !connections[1].is_empty() {
+                inputs[1].channel(0)
+            } else {
+                &[0.0; 128][..frames]
+            };
+            let gate = if connections.len() > 2 && !connections[2].is_empty() {
+                inputs[2].channel(0)
+            } else {
+                &[0.0; 128][..frames]
+            };
+            let strum = if connections.len() > 3 && !connections[3].is_empty() {
+                inputs[3].channel(0)
+            } else {
+                &[0.0; 128][..frames]
+            };
+            let damp = if connections.len() > 4 && !connections[4].is_empty() {
+                inputs[4].channel(0)
+            } else {
+                &[0.0; 128][..frames]
+            };
+
+            // Get parameter slices
+            let frequency = state.frequency.slice(frames);
+            let structure = state.structure.slice(frames);
+            let brightness = state.brightness.slice(frames);
+            let damping = state.damping.slice(frames);
+            let position = state.position.slice(frames);
+            let mode = state.mode.slice(frames);
+            let polyphony = state.polyphony.slice(frames);
+            let internal_exc = state.internal_exc.slice(frames);
+            let chorus = state.chorus.slice(frames);
+
+            let out = outputs[0].channel_mut(0);
+            for i in 0..frames {
+                let params = ResonatorParams {
+                    frequency: frequency[i],
+                    structure: structure[i],
+                    brightness: brightness[i],
+                    damping: damping[i],
+                    position: position[i],
+                    mode: mode[i] as i32,
+                    polyphony: polyphony[i] as i32,
+                    internal_exc: internal_exc[i],
+                    chorus: chorus[i],
+                };
+                let res_inputs = ResonatorInputs {
+                    audio_in: audio_in[i],
+                    pitch_cv: pitch_cv[i],
+                    gate: gate[i],
+                    strum: strum[i],
+                    damp: damp[i],
+                };
+                out[i] = state.resonator.process(params, res_inputs);
+            }
+        }
+        ModuleState::Wavetable(state) => {
+            // Input 0: pitch CV, Input 1: gate, Input 2: position CV, Input 3: sync
+            let pitch_cv = if !connections[0].is_empty() {
+                inputs[0].channel(0)
+            } else {
+                &[0.0; 128][..frames]
+            };
+            let gate = if connections.len() > 1 && !connections[1].is_empty() {
+                inputs[1].channel(0)
+            } else {
+                &[0.0; 128][..frames]
+            };
+            let position_cv = if connections.len() > 2 && !connections[2].is_empty() {
+                inputs[2].channel(0)
+            } else {
+                &[0.0; 128][..frames]
+            };
+            let sync = if connections.len() > 3 && !connections[3].is_empty() {
+                inputs[3].channel(0)
+            } else {
+                &[0.0; 128][..frames]
+            };
+
+            // Get parameter slices
+            let frequency = state.frequency.slice(frames);
+            let bank = state.bank.slice(frames);
+            let position = state.position.slice(frames);
+            let unison = state.unison.slice(frames);
+            let detune = state.detune.slice(frames);
+            let spread = state.spread.slice(frames);
+            let morph_speed = state.morph_speed.slice(frames);
+            let sub_mix = state.sub_mix.slice(frames);
+            let attack = state.attack.slice(frames);
+            let release = state.release.slice(frames);
+
+            let out = outputs[0].channel_mut(0);
+            for i in 0..frames {
+                let params = WavetableParams {
+                    frequency: frequency[i],
+                    bank: bank[i] as i32,
+                    position: position[i],
+                    unison: unison[i] as i32,
+                    detune: detune[i],
+                    spread: spread[i],
+                    morph_speed: morph_speed[i],
+                    sub_mix: sub_mix[i],
+                    attack: attack[i],
+                    release: release[i],
+                };
+                let wt_inputs = WavetableInputs {
+                    pitch_cv: pitch_cv[i],
+                    gate: gate[i],
+                    position_cv: position_cv[i],
+                    sync: sync[i],
+                };
+                out[i] = state.wavetable.process(params, wt_inputs);
+            }
         }
         ModuleState::Notes => {
             // UI-only module, no audio processing

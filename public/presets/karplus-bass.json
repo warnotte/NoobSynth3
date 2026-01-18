@@ -5,7 +5,10 @@
         "id": "clock-1",
         "type": "clock",
         "name": "Clock",
-        "position": { "x": 50, "y": 50 },
+        "position": {
+          "x": 50,
+          "y": 50
+        },
         "params": {
           "running": true,
           "tempo": 110,
@@ -17,7 +20,10 @@
         "id": "seq-1",
         "type": "step-sequencer",
         "name": "Bass Seq",
-        "position": { "x": 200, "y": 50 },
+        "position": {
+          "x": 200,
+          "y": 50
+        },
         "params": {
           "enabled": true,
           "tempo": 110,
@@ -34,7 +40,10 @@
         "id": "karplus-1",
         "type": "karplus",
         "name": "Bass",
-        "position": { "x": 500, "y": 50 },
+        "position": {
+          "x": 500,
+          "y": 50
+        },
         "params": {
           "frequency": 55,
           "damping": 0.12,
@@ -47,7 +56,10 @@
         "id": "vcf-1",
         "type": "vcf",
         "name": "VCF",
-        "position": { "x": 650, "y": 50 },
+        "position": {
+          "x": 650,
+          "y": 50
+        },
         "params": {
           "cutoff": 800,
           "resonance": 0.25,
@@ -64,7 +76,10 @@
         "id": "chorus-1",
         "type": "chorus",
         "name": "Chorus",
-        "position": { "x": 800, "y": 50 },
+        "position": {
+          "x": 800,
+          "y": 50
+        },
         "params": {
           "rate": 0.4,
           "depth": 2,
@@ -78,18 +93,93 @@
         "id": "out-1",
         "type": "output",
         "name": "Out",
-        "position": { "x": 950, "y": 50 },
-        "params": { "level": 0.8 }
+        "position": {
+          "x": 950,
+          "y": 50
+        },
+        "params": {
+          "level": 1
+        }
       }
     ],
     "connections": [
-      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "seq-1", "portId": "clock" }, "kind": "sync" },
-      { "from": { "moduleId": "clock-1", "portId": "reset" }, "to": { "moduleId": "seq-1", "portId": "reset" }, "kind": "sync" },
-      { "from": { "moduleId": "seq-1", "portId": "cv-out" }, "to": { "moduleId": "karplus-1", "portId": "pitch" }, "kind": "cv" },
-      { "from": { "moduleId": "seq-1", "portId": "gate-out" }, "to": { "moduleId": "karplus-1", "portId": "gate" }, "kind": "gate" },
-      { "from": { "moduleId": "karplus-1", "portId": "out" }, "to": { "moduleId": "vcf-1", "portId": "in" }, "kind": "audio" },
-      { "from": { "moduleId": "vcf-1", "portId": "out" }, "to": { "moduleId": "chorus-1", "portId": "in" }, "kind": "audio" },
-      { "from": { "moduleId": "chorus-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+      {
+        "from": {
+          "moduleId": "clock-1",
+          "portId": "clock"
+        },
+        "to": {
+          "moduleId": "seq-1",
+          "portId": "clock"
+        },
+        "kind": "sync"
+      },
+      {
+        "from": {
+          "moduleId": "clock-1",
+          "portId": "reset"
+        },
+        "to": {
+          "moduleId": "seq-1",
+          "portId": "reset"
+        },
+        "kind": "sync"
+      },
+      {
+        "from": {
+          "moduleId": "seq-1",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "karplus-1",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "seq-1",
+          "portId": "gate-out"
+        },
+        "to": {
+          "moduleId": "karplus-1",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "karplus-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "vcf-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "vcf-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "chorus-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "chorus-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "out-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      }
     ]
   }
 }

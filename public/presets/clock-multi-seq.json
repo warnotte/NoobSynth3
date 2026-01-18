@@ -5,7 +5,10 @@
         "id": "clock-1",
         "type": "clock",
         "name": "Master Clock",
-        "position": { "x": 50, "y": 250 },
+        "position": {
+          "x": 50,
+          "y": 250
+        },
         "params": {
           "running": true,
           "tempo": 120,
@@ -17,7 +20,10 @@
         "id": "seq-1",
         "type": "step-sequencer",
         "name": "Bass Seq",
-        "position": { "x": 250, "y": 50 },
+        "position": {
+          "x": 250,
+          "y": 50
+        },
         "params": {
           "enabled": true,
           "tempo": 120,
@@ -34,7 +40,10 @@
         "id": "seq-2",
         "type": "step-sequencer",
         "name": "Lead Seq",
-        "position": { "x": 250, "y": 350 },
+        "position": {
+          "x": 250,
+          "y": 350
+        },
         "params": {
           "enabled": true,
           "tempo": 120,
@@ -51,7 +60,10 @@
         "id": "drumseq-1",
         "type": "drum-sequencer",
         "name": "Drum Seq",
-        "position": { "x": 250, "y": 650 },
+        "position": {
+          "x": 250,
+          "y": 650
+        },
         "params": {
           "enabled": true,
           "tempo": 120,
@@ -66,7 +78,10 @@
         "id": "tb303-1",
         "type": "tb-303",
         "name": "Bass TB-303",
-        "position": { "x": 550, "y": 50 },
+        "position": {
+          "x": 550,
+          "y": 50
+        },
         "params": {
           "waveform": 0,
           "cutoff": 600,
@@ -81,7 +96,10 @@
         "id": "osc-2",
         "type": "oscillator",
         "name": "Lead VCO",
-        "position": { "x": 550, "y": 350 },
+        "position": {
+          "x": 550,
+          "y": 350
+        },
         "params": {
           "frequency": 220,
           "type": "sawtooth",
@@ -98,7 +116,10 @@
         "id": "vcf-2",
         "type": "vcf",
         "name": "Lead VCF",
-        "position": { "x": 700, "y": 350 },
+        "position": {
+          "x": 700,
+          "y": 350
+        },
         "params": {
           "cutoff": 1200,
           "resonance": 0.3,
@@ -115,7 +136,10 @@
         "id": "adsr-2",
         "type": "adsr",
         "name": "Lead ADSR",
-        "position": { "x": 700, "y": 500 },
+        "position": {
+          "x": 700,
+          "y": 500
+        },
         "params": {
           "attack": 0.02,
           "decay": 0.3,
@@ -127,7 +151,10 @@
         "id": "gain-2",
         "type": "gain",
         "name": "Lead VCA",
-        "position": { "x": 850, "y": 350 },
+        "position": {
+          "x": 850,
+          "y": 350
+        },
         "params": {
           "gain": 0.5
         }
@@ -136,7 +163,10 @@
         "id": "kick-1",
         "type": "909-kick",
         "name": "909 Kick",
-        "position": { "x": 550, "y": 650 },
+        "position": {
+          "x": 550,
+          "y": 650
+        },
         "params": {
           "tune": 50,
           "attack": 0.5,
@@ -148,7 +178,10 @@
         "id": "snare-1",
         "type": "909-snare",
         "name": "909 Snare",
-        "position": { "x": 700, "y": 650 },
+        "position": {
+          "x": 700,
+          "y": 650
+        },
         "params": {
           "tune": 200,
           "tone": 0.5,
@@ -160,7 +193,10 @@
         "id": "hh-1",
         "type": "909-hihat",
         "name": "909 HiHat",
-        "position": { "x": 850, "y": 650 },
+        "position": {
+          "x": 850,
+          "y": 650
+        },
         "params": {
           "openDecay": 0.4,
           "closedDecay": 0.08,
@@ -172,7 +208,10 @@
         "id": "clap-1",
         "type": "909-clap",
         "name": "909 Clap",
-        "position": { "x": 1000, "y": 650 },
+        "position": {
+          "x": 1000,
+          "y": 650
+        },
         "params": {
           "tone": 0.5,
           "decay": 0.4,
@@ -183,7 +222,10 @@
         "id": "mix-1",
         "type": "mixer-1x2",
         "name": "Drum Mix",
-        "position": { "x": 1150, "y": 650 },
+        "position": {
+          "x": 1150,
+          "y": 650
+        },
         "params": {
           "levelA": 0.8,
           "levelB": 0.6,
@@ -197,7 +239,10 @@
         "id": "mix-2",
         "type": "mixer",
         "name": "Synth Mix",
-        "position": { "x": 1000, "y": 200 },
+        "position": {
+          "x": 1000,
+          "y": 200
+        },
         "params": {
           "levelA": 0.7,
           "levelB": 0.5
@@ -207,7 +252,10 @@
         "id": "mix-3",
         "type": "mixer",
         "name": "Main Mix",
-        "position": { "x": 1300, "y": 400 },
+        "position": {
+          "x": 1300,
+          "y": 400
+        },
         "params": {
           "levelA": 0.7,
           "levelB": 0.7
@@ -217,7 +265,10 @@
         "id": "reverb-1",
         "type": "reverb",
         "name": "Reverb",
-        "position": { "x": 1450, "y": 400 },
+        "position": {
+          "x": 1450,
+          "y": 400
+        },
         "params": {
           "time": 0.4,
           "damp": 0.5,
@@ -229,42 +280,335 @@
         "id": "out-1",
         "type": "output",
         "name": "Main Out",
-        "position": { "x": 1600, "y": 400 },
+        "position": {
+          "x": 1600,
+          "y": 400
+        },
         "params": {
-          "level": 0.8
+          "level": 1
         }
       }
     ],
     "connections": [
-      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "seq-1", "portId": "clock" }, "kind": "sync" },
-      { "from": { "moduleId": "clock-1", "portId": "reset" }, "to": { "moduleId": "seq-1", "portId": "reset" }, "kind": "sync" },
-      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "seq-2", "portId": "clock" }, "kind": "sync" },
-      { "from": { "moduleId": "clock-1", "portId": "reset" }, "to": { "moduleId": "seq-2", "portId": "reset" }, "kind": "sync" },
-      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "drumseq-1", "portId": "clock" }, "kind": "sync" },
-      { "from": { "moduleId": "clock-1", "portId": "reset" }, "to": { "moduleId": "drumseq-1", "portId": "reset" }, "kind": "sync" },
-      { "from": { "moduleId": "seq-1", "portId": "cv-out" }, "to": { "moduleId": "tb303-1", "portId": "pitch" }, "kind": "cv" },
-      { "from": { "moduleId": "seq-1", "portId": "gate-out" }, "to": { "moduleId": "tb303-1", "portId": "gate" }, "kind": "gate" },
-      { "from": { "moduleId": "seq-1", "portId": "velocity-out" }, "to": { "moduleId": "tb303-1", "portId": "velocity" }, "kind": "cv" },
-      { "from": { "moduleId": "seq-2", "portId": "cv-out" }, "to": { "moduleId": "osc-2", "portId": "pitch" }, "kind": "cv" },
-      { "from": { "moduleId": "seq-2", "portId": "gate-out" }, "to": { "moduleId": "adsr-2", "portId": "gate" }, "kind": "gate" },
-      { "from": { "moduleId": "osc-2", "portId": "out" }, "to": { "moduleId": "vcf-2", "portId": "in" }, "kind": "audio" },
-      { "from": { "moduleId": "adsr-2", "portId": "env" }, "to": { "moduleId": "vcf-2", "portId": "env" }, "kind": "cv" },
-      { "from": { "moduleId": "adsr-2", "portId": "env" }, "to": { "moduleId": "gain-2", "portId": "cv" }, "kind": "cv" },
-      { "from": { "moduleId": "vcf-2", "portId": "out" }, "to": { "moduleId": "gain-2", "portId": "in" }, "kind": "audio" },
-      { "from": { "moduleId": "drumseq-1", "portId": "gate-kick" }, "to": { "moduleId": "kick-1", "portId": "trigger" }, "kind": "gate" },
-      { "from": { "moduleId": "drumseq-1", "portId": "gate-snare" }, "to": { "moduleId": "snare-1", "portId": "trigger" }, "kind": "gate" },
-      { "from": { "moduleId": "drumseq-1", "portId": "gate-hhc" }, "to": { "moduleId": "hh-1", "portId": "trigger" }, "kind": "gate" },
-      { "from": { "moduleId": "drumseq-1", "portId": "gate-clap" }, "to": { "moduleId": "clap-1", "portId": "trigger" }, "kind": "gate" },
-      { "from": { "moduleId": "kick-1", "portId": "out" }, "to": { "moduleId": "mix-1", "portId": "in-a" }, "kind": "audio" },
-      { "from": { "moduleId": "snare-1", "portId": "out" }, "to": { "moduleId": "mix-1", "portId": "in-b" }, "kind": "audio" },
-      { "from": { "moduleId": "hh-1", "portId": "out" }, "to": { "moduleId": "mix-1", "portId": "in-c" }, "kind": "audio" },
-      { "from": { "moduleId": "clap-1", "portId": "out" }, "to": { "moduleId": "mix-1", "portId": "in-d" }, "kind": "audio" },
-      { "from": { "moduleId": "tb303-1", "portId": "out" }, "to": { "moduleId": "mix-2", "portId": "in-a" }, "kind": "audio" },
-      { "from": { "moduleId": "gain-2", "portId": "out" }, "to": { "moduleId": "mix-2", "portId": "in-b" }, "kind": "audio" },
-      { "from": { "moduleId": "mix-2", "portId": "out" }, "to": { "moduleId": "mix-3", "portId": "in-a" }, "kind": "audio" },
-      { "from": { "moduleId": "mix-1", "portId": "out" }, "to": { "moduleId": "mix-3", "portId": "in-b" }, "kind": "audio" },
-      { "from": { "moduleId": "mix-3", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
-      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+      {
+        "from": {
+          "moduleId": "clock-1",
+          "portId": "clock"
+        },
+        "to": {
+          "moduleId": "seq-1",
+          "portId": "clock"
+        },
+        "kind": "sync"
+      },
+      {
+        "from": {
+          "moduleId": "clock-1",
+          "portId": "reset"
+        },
+        "to": {
+          "moduleId": "seq-1",
+          "portId": "reset"
+        },
+        "kind": "sync"
+      },
+      {
+        "from": {
+          "moduleId": "clock-1",
+          "portId": "clock"
+        },
+        "to": {
+          "moduleId": "seq-2",
+          "portId": "clock"
+        },
+        "kind": "sync"
+      },
+      {
+        "from": {
+          "moduleId": "clock-1",
+          "portId": "reset"
+        },
+        "to": {
+          "moduleId": "seq-2",
+          "portId": "reset"
+        },
+        "kind": "sync"
+      },
+      {
+        "from": {
+          "moduleId": "clock-1",
+          "portId": "clock"
+        },
+        "to": {
+          "moduleId": "drumseq-1",
+          "portId": "clock"
+        },
+        "kind": "sync"
+      },
+      {
+        "from": {
+          "moduleId": "clock-1",
+          "portId": "reset"
+        },
+        "to": {
+          "moduleId": "drumseq-1",
+          "portId": "reset"
+        },
+        "kind": "sync"
+      },
+      {
+        "from": {
+          "moduleId": "seq-1",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "tb303-1",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "seq-1",
+          "portId": "gate-out"
+        },
+        "to": {
+          "moduleId": "tb303-1",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "seq-1",
+          "portId": "velocity-out"
+        },
+        "to": {
+          "moduleId": "tb303-1",
+          "portId": "velocity"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "seq-2",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "osc-2",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "seq-2",
+          "portId": "gate-out"
+        },
+        "to": {
+          "moduleId": "adsr-2",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "osc-2",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "vcf-2",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "adsr-2",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "vcf-2",
+          "portId": "env"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "adsr-2",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "gain-2",
+          "portId": "cv"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "vcf-2",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "gain-2",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "drumseq-1",
+          "portId": "gate-kick"
+        },
+        "to": {
+          "moduleId": "kick-1",
+          "portId": "trigger"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "drumseq-1",
+          "portId": "gate-snare"
+        },
+        "to": {
+          "moduleId": "snare-1",
+          "portId": "trigger"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "drumseq-1",
+          "portId": "gate-hhc"
+        },
+        "to": {
+          "moduleId": "hh-1",
+          "portId": "trigger"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "drumseq-1",
+          "portId": "gate-clap"
+        },
+        "to": {
+          "moduleId": "clap-1",
+          "portId": "trigger"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "kick-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mix-1",
+          "portId": "in-a"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "snare-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mix-1",
+          "portId": "in-b"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "hh-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mix-1",
+          "portId": "in-c"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "clap-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mix-1",
+          "portId": "in-d"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "tb303-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mix-2",
+          "portId": "in-a"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "gain-2",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mix-2",
+          "portId": "in-b"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "mix-2",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mix-3",
+          "portId": "in-a"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "mix-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mix-3",
+          "portId": "in-b"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "mix-3",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "reverb-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "reverb-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "out-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      }
     ]
   }
 }

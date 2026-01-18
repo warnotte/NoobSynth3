@@ -1,0 +1,198 @@
+{
+  "graph": {
+    "modules": [
+      {
+        "id": "ctrl-1",
+        "type": "control",
+        "name": "Control",
+        "position": { "x": 50, "y": 50 },
+        "params": {
+          "octave": 3,
+          "glide": 80,
+          "voices": 4
+        }
+      },
+      {
+        "id": "lfo-1",
+        "type": "lfo",
+        "name": "Morph",
+        "position": { "x": 50, "y": 220 },
+        "params": {
+          "rate": 0.08,
+          "shape": "triangle",
+          "depth": 0.8,
+          "offset": 0,
+          "bipolar": false
+        }
+      },
+      {
+        "id": "lfo-2",
+        "type": "lfo",
+        "name": "Filter Mod",
+        "position": { "x": 200, "y": 220 },
+        "params": {
+          "rate": 0.12,
+          "shape": "sine",
+          "depth": 0.5,
+          "offset": 0,
+          "bipolar": true
+        }
+      },
+      {
+        "id": "lfo-3",
+        "type": "lfo",
+        "name": "Vibrato",
+        "position": { "x": 350, "y": 220 },
+        "params": {
+          "rate": 5.5,
+          "shape": "sine",
+          "depth": 0.15,
+          "offset": 0,
+          "bipolar": true
+        }
+      },
+      {
+        "id": "wt-1",
+        "type": "wavetable",
+        "name": "Evolve",
+        "position": { "x": 300, "y": 50 },
+        "params": {
+          "frequency": 131,
+          "bank": 1,
+          "position": 0.2,
+          "unison": 7,
+          "detune": 18,
+          "spread": 1.0,
+          "morphSpeed": 0,
+          "subMix": 0.25,
+          "attack": 0.4,
+          "release": 1.2
+        }
+      },
+      {
+        "id": "vcf-1",
+        "type": "vcf",
+        "name": "Filter",
+        "position": { "x": 550, "y": 50 },
+        "params": {
+          "cutoff": 1200,
+          "resonance": 0.3,
+          "drive": 0.1,
+          "envAmount": 0.4,
+          "modAmount": 0.5,
+          "keyTrack": 0.5,
+          "model": "svf",
+          "mode": "lp",
+          "slope": 12
+        }
+      },
+      {
+        "id": "adsr-1",
+        "type": "adsr",
+        "name": "Filter Env",
+        "position": { "x": 500, "y": 220 },
+        "params": {
+          "attack": 0.8,
+          "decay": 1.5,
+          "sustain": 0.4,
+          "release": 2.0
+        }
+      },
+      {
+        "id": "chorus-1",
+        "type": "chorus",
+        "name": "Chorus",
+        "position": { "x": 750, "y": 50 },
+        "params": {
+          "rate": 0.3,
+          "depth": 6,
+          "delay": 15,
+          "mix": 0.4,
+          "spread": 1.0,
+          "feedback": 0.2
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "x": 950, "y": 50 },
+        "params": {
+          "time": 0.85,
+          "damp": 0.25,
+          "preDelay": 40,
+          "mix": 0.45
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Out",
+        "position": { "x": 1150, "y": 50 },
+        "params": { "level": 1 }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "cv-out" },
+        "to": { "moduleId": "wt-1", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "gate-out" },
+        "to": { "moduleId": "wt-1", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "sync-out" },
+        "to": { "moduleId": "wt-1", "portId": "sync" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "gate-out" },
+        "to": { "moduleId": "adsr-1", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "lfo-1", "portId": "cv-out" },
+        "to": { "moduleId": "wt-1", "portId": "position" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "lfo-3", "portId": "cv-out" },
+        "to": { "moduleId": "wt-1", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "wt-1", "portId": "out" },
+        "to": { "moduleId": "vcf-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "adsr-1", "portId": "env" },
+        "to": { "moduleId": "vcf-1", "portId": "mod" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "lfo-2", "portId": "cv-out" },
+        "to": { "moduleId": "vcf-1", "portId": "mod" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "vcf-1", "portId": "out" },
+        "to": { "moduleId": "chorus-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "chorus-1", "portId": "out" },
+        "to": { "moduleId": "reverb-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb-1", "portId": "out" },
+        "to": { "moduleId": "out-1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

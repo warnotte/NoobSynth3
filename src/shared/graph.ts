@@ -10,6 +10,8 @@ export type ModuleType =
   | 'shepard'
   | 'pipe-organ'
   | 'spectral-swarm'
+  | 'resonator'
+  | 'wavetable'
   | 'mod-router'
   | 'sample-hold'
   | 'slew'

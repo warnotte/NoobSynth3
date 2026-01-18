@@ -1,0 +1,630 @@
+{
+  "graph": {
+    "modules": [
+      {
+        "id": "clock-1",
+        "type": "clock",
+        "name": "Clock",
+        "position": {
+          "x": 50,
+          "y": 50
+        },
+        "params": {
+          "running": true,
+          "tempo": 120,
+          "rate": 4,
+          "swing": 10
+        }
+      },
+      {
+        "id": "drum-seq",
+        "type": "drum-sequencer",
+        "name": "Drums",
+        "position": {
+          "x": 200,
+          "y": 50
+        },
+        "params": {
+          "enabled": true,
+          "tempo": 120,
+          "swing": 10,
+          "length": 16,
+          "drumData": "{\"tracks\":[[{\"g\":1,\"a\":1},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":1},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":1},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":1},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}]]}"
+        }
+      },
+      {
+        "id": "seq-1",
+        "type": "step-sequencer",
+        "name": "Melody",
+        "position": {
+          "x": 200,
+          "y": 300
+        },
+        "params": {
+          "enabled": true,
+          "tempo": 120,
+          "rate": 4,
+          "gateLength": 50,
+          "swing": 5,
+          "slideTime": 40,
+          "length": 16,
+          "direction": 0,
+          "stepData": "[{\"pitch\":0,\"gate\":true,\"velocity\":100,\"slide\":false},{\"pitch\":0,\"gate\":true,\"velocity\":70,\"slide\":false},{\"pitch\":12,\"gate\":true,\"velocity\":90,\"slide\":false},{\"pitch\":0,\"gate\":true,\"velocity\":60,\"slide\":false},{\"pitch\":7,\"gate\":true,\"velocity\":100,\"slide\":true},{\"pitch\":12,\"gate\":true,\"velocity\":70,\"slide\":false},{\"pitch\":0,\"gate\":true,\"velocity\":80,\"slide\":false},{\"pitch\":7,\"gate\":true,\"velocity\":60,\"slide\":false},{\"pitch\":12,\"gate\":true,\"velocity\":100,\"slide\":false},{\"pitch\":0,\"gate\":true,\"velocity\":70,\"slide\":false},{\"pitch\":7,\"gate\":true,\"velocity\":90,\"slide\":true},{\"pitch\":0,\"gate\":true,\"velocity\":60,\"slide\":false},{\"pitch\":0,\"gate\":true,\"velocity\":100,\"slide\":false},{\"pitch\":12,\"gate\":true,\"velocity\":70,\"slide\":false},{\"pitch\":7,\"gate\":true,\"velocity\":80,\"slide\":true},{\"pitch\":0,\"gate\":true,\"velocity\":60,\"slide\":false}]"
+        }
+      },
+      {
+        "id": "kick-909",
+        "type": "909-kick",
+        "name": "909 Kick",
+        "position": {
+          "x": 450,
+          "y": 50
+        },
+        "params": {
+          "tune": 50,
+          "attack": 0.6,
+          "decay": 0.7,
+          "drive": 0.4
+        }
+      },
+      {
+        "id": "snare-909",
+        "type": "909-snare",
+        "name": "909 Snare",
+        "position": {
+          "x": 450,
+          "y": 100
+        },
+        "params": {
+          "tune": 180,
+          "tone": 0.4,
+          "snappy": 0.7,
+          "decay": 0.3
+        }
+      },
+      {
+        "id": "hh-909",
+        "type": "909-hihat",
+        "name": "909 HiHat",
+        "position": {
+          "x": 450,
+          "y": 150
+        },
+        "params": {
+          "openDecay": 0.35,
+          "closedDecay": 0.08,
+          "tone": 0.7,
+          "mix": 0.6
+        }
+      },
+      {
+        "id": "clap-909",
+        "type": "909-clap",
+        "name": "909 Clap",
+        "position": {
+          "x": 450,
+          "y": 200
+        },
+        "params": {
+          "tone": 0.6,
+          "decay": 0.35,
+          "spread": 0.6
+        }
+      },
+      {
+        "id": "res-bells",
+        "type": "resonator",
+        "name": "Bells",
+        "position": {
+          "x": 650,
+          "y": 50
+        },
+        "params": {
+          "frequency": 880,
+          "structure": 0.7,
+          "brightness": 0.85,
+          "damping": 0.88,
+          "position": 0.3,
+          "mode": 0,
+          "polyphony": 2,
+          "internalExc": 1,
+          "chorus": 0.1
+        }
+      },
+      {
+        "id": "res-metal",
+        "type": "resonator",
+        "name": "Metal",
+        "position": {
+          "x": 650,
+          "y": 150
+        },
+        "params": {
+          "frequency": 440,
+          "structure": 0.9,
+          "brightness": 0.6,
+          "damping": 0.8,
+          "position": 0.4,
+          "mode": 2,
+          "polyphony": 2,
+          "internalExc": 1,
+          "chorus": 0.2
+        }
+      },
+      {
+        "id": "res-deep",
+        "type": "resonator",
+        "name": "Deep",
+        "position": {
+          "x": 650,
+          "y": 250
+        },
+        "params": {
+          "frequency": 110,
+          "structure": 0.4,
+          "brightness": 0.5,
+          "damping": 0.75,
+          "position": 0.6,
+          "mode": 2,
+          "polyphony": 1,
+          "internalExc": 1,
+          "chorus": 0
+        }
+      },
+      {
+        "id": "res-lead",
+        "type": "resonator",
+        "name": "Lead",
+        "position": {
+          "x": 650,
+          "y": 350
+        },
+        "params": {
+          "frequency": 330,
+          "structure": 0.6,
+          "brightness": 0.75,
+          "damping": 0.85,
+          "position": 0.35,
+          "mode": 0,
+          "polyphony": 1,
+          "internalExc": 1,
+          "chorus": 0.15
+        }
+      },
+      {
+        "id": "mix-drums",
+        "type": "mixer-1x2",
+        "name": "909 Mix",
+        "position": {
+          "x": 850,
+          "y": 50
+        },
+        "params": {
+          "levelA": 0.9,
+          "levelB": 0.6,
+          "levelC": 0.4,
+          "levelD": 0.5,
+          "levelE": 0,
+          "levelF": 0
+        }
+      },
+      {
+        "id": "mix-res",
+        "type": "mixer-1x2",
+        "name": "Res Mix",
+        "position": {
+          "x": 850,
+          "y": 200
+        },
+        "params": {
+          "levelA": 0.5,
+          "levelB": 0.4,
+          "levelC": 0.6,
+          "levelD": 0.5,
+          "levelE": 0,
+          "levelF": 0
+        }
+      },
+      {
+        "id": "mix-master",
+        "type": "mixer",
+        "name": "Master",
+        "position": {
+          "x": 1000,
+          "y": 100
+        },
+        "params": {
+          "levelA": 0.7,
+          "levelB": 0.6
+        }
+      },
+      {
+        "id": "delay-1",
+        "type": "delay",
+        "name": "Delay",
+        "position": {
+          "x": 1150,
+          "y": 50
+        },
+        "params": {
+          "time": 250,
+          "feedback": 0.3,
+          "mix": 0.2,
+          "tone": 0.6,
+          "pingPong": true
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": {
+          "x": 1150,
+          "y": 150
+        },
+        "params": {
+          "time": 0.6,
+          "damp": 0.4,
+          "preDelay": 20,
+          "mix": 0.3
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Out",
+        "position": {
+          "x": 1300,
+          "y": 100
+        },
+        "params": {
+          "level": 1
+        }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Guide",
+        "position": {
+          "x": 50,
+          "y": 300
+        },
+        "params": {
+          "text": "RESONATOR + 909\n\nFusion drums acoustiques/synthétiques!\n\n909 drums:\n• Kick, Snare, HiHat, Clap\n\nResonators (même pattern):\n• Bells, Metal, Deep\n• Lead (mélodie Moroder)\n\nAjustez les mixers pour\nbalancer 909 vs Resonators!"
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": {
+          "moduleId": "clock-1",
+          "portId": "clock"
+        },
+        "to": {
+          "moduleId": "drum-seq",
+          "portId": "clock"
+        },
+        "kind": "sync"
+      },
+      {
+        "from": {
+          "moduleId": "clock-1",
+          "portId": "reset"
+        },
+        "to": {
+          "moduleId": "drum-seq",
+          "portId": "reset"
+        },
+        "kind": "sync"
+      },
+      {
+        "from": {
+          "moduleId": "clock-1",
+          "portId": "clock"
+        },
+        "to": {
+          "moduleId": "seq-1",
+          "portId": "clock"
+        },
+        "kind": "sync"
+      },
+      {
+        "from": {
+          "moduleId": "clock-1",
+          "portId": "reset"
+        },
+        "to": {
+          "moduleId": "seq-1",
+          "portId": "reset"
+        },
+        "kind": "sync"
+      },
+      {
+        "from": {
+          "moduleId": "drum-seq",
+          "portId": "gate-kick"
+        },
+        "to": {
+          "moduleId": "kick-909",
+          "portId": "trigger"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "drum-seq",
+          "portId": "gate-snare"
+        },
+        "to": {
+          "moduleId": "snare-909",
+          "portId": "trigger"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "drum-seq",
+          "portId": "gate-hhc"
+        },
+        "to": {
+          "moduleId": "hh-909",
+          "portId": "trigger"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "drum-seq",
+          "portId": "gate-hho"
+        },
+        "to": {
+          "moduleId": "hh-909",
+          "portId": "trigger"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "drum-seq",
+          "portId": "gate-clap"
+        },
+        "to": {
+          "moduleId": "clap-909",
+          "portId": "trigger"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "drum-seq",
+          "portId": "acc-kick"
+        },
+        "to": {
+          "moduleId": "kick-909",
+          "portId": "accent"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "drum-seq",
+          "portId": "acc-snare"
+        },
+        "to": {
+          "moduleId": "snare-909",
+          "portId": "accent"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "drum-seq",
+          "portId": "acc-clap"
+        },
+        "to": {
+          "moduleId": "clap-909",
+          "portId": "accent"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "drum-seq",
+          "portId": "gate-kick"
+        },
+        "to": {
+          "moduleId": "res-bells",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "drum-seq",
+          "portId": "gate-snare"
+        },
+        "to": {
+          "moduleId": "res-metal",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "drum-seq",
+          "portId": "gate-tom"
+        },
+        "to": {
+          "moduleId": "res-deep",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "seq-1",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "res-lead",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "seq-1",
+          "portId": "gate-out"
+        },
+        "to": {
+          "moduleId": "res-lead",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "kick-909",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mix-drums",
+          "portId": "in-a"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "snare-909",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mix-drums",
+          "portId": "in-b"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "hh-909",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mix-drums",
+          "portId": "in-c"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "clap-909",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mix-drums",
+          "portId": "in-d"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "res-bells",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mix-res",
+          "portId": "in-a"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "res-metal",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mix-res",
+          "portId": "in-b"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "res-deep",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mix-res",
+          "portId": "in-c"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "res-lead",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mix-res",
+          "portId": "in-d"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "mix-drums",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mix-master",
+          "portId": "in-a"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "mix-res",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mix-master",
+          "portId": "in-b"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "mix-master",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "delay-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "delay-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "reverb-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "reverb-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "out-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      }
+    ]
+  }
+}

@@ -9,7 +9,10 @@
         "id": "midiseq-1",
         "type": "midi-file-sequencer",
         "name": "MIDI File",
-        "position": { "x": 0, "y": 3 },
+        "position": {
+          "x": 0,
+          "y": 3
+        },
         "params": {
           "enabled": true,
           "tempo": 72,
@@ -24,11 +27,14 @@
         "id": "organ-1",
         "type": "pipe-organ",
         "name": "Manual I",
-        "position": { "x": 4, "y": 0 },
+        "position": {
+          "x": 4,
+          "y": 0
+        },
         "params": {
           "frequency": 220,
           "drawbar16": 0.6,
-          "drawbar8": 1.0,
+          "drawbar8": 1,
           "drawbar4": 0.7,
           "drawbar223": 0.3,
           "drawbar2": 0.5,
@@ -37,8 +43,8 @@
           "drawbar1": 0.3,
           "voicing": 0,
           "chiff": 0.25,
-          "tremulant": 0.0,
-          "tremRate": 6.0,
+          "tremulant": 0,
+          "tremRate": 6,
           "wind": 0.08,
           "brightness": 0.75
         }
@@ -47,16 +53,19 @@
         "id": "organ-2",
         "type": "pipe-organ",
         "name": "Manual II",
-        "position": { "x": 4, "y": 4 },
+        "position": {
+          "x": 4,
+          "y": 4
+        },
         "params": {
           "frequency": 220,
           "drawbar16": 0.3,
           "drawbar8": 0.9,
           "drawbar4": 0.5,
-          "drawbar223": 0.0,
+          "drawbar223": 0,
           "drawbar2": 0.3,
-          "drawbar135": 0.0,
-          "drawbar113": 0.0,
+          "drawbar135": 0,
+          "drawbar113": 0,
           "drawbar1": 0.15,
           "voicing": 1,
           "chiff": 0.15,
@@ -70,7 +79,10 @@
         "id": "vca-1",
         "type": "gain",
         "name": "VCA I",
-        "position": { "x": 7, "y": 0 },
+        "position": {
+          "x": 7,
+          "y": 0
+        },
         "params": {
           "gain": 0.7
         }
@@ -79,7 +91,10 @@
         "id": "vca-2",
         "type": "gain",
         "name": "VCA II",
-        "position": { "x": 7, "y": 4 },
+        "position": {
+          "x": 7,
+          "y": 4
+        },
         "params": {
           "gain": 0.5
         }
@@ -88,7 +103,10 @@
         "id": "mixer-1",
         "type": "mixer",
         "name": "Manuals",
-        "position": { "x": 9, "y": 2 },
+        "position": {
+          "x": 9,
+          "y": 2
+        },
         "params": {
           "ch1": 0.7,
           "ch2": 0.5,
@@ -99,10 +117,13 @@
         "id": "reverb-1",
         "type": "reverb",
         "name": "Cathedral",
-        "position": { "x": 11, "y": 2 },
+        "position": {
+          "x": 11,
+          "y": 2
+        },
         "params": {
           "mix": 0.4,
-          "decay": 4.0,
+          "decay": 4,
           "damping": 0.35
         }
       },
@@ -110,27 +131,126 @@
         "id": "out-1",
         "type": "output",
         "name": "Main Out",
-        "position": { "x": 13, "y": 2 },
+        "position": {
+          "x": 13,
+          "y": 2
+        },
         "params": {
-          "level": 0.65
+          "level": 1
         }
       }
     ],
     "connections": [
-      { "from": { "moduleId": "midiseq-1", "portId": "cv-1" }, "to": { "moduleId": "organ-1", "portId": "pitch" }, "kind": "cv" },
-      { "from": { "moduleId": "midiseq-1", "portId": "gate-1" }, "to": { "moduleId": "organ-1", "portId": "gate" }, "kind": "gate" },
-
-      { "from": { "moduleId": "midiseq-1", "portId": "cv-2" }, "to": { "moduleId": "organ-2", "portId": "pitch" }, "kind": "cv" },
-      { "from": { "moduleId": "midiseq-1", "portId": "gate-2" }, "to": { "moduleId": "organ-2", "portId": "gate" }, "kind": "gate" },
-
-      { "from": { "moduleId": "organ-1", "portId": "out" }, "to": { "moduleId": "vca-1", "portId": "in" }, "kind": "audio" },
-      { "from": { "moduleId": "organ-2", "portId": "out" }, "to": { "moduleId": "vca-2", "portId": "in" }, "kind": "audio" },
-
-      { "from": { "moduleId": "vca-1", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-a" }, "kind": "audio" },
-      { "from": { "moduleId": "vca-2", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-b" }, "kind": "audio" },
-
-      { "from": { "moduleId": "mixer-1", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
-      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+      {
+        "from": {
+          "moduleId": "midiseq-1",
+          "portId": "cv-1"
+        },
+        "to": {
+          "moduleId": "organ-1",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "midiseq-1",
+          "portId": "gate-1"
+        },
+        "to": {
+          "moduleId": "organ-1",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "midiseq-1",
+          "portId": "cv-2"
+        },
+        "to": {
+          "moduleId": "organ-2",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "midiseq-1",
+          "portId": "gate-2"
+        },
+        "to": {
+          "moduleId": "organ-2",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "organ-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "vca-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "organ-2",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "vca-2",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "vca-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mixer-1",
+          "portId": "in-a"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "vca-2",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mixer-1",
+          "portId": "in-b"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "mixer-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "reverb-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "reverb-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "out-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      }
     ]
   }
 }

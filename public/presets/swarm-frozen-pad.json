@@ -8,8 +8,13 @@
       {
         "id": "ctrl1",
         "type": "control",
-        "params": { "portamento": 0.2 },
-        "position": { "col": 1, "row": 1 },
+        "params": {
+          "portamento": 0.2
+        },
+        "position": {
+          "col": 1,
+          "row": 1
+        },
         "name": "Control"
       },
       {
@@ -21,13 +26,13 @@
           "detune": 30,
           "drift": 0.5,
           "density": 0.75,
-          "evolution": 6.0,
+          "evolution": 6,
           "inharmonic": 0.05,
-          "tilt": -4.0,
+          "tilt": -4,
           "spread": 0.9,
           "shimmer": 0.2,
-          "attack": 4.0,
-          "release": 5.0,
+          "attack": 4,
+          "release": 5,
           "waveform": 0,
           "oddEven": 0,
           "fundamentalMix": 0.5,
@@ -38,9 +43,12 @@
           "attackLow": 1.5,
           "attackHigh": 0.8,
           "releaseLow": 1.2,
-          "releaseHigh": 1.0
+          "releaseHigh": 1
         },
-        "position": { "col": 3, "row": 1 },
+        "position": {
+          "col": 3,
+          "row": 1
+        },
         "name": "Frozen Swarm"
       },
       {
@@ -53,7 +61,10 @@
           "tone": 0.4,
           "pingPong": 1
         },
-        "position": { "col": 5, "row": 1 },
+        "position": {
+          "col": 5,
+          "row": 1
+        },
         "name": "Delay"
       },
       {
@@ -65,54 +76,105 @@
           "preDelay": 0.1,
           "mix": 0.5
         },
-        "position": { "col": 7, "row": 1 },
+        "position": {
+          "col": 7,
+          "row": 1
+        },
         "name": "Reverb"
       },
       {
         "id": "scope1",
         "type": "scope",
-        "params": { "mode": "spectrogram", "timeScale": 1, "gain": 1 },
-        "position": { "col": 9, "row": 1 },
+        "params": {
+          "mode": "spectrogram",
+          "timeScale": 1,
+          "gain": 1
+        },
+        "position": {
+          "col": 9,
+          "row": 1
+        },
         "size": "3x3",
         "name": "Scope"
       },
       {
         "id": "out1",
         "type": "output",
-        "params": { "level": 0.7 },
-        "position": { "col": 12, "row": 1 },
+        "params": {
+          "level": 1
+        },
+        "position": {
+          "col": 12,
+          "row": 1
+        },
         "name": "Output"
       }
     ],
     "connections": [
       {
-        "from": { "moduleId": "ctrl1", "portId": "cv-out" },
-        "to": { "moduleId": "swarm1", "portId": "pitch" },
+        "from": {
+          "moduleId": "ctrl1",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "swarm1",
+          "portId": "pitch"
+        },
         "kind": "cv"
       },
       {
-        "from": { "moduleId": "ctrl1", "portId": "gate-out" },
-        "to": { "moduleId": "swarm1", "portId": "gate" },
+        "from": {
+          "moduleId": "ctrl1",
+          "portId": "gate-out"
+        },
+        "to": {
+          "moduleId": "swarm1",
+          "portId": "gate"
+        },
         "kind": "gate"
       },
       {
-        "from": { "moduleId": "swarm1", "portId": "out" },
-        "to": { "moduleId": "delay1", "portId": "in" },
+        "from": {
+          "moduleId": "swarm1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "delay1",
+          "portId": "in"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "delay1", "portId": "out" },
-        "to": { "moduleId": "reverb1", "portId": "in" },
+        "from": {
+          "moduleId": "delay1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "reverb1",
+          "portId": "in"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "reverb1", "portId": "out" },
-        "to": { "moduleId": "scope1", "portId": "in-a" },
+        "from": {
+          "moduleId": "reverb1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "scope1",
+          "portId": "in-a"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "reverb1", "portId": "out" },
-        "to": { "moduleId": "out1", "portId": "in" },
+        "from": {
+          "moduleId": "reverb1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "out1",
+          "portId": "in"
+        },
         "kind": "audio"
       }
     ]

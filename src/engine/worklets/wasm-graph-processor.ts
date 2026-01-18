@@ -71,11 +71,40 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
   private stepPollCounter = 0
   private watchedMidiSeq: string | null = null
   private debugCounter = 0
+  private messageQueue: GraphMessage[] = []
 
   constructor() {
     super()
-    this.port.onmessage = (event) => this.handleMessage(event.data as GraphMessage)
+    this.port.onmessage = (event) => this.queueMessage(event.data as GraphMessage)
     void this.initWasm()
+  }
+
+  private queueMessage(message: GraphMessage) {
+    // setGraph is handled immediately (before engine is used in process)
+    if (message.type === 'setGraph') {
+      if (this.ready && this.engine) {
+        try {
+          this.engine.set_graph(message.graphJson)
+        } catch (error) {
+          console.error('WASM set_graph error:', error)
+        }
+      } else {
+        this.pendingGraph = message.graphJson
+      }
+      return
+    }
+    // watchSequencers and watchMidiSeq don't touch engine, handle immediately
+    if (message.type === 'watchSequencers') {
+      this.watchedSequencers = message.moduleIds
+      this.lastSteps.clear()
+      return
+    }
+    if (message.type === 'watchMidiSeq') {
+      this.watchedMidiSeq = message.moduleId
+      return
+    }
+    // Queue other messages to be processed in process() before render()
+    this.messageQueue.push(message)
   }
 
   private async initWasm() {
@@ -102,43 +131,29 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
     }
   }
 
-  private handleMessage(message: GraphMessage) {
-    if (message.type === 'setGraph') {
-      if (this.ready && this.engine) {
-        try {
-          this.engine.set_graph(message.graphJson)
-        } catch (error) {
-          console.error('WASM set_graph error:', error)
-        }
-      } else {
-        this.pendingGraph = message.graphJson
-      }
-      return
-    }
-    if (!this.ready || !this.engine) {
-      return
-    }
+  private processQueuedMessage(message: GraphMessage) {
+    // Only called from process() - engine is guaranteed to exist and not be borrowed
     switch (message.type) {
       case 'setParam':
-        this.engine.set_param(message.moduleId, message.paramId, message.value)
+        this.engine!.set_param(message.moduleId, message.paramId, message.value)
         break
       case 'setParamString':
-        this.engine.set_param_string(message.moduleId, message.paramId, message.value)
+        this.engine!.set_param_string(message.moduleId, message.paramId, message.value)
         break
       case 'controlVoiceCv':
-        this.engine.set_control_voice_cv(message.moduleId, message.voice, message.value)
+        this.engine!.set_control_voice_cv(message.moduleId, message.voice, message.value)
         break
       case 'controlVoiceGate':
-        this.engine.set_control_voice_gate(message.moduleId, message.voice, message.value)
+        this.engine!.set_control_voice_gate(message.moduleId, message.voice, message.value)
         break
       case 'controlVoiceTriggerGate':
-        this.engine.trigger_control_voice_gate(message.moduleId, message.voice)
+        this.engine!.trigger_control_voice_gate(message.moduleId, message.voice)
         break
       case 'controlVoiceTriggerSync':
-        this.engine.trigger_control_voice_sync(message.moduleId, message.voice)
+        this.engine!.trigger_control_voice_sync(message.moduleId, message.voice)
         break
       case 'controlVoiceVelocity':
-        this.engine.set_control_voice_velocity(
+        this.engine!.set_control_voice_velocity(
           message.moduleId,
           message.voice,
           message.value,
@@ -146,20 +161,13 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
         )
         break
       case 'marioCv':
-        this.engine.set_mario_channel_cv(message.moduleId, message.channel, message.value)
+        this.engine!.set_mario_channel_cv(message.moduleId, message.channel, message.value)
         break
       case 'marioGate':
-        this.engine.set_mario_channel_gate(message.moduleId, message.channel, message.value)
-        break
-      case 'watchSequencers':
-        this.watchedSequencers = message.moduleIds
-        this.lastSteps.clear()
-        break
-      case 'watchMidiSeq':
-        this.watchedMidiSeq = message.moduleId
+        this.engine!.set_mario_channel_gate(message.moduleId, message.channel, message.value)
         break
       case 'seekMidiSeq':
-        this.engine.seek_midi_sequencer(message.moduleId, message.tick)
+        this.engine!.seek_midi_sequencer(message.moduleId, message.tick)
         break
       default:
         break
@@ -178,6 +186,12 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
     if (!this.ready || !this.engine || frames === 0) {
       outputs.forEach((group) => group.forEach((channel) => channel.fill(0)))
       return true
+    }
+
+    // Process queued messages before render to avoid borrow conflicts
+    while (this.messageQueue.length > 0) {
+      const msg = this.messageQueue.shift()!
+      this.processQueuedMessage(msg)
     }
 
     const inputGroup = inputs[0]

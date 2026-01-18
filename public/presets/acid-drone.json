@@ -9,7 +9,10 @@
         "id": "ctrl-1",
         "type": "control",
         "name": "Control IO",
-        "position": { "x": 0, "y": 0 },
+        "position": {
+          "x": 0,
+          "y": 0
+        },
         "params": {
           "cv": 0,
           "cvMode": "unipolar",
@@ -23,7 +26,10 @@
         "id": "seq-1",
         "type": "step-sequencer",
         "name": "Step Seq",
-        "position": { "x": 2, "y": 0 },
+        "position": {
+          "x": 2,
+          "y": 0
+        },
         "params": {
           "enabled": true,
           "tempo": 80,
@@ -40,7 +46,10 @@
         "id": "tb303-1",
         "type": "tb-303",
         "name": "TB-303",
-        "position": { "x": 5, "y": 0 },
+        "position": {
+          "x": 5,
+          "y": 0
+        },
         "params": {
           "waveform": 1,
           "cutoff": 300,
@@ -55,31 +64,114 @@
         "id": "chorus-1",
         "type": "chorus",
         "name": "Chorus",
-        "position": { "x": 7, "y": 0 },
-        "params": { "rate": 0.4, "depth": 6, "delay": 12, "mix": 0.4, "feedback": 0.2, "spread": 0.7 }
+        "position": {
+          "x": 7,
+          "y": 0
+        },
+        "params": {
+          "rate": 0.4,
+          "depth": 6,
+          "delay": 12,
+          "mix": 0.4,
+          "feedback": 0.2,
+          "spread": 0.7
+        }
       },
       {
         "id": "reverb-1",
         "type": "reverb",
         "name": "Reverb",
-        "position": { "x": 9, "y": 0 },
-        "params": { "time": 0.8, "damp": 0.5, "preDelay": 30, "mix": 0.4 }
+        "position": {
+          "x": 9,
+          "y": 0
+        },
+        "params": {
+          "time": 0.8,
+          "damp": 0.5,
+          "preDelay": 30,
+          "mix": 0.4
+        }
       },
       {
         "id": "out-1",
         "type": "output",
         "name": "Main Out",
-        "position": { "x": 11, "y": 0 },
-        "params": { "level": 0.7 }
+        "position": {
+          "x": 11,
+          "y": 0
+        },
+        "params": {
+          "level": 1
+        }
       }
     ],
     "connections": [
-      { "from": { "moduleId": "seq-1", "portId": "cv-out" }, "to": { "moduleId": "tb303-1", "portId": "pitch" }, "kind": "cv" },
-      { "from": { "moduleId": "seq-1", "portId": "gate-out" }, "to": { "moduleId": "tb303-1", "portId": "gate" }, "kind": "gate" },
-      { "from": { "moduleId": "seq-1", "portId": "velocity-out" }, "to": { "moduleId": "tb303-1", "portId": "velocity" }, "kind": "cv" },
-      { "from": { "moduleId": "tb303-1", "portId": "out" }, "to": { "moduleId": "chorus-1", "portId": "in" }, "kind": "audio" },
-      { "from": { "moduleId": "chorus-1", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
-      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+      {
+        "from": {
+          "moduleId": "seq-1",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "tb303-1",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "seq-1",
+          "portId": "gate-out"
+        },
+        "to": {
+          "moduleId": "tb303-1",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "seq-1",
+          "portId": "velocity-out"
+        },
+        "to": {
+          "moduleId": "tb303-1",
+          "portId": "velocity"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "tb303-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "chorus-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "chorus-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "reverb-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "reverb-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "out-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      }
     ]
   }
 }

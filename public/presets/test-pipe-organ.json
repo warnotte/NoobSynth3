@@ -9,7 +9,10 @@
         "id": "control-1",
         "type": "control",
         "name": "Control",
-        "position": { "x": 0, "y": 2 },
+        "position": {
+          "x": 0,
+          "y": 2
+        },
         "params": {
           "voices": 4,
           "portamento": 0,
@@ -21,11 +24,14 @@
         "id": "organ-1",
         "type": "pipe-organ",
         "name": "Pipe Organ",
-        "position": { "x": 3, "y": 0 },
+        "position": {
+          "x": 3,
+          "y": 0
+        },
         "params": {
           "frequency": 220,
           "drawbar16": 0.6,
-          "drawbar8": 1.0,
+          "drawbar8": 1,
           "drawbar4": 0.7,
           "drawbar223": 0.3,
           "drawbar2": 0.5,
@@ -35,7 +41,7 @@
           "voicing": 0,
           "chiff": 0.2,
           "tremulant": 0.15,
-          "tremRate": 6.0,
+          "tremRate": 6,
           "wind": 0.08,
           "brightness": 0.75
         }
@@ -44,7 +50,10 @@
         "id": "vca-1",
         "type": "gain",
         "name": "VCA",
-        "position": { "x": 6, "y": 2 },
+        "position": {
+          "x": 6,
+          "y": 2
+        },
         "params": {
           "gain": 0.6
         }
@@ -53,7 +62,10 @@
         "id": "reverb-1",
         "type": "reverb",
         "name": "Hall",
-        "position": { "x": 8, "y": 2 },
+        "position": {
+          "x": 8,
+          "y": 2
+        },
         "params": {
           "mix": 0.3,
           "decay": 2.5,
@@ -64,18 +76,71 @@
         "id": "out-1",
         "type": "output",
         "name": "Output",
-        "position": { "x": 10, "y": 2 },
+        "position": {
+          "x": 10,
+          "y": 2
+        },
         "params": {
-          "level": 0.7
+          "level": 1
         }
       }
     ],
     "connections": [
-      { "from": { "moduleId": "control-1", "portId": "cv-out" }, "to": { "moduleId": "organ-1", "portId": "pitch" }, "kind": "cv" },
-      { "from": { "moduleId": "control-1", "portId": "gate-out" }, "to": { "moduleId": "organ-1", "portId": "gate" }, "kind": "gate" },
-      { "from": { "moduleId": "organ-1", "portId": "out" }, "to": { "moduleId": "vca-1", "portId": "in" }, "kind": "audio" },
-      { "from": { "moduleId": "vca-1", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
-      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+      {
+        "from": {
+          "moduleId": "control-1",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "organ-1",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "control-1",
+          "portId": "gate-out"
+        },
+        "to": {
+          "moduleId": "organ-1",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "organ-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "vca-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "vca-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "reverb-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "reverb-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "out-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      }
     ]
   }
 }

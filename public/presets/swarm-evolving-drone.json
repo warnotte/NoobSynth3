@@ -26,13 +26,13 @@
           "detune": 20,
           "drift": 0.4,
           "density": 0.85,
-          "evolution": 5.0,
-          "inharmonic": 0.0,
-          "tilt": -4.0,
+          "evolution": 5,
+          "inharmonic": 0,
+          "tilt": -4,
           "spread": 0.8,
-          "shimmer": 0.0,
-          "attack": 3.0,
-          "release": 4.0
+          "shimmer": 0,
+          "attack": 3,
+          "release": 4
         },
         "position": {
           "col": 3,
@@ -104,7 +104,7 @@
         "id": "out1",
         "type": "output",
         "params": {
-          "level": 0.8
+          "level": 1
         },
         "position": {
           "col": 14,
@@ -115,38 +115,80 @@
     ],
     "connections": [
       {
-        "from": { "moduleId": "ctrl1", "portId": "cv-out" },
-        "to": { "moduleId": "swarm1", "portId": "pitch" },
+        "from": {
+          "moduleId": "ctrl1",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "swarm1",
+          "portId": "pitch"
+        },
         "kind": "cv"
       },
       {
-        "from": { "moduleId": "ctrl1", "portId": "gate-out" },
-        "to": { "moduleId": "swarm1", "portId": "gate" },
+        "from": {
+          "moduleId": "ctrl1",
+          "portId": "gate-out"
+        },
+        "to": {
+          "moduleId": "swarm1",
+          "portId": "gate"
+        },
         "kind": "gate"
       },
       {
-        "from": { "moduleId": "swarm1", "portId": "out" },
-        "to": { "moduleId": "chorus1", "portId": "in" },
+        "from": {
+          "moduleId": "swarm1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "chorus1",
+          "portId": "in"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "chorus1", "portId": "out" },
-        "to": { "moduleId": "delay1", "portId": "in" },
+        "from": {
+          "moduleId": "chorus1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "delay1",
+          "portId": "in"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "delay1", "portId": "out" },
-        "to": { "moduleId": "reverb1", "portId": "in" },
+        "from": {
+          "moduleId": "delay1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "reverb1",
+          "portId": "in"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "reverb1", "portId": "out" },
-        "to": { "moduleId": "scope1", "portId": "in-a" },
+        "from": {
+          "moduleId": "reverb1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "scope1",
+          "portId": "in-a"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "reverb1", "portId": "out" },
-        "to": { "moduleId": "out1", "portId": "in" },
+        "from": {
+          "moduleId": "reverb1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "out1",
+          "portId": "in"
+        },
         "kind": "audio"
       }
     ]

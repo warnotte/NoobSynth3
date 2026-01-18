@@ -9,7 +9,10 @@
         "id": "ctrl-1",
         "type": "control",
         "name": "Control IO",
-        "position": { "x": 0, "y": 0 },
+        "position": {
+          "x": 0,
+          "y": 0
+        },
         "params": {
           "cv": 0,
           "cvMode": "unipolar",
@@ -23,7 +26,10 @@
         "id": "seq-bass",
         "type": "step-sequencer",
         "name": "Seq Bass",
-        "position": { "x": 0, "y": 1 },
+        "position": {
+          "x": 0,
+          "y": 1
+        },
         "params": {
           "enabled": true,
           "tempo": 126,
@@ -40,7 +46,10 @@
         "id": "seq-lead",
         "type": "step-sequencer",
         "name": "Seq Lead",
-        "position": { "x": 3, "y": 1 },
+        "position": {
+          "x": 3,
+          "y": 1
+        },
         "params": {
           "enabled": true,
           "tempo": 126,
@@ -57,7 +66,10 @@
         "id": "seq-stab",
         "type": "step-sequencer",
         "name": "Seq Stab",
-        "position": { "x": 6, "y": 1 },
+        "position": {
+          "x": 6,
+          "y": 1
+        },
         "params": {
           "enabled": true,
           "tempo": 126,
@@ -74,7 +86,10 @@
         "id": "tb303-bass",
         "type": "tb-303",
         "name": "303 Bass",
-        "position": { "x": 0, "y": 3 },
+        "position": {
+          "x": 0,
+          "y": 3
+        },
         "params": {
           "waveform": 0,
           "cutoff": 400,
@@ -89,7 +104,10 @@
         "id": "tb303-lead",
         "type": "tb-303",
         "name": "303 Lead",
-        "position": { "x": 3, "y": 3 },
+        "position": {
+          "x": 3,
+          "y": 3
+        },
         "params": {
           "waveform": 1,
           "cutoff": 1200,
@@ -104,18 +122,24 @@
         "id": "supersaw-1",
         "type": "supersaw",
         "name": "Supersaw",
-        "position": { "x": 6, "y": 3 },
+        "position": {
+          "x": 6,
+          "y": 3
+        },
         "params": {
           "frequency": 440,
           "detune": 30,
-          "mix": 1.0
+          "mix": 1
         }
       },
       {
         "id": "adsr-stab",
         "type": "adsr",
         "name": "ADSR Stab",
-        "position": { "x": 8, "y": 1 },
+        "position": {
+          "x": 8,
+          "y": 1
+        },
         "params": {
           "attack": 0.005,
           "decay": 0.2,
@@ -127,7 +151,10 @@
         "id": "vcf-stab",
         "type": "vcf",
         "name": "VCF Stab",
-        "position": { "x": 8, "y": 3 },
+        "position": {
+          "x": 8,
+          "y": 3
+        },
         "params": {
           "cutoff": 4000,
           "resonance": 0.2,
@@ -142,16 +169,22 @@
         "id": "vca-stab",
         "type": "gain",
         "name": "VCA Stab",
-        "position": { "x": 10, "y": 3 },
+        "position": {
+          "x": 10,
+          "y": 3
+        },
         "params": {
-          "gain": 1.0
+          "gain": 1
         }
       },
       {
         "id": "mixer-1",
         "type": "mixer-1x2",
         "name": "Mixer",
-        "position": { "x": 10, "y": 1 },
+        "position": {
+          "x": 10,
+          "y": 1
+        },
         "params": {
           "levelA": 0.7,
           "levelB": 0.5,
@@ -165,7 +198,10 @@
         "id": "chorus-1",
         "type": "chorus",
         "name": "Chorus",
-        "position": { "x": 12, "y": 0 },
+        "position": {
+          "x": 12,
+          "y": 0
+        },
         "params": {
           "rate": 0.8,
           "depth": 5,
@@ -179,7 +215,10 @@
         "id": "delay-1",
         "type": "delay",
         "name": "Delay",
-        "position": { "x": 12, "y": 2 },
+        "position": {
+          "x": 12,
+          "y": 2
+        },
         "params": {
           "time": 0.19,
           "feedback": 0.4,
@@ -191,7 +230,10 @@
         "id": "reverb-1",
         "type": "reverb",
         "name": "Reverb",
-        "position": { "x": 14, "y": 0 },
+        "position": {
+          "x": 14,
+          "y": 0
+        },
         "params": {
           "time": 0.6,
           "damp": 0.4,
@@ -203,37 +245,225 @@
         "id": "out-1",
         "type": "output",
         "name": "Main Out",
-        "position": { "x": 14, "y": 2 },
+        "position": {
+          "x": 14,
+          "y": 2
+        },
         "params": {
-          "level": 0.75
+          "level": 1
         }
       }
     ],
     "connections": [
-      { "from": { "moduleId": "seq-bass", "portId": "cv-out" }, "to": { "moduleId": "tb303-bass", "portId": "pitch" }, "kind": "cv" },
-      { "from": { "moduleId": "seq-bass", "portId": "gate-out" }, "to": { "moduleId": "tb303-bass", "portId": "gate" }, "kind": "gate" },
-      { "from": { "moduleId": "seq-bass", "portId": "velocity-out" }, "to": { "moduleId": "tb303-bass", "portId": "velocity" }, "kind": "cv" },
-
-      { "from": { "moduleId": "seq-lead", "portId": "cv-out" }, "to": { "moduleId": "tb303-lead", "portId": "pitch" }, "kind": "cv" },
-      { "from": { "moduleId": "seq-lead", "portId": "gate-out" }, "to": { "moduleId": "tb303-lead", "portId": "gate" }, "kind": "gate" },
-      { "from": { "moduleId": "seq-lead", "portId": "velocity-out" }, "to": { "moduleId": "tb303-lead", "portId": "velocity" }, "kind": "cv" },
-
-      { "from": { "moduleId": "seq-stab", "portId": "cv-out" }, "to": { "moduleId": "supersaw-1", "portId": "pitch" }, "kind": "cv" },
-      { "from": { "moduleId": "seq-stab", "portId": "gate-out" }, "to": { "moduleId": "adsr-stab", "portId": "gate" }, "kind": "gate" },
-
-      { "from": { "moduleId": "supersaw-1", "portId": "out" }, "to": { "moduleId": "vcf-stab", "portId": "in" }, "kind": "audio" },
-      { "from": { "moduleId": "adsr-stab", "portId": "env" }, "to": { "moduleId": "vcf-stab", "portId": "env" }, "kind": "cv" },
-      { "from": { "moduleId": "vcf-stab", "portId": "out" }, "to": { "moduleId": "vca-stab", "portId": "in" }, "kind": "audio" },
-      { "from": { "moduleId": "adsr-stab", "portId": "env" }, "to": { "moduleId": "vca-stab", "portId": "cv" }, "kind": "cv" },
-
-      { "from": { "moduleId": "tb303-bass", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-a" }, "kind": "audio" },
-      { "from": { "moduleId": "tb303-lead", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-b" }, "kind": "audio" },
-      { "from": { "moduleId": "vca-stab", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-c" }, "kind": "audio" },
-
-      { "from": { "moduleId": "mixer-1", "portId": "out" }, "to": { "moduleId": "chorus-1", "portId": "in" }, "kind": "audio" },
-      { "from": { "moduleId": "chorus-1", "portId": "out" }, "to": { "moduleId": "delay-1", "portId": "in" }, "kind": "audio" },
-      { "from": { "moduleId": "delay-1", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
-      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+      {
+        "from": {
+          "moduleId": "seq-bass",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "tb303-bass",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "seq-bass",
+          "portId": "gate-out"
+        },
+        "to": {
+          "moduleId": "tb303-bass",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "seq-bass",
+          "portId": "velocity-out"
+        },
+        "to": {
+          "moduleId": "tb303-bass",
+          "portId": "velocity"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "seq-lead",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "tb303-lead",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "seq-lead",
+          "portId": "gate-out"
+        },
+        "to": {
+          "moduleId": "tb303-lead",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "seq-lead",
+          "portId": "velocity-out"
+        },
+        "to": {
+          "moduleId": "tb303-lead",
+          "portId": "velocity"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "seq-stab",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "supersaw-1",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "seq-stab",
+          "portId": "gate-out"
+        },
+        "to": {
+          "moduleId": "adsr-stab",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "supersaw-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "vcf-stab",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "adsr-stab",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "vcf-stab",
+          "portId": "env"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "vcf-stab",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "vca-stab",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "adsr-stab",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "vca-stab",
+          "portId": "cv"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "tb303-bass",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mixer-1",
+          "portId": "in-a"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "tb303-lead",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mixer-1",
+          "portId": "in-b"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "vca-stab",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mixer-1",
+          "portId": "in-c"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "mixer-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "chorus-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "chorus-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "delay-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "delay-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "reverb-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "reverb-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "out-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      }
     ]
   }
 }

@@ -363,6 +363,29 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
       { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
     ],
   },
+  'resonator': {
+    inputs: [
+      { id: 'in', label: 'In', kind: 'audio', direction: 'in' },
+      { id: 'pitch', label: '1V/Oct', kind: 'cv', direction: 'in' },
+      { id: 'gate', label: 'Gate', kind: 'gate', direction: 'in' },
+      { id: 'strum', label: 'Strum', kind: 'gate', direction: 'in' },
+      { id: 'damp', label: 'Damp', kind: 'cv', direction: 'in' },
+    ],
+    outputs: [
+      { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
+    ],
+  },
+  'wavetable': {
+    inputs: [
+      { id: 'pitch', label: '1V/Oct', kind: 'cv', direction: 'in' },
+      { id: 'gate', label: 'Gate', kind: 'gate', direction: 'in' },
+      { id: 'position', label: 'Pos', kind: 'cv', direction: 'in' },
+      { id: 'sync', label: 'Sync', kind: 'sync', direction: 'in' },
+    ],
+    outputs: [
+      { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
+    ],
+  },
   notes: {
     inputs: [],
     outputs: [],

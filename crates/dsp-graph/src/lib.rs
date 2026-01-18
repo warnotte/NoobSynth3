@@ -629,6 +629,8 @@ fn normalize_module_type(raw: &str) -> ModuleType {
     "shepard" => ModuleType::Shepard,
     "pipe-organ" => ModuleType::PipeOrgan,
     "spectral-swarm" => ModuleType::SpectralSwarm,
+    "resonator" => ModuleType::Resonator,
+    "wavetable" => ModuleType::Wavetable,
     // Documentation
     "notes" => ModuleType::Notes,
     // Effects

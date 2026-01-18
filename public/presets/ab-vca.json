@@ -9,7 +9,10 @@
         "id": "osc-1",
         "type": "oscillator",
         "name": "VCO",
-        "position": { "x": 0, "y": 0 },
+        "position": {
+          "x": 0,
+          "y": 0
+        },
         "params": {
           "frequency": 220,
           "type": "sawtooth",
@@ -24,7 +27,10 @@
         "id": "gain-1",
         "type": "gain",
         "name": "VCA",
-        "position": { "x": 2, "y": 0 },
+        "position": {
+          "x": 2,
+          "y": 0
+        },
         "params": {
           "gain": 0.7
         }
@@ -33,21 +39,36 @@
         "id": "out-1",
         "type": "output",
         "name": "Main Out",
-        "position": { "x": 3, "y": 0 },
+        "position": {
+          "x": 3,
+          "y": 0
+        },
         "params": {
-          "level": 0.8
+          "level": 1
         }
       }
     ],
     "connections": [
       {
-        "from": { "moduleId": "osc-1", "portId": "out" },
-        "to": { "moduleId": "gain-1", "portId": "in" },
+        "from": {
+          "moduleId": "osc-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "gain-1",
+          "portId": "in"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "gain-1", "portId": "out" },
-        "to": { "moduleId": "out-1", "portId": "in" },
+        "from": {
+          "moduleId": "gain-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "out-1",
+          "portId": "in"
+        },
         "kind": "audio"
       }
     ]

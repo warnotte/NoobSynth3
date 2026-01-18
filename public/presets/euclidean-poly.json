@@ -5,7 +5,10 @@
         "id": "clock-1",
         "type": "clock",
         "name": "Clock",
-        "position": { "x": 50, "y": 150 },
+        "position": {
+          "x": 50,
+          "y": 150
+        },
         "params": {
           "running": true,
           "tempo": 110,
@@ -17,7 +20,10 @@
         "id": "euclid-1",
         "type": "euclidean",
         "name": "E(3,8)",
-        "position": { "x": 200, "y": 50 },
+        "position": {
+          "x": 200,
+          "y": 50
+        },
         "params": {
           "enabled": true,
           "tempo": 110,
@@ -33,7 +39,10 @@
         "id": "euclid-2",
         "type": "euclidean",
         "name": "E(5,16)",
-        "position": { "x": 200, "y": 200 },
+        "position": {
+          "x": 200,
+          "y": 200
+        },
         "params": {
           "enabled": true,
           "tempo": 110,
@@ -49,7 +58,10 @@
         "id": "euclid-3",
         "type": "euclidean",
         "name": "E(7,12)",
-        "position": { "x": 200, "y": 350 },
+        "position": {
+          "x": 200,
+          "y": 350
+        },
         "params": {
           "enabled": true,
           "tempo": 110,
@@ -65,60 +77,250 @@
         "id": "kick-1",
         "type": "909-kick",
         "name": "Kick",
-        "position": { "x": 400, "y": 50 },
-        "params": { "tune": 50, "attack": 50, "decay": 70, "tone": 0.4, "level": 1 }
+        "position": {
+          "x": 400,
+          "y": 50
+        },
+        "params": {
+          "tune": 50,
+          "attack": 50,
+          "decay": 70,
+          "tone": 0.4,
+          "level": 1
+        }
       },
       {
         "id": "snare-1",
         "type": "909-snare",
         "name": "Snare",
-        "position": { "x": 400, "y": 200 },
-        "params": { "tune": 50, "tone": 0.5, "snappy": 0.6, "decay": 50, "level": 0.8 }
+        "position": {
+          "x": 400,
+          "y": 200
+        },
+        "params": {
+          "tune": 50,
+          "tone": 0.5,
+          "snappy": 0.6,
+          "decay": 50,
+          "level": 0.8
+        }
       },
       {
         "id": "hh-1",
         "type": "909-hihat",
         "name": "HiHat",
-        "position": { "x": 400, "y": 350 },
-        "params": { "mode": 0, "decay": 30, "tone": 0.6, "level": 0.5 }
+        "position": {
+          "x": 400,
+          "y": 350
+        },
+        "params": {
+          "mode": 0,
+          "decay": 30,
+          "tone": 0.6,
+          "level": 0.5
+        }
       },
       {
         "id": "mixer-1",
         "type": "mixer-1x2",
         "name": "Mix",
-        "position": { "x": 600, "y": 150 },
-        "params": { "chA": 1, "chB": 0.7, "chC": 0.5, "chD": 0, "chE": 0, "chF": 0, "master": 0.8 }
+        "position": {
+          "x": 600,
+          "y": 150
+        },
+        "params": {
+          "chA": 1,
+          "chB": 0.7,
+          "chC": 0.5,
+          "chD": 0,
+          "chE": 0,
+          "chF": 0,
+          "master": 0.8
+        }
       },
       {
         "id": "reverb-1",
         "type": "reverb",
         "name": "Reverb",
-        "position": { "x": 750, "y": 150 },
-        "params": { "time": 0.4, "damp": 0.5, "preDelay": 10, "mix": 0.2 }
+        "position": {
+          "x": 750,
+          "y": 150
+        },
+        "params": {
+          "time": 0.4,
+          "damp": 0.5,
+          "preDelay": 10,
+          "mix": 0.2
+        }
       },
       {
         "id": "out-1",
         "type": "output",
         "name": "Out",
-        "position": { "x": 900, "y": 150 },
-        "params": { "level": 0.8 }
+        "position": {
+          "x": 900,
+          "y": 150
+        },
+        "params": {
+          "level": 1
+        }
       }
     ],
     "connections": [
-      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "euclid-1", "portId": "clock" }, "kind": "sync" },
-      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "euclid-2", "portId": "clock" }, "kind": "sync" },
-      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "euclid-3", "portId": "clock" }, "kind": "sync" },
-      { "from": { "moduleId": "clock-1", "portId": "reset" }, "to": { "moduleId": "euclid-1", "portId": "reset" }, "kind": "sync" },
-      { "from": { "moduleId": "clock-1", "portId": "reset" }, "to": { "moduleId": "euclid-2", "portId": "reset" }, "kind": "sync" },
-      { "from": { "moduleId": "clock-1", "portId": "reset" }, "to": { "moduleId": "euclid-3", "portId": "reset" }, "kind": "sync" },
-      { "from": { "moduleId": "euclid-1", "portId": "gate" }, "to": { "moduleId": "kick-1", "portId": "trigger" }, "kind": "gate" },
-      { "from": { "moduleId": "euclid-2", "portId": "gate" }, "to": { "moduleId": "snare-1", "portId": "trigger" }, "kind": "gate" },
-      { "from": { "moduleId": "euclid-3", "portId": "gate" }, "to": { "moduleId": "hh-1", "portId": "trigger" }, "kind": "gate" },
-      { "from": { "moduleId": "kick-1", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-a" }, "kind": "audio" },
-      { "from": { "moduleId": "snare-1", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-b" }, "kind": "audio" },
-      { "from": { "moduleId": "hh-1", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-c" }, "kind": "audio" },
-      { "from": { "moduleId": "mixer-1", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
-      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+      {
+        "from": {
+          "moduleId": "clock-1",
+          "portId": "clock"
+        },
+        "to": {
+          "moduleId": "euclid-1",
+          "portId": "clock"
+        },
+        "kind": "sync"
+      },
+      {
+        "from": {
+          "moduleId": "clock-1",
+          "portId": "clock"
+        },
+        "to": {
+          "moduleId": "euclid-2",
+          "portId": "clock"
+        },
+        "kind": "sync"
+      },
+      {
+        "from": {
+          "moduleId": "clock-1",
+          "portId": "clock"
+        },
+        "to": {
+          "moduleId": "euclid-3",
+          "portId": "clock"
+        },
+        "kind": "sync"
+      },
+      {
+        "from": {
+          "moduleId": "clock-1",
+          "portId": "reset"
+        },
+        "to": {
+          "moduleId": "euclid-1",
+          "portId": "reset"
+        },
+        "kind": "sync"
+      },
+      {
+        "from": {
+          "moduleId": "clock-1",
+          "portId": "reset"
+        },
+        "to": {
+          "moduleId": "euclid-2",
+          "portId": "reset"
+        },
+        "kind": "sync"
+      },
+      {
+        "from": {
+          "moduleId": "clock-1",
+          "portId": "reset"
+        },
+        "to": {
+          "moduleId": "euclid-3",
+          "portId": "reset"
+        },
+        "kind": "sync"
+      },
+      {
+        "from": {
+          "moduleId": "euclid-1",
+          "portId": "gate"
+        },
+        "to": {
+          "moduleId": "kick-1",
+          "portId": "trigger"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "euclid-2",
+          "portId": "gate"
+        },
+        "to": {
+          "moduleId": "snare-1",
+          "portId": "trigger"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "euclid-3",
+          "portId": "gate"
+        },
+        "to": {
+          "moduleId": "hh-1",
+          "portId": "trigger"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "kick-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mixer-1",
+          "portId": "in-a"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "snare-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mixer-1",
+          "portId": "in-b"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "hh-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mixer-1",
+          "portId": "in-c"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "mixer-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "reverb-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "reverb-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "out-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      }
     ]
   }
 }

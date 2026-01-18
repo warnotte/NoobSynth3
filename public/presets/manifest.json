@@ -784,6 +784,83 @@
       "description": "Deep bass with per-band envelope: slow bass attack, fast high shimmer.",
       "file": "swarm-evolving-bass.json",
       "group": "Drones"
+    },
+    {
+      "id": "resonator-bells",
+      "name": "Resonator Bells",
+      "description": "Modal resonator for bell-like tones with internal exciter.",
+      "file": "resonator-bells.json",
+      "group": "Physical Modeling"
+    },
+    {
+      "id": "resonator-strings",
+      "name": "Resonator Strings",
+      "description": "Sympathetic strings mode with 4 voices and noise excitation.",
+      "file": "resonator-strings.json",
+      "group": "Physical Modeling"
+    },
+    {
+      "id": "resonator-metallic",
+      "name": "Resonator Metallic",
+      "description": "Inharmonic metallic tones with step sequencer.",
+      "file": "resonator-metallic.json",
+      "group": "Physical Modeling"
+    },
+    {
+      "id": "resonator-massive",
+      "name": "Resonator Massive",
+      "description": "3 resonators en parallèle (Bells, Metal, Strings) jouables au clavier.",
+      "file": "resonator-massive.json",
+      "group": "Physical Modeling"
+    },
+    {
+      "id": "resonator-sequence",
+      "name": "Resonator Sequence",
+      "description": "4 resonators avec patterns Techno (drums) + Moroder (mélodie). Modifiez les séquences!",
+      "file": "resonator-sequence.json",
+      "group": "Physical Modeling"
+    },
+    {
+      "id": "resonator-909",
+      "name": "Resonator + 909",
+      "description": "Fusion! 909 drums + resonators en parallèle sur le même pattern. Ajustez le mix!",
+      "file": "resonator-909.json",
+      "group": "Physical Modeling"
+    },
+    {
+      "id": "wavetable-vocal",
+      "name": "Wavetable Vocal",
+      "description": "Vocal formants bank with LFO-controlled position morphing.",
+      "file": "wavetable-vocal.json",
+      "group": "Wavetable"
+    },
+    {
+      "id": "wavetable-digital",
+      "name": "Wavetable Digital",
+      "description": "Digital/FM bank with sequenced bass and distortion.",
+      "file": "wavetable-digital.json",
+      "group": "Wavetable"
+    },
+    {
+      "id": "wavetable-organic",
+      "name": "Wavetable Organic",
+      "description": "Organic textures bank with dual LFO modulation.",
+      "file": "wavetable-organic.json",
+      "group": "Wavetable"
+    },
+    {
+      "id": "wavetable-evolve",
+      "name": "Wavetable Evolve",
+      "description": "Massive evolving pad with 7-voice unison, morphing, vibrato and lush effects.",
+      "file": "wavetable-evolve.json",
+      "group": "Wavetable"
+    },
+    {
+      "id": "wavetable-screamer",
+      "name": "Wavetable Screamer",
+      "description": "Aggressive lead with digital bank, ladder filter, distortion and delay.",
+      "file": "wavetable-screamer.json",
+      "group": "Wavetable"
     }
   ]
 }

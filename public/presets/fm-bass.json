@@ -5,7 +5,10 @@
         "id": "notes-1",
         "type": "notes",
         "name": "FM Guide",
-        "position": { "x": 50, "y": 300 },
+        "position": {
+          "x": 50,
+          "y": 300
+        },
         "params": {
           "text": "FM BASS - Simple 2-Op\n\nMod (ratio 1, feedback) -> Carrier (ratio 1)\n\nSame ratio = punchy bass\nFeedback on Mod = growl/grit\nDistortion adds harmonics.\n\nTry: Increase Mod Feedback (0.5-0.8)"
         }
@@ -14,7 +17,10 @@
         "id": "clock-1",
         "type": "clock",
         "name": "Clock",
-        "position": { "x": 50, "y": 150 },
+        "position": {
+          "x": 50,
+          "y": 150
+        },
         "params": {
           "running": true,
           "tempo": 120,
@@ -26,7 +32,10 @@
         "id": "seq-1",
         "type": "step-sequencer",
         "name": "Bass Line",
-        "position": { "x": 200, "y": 100 },
+        "position": {
+          "x": 200,
+          "y": 100
+        },
         "params": {
           "enabled": true,
           "tempo": 120,
@@ -43,7 +52,10 @@
         "id": "fmop-1",
         "type": "fm-op",
         "name": "Mod",
-        "position": { "x": 400, "y": 50 },
+        "position": {
+          "x": 400,
+          "y": 50
+        },
         "params": {
           "frequency": 55,
           "ratio": 1,
@@ -59,7 +71,10 @@
         "id": "fmop-2",
         "type": "fm-op",
         "name": "Carrier",
-        "position": { "x": 550, "y": 150 },
+        "position": {
+          "x": 550,
+          "y": 150
+        },
         "params": {
           "frequency": 55,
           "ratio": 1,
@@ -75,7 +90,10 @@
         "id": "dist-1",
         "type": "distortion",
         "name": "Dist",
-        "position": { "x": 700, "y": 150 },
+        "position": {
+          "x": 700,
+          "y": 150
+        },
         "params": {
           "drive": 0.2,
           "tone": 0.4,
@@ -86,20 +104,115 @@
         "id": "out-1",
         "type": "output",
         "name": "Out",
-        "position": { "x": 850, "y": 150 },
-        "params": { "level": 0.75 }
+        "position": {
+          "x": 850,
+          "y": 150
+        },
+        "params": {
+          "level": 1
+        }
       }
     ],
     "connections": [
-      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "seq-1", "portId": "clock" }, "kind": "sync" },
-      { "from": { "moduleId": "clock-1", "portId": "reset" }, "to": { "moduleId": "seq-1", "portId": "reset" }, "kind": "sync" },
-      { "from": { "moduleId": "seq-1", "portId": "cv-out" }, "to": { "moduleId": "fmop-1", "portId": "pitch" }, "kind": "cv" },
-      { "from": { "moduleId": "seq-1", "portId": "cv-out" }, "to": { "moduleId": "fmop-2", "portId": "pitch" }, "kind": "cv" },
-      { "from": { "moduleId": "seq-1", "portId": "gate-out" }, "to": { "moduleId": "fmop-1", "portId": "gate" }, "kind": "gate" },
-      { "from": { "moduleId": "seq-1", "portId": "gate-out" }, "to": { "moduleId": "fmop-2", "portId": "gate" }, "kind": "gate" },
-      { "from": { "moduleId": "fmop-1", "portId": "out" }, "to": { "moduleId": "fmop-2", "portId": "fm" }, "kind": "audio" },
-      { "from": { "moduleId": "fmop-2", "portId": "out" }, "to": { "moduleId": "dist-1", "portId": "in" }, "kind": "audio" },
-      { "from": { "moduleId": "dist-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+      {
+        "from": {
+          "moduleId": "clock-1",
+          "portId": "clock"
+        },
+        "to": {
+          "moduleId": "seq-1",
+          "portId": "clock"
+        },
+        "kind": "sync"
+      },
+      {
+        "from": {
+          "moduleId": "clock-1",
+          "portId": "reset"
+        },
+        "to": {
+          "moduleId": "seq-1",
+          "portId": "reset"
+        },
+        "kind": "sync"
+      },
+      {
+        "from": {
+          "moduleId": "seq-1",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "fmop-1",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "seq-1",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "fmop-2",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "seq-1",
+          "portId": "gate-out"
+        },
+        "to": {
+          "moduleId": "fmop-1",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "seq-1",
+          "portId": "gate-out"
+        },
+        "to": {
+          "moduleId": "fmop-2",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "fmop-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "fmop-2",
+          "portId": "fm"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "fmop-2",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "dist-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "dist-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "out-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      }
     ]
   }
 }

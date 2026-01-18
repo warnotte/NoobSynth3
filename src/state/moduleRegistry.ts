@@ -10,6 +10,8 @@ export const moduleSizes: Record<ModuleType, string> = {
   shepard: '2x5',
   'pipe-organ': '2x3',
   'spectral-swarm': '2x3',
+  'resonator': '2x3',
+  'wavetable': '2x3',
   'mod-router': '2x2',
   'sample-hold': '2x1',
   slew: '1x2',
@@ -75,6 +77,8 @@ export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>>
   shepard: 'strip',
   'pipe-organ': 'strip',
   'spectral-swarm': 'strip',
+  'resonator': 'strip',
+  'wavetable': 'strip',
   vcf: 'strip',
   control: 'strip',
   lab: 'strip',
@@ -154,6 +158,8 @@ export const moduleCatalog: { type: ModuleType; label: string; category: ModuleC
   { type: 'shepard', label: 'Shepard', category: 'sources' },
   { type: 'pipe-organ', label: 'Pipe Organ', category: 'sources' },
   { type: 'spectral-swarm', label: 'Spectral Swarm', category: 'sources' },
+  { type: 'resonator', label: 'Resonator', category: 'sources' },
+  { type: 'wavetable', label: 'Wavetable', category: 'sources' },
   // Filters
   { type: 'vcf', label: 'VCF', category: 'filters' },
   { type: 'hpf', label: 'HPF', category: 'filters' },
@@ -218,6 +224,8 @@ export const modulePrefixes: Record<ModuleType, string> = {
   shepard: 'shep',
   'pipe-organ': 'organ',
   'spectral-swarm': 'swarm',
+  'resonator': 'res',
+  'wavetable': 'wt',
   'mod-router': 'modr',
   'sample-hold': 'sh',
   slew: 'slew',
@@ -284,6 +292,8 @@ export const moduleLabels: Record<ModuleType, string> = {
   shepard: 'Shepard',
   'pipe-organ': 'Pipe Organ',
   'spectral-swarm': 'Spectral Swarm',
+  'resonator': 'Resonator',
+  'wavetable': 'Wavetable',
   'mod-router': 'Mod Router',
   'sample-hold': 'S&H',
   slew: 'Slew',
@@ -414,6 +424,29 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     releaseLow: 1.0,      // Low band release multiplier (0.1-10)
     releaseHigh: 1.0,     // High band release multiplier (0.1-10)
   },
+  'resonator': {
+    frequency: 220,       // Base frequency Hz
+    structure: 0.5,       // Harmonic structure (0-1)
+    brightness: 0.7,      // High frequency damping (0-1)
+    damping: 0.7,         // Overall decay (0-1)
+    position: 0.5,        // Excitation position (0-1)
+    mode: 0,              // 0=Modal, 1=Sympathetic, 2=Inharmonic
+    polyphony: 1,         // Number of voices (1-4)
+    internalExc: 0.8,     // Internal exciter level (0-1)
+    chorus: 0,            // Detune between voices (0-1)
+  },
+  'wavetable': {
+    frequency: 220,       // Base frequency Hz
+    bank: 0,              // 0=Basic, 1=Vocal, 2=Digital, 3=Organic
+    position: 0.0,        // Position in wavetable (0-1)
+    unison: 1,            // Unison voices (1-7)
+    detune: 15,           // Detune in cents (0-50)
+    spread: 0.5,          // Stereo spread (0-1)
+    morphSpeed: 0.0,      // Auto-morph LFO rate Hz (0-10)
+    subMix: 0.0,          // Sub oscillator mix (0-1)
+    attack: 0.01,         // Envelope attack (0.001-2)
+    release: 0.3,         // Envelope release (0.001-5)
+  },
   'mod-router': { depthPitch: 0, depthPwm: 0, depthVcf: 0, depthVca: 0 },
   'sample-hold': { mode: 0 },
   slew: { rise: 0.05, fall: 0.05 },
@@ -536,7 +569,7 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     seqTempo: 90,
     seqGate: 0.6,
   },
-  output: { level: 0.8 },
+  output: { level: 1.0 },
   lab: { level: 0.5, drive: 0.3, bias: 0, shape: 'triangle' },
   mario: { running: false, tempo: 180, song: 'smb' },
   arpeggiator: {

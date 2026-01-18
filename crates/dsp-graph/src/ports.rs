@@ -142,6 +142,21 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // gate
       PortInfo { channels: 1 },  // sync
     ],
+    // Resonator - 5 inputs (audio in, pitch, gate, strum, damp)
+    ModuleType::Resonator => vec![
+      PortInfo { channels: 1 },  // audio in
+      PortInfo { channels: 1 },  // pitch CV
+      PortInfo { channels: 1 },  // gate
+      PortInfo { channels: 1 },  // strum trigger
+      PortInfo { channels: 1 },  // damp CV
+    ],
+    // Wavetable - 4 inputs (pitch, gate, position CV, sync)
+    ModuleType::Wavetable => vec![
+      PortInfo { channels: 1 },  // pitch CV
+      PortInfo { channels: 1 },  // gate
+      PortInfo { channels: 1 },  // position CV
+      PortInfo { channels: 1 },  // sync
+    ],
     // MIDI File Sequencer - 2 inputs (clock, reset)
     ModuleType::MidiFileSequencer => vec![
       PortInfo { channels: 1 },  // clock
@@ -284,6 +299,14 @@ pub fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
     // Spectral Swarm - 1 stereo output
     ModuleType::SpectralSwarm => vec![
       PortInfo { channels: 2 },  // stereo audio out
+    ],
+    // Resonator - 1 mono output
+    ModuleType::Resonator => vec![
+      PortInfo { channels: 1 },  // audio out
+    ],
+    // Wavetable - 1 mono output
+    ModuleType::Wavetable => vec![
+      PortInfo { channels: 1 },  // audio out
     ],
     // MIDI File Sequencer - 25 outputs (8 CV + 8 Gate + 8 Velocity + 1 Tick)
     ModuleType::MidiFileSequencer => vec![
@@ -532,6 +555,23 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
       "sync" | "reset" => Some(2),
       _ => None,
     },
+    // Resonator - 5 inputs
+    ModuleType::Resonator => match port_id {
+      "in" | "input" | "audio" => Some(0),
+      "pitch" | "pitch-cv" | "1volt" => Some(1),
+      "gate" => Some(2),
+      "strum" => Some(3),
+      "damp" | "damper" => Some(4),
+      _ => None,
+    },
+    // Wavetable - 4 inputs
+    ModuleType::Wavetable => match port_id {
+      "pitch" | "pitch-cv" | "1volt" => Some(0),
+      "gate" => Some(1),
+      "position" | "pos-cv" => Some(2),
+      "sync" => Some(3),
+      _ => None,
+    },
     // MIDI File Sequencer - 2 inputs
     ModuleType::MidiFileSequencer => match port_id {
       "clock" | "clk" => Some(0),
@@ -771,6 +811,16 @@ pub fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize
     },
     // Spectral Swarm - 1 stereo output
     ModuleType::SpectralSwarm => match port_id {
+      "out" | "output" => Some(0),
+      _ => None,
+    },
+    // Resonator - 1 mono output
+    ModuleType::Resonator => match port_id {
+      "out" | "output" => Some(0),
+      _ => None,
+    },
+    // Wavetable - 1 mono output
+    ModuleType::Wavetable => match port_id {
       "out" | "output" => Some(0),
       _ => None,
     },

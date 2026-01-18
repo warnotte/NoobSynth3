@@ -5,7 +5,10 @@
         "id": "clock-1",
         "type": "clock",
         "name": "Clock",
-        "position": { "x": 50, "y": 150 },
+        "position": {
+          "x": 50,
+          "y": 150
+        },
         "params": {
           "running": true,
           "tempo": 85,
@@ -17,7 +20,10 @@
         "id": "seq-1",
         "type": "step-sequencer",
         "name": "Melody",
-        "position": { "x": 200, "y": 50 },
+        "position": {
+          "x": 200,
+          "y": 50
+        },
         "params": {
           "enabled": true,
           "tempo": 85,
@@ -34,7 +40,10 @@
         "id": "euclid-1",
         "type": "euclidean",
         "name": "E(5,8)",
-        "position": { "x": 200, "y": 250 },
+        "position": {
+          "x": 200,
+          "y": 250
+        },
         "params": {
           "enabled": true,
           "tempo": 85,
@@ -50,7 +59,10 @@
         "id": "karplus-1",
         "type": "karplus",
         "name": "Harp",
-        "position": { "x": 450, "y": 150 },
+        "position": {
+          "x": 450,
+          "y": 150
+        },
         "params": {
           "frequency": 330,
           "damping": 0.3,
@@ -63,7 +75,10 @@
         "id": "chorus-1",
         "type": "chorus",
         "name": "Chorus",
-        "position": { "x": 600, "y": 150 },
+        "position": {
+          "x": 600,
+          "y": 150
+        },
         "params": {
           "rate": 0.25,
           "depth": 2.5,
@@ -77,27 +92,130 @@
         "id": "reverb-1",
         "type": "reverb",
         "name": "Reverb",
-        "position": { "x": 750, "y": 150 },
-        "params": { "time": 0.75, "damp": 0.35, "preDelay": 30, "mix": 0.5 }
+        "position": {
+          "x": 750,
+          "y": 150
+        },
+        "params": {
+          "time": 0.75,
+          "damp": 0.35,
+          "preDelay": 30,
+          "mix": 0.5
+        }
       },
       {
         "id": "out-1",
         "type": "output",
         "name": "Out",
-        "position": { "x": 900, "y": 150 },
-        "params": { "level": 0.75 }
+        "position": {
+          "x": 900,
+          "y": 150
+        },
+        "params": {
+          "level": 1
+        }
       }
     ],
     "connections": [
-      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "seq-1", "portId": "clock" }, "kind": "sync" },
-      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "euclid-1", "portId": "clock" }, "kind": "sync" },
-      { "from": { "moduleId": "clock-1", "portId": "reset" }, "to": { "moduleId": "seq-1", "portId": "reset" }, "kind": "sync" },
-      { "from": { "moduleId": "clock-1", "portId": "reset" }, "to": { "moduleId": "euclid-1", "portId": "reset" }, "kind": "sync" },
-      { "from": { "moduleId": "seq-1", "portId": "cv-out" }, "to": { "moduleId": "karplus-1", "portId": "pitch" }, "kind": "cv" },
-      { "from": { "moduleId": "euclid-1", "portId": "gate" }, "to": { "moduleId": "karplus-1", "portId": "gate" }, "kind": "gate" },
-      { "from": { "moduleId": "karplus-1", "portId": "out" }, "to": { "moduleId": "chorus-1", "portId": "in" }, "kind": "audio" },
-      { "from": { "moduleId": "chorus-1", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
-      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+      {
+        "from": {
+          "moduleId": "clock-1",
+          "portId": "clock"
+        },
+        "to": {
+          "moduleId": "seq-1",
+          "portId": "clock"
+        },
+        "kind": "sync"
+      },
+      {
+        "from": {
+          "moduleId": "clock-1",
+          "portId": "clock"
+        },
+        "to": {
+          "moduleId": "euclid-1",
+          "portId": "clock"
+        },
+        "kind": "sync"
+      },
+      {
+        "from": {
+          "moduleId": "clock-1",
+          "portId": "reset"
+        },
+        "to": {
+          "moduleId": "seq-1",
+          "portId": "reset"
+        },
+        "kind": "sync"
+      },
+      {
+        "from": {
+          "moduleId": "clock-1",
+          "portId": "reset"
+        },
+        "to": {
+          "moduleId": "euclid-1",
+          "portId": "reset"
+        },
+        "kind": "sync"
+      },
+      {
+        "from": {
+          "moduleId": "seq-1",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "karplus-1",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "euclid-1",
+          "portId": "gate"
+        },
+        "to": {
+          "moduleId": "karplus-1",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "karplus-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "chorus-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "chorus-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "reverb-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "reverb-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "out-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      }
     ]
   }
 }

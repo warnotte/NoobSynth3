@@ -17,6 +17,8 @@ pub enum ModuleType {
     Shepard,
     PipeOrgan,
     SpectralSwarm,
+    Resonator,
+    Wavetable,
 
     // Filters
     Vcf,

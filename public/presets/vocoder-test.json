@@ -9,14 +9,22 @@
         "id": "in-1",
         "type": "audio-in",
         "name": "Audio In",
-        "position": { "x": 120, "y": 120 },
-        "params": { "gain": 1.4 }
+        "position": {
+          "x": 120,
+          "y": 120
+        },
+        "params": {
+          "gain": 1.4
+        }
       },
       {
         "id": "osc-1",
         "type": "oscillator",
         "name": "VCO",
-        "position": { "x": 320, "y": 120 },
+        "position": {
+          "x": 320,
+          "y": 120
+        },
         "params": {
           "frequency": 110,
           "type": "sawtooth",
@@ -31,7 +39,10 @@
         "id": "vocode-1",
         "type": "vocoder",
         "name": "Vocoder",
-        "position": { "x": 520, "y": 120 },
+        "position": {
+          "x": 520,
+          "y": 120
+        },
         "params": {
           "attack": 8,
           "release": 90,
@@ -50,14 +61,49 @@
         "id": "out-1",
         "type": "output",
         "name": "Main Out",
-        "position": { "x": 720, "y": 120 },
-        "params": { "level": 0.8 }
+        "position": {
+          "x": 720,
+          "y": 120
+        },
+        "params": {
+          "level": 1
+        }
       }
     ],
     "connections": [
-      { "from": { "moduleId": "in-1", "portId": "out" }, "to": { "moduleId": "vocode-1", "portId": "mod" }, "kind": "audio" },
-      { "from": { "moduleId": "osc-1", "portId": "out" }, "to": { "moduleId": "vocode-1", "portId": "car" }, "kind": "audio" },
-      { "from": { "moduleId": "vocode-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+      {
+        "from": {
+          "moduleId": "in-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "vocode-1",
+          "portId": "mod"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "osc-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "vocode-1",
+          "portId": "car"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "vocode-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "out-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      }
     ]
   }
 }

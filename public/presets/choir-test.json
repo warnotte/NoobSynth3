@@ -9,7 +9,10 @@
         "id": "osc-1",
         "type": "oscillator",
         "name": "VCO",
-        "position": { "x": 120, "y": 120 },
+        "position": {
+          "x": 120,
+          "y": 120
+        },
         "params": {
           "frequency": 110,
           "type": "sawtooth",
@@ -24,13 +27,16 @@
         "id": "vcf-1",
         "type": "vcf",
         "name": "VCF",
-        "position": { "x": 320, "y": 120 },
+        "position": {
+          "x": 320,
+          "y": 120
+        },
         "params": {
           "cutoff": 1400,
           "resonance": 0.2,
           "drive": 0.1,
           "envAmount": 0.3,
-          "modAmount": 0.0,
+          "modAmount": 0,
           "keyTrack": 0.5,
           "model": "svf",
           "mode": "lp",
@@ -41,49 +47,94 @@
         "id": "gain-1",
         "type": "gain",
         "name": "VCA",
-        "position": { "x": 520, "y": 120 },
-        "params": { "gain": 0.8 }
+        "position": {
+          "x": 520,
+          "y": 120
+        },
+        "params": {
+          "gain": 0.8
+        }
       },
       {
         "id": "choir-1",
         "type": "choir",
         "name": "Choir",
-        "position": { "x": 720, "y": 120 },
-        "params": { "vowel": 0, "rate": 0.3, "depth": 0.45, "mix": 0.7 }
+        "position": {
+          "x": 720,
+          "y": 120
+        },
+        "params": {
+          "vowel": 0,
+          "rate": 0.3,
+          "depth": 0.45,
+          "mix": 0.7
+        }
       },
       {
         "id": "reverb-1",
         "type": "reverb",
         "name": "Reverb",
-        "position": { "x": 920, "y": 120 },
-        "params": { "time": 0.7, "damp": 0.35, "preDelay": 20, "mix": 0.3 }
+        "position": {
+          "x": 920,
+          "y": 120
+        },
+        "params": {
+          "time": 0.7,
+          "damp": 0.35,
+          "preDelay": 20,
+          "mix": 0.3
+        }
       },
       {
         "id": "out-1",
         "type": "output",
         "name": "Main Out",
-        "position": { "x": 1120, "y": 120 },
-        "params": { "level": 0.8 }
+        "position": {
+          "x": 1120,
+          "y": 120
+        },
+        "params": {
+          "level": 1
+        }
       },
       {
         "id": "adsr-1",
         "type": "adsr",
         "name": "Amp ADSR",
-        "position": { "x": 320, "y": 320 },
-        "params": { "attack": 0.4, "decay": 0.9, "sustain": 0.75, "release": 1.2 }
+        "position": {
+          "x": 320,
+          "y": 320
+        },
+        "params": {
+          "attack": 0.4,
+          "decay": 0.9,
+          "sustain": 0.75,
+          "release": 1.2
+        }
       },
       {
         "id": "adsr-2",
         "type": "adsr",
         "name": "Filter ADSR",
-        "position": { "x": 520, "y": 320 },
-        "params": { "attack": 0.2, "decay": 0.8, "sustain": 0.55, "release": 1.0 }
+        "position": {
+          "x": 520,
+          "y": 320
+        },
+        "params": {
+          "attack": 0.2,
+          "decay": 0.8,
+          "sustain": 0.55,
+          "release": 1
+        }
       },
       {
         "id": "ctrl-1",
         "type": "control",
         "name": "Control IO",
-        "position": { "x": 120, "y": 320 },
+        "position": {
+          "x": 120,
+          "y": 320
+        },
         "params": {
           "cv": 0,
           "cvMode": "unipolar",
@@ -102,17 +153,127 @@
       }
     ],
     "connections": [
-      { "from": { "moduleId": "ctrl-1", "portId": "cv-out" }, "to": { "moduleId": "osc-1", "portId": "pitch" }, "kind": "cv" },
-      { "from": { "moduleId": "ctrl-1", "portId": "cv-out" }, "to": { "moduleId": "vcf-1", "portId": "key" }, "kind": "cv" },
-      { "from": { "moduleId": "ctrl-1", "portId": "gate-out" }, "to": { "moduleId": "adsr-1", "portId": "gate" }, "kind": "gate" },
-      { "from": { "moduleId": "ctrl-1", "portId": "gate-out" }, "to": { "moduleId": "adsr-2", "portId": "gate" }, "kind": "gate" },
-      { "from": { "moduleId": "osc-1", "portId": "out" }, "to": { "moduleId": "vcf-1", "portId": "in" }, "kind": "audio" },
-      { "from": { "moduleId": "adsr-2", "portId": "env" }, "to": { "moduleId": "vcf-1", "portId": "env" }, "kind": "cv" },
-      { "from": { "moduleId": "vcf-1", "portId": "out" }, "to": { "moduleId": "gain-1", "portId": "in" }, "kind": "audio" },
-      { "from": { "moduleId": "adsr-1", "portId": "env" }, "to": { "moduleId": "gain-1", "portId": "cv" }, "kind": "cv" },
-      { "from": { "moduleId": "gain-1", "portId": "out" }, "to": { "moduleId": "choir-1", "portId": "in" }, "kind": "audio" },
-      { "from": { "moduleId": "choir-1", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
-      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+      {
+        "from": {
+          "moduleId": "ctrl-1",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "osc-1",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "ctrl-1",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "vcf-1",
+          "portId": "key"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "ctrl-1",
+          "portId": "gate-out"
+        },
+        "to": {
+          "moduleId": "adsr-1",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "ctrl-1",
+          "portId": "gate-out"
+        },
+        "to": {
+          "moduleId": "adsr-2",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "osc-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "vcf-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "adsr-2",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "vcf-1",
+          "portId": "env"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "vcf-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "gain-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "adsr-1",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "gain-1",
+          "portId": "cv"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "gain-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "choir-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "choir-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "reverb-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "reverb-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "out-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      }
     ]
   }
 }

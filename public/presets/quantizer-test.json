@@ -9,21 +9,39 @@
         "id": "lfo-1",
         "type": "lfo",
         "name": "LFO",
-        "position": { "x": 120, "y": 120 },
-        "params": { "rate": 0.25, "depth": 1, "offset": 0, "shape": "triangle", "bipolar": true }
+        "position": {
+          "x": 120,
+          "y": 120
+        },
+        "params": {
+          "rate": 0.25,
+          "depth": 1,
+          "offset": 0,
+          "shape": "triangle",
+          "bipolar": true
+        }
       },
       {
         "id": "quant-1",
         "type": "quantizer",
         "name": "Quantizer",
-        "position": { "x": 320, "y": 120 },
-        "params": { "root": 0, "scale": 1 }
+        "position": {
+          "x": 320,
+          "y": 120
+        },
+        "params": {
+          "root": 0,
+          "scale": 1
+        }
       },
       {
         "id": "osc-1",
         "type": "oscillator",
         "name": "VCO",
-        "position": { "x": 520, "y": 120 },
+        "position": {
+          "x": 520,
+          "y": 120
+        },
         "params": {
           "frequency": 110,
           "type": "sawtooth",
@@ -38,22 +56,72 @@
         "id": "gain-1",
         "type": "gain",
         "name": "VCA",
-        "position": { "x": 720, "y": 120 },
-        "params": { "gain": 0.7 }
+        "position": {
+          "x": 720,
+          "y": 120
+        },
+        "params": {
+          "gain": 0.7
+        }
       },
       {
         "id": "out-1",
         "type": "output",
         "name": "Main Out",
-        "position": { "x": 920, "y": 120 },
-        "params": { "level": 0.8 }
+        "position": {
+          "x": 920,
+          "y": 120
+        },
+        "params": {
+          "level": 1
+        }
       }
     ],
     "connections": [
-      { "from": { "moduleId": "lfo-1", "portId": "cv-out" }, "to": { "moduleId": "quant-1", "portId": "in" }, "kind": "cv" },
-      { "from": { "moduleId": "quant-1", "portId": "out" }, "to": { "moduleId": "osc-1", "portId": "pitch" }, "kind": "cv" },
-      { "from": { "moduleId": "osc-1", "portId": "out" }, "to": { "moduleId": "gain-1", "portId": "in" }, "kind": "audio" },
-      { "from": { "moduleId": "gain-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+      {
+        "from": {
+          "moduleId": "lfo-1",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "quant-1",
+          "portId": "in"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "quant-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "osc-1",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "osc-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "gain-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "gain-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "out-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      }
     ]
   }
 }

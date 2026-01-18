@@ -6,8 +6,8 @@ use dsp_core::{
   Adsr, Arpeggiator, Choir, Chorus, Clap909, Delay, DrumSequencer, Ensemble,
   EuclideanSequencer, FmOperator, GranularDelay, HiHat909, Hpf, KarplusStrong,
   Kick909, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, Phaser, PipeOrgan, PitchShifter,
-  Reverb, Rimshot909, SampleHold, Shepard, SlewLimiter, Snare909, SnesOsc, SpectralSwarm, SpringReverb,
-  StepSequencer, Supersaw, TapeDelay, Tb303, Tom909, Vcf, Vco, Vocoder,
+  Resonator, Reverb, Rimshot909, SampleHold, Shepard, SlewLimiter, Snare909, SnesOsc, SpectralSwarm, SpringReverb,
+  StepSequencer, Supersaw, TapeDelay, Tb303, Tom909, Vcf, Vco, Vocoder, Wavetable,
 };
 
 use crate::state::*;
@@ -505,6 +505,31 @@ pub(crate) fn create_state(
       release_low: ParamBuffer::new(param_number(params, "releaseLow", 1.0)),
       release_high: ParamBuffer::new(param_number(params, "releaseHigh", 1.0)),
     }),
+    ModuleType::Resonator => ModuleState::Resonator(ResonatorState {
+      resonator: Resonator::new(sample_rate),
+      frequency: ParamBuffer::new(param_number(params, "frequency", 220.0)),
+      structure: ParamBuffer::new(param_number(params, "structure", 0.5)),
+      brightness: ParamBuffer::new(param_number(params, "brightness", 0.7)),
+      damping: ParamBuffer::new(param_number(params, "damping", 0.7)),
+      position: ParamBuffer::new(param_number(params, "position", 0.5)),
+      mode: ParamBuffer::new(param_number(params, "mode", 0.0)),
+      polyphony: ParamBuffer::new(param_number(params, "polyphony", 1.0)),
+      internal_exc: ParamBuffer::new(param_number(params, "internalExc", 0.8)),
+      chorus: ParamBuffer::new(param_number(params, "chorus", 0.0)),
+    }),
+    ModuleType::Wavetable => ModuleState::Wavetable(WavetableState {
+      wavetable: Wavetable::new(sample_rate),
+      frequency: ParamBuffer::new(param_number(params, "frequency", 220.0)),
+      bank: ParamBuffer::new(param_number(params, "bank", 0.0)),
+      position: ParamBuffer::new(param_number(params, "position", 0.0)),
+      unison: ParamBuffer::new(param_number(params, "unison", 1.0)),
+      detune: ParamBuffer::new(param_number(params, "detune", 15.0)),
+      spread: ParamBuffer::new(param_number(params, "spread", 0.5)),
+      morph_speed: ParamBuffer::new(param_number(params, "morphSpeed", 0.0)),
+      sub_mix: ParamBuffer::new(param_number(params, "subMix", 0.0)),
+      attack: ParamBuffer::new(param_number(params, "attack", 0.01)),
+      release: ParamBuffer::new(param_number(params, "release", 0.3)),
+    }),
     ModuleType::Notes => ModuleState::Notes,  // UI-only, no DSP
   }
 }
@@ -985,6 +1010,31 @@ pub(crate) fn apply_param(state: &mut ModuleState, param: &str, value: f32) {
       "attackHigh" => state.attack_high.set(value),
       "releaseLow" => state.release_low.set(value),
       "releaseHigh" => state.release_high.set(value),
+      _ => {}
+    },
+    ModuleState::Resonator(state) => match param {
+      "frequency" => state.frequency.set(value),
+      "structure" => state.structure.set(value),
+      "brightness" => state.brightness.set(value),
+      "damping" => state.damping.set(value),
+      "position" => state.position.set(value),
+      "mode" => state.mode.set(value),
+      "polyphony" => state.polyphony.set(value),
+      "internalExc" => state.internal_exc.set(value),
+      "chorus" => state.chorus.set(value),
+      _ => {}
+    },
+    ModuleState::Wavetable(state) => match param {
+      "frequency" => state.frequency.set(value),
+      "bank" => state.bank.set(value),
+      "position" => state.position.set(value),
+      "unison" => state.unison.set(value),
+      "detune" => state.detune.set(value),
+      "spread" => state.spread.set(value),
+      "morphSpeed" => state.morph_speed.set(value),
+      "subMix" => state.sub_mix.set(value),
+      "attack" => state.attack.set(value),
+      "release" => state.release.set(value),
       _ => {}
     },
     _ => {}

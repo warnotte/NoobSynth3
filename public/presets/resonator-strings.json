@@ -1,0 +1,224 @@
+{
+  "graph": {
+    "modules": [
+      {
+        "id": "ctrl-1",
+        "type": "control",
+        "name": "Control",
+        "position": {
+          "x": 50,
+          "y": 50
+        },
+        "params": {
+          "octave": 4,
+          "glide": 15
+        }
+      },
+      {
+        "id": "noise-1",
+        "type": "noise",
+        "name": "Exciter",
+        "position": {
+          "x": 50,
+          "y": 250
+        },
+        "params": {
+          "level": 0.5,
+          "noiseType": "white"
+        }
+      },
+      {
+        "id": "adsr-1",
+        "type": "adsr",
+        "name": "Noise Env",
+        "position": {
+          "x": 200,
+          "y": 250
+        },
+        "params": {
+          "attack": 0.001,
+          "decay": 0.08,
+          "sustain": 0,
+          "release": 0.08
+        }
+      },
+      {
+        "id": "vca-1",
+        "type": "gain",
+        "name": "Noise VCA",
+        "position": {
+          "x": 350,
+          "y": 250
+        },
+        "params": {
+          "gain": 1
+        }
+      },
+      {
+        "id": "res-1",
+        "type": "resonator",
+        "name": "Strings",
+        "position": {
+          "x": 300,
+          "y": 50
+        },
+        "params": {
+          "frequency": 220,
+          "structure": 0.5,
+          "brightness": 0.75,
+          "damping": 0.9,
+          "position": 0.5,
+          "mode": 1,
+          "polyphony": 4,
+          "internalExc": 0,
+          "chorus": 0.4
+        }
+      },
+      {
+        "id": "chorus-1",
+        "type": "chorus",
+        "name": "Chorus",
+        "position": {
+          "x": 550,
+          "y": 50
+        },
+        "params": {
+          "rate": 0.5,
+          "depth": 3,
+          "delay": 15,
+          "mix": 0.3,
+          "spread": 0.8,
+          "feedback": 0.1
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": {
+          "x": 750,
+          "y": 50
+        },
+        "params": {
+          "time": 0.85,
+          "damp": 0.35,
+          "preDelay": 25,
+          "mix": 0.35
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Out",
+        "position": {
+          "x": 950,
+          "y": 50
+        },
+        "params": {
+          "level": 1
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": {
+          "moduleId": "ctrl-1",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "res-1",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "ctrl-1",
+          "portId": "gate-out"
+        },
+        "to": {
+          "moduleId": "res-1",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "ctrl-1",
+          "portId": "gate-out"
+        },
+        "to": {
+          "moduleId": "adsr-1",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "noise-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "vca-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "adsr-1",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "vca-1",
+          "portId": "cv"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "vca-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "res-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "res-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "chorus-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "chorus-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "reverb-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "reverb-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "out-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      }
+    ]
+  }
+}

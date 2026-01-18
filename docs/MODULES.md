@@ -218,6 +218,96 @@ Synthèse additive avec essaim de partiels évolutifs. Crée des textures organi
 - Sawtooth Chorus, Formant Voice, Frozen Pad
 - Odd Hollow, Evolving Bass
 
+### Bowed String
+
+Synthèse par modélisation physique d'instruments à cordes frottées (violon, violoncelle, erhu).
+Utilise un guide d'onde avec modèle de friction d'archet et résonances de corps modales.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `frequency` | 40-880 Hz | Fréquence de base |
+| `bowPressure` | 0-1 | Pression de l'archet sur la corde |
+| `bowPosition` | 0-1 | Position sur la corde (0=chevalet, 1=touche) |
+| `bowVelocity` | 0-1 | Vitesse de l'archet |
+| `brightness` | 0-1 | Brillance / contenu hautes fréquences |
+| `body` | 0-1 | Résonance du corps de l'instrument |
+| `vibratoRate` | 0-10 Hz | Vitesse du vibrato |
+| `vibratoDepth` | 0-1 | Profondeur du vibrato (en demi-tons) |
+| `attack` | 0.01-2 s | Temps d'attaque de l'enveloppe |
+| `release` | 0.01-5 s | Temps de relâchement |
+
+**Entrées** : pitch (CV), gate (gate), pressure (CV), bow (CV)
+**Sorties** : out (audio)
+
+**Conseils son :**
+- **Violon** : bowPosition 0.3-0.4, brightness 0.7-0.8, body 0.5-0.6
+- **Violoncelle** : frequency basse, bowPressure élevé, body 0.7+
+- **Erhu** : bowPosition 0.2-0.3, brightness 0.9, body faible, vibrato via LFO
+
+**Presets (3)** : bowed-violin, bowed-cello, bowed-erhu
+
+### Resonator
+
+Module de résonance sympathique inspiré de Mutable Instruments Rings.
+Trois modes : Modal (cloches/plaques), Sympathetic (cordes sympathiques), Inharmonic (métallique).
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `frequency` | 40-1000 Hz | Fréquence fondamentale |
+| `structure` | 0-1 | Structure harmonique (0=harmonique, 1=cloche/métal) |
+| `brightness` | 0-1 | Amortissement hautes fréquences |
+| `damping` | 0-1 | Temps de décroissance global |
+| `position` | 0-1 | Position d'excitation (affecte les harmoniques) |
+| `mode` | 0-2 | 0=Modal, 1=Sympathetic, 2=Inharmonic |
+| `polyphony` | 1-4 | Nombre de voix polyphoniques |
+| `internalExc` | 0-1 | Niveau de l'excitateur interne |
+| `chorus` | 0-1 | Désaccord entre les voix (effet chorus) |
+
+**Entrées** : in (audio - excitation externe), pitch (CV), gate (gate), strum (gate), damp (CV)
+**Sorties** : out (audio)
+
+**Conseils son :**
+- **Cloches** : mode 0, structure 0.7, damping élevé
+- **Cordes sympathiques** : mode 1, polyphony 4, chorus 0.3-0.5
+- **Métal/gamelan** : mode 2, structure 0.8+, brightness faible
+
+**Presets (3)** : resonator-bells, resonator-strings, resonator-metallic
+
+### Wavetable
+
+Oscillateur wavetable avec 4 banques, morphing et unison.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `frequency` | 40-1200 Hz | Fréquence de base |
+| `bank` | 0-3 | Banque : 0=Basic, 1=Vocal, 2=Digital, 3=Organic |
+| `position` | 0-1 | Position dans la wavetable (morphing) |
+| `unison` | 1-7 | Nombre de voix unison |
+| `detune` | 0-50 cents | Désaccord unison |
+| `spread` | 0-1 | Largeur stéréo unison |
+| `morphSpeed` | 0-10 Hz | Vitesse auto-morph (LFO interne) |
+| `subMix` | 0-1 | Volume du sub-oscillateur |
+| `attack` | 0.001-2 s | Temps d'attaque |
+| `release` | 0.001-5 s | Temps de relâchement |
+
+**Banques disponibles :**
+- **Basic** : Sine → Triangle → Saw → Square → Pulses
+- **Vocal** : Formants voyelles A, E, I, O, U avec transitions
+- **Digital** : FM, hard sync, bit crush, ring mod, métallique
+- **Organic** : Textures naturelles, souffle, vent, chorale
+
+**Entrées** : pitch (CV), gate (gate), position (CV - morphing), sync (sync)
+**Sorties** : out (audio)
+
+**Conseils son :**
+- **Pad vocal** : bank 1, position via LFO lent, unison 3
+- **Bass digitale** : bank 2, position 0.5, unison 5, detune 25
+- **Texture organique** : bank 3, position modulé, attack/release longs
+- **Pad massif** : bank 1, unison 7, LFO lent sur position + vibrato
+- **Lead agressif** : bank 2, unison 5, filtre ladder + distortion
+
+**Presets (5)** : wavetable-vocal, wavetable-digital, wavetable-organic, wavetable-evolve, wavetable-screamer
+
 ### TB-303
 
 Synthèse acid bass style Roland TB-303 avec filtre résonant et enveloppe caractéristique.

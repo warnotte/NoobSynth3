@@ -204,7 +204,7 @@
         "params": {
           "frequency": 659.255,
           "detune": 30,
-          "mix": 1.0
+          "mix": 1
         }
       },
       {
@@ -468,7 +468,7 @@
         },
         "params": {
           "attack": 0.4,
-          "decay": 1.0,
+          "decay": 1,
           "sustain": 0.5,
           "release": 1.2
         }
@@ -648,8 +648,8 @@
           "levelB": 0.7,
           "levelC": 0.6,
           "levelD": 0.6,
-          "levelE": 0.0,
-          "levelF": 0.0
+          "levelE": 0,
+          "levelF": 0
         }
       },
       {
@@ -661,7 +661,7 @@
           "y": 620
         },
         "params": {
-          "level": 0.8
+          "level": 1
         }
       }
     ],

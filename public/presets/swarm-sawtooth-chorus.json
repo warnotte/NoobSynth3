@@ -8,8 +8,13 @@
       {
         "id": "ctrl1",
         "type": "control",
-        "params": { "portamento": 0.05 },
-        "position": { "col": 1, "row": 1 },
+        "params": {
+          "portamento": 0.05
+        },
+        "position": {
+          "col": 1,
+          "row": 1
+        },
         "name": "Control"
       },
       {
@@ -20,12 +25,12 @@
           "partials": 16,
           "detune": 25,
           "drift": 0.2,
-          "density": 1.0,
-          "evolution": 2.0,
-          "inharmonic": 0.0,
-          "tilt": -2.0,
+          "density": 1,
+          "evolution": 2,
+          "inharmonic": 0,
+          "tilt": -2,
           "spread": 0.6,
-          "shimmer": 0.0,
+          "shimmer": 0,
           "attack": 0.5,
           "release": 1.5,
           "waveform": 2,
@@ -35,12 +40,15 @@
           "formantQ": 2,
           "freeze": 0,
           "chorus": 0.6,
-          "attackLow": 1.0,
-          "attackHigh": 1.0,
-          "releaseLow": 1.0,
-          "releaseHigh": 1.0
+          "attackLow": 1,
+          "attackHigh": 1,
+          "releaseLow": 1,
+          "releaseHigh": 1
         },
-        "position": { "col": 3, "row": 1 },
+        "position": {
+          "col": 3,
+          "row": 1
+        },
         "name": "Saw Swarm"
       },
       {
@@ -52,49 +60,94 @@
           "preDelay": 0.02,
           "mix": 0.3
         },
-        "position": { "col": 5, "row": 1 },
+        "position": {
+          "col": 5,
+          "row": 1
+        },
         "name": "Reverb"
       },
       {
         "id": "scope1",
         "type": "scope",
-        "params": { "mode": "spectrogram", "timeScale": 1, "gain": 1 },
-        "position": { "col": 7, "row": 1 },
+        "params": {
+          "mode": "spectrogram",
+          "timeScale": 1,
+          "gain": 1
+        },
+        "position": {
+          "col": 7,
+          "row": 1
+        },
         "size": "3x3",
         "name": "Scope"
       },
       {
         "id": "out1",
         "type": "output",
-        "params": { "level": 0.7 },
-        "position": { "col": 10, "row": 1 },
+        "params": {
+          "level": 1
+        },
+        "position": {
+          "col": 10,
+          "row": 1
+        },
         "name": "Output"
       }
     ],
     "connections": [
       {
-        "from": { "moduleId": "ctrl1", "portId": "cv-out" },
-        "to": { "moduleId": "swarm1", "portId": "pitch" },
+        "from": {
+          "moduleId": "ctrl1",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "swarm1",
+          "portId": "pitch"
+        },
         "kind": "cv"
       },
       {
-        "from": { "moduleId": "ctrl1", "portId": "gate-out" },
-        "to": { "moduleId": "swarm1", "portId": "gate" },
+        "from": {
+          "moduleId": "ctrl1",
+          "portId": "gate-out"
+        },
+        "to": {
+          "moduleId": "swarm1",
+          "portId": "gate"
+        },
         "kind": "gate"
       },
       {
-        "from": { "moduleId": "swarm1", "portId": "out" },
-        "to": { "moduleId": "reverb1", "portId": "in" },
+        "from": {
+          "moduleId": "swarm1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "reverb1",
+          "portId": "in"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "reverb1", "portId": "out" },
-        "to": { "moduleId": "scope1", "portId": "in-a" },
+        "from": {
+          "moduleId": "reverb1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "scope1",
+          "portId": "in-a"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "reverb1", "portId": "out" },
-        "to": { "moduleId": "out1", "portId": "in" },
+        "from": {
+          "moduleId": "reverb1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "out1",
+          "portId": "in"
+        },
         "kind": "audio"
       }
     ]

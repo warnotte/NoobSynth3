@@ -1,0 +1,286 @@
+{
+  "graph": {
+    "modules": [
+      {
+        "id": "ctrl-1",
+        "type": "control",
+        "name": "Keyboard",
+        "position": {
+          "x": 50,
+          "y": 50
+        },
+        "params": {
+          "octave": 3,
+          "glide": 20
+        }
+      },
+      {
+        "id": "res-bells",
+        "type": "resonator",
+        "name": "Bells",
+        "position": {
+          "x": 300,
+          "y": 50
+        },
+        "params": {
+          "frequency": 880,
+          "structure": 0.7,
+          "brightness": 0.85,
+          "damping": 0.88,
+          "position": 0.3,
+          "mode": 0,
+          "polyphony": 4,
+          "internalExc": 1,
+          "chorus": 0.15
+        }
+      },
+      {
+        "id": "res-metal",
+        "type": "resonator",
+        "name": "Metal",
+        "position": {
+          "x": 300,
+          "y": 150
+        },
+        "params": {
+          "frequency": 440,
+          "structure": 0.9,
+          "brightness": 0.6,
+          "damping": 0.75,
+          "position": 0.4,
+          "mode": 2,
+          "polyphony": 4,
+          "internalExc": 1,
+          "chorus": 0.2
+        }
+      },
+      {
+        "id": "res-strings",
+        "type": "resonator",
+        "name": "Strings",
+        "position": {
+          "x": 300,
+          "y": 250
+        },
+        "params": {
+          "frequency": 220,
+          "structure": 0.5,
+          "brightness": 0.7,
+          "damping": 0.92,
+          "position": 0.5,
+          "mode": 1,
+          "polyphony": 4,
+          "internalExc": 1,
+          "chorus": 0.3
+        }
+      },
+      {
+        "id": "mixer-1",
+        "type": "mixer-1x2",
+        "name": "Mix",
+        "position": {
+          "x": 550,
+          "y": 100
+        },
+        "params": {
+          "levelA": 0.5,
+          "levelB": 0.5,
+          "levelC": 0.6,
+          "levelD": 0,
+          "levelE": 0,
+          "levelF": 0
+        }
+      },
+      {
+        "id": "chorus-1",
+        "type": "chorus",
+        "name": "Chorus",
+        "position": {
+          "x": 700,
+          "y": 50
+        },
+        "params": {
+          "rate": 0.4,
+          "depth": 4,
+          "delay": 12,
+          "mix": 0.25,
+          "spread": 0.9,
+          "feedback": 0.1
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": {
+          "x": 700,
+          "y": 150
+        },
+        "params": {
+          "time": 0.85,
+          "damp": 0.3,
+          "preDelay": 25,
+          "mix": 0.4
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Out",
+        "position": {
+          "x": 850,
+          "y": 100
+        },
+        "params": {
+          "level": 1
+        }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": {
+          "x": 50,
+          "y": 250
+        },
+        "params": {
+          "text": "RESONATOR MASSIVE\n\n3 resonators en parallèle:\n• Bells (mode Modal) - aigu, cristallin\n• Metal (mode Sympathetic) - metallique\n• Strings (mode String) - cordes frottées\n\nJouez au clavier - les 3 sonnent ensemble!\n\nAjustez les niveaux dans le mixer\npour équilibrer les timbres."
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": {
+          "moduleId": "ctrl-1",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "res-bells",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "ctrl-1",
+          "portId": "gate-out"
+        },
+        "to": {
+          "moduleId": "res-bells",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "ctrl-1",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "res-metal",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "ctrl-1",
+          "portId": "gate-out"
+        },
+        "to": {
+          "moduleId": "res-metal",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "ctrl-1",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "res-strings",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "ctrl-1",
+          "portId": "gate-out"
+        },
+        "to": {
+          "moduleId": "res-strings",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "res-bells",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mixer-1",
+          "portId": "in-a"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "res-metal",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mixer-1",
+          "portId": "in-b"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "res-strings",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mixer-1",
+          "portId": "in-c"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "mixer-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "chorus-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "chorus-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "reverb-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "reverb-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "out-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      }
+    ]
+  }
+}

@@ -1,0 +1,112 @@
+{
+  "graph": {
+    "modules": [
+      {
+        "id": "ctrl-1",
+        "type": "control",
+        "name": "Control",
+        "position": {
+          "x": 50,
+          "y": 50
+        },
+        "params": {
+          "octave": 5,
+          "glide": 0
+        }
+      },
+      {
+        "id": "res-1",
+        "type": "resonator",
+        "name": "Bell",
+        "position": {
+          "x": 250,
+          "y": 50
+        },
+        "params": {
+          "frequency": 440,
+          "structure": 0.7,
+          "brightness": 0.8,
+          "damping": 0.85,
+          "position": 0.3,
+          "mode": 0,
+          "polyphony": 1,
+          "internalExc": 1,
+          "chorus": 0
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Hall",
+        "position": {
+          "x": 500,
+          "y": 50
+        },
+        "params": {
+          "time": 0.8,
+          "damp": 0.3,
+          "preDelay": 20,
+          "mix": 0.4
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Out",
+        "position": {
+          "x": 700,
+          "y": 50
+        },
+        "params": {
+          "level": 1
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": {
+          "moduleId": "ctrl-1",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "res-1",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "ctrl-1",
+          "portId": "gate-out"
+        },
+        "to": {
+          "moduleId": "res-1",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "res-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "reverb-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "reverb-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "out-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      }
+    ]
+  }
+}

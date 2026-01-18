@@ -1,7 +1,7 @@
 /**
  * Source module controls (oscillators, noise generators)
  *
- * Modules: oscillator, supersaw, karplus, nes-osc, snes-osc, noise, tb-303, fm-op, shepard, pipe-organ, spectral-swarm
+ * Modules: oscillator, supersaw, karplus, nes-osc, snes-osc, noise, tb-303, fm-op, shepard, pipe-organ, spectral-swarm, resonator, wavetable
  */
 
 import type React from 'react'
@@ -1202,6 +1202,228 @@ export function renderSourceControls(props: ControlProps): React.ReactElement | 
             size="small"
           />
         </ControlBoxRow>
+      </>
+    )
+  }
+
+  if (module.type === 'resonator') {
+    const frequency = Number(module.params.frequency ?? 220)
+    const structure = Number(module.params.structure ?? 0.5)
+    const brightness = Number(module.params.brightness ?? 0.7)
+    const damping = Number(module.params.damping ?? 0.7)
+    const position = Number(module.params.position ?? 0.5)
+    const mode = Number(module.params.mode ?? 0)
+    const polyphony = Number(module.params.polyphony ?? 1)
+    const internalExc = Number(module.params.internalExc ?? 0.8)
+    const chorus = Number(module.params.chorus ?? 0)
+
+    return (
+      <>
+        <RotaryKnob
+          label="Freq"
+          min={40}
+          max={2000}
+          step={1}
+          unit="Hz"
+          value={frequency}
+          onChange={(value) => updateParam(module.id, 'frequency', value)}
+          format={formatInt}
+        />
+        <ControlBox label="Mode" compact>
+          <ControlButtons
+            options={[
+              { id: 0, label: 'MOD' },
+              { id: 1, label: 'SYM' },
+              { id: 2, label: 'INH' },
+            ]}
+            value={mode}
+            onChange={(value) => updateParam(module.id, 'mode', value)}
+          />
+        </ControlBox>
+        <RotaryKnob
+          label="Structure"
+          min={0}
+          max={1}
+          step={0.01}
+          value={structure}
+          onChange={(value) => updateParam(module.id, 'structure', value)}
+          format={formatPercent}
+        />
+        <RotaryKnob
+          label="Bright"
+          min={0}
+          max={1}
+          step={0.01}
+          value={brightness}
+          onChange={(value) => updateParam(module.id, 'brightness', value)}
+          format={formatPercent}
+        />
+        <RotaryKnob
+          label="Damping"
+          min={0}
+          max={1}
+          step={0.01}
+          value={damping}
+          onChange={(value) => updateParam(module.id, 'damping', value)}
+          format={formatPercent}
+        />
+        <RotaryKnob
+          label="Position"
+          min={0}
+          max={1}
+          step={0.01}
+          value={position}
+          onChange={(value) => updateParam(module.id, 'position', value)}
+          format={formatPercent}
+        />
+        <RotaryKnob
+          label="Int Exc"
+          min={0}
+          max={1}
+          step={0.01}
+          value={internalExc}
+          onChange={(value) => updateParam(module.id, 'internalExc', value)}
+          format={formatPercent}
+        />
+        <ControlBox label="Poly" compact>
+          <ControlButtons
+            options={[
+              { id: 1, label: '1' },
+              { id: 2, label: '2' },
+              { id: 4, label: '4' },
+            ]}
+            value={polyphony}
+            onChange={(value) => updateParam(module.id, 'polyphony', value)}
+          />
+        </ControlBox>
+        <RotaryKnob
+          label="Chorus"
+          min={0}
+          max={1}
+          step={0.01}
+          value={chorus}
+          onChange={(value) => updateParam(module.id, 'chorus', value)}
+          format={formatPercent}
+        />
+      </>
+    )
+  }
+
+  if (module.type === 'wavetable') {
+    const frequency = Number(module.params.frequency ?? 220)
+    const bank = Number(module.params.bank ?? 0)
+    const position = Number(module.params.position ?? 0)
+    const unison = Number(module.params.unison ?? 1)
+    const detune = Number(module.params.detune ?? 15)
+    const spread = Number(module.params.spread ?? 0.5)
+    const morphSpeed = Number(module.params.morphSpeed ?? 0)
+    const subMix = Number(module.params.subMix ?? 0)
+    const attack = Number(module.params.attack ?? 0.01)
+    const release = Number(module.params.release ?? 0.3)
+
+    return (
+      <>
+        <RotaryKnob
+          label="Freq"
+          min={40}
+          max={2000}
+          step={1}
+          unit="Hz"
+          value={frequency}
+          onChange={(value) => updateParam(module.id, 'frequency', value)}
+          format={formatInt}
+        />
+        <ControlBox label="Bank" compact>
+          <ControlButtons
+            options={[
+              { id: 0, label: 'BAS' },
+              { id: 1, label: 'VOC' },
+              { id: 2, label: 'DIG' },
+              { id: 3, label: 'ORG' },
+            ]}
+            value={bank}
+            onChange={(value) => updateParam(module.id, 'bank', value)}
+          />
+        </ControlBox>
+        <RotaryKnob
+          label="Position"
+          min={0}
+          max={1}
+          step={0.01}
+          value={position}
+          onChange={(value) => updateParam(module.id, 'position', value)}
+          format={formatPercent}
+        />
+        <RotaryKnob
+          label="Morph"
+          min={0}
+          max={10}
+          step={0.1}
+          unit="Hz"
+          value={morphSpeed}
+          onChange={(value) => updateParam(module.id, 'morphSpeed', value)}
+          format={formatDecimal1}
+        />
+        <ControlBox label="Unison" compact>
+          <ControlButtons
+            options={[
+              { id: 1, label: '1' },
+              { id: 3, label: '3' },
+              { id: 5, label: '5' },
+              { id: 7, label: '7' },
+            ]}
+            value={unison}
+            onChange={(value) => updateParam(module.id, 'unison', value)}
+          />
+        </ControlBox>
+        <RotaryKnob
+          label="Detune"
+          min={0}
+          max={50}
+          step={1}
+          unit="ct"
+          value={detune}
+          onChange={(value) => updateParam(module.id, 'detune', value)}
+          format={formatInt}
+        />
+        <RotaryKnob
+          label="Spread"
+          min={0}
+          max={1}
+          step={0.01}
+          value={spread}
+          onChange={(value) => updateParam(module.id, 'spread', value)}
+          format={formatPercent}
+        />
+        <RotaryKnob
+          label="Sub"
+          min={0}
+          max={1}
+          step={0.01}
+          value={subMix}
+          onChange={(value) => updateParam(module.id, 'subMix', value)}
+          format={formatPercent}
+        />
+        <RotaryKnob
+          label="Attack"
+          min={0.001}
+          max={2}
+          step={0.001}
+          unit="s"
+          value={attack}
+          onChange={(value) => updateParam(module.id, 'attack', value)}
+          format={formatMs}
+        />
+        <RotaryKnob
+          label="Release"
+          min={0.001}
+          max={5}
+          step={0.001}
+          unit="s"
+          value={release}
+          onChange={(value) => updateParam(module.id, 'release', value)}
+          format={formatMs}
+        />
       </>
     )
   }
