@@ -21,6 +21,9 @@ type WasmGraphEngineCtor = new (sampleRate: number) => {
   clear_external_input(): void
   render(frames: number): Float32Array
   get_sequencer_step(moduleId: string): number
+  get_midi_total_ticks(moduleId: string): number
+  seek_midi_sequencer(moduleId: string, tick: number): void
+  drain_midi_events(moduleId: string): Uint8Array
 }
 
 const WasmGraphEngine = (wasm as unknown as { WasmGraphEngine?: WasmGraphEngineCtor })
