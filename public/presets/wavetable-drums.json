@@ -76,6 +76,20 @@
         }
       },
       {
+        "id": "drums-mix",
+        "type": "mixer-1x2",
+        "name": "Drums",
+        "position": { "x": 450, "y": 250 },
+        "params": {
+          "levelA": 0.9,
+          "levelB": 0.7,
+          "levelC": 0.5,
+          "levelD": 0.6,
+          "levelE": 0,
+          "levelF": 0
+        }
+      },
+      {
         "id": "seq-1",
         "type": "step-sequencer",
         "name": "Bass Seq",
@@ -96,7 +110,7 @@
         "id": "lfo-1",
         "type": "lfo",
         "name": "Position",
-        "position": { "x": 550, "y": 250 },
+        "position": { "x": 750, "y": 250 },
         "params": {
           "rate": 0.2,
           "shape": "triangle",
@@ -127,7 +141,7 @@
         "id": "adsr-1",
         "type": "adsr",
         "name": "Filter Env",
-        "position": { "x": 800, "y": 250 },
+        "position": { "x": 950, "y": 250 },
         "params": {
           "attack": 0.003,
           "decay": 0.18,
@@ -139,9 +153,9 @@
         "id": "vcf-1",
         "type": "vcf",
         "name": "Filter",
-        "position": { "x": 1000, "y": 50 },
+        "position": { "x": 1050, "y": 50 },
         "params": {
-          "cutoff": 800,
+          "cutoff": 3150,
           "resonance": 0.5,
           "drive": 0.35,
           "envAmount": 0.65,
@@ -153,48 +167,20 @@
         }
       },
       {
-        "id": "dist-1",
-        "type": "distortion",
-        "name": "Distortion",
-        "position": { "x": 1200, "y": 50 },
-        "params": {
-          "drive": 0.25,
-          "tone": 0.55,
-          "mix": 0.3,
-          "output": 0.75
-        }
-      },
-      {
-        "id": "drums-mix",
-        "type": "mixer",
-        "name": "Drums",
-        "position": { "x": 450, "y": 250 },
-        "params": {
-          "ch1": 0.8,
-          "ch2": 0.7,
-          "ch3": 0.5,
-          "ch4": 0.6,
-          "main": 0.85
-        }
-      },
-      {
         "id": "main-mix",
         "type": "mixer",
         "name": "Main",
-        "position": { "x": 1400, "y": 50 },
+        "position": { "x": 1250, "y": 50 },
         "params": {
-          "ch1": 0.75,
-          "ch2": 0.8,
-          "ch3": 0,
-          "ch4": 0,
-          "main": 1.0
+          "levelA": 0.48,
+          "levelB": 0.76
         }
       },
       {
         "id": "delay-1",
         "type": "delay",
         "name": "Delay",
-        "position": { "x": 1600, "y": 50 },
+        "position": { "x": 1400, "y": 50 },
         "params": {
           "time": 242,
           "feedback": 0.3,
@@ -207,7 +193,7 @@
         "id": "out-1",
         "type": "output",
         "name": "Out",
-        "position": { "x": 1800, "y": 50 },
+        "position": { "x": 1550, "y": 50 },
         "params": { "level": 1 }
       }
     ],
@@ -264,22 +250,27 @@
       },
       {
         "from": { "moduleId": "kick-1", "portId": "out" },
-        "to": { "moduleId": "drums-mix", "portId": "in1" },
+        "to": { "moduleId": "drums-mix", "portId": "in-a" },
         "kind": "audio"
       },
       {
         "from": { "moduleId": "snare-1", "portId": "out" },
-        "to": { "moduleId": "drums-mix", "portId": "in2" },
+        "to": { "moduleId": "drums-mix", "portId": "in-b" },
         "kind": "audio"
       },
       {
         "from": { "moduleId": "hh-1", "portId": "out" },
-        "to": { "moduleId": "drums-mix", "portId": "in3" },
+        "to": { "moduleId": "drums-mix", "portId": "in-c" },
         "kind": "audio"
       },
       {
         "from": { "moduleId": "clap-1", "portId": "out" },
-        "to": { "moduleId": "drums-mix", "portId": "in4" },
+        "to": { "moduleId": "drums-mix", "portId": "in-d" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "drums-mix", "portId": "out" },
+        "to": { "moduleId": "main-mix", "portId": "in-a" },
         "kind": "audio"
       },
       {
@@ -319,17 +310,7 @@
       },
       {
         "from": { "moduleId": "vcf-1", "portId": "out" },
-        "to": { "moduleId": "dist-1", "portId": "in" },
-        "kind": "audio"
-      },
-      {
-        "from": { "moduleId": "drums-mix", "portId": "out" },
-        "to": { "moduleId": "main-mix", "portId": "in1" },
-        "kind": "audio"
-      },
-      {
-        "from": { "moduleId": "dist-1", "portId": "out" },
-        "to": { "moduleId": "main-mix", "portId": "in2" },
+        "to": { "moduleId": "main-mix", "portId": "in-b" },
         "kind": "audio"
       },
       {
