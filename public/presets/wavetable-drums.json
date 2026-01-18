@@ -165,9 +165,9 @@
         }
       },
       {
-        "id": "mixer-1",
+        "id": "drums-mix",
         "type": "mixer",
-        "name": "Drums Mix",
+        "name": "Drums",
         "position": { "x": 450, "y": 250 },
         "params": {
           "ch1": 0.8,
@@ -178,9 +178,9 @@
         }
       },
       {
-        "id": "mixer-2",
+        "id": "main-mix",
         "type": "mixer",
-        "name": "Main Mix",
+        "name": "Main",
         "position": { "x": 1400, "y": 50 },
         "params": {
           "ch1": 0.75,
@@ -234,7 +234,7 @@
       },
       {
         "from": { "moduleId": "drumseq-1", "portId": "gate-kick" },
-        "to": { "moduleId": "kick-1", "portId": "gate" },
+        "to": { "moduleId": "kick-1", "portId": "trigger" },
         "kind": "gate"
       },
       {
@@ -244,7 +244,7 @@
       },
       {
         "from": { "moduleId": "drumseq-1", "portId": "gate-snare" },
-        "to": { "moduleId": "snare-1", "portId": "gate" },
+        "to": { "moduleId": "snare-1", "portId": "trigger" },
         "kind": "gate"
       },
       {
@@ -254,18 +254,33 @@
       },
       {
         "from": { "moduleId": "drumseq-1", "portId": "gate-hhc" },
-        "to": { "moduleId": "hh-1", "portId": "gate-closed" },
-        "kind": "gate"
-      },
-      {
-        "from": { "moduleId": "drumseq-1", "portId": "gate-hho" },
-        "to": { "moduleId": "hh-1", "portId": "gate-open" },
+        "to": { "moduleId": "hh-1", "portId": "trigger" },
         "kind": "gate"
       },
       {
         "from": { "moduleId": "drumseq-1", "portId": "gate-clap" },
-        "to": { "moduleId": "clap-1", "portId": "gate" },
+        "to": { "moduleId": "clap-1", "portId": "trigger" },
         "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "kick-1", "portId": "out" },
+        "to": { "moduleId": "drums-mix", "portId": "in1" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "snare-1", "portId": "out" },
+        "to": { "moduleId": "drums-mix", "portId": "in2" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "hh-1", "portId": "out" },
+        "to": { "moduleId": "drums-mix", "portId": "in3" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "clap-1", "portId": "out" },
+        "to": { "moduleId": "drums-mix", "portId": "in4" },
+        "kind": "audio"
       },
       {
         "from": { "moduleId": "seq-1", "portId": "cv-out" },
@@ -308,37 +323,17 @@
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "kick-1", "portId": "out" },
-        "to": { "moduleId": "mixer-1", "portId": "in1" },
-        "kind": "audio"
-      },
-      {
-        "from": { "moduleId": "snare-1", "portId": "out" },
-        "to": { "moduleId": "mixer-1", "portId": "in2" },
-        "kind": "audio"
-      },
-      {
-        "from": { "moduleId": "hh-1", "portId": "out" },
-        "to": { "moduleId": "mixer-1", "portId": "in3" },
-        "kind": "audio"
-      },
-      {
-        "from": { "moduleId": "clap-1", "portId": "out" },
-        "to": { "moduleId": "mixer-1", "portId": "in4" },
-        "kind": "audio"
-      },
-      {
-        "from": { "moduleId": "mixer-1", "portId": "out" },
-        "to": { "moduleId": "mixer-2", "portId": "in1" },
+        "from": { "moduleId": "drums-mix", "portId": "out" },
+        "to": { "moduleId": "main-mix", "portId": "in1" },
         "kind": "audio"
       },
       {
         "from": { "moduleId": "dist-1", "portId": "out" },
-        "to": { "moduleId": "mixer-2", "portId": "in2" },
+        "to": { "moduleId": "main-mix", "portId": "in2" },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "mixer-2", "portId": "out" },
+        "from": { "moduleId": "main-mix", "portId": "out" },
         "to": { "moduleId": "delay-1", "portId": "in" },
         "kind": "audio"
       },
