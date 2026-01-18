@@ -4,7 +4,7 @@ use dsp_core::{
     Adsr, Arpeggiator, Choir, Chorus, Clap909, Delay, DrumSequencer, Ensemble,
     EuclideanSequencer, FmOperator, GranularDelay, HiHat909, Hpf, KarplusStrong,
     Kick909, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, Phaser, PipeOrgan, PitchShifter,
-    Reverb, Rimshot909, SampleHold, Shepard, SlewLimiter, Snare909, SnesOsc, SpringReverb,
+    Reverb, Rimshot909, SampleHold, Shepard, SlewLimiter, Snare909, SnesOsc, SpectralSwarm, SpringReverb,
     StepSequencer, Supersaw, TapeDelay, Tb303, Tom909, Vcf, Vco, Vocoder,
 };
 
@@ -131,6 +131,34 @@ pub struct PipeOrganState {
     pub trem_rate: ParamBuffer,
     pub wind: ParamBuffer,
     pub brightness: ParamBuffer,
+}
+
+pub struct SpectralSwarmState {
+    pub swarm: SpectralSwarm,
+    pub frequency: ParamBuffer,
+    pub partials: ParamBuffer,
+    pub detune: ParamBuffer,
+    pub drift: ParamBuffer,
+    pub density: ParamBuffer,
+    pub evolution: ParamBuffer,
+    pub inharmonic: ParamBuffer,
+    pub tilt: ParamBuffer,
+    pub spread: ParamBuffer,
+    pub shimmer: ParamBuffer,
+    pub attack: ParamBuffer,
+    pub release: ParamBuffer,
+    // New parameters
+    pub waveform: ParamBuffer,
+    pub odd_even: ParamBuffer,
+    pub fundamental_mix: ParamBuffer,
+    pub formant_freq: ParamBuffer,
+    pub formant_q: ParamBuffer,
+    pub freeze: ParamBuffer,
+    pub chorus: ParamBuffer,
+    pub attack_low: ParamBuffer,
+    pub attack_high: ParamBuffer,
+    pub release_low: ParamBuffer,
+    pub release_high: ParamBuffer,
 }
 
 // =============================================================================
@@ -531,6 +559,7 @@ pub enum ModuleState {
     FmOp(FmOpState),
     Shepard(ShepardState),
     PipeOrgan(PipeOrganState),
+    SpectralSwarm(SpectralSwarmState),
 
     // Filters
     Vcf(VcfState),

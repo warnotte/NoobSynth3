@@ -728,6 +728,62 @@
       "description": "Full 8-track MIDI setup with Pipe Organs. All tracks connected and ready.",
       "file": "midi-full-organ.json",
       "group": "MIDI Sequencer"
+    },
+    {
+      "id": "swarm-evolving-drone",
+      "name": "Evolving Drone",
+      "description": "Slowly evolving harmonic swarm with rich stereo movement.",
+      "file": "swarm-evolving-drone.json",
+      "group": "Drones"
+    },
+    {
+      "id": "swarm-ascending",
+      "name": "Ascending Swarm",
+      "description": "Shepard-like ascending harmonic swarm with ethereal shimmer.",
+      "file": "swarm-ascending.json",
+      "group": "Drones"
+    },
+    {
+      "id": "swarm-bells",
+      "name": "Spectral Bells",
+      "description": "Bell-like inharmonic swarm with metallic overtones.",
+      "file": "swarm-bells.json",
+      "group": "Drones"
+    },
+    {
+      "id": "swarm-sawtooth-chorus",
+      "name": "Sawtooth Chorus",
+      "description": "Bright sawtooth swarm with built-in chorus for thick supersaw-like textures.",
+      "file": "swarm-sawtooth-chorus.json",
+      "group": "Drones"
+    },
+    {
+      "id": "swarm-formant-voice",
+      "name": "Formant Voice",
+      "description": "Vocal-like swarm using formant resonance for vowel textures.",
+      "file": "swarm-formant-voice.json",
+      "group": "Drones"
+    },
+    {
+      "id": "swarm-frozen-pad",
+      "name": "Frozen Pad",
+      "description": "Static frozen texture - partials stop evolving for stable pad sounds.",
+      "file": "swarm-frozen-pad.json",
+      "group": "Drones"
+    },
+    {
+      "id": "swarm-odd-hollow",
+      "name": "Odd Hollow",
+      "description": "Hollow clarinet-like texture using odd harmonics emphasis.",
+      "file": "swarm-odd-hollow.json",
+      "group": "Drones"
+    },
+    {
+      "id": "swarm-evolving-bass",
+      "name": "Evolving Bass",
+      "description": "Deep bass with per-band envelope: slow bass attack, fast high shimmer.",
+      "file": "swarm-evolving-bass.json",
+      "group": "Drones"
     }
   ]
 }

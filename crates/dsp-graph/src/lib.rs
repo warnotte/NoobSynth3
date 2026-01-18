@@ -628,6 +628,7 @@ fn normalize_module_type(raw: &str) -> ModuleType {
     "fm-op" => ModuleType::FmOp,
     "shepard" => ModuleType::Shepard,
     "pipe-organ" => ModuleType::PipeOrgan,
+    "spectral-swarm" => ModuleType::SpectralSwarm,
     // Documentation
     "notes" => ModuleType::Notes,
     // Effects

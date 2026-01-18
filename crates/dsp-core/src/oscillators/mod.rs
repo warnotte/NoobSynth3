@@ -13,6 +13,7 @@
 //! - [`FmOperator`] - FM synthesis operator with ADSR envelope
 //! - [`Shepard`] - Shepard tone generator (endless rising/falling pitch illusion)
 //! - [`PipeOrgan`] - Pipe organ emulation with drawbars and voicings
+//! - [`SpectralSwarm`] - Additive drone synthesizer with evolving harmonics
 
 mod vco;
 mod supersaw;
@@ -25,6 +26,7 @@ mod karplus;
 mod fm_op;
 mod shepard;
 mod pipe_organ;
+mod spectral_swarm;
 
 pub use vco::{Vco, VcoParams, VcoInputs};
 pub use supersaw::{Supersaw, SupersawParams, SupersawInputs};
@@ -37,3 +39,4 @@ pub use karplus::{KarplusStrong, KarplusParams, KarplusInputs};
 pub use fm_op::{FmOperator, FmOperatorParams, FmOperatorInputs};
 pub use shepard::{Shepard, ShepardParams, ShepardInputs};
 pub use pipe_organ::{PipeOrgan, PipeOrganParams, PipeOrganInputs, OrganVoicing, ORGAN_DRAWBARS, DRAWBAR_NAMES};
+pub use spectral_swarm::{SpectralSwarm, SpectralSwarmParams, SpectralSwarmInputs};

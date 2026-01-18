@@ -50,6 +50,13 @@ impl Buffer {
     pub fn channel_count(&self) -> usize {
         self.channels.len()
     }
+
+    /// Get mutable references to first two channels (for stereo output).
+    /// Panics if buffer has fewer than 2 channels.
+    pub fn channels_mut_2(&mut self) -> (&mut [Sample], &mut [Sample]) {
+        let (left, right) = self.channels.split_at_mut(1);
+        (&mut left[0], &mut right[0])
+    }
 }
 
 /// Mix source buffer into target buffer with gain.

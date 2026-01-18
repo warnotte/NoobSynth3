@@ -9,6 +9,7 @@ export const moduleSizes: Record<ModuleType, string> = {
   noise: '2x1',
   shepard: '2x5',
   'pipe-organ': '2x3',
+  'spectral-swarm': '2x3',
   'mod-router': '2x2',
   'sample-hold': '2x1',
   slew: '1x2',
@@ -73,6 +74,7 @@ export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>>
   'snes-osc': 'strip',
   shepard: 'strip',
   'pipe-organ': 'strip',
+  'spectral-swarm': 'strip',
   vcf: 'strip',
   control: 'strip',
   lab: 'strip',
@@ -151,6 +153,7 @@ export const moduleCatalog: { type: ModuleType; label: string; category: ModuleC
   { type: 'fm-op', label: 'FM Op', category: 'sources' },
   { type: 'shepard', label: 'Shepard', category: 'sources' },
   { type: 'pipe-organ', label: 'Pipe Organ', category: 'sources' },
+  { type: 'spectral-swarm', label: 'Spectral Swarm', category: 'sources' },
   // Filters
   { type: 'vcf', label: 'VCF', category: 'filters' },
   { type: 'hpf', label: 'HPF', category: 'filters' },
@@ -214,6 +217,7 @@ export const modulePrefixes: Record<ModuleType, string> = {
   noise: 'noise',
   shepard: 'shep',
   'pipe-organ': 'organ',
+  'spectral-swarm': 'swarm',
   'mod-router': 'modr',
   'sample-hold': 'sh',
   slew: 'slew',
@@ -279,6 +283,7 @@ export const moduleLabels: Record<ModuleType, string> = {
   noise: 'Noise',
   shepard: 'Shepard',
   'pipe-organ': 'Pipe Organ',
+  'spectral-swarm': 'Spectral Swarm',
   'mod-router': 'Mod Router',
   'sample-hold': 'S&H',
   slew: 'Slew',
@@ -382,6 +387,32 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     tremRate: 6.0,    // Tremulant rate Hz (4-8)
     wind: 0.1,        // Wind instability (0-1)
     brightness: 0.7,  // Brightness/filter (0-1)
+  },
+  'spectral-swarm': {
+    frequency: 110,       // Base frequency Hz
+    partials: 16,         // Number of partials (4-32)
+    detune: 15,           // Micro-detuning in cents (0-100)
+    drift: 0.3,           // Drift speed (0-1)
+    density: 0.8,         // Partial density (0-1)
+    evolution: 4.0,       // Evolution time in seconds (0.1-10)
+    inharmonic: 0,        // Inharmonicity (-1 to +1)
+    tilt: -3,             // Spectral tilt dB/octave (-12 to +12)
+    spread: 0.7,          // Stereo spread (0-1)
+    shimmer: 0,           // Shepard-like movement (-1 to +1)
+    attack: 2.0,          // Attack time (0.001-10)
+    release: 3.0,         // Release time (0.001-10)
+    // New parameters
+    waveform: 0,          // 0=sine, 1=triangle, 2=saw, 3=square
+    oddEven: 0,           // Odd/even balance (-1=odd, 0=all, +1=even)
+    fundamentalMix: 0.5,  // Fundamental vs harmonics (0-1)
+    formantFreq: 0,       // Formant frequency Hz (0=off, 200-4000)
+    formantQ: 2,          // Formant resonance Q (0.1-20)
+    freeze: 0,            // Spectral freeze (0 or 1)
+    chorus: 0,            // Chorus per partial (0-1)
+    attackLow: 1.0,       // Low band attack multiplier (0.1-10)
+    attackHigh: 1.0,      // High band attack multiplier (0.1-10)
+    releaseLow: 1.0,      // Low band release multiplier (0.1-10)
+    releaseHigh: 1.0,     // High band release multiplier (0.1-10)
   },
   'mod-router': { depthPitch: 0, depthPwm: 0, depthVcf: 0, depthVca: 0 },
   'sample-hold': { mode: 0 },
@@ -487,7 +518,7 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
   },
   adsr: { attack: 0.02, decay: 0.2, sustain: 0.65, release: 0.5 },
   lfo: { rate: 0.5, depth: 0.6, offset: 0, shape: 'sine', bipolar: true },
-  scope: { time: 1, gain: 1, freeze: false },
+  scope: { time: 1, gain: 1, freeze: false, mode: 'scope' },
   control: {
     cv: 0,
     cvMode: 'unipolar',

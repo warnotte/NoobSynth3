@@ -16,6 +16,7 @@ pub enum ModuleType {
     FmOp,
     Shepard,
     PipeOrgan,
+    SpectralSwarm,
 
     // Filters
     Vcf,

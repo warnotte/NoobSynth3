@@ -141,17 +141,17 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 
 ### Documentation (obligatoire)
 - [ ] `docs/MODULES.md` - Documentation complète du module
-- [ ] `README.md` - Mettre à jour le compte de modules (actuellement 54)
+- [ ] `README.md` - Mettre à jour le compte de modules (actuellement 56)
 - [ ] `CLAUDE.md` - Ajouter à la liste "Module Types" si pertinent
 
 ### Optionnel
 - [ ] `public/presets/` - Preset de démonstration
 - [ ] `npm run build:wasm` - Rebuild WASM après modifs Rust
 
-## Module Types (55 total)
+## Module Types (56 total)
 
-### Sources (10)
-oscillator, supersaw, karplus, fm-op, nes-osc, snes-osc, noise, tb-303, shepard, pipe-organ
+### Sources (11)
+oscillator, supersaw, karplus, fm-op, nes-osc, snes-osc, noise, tb-303, shepard, pipe-organ, spectral-swarm
 
 ### Filters (2)
 vcf, hpf
@@ -296,7 +296,26 @@ Presets stockés dans `public/presets/` avec structure:
 }
 ```
 
-Groupes existants: Basics, Leads, Bass, Pads, FX, Drums, 8-Bit, Experimental, Shepard
+Groupes existants: Basics, Leads, Bass, Pads, FX, Drums, 8-Bit, Experimental, Shepard, Drones
+
+### New Preset Checklist
+
+**IMPORTANT:** Lors de la création d'un nouveau preset, **TOUJOURS** mettre à jour les deux fichiers :
+
+1. [ ] `public/presets/<preset-name>.json` - Le fichier preset
+2. [ ] `public/presets/manifest.json` - **OBLIGATOIRE** : Ajouter l'entrée au manifest
+
+```json
+{
+  "id": "preset-id",
+  "name": "Preset Display Name",
+  "description": "Short description of the preset.",
+  "file": "preset-filename.json",
+  "group": "Group Name"
+}
+```
+
+**Ne jamais oublier le manifest !** Sans cette entrée, le preset n'apparaîtra pas dans l'UI.
 
 ### Preset Creation Guidelines
 

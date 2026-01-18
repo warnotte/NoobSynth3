@@ -136,6 +136,12 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // pitch CV
       PortInfo { channels: 1 },  // gate
     ],
+    // Spectral Swarm - 3 inputs (pitch, gate, sync)
+    ModuleType::SpectralSwarm => vec![
+      PortInfo { channels: 1 },  // pitch CV
+      PortInfo { channels: 1 },  // gate
+      PortInfo { channels: 1 },  // sync
+    ],
     // MIDI File Sequencer - 2 inputs (clock, reset)
     ModuleType::MidiFileSequencer => vec![
       PortInfo { channels: 1 },  // clock
@@ -274,6 +280,10 @@ pub fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
     // Pipe Organ - 1 mono output
     ModuleType::PipeOrgan => vec![
       PortInfo { channels: 1 },  // audio out
+    ],
+    // Spectral Swarm - 1 stereo output
+    ModuleType::SpectralSwarm => vec![
+      PortInfo { channels: 2 },  // stereo audio out
     ],
     // MIDI File Sequencer - 25 outputs (8 CV + 8 Gate + 8 Velocity + 1 Tick)
     ModuleType::MidiFileSequencer => vec![
@@ -515,6 +525,13 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
       "gate" => Some(1),
       _ => None,
     },
+    // Spectral Swarm - 3 inputs
+    ModuleType::SpectralSwarm => match port_id {
+      "pitch" | "pitch-cv" | "1volt" => Some(0),
+      "gate" => Some(1),
+      "sync" | "reset" => Some(2),
+      _ => None,
+    },
     // MIDI File Sequencer - 2 inputs
     ModuleType::MidiFileSequencer => match port_id {
       "clock" | "clk" => Some(0),
@@ -749,6 +766,11 @@ pub fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize
     },
     // Pipe Organ - 1 output
     ModuleType::PipeOrgan => match port_id {
+      "out" | "output" => Some(0),
+      _ => None,
+    },
+    // Spectral Swarm - 1 stereo output
+    ModuleType::SpectralSwarm => match port_id {
       "out" | "output" => Some(0),
       _ => None,
     },

@@ -9,6 +9,7 @@ export type ModuleType =
   | 'noise'
   | 'shepard'
   | 'pipe-organ'
+  | 'spectral-swarm'
   | 'mod-router'
   | 'sample-hold'
   | 'slew'

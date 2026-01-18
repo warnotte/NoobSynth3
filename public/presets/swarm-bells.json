@@ -1,0 +1,135 @@
+{
+  "id": "swarm-bells",
+  "name": "Spectral Bells",
+  "description": "Bell-like inharmonic swarm with metallic overtones",
+  "group": "Drones",
+  "graph": {
+    "modules": [
+      {
+        "id": "ctrl1",
+        "type": "control",
+        "params": {
+          "portamento": 0
+        },
+        "position": {
+          "col": 1,
+          "row": 1
+        },
+        "name": "Control"
+      },
+      {
+        "id": "swarm1",
+        "type": "spectral-swarm",
+        "params": {
+          "frequency": 220,
+          "partials": 20,
+          "detune": 5,
+          "drift": 0.15,
+          "density": 0.7,
+          "evolution": 3.0,
+          "inharmonic": -0.4,
+          "tilt": -2.0,
+          "spread": 0.6,
+          "shimmer": 0.0,
+          "attack": 0.01,
+          "release": 6.0
+        },
+        "position": {
+          "col": 3,
+          "row": 1
+        },
+        "name": "Swarm"
+      },
+      {
+        "id": "delay1",
+        "type": "delay",
+        "params": {
+          "time": 0.375,
+          "feedback": 0.45,
+          "mix": 0.3,
+          "tone": 0.6,
+          "pingPong": 1
+        },
+        "position": {
+          "col": 5,
+          "row": 1
+        },
+        "name": "Delay"
+      },
+      {
+        "id": "reverb1",
+        "type": "reverb",
+        "params": {
+          "time": 5,
+          "damp": 0.35,
+          "preDelay": 0.05,
+          "mix": 0.5
+        },
+        "position": {
+          "col": 7,
+          "row": 1
+        },
+        "name": "Reverb"
+      },
+      {
+        "id": "scope1",
+        "type": "scope",
+        "params": {
+          "mode": "spectrogram",
+          "timeScale": 1,
+          "gain": 1
+        },
+        "position": {
+          "col": 9,
+          "row": 1
+        },
+        "size": "3x3",
+        "name": "Scope"
+      },
+      {
+        "id": "out1",
+        "type": "output",
+        "params": {
+          "level": 0.8
+        },
+        "position": {
+          "col": 12,
+          "row": 1
+        },
+        "name": "Output"
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "ctrl1", "portId": "cv-out" },
+        "to": { "moduleId": "swarm1", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "ctrl1", "portId": "gate-out" },
+        "to": { "moduleId": "swarm1", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "swarm1", "portId": "out" },
+        "to": { "moduleId": "delay1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "delay1", "portId": "out" },
+        "to": { "moduleId": "reverb1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb1", "portId": "out" },
+        "to": { "moduleId": "scope1", "portId": "in-a" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb1", "portId": "out" },
+        "to": { "moduleId": "out1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

@@ -353,6 +353,16 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
       { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
     ],
   },
+  'spectral-swarm': {
+    inputs: [
+      { id: 'pitch', label: '1V/Oct', kind: 'cv', direction: 'in' },
+      { id: 'gate', label: 'Gate', kind: 'gate', direction: 'in' },
+      { id: 'sync', label: 'Sync', kind: 'sync', direction: 'in' },
+    ],
+    outputs: [
+      { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
+    ],
+  },
   notes: {
     inputs: [],
     outputs: [],

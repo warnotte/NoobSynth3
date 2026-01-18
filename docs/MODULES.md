@@ -168,6 +168,56 @@ Quantifie les positions en demi-tons pour un effet de glissando discret au lieu 
 - **Orchestra, Cathedral, Universe, Celestial** - Multi-couches (3-5 Shepards)
 - **Morphing, Chaos, Infinity** - Modulation dynamique via LFO/S&H
 
+### Spectral Swarm
+
+Synthèse additive avec essaim de partiels évolutifs. Crée des textures organiques et des drones complexes.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `frequency` | 20-880 Hz | Fréquence fondamentale |
+| `partials` | 4-32 | Nombre de partiels |
+| `detune` | 0-50 cents | Désaccord max par partiel |
+| `drift` | 0-1 | Vitesse de dérive aléatoire |
+| `density` | 0-1 | Densité des partiels (0=creux, 1=plein) |
+| `evolution` | 0.1-20 s | Vitesse d'évolution des amplitudes |
+| `inharmonic` | 0-0.5 | Degré d'inharmonicité |
+| `tilt` | -6 à +6 dB/oct | Pente spectrale (neg=sombre, pos=brillant) |
+| `spread` | 0-1 | Largeur stéréo |
+| `shimmer` | 0-1 | Variations d'amplitude aléatoires |
+| `attack` | 0.01-10 s | Temps d'attaque global |
+| `release` | 0.01-10 s | Temps de relâchement global |
+
+**Paramètres avancés :**
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `waveform` | 0-3 | Forme d'onde (0=sine, 1=tri, 2=saw, 3=square) |
+| `oddEven` | -1 à +1 | Balance harmoniques (-1=impairs, +1=pairs) |
+| `fundamentalMix` | 0-1 | Mix de la fondamentale |
+| `formantFreq` | 0-5000 Hz | Fréquence du formant (0=désactivé) |
+| `formantQ` | 0.5-10 | Résonance du formant |
+| `freeze` | 0/1 | Gel de l'évolution spectrale |
+| `chorus` | 0-1 | Chorus intégré par partiel (3 voix) |
+| `attackLow` | 0.1-4 | Multiplicateur attack basses |
+| `attackHigh` | 0.1-4 | Multiplicateur attack aigus |
+| `releaseLow` | 0.1-4 | Multiplicateur release basses |
+| `releaseHigh` | 0.1-4 | Multiplicateur release aigus |
+
+**Entrées** : pitch (CV), gate (gate), sync (sync - reset de l'état)
+**Sorties** : out (audio)
+
+**Conseils :**
+- **Drone évolué** : partials 24, drift 0.4, evolution 5, attack/release longs
+- **Pad vocal** : formantFreq 800, formantQ 4, waveform 0
+- **Texture gelée** : freeze 1 après évolution intéressante
+- **Son creux (clarinette)** : oddEven -0.8, waveform 3 (square)
+- **Bass évolutive** : attackLow 2, attackHigh 0.3, releaseLow 1.5, releaseHigh 0.5
+
+**Presets Drones (8) :**
+- Evolving Drone, Ascending Swarm, Spectral Bells
+- Sawtooth Chorus, Formant Voice, Frozen Pad
+- Odd Hollow, Evolving Bass
+
 ### TB-303
 
 Synthèse acid bass style Roland TB-303 avec filtre résonant et enveloppe caractéristique.

@@ -22,7 +22,7 @@ use dsp_core::{
     ReverbInputs, ReverbParams, RingMod, RingModParams,
     Rimshot909Inputs, Rimshot909Params, Sample,
     SampleHoldInputs, SampleHoldParams, ShepardInputs, ShepardParams, SlewInputs, SlewParams,
-    Snare909Inputs, Snare909Params, SnesOscInputs, SnesOscParams,
+    Snare909Inputs, Snare909Params, SnesOscInputs, SnesOscParams, SpectralSwarmInputs, SpectralSwarmParams,
     SpringReverbInputs, SpringReverbParams,
     StepSequencerInputs, StepSequencerOutputs, StepSequencerParams,
     SupersawInputs, SupersawParams,
@@ -1293,6 +1293,56 @@ pub(crate) fn process_module(
 
             let out = outputs[0].channel_mut(0);
             state.organ.process_block(out, organ_inputs, params);
+        }
+        ModuleState::SpectralSwarm(state) => {
+            // Input 0: pitch CV, Input 1: gate, Input 2: sync
+            let pitch = if !connections[0].is_empty() {
+                Some(inputs[0].channel(0))
+            } else {
+                None
+            };
+            let gate = if connections.len() > 1 && !connections[1].is_empty() {
+                Some(inputs[1].channel(0))
+            } else {
+                None
+            };
+            let sync = if connections.len() > 2 && !connections[2].is_empty() {
+                Some(inputs[2].channel(0))
+            } else {
+                None
+            };
+
+            let swarm_inputs = SpectralSwarmInputs { pitch, gate, sync };
+            let params = SpectralSwarmParams {
+                frequency: state.frequency.slice(frames),
+                partials: state.partials.slice(frames),
+                detune: state.detune.slice(frames),
+                drift: state.drift.slice(frames),
+                density: state.density.slice(frames),
+                evolution: state.evolution.slice(frames),
+                inharmonic: state.inharmonic.slice(frames),
+                tilt: state.tilt.slice(frames),
+                spread: state.spread.slice(frames),
+                shimmer: state.shimmer.slice(frames),
+                attack: state.attack.slice(frames),
+                release: state.release.slice(frames),
+                // New parameters
+                waveform: state.waveform.slice(frames),
+                odd_even: state.odd_even.slice(frames),
+                fundamental_mix: state.fundamental_mix.slice(frames),
+                formant_freq: state.formant_freq.slice(frames),
+                formant_q: state.formant_q.slice(frames),
+                freeze: state.freeze.slice(frames),
+                chorus: state.chorus.slice(frames),
+                attack_low: state.attack_low.slice(frames),
+                attack_high: state.attack_high.slice(frames),
+                release_low: state.release_low.slice(frames),
+                release_high: state.release_high.slice(frames),
+            };
+
+            // Stereo output
+            let (out_l, out_r) = outputs[0].channels_mut_2();
+            state.swarm.process_block_stereo(out_l, out_r, swarm_inputs, params);
         }
         ModuleState::Notes => {
             // UI-only module, no audio processing

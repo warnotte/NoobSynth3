@@ -6,7 +6,7 @@ use dsp_core::{
   Adsr, Arpeggiator, Choir, Chorus, Clap909, Delay, DrumSequencer, Ensemble,
   EuclideanSequencer, FmOperator, GranularDelay, HiHat909, Hpf, KarplusStrong,
   Kick909, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, Phaser, PipeOrgan, PitchShifter,
-  Reverb, Rimshot909, SampleHold, Shepard, SlewLimiter, Snare909, SnesOsc, SpringReverb,
+  Reverb, Rimshot909, SampleHold, Shepard, SlewLimiter, Snare909, SnesOsc, SpectralSwarm, SpringReverb,
   StepSequencer, Supersaw, TapeDelay, Tb303, Tom909, Vcf, Vco, Vocoder,
 };
 
@@ -478,6 +478,33 @@ pub(crate) fn create_state(
       wind: ParamBuffer::new(param_number(params, "wind", 0.1)),
       brightness: ParamBuffer::new(param_number(params, "brightness", 0.7)),
     }),
+    ModuleType::SpectralSwarm => ModuleState::SpectralSwarm(SpectralSwarmState {
+      swarm: SpectralSwarm::new(sample_rate),
+      frequency: ParamBuffer::new(param_number(params, "frequency", 110.0)),
+      partials: ParamBuffer::new(param_number(params, "partials", 16.0)),
+      detune: ParamBuffer::new(param_number(params, "detune", 15.0)),
+      drift: ParamBuffer::new(param_number(params, "drift", 0.3)),
+      density: ParamBuffer::new(param_number(params, "density", 0.8)),
+      evolution: ParamBuffer::new(param_number(params, "evolution", 4.0)),
+      inharmonic: ParamBuffer::new(param_number(params, "inharmonic", 0.0)),
+      tilt: ParamBuffer::new(param_number(params, "tilt", -3.0)),
+      spread: ParamBuffer::new(param_number(params, "spread", 0.7)),
+      shimmer: ParamBuffer::new(param_number(params, "shimmer", 0.0)),
+      attack: ParamBuffer::new(param_number(params, "attack", 2.0)),
+      release: ParamBuffer::new(param_number(params, "release", 3.0)),
+      // New parameters
+      waveform: ParamBuffer::new(param_number(params, "waveform", 0.0)),
+      odd_even: ParamBuffer::new(param_number(params, "oddEven", 0.0)),
+      fundamental_mix: ParamBuffer::new(param_number(params, "fundamentalMix", 0.5)),
+      formant_freq: ParamBuffer::new(param_number(params, "formantFreq", 0.0)),
+      formant_q: ParamBuffer::new(param_number(params, "formantQ", 2.0)),
+      freeze: ParamBuffer::new(param_number(params, "freeze", 0.0)),
+      chorus: ParamBuffer::new(param_number(params, "chorus", 0.0)),
+      attack_low: ParamBuffer::new(param_number(params, "attackLow", 1.0)),
+      attack_high: ParamBuffer::new(param_number(params, "attackHigh", 1.0)),
+      release_low: ParamBuffer::new(param_number(params, "releaseLow", 1.0)),
+      release_high: ParamBuffer::new(param_number(params, "releaseHigh", 1.0)),
+    }),
     ModuleType::Notes => ModuleState::Notes,  // UI-only, no DSP
   }
 }
@@ -931,6 +958,33 @@ pub(crate) fn apply_param(state: &mut ModuleState, param: &str, value: f32) {
       "tremRate" => state.trem_rate.set(value),
       "wind" => state.wind.set(value),
       "brightness" => state.brightness.set(value),
+      _ => {}
+    },
+    ModuleState::SpectralSwarm(state) => match param {
+      "frequency" => state.frequency.set(value),
+      "partials" => state.partials.set(value),
+      "detune" => state.detune.set(value),
+      "drift" => state.drift.set(value),
+      "density" => state.density.set(value),
+      "evolution" => state.evolution.set(value),
+      "inharmonic" => state.inharmonic.set(value),
+      "tilt" => state.tilt.set(value),
+      "spread" => state.spread.set(value),
+      "shimmer" => state.shimmer.set(value),
+      "attack" => state.attack.set(value),
+      "release" => state.release.set(value),
+      // New parameters
+      "waveform" => state.waveform.set(value),
+      "oddEven" => state.odd_even.set(value),
+      "fundamentalMix" => state.fundamental_mix.set(value),
+      "formantFreq" => state.formant_freq.set(value),
+      "formantQ" => state.formant_q.set(value),
+      "freeze" => state.freeze.set(value),
+      "chorus" => state.chorus.set(value),
+      "attackLow" => state.attack_low.set(value),
+      "attackHigh" => state.attack_high.set(value),
+      "releaseLow" => state.release_low.set(value),
+      "releaseHigh" => state.release_high.set(value),
       _ => {}
     },
     _ => {}
