@@ -1,0 +1,265 @@
+{
+  "graph": {
+    "modules": [
+      {
+        "id": "clock-1",
+        "type": "clock",
+        "name": "Clock",
+        "position": { "x": 50, "y": 50 },
+        "params": {
+          "running": true,
+          "tempo": 60,
+          "rate": 2,
+          "swing": 0
+        }
+      },
+      {
+        "id": "euclid-1",
+        "type": "euclidean",
+        "name": "Euclidean",
+        "position": { "x": 200, "y": 50 },
+        "params": {
+          "enabled": true,
+          "tempo": 60,
+          "rate": 4,
+          "steps": 16,
+          "pulses": 5,
+          "rotation": 3,
+          "gateLength": 80,
+          "swing": 0
+        }
+      },
+      {
+        "id": "shepard-1",
+        "type": "shepard",
+        "name": "Shepard Up",
+        "position": { "x": 400, "y": 50 },
+        "params": {
+          "frequency": 110,
+          "rate": 0.03,
+          "direction": 1,
+          "interval": 1,
+          "spread": 0.5,
+          "shimmer": 0.3,
+          "vibrato": 0.02
+        }
+      },
+      {
+        "id": "shepard-2",
+        "type": "shepard",
+        "name": "Shepard Down",
+        "position": { "x": 400, "y": 200 },
+        "params": {
+          "frequency": 220,
+          "rate": 0.02,
+          "direction": -1,
+          "interval": 2,
+          "spread": 0.6,
+          "shimmer": 0.4,
+          "vibrato": 0.01
+        }
+      },
+      {
+        "id": "lfo-pos",
+        "type": "lfo",
+        "name": "Position",
+        "position": { "x": 50, "y": 350 },
+        "params": {
+          "rate": 0.04,
+          "shape": "sine",
+          "depth": 0.7,
+          "offset": 0.5,
+          "bipolar": false
+        }
+      },
+      {
+        "id": "wt-1",
+        "type": "wavetable",
+        "name": "Pad",
+        "position": { "x": 400, "y": 350 },
+        "params": {
+          "frequency": 65.4,
+          "bank": 3,
+          "position": 0.5,
+          "unison": 5,
+          "detune": 20,
+          "spread": 0.9,
+          "morphSpeed": 0,
+          "subMix": 0.4,
+          "attack": 1.5,
+          "release": 3.0
+        }
+      },
+      {
+        "id": "vcf-1",
+        "type": "vcf",
+        "name": "Filter",
+        "position": { "x": 600, "y": 350 },
+        "params": {
+          "cutoff": 1200,
+          "resonance": 0.15,
+          "drive": 0.05,
+          "envAmount": 0,
+          "modAmount": 0.3,
+          "keyTrack": 0.2,
+          "model": "svf",
+          "mode": "lp",
+          "slope": 12
+        }
+      },
+      {
+        "id": "lfo-filter",
+        "type": "lfo",
+        "name": "Filter Mod",
+        "position": { "x": 200, "y": 350 },
+        "params": {
+          "rate": 0.06,
+          "shape": "triangle",
+          "depth": 0.4,
+          "offset": 0,
+          "bipolar": true
+        }
+      },
+      {
+        "id": "shep-mix",
+        "type": "mixer",
+        "name": "Shepard",
+        "position": { "x": 600, "y": 125 },
+        "params": {
+          "levelA": 0.5,
+          "levelB": 0.5
+        }
+      },
+      {
+        "id": "main-mix",
+        "type": "mixer",
+        "name": "Main",
+        "position": { "x": 800, "y": 200 },
+        "params": {
+          "levelA": 0.6,
+          "levelB": 0.5
+        }
+      },
+      {
+        "id": "chorus-1",
+        "type": "chorus",
+        "name": "Chorus",
+        "position": { "x": 950, "y": 200 },
+        "params": {
+          "rate": 0.25,
+          "depth": 10,
+          "delay": 18,
+          "mix": 0.35,
+          "spread": 1.0,
+          "feedback": 0.1
+        }
+      },
+      {
+        "id": "delay-1",
+        "type": "granular-delay",
+        "name": "Granular",
+        "position": { "x": 1100, "y": 200 },
+        "params": {
+          "time": 500,
+          "feedback": 0.45,
+          "mix": 0.3,
+          "pitch": 5,
+          "grainSize": 100,
+          "density": 0.6,
+          "spread": 0.9
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "x": 1250, "y": 200 },
+        "params": {
+          "time": 0.9,
+          "damp": 0.25,
+          "preDelay": 50,
+          "mix": 0.55
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Out",
+        "position": { "x": 1400, "y": 200 },
+        "params": { "level": 1 }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "clock-1", "portId": "clock" },
+        "to": { "moduleId": "euclid-1", "portId": "clock" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "clock-1", "portId": "reset" },
+        "to": { "moduleId": "euclid-1", "portId": "reset" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "euclid-1", "portId": "gate" },
+        "to": { "moduleId": "wt-1", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "lfo-pos", "portId": "cv-out" },
+        "to": { "moduleId": "wt-1", "portId": "position" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "lfo-filter", "portId": "cv-out" },
+        "to": { "moduleId": "vcf-1", "portId": "mod" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "wt-1", "portId": "out" },
+        "to": { "moduleId": "vcf-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "shepard-1", "portId": "out" },
+        "to": { "moduleId": "shep-mix", "portId": "in-a" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "shepard-2", "portId": "out" },
+        "to": { "moduleId": "shep-mix", "portId": "in-b" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "shep-mix", "portId": "out" },
+        "to": { "moduleId": "main-mix", "portId": "in-a" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "vcf-1", "portId": "out" },
+        "to": { "moduleId": "main-mix", "portId": "in-b" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "main-mix", "portId": "out" },
+        "to": { "moduleId": "chorus-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "chorus-1", "portId": "out" },
+        "to": { "moduleId": "delay-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "delay-1", "portId": "out" },
+        "to": { "moduleId": "reverb-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb-1", "portId": "out" },
+        "to": { "moduleId": "out-1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

@@ -1,0 +1,342 @@
+{
+  "graph": {
+    "modules": [
+      {
+        "id": "clock-1",
+        "type": "clock",
+        "name": "Clock",
+        "position": { "x": 50, "y": 50 },
+        "params": {
+          "running": true,
+          "tempo": 45,
+          "rate": 1,
+          "swing": 0
+        }
+      },
+      {
+        "id": "euclid-1",
+        "type": "euclidean",
+        "name": "Sparse",
+        "position": { "x": 200, "y": 50 },
+        "params": {
+          "enabled": true,
+          "tempo": 45,
+          "rate": 2,
+          "steps": 16,
+          "pulses": 3,
+          "rotation": 5,
+          "gateLength": 90,
+          "swing": 0
+        }
+      },
+      {
+        "id": "euclid-2",
+        "type": "euclidean",
+        "name": "Dense",
+        "position": { "x": 200, "y": 200 },
+        "params": {
+          "enabled": true,
+          "tempo": 45,
+          "rate": 4,
+          "steps": 12,
+          "pulses": 5,
+          "rotation": 2,
+          "gateLength": 70,
+          "swing": 0
+        }
+      },
+      {
+        "id": "shepard-deep",
+        "type": "shepard",
+        "name": "Deep",
+        "position": { "x": 400, "y": 50 },
+        "params": {
+          "frequency": 36.7,
+          "rate": 0.008,
+          "direction": -1,
+          "interval": 1,
+          "spread": 0.3,
+          "shimmer": 0.1,
+          "vibrato": 0.005
+        }
+      },
+      {
+        "id": "shepard-mid",
+        "type": "shepard",
+        "name": "Mid",
+        "position": { "x": 400, "y": 200 },
+        "params": {
+          "frequency": 73.4,
+          "rate": 0.012,
+          "direction": -1,
+          "interval": 2,
+          "spread": 0.5,
+          "shimmer": 0.25,
+          "vibrato": 0.01
+        }
+      },
+      {
+        "id": "shepard-high",
+        "type": "shepard",
+        "name": "High",
+        "position": { "x": 400, "y": 350 },
+        "params": {
+          "frequency": 146.8,
+          "rate": 0.018,
+          "direction": -1,
+          "interval": 2,
+          "spread": 0.7,
+          "shimmer": 0.4,
+          "vibrato": 0.015
+        }
+      },
+      {
+        "id": "noise-1",
+        "type": "noise",
+        "name": "Noise",
+        "position": { "x": 50, "y": 350 },
+        "params": {
+          "color": 0.2,
+          "level": 0.3
+        }
+      },
+      {
+        "id": "res-1",
+        "type": "resonator",
+        "name": "Metal",
+        "position": { "x": 600, "y": 50 },
+        "params": {
+          "frequency": 55,
+          "decay": 5.0,
+          "brightness": 0.2,
+          "damping": 0.15,
+          "position": 0.3,
+          "spread": 0.9,
+          "voices": 4,
+          "inharmonic": 0.4,
+          "mode": 0,
+          "exciterType": 0,
+          "mix": 1.0
+        }
+      },
+      {
+        "id": "res-2",
+        "type": "resonator",
+        "name": "Strings",
+        "position": { "x": 600, "y": 200 },
+        "params": {
+          "frequency": 82.4,
+          "decay": 6.0,
+          "brightness": 0.3,
+          "damping": 0.2,
+          "position": 0.5,
+          "spread": 0.8,
+          "voices": 4,
+          "inharmonic": 0.05,
+          "mode": 1,
+          "exciterType": 0,
+          "mix": 1.0
+        }
+      },
+      {
+        "id": "vcf-noise",
+        "type": "vcf",
+        "name": "Noise Flt",
+        "position": { "x": 200, "y": 350 },
+        "params": {
+          "cutoff": 400,
+          "resonance": 0.6,
+          "drive": 0.1,
+          "envAmount": 0,
+          "modAmount": 0.5,
+          "keyTrack": 0,
+          "model": "svf",
+          "mode": "bp",
+          "slope": 12
+        }
+      },
+      {
+        "id": "lfo-noise",
+        "type": "lfo",
+        "name": "Sweep",
+        "position": { "x": 50, "y": 500 },
+        "params": {
+          "rate": 0.02,
+          "shape": "sine",
+          "depth": 0.6,
+          "offset": 0,
+          "bipolar": true
+        }
+      },
+      {
+        "id": "shep-mix",
+        "type": "mixer-1x2",
+        "name": "Shepards",
+        "position": { "x": 550, "y": 350 },
+        "params": {
+          "levelA": 0.6,
+          "levelB": 0.5,
+          "levelC": 0.4,
+          "levelD": 0,
+          "levelE": 0,
+          "levelF": 0
+        }
+      },
+      {
+        "id": "res-mix",
+        "type": "mixer",
+        "name": "Resonators",
+        "position": { "x": 750, "y": 125 },
+        "params": {
+          "levelA": 0.5,
+          "levelB": 0.5
+        }
+      },
+      {
+        "id": "main-mix",
+        "type": "mixer-1x2",
+        "name": "Main",
+        "position": { "x": 750, "y": 350 },
+        "params": {
+          "levelA": 0.55,
+          "levelB": 0.4,
+          "levelC": 0.25,
+          "levelD": 0,
+          "levelE": 0,
+          "levelF": 0
+        }
+      },
+      {
+        "id": "delay-1",
+        "type": "granular-delay",
+        "name": "Granular",
+        "position": { "x": 900, "y": 350 },
+        "params": {
+          "time": 800,
+          "feedback": 0.6,
+          "mix": 0.4,
+          "pitch": -5,
+          "grainSize": 150,
+          "density": 0.5,
+          "spread": 1.0
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "x": 1050, "y": 350 },
+        "params": {
+          "time": 0.98,
+          "damp": 0.15,
+          "preDelay": 80,
+          "mix": 0.7
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Out",
+        "position": { "x": 1200, "y": 350 },
+        "params": { "level": 1 }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "clock-1", "portId": "clock" },
+        "to": { "moduleId": "euclid-1", "portId": "clock" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "clock-1", "portId": "reset" },
+        "to": { "moduleId": "euclid-1", "portId": "reset" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "clock-1", "portId": "clock" },
+        "to": { "moduleId": "euclid-2", "portId": "clock" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "clock-1", "portId": "reset" },
+        "to": { "moduleId": "euclid-2", "portId": "reset" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "euclid-1", "portId": "gate" },
+        "to": { "moduleId": "res-1", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "euclid-2", "portId": "gate" },
+        "to": { "moduleId": "res-2", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "noise-1", "portId": "out" },
+        "to": { "moduleId": "vcf-noise", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "lfo-noise", "portId": "cv-out" },
+        "to": { "moduleId": "vcf-noise", "portId": "mod" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "shepard-deep", "portId": "out" },
+        "to": { "moduleId": "shep-mix", "portId": "in-a" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "shepard-mid", "portId": "out" },
+        "to": { "moduleId": "shep-mix", "portId": "in-b" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "shepard-high", "portId": "out" },
+        "to": { "moduleId": "shep-mix", "portId": "in-c" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "res-1", "portId": "out" },
+        "to": { "moduleId": "res-mix", "portId": "in-a" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "res-2", "portId": "out" },
+        "to": { "moduleId": "res-mix", "portId": "in-b" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "shep-mix", "portId": "out" },
+        "to": { "moduleId": "main-mix", "portId": "in-a" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "res-mix", "portId": "out" },
+        "to": { "moduleId": "main-mix", "portId": "in-b" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "vcf-noise", "portId": "out" },
+        "to": { "moduleId": "main-mix", "portId": "in-c" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "main-mix", "portId": "out" },
+        "to": { "moduleId": "delay-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "delay-1", "portId": "out" },
+        "to": { "moduleId": "reverb-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb-1", "portId": "out" },
+        "to": { "moduleId": "out-1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

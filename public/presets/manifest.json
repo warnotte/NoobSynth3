@@ -917,6 +917,34 @@
       "description": "Ethereal soundscape: wavetable pad + resonator + granular delay + big reverb.",
       "file": "ambient-space.json",
       "group": "Demos & Fun"
+    },
+    {
+      "id": "shepard-dreamscape",
+      "name": "Shepard Dreamscape",
+      "description": "Dual Shepards (up/down) + euclidean wavetable pad + granular delay. Fully automatic.",
+      "file": "shepard-dreamscape.json",
+      "group": "Demos & Fun"
+    },
+    {
+      "id": "infinite-ascension",
+      "name": "Infinite Ascension",
+      "description": "3 ascending Shepards + sequenced resonator + tape delay + phaser. Hypnotic rise.",
+      "file": "infinite-ascension.json",
+      "group": "Demos & Fun"
+    },
+    {
+      "id": "cosmic-machinery",
+      "name": "Cosmic Machinery",
+      "description": "Soft 909 drums + wavetable bass + dual Shepards. Ambient techno auto-jam.",
+      "file": "cosmic-machinery.json",
+      "group": "Demos & Fun"
+    },
+    {
+      "id": "descent-into-void",
+      "name": "Descent Into Void",
+      "description": "3 descending Shepards + euclidean resonators + filtered noise + massive reverb. Dark ambient.",
+      "file": "descent-into-void.json",
+      "group": "Demos & Fun"
     }
   ]
 }
