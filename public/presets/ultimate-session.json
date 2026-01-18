@@ -1,0 +1,548 @@
+{
+  "graph": {
+    "modules": [
+      {
+        "id": "clock-1",
+        "type": "clock",
+        "name": "Clock",
+        "position": { "x": 50, "y": 50 },
+        "params": {
+          "running": true,
+          "tempo": 128,
+          "rate": 4,
+          "swing": 12
+        }
+      },
+      {
+        "id": "drumseq-1",
+        "type": "drum-sequencer",
+        "name": "Drums",
+        "position": { "x": 200, "y": 50 },
+        "params": {
+          "enabled": 1,
+          "tempo": 128,
+          "rate": 4,
+          "gateLength": 50,
+          "swing": 12,
+          "length": 16,
+          "drumData": "{\"tracks\":[[{\"g\":1,\"a\":1},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":1},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":1},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":1},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":1},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":1},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}]]}"
+        }
+      },
+      {
+        "id": "kick-1",
+        "type": "909-kick",
+        "name": "Kick",
+        "position": { "x": 50, "y": 200 },
+        "params": {
+          "tune": 50,
+          "attack": 0.5,
+          "decay": 0.7,
+          "drive": 0.4
+        }
+      },
+      {
+        "id": "snare-1",
+        "type": "909-snare",
+        "name": "Snare",
+        "position": { "x": 150, "y": 200 },
+        "params": {
+          "tune": 180,
+          "tone": 0.55,
+          "snappy": 0.6,
+          "decay": 0.4
+        }
+      },
+      {
+        "id": "hh-1",
+        "type": "909-hihat",
+        "name": "HiHat",
+        "position": { "x": 250, "y": 200 },
+        "params": {
+          "openDecay": 0.3,
+          "closedDecay": 0.08,
+          "tone": 0.6,
+          "mix": 0.5
+        }
+      },
+      {
+        "id": "hh-open",
+        "type": "909-hihat",
+        "name": "HH Open",
+        "position": { "x": 350, "y": 200 },
+        "params": {
+          "openDecay": 0.5,
+          "closedDecay": 0.08,
+          "tone": 0.5,
+          "mix": 0.8
+        }
+      },
+      {
+        "id": "clap-1",
+        "type": "909-clap",
+        "name": "Clap",
+        "position": { "x": 450, "y": 200 },
+        "params": {
+          "tone": 0.5,
+          "decay": 0.4,
+          "spread": 0.35
+        }
+      },
+      {
+        "id": "drums-mix",
+        "type": "mixer-1x2",
+        "name": "Drum Mix",
+        "position": { "x": 550, "y": 200 },
+        "params": {
+          "levelA": 0.85,
+          "levelB": 0.7,
+          "levelC": 0.5,
+          "levelD": 0.45,
+          "levelE": 0.65,
+          "levelF": 0
+        }
+      },
+      {
+        "id": "seq-bass",
+        "type": "step-sequencer",
+        "name": "Bass Seq",
+        "position": { "x": 50, "y": 350 },
+        "params": {
+          "enabled": true,
+          "tempo": 128,
+          "rate": 8,
+          "gateLength": 55,
+          "swing": 12,
+          "slideTime": 40,
+          "length": 16,
+          "direction": 0,
+          "stepData": "[{\"pitch\":0,\"gate\":true,\"velocity\":100,\"slide\":false},{\"pitch\":0,\"gate\":true,\"velocity\":80,\"slide\":false},{\"pitch\":0,\"gate\":false,\"velocity\":70,\"slide\":false},{\"pitch\":12,\"gate\":true,\"velocity\":90,\"slide\":true},{\"pitch\":0,\"gate\":true,\"velocity\":100,\"slide\":false},{\"pitch\":7,\"gate\":true,\"velocity\":85,\"slide\":false},{\"pitch\":0,\"gate\":true,\"velocity\":75,\"slide\":false},{\"pitch\":5,\"gate\":true,\"velocity\":90,\"slide\":true},{\"pitch\":0,\"gate\":true,\"velocity\":100,\"slide\":false},{\"pitch\":0,\"gate\":true,\"velocity\":80,\"slide\":false},{\"pitch\":3,\"gate\":true,\"velocity\":85,\"slide\":false},{\"pitch\":7,\"gate\":true,\"velocity\":80,\"slide\":true},{\"pitch\":0,\"gate\":true,\"velocity\":100,\"slide\":false},{\"pitch\":0,\"gate\":false,\"velocity\":70,\"slide\":false},{\"pitch\":10,\"gate\":true,\"velocity\":90,\"slide\":true},{\"pitch\":12,\"gate\":true,\"velocity\":85,\"slide\":false}]"
+        }
+      },
+      {
+        "id": "lfo-bass-pos",
+        "type": "lfo",
+        "name": "Bass Pos",
+        "position": { "x": 200, "y": 350 },
+        "params": {
+          "rate": 0.15,
+          "shape": "triangle",
+          "depth": 0.5,
+          "offset": 0.3,
+          "bipolar": false
+        }
+      },
+      {
+        "id": "wt-bass",
+        "type": "wavetable",
+        "name": "Bass WT",
+        "position": { "x": 350, "y": 350 },
+        "params": {
+          "frequency": 65.4,
+          "bank": 2,
+          "position": 0.25,
+          "unison": 3,
+          "detune": 8,
+          "spread": 0.4,
+          "morphSpeed": 0,
+          "subMix": 0.7,
+          "attack": 0.003,
+          "release": 0.15
+        }
+      },
+      {
+        "id": "adsr-bass",
+        "type": "adsr",
+        "name": "Bass Env",
+        "position": { "x": 500, "y": 350 },
+        "params": {
+          "attack": 0.002,
+          "decay": 0.2,
+          "sustain": 0.3,
+          "release": 0.1
+        }
+      },
+      {
+        "id": "vcf-bass",
+        "type": "vcf",
+        "name": "Bass Flt",
+        "position": { "x": 650, "y": 350 },
+        "params": {
+          "cutoff": 1200,
+          "resonance": 0.45,
+          "drive": 0.3,
+          "envAmount": 0.6,
+          "modAmount": 0,
+          "keyTrack": 0.5,
+          "model": "ladder",
+          "mode": "lp",
+          "slope": 24
+        }
+      },
+      {
+        "id": "ctrl-lead",
+        "type": "control",
+        "name": "Lead",
+        "position": { "x": 50, "y": 500 },
+        "params": {
+          "octave": 4,
+          "glide": 0.02
+        }
+      },
+      {
+        "id": "arp-lead",
+        "type": "arpeggiator",
+        "name": "Arp",
+        "position": { "x": 200, "y": 500 },
+        "params": {
+          "enabled": true,
+          "tempo": 128,
+          "rate": 8,
+          "octaves": 2,
+          "mode": 2,
+          "gateLength": 65,
+          "swing": 12
+        }
+      },
+      {
+        "id": "lfo-lead-pos",
+        "type": "lfo",
+        "name": "Lead Pos",
+        "position": { "x": 350, "y": 650 },
+        "params": {
+          "rate": 0.2,
+          "shape": "sine",
+          "depth": 0.6,
+          "offset": 0.4,
+          "bipolar": false
+        }
+      },
+      {
+        "id": "lfo-vibrato",
+        "type": "lfo",
+        "name": "Vibrato",
+        "position": { "x": 500, "y": 650 },
+        "params": {
+          "rate": 5.5,
+          "shape": "sine",
+          "depth": 0.06,
+          "offset": 0,
+          "bipolar": true
+        }
+      },
+      {
+        "id": "wt-lead",
+        "type": "wavetable",
+        "name": "Lead WT",
+        "position": { "x": 350, "y": 500 },
+        "params": {
+          "frequency": 261.6,
+          "bank": 1,
+          "position": 0.5,
+          "unison": 5,
+          "detune": 18,
+          "spread": 0.85,
+          "morphSpeed": 0,
+          "subMix": 0.1,
+          "attack": 0.01,
+          "release": 0.35
+        }
+      },
+      {
+        "id": "adsr-lead",
+        "type": "adsr",
+        "name": "Lead Env",
+        "position": { "x": 500, "y": 500 },
+        "params": {
+          "attack": 0.01,
+          "decay": 0.25,
+          "sustain": 0.5,
+          "release": 0.3
+        }
+      },
+      {
+        "id": "vcf-lead",
+        "type": "vcf",
+        "name": "Lead Flt",
+        "position": { "x": 650, "y": 500 },
+        "params": {
+          "cutoff": 2400,
+          "resonance": 0.3,
+          "drive": 0.15,
+          "envAmount": 0.5,
+          "modAmount": 0.25,
+          "keyTrack": 0.6,
+          "model": "ladder",
+          "mode": "lp",
+          "slope": 24
+        }
+      },
+      {
+        "id": "chorus-lead",
+        "type": "chorus",
+        "name": "Chorus",
+        "position": { "x": 800, "y": 500 },
+        "params": {
+          "rate": 0.6,
+          "depth": 6,
+          "delay": 10,
+          "mix": 0.35,
+          "spread": 0.9,
+          "feedback": 0.1
+        }
+      },
+      {
+        "id": "main-mix",
+        "type": "mixer-1x2",
+        "name": "Main",
+        "position": { "x": 800, "y": 350 },
+        "params": {
+          "levelA": 0.45,
+          "levelB": 0.6,
+          "levelC": 0.55,
+          "levelD": 0,
+          "levelE": 0,
+          "levelF": 0
+        }
+      },
+      {
+        "id": "delay-1",
+        "type": "delay",
+        "name": "Delay",
+        "position": { "x": 950, "y": 350 },
+        "params": {
+          "time": 234,
+          "feedback": 0.35,
+          "mix": 0.22,
+          "tone": 0.55,
+          "pingPong": true
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "x": 1100, "y": 350 },
+        "params": {
+          "time": 0.5,
+          "damp": 0.45,
+          "preDelay": 20,
+          "mix": 0.25
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Out",
+        "position": { "x": 1250, "y": 350 },
+        "params": { "level": 1 }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "clock-1", "portId": "clock" },
+        "to": { "moduleId": "drumseq-1", "portId": "clock" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "clock-1", "portId": "reset" },
+        "to": { "moduleId": "drumseq-1", "portId": "reset" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "clock-1", "portId": "clock" },
+        "to": { "moduleId": "seq-bass", "portId": "clock" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "clock-1", "portId": "reset" },
+        "to": { "moduleId": "seq-bass", "portId": "reset" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "clock-1", "portId": "clock" },
+        "to": { "moduleId": "arp-lead", "portId": "clock" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "drumseq-1", "portId": "gate-kick" },
+        "to": { "moduleId": "kick-1", "portId": "trigger" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "drumseq-1", "portId": "acc-kick" },
+        "to": { "moduleId": "kick-1", "portId": "accent" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "drumseq-1", "portId": "gate-snare" },
+        "to": { "moduleId": "snare-1", "portId": "trigger" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "drumseq-1", "portId": "acc-snare" },
+        "to": { "moduleId": "snare-1", "portId": "accent" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "drumseq-1", "portId": "gate-hhc" },
+        "to": { "moduleId": "hh-1", "portId": "trigger" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "drumseq-1", "portId": "gate-hho" },
+        "to": { "moduleId": "hh-open", "portId": "trigger" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "drumseq-1", "portId": "gate-clap" },
+        "to": { "moduleId": "clap-1", "portId": "trigger" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "kick-1", "portId": "out" },
+        "to": { "moduleId": "drums-mix", "portId": "in-a" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "snare-1", "portId": "out" },
+        "to": { "moduleId": "drums-mix", "portId": "in-b" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "hh-1", "portId": "out" },
+        "to": { "moduleId": "drums-mix", "portId": "in-c" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "hh-open", "portId": "out" },
+        "to": { "moduleId": "drums-mix", "portId": "in-d" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "clap-1", "portId": "out" },
+        "to": { "moduleId": "drums-mix", "portId": "in-e" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "seq-bass", "portId": "cv-out" },
+        "to": { "moduleId": "wt-bass", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "seq-bass", "portId": "gate-out" },
+        "to": { "moduleId": "wt-bass", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "seq-bass", "portId": "gate-out" },
+        "to": { "moduleId": "wt-bass", "portId": "sync" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "seq-bass", "portId": "gate-out" },
+        "to": { "moduleId": "adsr-bass", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "lfo-bass-pos", "portId": "cv-out" },
+        "to": { "moduleId": "wt-bass", "portId": "position" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "wt-bass", "portId": "out" },
+        "to": { "moduleId": "vcf-bass", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "adsr-bass", "portId": "env" },
+        "to": { "moduleId": "vcf-bass", "portId": "mod" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "ctrl-lead", "portId": "cv-out" },
+        "to": { "moduleId": "arp-lead", "portId": "cv-in" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "ctrl-lead", "portId": "gate-out" },
+        "to": { "moduleId": "arp-lead", "portId": "gate-in" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "arp-lead", "portId": "cv-out" },
+        "to": { "moduleId": "wt-lead", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "arp-lead", "portId": "gate-out" },
+        "to": { "moduleId": "wt-lead", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "arp-lead", "portId": "gate-out" },
+        "to": { "moduleId": "wt-lead", "portId": "sync" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "arp-lead", "portId": "gate-out" },
+        "to": { "moduleId": "adsr-lead", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "lfo-lead-pos", "portId": "cv-out" },
+        "to": { "moduleId": "wt-lead", "portId": "position" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "lfo-vibrato", "portId": "cv-out" },
+        "to": { "moduleId": "wt-lead", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "wt-lead", "portId": "out" },
+        "to": { "moduleId": "vcf-lead", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "adsr-lead", "portId": "env" },
+        "to": { "moduleId": "vcf-lead", "portId": "mod" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "vcf-lead", "portId": "out" },
+        "to": { "moduleId": "chorus-lead", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "drums-mix", "portId": "out" },
+        "to": { "moduleId": "main-mix", "portId": "in-a" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "vcf-bass", "portId": "out" },
+        "to": { "moduleId": "main-mix", "portId": "in-b" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "chorus-lead", "portId": "out" },
+        "to": { "moduleId": "main-mix", "portId": "in-c" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "main-mix", "portId": "out" },
+        "to": { "moduleId": "delay-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "delay-1", "portId": "out" },
+        "to": { "moduleId": "reverb-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb-1", "portId": "out" },
+        "to": { "moduleId": "out-1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}
