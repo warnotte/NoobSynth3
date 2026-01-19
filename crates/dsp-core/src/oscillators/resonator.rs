@@ -36,6 +36,8 @@ pub struct Resonator {
     // Internal exciter
     noise_state: u32,
     click_phase: f32,
+    prev_gate: f32,
+    exciter_ramp: f32,
 }
 
 #[derive(Clone, Copy)]
@@ -72,6 +74,8 @@ impl Resonator {
             excitation_env: 0.0,
             noise_state: 54321,
             click_phase: 1.0,
+            prev_gate: 0.0,
+            exciter_ramp: 0.0,
         }
     }
 
@@ -218,23 +222,35 @@ impl Resonator {
 
         // Internal exciter (click + noise burst on gate)
         let gate_on = inputs.gate > 0.5;
-        if gate_on && self.click_phase >= 1.0 {
+        let prev_gate_on = self.prev_gate > 0.5;
+
+        // Rising edge detection - only trigger on gate onset
+        if gate_on && !prev_gate_on {
             self.click_phase = 0.0;
+            self.exciter_ramp = 0.0;
         }
+        self.prev_gate = inputs.gate;
 
         let mut internal_exc = 0.0;
         if self.click_phase < 1.0 {
-            // Short click/impulse
+            // Attack ramp (2ms rise time to prevent pop)
+            let ramp_samples = 0.002 * self.sample_rate;
+            self.exciter_ramp = (self.exciter_ramp + 1.0 / ramp_samples).min(1.0);
+
+            // Smooth window for click (half-sine window)
+            let window = (self.click_phase * PI).sin();
+
+            // Short click/impulse with window
             let click = if self.click_phase < 0.1 {
-                (self.click_phase * 10.0 * PI).sin()
+                (self.click_phase * 10.0 * PI).sin() * window
             } else {
                 0.0
             };
-            // Noise burst
+            // Noise burst with attack ramp applied
             let noise_env = (-self.click_phase * 20.0).exp();
             let noise = self.noise() * noise_env * 0.5;
 
-            internal_exc = (click + noise) * params.internal_exc;
+            internal_exc = (click + noise) * params.internal_exc * self.exciter_ramp;
             self.click_phase += 1.0 / (self.sample_rate * 0.05); // 50ms burst
         }
 
@@ -306,5 +322,7 @@ impl Resonator {
         self.prev_input = 0.0;
         self.excitation_env = 0.0;
         self.click_phase = 1.0;
+        self.prev_gate = 0.0;
+        self.exciter_ramp = 0.0;
     }
 }

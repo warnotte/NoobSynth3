@@ -7,7 +7,7 @@ export const moduleSizes: Record<ModuleType, string> = {
   'nes-osc': '2x3',
   'snes-osc': '2x2',
   noise: '2x1',
-  shepard: '2x5',
+  shepard: '2x3',
   'pipe-organ': '2x3',
   'spectral-swarm': '2x3',
   'resonator': '2x3',
@@ -25,7 +25,7 @@ export const moduleSizes: Record<ModuleType, string> = {
   lfo: '2x2',
   chorus: '1x2',
   delay: '2x1',
-  'granular-delay': '2x2',
+  'granular-delay': '2x1',
   'tape-delay': '2x2',
   'spring-reverb': '2x1',
   reverb: '2x1',
@@ -56,7 +56,7 @@ export const moduleSizes: Record<ModuleType, string> = {
   // Drum Sequencer
   'drum-sequencer': '5x5',
   // Euclidean Sequencer
-  euclidean: '2x2',
+  euclidean: '2x3',
   // FM Synthesis
   'fm-op': '2x3',
   // Documentation
