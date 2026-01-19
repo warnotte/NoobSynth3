@@ -85,12 +85,13 @@ pub(crate) fn process_module(
             state.vco.process_block(out, sub_out, sync_out, vco_inputs, params);
         }
         ModuleState::Noise(state) => {
-            let out = outputs[0].channel_mut(0);
+            let (out_l, out_r) = outputs[0].channels_mut_2();
             let params = NoiseParams {
                 level: state.level.slice(frames),
                 noise_type: state.noise_type.slice(frames),
+                stereo: state.stereo.slice(frames),
             };
-            state.noise.process_block(out, params);
+            state.noise.process_block_stereo(out_l, out_r, params);
         }
         ModuleState::ModRouter(state) => {
             let input = if connections[0].is_empty() {

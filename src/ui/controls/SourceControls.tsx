@@ -120,28 +120,42 @@ export function renderSourceControls(props: ControlProps): React.ReactElement | 
 
   if (module.type === 'noise') {
     return (
-      <>
-        <RotaryKnob
-          label="Level"
-          min={0}
-          max={1}
-          step={0.01}
-          value={Number(module.params.level ?? 0.4)}
-          onChange={(value) => updateParam(module.id, 'level', value)}
-          format={formatDecimal2}
-        />
+      <ControlBoxRow>
+        <ControlBox horizontal>
+          <RotaryKnob
+            label="Level"
+            min={0}
+            max={1}
+            step={0.01}
+            value={Number(module.params.level ?? 0.4)}
+            onChange={(value) => updateParam(module.id, 'level', value)}
+            format={formatDecimal2}
+          />
+          <RotaryKnob
+            label="Stereo"
+            min={0}
+            max={1}
+            step={0.01}
+            value={Number(module.params.stereo ?? 0)}
+            onChange={(value) => updateParam(module.id, 'stereo', value)}
+            format={formatPercent}
+          />
+        </ControlBox>
         <ControlBox label="Type" compact>
           <ControlButtons
             options={[
               { id: 'white', label: 'WHT' },
               { id: 'pink', label: 'PNK' },
               { id: 'brown', label: 'BRN' },
+              { id: 'blue', label: 'BLU' },
+              { id: 'violet', label: 'VIO' },
             ]}
             value={String(module.params.noiseType ?? 'white')}
             onChange={(value) => updateParam(module.id, 'noiseType', value)}
+            columns={3}
           />
         </ControlBox>
-      </>
+      </ControlBoxRow>
     )
   }
 

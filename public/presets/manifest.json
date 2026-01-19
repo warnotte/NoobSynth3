@@ -952,6 +952,41 @@
       "description": "3 descending Shepards + euclidean resonators + filtered noise + massive reverb. Dark ambient.",
       "file": "descent-into-void.json",
       "group": "Demos & Fun"
+    },
+    {
+      "id": "noise-wind",
+      "name": "Wind Ambience",
+      "description": "3-layer wind: base, gusts, whistle - each with independent LFO amplitude.",
+      "file": "noise-wind.json",
+      "group": "Noise Textures"
+    },
+    {
+      "id": "noise-ocean",
+      "name": "Ocean Waves",
+      "description": "3-layer ocean: deep rumble, waves, foam - each with independent LFO amplitude.",
+      "file": "noise-ocean.json",
+      "group": "Noise Textures"
+    },
+    {
+      "id": "noise-percussion",
+      "name": "Noise Percussion",
+      "description": "Euclidean-triggered noise snare and hihat with VCA envelopes.",
+      "file": "noise-percussion.json",
+      "group": "Noise Textures"
+    },
+    {
+      "id": "noise-random-cv",
+      "name": "Random CV Generator",
+      "description": "Noise through S&H and quantizer for random melodic sequences.",
+      "file": "noise-random-cv.json",
+      "group": "Noise Textures"
+    },
+    {
+      "id": "noise-resonator-exciter",
+      "name": "Noise Resonator Exciter",
+      "description": "Filtered noise burst exciting dual resonators for metallic plucks.",
+      "file": "noise-resonator-exciter.json",
+      "group": "Noise Textures"
     }
   ]
 }

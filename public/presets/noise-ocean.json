@@ -1,0 +1,259 @@
+{
+  "graph": {
+    "modules": [
+      {
+        "id": "noise-deep",
+        "type": "noise",
+        "name": "Deep",
+        "position": { "x": 50, "y": 50 },
+        "params": {
+          "level": 0.7,
+          "noiseType": "brown",
+          "stereo": 0.5
+        }
+      },
+      {
+        "id": "noise-wave",
+        "type": "noise",
+        "name": "Waves",
+        "position": { "x": 50, "y": 150 },
+        "params": {
+          "level": 0.6,
+          "noiseType": "pink",
+          "stereo": 0.7
+        }
+      },
+      {
+        "id": "noise-foam",
+        "type": "noise",
+        "name": "Foam",
+        "position": { "x": 50, "y": 250 },
+        "params": {
+          "level": 0.4,
+          "noiseType": "white",
+          "stereo": 0.9
+        }
+      },
+      {
+        "id": "vcf-deep",
+        "type": "vcf",
+        "name": "Deep Flt",
+        "position": { "x": 200, "y": 50 },
+        "params": {
+          "cutoff": 150,
+          "resonance": 0,
+          "drive": 0,
+          "envAmount": 0,
+          "modAmount": 0,
+          "keyTrack": 0,
+          "model": "svf",
+          "mode": "lp",
+          "slope": 24
+        }
+      },
+      {
+        "id": "vcf-wave",
+        "type": "vcf",
+        "name": "Wave Flt",
+        "position": { "x": 200, "y": 150 },
+        "params": {
+          "cutoff": 600,
+          "resonance": 0,
+          "drive": 0,
+          "envAmount": 0,
+          "modAmount": 0.2,
+          "keyTrack": 0,
+          "model": "svf",
+          "mode": "lp",
+          "slope": 12
+        }
+      },
+      {
+        "id": "vcf-foam",
+        "type": "hpf",
+        "name": "Foam Flt",
+        "position": { "x": 200, "y": 250 },
+        "params": {
+          "cutoff": 2500,
+          "resonance": 0
+        }
+      },
+      {
+        "id": "vca-deep",
+        "type": "gain",
+        "name": "Deep Vol",
+        "position": { "x": 350, "y": 50 },
+        "params": {
+          "gain": 0.6
+        }
+      },
+      {
+        "id": "vca-wave",
+        "type": "gain",
+        "name": "Wave Vol",
+        "position": { "x": 350, "y": 150 },
+        "params": {
+          "gain": 0.7
+        }
+      },
+      {
+        "id": "vca-foam",
+        "type": "gain",
+        "name": "Foam Vol",
+        "position": { "x": 350, "y": 250 },
+        "params": {
+          "gain": 0.4
+        }
+      },
+      {
+        "id": "lfo-deep",
+        "type": "lfo",
+        "name": "Tide LFO",
+        "position": { "x": 50, "y": 400 },
+        "params": {
+          "rate": 0.02,
+          "shape": "sine",
+          "depth": 0.3,
+          "offset": 0.6,
+          "bipolar": false
+        }
+      },
+      {
+        "id": "lfo-wave",
+        "type": "lfo",
+        "name": "Wave LFO",
+        "position": { "x": 200, "y": 400 },
+        "params": {
+          "rate": 0.07,
+          "shape": "sine",
+          "depth": 0.6,
+          "offset": 0.4,
+          "bipolar": false
+        }
+      },
+      {
+        "id": "lfo-foam",
+        "type": "lfo",
+        "name": "Foam LFO",
+        "position": { "x": 350, "y": 400 },
+        "params": {
+          "rate": 0.09,
+          "shape": "sine",
+          "depth": 0.7,
+          "offset": 0.3,
+          "bipolar": false
+        }
+      },
+      {
+        "id": "mix-1",
+        "type": "mixer-1x2",
+        "name": "Mix",
+        "position": { "x": 500, "y": 150 },
+        "params": {
+          "levelA": 0.4,
+          "levelB": 0.5,
+          "levelC": 0.3,
+          "levelD": 0,
+          "levelE": 0,
+          "levelF": 0
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Beach",
+        "position": { "x": 650, "y": 150 },
+        "params": {
+          "time": 0.55,
+          "damp": 0.5,
+          "preDelay": 25,
+          "mix": 0.3
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Out",
+        "position": { "x": 800, "y": 150 },
+        "params": { "level": 1 }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "noise-deep", "portId": "out" },
+        "to": { "moduleId": "vcf-deep", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "noise-wave", "portId": "out" },
+        "to": { "moduleId": "vcf-wave", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "noise-foam", "portId": "out" },
+        "to": { "moduleId": "vcf-foam", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "vcf-deep", "portId": "out" },
+        "to": { "moduleId": "vca-deep", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "vcf-wave", "portId": "out" },
+        "to": { "moduleId": "vca-wave", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "vcf-foam", "portId": "out" },
+        "to": { "moduleId": "vca-foam", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "lfo-deep", "portId": "cv-out" },
+        "to": { "moduleId": "vca-deep", "portId": "cv" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "lfo-wave", "portId": "cv-out" },
+        "to": { "moduleId": "vca-wave", "portId": "cv" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "lfo-wave", "portId": "cv-out" },
+        "to": { "moduleId": "vcf-wave", "portId": "mod" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "lfo-foam", "portId": "cv-out" },
+        "to": { "moduleId": "vca-foam", "portId": "cv" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "vca-deep", "portId": "out" },
+        "to": { "moduleId": "mix-1", "portId": "in-a" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "vca-wave", "portId": "out" },
+        "to": { "moduleId": "mix-1", "portId": "in-b" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "vca-foam", "portId": "out" },
+        "to": { "moduleId": "mix-1", "portId": "in-c" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "mix-1", "portId": "out" },
+        "to": { "moduleId": "reverb-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb-1", "portId": "out" },
+        "to": { "moduleId": "out-1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

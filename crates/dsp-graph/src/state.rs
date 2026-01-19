@@ -69,6 +69,7 @@ pub struct NoiseState {
     pub noise: Noise,
     pub level: ParamBuffer,
     pub noise_type: ParamBuffer,
+    pub stereo: ParamBuffer,
 }
 
 pub struct Tb303State {

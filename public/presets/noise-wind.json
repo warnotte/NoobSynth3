@@ -1,0 +1,272 @@
+{
+  "graph": {
+    "modules": [
+      {
+        "id": "noise-base",
+        "type": "noise",
+        "name": "Base",
+        "position": { "x": 50, "y": 50 },
+        "params": {
+          "level": 0.6,
+          "noiseType": "pink",
+          "stereo": 0.7
+        }
+      },
+      {
+        "id": "noise-gust",
+        "type": "noise",
+        "name": "Gusts",
+        "position": { "x": 50, "y": 150 },
+        "params": {
+          "level": 0.5,
+          "noiseType": "pink",
+          "stereo": 0.8
+        }
+      },
+      {
+        "id": "noise-whistle",
+        "type": "noise",
+        "name": "Whistle",
+        "position": { "x": 50, "y": 250 },
+        "params": {
+          "level": 0.3,
+          "noiseType": "white",
+          "stereo": 0.9
+        }
+      },
+      {
+        "id": "vcf-base",
+        "type": "vcf",
+        "name": "Base Flt",
+        "position": { "x": 200, "y": 50 },
+        "params": {
+          "cutoff": 800,
+          "resonance": 0,
+          "drive": 0,
+          "envAmount": 0,
+          "modAmount": 0.2,
+          "keyTrack": 0,
+          "model": "svf",
+          "mode": "lp",
+          "slope": 12
+        }
+      },
+      {
+        "id": "vcf-gust",
+        "type": "vcf",
+        "name": "Gust Flt",
+        "position": { "x": 200, "y": 150 },
+        "params": {
+          "cutoff": 1500,
+          "resonance": 0.1,
+          "drive": 0,
+          "envAmount": 0,
+          "modAmount": 0,
+          "keyTrack": 0,
+          "model": "svf",
+          "mode": "bp",
+          "slope": 12
+        }
+      },
+      {
+        "id": "vcf-whistle",
+        "type": "hpf",
+        "name": "Whstl Flt",
+        "position": { "x": 200, "y": 250 },
+        "params": {
+          "cutoff": 3500,
+          "resonance": 0.15
+        }
+      },
+      {
+        "id": "vca-base",
+        "type": "gain",
+        "name": "Base Vol",
+        "position": { "x": 350, "y": 50 },
+        "params": {
+          "gain": 0.7
+        }
+      },
+      {
+        "id": "vca-gust",
+        "type": "gain",
+        "name": "Gust Vol",
+        "position": { "x": 350, "y": 150 },
+        "params": {
+          "gain": 0.5
+        }
+      },
+      {
+        "id": "vca-whistle",
+        "type": "gain",
+        "name": "Whstl Vol",
+        "position": { "x": 350, "y": 250 },
+        "params": {
+          "gain": 0.3
+        }
+      },
+      {
+        "id": "lfo-base",
+        "type": "lfo",
+        "name": "Base LFO",
+        "position": { "x": 50, "y": 400 },
+        "params": {
+          "rate": 0.03,
+          "shape": "sine",
+          "depth": 0.2,
+          "offset": 0.7,
+          "bipolar": false
+        }
+      },
+      {
+        "id": "lfo-gust",
+        "type": "lfo",
+        "name": "Gust LFO",
+        "position": { "x": 200, "y": 400 },
+        "params": {
+          "rate": 0.08,
+          "shape": "sine",
+          "depth": 0.6,
+          "offset": 0.3,
+          "bipolar": false
+        }
+      },
+      {
+        "id": "lfo-whistle",
+        "type": "lfo",
+        "name": "Whstl LFO",
+        "position": { "x": 350, "y": 400 },
+        "params": {
+          "rate": 0.12,
+          "shape": "sine",
+          "depth": 0.5,
+          "offset": 0.2,
+          "bipolar": false
+        }
+      },
+      {
+        "id": "lfo-filter",
+        "type": "lfo",
+        "name": "Flt LFO",
+        "position": { "x": 500, "y": 400 },
+        "params": {
+          "rate": 0.04,
+          "shape": "sine",
+          "depth": 0.3,
+          "offset": 0.5,
+          "bipolar": false
+        }
+      },
+      {
+        "id": "mix-1",
+        "type": "mixer-1x2",
+        "name": "Mix",
+        "position": { "x": 500, "y": 150 },
+        "params": {
+          "levelA": 0.5,
+          "levelB": 0.4,
+          "levelC": 0.25,
+          "levelD": 0,
+          "levelE": 0,
+          "levelF": 0
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Space",
+        "position": { "x": 650, "y": 150 },
+        "params": {
+          "time": 0.4,
+          "damp": 0.6,
+          "preDelay": 15,
+          "mix": 0.2
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Out",
+        "position": { "x": 800, "y": 150 },
+        "params": { "level": 1 }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "noise-base", "portId": "out" },
+        "to": { "moduleId": "vcf-base", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "noise-gust", "portId": "out" },
+        "to": { "moduleId": "vcf-gust", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "noise-whistle", "portId": "out" },
+        "to": { "moduleId": "vcf-whistle", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "vcf-base", "portId": "out" },
+        "to": { "moduleId": "vca-base", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "vcf-gust", "portId": "out" },
+        "to": { "moduleId": "vca-gust", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "vcf-whistle", "portId": "out" },
+        "to": { "moduleId": "vca-whistle", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "lfo-base", "portId": "cv-out" },
+        "to": { "moduleId": "vca-base", "portId": "cv" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "lfo-gust", "portId": "cv-out" },
+        "to": { "moduleId": "vca-gust", "portId": "cv" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "lfo-whistle", "portId": "cv-out" },
+        "to": { "moduleId": "vca-whistle", "portId": "cv" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "lfo-filter", "portId": "cv-out" },
+        "to": { "moduleId": "vcf-base", "portId": "mod" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "vca-base", "portId": "out" },
+        "to": { "moduleId": "mix-1", "portId": "in-a" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "vca-gust", "portId": "out" },
+        "to": { "moduleId": "mix-1", "portId": "in-b" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "vca-whistle", "portId": "out" },
+        "to": { "moduleId": "mix-1", "portId": "in-c" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "mix-1", "portId": "out" },
+        "to": { "moduleId": "reverb-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb-1", "portId": "out" },
+        "to": { "moduleId": "out-1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

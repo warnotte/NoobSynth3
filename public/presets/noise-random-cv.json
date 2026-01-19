@@ -1,0 +1,190 @@
+{
+  "graph": {
+    "modules": [
+      {
+        "id": "clock-1",
+        "type": "clock",
+        "name": "Clock",
+        "position": { "x": 50, "y": 50 },
+        "params": {
+          "running": true,
+          "tempo": 100,
+          "rate": 4,
+          "swing": 0
+        }
+      },
+      {
+        "id": "euclid-1",
+        "type": "euclidean",
+        "name": "Trigger",
+        "position": { "x": 200, "y": 50 },
+        "params": {
+          "enabled": true,
+          "tempo": 100,
+          "rate": 8,
+          "steps": 16,
+          "pulses": 7,
+          "rotation": 0,
+          "gateLength": 50,
+          "swing": 10
+        }
+      },
+      {
+        "id": "noise-1",
+        "type": "noise",
+        "name": "Random",
+        "position": { "x": 50, "y": 200 },
+        "params": {
+          "level": 1.0,
+          "noiseType": "white"
+        }
+      },
+      {
+        "id": "sh-pitch",
+        "type": "sample-hold",
+        "name": "S&H Pitch",
+        "position": { "x": 200, "y": 200 },
+        "params": {
+          "slew": 0.01
+        }
+      },
+      {
+        "id": "sh-filter",
+        "type": "sample-hold",
+        "name": "S&H Flt",
+        "position": { "x": 200, "y": 350 },
+        "params": {
+          "slew": 0.05
+        }
+      },
+      {
+        "id": "quantizer-1",
+        "type": "quantizer",
+        "name": "Quant",
+        "position": { "x": 350, "y": 200 },
+        "params": {
+          "scale": 0,
+          "root": 0
+        }
+      },
+      {
+        "id": "osc-1",
+        "type": "oscillator",
+        "name": "Osc",
+        "position": { "x": 500, "y": 50 },
+        "params": {
+          "frequency": 220,
+          "waveform": "sawtooth",
+          "pulseWidth": 0.5,
+          "sync": false,
+          "attack": 0.01,
+          "release": 0.2
+        }
+      },
+      {
+        "id": "vcf-1",
+        "type": "vcf",
+        "name": "Filter",
+        "position": { "x": 650, "y": 50 },
+        "params": {
+          "cutoff": 1500,
+          "resonance": 0.4,
+          "drive": 0.2,
+          "envAmount": 0,
+          "modAmount": 0.6,
+          "keyTrack": 0.3,
+          "model": "ladder",
+          "mode": "lp",
+          "slope": 24
+        }
+      },
+      {
+        "id": "delay-1",
+        "type": "delay",
+        "name": "Delay",
+        "position": { "x": 800, "y": 50 },
+        "params": {
+          "time": 300,
+          "feedback": 0.35,
+          "mix": 0.25,
+          "tone": 0.5,
+          "pingPong": true
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Out",
+        "position": { "x": 950, "y": 50 },
+        "params": { "level": 1 }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "clock-1", "portId": "clock" },
+        "to": { "moduleId": "euclid-1", "portId": "clock" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "clock-1", "portId": "reset" },
+        "to": { "moduleId": "euclid-1", "portId": "reset" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "noise-1", "portId": "out" },
+        "to": { "moduleId": "sh-pitch", "portId": "in" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "noise-1", "portId": "out" },
+        "to": { "moduleId": "sh-filter", "portId": "in" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "euclid-1", "portId": "gate" },
+        "to": { "moduleId": "sh-pitch", "portId": "trig" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "euclid-1", "portId": "gate" },
+        "to": { "moduleId": "sh-filter", "portId": "trig" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "euclid-1", "portId": "gate" },
+        "to": { "moduleId": "osc-1", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "sh-pitch", "portId": "out" },
+        "to": { "moduleId": "quantizer-1", "portId": "in" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "quantizer-1", "portId": "out" },
+        "to": { "moduleId": "osc-1", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "sh-filter", "portId": "out" },
+        "to": { "moduleId": "vcf-1", "portId": "mod" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "osc-1", "portId": "out" },
+        "to": { "moduleId": "vcf-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "vcf-1", "portId": "out" },
+        "to": { "moduleId": "delay-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "delay-1", "portId": "out" },
+        "to": { "moduleId": "out-1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

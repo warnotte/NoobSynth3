@@ -38,6 +38,7 @@ pub(crate) fn create_state(
       noise: Noise::new(),
       level: ParamBuffer::new(param_number(params, "level", 0.4)),
       noise_type: ParamBuffer::new(param_number(params, "noiseType", 0.0)),
+      stereo: ParamBuffer::new(param_number(params, "stereo", 0.0)),
     }),
     ModuleType::ModRouter => ModuleState::ModRouter(ModRouterState {
       depth_pitch: ParamBuffer::new(param_number(params, "depthPitch", 0.0)),

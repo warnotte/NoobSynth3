@@ -1,0 +1,183 @@
+{
+  "graph": {
+    "modules": [
+      {
+        "id": "ctrl-1",
+        "type": "control",
+        "name": "Keys",
+        "position": { "x": 50, "y": 50 },
+        "params": {
+          "octave": 3,
+          "glide": 0.01
+        }
+      },
+      {
+        "id": "noise-1",
+        "type": "noise",
+        "name": "Exciter",
+        "position": { "x": 50, "y": 200 },
+        "params": {
+          "level": 0.9,
+          "noiseType": "white"
+        }
+      },
+      {
+        "id": "adsr-1",
+        "type": "adsr",
+        "name": "Burst",
+        "position": { "x": 200, "y": 200 },
+        "params": {
+          "attack": 0.001,
+          "decay": 0.015,
+          "sustain": 0,
+          "release": 0.01
+        }
+      },
+      {
+        "id": "vca-1",
+        "type": "gain",
+        "name": "Exc VCA",
+        "position": { "x": 350, "y": 200 },
+        "params": {
+          "gain": 1
+        }
+      },
+      {
+        "id": "vcf-1",
+        "type": "vcf",
+        "name": "Tone",
+        "position": { "x": 500, "y": 200 },
+        "params": {
+          "cutoff": 6000,
+          "resonance": 0,
+          "drive": 0,
+          "envAmount": 0,
+          "modAmount": 0,
+          "keyTrack": 0.4,
+          "model": "svf",
+          "mode": "lp",
+          "slope": 12
+        }
+      },
+      {
+        "id": "res-1",
+        "type": "resonator",
+        "name": "Body 1",
+        "position": { "x": 300, "y": 50 },
+        "params": {
+          "frequency": 220,
+          "decay": 3,
+          "brightness": 0.7,
+          "position": 0.25,
+          "inharmonicity": 0.01,
+          "internal_exc": 0
+        }
+      },
+      {
+        "id": "res-2",
+        "type": "resonator",
+        "name": "Body 2",
+        "position": { "x": 450, "y": 50 },
+        "params": {
+          "frequency": 220,
+          "decay": 2.5,
+          "brightness": 0.5,
+          "position": 0.4,
+          "inharmonicity": 0.02,
+          "internal_exc": 0
+        }
+      },
+      {
+        "id": "mix-1",
+        "type": "mixer",
+        "name": "Bodies",
+        "position": { "x": 600, "y": 50 },
+        "params": {
+          "levelA": 0.6,
+          "levelB": 0.5
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Hall",
+        "position": { "x": 750, "y": 50 },
+        "params": {
+          "time": 0.5,
+          "damp": 0.45,
+          "preDelay": 20,
+          "mix": 0.3
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Out",
+        "position": { "x": 900, "y": 50 },
+        "params": { "level": 1 }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "cv-out" },
+        "to": { "moduleId": "res-1", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "cv-out" },
+        "to": { "moduleId": "res-2", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "gate-out" },
+        "to": { "moduleId": "adsr-1", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "noise-1", "portId": "out" },
+        "to": { "moduleId": "vca-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "adsr-1", "portId": "env" },
+        "to": { "moduleId": "vca-1", "portId": "cv" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "vca-1", "portId": "out" },
+        "to": { "moduleId": "vcf-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "vcf-1", "portId": "out" },
+        "to": { "moduleId": "res-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "vcf-1", "portId": "out" },
+        "to": { "moduleId": "res-2", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "res-1", "portId": "out" },
+        "to": { "moduleId": "mix-1", "portId": "in-a" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "res-2", "portId": "out" },
+        "to": { "moduleId": "mix-1", "portId": "in-b" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "mix-1", "portId": "out" },
+        "to": { "moduleId": "reverb-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb-1", "portId": "out" },
+        "to": { "moduleId": "out-1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

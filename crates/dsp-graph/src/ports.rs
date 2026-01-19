@@ -173,7 +173,7 @@ pub fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },
       PortInfo { channels: 1 },
     ],
-    ModuleType::Noise => vec![PortInfo { channels: 1 }],
+    ModuleType::Noise => vec![PortInfo { channels: 2 }],
     ModuleType::ModRouter => vec![
       PortInfo { channels: 1 },
       PortInfo { channels: 1 },

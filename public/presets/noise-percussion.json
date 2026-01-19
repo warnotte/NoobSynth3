@@ -1,0 +1,257 @@
+{
+  "graph": {
+    "modules": [
+      {
+        "id": "clock-1",
+        "type": "clock",
+        "name": "Clock",
+        "position": { "x": 50, "y": 50 },
+        "params": {
+          "running": true,
+          "tempo": 120,
+          "rate": 4,
+          "swing": 0
+        }
+      },
+      {
+        "id": "euclid-snare",
+        "type": "euclidean",
+        "name": "Snare",
+        "position": { "x": 200, "y": 50 },
+        "params": {
+          "enabled": true,
+          "tempo": 120,
+          "rate": 4,
+          "steps": 16,
+          "pulses": 4,
+          "rotation": 4,
+          "gateLength": 30,
+          "swing": 0
+        }
+      },
+      {
+        "id": "euclid-hat",
+        "type": "euclidean",
+        "name": "HiHat",
+        "position": { "x": 200, "y": 200 },
+        "params": {
+          "enabled": true,
+          "tempo": 120,
+          "rate": 8,
+          "steps": 8,
+          "pulses": 5,
+          "rotation": 0,
+          "gateLength": 20,
+          "swing": 0
+        }
+      },
+      {
+        "id": "noise-snare",
+        "type": "noise",
+        "name": "Snare Nz",
+        "position": { "x": 400, "y": 50 },
+        "params": {
+          "level": 0.8,
+          "noiseType": "pink"
+        }
+      },
+      {
+        "id": "noise-hat",
+        "type": "noise",
+        "name": "Hat Nz",
+        "position": { "x": 400, "y": 200 },
+        "params": {
+          "level": 0.6,
+          "noiseType": "white"
+        }
+      },
+      {
+        "id": "adsr-snare",
+        "type": "adsr",
+        "name": "Snr Env",
+        "position": { "x": 550, "y": 50 },
+        "params": {
+          "attack": 0.001,
+          "decay": 0.15,
+          "sustain": 0,
+          "release": 0.1
+        }
+      },
+      {
+        "id": "adsr-hat",
+        "type": "adsr",
+        "name": "Hat Env",
+        "position": { "x": 550, "y": 200 },
+        "params": {
+          "attack": 0.001,
+          "decay": 0.05,
+          "sustain": 0,
+          "release": 0.03
+        }
+      },
+      {
+        "id": "vca-snare",
+        "type": "cv-vca",
+        "name": "Snr VCA",
+        "position": { "x": 700, "y": 50 },
+        "params": {
+          "gain": 1
+        }
+      },
+      {
+        "id": "vca-hat",
+        "type": "cv-vca",
+        "name": "Hat VCA",
+        "position": { "x": 700, "y": 200 },
+        "params": {
+          "gain": 1
+        }
+      },
+      {
+        "id": "vcf-snare",
+        "type": "vcf",
+        "name": "Snr Flt",
+        "position": { "x": 850, "y": 50 },
+        "params": {
+          "cutoff": 2500,
+          "resonance": 0.2,
+          "drive": 0.15,
+          "envAmount": 0,
+          "modAmount": 0,
+          "keyTrack": 0,
+          "model": "svf",
+          "mode": "bp",
+          "slope": 12
+        }
+      },
+      {
+        "id": "vcf-hat",
+        "type": "vcf",
+        "name": "Hat Flt",
+        "position": { "x": 850, "y": 200 },
+        "params": {
+          "cutoff": 8000,
+          "resonance": 0.1,
+          "drive": 0,
+          "envAmount": 0,
+          "modAmount": 0,
+          "keyTrack": 0,
+          "model": "svf",
+          "mode": "hp",
+          "slope": 12
+        }
+      },
+      {
+        "id": "mix-1",
+        "type": "mixer",
+        "name": "Mix",
+        "position": { "x": 1000, "y": 125 },
+        "params": {
+          "levelA": 0.7,
+          "levelB": 0.5
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Room",
+        "position": { "x": 1100, "y": 125 },
+        "params": {
+          "time": 0.25,
+          "damp": 0.6,
+          "preDelay": 10,
+          "mix": 0.2
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Out",
+        "position": { "x": 1250, "y": 125 },
+        "params": { "level": 1 }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "clock-1", "portId": "clock" },
+        "to": { "moduleId": "euclid-snare", "portId": "clock" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "clock-1", "portId": "reset" },
+        "to": { "moduleId": "euclid-snare", "portId": "reset" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "clock-1", "portId": "clock" },
+        "to": { "moduleId": "euclid-hat", "portId": "clock" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "clock-1", "portId": "reset" },
+        "to": { "moduleId": "euclid-hat", "portId": "reset" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "euclid-snare", "portId": "gate" },
+        "to": { "moduleId": "adsr-snare", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "euclid-hat", "portId": "gate" },
+        "to": { "moduleId": "adsr-hat", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "noise-snare", "portId": "out" },
+        "to": { "moduleId": "vca-snare", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "adsr-snare", "portId": "env" },
+        "to": { "moduleId": "vca-snare", "portId": "cv" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "noise-hat", "portId": "out" },
+        "to": { "moduleId": "vca-hat", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "adsr-hat", "portId": "env" },
+        "to": { "moduleId": "vca-hat", "portId": "cv" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "vca-snare", "portId": "out" },
+        "to": { "moduleId": "vcf-snare", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "vca-hat", "portId": "out" },
+        "to": { "moduleId": "vcf-hat", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "vcf-snare", "portId": "out" },
+        "to": { "moduleId": "mix-1", "portId": "in-a" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "vcf-hat", "portId": "out" },
+        "to": { "moduleId": "mix-1", "portId": "in-b" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "mix-1", "portId": "out" },
+        "to": { "moduleId": "reverb-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb-1", "portId": "out" },
+        "to": { "moduleId": "out-1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

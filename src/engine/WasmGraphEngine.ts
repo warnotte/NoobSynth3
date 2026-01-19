@@ -494,6 +494,8 @@ export class AudioEngine {
     if (paramId === 'noiseType') {
       if (text === 'pink') return 1
       if (text === 'brown') return 2
+      if (text === 'blue') return 3
+      if (text === 'violet') return 4
       return 0
     }
     if (paramId === 'mode') {

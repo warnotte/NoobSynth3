@@ -362,7 +362,7 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     subMix: 0,
     subOct: 1,
   },
-  noise: { level: 0.4, noiseType: 'white' },
+  noise: { level: 0.4, noiseType: 'white', stereo: 0 },
   shepard: {
     voices: 8,        // Number of octave-spaced voices (2-12)
     rate: 0.1,        // Climb rate (-4 to 4, cycles/second)

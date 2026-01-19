@@ -95,14 +95,22 @@ Synthèse physique par modélisation de cordes pincées. Idéal pour guitares, h
 
 ### Noise
 
-Générateur de bruit.
+Générateur de bruit stéréo avec 5 couleurs spectrales.
 
 | Paramètre | Range | Description |
 |-----------|-------|-------------|
-| `level` | 0-1 | Niveau |
-| `noiseType` | white/pink/brown | Type de bruit |
+| `level` | 0-1 | Niveau de sortie |
+| `stereo` | 0-1 | Largeur stéréo (0=mono, 1=full stereo) |
+| `noiseType` | white/pink/brown/blue/violet | Couleur du bruit |
 
-**Sorties** : out (audio)
+**Types de bruit :**
+- **White** : Énergie égale à toutes les fréquences (référence)
+- **Pink** : -3dB/octave, plus de basses (naturel, pluie, vent)
+- **Brown** : -6dB/octave, très basses fréquences (grondement, tonnerre)
+- **Blue** : +3dB/octave, plus d'aigus (inverse de pink)
+- **Violet** : +6dB/octave, très hautes fréquences (inverse de brown)
+
+**Sorties** : out (audio stéréo)
 
 ### Shepard
 
