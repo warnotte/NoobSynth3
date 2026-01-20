@@ -5,6 +5,7 @@
 
 use dsp_core::{
     AdsrInputs, AdsrParams, ArpeggiatorInputs, ArpeggiatorOutputs, ArpeggiatorParams,
+    ChaosInputs, ChaosParams,
     ChoirInputs, ChoirParams, ChorusInputs, ChorusParams, Clap909Inputs, Clap909Params,
     DelayInputs, DelayParams, Distortion, DistortionParams,
     DrumSequencerInputs, DrumSequencerOutputs, DrumSequencerParams,
@@ -172,6 +173,34 @@ pub(crate) fn process_module(
             let q_inputs = QuantizerInputs { input };
             let output = outputs[0].channel_mut(0);
             Quantizer::process_block(output, q_inputs, params);
+        }
+        ModuleState::Chaos(state) => {
+            let speed = if !connections[0].is_empty() {
+                Some(inputs[0].channel(0))
+            } else {
+                None
+            };
+            let params = ChaosParams {
+                speed: state.speed.slice(frames),
+                rho: state.rho.slice(frames),
+                sigma: state.sigma.slice(frames),
+                beta: state.beta.slice(frames),
+                scale: state.scale.slice(frames),
+                root: state.root.slice(frames),
+            };
+            let chaos_inputs = ChaosInputs { speed };
+            
+            // X, Y, Z, Gate outputs
+            let (x_group, rest) = outputs.split_at_mut(1);
+            let (y_group, rest2) = rest.split_at_mut(1);
+            let (z_group, gate_group) = rest2.split_at_mut(1);
+            
+            let out_x = x_group[0].channel_mut(0);
+            let out_y = y_group[0].channel_mut(0);
+            let out_z = z_group[0].channel_mut(0);
+            let out_gate = gate_group[0].channel_mut(0);
+            
+            state.chaos.process_block(out_x, out_y, out_z, out_gate, chaos_inputs, params);
         }
         ModuleState::RingMod(state) => {
             let input_a = if connections[0].is_empty() {
@@ -470,13 +499,19 @@ pub(crate) fn process_module(
             } else {
                 None
             };
+            // Input 1 is Vowel CV
+            let vowel_cv = if connections.len() > 1 && !connections[1].is_empty() {
+                Some(inputs[1].channel(0))
+            } else {
+                None
+            };
             let params = ChoirParams {
                 vowel: state.vowel.slice(frames),
                 rate: state.rate.slice(frames),
                 depth: state.depth.slice(frames),
                 mix: state.mix.slice(frames),
             };
-            let choir_inputs = ChoirInputs { input_l, input_r };
+            let choir_inputs = ChoirInputs { input_l, input_r, vowel_cv };
             let (left, right) = outputs[0].channels.split_at_mut(1);
             let out_l = &mut left[0];
             let out_r = &mut right[0];

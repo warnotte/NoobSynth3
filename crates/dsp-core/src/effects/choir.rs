@@ -73,11 +73,13 @@ pub struct ChoirInputs<'a> {
     pub input_l: Option<&'a [Sample]>,
     /// Right audio input
     pub input_r: Option<&'a [Sample]>,
+    /// Vowel modulation CV (-1 to +1, adds to vowel param)
+    pub vowel_cv: Option<&'a [Sample]>,
 }
 
 /// Parameters for Choir.
 pub struct ChoirParams<'a> {
-    /// Vowel select (0-4: A, E, I, O, U)
+    /// Vowel select (0.0-4.0: Morph A->E->I->O->U)
     pub vowel: &'a [Sample],
     /// LFO rate for formant modulation (0.05-2.0 Hz)
     pub rate: &'a [Sample],
@@ -116,6 +118,7 @@ impl Choir {
         }
 
         // Formant frequencies for A, E, I, O, U (F1, F2, F3)
+        // Interpolatable table
         let vowels: [[f32; 3]; 5] = [
             [800.0, 1150.0, 2900.0],  // A
             [400.0, 1700.0, 2600.0],  // E
@@ -123,12 +126,24 @@ impl Choir {
             [450.0, 800.0, 2830.0],   // O
             [325.0, 700.0, 2530.0],   // U
         ];
+        
         let q_values = [5.0, 4.5, 4.0];
         let weights = [0.55, 0.45, 0.35];
         let tau = std::f32::consts::TAU;
 
         for i in 0..out_l.len() {
-            let vowel = sample_at(params.vowel, i, 0.0).round().clamp(0.0, 4.0) as usize;
+            let vowel_cv = input_at(inputs.vowel_cv, i);
+            let vowel_param = sample_at(params.vowel, i, 0.0);
+            
+            // Map total vowel position: 0..4 (A..U)
+            // CV (-1..1) maps to +/- 2 vowels range
+            let mut pos = vowel_param + vowel_cv * 2.0;
+            pos = pos.clamp(0.0, 4.0);
+            
+            let idx = pos.floor() as usize;
+            let frac = pos - pos.floor();
+            let next_idx = (idx + 1).min(4);
+
             let rate = sample_at(params.rate, i, 0.25).clamp(0.05, 2.0);
             let depth = sample_at(params.depth, i, 0.35).clamp(0.0, 1.0);
             let mix = sample_at(params.mix, i, 0.5).clamp(0.0, 1.0);
@@ -146,8 +161,13 @@ impl Choir {
 
             let mut wet_l = 0.0;
             let mut wet_r = 0.0;
+            
             for band in 0..3 {
-                let freq = vowels[vowel][band];
+                // Linear interpolation of formant frequencies
+                let freq_a = vowels[idx][band];
+                let freq_b = vowels[next_idx][band];
+                let freq = freq_a * (1.0 - frac) + freq_b * frac;
+                
                 wet_l += self.filters_l[band]
                     .process(input_l, freq * mod_l, q_values[band], self.sample_rate)
                     * weights[band];

@@ -221,3 +221,19 @@ pub fn midi_to_freq(note: i32) -> f32 {
 pub fn freq_to_midi(freq: f32) -> f32 {
     A4_MIDI as f32 + SEMITONES_PER_OCTAVE * (freq / A4_FREQ).log2()
 }
+
+/// Get musical scale intervals (semitones from root).
+/// 0=Off, 1=Chrom, 2=Maj, 3=Min, 4=Dor, 5=Lyd, 6=Mix, 7=MajPent, 8=MinPent
+pub fn get_scale_notes(scale_idx: i32) -> &'static [i32] {
+    match scale_idx {
+        1 => &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], // Chromatic
+        2 => &[0, 2, 4, 5, 7, 9, 11], // Major
+        3 => &[0, 2, 3, 5, 7, 8, 10], // Minor
+        4 => &[0, 2, 3, 5, 7, 9, 10], // Dorian
+        5 => &[0, 2, 4, 6, 7, 9, 11], // Lydian
+        6 => &[0, 2, 4, 5, 7, 9, 10], // Mixolydian
+        7 => &[0, 2, 4, 7, 9],        // Major Pentatonic
+        8 => &[0, 3, 5, 7, 10],       // Minor Pentatonic
+        _ => &[],
+    }
+}

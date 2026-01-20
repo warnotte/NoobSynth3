@@ -1,0 +1,214 @@
+{
+  "id": "chaos-singing",
+  "name": "Celestial Choir",
+  "description": "Ghostly vocals (Honest Version). Supersaw into Formant Filter. Chaos quantizer drives pitch, Chaos X modulates vowel formants via CV.",
+  "group": "Lorenz Experiment",
+  "graph": {
+    "modules": [
+      {
+        "id": "out",
+        "type": "output",
+        "name": "Main Out",
+        "params": {
+          "level": 0.8
+        },
+        "position": {
+          "x": 40,
+          "y": 2
+        }
+      },
+      {
+        "id": "chaos",
+        "type": "chaos",
+        "name": "Conductor",
+        "params": {
+          "speed": 0.35,
+          "rho": 28,
+          "sigma": 10,
+          "beta": 2.66,
+          "scale": 3,
+          "root": 0
+        },
+        "position": {
+          "x": 2,
+          "y": 2
+        }
+      },
+      {
+        "id": "saw",
+        "type": "supersaw",
+        "name": "Vocal Chords",
+        "params": {
+          "frequency": 110,
+          "detune": 40,
+          "mix": 0.8
+        },
+        "position": {
+          "x": 12,
+          "y": 2
+        }
+      },
+      {
+        "id": "vca",
+        "type": "gain",
+        "name": "Gate VCA",
+        "params": {
+          "gain": 1.0
+        },
+        "position": {
+          "x": 18,
+          "y": 2
+        }
+      },
+      {
+        "id": "adsr",
+        "type": "adsr",
+        "name": "Breath Env",
+        "params": {
+          "attack": 0.5,
+          "decay": 0.5,
+          "sustain": 1.0,
+          "release": 2.0
+        },
+        "position": {
+          "x": 8,
+          "y": 8
+        }
+      },
+      {
+        "id": "choir",
+        "type": "choir",
+        "name": "Throat",
+        "params": {
+          "vowel": 2,
+          "rate": 0.15,
+          "depth": 0.2,
+          "mix": 1.0
+        },
+        "position": {
+          "x": 24,
+          "y": 2
+        }
+      },
+      {
+        "id": "reverb",
+        "type": "reverb",
+        "name": "Cathedral",
+        "params": {
+          "time": 0.98,
+          "damp": 0.1,
+          "mix": 0.5
+        },
+        "position": {
+          "x": 32,
+          "y": 2
+        }
+      },
+      {
+        "id": "att_x",
+        "type": "gain",
+        "name": "Vowel Mod",
+        "params": {
+          "gain": 1.0
+        },
+        "position": {
+          "x": 8,
+          "y": 2
+        }
+      },
+      {
+        "id": "att_z",
+        "type": "gain",
+        "name": "Verb Mod",
+        "params": {
+          "gain": 0.3
+        },
+        "position": {
+          "x": 8,
+          "y": 4
+        }
+      },
+      {
+        "id": "scope",
+        "type": "scope",
+        "name": "Visuals",
+        "params": {
+          "time": 2,
+          "gain": 1,
+          "mode": "spectrogram"
+        },
+        "position": {
+          "x": 36,
+          "y": 8
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "chaos", "portId": "gate" },
+        "to": { "moduleId": "adsr", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "adsr", "portId": "env" },
+        "to": { "moduleId": "vca", "portId": "cv" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "chaos", "portId": "x" },
+        "to": { "moduleId": "att_x", "portId": "in" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "att_x", "portId": "out" },
+        "to": { "moduleId": "choir", "portId": "vowel" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "chaos", "portId": "z" },
+        "to": { "moduleId": "att_z", "portId": "in" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "att_z", "portId": "out" },
+        "to": { "moduleId": "reverb", "portId": "mix" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "chaos", "portId": "y" },
+        "to": { "moduleId": "saw", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "saw", "portId": "out" },
+        "to": { "moduleId": "vca", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "vca", "portId": "out" },
+        "to": { "moduleId": "choir", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "choir", "portId": "out" },
+        "to": { "moduleId": "reverb", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb", "portId": "out" },
+        "to": { "moduleId": "out", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "chaos", "portId": "x" },
+        "to": { "moduleId": "scope", "portId": "in-c" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "reverb", "portId": "out" },
+        "to": { "moduleId": "scope", "portId": "in-a" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

@@ -458,6 +458,31 @@ Quantifie un CV sur une gamme musicale.
 **Entrées** : in (CV)  
 **Sorties** : out (CV)
 
+### Chaos Engine (Attracteur de Lorenz)
+
+Générateur de signaux chaotiques interconnectés basés sur l'attracteur de Lorenz.
+Génère trois signaux de modulation (X, Y, Z) qui orbitent autour de deux points attracteurs sans jamais se répéter.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `speed` | 0.01-2 | Vitesse de simulation (time step) |
+| `rho` | 0-50 | Nombre de Rayleigh (Chaos si > 24) |
+| `sigma` | 1-20 | Nombre de Prandtl (Stabilité) |
+| `beta` | 0.1-10 | Facteur géométrique (Damping) |
+
+**Entrées** : speed (CV)
+**Sorties** : x (CV), y (CV), z (CV)
+
+**Utilisation :**
+- **X** : Modulation principale, oscille entre -1 et 1
+- **Y** : Similaire à X mais déphasé
+- **Z** : Oscillation plus lente et unipolaire (haut/bas)
+
+Idéal pour :
+- Drones évolutifs
+- Modulations imprévisibles mais organiques
+- "Humaniser" des séquences
+
 ### Mod Router
 
 Distribue un CV vers 4 destinations avec profondeur réglable.

@@ -16,6 +16,7 @@ export type ModuleType =
   | 'sample-hold'
   | 'slew'
   | 'quantizer'
+  | 'chaos'
   | 'ring-mod'
   | 'gain'
   | 'cv-vca'

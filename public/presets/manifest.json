@@ -987,6 +987,48 @@
       "description": "Filtered noise burst exciting dual resonators for metallic plucks.",
       "file": "noise-resonator-exciter.json",
       "group": "Noise Textures"
+    },
+    {
+      "id": "chaos-butterfly",
+      "name": "Butterfly Deep",
+      "description": "Deep generative drone. Chaos Z drives Reverb size, X/Y swirl the filter and position.",
+      "file": "chaos-butterfly.json",
+      "group": "Lorenz Experiment"
+    },
+    {
+      "id": "chaos-crystals",
+      "name": "Chaotic Crystals",
+      "description": "High-pitched generative bells. Chaos modulates the physical structure and brightness of the Resonator.",
+      "file": "chaos-crystals.json",
+      "group": "Lorenz Experiment"
+    },
+    {
+      "id": "chaos-concerto",
+      "name": "Chaos Concerto",
+      "description": "Self-playing melody generated entirely by the Chaos Engine. Internal Quantizer provides pitch, Derivative Gate provides rhythm.",
+      "file": "chaos-concerto.json",
+      "group": "Lorenz Experiment"
+    },
+    {
+      "id": "chaos-oracle",
+      "name": "The Oracle",
+      "description": "Master Chief Demo. Chaos drives additive Spectral Swarm. Sci-fi resonant texture.",
+      "file": "chaos-oracle.json",
+      "group": "Lorenz Experiment"
+    },
+    {
+      "id": "chaos-singing",
+      "name": "Celestial Choir",
+      "description": "Ghostly vocals. Chaos quantizer drives pitch, Chaos X/Y modulate vowel formants.",
+      "file": "chaos-singing.json",
+      "group": "Lorenz Experiment"
+    },
+    {
+      "id": "choir-debug",
+      "name": "Choir Debug",
+      "description": "DEBUG PRESET. LFO modulating Choir Vowel directly.",
+      "file": "choir-debug.json",
+      "group": "Lorenz Experiment"
     }
   ]
 }

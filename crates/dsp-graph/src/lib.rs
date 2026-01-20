@@ -636,6 +636,7 @@ fn normalize_module_type(raw: &str) -> ModuleType {
     // Effects
     "pitch-shifter" => ModuleType::PitchShifter,
     "clock" => ModuleType::Clock,
+    "chaos" => ModuleType::Chaos,
     _ => ModuleType::Oscillator,
   }
 }
@@ -654,6 +655,7 @@ fn is_poly_type(module_type: ModuleType) -> bool {
       | ModuleType::SampleHold
       | ModuleType::Slew
       | ModuleType::Quantizer
+      | ModuleType::Chaos
       | ModuleType::RingMod
       | ModuleType::Gain
       | ModuleType::CvVca

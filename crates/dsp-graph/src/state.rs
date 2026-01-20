@@ -1,7 +1,7 @@
 //! Module state definitions for all DSP modules.
 
 use dsp_core::{
-    Adsr, Arpeggiator, Choir, Chorus, Clap909, Delay, DrumSequencer, Ensemble,
+    Adsr, Arpeggiator, Chaos, Choir, Chorus, Clap909, Delay, DrumSequencer, Ensemble,
     EuclideanSequencer, FmOperator, GranularDelay, HiHat909, Hpf, KarplusStrong,
     Kick909, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, Phaser, PipeOrgan, PitchShifter,
     Resonator, Reverb, Rimshot909, SampleHold, Shepard, SlewLimiter, Snare909, SnesOsc, SpectralSwarm, SpringReverb,
@@ -279,6 +279,16 @@ pub struct SlewState {
 pub struct QuantizerState {
     pub root: ParamBuffer,
     pub scale: ParamBuffer,
+}
+
+pub struct ChaosState {
+    pub chaos: Chaos,
+    pub speed: ParamBuffer,
+    pub rho: ParamBuffer,
+    pub sigma: ParamBuffer,
+    pub beta: ParamBuffer,
+    pub scale: ParamBuffer,
+    pub root: ParamBuffer,
 }
 
 // =============================================================================
@@ -609,6 +619,7 @@ pub enum ModuleState {
     SampleHold(SampleHoldState),
     Slew(SlewState),
     Quantizer(QuantizerState),
+    Chaos(ChaosState),
 
     // Effects
     Chorus(ChorusState),

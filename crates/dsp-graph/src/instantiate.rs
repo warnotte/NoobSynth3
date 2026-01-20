@@ -3,7 +3,7 @@
 use std::collections::HashMap;
 
 use dsp_core::{
-  Adsr, Arpeggiator, Choir, Chorus, Clap909, Delay, DrumSequencer, Ensemble,
+  Adsr, Arpeggiator, Chaos, Choir, Chorus, Clap909, Delay, DrumSequencer, Ensemble,
   EuclideanSequencer, FmOperator, GranularDelay, HiHat909, Hpf, KarplusStrong,
   Kick909, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, Phaser, PipeOrgan, PitchShifter,
   Resonator, Reverb, Rimshot909, SampleHold, Shepard, SlewLimiter, Snare909, SnesOsc, SpectralSwarm, SpringReverb,
@@ -58,6 +58,15 @@ pub(crate) fn create_state(
     ModuleType::Quantizer => ModuleState::Quantizer(QuantizerState {
       root: ParamBuffer::new(param_number(params, "root", 0.0)),
       scale: ParamBuffer::new(param_number(params, "scale", 0.0)),
+    }),
+    ModuleType::Chaos => ModuleState::Chaos(ChaosState {
+      chaos: Chaos::new(sample_rate),
+      speed: ParamBuffer::new(param_number(params, "speed", 0.5)),
+      rho: ParamBuffer::new(param_number(params, "rho", 28.0)),
+      sigma: ParamBuffer::new(param_number(params, "sigma", 10.0)),
+      beta: ParamBuffer::new(param_number(params, "beta", 8.0 / 3.0)),
+      scale: ParamBuffer::new(param_number(params, "scale", 0.0)),
+      root: ParamBuffer::new(param_number(params, "root", 0.0)),
     }),
     ModuleType::RingMod => ModuleState::RingMod(RingModState {
       level: ParamBuffer::new(param_number(params, "level", 0.9)),
@@ -575,6 +584,15 @@ pub(crate) fn apply_param(state: &mut ModuleState, param: &str, value: f32) {
     ModuleState::Quantizer(state) => match param {
       "root" => state.root.set(value),
       "scale" => state.scale.set(value),
+      _ => {}
+    },
+    ModuleState::Chaos(state) => match param {
+      "speed" => state.speed.set(value),
+      "rho" => state.rho.set(value),
+      "sigma" => state.sigma.set(value),
+      "beta" => state.beta.set(value),
+      "scale" => state.scale.set(value),
+      "root" => state.root.set(value),
       _ => {}
     },
     ModuleState::RingMod(state) => {

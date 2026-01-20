@@ -1,0 +1,221 @@
+{
+  "id": "chaos-crystals",
+  "name": "Chaotic Crystals",
+  "description": "High-pitched generative bells. Chaos modulates the physical structure and brightness of the Resonator. Triggered by Euclidean rhythm.",
+  "group": "Lorenz Experiment",
+  "graph": {
+    "modules": [
+      {
+        "id": "out",
+        "type": "output",
+        "name": "Main Out",
+        "params": {
+          "level": 0.8
+        },
+        "position": {
+          "x": 40,
+          "y": 2
+        }
+      },
+      {
+        "id": "chaos",
+        "type": "chaos",
+        "name": "Chaos Source",
+        "params": {
+          "speed": 0.4,
+          "rho": 28,
+          "sigma": 10,
+          "beta": 2.66
+        },
+        "position": {
+          "x": 2,
+          "y": 2
+        }
+      },
+      {
+        "id": "clock",
+        "type": "clock",
+        "name": "Master Clock",
+        "params": {
+          "tempo": 110,
+          "running": true
+        },
+        "position": {
+          "x": 2,
+          "y": 6
+        }
+      },
+      {
+        "id": "euclid",
+        "type": "euclidean",
+        "name": "Rhythm",
+        "params": {
+          "steps": 16,
+          "pulses": 7,
+          "rotation": 0,
+          "gateLength": 40
+        },
+        "position": {
+          "x": 6,
+          "y": 6
+        }
+      },
+      {
+        "id": "res",
+        "type": "resonator",
+        "name": "Crystal Bell",
+        "params": {
+          "frequency": 880,
+          "structure": 0.25,
+          "brightness": 0.5,
+          "damping": 0.3,
+          "mode": 0,
+          "polyphony": 4,
+          "internalExc": 1
+        },
+        "position": {
+          "x": 16,
+          "y": 2
+        }
+      },
+      {
+        "id": "delay",
+        "type": "delay",
+        "name": "Ping Pong",
+        "params": {
+          "time": 350,
+          "feedback": 0.4,
+          "mix": 0.3,
+          "pingPong": true
+        },
+        "position": {
+          "x": 24,
+          "y": 2
+        }
+      },
+      {
+        "id": "reverb",
+        "type": "reverb",
+        "name": "Shimmer Verb",
+        "params": {
+          "time": 0.8,
+          "damp": 0.1,
+          "mix": 0.3
+        },
+        "position": {
+          "x": 32,
+          "y": 2
+        }
+      },
+      {
+        "id": "att_x",
+        "type": "gain",
+        "name": "Mod Struct",
+        "params": {
+          "gain": 0.4
+        },
+        "position": {
+          "x": 8,
+          "y": 2
+        }
+      },
+      {
+        "id": "att_y",
+        "type": "gain",
+        "name": "Mod Bright",
+        "params": {
+          "gain": 0.3
+        },
+        "position": {
+          "x": 8,
+          "y": 4
+        }
+      },
+      {
+        "id": "scope",
+        "type": "scope",
+        "name": "Visuals",
+        "params": {
+          "time": 2,
+          "gain": 1
+        },
+        "position": {
+          "x": 32,
+          "y": 8
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "clock", "portId": "clock" },
+        "to": { "moduleId": "euclid", "portId": "clock" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "clock", "portId": "reset" },
+        "to": { "moduleId": "euclid", "portId": "reset" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "euclid", "portId": "gate" },
+        "to": { "moduleId": "res", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "euclid", "portId": "gate" },
+        "to": { "moduleId": "res", "portId": "strum" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "res", "portId": "out" },
+        "to": { "moduleId": "delay", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "delay", "portId": "out" },
+        "to": { "moduleId": "reverb", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb", "portId": "out" },
+        "to": { "moduleId": "out", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "chaos", "portId": "x" },
+        "to": { "moduleId": "att_x", "portId": "in" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "att_x", "portId": "out" },
+        "to": { "moduleId": "res", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "chaos", "portId": "y" },
+        "to": { "moduleId": "att_y", "portId": "in" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "att_y", "portId": "out" },
+        "to": { "moduleId": "res", "portId": "damp" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "chaos", "portId": "x" },
+        "to": { "moduleId": "scope", "portId": "in-c" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "chaos", "portId": "y" },
+        "to": { "moduleId": "scope", "portId": "in-d" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "res", "portId": "out" },
+        "to": { "moduleId": "scope", "portId": "in-a" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

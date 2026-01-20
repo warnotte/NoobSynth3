@@ -82,6 +82,7 @@ pub use modulators::{
     SampleHold, SampleHoldParams, SampleHoldInputs,
     SlewLimiter, SlewParams, SlewInputs,
     Quantizer, QuantizerParams, QuantizerInputs,
+    Chaos, ChaosParams, ChaosInputs,
 };
 
 // Re-export sequencers

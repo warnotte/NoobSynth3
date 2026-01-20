@@ -38,6 +38,7 @@ pub enum ModuleType {
     SampleHold,
     Slew,
     Quantizer,
+    Chaos,
 
     // Effects
     Chorus,

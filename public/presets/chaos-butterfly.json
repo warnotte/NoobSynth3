@@ -1,0 +1,247 @@
+{
+  "id": "chaos-butterfly",
+  "name": "Butterfly Deep",
+  "description": "Deep generative drone. Chaos Z drives Reverb size, X/Y swirl the filter and position. Slow LFO breathes life into the amplitude.",
+  "group": "Lorenz Experiment",
+  "graph": {
+    "modules": [
+      {
+        "id": "out",
+        "type": "output",
+        "name": "Main Out",
+        "params": {
+          "level": 0.9
+        },
+        "position": {
+          "x": 42,
+          "y": 2
+        }
+      },
+      {
+        "id": "chaos",
+        "type": "chaos",
+        "name": "Lorenz Engine",
+        "params": {
+          "speed": 0.2,
+          "rho": 28,
+          "sigma": 10,
+          "beta": 2.66
+        },
+        "position": {
+          "x": 2,
+          "y": 2
+        }
+      },
+      {
+        "id": "breath_lfo",
+        "type": "lfo",
+        "name": "Breath",
+        "params": {
+          "rate": 0.15,
+          "shape": "sine",
+          "depth": 1,
+          "offset": 0,
+          "bipolar": false
+        },
+        "position": {
+          "x": 8,
+          "y": 8
+        }
+      },
+      {
+        "id": "wt",
+        "type": "wavetable",
+        "name": "Deep Texture",
+        "params": {
+          "frequency": 65,
+          "bank": 3,
+          "position": 0.2,
+          "unison": 4,
+          "detune": 12,
+          "spread": 1.0,
+          "morphSpeed": 0,
+          "subMix": 0.5,
+          "attack": 2.0,
+          "release": 4.0
+        },
+        "position": {
+          "x": 14,
+          "y": 2
+        }
+      },
+      {
+        "id": "vcf",
+        "type": "vcf",
+        "name": "Morph Filter",
+        "params": {
+          "cutoff": 300,
+          "resonance": 0.3,
+          "drive": 0.1,
+          "modAmount": 0.7,
+          "model": "ladder",
+          "mode": "lp",
+          "slope": 24
+        },
+        "position": {
+          "x": 20,
+          "y": 2
+        }
+      },
+      {
+        "id": "delay",
+        "type": "tape-delay",
+        "name": "Tape Echo",
+        "params": {
+          "time": 600,
+          "feedback": 0.4,
+          "mix": 0.3,
+          "wow": 0.2,
+          "flutter": 0.1
+        },
+        "position": {
+          "x": 26,
+          "y": 2
+        }
+      },
+      {
+        "id": "reverb",
+        "type": "reverb",
+        "name": "Infinite Hall",
+        "params": {
+          "time": 0.85,
+          "damp": 0.4,
+          "preDelay": 30,
+          "mix": 0.4
+        },
+        "position": {
+          "x": 32,
+          "y": 2
+        }
+      },
+      {
+        "id": "att_x",
+        "type": "gain",
+        "name": "Scale X",
+        "params": {
+          "gain": 0.5
+        },
+        "position": {
+          "x": 8,
+          "y": 2
+        }
+      },
+      {
+        "id": "att_z",
+        "type": "gain",
+        "name": "Scale Z",
+        "params": {
+          "gain": 0.3
+        },
+        "position": {
+          "x": 8,
+          "y": 4
+        }
+      },
+      {
+        "id": "noise",
+        "type": "noise",
+        "name": "Dust",
+        "params": {
+          "level": 0.05,
+          "noiseType": "pink",
+          "stereo": 1
+        },
+        "position": {
+          "x": 14,
+          "y": 8
+        }
+      },
+      {
+        "id": "scope",
+        "type": "scope",
+        "name": "Visuals",
+        "params": {
+          "time": 4,
+          "gain": 1,
+          "mode": "scope"
+        },
+        "position": {
+          "x": 38,
+          "y": 8
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "breath_lfo", "portId": "cv-out" },
+        "to": { "moduleId": "wt", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "wt", "portId": "out" },
+        "to": { "moduleId": "vcf", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "noise", "portId": "out" },
+        "to": { "moduleId": "vcf", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "vcf", "portId": "out" },
+        "to": { "moduleId": "delay", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "delay", "portId": "out" },
+        "to": { "moduleId": "reverb", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb", "portId": "out" },
+        "to": { "moduleId": "out", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "chaos", "portId": "x" },
+        "to": { "moduleId": "att_x", "portId": "in" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "att_x", "portId": "out" },
+        "to": { "moduleId": "vcf", "portId": "mod" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "chaos", "portId": "y" },
+        "to": { "moduleId": "wt", "portId": "position" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "chaos", "portId": "z" },
+        "to": { "moduleId": "att_z", "portId": "in" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "att_z", "portId": "out" },
+        "to": { "moduleId": "reverb", "portId": "mix" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "chaos", "portId": "x" },
+        "to": { "moduleId": "scope", "portId": "in-c" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "chaos", "portId": "z" },
+        "to": { "moduleId": "scope", "portId": "in-d" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "vcf", "portId": "out" },
+        "to": { "moduleId": "scope", "portId": "in-a" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

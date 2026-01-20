@@ -38,9 +38,11 @@ pub mod adsr;
 pub mod sample_hold;
 pub mod slew;
 pub mod quantizer;
+pub mod chaos;
 
 pub use lfo::{Lfo, LfoInputs, LfoParams};
 pub use adsr::{Adsr, AdsrInputs, AdsrParams};
 pub use sample_hold::{SampleHold, SampleHoldInputs, SampleHoldParams};
 pub use slew::{SlewLimiter, SlewInputs, SlewParams};
 pub use quantizer::{Quantizer, QuantizerInputs, QuantizerParams};
+pub use chaos::{Chaos, ChaosInputs, ChaosParams};

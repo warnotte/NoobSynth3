@@ -1,0 +1,159 @@
+{
+  "id": "chaos-oracle",
+  "name": "The Oracle",
+  "description": "Master Chief Demo. Additive Swarm with Formant filtering. Chaos drives EVERYTHING: Pitch, Timbre, and Trigger. It speaks when it moves.",
+  "group": "Lorenz Experiment",
+  "graph": {
+    "modules": [
+      {
+        "id": "out",
+        "type": "output",
+        "name": "Main Out",
+        "params": {
+          "level": 0.9
+        },
+        "position": {
+          "x": 42,
+          "y": 2
+        }
+      },
+      {
+        "id": "chaos",
+        "type": "chaos",
+        "name": "Oracle Brain",
+        "params": {
+          "speed": 0.9,
+          "rho": 28,
+          "sigma": 10,
+          "beta": 2.66,
+          "scale": 8,
+          "root": 2
+        },
+        "position": {
+          "x": 2,
+          "y": 2
+        }
+      },
+      {
+        "id": "swarm",
+        "type": "spectral-swarm",
+        "name": "Additive Soul",
+        "params": {
+          "frequency": 65,
+          "partials": 32,
+          "detune": 25,
+          "drift": 0.8,
+          "density": 0.9,
+          "evolution": 0.8,
+          "tilt": -1,
+          "formantFreq": 600,
+          "formantQ": 3,
+          "fundamentalMix": 0.4,
+          "attack": 0.05,
+          "release": 0.6
+        },
+        "position": {
+          "x": 12,
+          "y": 2
+        }
+      },
+      {
+        "id": "vcf",
+        "type": "vcf",
+        "name": "Vocal Filter",
+        "params": {
+          "cutoff": 1800,
+          "resonance": 0.4,
+          "drive": 0.3,
+          "model": "svf",
+          "mode": "lp",
+          "modAmount": 0.0
+        },
+        "position": {
+          "x": 20,
+          "y": 2
+        }
+      },
+      {
+        "id": "reverb",
+        "type": "reverb",
+        "name": "Void",
+        "params": {
+          "time": 0.98,
+          "mix": 0.5
+        },
+        "position": {
+          "x": 34,
+          "y": 2
+        }
+      },
+      {
+        "id": "att_x",
+        "type": "gain",
+        "name": "Spectral Mod",
+        "params": {
+          "gain": 0.9
+        },
+        "position": {
+          "x": 8,
+          "y": 2
+        }
+      },
+      {
+        "id": "scope",
+        "type": "scope",
+        "name": "Energy",
+        "params": {
+          "mode": "spectrogram",
+          "time": 2
+        },
+        "position": {
+          "x": 34,
+          "y": 8
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "chaos", "portId": "gate" },
+        "to": { "moduleId": "swarm", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "chaos", "portId": "x" },
+        "to": { "moduleId": "swarm", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "chaos", "portId": "y" },
+        "to": { "moduleId": "att_x", "portId": "in" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "att_x", "portId": "out" },
+        "to": { "moduleId": "swarm", "portId": "sync" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "swarm", "portId": "out" },
+        "to": { "moduleId": "vcf", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "vcf", "portId": "out" },
+        "to": { "moduleId": "reverb", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb", "portId": "out" },
+        "to": { "moduleId": "out", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb", "portId": "out" },
+        "to": { "moduleId": "scope", "portId": "in-a" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

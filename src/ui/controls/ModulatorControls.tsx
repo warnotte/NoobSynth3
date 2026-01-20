@@ -232,5 +232,73 @@ export function renderModulatorControls(props: ControlProps): React.ReactElement
     )
   }
 
+  if (module.type === 'chaos') {
+    const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+    return (
+      <div className="control-grid">
+        <RotaryKnob
+          label="Speed"
+          min={0.01}
+          max={2}
+          step={0.01}
+          value={Number(module.params.speed ?? 0.5)}
+          onChange={(value) => updateParam(module.id, 'speed', value)}
+          format={formatDecimal2}
+        />
+        <RotaryKnob
+          label="Rho"
+          min={0}
+          max={50}
+          step={0.1}
+          value={Number(module.params.rho ?? 28)}
+          onChange={(value) => updateParam(module.id, 'rho', value)}
+          format={formatDecimal2}
+        />
+        <RotaryKnob
+          label="Sigma"
+          min={1}
+          max={20}
+          step={0.1}
+          value={Number(module.params.sigma ?? 10)}
+          onChange={(value) => updateParam(module.id, 'sigma', value)}
+          format={formatDecimal2}
+        />
+        <RotaryKnob
+          label="Beta"
+          min={0.1}
+          max={10}
+          step={0.1}
+          value={Number(module.params.beta ?? 2.66)}
+          onChange={(value) => updateParam(module.id, 'beta', value)}
+          format={formatDecimal2}
+        />
+        <ControlBox label="Quantize" className="control-row">
+          <ControlButtons
+            options={[
+              { id: 0, label: 'Off' },
+              { id: 1, label: 'Chr' },
+              { id: 2, label: 'Maj' },
+              { id: 3, label: 'Min' },
+              { id: 7, label: 'P.Maj' },
+              { id: 8, label: 'P.Min' },
+            ]}
+            value={Number(module.params.scale ?? 0)}
+            onChange={(value) => updateParam(module.id, 'scale', value)}
+            columns={3}
+          />
+        </ControlBox>
+        <RotaryKnob
+          label="Root"
+          min={0}
+          max={11}
+          step={1}
+          value={Number(module.params.root ?? 0)}
+          onChange={(value) => updateParam(module.id, 'root', Math.round(value))}
+          format={(value) => notes[Math.round(value) % notes.length] ?? 'C'}
+        />
+      </div>
+    )
+  }
+
   return null
 }

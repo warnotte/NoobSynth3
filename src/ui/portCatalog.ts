@@ -79,6 +79,15 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
   },
   slew: simpleCvProcessor(),
   quantizer: simpleCvProcessor(),
+  chaos: {
+    inputs: [{ id: 'speed', label: 'Speed', kind: 'cv', direction: 'in' }],
+    outputs: [
+      { id: 'x', label: 'X', kind: 'cv', direction: 'out' },
+      { id: 'y', label: 'Y', kind: 'cv', direction: 'out' },
+      { id: 'z', label: 'Z', kind: 'cv', direction: 'out' },
+      { id: 'gate', label: 'Gate', kind: 'gate', direction: 'out' },
+    ],
+  },
   'ring-mod': {
     inputs: [
       { id: 'in-a', label: 'In A', kind: 'audio', direction: 'in' },
@@ -134,7 +143,13 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
   },
   chorus: simpleAudioEffect(),
   ensemble: simpleAudioEffect(),
-  choir: simpleAudioEffect(),
+  choir: {
+    inputs: [
+      { id: 'in', label: 'In', kind: 'audio', direction: 'in' },
+      { id: 'vowel', label: 'Vowel', kind: 'cv', direction: 'in' },
+    ],
+    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
+  },
   'audio-in': {
     inputs: [],
     outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],

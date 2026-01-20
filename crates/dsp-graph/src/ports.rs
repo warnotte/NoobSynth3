@@ -46,7 +46,6 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
     ],
     ModuleType::Chorus
     | ModuleType::Ensemble
-    | ModuleType::Choir
     | ModuleType::Delay
     | ModuleType::GranularDelay
     | ModuleType::TapeDelay
@@ -55,6 +54,10 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
     | ModuleType::Phaser => {
       vec![PortInfo { channels: 2 }]
     },
+    ModuleType::Choir => vec![
+      PortInfo { channels: 2 }, // audio in (stereo)
+      PortInfo { channels: 1 }, // vowel CV
+    ],
     ModuleType::Distortion => vec![PortInfo { channels: 1 }],
     ModuleType::Wavefolder => vec![PortInfo { channels: 1 }],
     ModuleType::Supersaw => vec![PortInfo { channels: 1 }],
@@ -161,6 +164,10 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
     ModuleType::MidiFileSequencer => vec![
       PortInfo { channels: 1 },  // clock
       PortInfo { channels: 1 },  // reset
+    ],
+    // Chaos - 1 input (speed)
+    ModuleType::Chaos => vec![
+      PortInfo { channels: 1 },  // speed
     ],
   }
 }
@@ -336,6 +343,13 @@ pub fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // vel-8
       PortInfo { channels: 1 },  // tick-out
     ],
+    // Chaos - 4 outputs (x, y, z, gate)
+    ModuleType::Chaos => vec![
+      PortInfo { channels: 1 },  // x
+      PortInfo { channels: 1 },  // y
+      PortInfo { channels: 1 },  // z
+      PortInfo { channels: 1 },  // gate
+    ],
   }
 }
 
@@ -428,7 +442,6 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
     },
     ModuleType::Chorus
     | ModuleType::Ensemble
-    | ModuleType::Choir
     | ModuleType::Delay
     | ModuleType::GranularDelay
     | ModuleType::TapeDelay
@@ -436,6 +449,11 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
     | ModuleType::Reverb
     | ModuleType::Phaser => match port_id {
       "in" => Some(0),
+      _ => None,
+    },
+    ModuleType::Choir => match port_id {
+      "in" => Some(0),
+      "vowel" | "cv" => Some(1),
       _ => None,
     },
     ModuleType::Distortion => match port_id {
@@ -576,6 +594,10 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
     ModuleType::MidiFileSequencer => match port_id {
       "clock" | "clk" => Some(0),
       "reset" | "rst" => Some(1),
+      _ => None,
+    },
+    ModuleType::Chaos => match port_id {
+      "speed" => Some(0),
       _ => None,
     },
     _ => None,
@@ -851,6 +873,13 @@ pub fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize
       "vel-7" => Some(22),
       "vel-8" => Some(23),
       "tick-out" => Some(24),
+      _ => None,
+    },
+    ModuleType::Chaos => match port_id {
+      "x" => Some(0),
+      "y" => Some(1),
+      "z" => Some(2),
+      "gate" => Some(3),
       _ => None,
     },
   }
