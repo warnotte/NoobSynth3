@@ -1,0 +1,230 @@
+{
+  "id": "chaos-requiem",
+  "name": "The Butterfly's Requiem",
+  "description": "ULTIMATE CINEMATIC. No static controls. The 'Evolution' LFO breathes life into the Choir and gates the Chaos modulation intensity simultaneously. A living ecosystem.",
+  "group": "Lorenz Experiment",
+  "graph": {
+    "modules": [
+      {
+        "id": "out",
+        "type": "output",
+        "name": "Master",
+        "params": { "level": 0.9 },
+        "position": { "x": 46, "y": 2 }
+      },
+      {
+        "id": "chaos",
+        "type": "chaos",
+        "name": "Lorenz Engine",
+        "params": {
+          "speed": 0.5,
+          "rho": 28,
+          "sigma": 10,
+          "beta": 2.66,
+          "scale": 3,
+          "root": 0
+        },
+        "position": { "x": 2, "y": 2 }
+      },
+      {
+        "id": "evolution",
+        "type": "lfo",
+        "name": "The Lung",
+        "params": {
+          "rate": 0.08,
+          "shape": "sine",
+          "depth": 1.0,
+          "bipolar": false
+        },
+        "position": { "x": 2, "y": 8 }
+      },
+      {
+        "id": "complexity",
+        "type": "gain",
+        "name": "Chaos VCA",
+        "params": { "gain": 1.0 },
+        "position": { "x": 8, "y": 2 }
+      },
+      {
+        "id": "bass",
+        "type": "tb-303",
+        "name": "Earth Bass",
+        "params": {
+          "cutoff": 200,
+          "resonance": 0.7,
+          "decay": 0.4,
+          "envmod": 0.3,
+          "glide": 0.1,
+          "accent": 0.8
+        },
+        "position": { "x": 14, "y": 14 }
+      },
+      {
+        "id": "vocal",
+        "type": "wavetable",
+        "name": "Ghost Choir",
+        "params": {
+          "frequency": 110,
+          "bank": 1,
+          "position": 0.2,
+          "unison": 3,
+          "detune": 20,
+          "spread": 1.0,
+          "subMix": 0.0,
+          "attack": 3.0,
+          "release": 4.0
+        },
+        "position": { "x": 14, "y": 2 }
+      },
+      {
+        "id": "strings",
+        "type": "karplus",
+        "name": "Stars",
+        "params": {
+          "frequency": 440,
+          "damping": 0.1,
+          "decay": 0.95,
+          "brightness": 0.9,
+          "pluckPos": 0.2
+        },
+        "position": { "x": 14, "y": 8 }
+      },
+      {
+        "id": "delay",
+        "type": "delay",
+        "name": "Memories",
+        "params": {
+          "time": 500,
+          "feedback": 0.4,
+          "mix": 0.3,
+          "pingPong": true
+        },
+        "position": { "x": 28, "y": 2 }
+      },
+      {
+        "id": "reverb",
+        "type": "reverb",
+        "name": "The Void",
+        "params": {
+          "time": 0.96,
+          "damp": 0.4,
+          "mix": 0.4
+        },
+        "position": { "x": 36, "y": 2 }
+      },
+      {
+        "id": "mix",
+        "type": "mixer-1x2",
+        "name": "Mixer",
+        "params": {
+          "levelA": 0.6,
+          "levelB": 0.6,
+          "levelC": 0.7
+        },
+        "position": { "x": 22, "y": 2 }
+      },
+      {
+        "id": "scope",
+        "type": "scope",
+        "name": "Analysis",
+        "params": {
+          "mode": "spectrogram",
+          "time": 4
+        },
+        "position": { "x": 36, "y": 8 }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "chaos", "portId": "x" },
+        "to": { "moduleId": "complexity", "portId": "in" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "evolution", "portId": "cv-out" },
+        "to": { "moduleId": "complexity", "portId": "cv" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "evolution", "portId": "cv-out" },
+        "to": { "moduleId": "vocal", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "complexity", "portId": "out" },
+        "to": { "moduleId": "bass", "portId": "cutoff-cv" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "complexity", "portId": "out" },
+        "to": { "moduleId": "vocal", "portId": "position" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "chaos", "portId": "y" },
+        "to": { "moduleId": "bass", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "chaos", "portId": "y" },
+        "to": { "moduleId": "strings", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "chaos", "portId": "gate" },
+        "to": { "moduleId": "bass", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "chaos", "portId": "gate" },
+        "to": { "moduleId": "strings", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "chaos", "portId": "z" },
+        "to": { "moduleId": "reverb", "portId": "mix" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "vocal", "portId": "out" },
+        "to": { "moduleId": "mix", "portId": "in-a" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "strings", "portId": "out" },
+        "to": { "moduleId": "mix", "portId": "in-b" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "bass", "portId": "out" },
+        "to": { "moduleId": "mix", "portId": "in-c" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "mix", "portId": "out" },
+        "to": { "moduleId": "delay", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "delay", "portId": "out" },
+        "to": { "moduleId": "reverb", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb", "portId": "out" },
+        "to": { "moduleId": "out", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb", "portId": "out" },
+        "to": { "moduleId": "scope", "portId": "in-a" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "complexity", "portId": "out" },
+        "to": { "moduleId": "scope", "portId": "in-c" },
+        "kind": "cv"
+      }
+    ]
+  }
+}

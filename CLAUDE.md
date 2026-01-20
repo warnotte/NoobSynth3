@@ -148,7 +148,7 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 - [ ] `public/presets/` - Preset de démonstration
 - [ ] `npm run build:wasm` - Rebuild WASM après modifs Rust
 
-## Module Types (58 total)
+## Module Types (59 total)
 
 ### Sources (13)
 oscillator, supersaw, karplus, fm-op, nes-osc, snes-osc, noise, tb-303, shepard, pipe-organ, spectral-swarm, resonator, wavetable
@@ -162,8 +162,8 @@ gain, cv-vca, mixer, mixer-1x2
 ### Effects (14)
 chorus, ensemble, choir, vocoder, delay, granular-delay, tape-delay, spring-reverb, reverb, phaser, distortion, wavefolder, ring-mod, pitch-shifter
 
-### Modulators (6)
-adsr, lfo, mod-router, sample-hold, slew, quantizer
+### Modulators (7)
+adsr, lfo, mod-router, sample-hold, slew, quantizer, chaos
 
 ### Sequencers (7)
 clock, arpeggiator, step-sequencer, euclidean, drum-sequencer, midi-file-sequencer, mario

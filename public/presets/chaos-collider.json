@@ -1,0 +1,195 @@
+{
+  "id": "chaos-collider",
+  "name": "The Lorenz Collider",
+  "description": "EXPERIMENTAL AGGRESSION. Self-modulating chaos! Chaos Speed modulated by LFO. FM cross-modulation ring collision. Warning: Intense.",
+  "group": "Lorenz Experiment",
+  "graph": {
+    "modules": [
+      {
+        "id": "out",
+        "type": "output",
+        "name": "Master",
+        "params": { "level": 0.8 },
+        "position": { "x": 42, "y": 2 }
+      },
+      {
+        "id": "chaos",
+        "type": "chaos",
+        "name": "Time Engine",
+        "params": {
+          "speed": 0.5,
+          "rho": 28,
+          "sigma": 10,
+          "beta": 2.66,
+          "scale": 0,
+          "root": 0
+        },
+        "position": { "x": 8, "y": 2 }
+      },
+      {
+        "id": "time_lfo",
+        "type": "lfo",
+        "name": "Time Warper",
+        "params": {
+          "rate": 0.1,
+          "shape": "triangle",
+          "depth": 0.8,
+          "bipolar": true
+        },
+        "position": { "x": 2, "y": 2 }
+      },
+      {
+        "id": "fm1",
+        "type": "fm-op",
+        "name": "Particle A",
+        "params": {
+          "frequency": 110,
+          "ratio": 1.0,
+          "feedback": 0.4,
+          "attack": 0.01,
+          "decay": 0.2,
+          "sustain": 0.8,
+          "release": 0.1
+        },
+        "position": { "x": 16, "y": 2 }
+      },
+      {
+        "id": "fm2",
+        "type": "fm-op",
+        "name": "Particle B",
+        "params": {
+          "frequency": 110,
+          "ratio": 1.01,
+          "feedback": 0.4,
+          "attack": 0.01,
+          "decay": 0.2,
+          "sustain": 0.8,
+          "release": 0.1
+        },
+        "position": { "x": 16, "y": 8 }
+      },
+      {
+        "id": "ring",
+        "type": "ring-mod",
+        "name": "Collision",
+        "params": { "level": 1.0 },
+        "position": { "x": 24, "y": 2 }
+      },
+      {
+        "id": "spring",
+        "type": "spring-reverb",
+        "name": "Metal Chamber",
+        "params": {
+          "decay": 0.7,
+          "tone": 0.8,
+          "mix": 0.4,
+          "drive": 0.6
+        },
+        "position": { "x": 30, "y": 2 }
+      },
+      {
+        "id": "gate_on",
+        "type": "control",
+        "name": "Beam On",
+        "params": { "gate": 1 },
+        "position": { "x": 8, "y": 8 }
+      },
+      {
+        "id": "att_pitch",
+        "type": "gain",
+        "name": "Pitch Mod",
+        "params": { "gain": 0.5 },
+        "position": { "x": 8, "y": 14 }
+      },
+      {
+        "id": "att_z",
+        "type": "gain",
+        "name": "Mix Mod",
+        "params": { "gain": 0.5 },
+        "position": { "x": 24, "y": 8 }
+      },
+      {
+        "id": "scope",
+        "type": "scope",
+        "name": "Collider View",
+        "params": {
+          "mode": "scope",
+          "time": 1
+        },
+        "position": { "x": 36, "y": 8 }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "time_lfo", "portId": "cv-out" },
+        "to": { "moduleId": "chaos", "portId": "speed" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "gate_on", "portId": "gate-out" },
+        "to": { "moduleId": "fm1", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "gate_on", "portId": "gate-out" },
+        "to": { "moduleId": "fm2", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "chaos", "portId": "x" },
+        "to": { "moduleId": "att_pitch", "portId": "in" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "att_pitch", "portId": "out" },
+        "to": { "moduleId": "fm1", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "chaos", "portId": "y" },
+        "to": { "moduleId": "fm2", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "fm1", "portId": "out" },
+        "to": { "moduleId": "ring", "portId": "in-a" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "fm2", "portId": "out" },
+        "to": { "moduleId": "ring", "portId": "in-b" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "ring", "portId": "out" },
+        "to": { "moduleId": "spring", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "chaos", "portId": "z" },
+        "to": { "moduleId": "att_z", "portId": "in" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "att_z", "portId": "out" },
+        "to": { "moduleId": "spring", "portId": "mix" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "spring", "portId": "out" },
+        "to": { "moduleId": "out", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "spring", "portId": "out" },
+        "to": { "moduleId": "scope", "portId": "in-a" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "chaos", "portId": "x" },
+        "to": { "moduleId": "scope", "portId": "in-c" },
+        "kind": "cv"
+      }
+    ]
+  }
+}

@@ -152,8 +152,8 @@ export const loadPresets = async (): Promise<PresetLoadResult> => {
       const patch = (await response.json()) as PresetPatchFile
       return buildPresetFromPatch(entry, patch)
     } catch (error) {
-      console.error(error)
-      errors.push(`Preset ${entry.id} failed to load.`)
+      console.error(`Preset "${entry.id}" (${entry.file}) failed to load:`, error)
+      errors.push(`"${entry.id}" (${entry.file})`)
       return null
     }
   })

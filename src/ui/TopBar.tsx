@@ -85,7 +85,6 @@ export const TopBar = ({
     }
   }, [shareUrl])
 
-  const shareLabel = shareStatus === 'copied' ? 'Copied!' : shareStatus === 'error' ? 'Error' : 'Share'
   const shareTitle = shareError || (shareUrl ? 'Copy shareable URL' : 'Patch too large to share')
 
   return (

@@ -1,0 +1,258 @@
+{
+  "id": "chaos-symphony",
+  "name": "Chaos Symphony",
+  "description": "THE ULTIMATE. Full spectrum generative composition. Highs: Resonator bells (Chaos Rhythm). Mids: Swarm pads (Breath LFO). Lows: FM Bass. All driven by one Chaos Engine.",
+  "group": "Lorenz Experiment",
+  "graph": {
+    "modules": [
+      {
+        "id": "out",
+        "type": "output",
+        "name": "Master",
+        "params": {
+          "level": 0.9
+        },
+        "position": {
+          "x": 44,
+          "y": 2
+        }
+      },
+      {
+        "id": "chaos",
+        "type": "chaos",
+        "name": "Conductor",
+        "params": {
+          "speed": 0.5,
+          "rho": 28,
+          "sigma": 10,
+          "beta": 2.66,
+          "scale": 2,
+          "root": 0
+        },
+        "position": {
+          "x": 2,
+          "y": 2
+        }
+      },
+      {
+        "id": "res",
+        "type": "resonator",
+        "name": "High Bells",
+        "params": {
+          "frequency": 880,
+          "structure": 0.2,
+          "brightness": 0.8,
+          "damping": 0.4,
+          "mode": 0,
+          "polyphony": 4,
+          "internalExc": 1,
+          "chorus": 0.2
+        },
+        "position": {
+          "x": 12,
+          "y": 2
+        }
+      },
+      {
+        "id": "swarm",
+        "type": "spectral-swarm",
+        "name": "Mid Texture",
+        "params": {
+          "frequency": 220,
+          "partials": 16,
+          "detune": 15,
+          "drift": 0.3,
+          "density": 0.6,
+          "evolution": 2.0,
+          "tilt": 0,
+          "formantFreq": 1200,
+          "formantQ": 2,
+          "fundamentalMix": 0.3,
+          "attack": 2.0,
+          "release": 4.0
+        },
+        "position": {
+          "x": 12,
+          "y": 8
+        }
+      },
+      {
+        "id": "fm",
+        "type": "fm-op",
+        "name": "Low Bass",
+        "params": {
+          "frequency": 55,
+          "ratio": 2.0,
+          "level": 1.0,
+          "feedback": 0.3,
+          "attack": 0.01,
+          "decay": 0.4,
+          "sustain": 0.0,
+          "release": 0.2
+        },
+        "position": {
+          "x": 12,
+          "y": 14
+        }
+      },
+      {
+        "id": "mix",
+        "type": "mixer-1x2",
+        "name": "Mixer",
+        "params": {
+          "levelA": 0.7,
+          "levelB": 0.5,
+          "levelC": 0.8,
+          "levelD": 0,
+          "levelE": 0,
+          "levelF": 0
+        },
+        "position": {
+          "x": 22,
+          "y": 2
+        }
+      },
+      {
+        "id": "delay",
+        "type": "delay",
+        "name": "Echo",
+        "params": {
+          "time": 450,
+          "feedback": 0.4,
+          "mix": 0.3,
+          "pingPong": true
+        },
+        "position": {
+          "x": 30,
+          "y": 2
+        }
+      },
+      {
+        "id": "reverb",
+        "type": "reverb",
+        "name": "Space",
+        "params": {
+          "time": 0.9,
+          "damp": 0.2,
+          "mix": 0.4
+        },
+        "position": {
+          "x": 36,
+          "y": 2
+        }
+      },
+      {
+        "id": "breath",
+        "type": "lfo",
+        "name": "Pad Breath",
+        "params": {
+          "rate": 0.1,
+          "shape": "sine",
+          "depth": 1,
+          "bipolar": false
+        },
+        "position": {
+          "x": 6,
+          "y": 14
+        }
+      },
+      {
+        "id": "att_x",
+        "type": "gain",
+        "name": "Mod 1",
+        "params": {
+          "gain": 0.5
+        },
+        "position": {
+          "x": 8,
+          "y": 2
+        }
+      },
+      {
+        "id": "scope",
+        "type": "scope",
+        "name": "Spectrum",
+        "params": {
+          "mode": "spectrogram",
+          "time": 2
+        },
+        "position": {
+          "x": 36,
+          "y": 8
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "chaos", "portId": "y" },
+        "to": { "moduleId": "res", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "chaos", "portId": "gate" },
+        "to": { "moduleId": "res", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "chaos", "portId": "gate" },
+        "to": { "moduleId": "res", "portId": "strum" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "chaos", "portId": "x" },
+        "to": { "moduleId": "att_x", "portId": "in" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "att_x", "portId": "out" },
+        "to": { "moduleId": "swarm", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "breath", "portId": "cv-out" },
+        "to": { "moduleId": "swarm", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "chaos", "portId": "gate" },
+        "to": { "moduleId": "fm", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "res", "portId": "out" },
+        "to": { "moduleId": "mix", "portId": "in-a" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "swarm", "portId": "out" },
+        "to": { "moduleId": "mix", "portId": "in-b" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "fm", "portId": "out" },
+        "to": { "moduleId": "mix", "portId": "in-c" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "mix", "portId": "out" },
+        "to": { "moduleId": "delay", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "delay", "portId": "out" },
+        "to": { "moduleId": "reverb", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb", "portId": "out" },
+        "to": { "moduleId": "out", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb", "portId": "out" },
+        "to": { "moduleId": "scope", "portId": "in-a" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

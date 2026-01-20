@@ -1010,6 +1010,34 @@
       "group": "Lorenz Experiment"
     },
     {
+      "id": "chaos-collider",
+      "name": "The Lorenz Collider",
+      "description": "EXPERIMENTAL AGGRESSION. Self-modulating chaos! Chaos Speed modulated by LFO. FM cross-modulation and stereo panning.",
+      "file": "chaos-collider.json",
+      "group": "Lorenz Experiment"
+    },
+    {
+      "id": "chaos-requiem",
+      "name": "The Butterfly's Requiem",
+      "description": "ULTIMATE CINEMATIC. A full generative orchestra: Low growls, Ghost voices, and Crystal strings.",
+      "file": "chaos-requiem.json",
+      "group": "Lorenz Experiment"
+    },
+    {
+      "id": "chaos-singularity",
+      "name": "The Lorenz Singularity",
+      "description": "MASTERPIECE. A fusion of Chaos theory and Euclidean rhythms. Chaos drives the melody and bass. Euclidean sequencer drives granular percussion.",
+      "file": "chaos-singularity.json",
+      "group": "Lorenz Experiment"
+    },
+    {
+      "id": "chaos-symphony",
+      "name": "Chaos Symphony",
+      "description": "THE ULTIMATE. Full spectrum generative composition. Highs: Resonator. Mids: Swarm. Lows: FM Bass.",
+      "file": "chaos-symphony.json",
+      "group": "Lorenz Experiment"
+    },
+    {
       "id": "chaos-oracle",
       "name": "The Oracle",
       "description": "Master Chief Demo. Chaos drives additive Spectral Swarm. Sci-fi resonant texture.",
@@ -1021,13 +1049,6 @@
       "name": "Celestial Choir",
       "description": "Ghostly vocals. Chaos quantizer drives pitch, Chaos X/Y modulate vowel formants.",
       "file": "chaos-singing.json",
-      "group": "Lorenz Experiment"
-    },
-    {
-      "id": "choir-debug",
-      "name": "Choir Debug",
-      "description": "DEBUG PRESET. LFO modulating Choir Vowel directly.",
-      "file": "choir-debug.json",
       "group": "Lorenz Experiment"
     }
   ]

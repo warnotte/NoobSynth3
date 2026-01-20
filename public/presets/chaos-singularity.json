@@ -1,0 +1,246 @@
+{
+  "id": "chaos-singularity",
+  "name": "The Lorenz Singularity",
+  "description": "MASTERPIECE. A fusion of Chaos theory and Euclidean rhythms. Chaos drives the melody and bass. Euclidean sequencer drives granular percussion. S&H scatters the stereo field.",
+  "group": "Lorenz Experiment",
+  "graph": {
+    "modules": [
+      {
+        "id": "out",
+        "type": "output",
+        "name": "Master",
+        "params": { "level": 0.9 },
+        "position": { "x": 46, "y": 2 }
+      },
+      {
+        "id": "clock",
+        "type": "clock",
+        "name": "Timekeeper",
+        "params": { "tempo": 110, "running": true },
+        "position": { "x": 2, "y": 8 }
+      },
+      {
+        "id": "chaos",
+        "type": "chaos",
+        "name": "Singularity",
+        "params": {
+          "speed": 0.4,
+          "rho": 28,
+          "sigma": 10,
+          "beta": 2.66,
+          "scale": 8,
+          "root": 0
+        },
+        "position": { "x": 2, "y": 2 }
+      },
+      {
+        "id": "euclid",
+        "type": "euclidean",
+        "name": "Polyrhythm",
+        "params": {
+          "steps": 16,
+          "pulses": 7,
+          "rotation": 0,
+          "gateLength": 30
+        },
+        "position": { "x": 8, "y": 8 }
+      },
+      {
+        "id": "sh",
+        "type": "sample-hold",
+        "name": "Scatter",
+        "params": { "mode": 0 },
+        "position": { "x": 8, "y": 14 }
+      },
+      {
+        "id": "bass",
+        "type": "tb-303",
+        "name": "Abyss Bass",
+        "params": {
+          "cutoff": 300,
+          "resonance": 0.6,
+          "decay": 0.5,
+          "envmod": 0.5,
+          "accent": 0.7
+        },
+        "position": { "x": 14, "y": 2 }
+      },
+      {
+        "id": "pad",
+        "type": "wavetable",
+        "name": "Void Pad",
+        "params": {
+          "frequency": 110,
+          "bank": 3,
+          "position": 0.4,
+          "unison": 3,
+          "detune": 15,
+          "spread": 1.0,
+          "attack": 2.0,
+          "release": 3.0
+        },
+        "position": { "x": 14, "y": 8 }
+      },
+      {
+        "id": "perc",
+        "type": "909-rimshot",
+        "name": "Ticks",
+        "params": { "tune": 1200, "decay": 0.1 },
+        "position": { "x": 14, "y": 14 }
+      },
+      {
+        "id": "granular",
+        "type": "granular-delay",
+        "name": "Glitch",
+        "params": {
+          "time": 120,
+          "size": 40,
+          "density": 15,
+          "mix": 0.5,
+          "feedback": 0.4
+        },
+        "position": { "x": 20, "y": 14 }
+      },
+      {
+        "id": "lfo_slow",
+        "type": "lfo",
+        "name": "Tide",
+        "params": { "rate": 0.05, "depth": 1.0 },
+        "position": { "x": 8, "y": 2 }
+      },
+      {
+        "id": "mix",
+        "type": "mixer-1x2",
+        "name": "Nexus",
+        "params": {
+          "levelA": 0.6,
+          "levelB": 0.5,
+          "levelC": 0.4,
+          "levelD": 0,
+          "levelE": 0,
+          "levelF": 0
+        },
+        "position": { "x": 28, "y": 2 }
+      },
+      {
+        "id": "tape",
+        "type": "tape-delay",
+        "name": "Tape Sat",
+        "params": {
+          "time": 400,
+          "feedback": 0.3,
+          "mix": 0.2,
+          "drive": 0.4,
+          "wow": 0.3
+        },
+        "position": { "x": 36, "y": 2 }
+      },
+      {
+        "id": "reverb",
+        "type": "reverb",
+        "name": "Deep Space",
+        "params": { "time": 0.94, "mix": 0.4 },
+        "position": { "x": 42, "y": 8 }
+      },
+      {
+        "id": "scope",
+        "type": "scope",
+        "name": "Monitor",
+        "params": { "time": 2 },
+        "position": { "x": 36, "y": 14 }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "clock", "portId": "clock" },
+        "to": { "moduleId": "euclid", "portId": "clock" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "chaos", "portId": "gate" },
+        "to": { "moduleId": "bass", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "chaos", "portId": "y" },
+        "to": { "moduleId": "bass", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "lfo_slow", "portId": "cv-out" },
+        "to": { "moduleId": "pad", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "chaos", "portId": "x" },
+        "to": { "moduleId": "pad", "portId": "position" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "euclid", "portId": "gate" },
+        "to": { "moduleId": "perc", "portId": "trigger" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "chaos", "portId": "z" },
+        "to": { "moduleId": "sh", "portId": "in" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "euclid", "portId": "gate" },
+        "to": { "moduleId": "sh", "portId": "trig" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "sh", "portId": "out" },
+        "to": { "moduleId": "granular", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "perc", "portId": "out" },
+        "to": { "moduleId": "granular", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "bass", "portId": "out" },
+        "to": { "moduleId": "mix", "portId": "in-a" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "pad", "portId": "out" },
+        "to": { "moduleId": "mix", "portId": "in-b" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "granular", "portId": "out" },
+        "to": { "moduleId": "mix", "portId": "in-c" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "mix", "portId": "out" },
+        "to": { "moduleId": "tape", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "tape", "portId": "out" },
+        "to": { "moduleId": "reverb", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb", "portId": "out" },
+        "to": { "moduleId": "out", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb", "portId": "out" },
+        "to": { "moduleId": "scope", "portId": "in-a" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "chaos", "portId": "x" },
+        "to": { "moduleId": "scope", "portId": "in-c" },
+        "kind": "cv"
+      }
+    ]
+  }
+}

@@ -471,12 +471,13 @@ Génère trois signaux de modulation (X, Y, Z) qui orbitent autour de deux point
 | `beta` | 0.1-10 | Facteur géométrique (Damping) |
 
 **Entrées** : speed (CV)
-**Sorties** : x (CV), y (CV), z (CV)
+**Sorties** : x (CV), y (CV), z (CV), gate (Gate)
 
 **Utilisation :**
 - **X** : Modulation principale, oscille entre -1 et 1
 - **Y** : Similaire à X mais déphasé
 - **Z** : Oscillation plus lente et unipolaire (haut/bas)
+- **Gate** : Pulse (10ms) quand Z traverse le seuil 0.5 vers le haut
 
 Idéal pour :
 - Drones évolutifs
@@ -545,16 +546,16 @@ Chorus élargi pour cordes et pads.
 
 ### Choir
 
-Banque de formants (voyelles) pour timbres vocaux.
+Banque de formants (voyelles) pour timbres vocaux. Dispose d'une interpolation fluide entre les voyelles pour des transitions naturelles.
 
 | Paramètre | Range | Description |
 |-----------|-------|-------------|
-| `vowel` | 0-4 | A/E/I/O/U |
+| `vowel` | 0.0-4.0 | Morphing A/E/I/O/U |
 | `rate` | 0.05-2 Hz | LFO interne |
 | `depth` | 0-1 | Profondeur de modulation |
 | `mix` | 0-1 | Dry/Wet |
 
-**Entrées** : in (audio)  
+**Entrées** : in (audio), vowel (CV)  
 **Sorties** : out (audio)
 
 ### Vocoder

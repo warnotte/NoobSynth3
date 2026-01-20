@@ -768,7 +768,7 @@ function App() {
         setPresets(result.presets)
         setPresetStatus('ready')
         if (result.errors.length > 0) {
-          setPresetError(`Some presets failed to load (${result.errors.length}).`)
+          setPresetError(`Failed to load: ${result.errors.join(', ')}`)
         }
       })
       .catch((error) => {
