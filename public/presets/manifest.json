@@ -541,6 +541,13 @@
       "group": "Euclidean Rhythms"
     },
     {
+      "id": "euclidean-acid-drums",
+      "name": "Acid + Polyrhythmic Drums",
+      "description": "Combined preset: TB-303 acid line + 909 polyrhythmic drums. All synced to master clock.",
+      "file": "euclidean-acid-drums.json",
+      "group": "Euclidean Rhythms"
+    },
+    {
       "id": "fm-epiano",
       "name": "FM Electric Piano",
       "description": "DX7-style electric piano with 2 operators and chorus.",
