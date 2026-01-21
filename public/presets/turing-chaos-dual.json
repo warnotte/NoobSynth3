@@ -1,0 +1,229 @@
+{
+  "id": "turing-chaos-dual",
+  "name": "Turing Chaos Dual",
+  "description": "Polyrhythmic chaos. Lead at 1/8, Bass at 1/4. Two Turing Machines with Lorenz modulation.",
+  "group": "Turing Machine",
+  "graph": {
+    "modules": [
+      {
+        "id": "clock-1",
+        "type": "clock",
+        "name": "Lead Clk",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "running": true,
+          "tempo": 100,
+          "rate": 3,
+          "swing": 12
+        }
+      },
+      {
+        "id": "clock-2",
+        "type": "clock",
+        "name": "Bass Clk",
+        "position": { "x": 0, "y": 4 },
+        "params": {
+          "running": true,
+          "tempo": 100,
+          "rate": 2,
+          "swing": 0
+        }
+      },
+      {
+        "id": "turing-1",
+        "type": "turing-machine",
+        "name": "Lead TM",
+        "position": { "x": 2, "y": 0 },
+        "params": {
+          "probability": 0.42,
+          "length": 8,
+          "range": 2,
+          "scale": 8,
+          "root": 0
+        }
+      },
+      {
+        "id": "turing-2",
+        "type": "turing-machine",
+        "name": "Bass TM",
+        "position": { "x": 2, "y": 4 },
+        "params": {
+          "probability": 0.20,
+          "length": 8,
+          "range": 1,
+          "scale": 8,
+          "root": 0
+        }
+      },
+      {
+        "id": "chaos-1",
+        "type": "chaos",
+        "name": "Lorenz",
+        "position": { "x": 0, "y": 2 },
+        "params": {
+          "speed": 1.27,
+          "sigma": 13.2,
+          "rho": 28,
+          "beta": 7.1,
+          "scale": 2,
+          "root": 0
+        }
+      },
+      {
+        "id": "osc-1",
+        "type": "wavetable",
+        "name": "Lead",
+        "position": { "x": 4, "y": 0 },
+        "params": {
+          "frequency": 249,
+          "bank": 1,
+          "position": 0.5,
+          "unison": 3,
+          "detune": 10,
+          "spread": 0.6,
+          "morphSpeed": 0,
+          "subMix": 0.2,
+          "attack": 0.01,
+          "release": 0.4
+        }
+      },
+      {
+        "id": "osc-2",
+        "type": "wavetable",
+        "name": "Bass",
+        "position": { "x": 4, "y": 4 },
+        "params": {
+          "frequency": 62,
+          "bank": 0,
+          "position": 0.3,
+          "unison": 2,
+          "detune": 5,
+          "spread": 0.3,
+          "morphSpeed": 0,
+          "subMix": 0.7,
+          "attack": 0.02,
+          "release": 0.5
+        }
+      },
+      {
+        "id": "vcf-1",
+        "type": "vcf",
+        "name": "Lead VCF",
+        "position": { "x": 6, "y": 0 },
+        "params": {
+          "cutoff": 3150,
+          "resonance": 0.06,
+          "drive": 0.15,
+          "envAmount": 0,
+          "modAmount": 0.6,
+          "keyTrack": 0.4,
+          "model": "ladder",
+          "mode": "lp",
+          "slope": 24
+        }
+      },
+      {
+        "id": "vcf-2",
+        "type": "vcf",
+        "name": "Bass VCF",
+        "position": { "x": 6, "y": 4 },
+        "params": {
+          "cutoff": 800,
+          "resonance": 0.2,
+          "drive": 0.2,
+          "envAmount": 0,
+          "modAmount": 0.4,
+          "keyTrack": 0.3,
+          "model": "ladder",
+          "mode": "lp",
+          "slope": 24
+        }
+      },
+      {
+        "id": "mixer-1",
+        "type": "mixer",
+        "name": "Mix",
+        "position": { "x": 8, "y": 2 },
+        "params": {
+          "ch1": 0.6,
+          "ch2": 0.7,
+          "ch3": 0,
+          "ch4": 0,
+          "mute1": false,
+          "mute2": false,
+          "mute3": true,
+          "mute4": true
+        }
+      },
+      {
+        "id": "chorus-1",
+        "type": "chorus",
+        "name": "Chorus",
+        "position": { "x": 10, "y": 2 },
+        "params": {
+          "rate": 0.6,
+          "depth": 0.4,
+          "mix": 0.3,
+          "voices": 3
+        }
+      },
+      {
+        "id": "delay-1",
+        "type": "tape-delay",
+        "name": "Tape",
+        "position": { "x": 12, "y": 2 },
+        "params": {
+          "time": 300,
+          "feedback": 0.4,
+          "mix": 0.3,
+          "tone": 0.5,
+          "wow": 0.2,
+          "flutter": 0.15,
+          "drive": 0.2
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "x": 14, "y": 2 },
+        "params": {
+          "time": 0.7,
+          "damp": 0.4,
+          "preDelay": 30,
+          "mix": 0.35
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Out",
+        "position": { "x": 16, "y": 2 },
+        "params": {
+          "level": 1.0
+        }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "turing-1", "portId": "clock" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "reset" }, "to": { "moduleId": "turing-1", "portId": "reset" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-2", "portId": "clock" }, "to": { "moduleId": "turing-2", "portId": "clock" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-2", "portId": "reset" }, "to": { "moduleId": "turing-2", "portId": "reset" }, "kind": "sync" },
+      { "from": { "moduleId": "turing-1", "portId": "cv" }, "to": { "moduleId": "osc-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "turing-1", "portId": "gate" }, "to": { "moduleId": "osc-1", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "turing-2", "portId": "cv" }, "to": { "moduleId": "osc-2", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "turing-2", "portId": "gate" }, "to": { "moduleId": "osc-2", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "chaos-1", "portId": "x" }, "to": { "moduleId": "osc-1", "portId": "position" }, "kind": "cv" },
+      { "from": { "moduleId": "chaos-1", "portId": "y" }, "to": { "moduleId": "vcf-1", "portId": "mod" }, "kind": "cv" },
+      { "from": { "moduleId": "chaos-1", "portId": "z" }, "to": { "moduleId": "vcf-2", "portId": "mod" }, "kind": "cv" },
+      { "from": { "moduleId": "osc-1", "portId": "out" }, "to": { "moduleId": "vcf-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "osc-2", "portId": "out" }, "to": { "moduleId": "vcf-2", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "vcf-1", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "vcf-2", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-b" }, "kind": "audio" },
+      { "from": { "moduleId": "mixer-1", "portId": "out" }, "to": { "moduleId": "chorus-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "chorus-1", "portId": "out" }, "to": { "moduleId": "delay-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "delay-1", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}

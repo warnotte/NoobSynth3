@@ -1092,5 +1092,26 @@
       "description": "Two Turing Machines at different rates: slow bass drone + fast high melody. Frequency separated.",
       "file": "turing-slow-chaos.json",
       "group": "Turing Machine"
+    },
+    {
+      "id": "turing-chaos-bright",
+      "name": "Turing Chaos Bright",
+      "description": "Bright vocal wavetable with high cutoff. Lorenz chaos with Major quantize.",
+      "file": "turing-chaos-bright.json",
+      "group": "Turing Machine"
+    },
+    {
+      "id": "turing-chaos-dual",
+      "name": "Turing Chaos Dual",
+      "description": "Polyrhythmic chaos. Lead at 1/8, Bass at 1/4. Two Turing Machines with Lorenz modulation.",
+      "file": "turing-chaos-dual.json",
+      "group": "Turing Machine"
+    },
+    {
+      "id": "turing-chaos-trio",
+      "name": "Turing Chaos Trio",
+      "description": "Three voices in polyrhythm. High 1/16, Lead 1/8, Bass 1/4. Lorenz chaos modulates all.",
+      "file": "turing-chaos-trio.json",
+      "group": "Turing Machine"
     }  ]
 }
