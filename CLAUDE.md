@@ -300,10 +300,11 @@ Groupes existants: Basics, Leads, Bass, Pads, FX, Drums, 8-Bit, Experimental, Sh
 
 ### New Preset Checklist
 
-**IMPORTANT:** Lors de la création d'un nouveau preset, **TOUJOURS** mettre à jour les deux fichiers :
+**IMPORTANT:** Lors de la création d'un nouveau preset, **TOUJOURS** :
 
 1. [ ] `public/presets/<preset-name>.json` - Le fichier preset
 2. [ ] `public/presets/manifest.json` - **OBLIGATOIRE** : Ajouter l'entrée au manifest
+3. [ ] **Module Notes** - **OBLIGATOIRE** : Ajouter un module `notes` explicatif dans le preset
 
 ```json
 {
@@ -316,6 +317,31 @@ Groupes existants: Basics, Leads, Bass, Pads, FX, Drums, 8-Bit, Experimental, Sh
 ```
 
 **Ne jamais oublier le manifest !** Sans cette entrée, le preset n'apparaîtra pas dans l'UI.
+
+### Notes Module (OBLIGATOIRE pour chaque preset)
+
+Chaque preset doit inclure un module `notes` qui explique le patch à l'utilisateur :
+
+```json
+{
+  "id": "notes-1",
+  "type": "notes",
+  "name": "Info",
+  "position": { "x": 0, "y": 10 },
+  "params": {
+    "text": "NOM DU PRESET\n\nDescription courte.\n\n- Point 1: explication\n- Point 2: explication\n\nConseils d'utilisation."
+  }
+}
+```
+
+**Contenu recommandé :**
+- Nom du preset en majuscules
+- Description du concept sonore
+- Routing des signaux (CV, audio, modulation)
+- Paramètres clés à ajuster
+- Conseils d'utilisation
+
+**Position :** Placer le module notes dans un coin libre du patch (souvent en bas ou à droite).
 
 ### Preset Creation Guidelines
 
