@@ -1120,5 +1120,33 @@
       "description": "Full techno jam: FM lead + TB-303 acid bass + 909 drums. All driven by Turing Machines.",
       "file": "turing-techno-909.json",
       "group": "Turing Machine"
+    },
+    {
+      "id": "generative-factory",
+      "name": "The Generative Factory",
+      "description": "Full generative techno: Shepard + TB-303 + Resonator + Karplus + 909. Lorenz chaos modulates everything.",
+      "file": "generative-factory.json",
+      "group": "Turing Machine"
+    },
+    {
+      "id": "infinite-cathedral",
+      "name": "The Infinite Cathedral",
+      "description": "Dual Shepard (up+down) + Pipe Organ + Spectral Swarm + Resonator bells. Lorenz chaos. Massive reverb. Pure ambient generative.",
+      "file": "infinite-cathedral.json",
+      "group": "Turing Machine"
+    },
+    {
+      "id": "triple-acid-chaos",
+      "name": "Triple Acid Chaos",
+      "description": "3x TB-303 acid lines driven by Turing Machines + Lorenz chaos filter modulation. Pure acid mayhem.",
+      "file": "triple-acid-chaos.json",
+      "group": "Turing Machine"
+    },
+    {
+      "id": "euclidean-chaos-orchestra",
+      "name": "Euclidean Chaos Orchestra",
+      "description": "5 Euclidean sequencers with polyrhythmic patterns. Lorenz chaos modulates everything. Resonator + FM + Karplus + Wavetable + 909 drums.",
+      "file": "euclidean-chaos-orchestra.json",
+      "group": "Turing Machine"
     }  ]
 }

@@ -1,0 +1,391 @@
+{
+  "id": "generative-factory",
+  "name": "The Generative Factory",
+  "description": "Full generative techno: Shepard lead + TB-303 acid + Resonator percussion + Karplus plucks + 909 drums. Lorenz chaos modulates everything. Never repeats.",
+  "group": "Turing Machine",
+  "graph": {
+    "modules": [
+      {
+        "id": "clock-1",
+        "type": "clock",
+        "name": "Master",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "running": true,
+          "tempo": 128,
+          "rate": 4,
+          "swing": 10
+        }
+      },
+      {
+        "id": "clock-2",
+        "type": "clock",
+        "name": "Slow",
+        "position": { "x": 0, "y": 3 },
+        "params": {
+          "running": true,
+          "tempo": 128,
+          "rate": 3,
+          "swing": 0
+        }
+      },
+      {
+        "id": "turing-lead",
+        "type": "turing-machine",
+        "name": "Lead TM",
+        "position": { "x": 2, "y": 0 },
+        "params": {
+          "probability": 0.25,
+          "length": 16,
+          "range": 2,
+          "scale": 2,
+          "root": 0
+        }
+      },
+      {
+        "id": "turing-bass",
+        "type": "turing-machine",
+        "name": "Bass TM",
+        "position": { "x": 2, "y": 3 },
+        "params": {
+          "probability": 0.08,
+          "length": 4,
+          "range": 1,
+          "scale": 8,
+          "root": 0
+        }
+      },
+      {
+        "id": "turing-perc",
+        "type": "turing-machine",
+        "name": "Perc TM",
+        "position": { "x": 2, "y": 6 },
+        "params": {
+          "probability": 0.4,
+          "length": 8,
+          "range": 1,
+          "scale": 2,
+          "root": 0
+        }
+      },
+      {
+        "id": "euclidean-1",
+        "type": "euclidean",
+        "name": "E(7,16)",
+        "position": { "x": 2, "y": 9 },
+        "params": {
+          "steps": 16,
+          "hits": 7,
+          "rotation": 0,
+          "gateLength": 50
+        }
+      },
+      {
+        "id": "drum-seq",
+        "type": "drum-sequencer",
+        "name": "909 Seq",
+        "position": { "x": 0, "y": 12 },
+        "params": {
+          "enabled": 1,
+          "tempo": 128,
+          "rate": 4,
+          "gateLength": 50,
+          "swing": 10,
+          "length": 16,
+          "drumData": "{\"tracks\":[[{\"g\":1,\"a\":1},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":1},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":1},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":1},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":1},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":1},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}]]}"
+        }
+      },
+      {
+        "id": "chaos-1",
+        "type": "chaos",
+        "name": "Lorenz",
+        "position": { "x": 4, "y": 6 },
+        "params": {
+          "speed": 0.8,
+          "sigma": 12,
+          "rho": 28,
+          "beta": 6,
+          "scale": 0,
+          "root": 0
+        }
+      },
+      {
+        "id": "shepard-1",
+        "type": "shepard",
+        "name": "Shepard",
+        "position": { "x": 4, "y": 0 },
+        "params": {
+          "rate": 0.03,
+          "direction": 1,
+          "baseFreq": 220,
+          "voices": 6,
+          "spread": 1.0,
+          "shape": 0,
+          "shimmer": 0.3,
+          "vibrato": 0.1
+        }
+      },
+      {
+        "id": "tb303-1",
+        "type": "tb-303",
+        "name": "303 Acid",
+        "position": { "x": 4, "y": 3 },
+        "params": {
+          "waveform": 0,
+          "cutoff": 550,
+          "resonance": 0.72,
+          "envmod": 0.8,
+          "decay": 0.28,
+          "accent": 0.65,
+          "glide": 0.035
+        }
+      },
+      {
+        "id": "resonator-1",
+        "type": "resonator",
+        "name": "Metal",
+        "position": { "x": 4, "y": 6 },
+        "params": {
+          "frequency": 440,
+          "decay": 0.85,
+          "brightness": 0.7,
+          "inharmonic": 0.6,
+          "mix": 0.8,
+          "mode": 2,
+          "voices": 4,
+          "exciterType": 1
+        }
+      },
+      {
+        "id": "karplus-1",
+        "type": "karplus",
+        "name": "Plucks",
+        "position": { "x": 4, "y": 9 },
+        "params": {
+          "frequency": 330,
+          "damping": 0.25,
+          "decay": 0.995,
+          "brightness": 0.7,
+          "pluckPos": 0.4
+        }
+      },
+      {
+        "id": "kick-1",
+        "type": "909-kick",
+        "name": "Kick",
+        "position": { "x": 4, "y": 12 },
+        "params": {
+          "tune": 48,
+          "attack": 0.55,
+          "decay": 0.75,
+          "drive": 0.35
+        }
+      },
+      {
+        "id": "snare-1",
+        "type": "909-snare",
+        "name": "Snare",
+        "position": { "x": 5, "y": 12 },
+        "params": {
+          "tune": 180,
+          "tone": 0.5,
+          "snappy": 0.65,
+          "decay": 0.3
+        }
+      },
+      {
+        "id": "hihat-1",
+        "type": "909-hihat",
+        "name": "HiHat",
+        "position": { "x": 6, "y": 12 },
+        "params": {
+          "openDecay": 0.3,
+          "closedDecay": 0.06,
+          "tone": 0.6,
+          "mix": 0.55
+        }
+      },
+      {
+        "id": "clap-1",
+        "type": "909-clap",
+        "name": "Clap",
+        "position": { "x": 7, "y": 12 },
+        "params": {
+          "tone": 0.55,
+          "decay": 0.3,
+          "spread": 0.5
+        }
+      },
+      {
+        "id": "vcf-1",
+        "type": "vcf",
+        "name": "303 VCF",
+        "position": { "x": 6, "y": 3 },
+        "params": {
+          "cutoff": 1200,
+          "resonance": 0.5,
+          "drive": 0.3,
+          "envAmount": 0,
+          "modAmount": 0.6,
+          "keyTrack": 0.3,
+          "model": "ladder",
+          "mode": "lp",
+          "slope": 24
+        }
+      },
+      {
+        "id": "distortion-1",
+        "type": "distortion",
+        "name": "Acid Dist",
+        "position": { "x": 7, "y": 3 },
+        "params": {
+          "drive": 0.35,
+          "tone": 0.55,
+          "mix": 0.45
+        }
+      },
+      {
+        "id": "drum-mix",
+        "type": "mixer-1x2",
+        "name": "Drum Mix",
+        "position": { "x": 8, "y": 12 },
+        "params": {
+          "levelA": 0.2,
+          "levelB": 0.15,
+          "levelC": 0.12,
+          "levelD": 0.15,
+          "levelE": 0,
+          "levelF": 0
+        }
+      },
+      {
+        "id": "synth-mix",
+        "type": "mixer-1x2",
+        "name": "Synth Mix",
+        "position": { "x": 8, "y": 4 },
+        "params": {
+          "levelA": 0.35,
+          "levelB": 0.6,
+          "levelC": 0.3,
+          "levelD": 0.4,
+          "levelE": 0,
+          "levelF": 0
+        }
+      },
+      {
+        "id": "master-mix",
+        "type": "mixer",
+        "name": "Master",
+        "position": { "x": 10, "y": 6 },
+        "params": {
+          "levelA": 0.8,
+          "levelB": 0.4
+        }
+      },
+      {
+        "id": "chorus-1",
+        "type": "chorus",
+        "name": "Chorus",
+        "position": { "x": 12, "y": 6 },
+        "params": {
+          "rate": 0.5,
+          "depth": 0.35,
+          "mix": 0.25,
+          "voices": 3
+        }
+      },
+      {
+        "id": "delay-1",
+        "type": "tape-delay",
+        "name": "Tape",
+        "position": { "x": 14, "y": 6 },
+        "params": {
+          "time": 234,
+          "feedback": 0.4,
+          "mix": 0.25,
+          "tone": 0.45,
+          "wow": 0.15,
+          "flutter": 0.1,
+          "drive": 0.15
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "x": 16, "y": 6 },
+        "params": {
+          "time": 0.5,
+          "damp": 0.55,
+          "preDelay": 20,
+          "mix": 0.25
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Out",
+        "position": { "x": 18, "y": 6 },
+        "params": {
+          "level": 1.0
+        }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "turing-lead", "portId": "clock" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "reset" }, "to": { "moduleId": "turing-lead", "portId": "reset" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-2", "portId": "clock" }, "to": { "moduleId": "turing-bass", "portId": "clock" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-2", "portId": "reset" }, "to": { "moduleId": "turing-bass", "portId": "reset" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "turing-perc", "portId": "clock" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "reset" }, "to": { "moduleId": "turing-perc", "portId": "reset" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "euclidean-1", "portId": "clock" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "reset" }, "to": { "moduleId": "euclidean-1", "portId": "reset" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "drum-seq", "portId": "clock" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "reset" }, "to": { "moduleId": "drum-seq", "portId": "reset" }, "kind": "sync" },
+
+      { "from": { "moduleId": "turing-lead", "portId": "cv" }, "to": { "moduleId": "shepard-1", "portId": "pitch-cv" }, "kind": "cv" },
+      { "from": { "moduleId": "turing-lead", "portId": "pulse" }, "to": { "moduleId": "shepard-1", "portId": "sync" }, "kind": "sync" },
+
+      { "from": { "moduleId": "turing-bass", "portId": "cv" }, "to": { "moduleId": "tb303-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "turing-bass", "portId": "gate" }, "to": { "moduleId": "tb303-1", "portId": "gate" }, "kind": "gate" },
+
+      { "from": { "moduleId": "turing-perc", "portId": "cv" }, "to": { "moduleId": "resonator-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "turing-perc", "portId": "gate" }, "to": { "moduleId": "resonator-1", "portId": "gate" }, "kind": "gate" },
+
+      { "from": { "moduleId": "turing-perc", "portId": "cv" }, "to": { "moduleId": "karplus-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "euclidean-1", "portId": "gate" }, "to": { "moduleId": "karplus-1", "portId": "gate" }, "kind": "gate" },
+
+      { "from": { "moduleId": "drum-seq", "portId": "gate-kick" }, "to": { "moduleId": "kick-1", "portId": "trigger" }, "kind": "gate" },
+      { "from": { "moduleId": "drum-seq", "portId": "acc-kick" }, "to": { "moduleId": "kick-1", "portId": "accent" }, "kind": "cv" },
+      { "from": { "moduleId": "drum-seq", "portId": "gate-snare" }, "to": { "moduleId": "snare-1", "portId": "trigger" }, "kind": "gate" },
+      { "from": { "moduleId": "drum-seq", "portId": "acc-snare" }, "to": { "moduleId": "snare-1", "portId": "accent" }, "kind": "cv" },
+      { "from": { "moduleId": "drum-seq", "portId": "gate-hhc" }, "to": { "moduleId": "hihat-1", "portId": "trigger" }, "kind": "gate" },
+      { "from": { "moduleId": "drum-seq", "portId": "acc-hhc" }, "to": { "moduleId": "hihat-1", "portId": "accent" }, "kind": "cv" },
+      { "from": { "moduleId": "drum-seq", "portId": "gate-clap" }, "to": { "moduleId": "clap-1", "portId": "trigger" }, "kind": "gate" },
+      { "from": { "moduleId": "drum-seq", "portId": "acc-clap" }, "to": { "moduleId": "clap-1", "portId": "accent" }, "kind": "cv" },
+
+      { "from": { "moduleId": "chaos-1", "portId": "y" }, "to": { "moduleId": "vcf-1", "portId": "mod" }, "kind": "cv" },
+
+      { "from": { "moduleId": "tb303-1", "portId": "out" }, "to": { "moduleId": "vcf-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "vcf-1", "portId": "out" }, "to": { "moduleId": "distortion-1", "portId": "in" }, "kind": "audio" },
+
+      { "from": { "moduleId": "kick-1", "portId": "out" }, "to": { "moduleId": "drum-mix", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "snare-1", "portId": "out" }, "to": { "moduleId": "drum-mix", "portId": "in-b" }, "kind": "audio" },
+      { "from": { "moduleId": "hihat-1", "portId": "out" }, "to": { "moduleId": "drum-mix", "portId": "in-c" }, "kind": "audio" },
+      { "from": { "moduleId": "clap-1", "portId": "out" }, "to": { "moduleId": "drum-mix", "portId": "in-d" }, "kind": "audio" },
+
+      { "from": { "moduleId": "shepard-1", "portId": "out" }, "to": { "moduleId": "synth-mix", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "distortion-1", "portId": "out" }, "to": { "moduleId": "synth-mix", "portId": "in-b" }, "kind": "audio" },
+      { "from": { "moduleId": "resonator-1", "portId": "out" }, "to": { "moduleId": "synth-mix", "portId": "in-c" }, "kind": "audio" },
+      { "from": { "moduleId": "karplus-1", "portId": "out" }, "to": { "moduleId": "synth-mix", "portId": "in-d" }, "kind": "audio" },
+
+      { "from": { "moduleId": "synth-mix", "portId": "out" }, "to": { "moduleId": "master-mix", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "drum-mix", "portId": "out" }, "to": { "moduleId": "master-mix", "portId": "in-b" }, "kind": "audio" },
+
+      { "from": { "moduleId": "master-mix", "portId": "out" }, "to": { "moduleId": "chorus-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "chorus-1", "portId": "out" }, "to": { "moduleId": "delay-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "delay-1", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}

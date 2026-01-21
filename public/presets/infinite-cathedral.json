@@ -1,0 +1,267 @@
+{
+  "id": "infinite-cathedral",
+  "name": "The Infinite Cathedral",
+  "description": "Dual Shepard (up+down) + Pipe Organ + Spectral Swarm + Resonator bells. Lorenz chaos. Massive reverb. Pure ambient generative.",
+  "group": "Turing Machine",
+  "graph": {
+    "modules": [
+      {
+        "id": "clock-1",
+        "type": "clock",
+        "name": "Slow Clock",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "running": true,
+          "tempo": 60,
+          "rate": 2,
+          "swing": 0
+        }
+      },
+      {
+        "id": "turing-organ",
+        "type": "turing-machine",
+        "name": "Organ TM",
+        "position": { "x": 2, "y": 0 },
+        "params": {
+          "probability": 0.12,
+          "length": 16,
+          "range": 2,
+          "scale": 2,
+          "root": 0
+        }
+      },
+      {
+        "id": "turing-bells",
+        "type": "turing-machine",
+        "name": "Bells TM",
+        "position": { "x": 2, "y": 3 },
+        "params": {
+          "probability": 0.35,
+          "length": 12,
+          "range": 2,
+          "scale": 2,
+          "root": 0
+        }
+      },
+      {
+        "id": "chaos-1",
+        "type": "chaos",
+        "name": "Lorenz",
+        "position": { "x": 0, "y": 6 },
+        "params": {
+          "speed": 0.4,
+          "sigma": 10,
+          "rho": 28,
+          "beta": 2.67,
+          "scale": 2,
+          "root": 0
+        }
+      },
+      {
+        "id": "shepard-up",
+        "type": "shepard",
+        "name": "Shepard Up",
+        "position": { "x": 4, "y": 0 },
+        "params": {
+          "rate": 0.02,
+          "direction": 1,
+          "baseFreq": 220,
+          "voices": 8,
+          "spread": 1.0,
+          "shape": 0,
+          "shimmer": 0.4,
+          "vibrato": 0.15
+        }
+      },
+      {
+        "id": "shepard-down",
+        "type": "shepard",
+        "name": "Shepard Down",
+        "position": { "x": 4, "y": 2 },
+        "params": {
+          "rate": 0.015,
+          "direction": -1,
+          "baseFreq": 330,
+          "voices": 8,
+          "spread": 1.0,
+          "shape": 0,
+          "shimmer": 0.5,
+          "vibrato": 0.1
+        }
+      },
+      {
+        "id": "pipe-organ",
+        "type": "pipe-organ",
+        "name": "Organ",
+        "position": { "x": 4, "y": 4 },
+        "params": {
+          "frequency": 130,
+          "footage16": 0.7,
+          "footage8": 1.0,
+          "footage4": 0.6,
+          "footage223": 0.3,
+          "footage2": 0.4,
+          "attack": 0.3,
+          "release": 1.5,
+          "chiff": 0.1,
+          "wind": 0.05
+        }
+      },
+      {
+        "id": "swarm-1",
+        "type": "spectral-swarm",
+        "name": "Swarm",
+        "position": { "x": 4, "y": 6 },
+        "params": {
+          "frequency": 165,
+          "partials": 24,
+          "spread": 0.8,
+          "drift": 0.3,
+          "driftSpeed": 0.2,
+          "attack": 2.0,
+          "release": 4.0,
+          "shape": 0,
+          "stereoWidth": 0.9
+        }
+      },
+      {
+        "id": "resonator-1",
+        "type": "resonator",
+        "name": "Bells",
+        "position": { "x": 4, "y": 8 },
+        "params": {
+          "frequency": 880,
+          "decay": 0.92,
+          "brightness": 0.8,
+          "inharmonic": 0.3,
+          "mix": 0.85,
+          "mode": 0,
+          "voices": 4,
+          "exciterType": 1
+        }
+      },
+      {
+        "id": "vcf-organ",
+        "type": "vcf",
+        "name": "Organ VCF",
+        "position": { "x": 6, "y": 4 },
+        "params": {
+          "cutoff": 2000,
+          "resonance": 0.1,
+          "drive": 0.05,
+          "envAmount": 0,
+          "modAmount": 0.4,
+          "keyTrack": 0.3,
+          "model": "svf",
+          "mode": "lp",
+          "slope": 12
+        }
+      },
+      {
+        "id": "shepard-mix",
+        "type": "mixer",
+        "name": "Shepard Mix",
+        "position": { "x": 6, "y": 1 },
+        "params": {
+          "levelA": 0.4,
+          "levelB": 0.35
+        }
+      },
+      {
+        "id": "synth-mix",
+        "type": "mixer-1x2",
+        "name": "Synth Mix",
+        "position": { "x": 8, "y": 4 },
+        "params": {
+          "levelA": 0.5,
+          "levelB": 0.45,
+          "levelC": 0.35,
+          "levelD": 0.3,
+          "levelE": 0,
+          "levelF": 0
+        }
+      },
+      {
+        "id": "chorus-1",
+        "type": "ensemble",
+        "name": "Ensemble",
+        "position": { "x": 10, "y": 4 },
+        "params": {
+          "rate": 0.3,
+          "depth": 0.5,
+          "mix": 0.35,
+          "voices": 3
+        }
+      },
+      {
+        "id": "delay-1",
+        "type": "granular-delay",
+        "name": "Granular",
+        "position": { "x": 12, "y": 4 },
+        "params": {
+          "time": 500,
+          "feedback": 0.5,
+          "mix": 0.3,
+          "grainSize": 80,
+          "pitch": 0,
+          "density": 0.7,
+          "spread": 0.8
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Cathedral",
+        "position": { "x": 14, "y": 4 },
+        "params": {
+          "time": 0.95,
+          "damp": 0.3,
+          "preDelay": 50,
+          "mix": 0.55
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Out",
+        "position": { "x": 16, "y": 4 },
+        "params": {
+          "level": 1.0
+        }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "turing-organ", "portId": "clock" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "reset" }, "to": { "moduleId": "turing-organ", "portId": "reset" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "turing-bells", "portId": "clock" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "reset" }, "to": { "moduleId": "turing-bells", "portId": "reset" }, "kind": "sync" },
+
+      { "from": { "moduleId": "turing-organ", "portId": "cv" }, "to": { "moduleId": "shepard-up", "portId": "pitch-cv" }, "kind": "cv" },
+      { "from": { "moduleId": "turing-organ", "portId": "cv" }, "to": { "moduleId": "shepard-down", "portId": "pitch-cv" }, "kind": "cv" },
+      { "from": { "moduleId": "turing-organ", "portId": "cv" }, "to": { "moduleId": "pipe-organ", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "turing-organ", "portId": "gate" }, "to": { "moduleId": "pipe-organ", "portId": "gate" }, "kind": "gate" },
+
+      { "from": { "moduleId": "chaos-1", "portId": "x" }, "to": { "moduleId": "swarm-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "chaos-1", "portId": "gate" }, "to": { "moduleId": "swarm-1", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "chaos-1", "portId": "y" }, "to": { "moduleId": "vcf-organ", "portId": "mod" }, "kind": "cv" },
+
+      { "from": { "moduleId": "turing-bells", "portId": "cv" }, "to": { "moduleId": "resonator-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "turing-bells", "portId": "gate" }, "to": { "moduleId": "resonator-1", "portId": "gate" }, "kind": "gate" },
+
+      { "from": { "moduleId": "shepard-up", "portId": "out" }, "to": { "moduleId": "shepard-mix", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "shepard-down", "portId": "out" }, "to": { "moduleId": "shepard-mix", "portId": "in-b" }, "kind": "audio" },
+
+      { "from": { "moduleId": "pipe-organ", "portId": "out" }, "to": { "moduleId": "vcf-organ", "portId": "in" }, "kind": "audio" },
+
+      { "from": { "moduleId": "shepard-mix", "portId": "out" }, "to": { "moduleId": "synth-mix", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "vcf-organ", "portId": "out" }, "to": { "moduleId": "synth-mix", "portId": "in-b" }, "kind": "audio" },
+      { "from": { "moduleId": "swarm-1", "portId": "out" }, "to": { "moduleId": "synth-mix", "portId": "in-c" }, "kind": "audio" },
+      { "from": { "moduleId": "resonator-1", "portId": "out" }, "to": { "moduleId": "synth-mix", "portId": "in-d" }, "kind": "audio" },
+
+      { "from": { "moduleId": "synth-mix", "portId": "out" }, "to": { "moduleId": "chorus-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "chorus-1", "portId": "out" }, "to": { "moduleId": "delay-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "delay-1", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}
