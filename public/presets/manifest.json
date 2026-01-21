@@ -1113,5 +1113,12 @@
       "description": "Three voices in polyrhythm. High 1/16, Lead 1/8, Bass 1/4. Lorenz chaos modulates all.",
       "file": "turing-chaos-trio.json",
       "group": "Turing Machine"
+    },
+    {
+      "id": "turing-techno-909",
+      "name": "Turing Techno 909",
+      "description": "Full techno jam: FM lead + TB-303 acid bass + 909 drums. All driven by Turing Machines.",
+      "file": "turing-techno-909.json",
+      "group": "Turing Machine"
     }  ]
 }

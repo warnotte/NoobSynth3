@@ -1,0 +1,294 @@
+{
+  "id": "turing-techno-909",
+  "name": "Turing Techno 909",
+  "description": "Full techno jam: FM lead + acid bass + 909 drums. Turing Machines drive the melodies.",
+  "group": "Turing Machine",
+  "graph": {
+    "modules": [
+      {
+        "id": "clock-1",
+        "type": "clock",
+        "name": "Clock",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "running": true,
+          "tempo": 130,
+          "rate": 4,
+          "swing": 8
+        }
+      },
+      {
+        "id": "turing-1",
+        "type": "turing-machine",
+        "name": "Lead TM",
+        "position": { "x": 2, "y": 0 },
+        "params": {
+          "probability": 0.18,
+          "length": 8,
+          "range": 2,
+          "scale": 8,
+          "root": 0
+        }
+      },
+      {
+        "id": "turing-2",
+        "type": "turing-machine",
+        "name": "Bass TM",
+        "position": { "x": 2, "y": 2 },
+        "params": {
+          "probability": 0.05,
+          "length": 4,
+          "range": 1,
+          "scale": 8,
+          "root": 0
+        }
+      },
+      {
+        "id": "drum-seq",
+        "type": "drum-sequencer",
+        "name": "Drums",
+        "position": { "x": 0, "y": 5 },
+        "params": {
+          "enabled": 1,
+          "tempo": 130,
+          "rate": 4,
+          "gateLength": 50,
+          "swing": 8,
+          "length": 16,
+          "drumData": "{\"tracks\":[[{\"g\":1,\"a\":1},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":1},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":1},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":1},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}]]}"
+        }
+      },
+      {
+        "id": "fm-1",
+        "type": "fm-op",
+        "name": "FM Lead",
+        "position": { "x": 4, "y": 0 },
+        "params": {
+          "frequency": 440,
+          "ratio": 2,
+          "index": 3,
+          "feedback": 0.1,
+          "attack": 0.005,
+          "decay": 0.15,
+          "sustain": 0.3,
+          "release": 0.2
+        }
+      },
+      {
+        "id": "osc-2",
+        "type": "oscillator",
+        "name": "Bass VCO",
+        "position": { "x": 4, "y": 2 },
+        "params": {
+          "frequency": 55,
+          "type": "sawtooth",
+          "pwm": 0.5,
+          "unison": 1,
+          "detune": 0,
+          "fmLin": 0,
+          "fmExp": 0,
+          "subMix": 0.4,
+          "subOct": 1
+        }
+      },
+      {
+        "id": "adsr-2",
+        "type": "adsr",
+        "name": "Bass Env",
+        "position": { "x": 5, "y": 2 },
+        "params": {
+          "attack": 0.002,
+          "decay": 0.2,
+          "sustain": 0.0,
+          "release": 0.15
+        }
+      },
+      {
+        "id": "vcf-2",
+        "type": "vcf",
+        "name": "Acid VCF",
+        "position": { "x": 6, "y": 2 },
+        "params": {
+          "cutoff": 700,
+          "resonance": 0.75,
+          "drive": 0.4,
+          "envAmount": 0.8,
+          "modAmount": 0,
+          "keyTrack": 0.3,
+          "model": "ladder",
+          "mode": "lp",
+          "slope": 24
+        }
+      },
+      {
+        "id": "kick-1",
+        "type": "909-kick",
+        "name": "Kick",
+        "position": { "x": 4, "y": 5 },
+        "params": {
+          "tune": 50,
+          "attack": 0.6,
+          "decay": 0.7,
+          "drive": 0.4
+        }
+      },
+      {
+        "id": "snare-1",
+        "type": "909-snare",
+        "name": "Snare",
+        "position": { "x": 5, "y": 5 },
+        "params": {
+          "tune": 180,
+          "tone": 0.5,
+          "snappy": 0.7,
+          "decay": 0.35
+        }
+      },
+      {
+        "id": "hihat-1",
+        "type": "909-hihat",
+        "name": "HiHat",
+        "position": { "x": 6, "y": 5 },
+        "params": {
+          "openDecay": 0.35,
+          "closedDecay": 0.08,
+          "tone": 0.65,
+          "mix": 0.6
+        }
+      },
+      {
+        "id": "gain-1",
+        "type": "gain",
+        "name": "Lead VCA",
+        "position": { "x": 6, "y": 0 },
+        "params": {
+          "gain": 0.5
+        }
+      },
+      {
+        "id": "gain-2",
+        "type": "gain",
+        "name": "Bass VCA",
+        "position": { "x": 7, "y": 2 },
+        "params": {
+          "gain": 0.7
+        }
+      },
+      {
+        "id": "distortion-1",
+        "type": "distortion",
+        "name": "Dist",
+        "position": { "x": 8, "y": 2 },
+        "params": {
+          "drive": 0.3,
+          "tone": 0.5,
+          "mix": 0.4,
+          "mode": "soft"
+        }
+      },
+      {
+        "id": "delay-1",
+        "type": "delay",
+        "name": "Delay",
+        "position": { "x": 8, "y": 0 },
+        "params": {
+          "time": 231,
+          "feedback": 0.4,
+          "mix": 0.25,
+          "tone": 0.5,
+          "pingPong": true
+        }
+      },
+      {
+        "id": "drum-mix",
+        "type": "mixer-1x2",
+        "name": "Drum Mix",
+        "position": { "x": 7, "y": 5 },
+        "params": {
+          "levelA": 0.4,
+          "levelB": 0.45,
+          "levelC": 0.45,
+          "levelD": 0,
+          "levelE": 0,
+          "levelF": 0
+        }
+      },
+      {
+        "id": "mixer-1",
+        "type": "mixer-1x2",
+        "name": "Master",
+        "position": { "x": 10, "y": 2 },
+        "params": {
+          "levelA": 0.6,
+          "levelB": 0.8,
+          "levelC": 0.7,
+          "levelD": 0,
+          "levelE": 0,
+          "levelF": 0
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "x": 12, "y": 2 },
+        "params": {
+          "time": 0.4,
+          "damp": 0.6,
+          "preDelay": 15,
+          "mix": 0.2
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Out",
+        "position": { "x": 14, "y": 2 },
+        "params": {
+          "level": 1.0
+        }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "turing-1", "portId": "clock" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "reset" }, "to": { "moduleId": "turing-1", "portId": "reset" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "turing-2", "portId": "clock" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "reset" }, "to": { "moduleId": "turing-2", "portId": "reset" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "drum-seq", "portId": "clock" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "reset" }, "to": { "moduleId": "drum-seq", "portId": "reset" }, "kind": "sync" },
+
+      { "from": { "moduleId": "turing-1", "portId": "cv" }, "to": { "moduleId": "fm-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "turing-1", "portId": "gate" }, "to": { "moduleId": "fm-1", "portId": "gate" }, "kind": "gate" },
+
+      { "from": { "moduleId": "turing-2", "portId": "cv" }, "to": { "moduleId": "osc-2", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "turing-2", "portId": "gate" }, "to": { "moduleId": "adsr-2", "portId": "gate" }, "kind": "gate" },
+
+      { "from": { "moduleId": "fm-1", "portId": "out" }, "to": { "moduleId": "gain-1", "portId": "in" }, "kind": "audio" },
+
+      { "from": { "moduleId": "osc-2", "portId": "out" }, "to": { "moduleId": "vcf-2", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-2", "portId": "env" }, "to": { "moduleId": "vcf-2", "portId": "env" }, "kind": "cv" },
+      { "from": { "moduleId": "adsr-2", "portId": "env" }, "to": { "moduleId": "gain-2", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "vcf-2", "portId": "out" }, "to": { "moduleId": "gain-2", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "gain-2", "portId": "out" }, "to": { "moduleId": "distortion-1", "portId": "in" }, "kind": "audio" },
+
+      { "from": { "moduleId": "drum-seq", "portId": "gate-kick" }, "to": { "moduleId": "kick-1", "portId": "trigger" }, "kind": "gate" },
+      { "from": { "moduleId": "drum-seq", "portId": "acc-kick" }, "to": { "moduleId": "kick-1", "portId": "accent" }, "kind": "cv" },
+      { "from": { "moduleId": "drum-seq", "portId": "gate-snare" }, "to": { "moduleId": "snare-1", "portId": "trigger" }, "kind": "gate" },
+      { "from": { "moduleId": "drum-seq", "portId": "acc-snare" }, "to": { "moduleId": "snare-1", "portId": "accent" }, "kind": "cv" },
+      { "from": { "moduleId": "drum-seq", "portId": "gate-hhc" }, "to": { "moduleId": "hihat-1", "portId": "trigger" }, "kind": "gate" },
+      { "from": { "moduleId": "drum-seq", "portId": "acc-hhc" }, "to": { "moduleId": "hihat-1", "portId": "accent" }, "kind": "cv" },
+
+      { "from": { "moduleId": "kick-1", "portId": "out" }, "to": { "moduleId": "drum-mix", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "snare-1", "portId": "out" }, "to": { "moduleId": "drum-mix", "portId": "in-b" }, "kind": "audio" },
+      { "from": { "moduleId": "hihat-1", "portId": "out" }, "to": { "moduleId": "drum-mix", "portId": "in-c" }, "kind": "audio" },
+
+      { "from": { "moduleId": "gain-1", "portId": "out" }, "to": { "moduleId": "delay-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "delay-1", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "distortion-1", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-b" }, "kind": "audio" },
+      { "from": { "moduleId": "drum-mix", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-c" }, "kind": "audio" },
+
+      { "from": { "moduleId": "mixer-1", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}

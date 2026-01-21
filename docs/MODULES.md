@@ -1189,7 +1189,11 @@ Turing Machine (cv) → VCO (pitch)
 - **Turing Plucks** - Mélodies Karplus-Strong avec chorus et delay
 - **Turing Ambient** - Pads wavetable évolutifs avec granular delay
 - **Turing Techno** - FM lead + acid bass, deux Turing Machines
+- **Turing Techno 909** - Turing Techno + 909 drums (kick, snare, hihat)
 - **Turing Chaos** - Lorenz chaos module le filtre et le wavetable
+- **Turing Chaos Bright** - Comme Chaos mais cutoff VCF élevé (3150 Hz)
+- **Turing Chaos Dual** - Deux voix (lead + bass) en polyrythmie 2:1
+- **Turing Chaos Trio** - Trois voix (high, lead, bass) en polyrythmie
 - **Turing Dual Band** - Deux bandes de fréquences, rates différents
 
 ### Main Out
