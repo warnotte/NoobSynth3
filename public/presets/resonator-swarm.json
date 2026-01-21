@@ -1,0 +1,358 @@
+{
+  "id": "resonator-swarm",
+  "name": "Resonator Swarm",
+  "description": "4 Resonators (bells, strings, metallic, pluck) + Spectral Swarm + ascending Shepard. Euclidean patterns with phase shifts. Otherworldly textures.",
+  "group": "Turing Machine",
+  "graph": {
+    "modules": [
+      {
+        "id": "clock-1",
+        "type": "clock",
+        "name": "Master Clock",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "running": true,
+          "tempo": 72,
+          "rate": 3,
+          "swing": 0
+        }
+      },
+      {
+        "id": "chaos-1",
+        "type": "chaos",
+        "name": "Lorenz",
+        "position": { "x": 0, "y": 4 },
+        "params": {
+          "speed": 0.25,
+          "sigma": 10,
+          "rho": 28,
+          "beta": 2.67,
+          "scale": 2,
+          "root": 0
+        }
+      },
+      {
+        "id": "shepard-1",
+        "type": "shepard",
+        "name": "Shepard Rise",
+        "position": { "x": 0, "y": 8 },
+        "params": {
+          "rate": 0.008,
+          "direction": 1,
+          "baseFreq": 110,
+          "voices": 6,
+          "spread": 1.0,
+          "shape": 0,
+          "shimmer": 0.6,
+          "vibrato": 0.1
+        }
+      },
+      {
+        "id": "euc-bells",
+        "type": "euclidean",
+        "name": "E(5,16)",
+        "position": { "x": 2, "y": 0 },
+        "params": {
+          "steps": 16,
+          "hits": 5,
+          "shift": 0,
+          "probability": 0.9
+        }
+      },
+      {
+        "id": "euc-strings",
+        "type": "euclidean",
+        "name": "E(3,8)",
+        "position": { "x": 2, "y": 2 },
+        "params": {
+          "steps": 8,
+          "hits": 3,
+          "shift": 2,
+          "probability": 1.0
+        }
+      },
+      {
+        "id": "euc-metal",
+        "type": "euclidean",
+        "name": "E(7,12)",
+        "position": { "x": 2, "y": 4 },
+        "params": {
+          "steps": 12,
+          "hits": 7,
+          "shift": 4,
+          "probability": 0.85
+        }
+      },
+      {
+        "id": "euc-pluck",
+        "type": "euclidean",
+        "name": "E(4,7)",
+        "position": { "x": 2, "y": 6 },
+        "params": {
+          "steps": 7,
+          "hits": 4,
+          "shift": 1,
+          "probability": 0.95
+        }
+      },
+      {
+        "id": "euc-swarm",
+        "type": "euclidean",
+        "name": "E(2,5)",
+        "position": { "x": 2, "y": 8 },
+        "params": {
+          "steps": 5,
+          "hits": 2,
+          "shift": 0,
+          "probability": 1.0
+        }
+      },
+      {
+        "id": "res-bells",
+        "type": "resonator",
+        "name": "Bells",
+        "position": { "x": 4, "y": 0 },
+        "params": {
+          "frequency": 1760,
+          "decay": 0.92,
+          "brightness": 0.85,
+          "inharmonic": 0.15,
+          "mix": 0.9,
+          "mode": 0,
+          "voices": 4,
+          "exciterType": 1
+        }
+      },
+      {
+        "id": "res-strings",
+        "type": "resonator",
+        "name": "Strings",
+        "position": { "x": 4, "y": 2 },
+        "params": {
+          "frequency": 220,
+          "decay": 0.96,
+          "brightness": 0.5,
+          "inharmonic": 0.02,
+          "mix": 0.85,
+          "mode": 1,
+          "voices": 6,
+          "exciterType": 2
+        }
+      },
+      {
+        "id": "res-metal",
+        "type": "resonator",
+        "name": "Metallic",
+        "position": { "x": 4, "y": 4 },
+        "params": {
+          "frequency": 660,
+          "decay": 0.85,
+          "brightness": 0.9,
+          "inharmonic": 0.5,
+          "mix": 0.8,
+          "mode": 0,
+          "voices": 3,
+          "exciterType": 1
+        }
+      },
+      {
+        "id": "res-pluck",
+        "type": "resonator",
+        "name": "Pluck",
+        "position": { "x": 4, "y": 6 },
+        "params": {
+          "frequency": 440,
+          "decay": 0.75,
+          "brightness": 0.7,
+          "inharmonic": 0.08,
+          "mix": 0.9,
+          "mode": 0,
+          "voices": 2,
+          "exciterType": 0
+        }
+      },
+      {
+        "id": "swarm-1",
+        "type": "spectral-swarm",
+        "name": "Swarm",
+        "position": { "x": 4, "y": 8 },
+        "params": {
+          "frequency": 165,
+          "partials": 32,
+          "spread": 0.6,
+          "drift": 0.4,
+          "driftSpeed": 0.15,
+          "attack": 3.0,
+          "release": 5.0,
+          "shape": 0,
+          "stereoWidth": 1.0
+        }
+      },
+      {
+        "id": "vcf-bells",
+        "type": "vcf",
+        "name": "Bells VCF",
+        "position": { "x": 6, "y": 0 },
+        "params": {
+          "cutoff": 5000,
+          "resonance": 0.15,
+          "drive": 0,
+          "envAmount": 0,
+          "modAmount": 0.3,
+          "keyTrack": 0.4,
+          "model": "svf",
+          "mode": "lp",
+          "slope": 12
+        }
+      },
+      {
+        "id": "vcf-metal",
+        "type": "vcf",
+        "name": "Metal VCF",
+        "position": { "x": 6, "y": 4 },
+        "params": {
+          "cutoff": 3000,
+          "resonance": 0.35,
+          "drive": 0.1,
+          "envAmount": 0,
+          "modAmount": 0.5,
+          "keyTrack": 0.2,
+          "model": "svf",
+          "mode": "bp",
+          "slope": 12
+        }
+      },
+      {
+        "id": "res-mix",
+        "type": "mixer-1x2",
+        "name": "Resonator Mix",
+        "position": { "x": 8, "y": 2 },
+        "params": {
+          "levelA": 0.35,
+          "levelB": 0.45,
+          "levelC": 0.3,
+          "levelD": 0.4,
+          "levelE": 0,
+          "levelF": 0
+        }
+      },
+      {
+        "id": "texture-mix",
+        "type": "mixer",
+        "name": "Texture Mix",
+        "position": { "x": 10, "y": 4 },
+        "params": {
+          "levelA": 0.6,
+          "levelB": 0.4
+        }
+      },
+      {
+        "id": "master-mix",
+        "type": "mixer",
+        "name": "Master Mix",
+        "position": { "x": 10, "y": 6 },
+        "params": {
+          "levelA": 0.7,
+          "levelB": 0.25
+        }
+      },
+      {
+        "id": "chorus-1",
+        "type": "ensemble",
+        "name": "Ensemble",
+        "position": { "x": 12, "y": 4 },
+        "params": {
+          "rate": 0.2,
+          "depth": 0.5,
+          "mix": 0.35,
+          "voices": 3
+        }
+      },
+      {
+        "id": "delay-1",
+        "type": "granular-delay",
+        "name": "Granular",
+        "position": { "x": 14, "y": 4 },
+        "params": {
+          "time": 666,
+          "feedback": 0.55,
+          "mix": 0.35,
+          "grainSize": 100,
+          "pitch": 7,
+          "density": 0.5,
+          "spread": 0.9
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Cathedral",
+        "position": { "x": 16, "y": 4 },
+        "params": {
+          "time": 0.92,
+          "damp": 0.25,
+          "preDelay": 60,
+          "mix": 0.5
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Out",
+        "position": { "x": 18, "y": 4 },
+        "params": {
+          "level": 1.0
+        }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "euc-bells", "portId": "clock" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "reset" }, "to": { "moduleId": "euc-bells", "portId": "reset" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "euc-strings", "portId": "clock" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "reset" }, "to": { "moduleId": "euc-strings", "portId": "reset" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "euc-metal", "portId": "clock" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "reset" }, "to": { "moduleId": "euc-metal", "portId": "reset" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "euc-pluck", "portId": "clock" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "reset" }, "to": { "moduleId": "euc-pluck", "portId": "reset" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "euc-swarm", "portId": "clock" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "reset" }, "to": { "moduleId": "euc-swarm", "portId": "reset" }, "kind": "sync" },
+
+      { "from": { "moduleId": "chaos-1", "portId": "cv" }, "to": { "moduleId": "res-bells", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "euc-bells", "portId": "gate" }, "to": { "moduleId": "res-bells", "portId": "gate" }, "kind": "gate" },
+
+      { "from": { "moduleId": "chaos-1", "portId": "cv" }, "to": { "moduleId": "res-strings", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "euc-strings", "portId": "gate" }, "to": { "moduleId": "res-strings", "portId": "gate" }, "kind": "gate" },
+
+      { "from": { "moduleId": "chaos-1", "portId": "cv" }, "to": { "moduleId": "res-metal", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "euc-metal", "portId": "gate" }, "to": { "moduleId": "res-metal", "portId": "gate" }, "kind": "gate" },
+
+      { "from": { "moduleId": "chaos-1", "portId": "cv" }, "to": { "moduleId": "res-pluck", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "euc-pluck", "portId": "gate" }, "to": { "moduleId": "res-pluck", "portId": "gate" }, "kind": "gate" },
+
+      { "from": { "moduleId": "chaos-1", "portId": "cv" }, "to": { "moduleId": "swarm-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "euc-swarm", "portId": "gate" }, "to": { "moduleId": "swarm-1", "portId": "gate" }, "kind": "gate" },
+
+      { "from": { "moduleId": "chaos-1", "portId": "x" }, "to": { "moduleId": "vcf-bells", "portId": "mod" }, "kind": "cv" },
+      { "from": { "moduleId": "chaos-1", "portId": "y" }, "to": { "moduleId": "vcf-metal", "portId": "mod" }, "kind": "cv" },
+
+      { "from": { "moduleId": "res-bells", "portId": "out" }, "to": { "moduleId": "vcf-bells", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "res-metal", "portId": "out" }, "to": { "moduleId": "vcf-metal", "portId": "in" }, "kind": "audio" },
+
+      { "from": { "moduleId": "vcf-bells", "portId": "out" }, "to": { "moduleId": "res-mix", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "res-strings", "portId": "out" }, "to": { "moduleId": "res-mix", "portId": "in-b" }, "kind": "audio" },
+      { "from": { "moduleId": "vcf-metal", "portId": "out" }, "to": { "moduleId": "res-mix", "portId": "in-c" }, "kind": "audio" },
+      { "from": { "moduleId": "res-pluck", "portId": "out" }, "to": { "moduleId": "res-mix", "portId": "in-d" }, "kind": "audio" },
+
+      { "from": { "moduleId": "res-mix", "portId": "out" }, "to": { "moduleId": "texture-mix", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "swarm-1", "portId": "out" }, "to": { "moduleId": "texture-mix", "portId": "in-b" }, "kind": "audio" },
+
+      { "from": { "moduleId": "texture-mix", "portId": "out" }, "to": { "moduleId": "master-mix", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "shepard-1", "portId": "out" }, "to": { "moduleId": "master-mix", "portId": "in-b" }, "kind": "audio" },
+
+      { "from": { "moduleId": "master-mix", "portId": "out" }, "to": { "moduleId": "chorus-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "chorus-1", "portId": "out" }, "to": { "moduleId": "delay-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "delay-1", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}

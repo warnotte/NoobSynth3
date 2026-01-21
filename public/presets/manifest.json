@@ -1136,17 +1136,17 @@
       "group": "Turing Machine"
     },
     {
-      "id": "triple-acid-chaos",
-      "name": "Triple Acid Chaos",
-      "description": "3x TB-303 acid lines driven by Turing Machines + Lorenz chaos filter modulation. Pure acid mayhem.",
-      "file": "triple-acid-chaos.json",
+      "id": "resonator-swarm",
+      "name": "Resonator Swarm",
+      "description": "4 Resonators (bells, strings, metallic, pluck) + Spectral Swarm + ascending Shepard. Euclidean patterns with phase shifts. Otherworldly textures.",
+      "file": "resonator-swarm.json",
       "group": "Turing Machine"
     },
     {
-      "id": "euclidean-chaos-orchestra",
-      "name": "Euclidean Chaos Orchestra",
-      "description": "5 Euclidean sequencers with polyrhythmic patterns. Lorenz chaos modulates everything. Resonator + FM + Karplus + Wavetable + 909 drums.",
-      "file": "euclidean-chaos-orchestra.json",
+      "id": "lorenz-machine",
+      "name": "The Lorenz Machine",
+      "description": "Pure chaos-driven synthesis. Lorenz attractor controls EVERYTHING: pitch (quantized), gates (derivative), filter, delay feedback, reverb. Self-evolving sonic organism.",
+      "file": "lorenz-machine.json",
       "group": "Turing Machine"
     }  ]
 }

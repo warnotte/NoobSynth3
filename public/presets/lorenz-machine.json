@@ -1,0 +1,270 @@
+{
+  "id": "lorenz-machine",
+  "name": "The Lorenz Machine",
+  "description": "Pure chaos-driven synthesis. Lorenz attractor controls EVERYTHING: pitch (quantized), gates (derivative), filter, delay feedback, reverb. Self-evolving sonic organism.",
+  "group": "Turing Machine",
+  "graph": {
+    "modules": [
+      {
+        "id": "chaos-main",
+        "type": "chaos",
+        "name": "Lorenz Core",
+        "position": { "x": 0, "y": 4 },
+        "params": {
+          "speed": 0.5,
+          "sigma": 10,
+          "rho": 28,
+          "beta": 2.67,
+          "scale": 8,
+          "root": 0
+        }
+      },
+      {
+        "id": "chaos-slow",
+        "type": "chaos",
+        "name": "Lorenz Slow",
+        "position": { "x": 0, "y": 8 },
+        "params": {
+          "speed": 0.08,
+          "sigma": 12,
+          "rho": 32,
+          "beta": 2.5,
+          "scale": 2,
+          "root": 0
+        }
+      },
+      {
+        "id": "wt-lead",
+        "type": "wavetable",
+        "name": "Lead",
+        "position": { "x": 4, "y": 0 },
+        "params": {
+          "frequency": 440,
+          "position": 0.5,
+          "bank": 0,
+          "voices": 5,
+          "detune": 0.12,
+          "spread": 0.6,
+          "attack": 0.05,
+          "decay": 0.3,
+          "sustain": 0.7,
+          "release": 0.8,
+          "vibrato": 0.15,
+          "vibratoRate": 5
+        }
+      },
+      {
+        "id": "fm-mid",
+        "type": "fm-op",
+        "name": "FM Mid",
+        "position": { "x": 4, "y": 3 },
+        "params": {
+          "frequency": 220,
+          "ratio": 2,
+          "index": 3.0,
+          "feedback": 0.15,
+          "attack": 0.02,
+          "decay": 0.4,
+          "sustain": 0.5,
+          "release": 0.6
+        }
+      },
+      {
+        "id": "swarm-pad",
+        "type": "spectral-swarm",
+        "name": "Swarm Pad",
+        "position": { "x": 4, "y": 6 },
+        "params": {
+          "frequency": 110,
+          "partials": 24,
+          "spread": 0.5,
+          "drift": 0.6,
+          "driftSpeed": 0.3,
+          "attack": 2.0,
+          "release": 4.0,
+          "shape": 0,
+          "stereoWidth": 0.8
+        }
+      },
+      {
+        "id": "res-perc",
+        "type": "resonator",
+        "name": "Perc",
+        "position": { "x": 4, "y": 9 },
+        "params": {
+          "frequency": 880,
+          "decay": 0.7,
+          "brightness": 0.8,
+          "inharmonic": 0.35,
+          "mix": 0.9,
+          "mode": 0,
+          "voices": 3,
+          "exciterType": 1
+        }
+      },
+      {
+        "id": "vcf-lead",
+        "type": "vcf",
+        "name": "Lead VCF",
+        "position": { "x": 6, "y": 0 },
+        "params": {
+          "cutoff": 2000,
+          "resonance": 0.5,
+          "drive": 0.15,
+          "envAmount": 0,
+          "modAmount": 0.7,
+          "keyTrack": 0.3,
+          "model": "ladder",
+          "mode": "lp",
+          "slope": 24
+        }
+      },
+      {
+        "id": "vcf-fm",
+        "type": "vcf",
+        "name": "FM VCF",
+        "position": { "x": 6, "y": 3 },
+        "params": {
+          "cutoff": 1500,
+          "resonance": 0.4,
+          "drive": 0.1,
+          "envAmount": 0,
+          "modAmount": 0.6,
+          "keyTrack": 0.2,
+          "model": "svf",
+          "mode": "lp",
+          "slope": 12
+        }
+      },
+      {
+        "id": "vcf-swarm",
+        "type": "vcf",
+        "name": "Swarm VCF",
+        "position": { "x": 6, "y": 6 },
+        "params": {
+          "cutoff": 800,
+          "resonance": 0.25,
+          "drive": 0.05,
+          "envAmount": 0,
+          "modAmount": 0.5,
+          "keyTrack": 0.1,
+          "model": "svf",
+          "mode": "lp",
+          "slope": 12
+        }
+      },
+      {
+        "id": "wavefolder-1",
+        "type": "wavefolder",
+        "name": "Folder",
+        "position": { "x": 8, "y": 0 },
+        "params": {
+          "drive": 0.4,
+          "folds": 3,
+          "symmetry": 0.5,
+          "mix": 0.3
+        }
+      },
+      {
+        "id": "synth-mix",
+        "type": "mixer-1x2",
+        "name": "Synth Mix",
+        "position": { "x": 10, "y": 3 },
+        "params": {
+          "levelA": 0.4,
+          "levelB": 0.35,
+          "levelC": 0.45,
+          "levelD": 0.25,
+          "levelE": 0,
+          "levelF": 0
+        }
+      },
+      {
+        "id": "phaser-1",
+        "type": "phaser",
+        "name": "Phaser",
+        "position": { "x": 12, "y": 3 },
+        "params": {
+          "rate": 0.3,
+          "depth": 0.6,
+          "feedback": 0.5,
+          "stages": 6,
+          "mix": 0.4
+        }
+      },
+      {
+        "id": "delay-1",
+        "type": "tape-delay",
+        "name": "Tape Delay",
+        "position": { "x": 14, "y": 3 },
+        "params": {
+          "time": 400,
+          "feedback": 0.5,
+          "mix": 0.35,
+          "wow": 0.15,
+          "flutter": 0.1,
+          "saturation": 0.2,
+          "highCut": 4000,
+          "lowCut": 80
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Space",
+        "position": { "x": 16, "y": 3 },
+        "params": {
+          "time": 0.85,
+          "damp": 0.35,
+          "preDelay": 40,
+          "mix": 0.45
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Out",
+        "position": { "x": 18, "y": 3 },
+        "params": {
+          "level": 1.0
+        }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "chaos-main", "portId": "cv" }, "to": { "moduleId": "wt-lead", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "chaos-main", "portId": "gate" }, "to": { "moduleId": "wt-lead", "portId": "gate" }, "kind": "gate" },
+
+      { "from": { "moduleId": "chaos-main", "portId": "cv" }, "to": { "moduleId": "fm-mid", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "chaos-main", "portId": "gate" }, "to": { "moduleId": "fm-mid", "portId": "gate" }, "kind": "gate" },
+
+      { "from": { "moduleId": "chaos-slow", "portId": "cv" }, "to": { "moduleId": "swarm-pad", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "chaos-slow", "portId": "gate" }, "to": { "moduleId": "swarm-pad", "portId": "gate" }, "kind": "gate" },
+
+      { "from": { "moduleId": "chaos-main", "portId": "cv" }, "to": { "moduleId": "res-perc", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "chaos-main", "portId": "gate" }, "to": { "moduleId": "res-perc", "portId": "gate" }, "kind": "gate" },
+
+      { "from": { "moduleId": "chaos-main", "portId": "x" }, "to": { "moduleId": "vcf-lead", "portId": "mod" }, "kind": "cv" },
+      { "from": { "moduleId": "chaos-main", "portId": "y" }, "to": { "moduleId": "vcf-fm", "portId": "mod" }, "kind": "cv" },
+      { "from": { "moduleId": "chaos-slow", "portId": "x" }, "to": { "moduleId": "vcf-swarm", "portId": "mod" }, "kind": "cv" },
+
+      { "from": { "moduleId": "chaos-main", "portId": "z" }, "to": { "moduleId": "wt-lead", "portId": "pos-cv" }, "kind": "cv" },
+      { "from": { "moduleId": "chaos-slow", "portId": "y" }, "to": { "moduleId": "fm-mid", "portId": "index-cv" }, "kind": "cv" },
+
+      { "from": { "moduleId": "wt-lead", "portId": "out" }, "to": { "moduleId": "vcf-lead", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "fm-mid", "portId": "out" }, "to": { "moduleId": "vcf-fm", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "swarm-pad", "portId": "out" }, "to": { "moduleId": "vcf-swarm", "portId": "in" }, "kind": "audio" },
+
+      { "from": { "moduleId": "vcf-lead", "portId": "out" }, "to": { "moduleId": "wavefolder-1", "portId": "in" }, "kind": "audio" },
+
+      { "from": { "moduleId": "wavefolder-1", "portId": "out" }, "to": { "moduleId": "synth-mix", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "vcf-fm", "portId": "out" }, "to": { "moduleId": "synth-mix", "portId": "in-b" }, "kind": "audio" },
+      { "from": { "moduleId": "vcf-swarm", "portId": "out" }, "to": { "moduleId": "synth-mix", "portId": "in-c" }, "kind": "audio" },
+      { "from": { "moduleId": "res-perc", "portId": "out" }, "to": { "moduleId": "synth-mix", "portId": "in-d" }, "kind": "audio" },
+
+      { "from": { "moduleId": "synth-mix", "portId": "out" }, "to": { "moduleId": "phaser-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "phaser-1", "portId": "out" }, "to": { "moduleId": "delay-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "delay-1", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}
