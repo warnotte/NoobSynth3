@@ -30,6 +30,7 @@ export type ModuleType =
   | 'hpf'
   | 'mixer'
   | 'mixer-1x2'
+  | 'mixer-8'
   | 'chorus'
   | 'ensemble'
   | 'choir'
@@ -54,6 +55,13 @@ export type ModuleType =
   | '909-clap'
   | '909-tom'
   | '909-rimshot'
+  // TR-808 Drums
+  | '808-kick'
+  | '808-snare'
+  | '808-hihat'
+  | '808-cowbell'
+  | '808-clap'
+  | '808-tom'
   // Drum Sequencer
   | 'drum-sequencer'
   // Euclidean Sequencer

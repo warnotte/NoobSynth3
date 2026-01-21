@@ -1,7 +1,7 @@
 /**
  * Amplifier and mixer module controls
  *
- * Modules: gain, cv-vca, mixer, mixer-1x2, ring-mod
+ * Modules: gain, cv-vca, mixer, mixer-1x2, mixer-8, ring-mod
  */
 
 import type React from 'react'
@@ -62,6 +62,26 @@ export function renderAmplifierControls(props: ControlProps): React.ReactElement
           <RotaryKnob
             key={ch}
             label={`Level ${ch}`}
+            min={0}
+            max={1}
+            step={0.01}
+            value={Number(module.params[`level${ch}`] ?? 0.6)}
+            onChange={(value) => updateParam(module.id, `level${ch}`, value)}
+            format={formatDecimal2}
+          />
+        ))}
+      </>
+    )
+  }
+
+  if (module.type === 'mixer-8') {
+    const channels = [1, 2, 3, 4, 5, 6, 7, 8]
+    return (
+      <>
+        {channels.map((ch) => (
+          <RotaryKnob
+            key={ch}
+            label={`Ch ${ch}`}
             min={0}
             max={1}
             step={0.01}

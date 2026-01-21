@@ -35,6 +35,7 @@ export const moduleSizes: Record<ModuleType, string> = {
   wavefolder: '2x2',
   mixer: '1x1',
   'mixer-1x2': '1x2',
+  'mixer-8': '1x3',
   gain: '1x1',
   'cv-vca': '1x1',
   output: '1x1',
@@ -54,6 +55,13 @@ export const moduleSizes: Record<ModuleType, string> = {
   '909-clap': '1x2',
   '909-tom': '1x2',
   '909-rimshot': '1x2',
+  // TR-808 Drums
+  '808-kick': '1x2',
+  '808-snare': '1x2',
+  '808-hihat': '1x2',
+  '808-cowbell': '1x2',
+  '808-clap': '1x2',
+  '808-tom': '1x2',
   // Drum Sequencer
   'drum-sequencer': '5x5',
   // Euclidean Sequencer
@@ -93,6 +101,7 @@ export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>>
   vocoder: 'strip',
   mario: 'strip',
   'mixer-1x2': 'strip',
+  'mixer-8': 'strip',
   arpeggiator: 'strip',
   'step-sequencer': 'strip',
   'tb-303': 'strip',
@@ -103,6 +112,13 @@ export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>>
   '909-clap': 'strip',
   '909-tom': 'strip',
   '909-rimshot': 'strip',
+  // TR-808 Drums
+  '808-kick': 'strip',
+  '808-snare': 'strip',
+  '808-hihat': 'strip',
+  '808-cowbell': 'strip',
+  '808-clap': 'strip',
+  '808-tom': 'strip',
   // Drum Sequencer
   'drum-sequencer': 'strip',
   // Euclidean Sequencer
@@ -136,7 +152,7 @@ export const moduleCategoryMeta: Record<ModuleCategory, { label: string; icon: s
   effects: { label: 'Effects', icon: '✨' },
   modulators: { label: 'Modulators', icon: '📈' },
   sequencers: { label: 'Sequencers', icon: '🎼' },
-  drums: { label: 'TR-909 Drums', icon: '🥁' },
+  drums: { label: 'TR-808 / 909 Drums', icon: '🥁' },
   io: { label: 'I/O', icon: '🔌' },
 }
 
@@ -173,7 +189,8 @@ export const moduleCatalog: { type: ModuleType; label: string; category: ModuleC
   { type: 'gain', label: 'VCA', category: 'amplifiers' },
   { type: 'cv-vca', label: 'Mod VCA', category: 'amplifiers' },
   { type: 'mixer', label: 'Mixer 1x1', category: 'amplifiers' },
-  { type: 'mixer-1x2', label: 'Mixer 1x2', category: 'amplifiers' },
+  { type: 'mixer-1x2', label: 'Mixer 6ch', category: 'amplifiers' },
+  { type: 'mixer-8', label: 'Mixer 8ch', category: 'amplifiers' },
   // Effects
   { type: 'chorus', label: 'Chorus', category: 'effects' },
   { type: 'ensemble', label: 'Ensemble', category: 'effects' },
@@ -207,12 +224,19 @@ export const moduleCatalog: { type: ModuleType; label: string; category: ModuleC
   { type: 'turing-machine', label: 'Turing Machine', category: 'sequencers' },
   { type: 'mario', label: 'Mario IO', category: 'sequencers' },
   // TR-909 Drums
-  { type: '909-kick', label: 'Kick', category: 'drums' },
-  { type: '909-snare', label: 'Snare', category: 'drums' },
-  { type: '909-hihat', label: 'HiHat', category: 'drums' },
-  { type: '909-clap', label: 'Clap', category: 'drums' },
-  { type: '909-tom', label: 'Tom', category: 'drums' },
-  { type: '909-rimshot', label: 'Rimshot', category: 'drums' },
+  { type: '909-kick', label: '909 Kick', category: 'drums' },
+  { type: '909-snare', label: '909 Snare', category: 'drums' },
+  { type: '909-hihat', label: '909 HiHat', category: 'drums' },
+  { type: '909-clap', label: '909 Clap', category: 'drums' },
+  { type: '909-tom', label: '909 Tom', category: 'drums' },
+  { type: '909-rimshot', label: '909 Rim', category: 'drums' },
+  // TR-808 Drums
+  { type: '808-kick', label: '808 Kick', category: 'drums' },
+  { type: '808-snare', label: '808 Snare', category: 'drums' },
+  { type: '808-hihat', label: '808 HiHat', category: 'drums' },
+  { type: '808-cowbell', label: '808 Cowbell', category: 'drums' },
+  { type: '808-clap', label: '808 Clap', category: 'drums' },
+  { type: '808-tom', label: '808 Tom', category: 'drums' },
   // I/O
   { type: 'control', label: 'Control IO', category: 'io' },
   { type: 'output', label: 'Main Out', category: 'io' },
@@ -245,7 +269,8 @@ export const modulePrefixes: Record<ModuleType, string> = {
   gain: 'gain',
   'cv-vca': 'mod',
   mixer: 'mix',
-  'mixer-1x2': 'mix2',
+  'mixer-1x2': 'mix6',
+  'mixer-8': 'mix8',
   chorus: 'chorus',
   ensemble: 'ens',
   choir: 'choir',
@@ -271,12 +296,19 @@ export const modulePrefixes: Record<ModuleType, string> = {
   'step-sequencer': 'seq',
   'tb-303': 'tb303',
   // TR-909 Drums
-  '909-kick': 'kick',
-  '909-snare': 'snare',
-  '909-hihat': 'hh',
-  '909-clap': 'clap',
-  '909-tom': 'tom',
-  '909-rimshot': 'rim',
+  '909-kick': 'kick9',
+  '909-snare': 'snare9',
+  '909-hihat': 'hh9',
+  '909-clap': 'clap9',
+  '909-tom': 'tom9',
+  '909-rimshot': 'rim9',
+  // TR-808 Drums
+  '808-kick': 'kick8',
+  '808-snare': 'snare8',
+  '808-hihat': 'hh8',
+  '808-cowbell': 'cow8',
+  '808-clap': 'clap8',
+  '808-tom': 'tom8',
   // Drum Sequencer
   'drum-sequencer': 'drumseq',
   // Euclidean Sequencer
@@ -315,8 +347,9 @@ export const moduleLabels: Record<ModuleType, string> = {
   hpf: 'HPF',
   gain: 'VCA',
   'cv-vca': 'Mod VCA',
-  mixer: 'Mixer 1x1',
-  'mixer-1x2': 'Mixer 1x2',
+  mixer: 'Mixer 2ch',
+  'mixer-1x2': 'Mixer 6ch',
+  'mixer-8': 'Mixer 8ch',
   chorus: 'Chorus',
   ensemble: 'Ensemble',
   choir: 'Choir',
@@ -348,6 +381,13 @@ export const moduleLabels: Record<ModuleType, string> = {
   '909-clap': '909 Clap',
   '909-tom': '909 Tom',
   '909-rimshot': '909 Rim',
+  // TR-808 Drums
+  '808-kick': '808 Kick',
+  '808-snare': '808 Snare',
+  '808-hihat': '808 HiHat',
+  '808-cowbell': '808 Cowbell',
+  '808-clap': '808 Clap',
+  '808-tom': '808 Tom',
   // Drum Sequencer
   'drum-sequencer': 'Drum Seq',
   // Euclidean Sequencer
@@ -491,6 +531,16 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     levelD: 0.6,
     levelE: 0.6,
     levelF: 0.6,
+  },
+  'mixer-8': {
+    level1: 0.6,
+    level2: 0.6,
+    level3: 0.6,
+    level4: 0.6,
+    level5: 0.6,
+    level6: 0.6,
+    level7: 0.6,
+    level8: 0.6,
   },
   chorus: { rate: 0.3, depth: 8, delay: 18, mix: 0.4, spread: 0.6, feedback: 0.1 },
   ensemble: { rate: 0.25, depth: 12, delay: 12, mix: 0.6, spread: 0.7 },
@@ -678,6 +728,41 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     tune: 500,          // Base frequency Hz
     tone: 0.6,          // Brightness 0-1
     decay: 0.2,         // Decay time 0-1
+  },
+  // TR-808 Drums
+  '808-kick': {
+    tune: 45,           // Base frequency Hz (lower than 909)
+    decay: 1.5,         // Decay time seconds (longer "boom")
+    tone: 0.3,          // Triangle/sine mix 0-1
+    click: 0.2,         // Click transient 0-1
+  },
+  '808-snare': {
+    tune: 180,          // Tone frequency Hz
+    tone: 0.5,          // Oscillator level 0-1
+    snappy: 0.6,        // Noise snap 0-1
+    decay: 0.3,         // Decay time 0-1
+  },
+  '808-hihat': {
+    tune: 1.0,          // Frequency multiplier 0.5-2
+    decay: 0.15,        // Decay time seconds
+    tone: 0.6,          // Filter brightness 0-1
+    snap: 0.5,          // Attack sharpness 0-1
+  },
+  '808-cowbell': {
+    tune: 1.0,          // Pitch multiplier 0.5-2
+    decay: 0.1,         // Decay time seconds
+    tone: 0.6,          // Filter brightness 0-1
+  },
+  '808-clap': {
+    tone: 0.5,          // Filter brightness 0-1
+    decay: 0.3,         // Decay time 0.1-0.8
+    spread: 0.5,        // Burst spread 0-1
+  },
+  '808-tom': {
+    tune: 150,          // Base pitch Hz (60-400)
+    decay: 0.3,         // Decay time 0.05-1
+    pitch: 0.5,         // Pitch envelope depth 0-1
+    tone: 0.4,          // Brightness 0-1
   },
   // Drum Sequencer
   'drum-sequencer': {

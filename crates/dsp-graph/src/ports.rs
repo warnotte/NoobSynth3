@@ -44,6 +44,16 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },
       PortInfo { channels: 1 },
     ],
+    ModuleType::Mixer8 => vec![
+      PortInfo { channels: 1 },
+      PortInfo { channels: 1 },
+      PortInfo { channels: 1 },
+      PortInfo { channels: 1 },
+      PortInfo { channels: 1 },
+      PortInfo { channels: 1 },
+      PortInfo { channels: 1 },
+      PortInfo { channels: 1 },
+    ],
     ModuleType::Chorus
     | ModuleType::Ensemble
     | ModuleType::Delay
@@ -96,6 +106,12 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
     // TR-909 Drums - all have trigger + accent inputs
     ModuleType::Kick909 | ModuleType::Snare909 | ModuleType::HiHat909 |
     ModuleType::Clap909 | ModuleType::Tom909 | ModuleType::Rimshot909 => vec![
+      PortInfo { channels: 1 },  // trigger
+      PortInfo { channels: 1 },  // accent
+    ],
+    // TR-808 Drums - all have trigger + accent inputs
+    ModuleType::Kick808 | ModuleType::Snare808 | ModuleType::HiHat808
+    | ModuleType::Cowbell808 | ModuleType::Clap808 | ModuleType::Tom808 => vec![
       PortInfo { channels: 1 },  // trigger
       PortInfo { channels: 1 },  // accent
     ],
@@ -206,6 +222,7 @@ pub fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
     ModuleType::Hpf => vec![PortInfo { channels: 1 }],
     ModuleType::Mixer => vec![PortInfo { channels: 1 }],
     ModuleType::MixerWide => vec![PortInfo { channels: 1 }],
+    ModuleType::Mixer8 => vec![PortInfo { channels: 1 }],
     ModuleType::Chorus
     | ModuleType::Ensemble
     | ModuleType::Choir
@@ -258,6 +275,11 @@ pub fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
     // TR-909 Drums - all have single audio output
     ModuleType::Kick909 | ModuleType::Snare909 | ModuleType::HiHat909 |
     ModuleType::Clap909 | ModuleType::Tom909 | ModuleType::Rimshot909 => vec![
+      PortInfo { channels: 1 },  // out
+    ],
+    // TR-808 Drums - all have single audio output
+    ModuleType::Kick808 | ModuleType::Snare808 | ModuleType::HiHat808
+    | ModuleType::Cowbell808 | ModuleType::Clap808 | ModuleType::Tom808 => vec![
       PortInfo { channels: 1 },  // out
     ],
     // Drum Sequencer - 17 outputs (8 gates + 8 accents + step)
@@ -451,6 +473,17 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
       "in-f" => Some(5),
       _ => None,
     },
+    ModuleType::Mixer8 => match port_id {
+      "in-1" => Some(0),
+      "in-2" => Some(1),
+      "in-3" => Some(2),
+      "in-4" => Some(3),
+      "in-5" => Some(4),
+      "in-6" => Some(5),
+      "in-7" => Some(6),
+      "in-8" => Some(7),
+      _ => None,
+    },
     ModuleType::Chorus
     | ModuleType::Ensemble
     | ModuleType::Delay
@@ -526,6 +559,13 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
     // TR-909 Drums
     ModuleType::Kick909 | ModuleType::Snare909 | ModuleType::HiHat909 |
     ModuleType::Clap909 | ModuleType::Tom909 | ModuleType::Rimshot909 => match port_id {
+      "trigger" | "trig" => Some(0),
+      "accent" | "acc" => Some(1),
+      _ => None,
+    },
+    // TR-808 Drums
+    ModuleType::Kick808 | ModuleType::Snare808 | ModuleType::HiHat808
+    | ModuleType::Cowbell808 | ModuleType::Clap808 | ModuleType::Tom808 => match port_id {
       "trigger" | "trig" => Some(0),
       "accent" | "acc" => Some(1),
       _ => None,
@@ -697,6 +737,10 @@ pub fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize
       "out" => Some(0),
       _ => None,
     },
+    ModuleType::Mixer8 => match port_id {
+      "out" => Some(0),
+      _ => None,
+    },
     ModuleType::Chorus
     | ModuleType::Ensemble
     | ModuleType::Choir
@@ -787,6 +831,12 @@ pub fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize
     // TR-909 Drums
     ModuleType::Kick909 | ModuleType::Snare909 | ModuleType::HiHat909 |
     ModuleType::Clap909 | ModuleType::Tom909 | ModuleType::Rimshot909 => match port_id {
+      "out" => Some(0),
+      _ => None,
+    },
+    // TR-808 Drums
+    ModuleType::Kick808 | ModuleType::Snare808 | ModuleType::HiHat808
+    | ModuleType::Cowbell808 | ModuleType::Clap808 | ModuleType::Tom808 => match port_id {
       "out" => Some(0),
       _ => None,
     },

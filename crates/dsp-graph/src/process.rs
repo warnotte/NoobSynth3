@@ -6,14 +6,19 @@
 use dsp_core::{
     AdsrInputs, AdsrParams, ArpeggiatorInputs, ArpeggiatorOutputs, ArpeggiatorParams,
     ChaosInputs, ChaosParams,
-    ChoirInputs, ChoirParams, ChorusInputs, ChorusParams, Clap909Inputs, Clap909Params,
+    ChoirInputs, ChoirParams, ChorusInputs, ChorusParams,
+    Clap808Inputs, Clap808Params, Clap909Inputs, Clap909Params,
+    Cowbell808Inputs, Cowbell808Params,
     DelayInputs, DelayParams, Distortion, DistortionParams,
     DrumSequencerInputs, DrumSequencerOutputs, DrumSequencerParams,
     EnsembleInputs, EnsembleParams, EuclideanInputs, EuclideanParams,
     FmOperatorInputs, FmOperatorParams,
     GranularDelayInputs, GranularDelayParams,
+    HiHat808Inputs, HiHat808Params,
     HiHat909Inputs, HiHat909Params, HpfInputs, HpfParams,
-    KarplusInputs, KarplusParams, Kick909Inputs, Kick909Params,
+    KarplusInputs, KarplusParams,
+    Kick808Inputs, Kick808Params,
+    Kick909Inputs, Kick909Params,
     LfoInputs, LfoParams,
     MasterClockInputs, MasterClockOutputs, MasterClockParams,
     MidiFileSequencerInputs, MidiFileSequencerOutputs, MidiFileSequencerParams,
@@ -24,13 +29,14 @@ use dsp_core::{
     ReverbInputs, ReverbParams, RingMod, RingModParams,
     Rimshot909Inputs, Rimshot909Params, Sample,
     SampleHoldInputs, SampleHoldParams, ShepardInputs, ShepardParams, SlewInputs, SlewParams,
+    Snare808Inputs, Snare808Params,
     Snare909Inputs, Snare909Params, SnesOscInputs, SnesOscParams, SpectralSwarmInputs, SpectralSwarmParams,
     SpringReverbInputs, SpringReverbParams,
     StepSequencerInputs, StepSequencerOutputs, StepSequencerParams,
     SupersawInputs, SupersawParams,
     TapeDelayInputs, TapeDelayParams,
     Tb303Inputs, Tb303Outputs, Tb303Params,
-    Tom909Inputs, Tom909Params,
+    Tom808Inputs, Tom808Params, Tom909Inputs, Tom909Params,
     TuringInputs, TuringParams,
     Vca, VcfInputs, VcfParams, VcoInputs, VcoParams,
     VocoderInputs, VocoderParams, Wavefolder, WavefolderParams,
@@ -446,6 +452,29 @@ pub(crate) fn process_module(
                 state.level_d.slice(frames),
                 state.level_e.slice(frames),
                 state.level_f.slice(frames),
+            ];
+            Mixer::process_block_multi(output, &mixer_inputs, &levels);
+        }
+        ModuleState::Mixer8(state) => {
+            let input1 = if connections[0].is_empty() { None } else { Some(inputs[0].channel(0)) };
+            let input2 = if connections[1].is_empty() { None } else { Some(inputs[1].channel(0)) };
+            let input3 = if connections[2].is_empty() { None } else { Some(inputs[2].channel(0)) };
+            let input4 = if connections[3].is_empty() { None } else { Some(inputs[3].channel(0)) };
+            let input5 = if connections[4].is_empty() { None } else { Some(inputs[4].channel(0)) };
+            let input6 = if connections[5].is_empty() { None } else { Some(inputs[5].channel(0)) };
+            let input7 = if connections[6].is_empty() { None } else { Some(inputs[6].channel(0)) };
+            let input8 = if connections[7].is_empty() { None } else { Some(inputs[7].channel(0)) };
+            let output = outputs[0].channel_mut(0);
+            let mixer_inputs = [input1, input2, input3, input4, input5, input6, input7, input8];
+            let levels = [
+                state.level1.slice(frames),
+                state.level2.slice(frames),
+                state.level3.slice(frames),
+                state.level4.slice(frames),
+                state.level5.slice(frames),
+                state.level6.slice(frames),
+                state.level7.slice(frames),
+                state.level8.slice(frames),
             ];
             Mixer::process_block_multi(output, &mixer_inputs, &levels);
         }
@@ -960,6 +989,83 @@ pub(crate) fn process_module(
                 tune: state.tune.slice(frames),
             };
             state.rimshot.process_block(out, rim_inputs, params);
+        }
+        // TR-808 Drums
+        ModuleState::Kick808(state) => {
+            let trigger = if connections[0].is_empty() { None } else { Some(inputs[0].channel(0)) };
+            let accent = if connections[1].is_empty() { None } else { Some(inputs[1].channel(0)) };
+            let out = outputs[0].channel_mut(0);
+            let kick_inputs = Kick808Inputs { trigger, accent };
+            let params = Kick808Params {
+                tune: state.tune.slice(frames),
+                decay: state.decay.slice(frames),
+                tone: state.tone.slice(frames),
+                click: state.click.slice(frames),
+            };
+            state.kick.process_block(out, kick_inputs, params);
+        }
+        ModuleState::Snare808(state) => {
+            let trigger = if connections[0].is_empty() { None } else { Some(inputs[0].channel(0)) };
+            let accent = if connections[1].is_empty() { None } else { Some(inputs[1].channel(0)) };
+            let out = outputs[0].channel_mut(0);
+            let snare_inputs = Snare808Inputs { trigger, accent };
+            let params = Snare808Params {
+                tune: state.tune.slice(frames),
+                tone: state.tone.slice(frames),
+                snappy: state.snappy.slice(frames),
+                decay: state.decay.slice(frames),
+            };
+            state.snare.process_block(out, snare_inputs, params);
+        }
+        ModuleState::HiHat808(state) => {
+            let trigger = if connections[0].is_empty() { None } else { Some(inputs[0].channel(0)) };
+            let accent = if connections[1].is_empty() { None } else { Some(inputs[1].channel(0)) };
+            let out = outputs[0].channel_mut(0);
+            let hihat_inputs = HiHat808Inputs { trigger, accent };
+            let params = HiHat808Params {
+                tune: state.tune.slice(frames),
+                decay: state.decay.slice(frames),
+                tone: state.tone.slice(frames),
+                snap: state.snap.slice(frames),
+            };
+            state.hihat.process_block(out, hihat_inputs, params);
+        }
+        ModuleState::Cowbell808(state) => {
+            let trigger = if connections[0].is_empty() { None } else { Some(inputs[0].channel(0)) };
+            let accent = if connections[1].is_empty() { None } else { Some(inputs[1].channel(0)) };
+            let out = outputs[0].channel_mut(0);
+            let cowbell_inputs = Cowbell808Inputs { trigger, accent };
+            let params = Cowbell808Params {
+                tune: state.tune.slice(frames),
+                decay: state.decay.slice(frames),
+                tone: state.tone.slice(frames),
+            };
+            state.cowbell.process_block(out, cowbell_inputs, params);
+        }
+        ModuleState::Clap808(state) => {
+            let trigger = if connections[0].is_empty() { None } else { Some(inputs[0].channel(0)) };
+            let accent = if connections[1].is_empty() { None } else { Some(inputs[1].channel(0)) };
+            let out = outputs[0].channel_mut(0);
+            let clap_inputs = Clap808Inputs { trigger, accent };
+            let params = Clap808Params {
+                tone: state.tone.slice(frames),
+                decay: state.decay.slice(frames),
+                spread: state.spread.slice(frames),
+            };
+            state.clap.process_block(out, clap_inputs, params);
+        }
+        ModuleState::Tom808(state) => {
+            let trigger = if connections[0].is_empty() { None } else { Some(inputs[0].channel(0)) };
+            let accent = if connections[1].is_empty() { None } else { Some(inputs[1].channel(0)) };
+            let out = outputs[0].channel_mut(0);
+            let tom_inputs = Tom808Inputs { trigger, accent };
+            let params = Tom808Params {
+                tune: state.tune.slice(frames),
+                decay: state.decay.slice(frames),
+                pitch: state.pitch.slice(frames),
+                tone: state.tone.slice(frames),
+            };
+            state.tom.process_block(out, tom_inputs, params);
         }
         ModuleState::DrumSequencer(state) => {
             let clock = if connections[0].is_empty() { None } else { Some(inputs[0].channel(0)) };

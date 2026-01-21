@@ -148,7 +148,7 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 - [ ] `public/presets/` - Preset de démonstration
 - [ ] `npm run build:wasm` - Rebuild WASM après modifs Rust
 
-## Module Types (60 total)
+## Module Types (67 total)
 
 ### Sources (13)
 oscillator, supersaw, karplus, fm-op, nes-osc, snes-osc, noise, tb-303, shepard, pipe-organ, spectral-swarm, resonator, wavetable
@@ -156,8 +156,8 @@ oscillator, supersaw, karplus, fm-op, nes-osc, snes-osc, noise, tb-303, shepard,
 ### Filters (2)
 vcf, hpf
 
-### Amplifiers (4)
-gain, cv-vca, mixer, mixer-1x2
+### Amplifiers (5)
+gain, cv-vca, mixer, mixer-1x2, mixer-8
 
 ### Effects (14)
 chorus, ensemble, choir, vocoder, delay, granular-delay, tape-delay, spring-reverb, reverb, phaser, distortion, wavefolder, ring-mod, pitch-shifter
@@ -170,6 +170,9 @@ clock, arpeggiator, step-sequencer, euclidean, drum-sequencer, midi-file-sequenc
 
 ### TR-909 Drums (6)
 909-kick, 909-snare, 909-hihat, 909-clap, 909-tom, 909-rimshot
+
+### TR-808 Drums (6)
+808-kick, 808-snare, 808-hihat, 808-cowbell, 808-clap, 808-tom
 
 ### I/O & Utilities (6)
 control, output, audio-in, scope, lab, notes
@@ -472,6 +475,21 @@ Ces paramètres utilisent des **valeurs numériques** :
 | VST UI | L'éditeur est un launcher; UI complète dans fenêtre Tauri externe |
 | VST Macros | Les édits UI ne modifient pas l'automation DAW |
 | WASM | `wasm-opt` désactivé (bulk memory mismatch); non optimisé |
+| **Mixers Mono** | Tous les mixers (mixer, mixer-1x2, mixer-8) sont mono. Les modules stéréo (Noise, Shepard, SpectralSwarm, Chorus, etc.) perdent leur stéréo en passant par un mixer. |
+
+---
+
+## TODO - Améliorations Futures
+
+### Stereo & Mixers
+- [ ] **Clarifier architecture stéréo** - Documenter quels modules sont mono vs stéréo
+- [ ] **Mixers stéréo avec pan** - Ajouter support pan + sortie stéréo aux mixers
+- [ ] **Presets de test stéréo** - Créer presets pour valider le routing stéréo
+
+### Tests & Validation
+- [ ] **Presets de test polyphonie** - Valider comportement avec plusieurs voix
+- [ ] **Presets de test edge cases** - Résonance extrême, feedback, etc.
+- [ ] **Documentation mono/stéréo par module** - Tableau clair dans MODULES.md
 
 ---
 

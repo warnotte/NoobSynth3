@@ -450,6 +450,13 @@
       "group": "TR-909 / Drums"
     },
     {
+      "id": "tr808-demo",
+      "name": "TR-808 Demo",
+      "description": "Classic 808 drum machine - deep kick, snappy snare, metallic hats.",
+      "file": "tr808-demo.json",
+      "group": "TR-808 / Drums"
+    },
+    {
       "id": "pitch-shifter-test",
       "name": "Pitch Shifter",
       "description": "Real-time pitch shifting with microphone input.",

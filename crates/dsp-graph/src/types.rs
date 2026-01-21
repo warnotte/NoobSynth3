@@ -29,6 +29,7 @@ pub enum ModuleType {
     CvVca,
     Mixer,
     MixerWide,
+    Mixer8,
     RingMod,
 
     // Modulators
@@ -72,6 +73,14 @@ pub enum ModuleType {
     Clap909,
     Tom909,
     Rimshot909,
+
+    // TR-808 Drums
+    Kick808,
+    Snare808,
+    HiHat808,
+    Cowbell808,
+    Clap808,
+    Tom808,
 
     // I/O & Utilities
     Control,

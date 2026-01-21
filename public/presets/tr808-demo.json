@@ -1,0 +1,188 @@
+{
+  "id": "tr808-demo",
+  "name": "TR-808 Demo",
+  "description": "Classic 808 drum machine sounds - all 6 voices: kick, snare, hihat, cowbell, clap, and tom",
+  "group": "Drums",
+  "graph": {
+    "modules": [
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "TR-808 Demo",
+        "position": { "x": 50, "y": 50 },
+        "params": {
+          "text": "TR-808 Drum Machine Demo\n\nThe legendary drum machine that defined hip-hop, electro, and countless genres.\n\n808 KICK: Deep, booming sub-bass with long decay.\n808 SNARE: Snappy, punchy snare with tonal component.\n808 HIHAT: Metallic hats from 6 square wave oscillators.\n808 COWBELL: Dual oscillators at 540Hz/800Hz.\n808 CLAP: Multiple noise bursts with reverb tail.\n808 TOM: Pitch envelope tom (tune for low/mid/high).\n\nTIP: Adjust Tom tune (60-400Hz) for low, mid, or high toms."
+        }
+      },
+      {
+        "id": "clock-1",
+        "type": "clock",
+        "name": "Clock",
+        "position": { "x": 50, "y": 250 },
+        "params": {
+          "running": true,
+          "tempo": 98,
+          "rate": 4,
+          "swing": 0
+        }
+      },
+      {
+        "id": "drumseq-1",
+        "type": "drum-sequencer",
+        "name": "808 Pattern",
+        "position": { "x": 200, "y": 200 },
+        "params": {
+          "enabled": true,
+          "tempo": 98,
+          "rate": 4,
+          "gateLength": 50,
+          "swing": 15,
+          "length": 16,
+          "drumData": "{\"tracks\":[[{\"g\":1,\"a\":1},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":1},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":1},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":1},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":1},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}]]}"
+        }
+      },
+      {
+        "id": "kick8-1",
+        "type": "808-kick",
+        "name": "808 Kick",
+        "position": { "x": 550, "y": 50 },
+        "params": {
+          "tune": 45,
+          "decay": 1.2,
+          "tone": 0.35,
+          "click": 0.25
+        }
+      },
+      {
+        "id": "snare8-1",
+        "type": "808-snare",
+        "name": "808 Snare",
+        "position": { "x": 550, "y": 150 },
+        "params": {
+          "tune": 180,
+          "tone": 0.5,
+          "snappy": 0.7,
+          "decay": 0.35
+        }
+      },
+      {
+        "id": "hh8-1",
+        "type": "808-hihat",
+        "name": "808 CH",
+        "position": { "x": 550, "y": 250 },
+        "params": {
+          "tune": 1.0,
+          "decay": 0.08,
+          "tone": 0.6,
+          "snap": 0.5
+        }
+      },
+      {
+        "id": "hh8-2",
+        "type": "808-hihat",
+        "name": "808 OH",
+        "position": { "x": 550, "y": 350 },
+        "params": {
+          "tune": 1.0,
+          "decay": 0.35,
+          "tone": 0.55,
+          "snap": 0.4
+        }
+      },
+      {
+        "id": "clap8-1",
+        "type": "808-clap",
+        "name": "808 Clap",
+        "position": { "x": 550, "y": 450 },
+        "params": {
+          "tone": 0.5,
+          "decay": 0.35,
+          "spread": 0.5
+        }
+      },
+      {
+        "id": "tom8-1",
+        "type": "808-tom",
+        "name": "808 Tom",
+        "position": { "x": 550, "y": 550 },
+        "params": {
+          "tune": 150,
+          "decay": 0.3,
+          "pitch": 0.5,
+          "tone": 0.4
+        }
+      },
+      {
+        "id": "cowbell8-1",
+        "type": "808-cowbell",
+        "name": "808 Cowbell",
+        "position": { "x": 550, "y": 650 },
+        "params": {
+          "tune": 1.0,
+          "decay": 0.1,
+          "tone": 0.6
+        }
+      },
+      {
+        "id": "mixer8-1",
+        "type": "mixer-8",
+        "name": "Drum Mix",
+        "position": { "x": 750, "y": 250 },
+        "params": {
+          "level1": 1.0,
+          "level2": 0.85,
+          "level3": 0.5,
+          "level4": 0.6,
+          "level5": 0.7,
+          "level6": 0.65,
+          "level7": 0.45,
+          "level8": 0
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Room",
+        "position": { "x": 900, "y": 250 },
+        "params": {
+          "time": 0.25,
+          "damp": 0.6,
+          "preDelay": 8,
+          "mix": 0.15
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Out",
+        "position": { "x": 1050, "y": 250 },
+        "params": { "level": 0.85 }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "drumseq-1", "portId": "clock" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "reset" }, "to": { "moduleId": "drumseq-1", "portId": "reset" }, "kind": "sync" },
+      { "from": { "moduleId": "drumseq-1", "portId": "gate-kick" }, "to": { "moduleId": "kick8-1", "portId": "trigger" }, "kind": "gate" },
+      { "from": { "moduleId": "drumseq-1", "portId": "acc-kick" }, "to": { "moduleId": "kick8-1", "portId": "accent" }, "kind": "cv" },
+      { "from": { "moduleId": "drumseq-1", "portId": "gate-snare" }, "to": { "moduleId": "snare8-1", "portId": "trigger" }, "kind": "gate" },
+      { "from": { "moduleId": "drumseq-1", "portId": "acc-snare" }, "to": { "moduleId": "snare8-1", "portId": "accent" }, "kind": "cv" },
+      { "from": { "moduleId": "drumseq-1", "portId": "gate-hhc" }, "to": { "moduleId": "hh8-1", "portId": "trigger" }, "kind": "gate" },
+      { "from": { "moduleId": "drumseq-1", "portId": "gate-hho" }, "to": { "moduleId": "hh8-2", "portId": "trigger" }, "kind": "gate" },
+      { "from": { "moduleId": "drumseq-1", "portId": "gate-clap" }, "to": { "moduleId": "clap8-1", "portId": "trigger" }, "kind": "gate" },
+      { "from": { "moduleId": "drumseq-1", "portId": "acc-clap" }, "to": { "moduleId": "clap8-1", "portId": "accent" }, "kind": "cv" },
+      { "from": { "moduleId": "drumseq-1", "portId": "gate-tom" }, "to": { "moduleId": "tom8-1", "portId": "trigger" }, "kind": "gate" },
+      { "from": { "moduleId": "drumseq-1", "portId": "acc-tom" }, "to": { "moduleId": "tom8-1", "portId": "accent" }, "kind": "cv" },
+      { "from": { "moduleId": "drumseq-1", "portId": "gate-rim" }, "to": { "moduleId": "cowbell8-1", "portId": "trigger" }, "kind": "gate" },
+      { "from": { "moduleId": "drumseq-1", "portId": "acc-rim" }, "to": { "moduleId": "cowbell8-1", "portId": "accent" }, "kind": "cv" },
+      { "from": { "moduleId": "kick8-1", "portId": "out" }, "to": { "moduleId": "mixer8-1", "portId": "in-1" }, "kind": "audio" },
+      { "from": { "moduleId": "snare8-1", "portId": "out" }, "to": { "moduleId": "mixer8-1", "portId": "in-2" }, "kind": "audio" },
+      { "from": { "moduleId": "hh8-1", "portId": "out" }, "to": { "moduleId": "mixer8-1", "portId": "in-3" }, "kind": "audio" },
+      { "from": { "moduleId": "hh8-2", "portId": "out" }, "to": { "moduleId": "mixer8-1", "portId": "in-4" }, "kind": "audio" },
+      { "from": { "moduleId": "clap8-1", "portId": "out" }, "to": { "moduleId": "mixer8-1", "portId": "in-5" }, "kind": "audio" },
+      { "from": { "moduleId": "tom8-1", "portId": "out" }, "to": { "moduleId": "mixer8-1", "portId": "in-6" }, "kind": "audio" },
+      { "from": { "moduleId": "cowbell8-1", "portId": "out" }, "to": { "moduleId": "mixer8-1", "portId": "in-7" }, "kind": "audio" },
+      { "from": { "moduleId": "mixer8-1", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}

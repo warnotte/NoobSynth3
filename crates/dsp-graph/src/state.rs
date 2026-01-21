@@ -1,11 +1,11 @@
 //! Module state definitions for all DSP modules.
 
 use dsp_core::{
-    Adsr, Arpeggiator, Chaos, Choir, Chorus, Clap909, Delay, DrumSequencer, Ensemble,
-    EuclideanSequencer, FmOperator, GranularDelay, HiHat909, Hpf, KarplusStrong,
-    Kick909, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, Phaser, PipeOrgan, PitchShifter,
-    Resonator, Reverb, Rimshot909, SampleHold, Shepard, SlewLimiter, Snare909, SnesOsc, SpectralSwarm, SpringReverb,
-    StepSequencer, Supersaw, TapeDelay, Tb303, Tom909, TuringMachine, Vcf, Vco, Vocoder, Wavetable,
+    Adsr, Arpeggiator, Chaos, Choir, Chorus, Clap808, Clap909, Cowbell808, Delay, DrumSequencer, Ensemble,
+    EuclideanSequencer, FmOperator, GranularDelay, HiHat808, HiHat909, Hpf, KarplusStrong,
+    Kick808, Kick909, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, Phaser, PipeOrgan, PitchShifter,
+    Resonator, Reverb, Rimshot909, SampleHold, Shepard, SlewLimiter, Snare808, Snare909, SnesOsc, SpectralSwarm, SpringReverb,
+    StepSequencer, Supersaw, TapeDelay, Tb303, Tom808, Tom909, TuringMachine, Vcf, Vco, Vocoder, Wavetable,
 };
 
 use crate::types::ParamBuffer;
@@ -231,6 +231,17 @@ pub struct MixerWideState {
     pub level_d: ParamBuffer,
     pub level_e: ParamBuffer,
     pub level_f: ParamBuffer,
+}
+
+pub struct Mixer8State {
+    pub level1: ParamBuffer,
+    pub level2: ParamBuffer,
+    pub level3: ParamBuffer,
+    pub level4: ParamBuffer,
+    pub level5: ParamBuffer,
+    pub level6: ParamBuffer,
+    pub level7: ParamBuffer,
+    pub level8: ParamBuffer,
 }
 
 pub struct RingModState {
@@ -557,6 +568,56 @@ pub struct Rimshot909State {
 }
 
 // =============================================================================
+// TR-808 Drum States
+// =============================================================================
+
+pub struct Kick808State {
+    pub kick: Kick808,
+    pub tune: ParamBuffer,
+    pub decay: ParamBuffer,
+    pub tone: ParamBuffer,
+    pub click: ParamBuffer,
+}
+
+pub struct Snare808State {
+    pub snare: Snare808,
+    pub tune: ParamBuffer,
+    pub tone: ParamBuffer,
+    pub snappy: ParamBuffer,
+    pub decay: ParamBuffer,
+}
+
+pub struct HiHat808State {
+    pub hihat: HiHat808,
+    pub tune: ParamBuffer,
+    pub decay: ParamBuffer,
+    pub tone: ParamBuffer,
+    pub snap: ParamBuffer,
+}
+
+pub struct Cowbell808State {
+    pub cowbell: Cowbell808,
+    pub tune: ParamBuffer,
+    pub decay: ParamBuffer,
+    pub tone: ParamBuffer,
+}
+
+pub struct Clap808State {
+    pub clap: Clap808,
+    pub tone: ParamBuffer,
+    pub decay: ParamBuffer,
+    pub spread: ParamBuffer,
+}
+
+pub struct Tom808State {
+    pub tom: Tom808,
+    pub tune: ParamBuffer,
+    pub decay: ParamBuffer,
+    pub pitch: ParamBuffer,
+    pub tone: ParamBuffer,
+}
+
+// =============================================================================
 // I/O & Utility States
 // =============================================================================
 
@@ -619,6 +680,7 @@ pub enum ModuleState {
     CvVca(GainState),
     Mixer(MixerState),
     MixerWide(MixerWideState),
+    Mixer8(Mixer8State),
     RingMod(RingModState),
 
     // Modulators
@@ -662,6 +724,14 @@ pub enum ModuleState {
     Clap909(Clap909State),
     Tom909(Tom909State),
     Rimshot909(Rimshot909State),
+
+    // TR-808 Drums
+    Kick808(Kick808State),
+    Snare808(Snare808State),
+    HiHat808(HiHat808State),
+    Cowbell808(Cowbell808State),
+    Clap808(Clap808State),
+    Tom808(Tom808State),
 
     // I/O & Utilities
     Output(OutputState),

@@ -593,6 +593,7 @@ fn normalize_module_type(raw: &str) -> ModuleType {
     "hpf" => ModuleType::Hpf,
     "mixer" => ModuleType::Mixer,
     "mixer-1x2" => ModuleType::MixerWide,
+    "mixer-8" => ModuleType::Mixer8,
     "chorus" => ModuleType::Chorus,
     "ensemble" => ModuleType::Ensemble,
     "choir" => ModuleType::Choir,
@@ -619,6 +620,13 @@ fn normalize_module_type(raw: &str) -> ModuleType {
     "909-clap" => ModuleType::Clap909,
     "909-tom" => ModuleType::Tom909,
     "909-rimshot" => ModuleType::Rimshot909,
+    // TR-808 Drums
+    "808-kick" => ModuleType::Kick808,
+    "808-snare" => ModuleType::Snare808,
+    "808-hihat" => ModuleType::HiHat808,
+    "808-cowbell" => ModuleType::Cowbell808,
+    "808-clap" => ModuleType::Clap808,
+    "808-tom" => ModuleType::Tom808,
     // Drum Sequencer
     "drum-sequencer" => ModuleType::DrumSequencer,
     "euclidean" => ModuleType::Euclidean,

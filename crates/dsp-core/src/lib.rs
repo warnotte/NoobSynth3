@@ -102,7 +102,7 @@ pub use sequencers::{
     TuringMachine, TuringParams, TuringInputs,
 };
 
-// Re-export drums
+// Re-export drums (TR-909)
 pub use drums::{
     Kick909, Kick909Params, Kick909Inputs,
     Snare909, Snare909Params, Snare909Inputs,
@@ -110,6 +110,16 @@ pub use drums::{
     Clap909, Clap909Params, Clap909Inputs,
     Tom909, Tom909Params, Tom909Inputs,
     Rimshot909, Rimshot909Params, Rimshot909Inputs,
+};
+
+// Re-export drums (TR-808)
+pub use drums::{
+    Kick808, Kick808Params, Kick808Inputs,
+    Snare808, Snare808Params, Snare808Inputs,
+    HiHat808, HiHat808Params, HiHat808Inputs,
+    Cowbell808, Cowbell808Params, Cowbell808Inputs,
+    Clap808, Clap808Params, Clap808Inputs,
+    Tom808, Tom808Params, Tom808Inputs,
 };
 
 // =============================================================================

@@ -3,11 +3,11 @@
 use std::collections::HashMap;
 
 use dsp_core::{
-  Adsr, Arpeggiator, Chaos, Choir, Chorus, Clap909, Delay, DrumSequencer, Ensemble,
-  EuclideanSequencer, FmOperator, GranularDelay, HiHat909, Hpf, KarplusStrong,
-  Kick909, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, Phaser, PipeOrgan, PitchShifter,
-  Resonator, Reverb, Rimshot909, SampleHold, Shepard, SlewLimiter, Snare909, SnesOsc, SpectralSwarm, SpringReverb,
-  StepSequencer, Supersaw, TapeDelay, Tb303, Tom909, TuringMachine, Vcf, Vco, Vocoder, Wavetable,
+  Adsr, Arpeggiator, Chaos, Choir, Chorus, Clap808, Clap909, Cowbell808, Delay, DrumSequencer, Ensemble,
+  EuclideanSequencer, FmOperator, GranularDelay, HiHat808, HiHat909, Hpf, KarplusStrong,
+  Kick808, Kick909, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, Phaser, PipeOrgan, PitchShifter,
+  Resonator, Reverb, Rimshot909, SampleHold, Shepard, SlewLimiter, Snare808, Snare909, SnesOsc, SpectralSwarm, SpringReverb,
+  StepSequencer, Supersaw, TapeDelay, Tb303, Tom808, Tom909, TuringMachine, Vcf, Vco, Vocoder, Wavetable,
 };
 
 use crate::state::*;
@@ -125,6 +125,16 @@ pub(crate) fn create_state(
       level_d: ParamBuffer::new(param_number(params, "levelD", 0.6)),
       level_e: ParamBuffer::new(param_number(params, "levelE", 0.6)),
       level_f: ParamBuffer::new(param_number(params, "levelF", 0.6)),
+    }),
+    ModuleType::Mixer8 => ModuleState::Mixer8(Mixer8State {
+      level1: ParamBuffer::new(param_number(params, "level1", 0.6)),
+      level2: ParamBuffer::new(param_number(params, "level2", 0.6)),
+      level3: ParamBuffer::new(param_number(params, "level3", 0.6)),
+      level4: ParamBuffer::new(param_number(params, "level4", 0.6)),
+      level5: ParamBuffer::new(param_number(params, "level5", 0.6)),
+      level6: ParamBuffer::new(param_number(params, "level6", 0.6)),
+      level7: ParamBuffer::new(param_number(params, "level7", 0.6)),
+      level8: ParamBuffer::new(param_number(params, "level8", 0.6)),
     }),
     ModuleType::Chorus => ModuleState::Chorus(ChorusState {
       chorus: Chorus::new(sample_rate),
@@ -366,6 +376,47 @@ pub(crate) fn create_state(
     ModuleType::Rimshot909 => ModuleState::Rimshot909(Rimshot909State {
       rimshot: Rimshot909::new(sample_rate),
       tune: ParamBuffer::new(param_number(params, "tune", 400.0)),
+    }),
+    // TR-808 Drums
+    ModuleType::Kick808 => ModuleState::Kick808(Kick808State {
+      kick: Kick808::new(sample_rate),
+      tune: ParamBuffer::new(param_number(params, "tune", 45.0)),
+      decay: ParamBuffer::new(param_number(params, "decay", 1.5)),
+      tone: ParamBuffer::new(param_number(params, "tone", 0.3)),
+      click: ParamBuffer::new(param_number(params, "click", 0.2)),
+    }),
+    ModuleType::Snare808 => ModuleState::Snare808(Snare808State {
+      snare: Snare808::new(sample_rate),
+      tune: ParamBuffer::new(param_number(params, "tune", 180.0)),
+      tone: ParamBuffer::new(param_number(params, "tone", 0.5)),
+      snappy: ParamBuffer::new(param_number(params, "snappy", 0.6)),
+      decay: ParamBuffer::new(param_number(params, "decay", 0.3)),
+    }),
+    ModuleType::HiHat808 => ModuleState::HiHat808(HiHat808State {
+      hihat: HiHat808::new(sample_rate),
+      tune: ParamBuffer::new(param_number(params, "tune", 1.0)),
+      decay: ParamBuffer::new(param_number(params, "decay", 0.15)),
+      tone: ParamBuffer::new(param_number(params, "tone", 0.6)),
+      snap: ParamBuffer::new(param_number(params, "snap", 0.5)),
+    }),
+    ModuleType::Cowbell808 => ModuleState::Cowbell808(Cowbell808State {
+      cowbell: Cowbell808::new(sample_rate),
+      tune: ParamBuffer::new(param_number(params, "tune", 1.0)),
+      decay: ParamBuffer::new(param_number(params, "decay", 0.1)),
+      tone: ParamBuffer::new(param_number(params, "tone", 0.6)),
+    }),
+    ModuleType::Clap808 => ModuleState::Clap808(Clap808State {
+      clap: Clap808::new(sample_rate),
+      tone: ParamBuffer::new(param_number(params, "tone", 0.5)),
+      decay: ParamBuffer::new(param_number(params, "decay", 0.3)),
+      spread: ParamBuffer::new(param_number(params, "spread", 0.5)),
+    }),
+    ModuleType::Tom808 => ModuleState::Tom808(Tom808State {
+      tom: Tom808::new(sample_rate),
+      tune: ParamBuffer::new(param_number(params, "tune", 150.0)),
+      decay: ParamBuffer::new(param_number(params, "decay", 0.3)),
+      pitch: ParamBuffer::new(param_number(params, "pitch", 0.5)),
+      tone: ParamBuffer::new(param_number(params, "tone", 0.4)),
     }),
     ModuleType::DrumSequencer => {
       let mut seq = DrumSequencer::new(sample_rate);
@@ -669,6 +720,17 @@ pub(crate) fn apply_param(state: &mut ModuleState, param: &str, value: f32) {
       "levelF" => state.level_f.set(value),
       _ => {}
     },
+    ModuleState::Mixer8(state) => match param {
+      "level1" => state.level1.set(value),
+      "level2" => state.level2.set(value),
+      "level3" => state.level3.set(value),
+      "level4" => state.level4.set(value),
+      "level5" => state.level5.set(value),
+      "level6" => state.level6.set(value),
+      "level7" => state.level7.set(value),
+      "level8" => state.level8.set(value),
+      _ => {}
+    },
     ModuleState::Chorus(state) => match param {
       "rate" => state.rate.set(value),
       "depth" => state.depth.set(value),
@@ -913,6 +975,47 @@ pub(crate) fn apply_param(state: &mut ModuleState, param: &str, value: f32) {
     },
     ModuleState::Rimshot909(state) => match param {
       "tune" => state.tune.set(value),
+      _ => {}
+    },
+    // TR-808 Drums
+    ModuleState::Kick808(state) => match param {
+      "tune" => state.tune.set(value),
+      "decay" => state.decay.set(value),
+      "tone" => state.tone.set(value),
+      "click" => state.click.set(value),
+      _ => {}
+    },
+    ModuleState::Snare808(state) => match param {
+      "tune" => state.tune.set(value),
+      "tone" => state.tone.set(value),
+      "snappy" => state.snappy.set(value),
+      "decay" => state.decay.set(value),
+      _ => {}
+    },
+    ModuleState::HiHat808(state) => match param {
+      "tune" => state.tune.set(value),
+      "decay" => state.decay.set(value),
+      "tone" => state.tone.set(value),
+      "snap" => state.snap.set(value),
+      _ => {}
+    },
+    ModuleState::Cowbell808(state) => match param {
+      "tune" => state.tune.set(value),
+      "decay" => state.decay.set(value),
+      "tone" => state.tone.set(value),
+      _ => {}
+    },
+    ModuleState::Clap808(state) => match param {
+      "tone" => state.tone.set(value),
+      "decay" => state.decay.set(value),
+      "spread" => state.spread.set(value),
+      _ => {}
+    },
+    ModuleState::Tom808(state) => match param {
+      "tune" => state.tune.set(value),
+      "decay" => state.decay.set(value),
+      "pitch" => state.pitch.set(value),
+      "tone" => state.tone.set(value),
       _ => {}
     },
     ModuleState::DrumSequencer(state) => match param {

@@ -141,6 +141,19 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
     ],
     outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
   },
+  'mixer-8': {
+    inputs: [
+      { id: 'in-1', label: '1', kind: 'audio', direction: 'in' },
+      { id: 'in-2', label: '2', kind: 'audio', direction: 'in' },
+      { id: 'in-3', label: '3', kind: 'audio', direction: 'in' },
+      { id: 'in-4', label: '4', kind: 'audio', direction: 'in' },
+      { id: 'in-5', label: '5', kind: 'audio', direction: 'in' },
+      { id: 'in-6', label: '6', kind: 'audio', direction: 'in' },
+      { id: 'in-7', label: '7', kind: 'audio', direction: 'in' },
+      { id: 'in-8', label: '8', kind: 'audio', direction: 'in' },
+    ],
+    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
+  },
   chorus: simpleAudioEffect(),
   ensemble: simpleAudioEffect(),
   choir: {
@@ -291,6 +304,13 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
   '909-clap': drum909Ports(),
   '909-tom': drum909Ports(),
   '909-rimshot': drum909Ports(),
+  // TR-808 Drums (same port layout as 909)
+  '808-kick': drum909Ports(),
+  '808-snare': drum909Ports(),
+  '808-hihat': drum909Ports(),
+  '808-cowbell': drum909Ports(),
+  '808-clap': drum909Ports(),
+  '808-tom': drum909Ports(),
   // Drum Sequencer
   'drum-sequencer': {
     inputs: [
