@@ -228,6 +228,15 @@
         "params": {
           "level": 1.0
         }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 0, "y": 10 },
+        "params": {
+          "text": "THE INFINITE CATHEDRAL\n\nAmbiance cathedrale generative.\n\n- Shepard Up: monte infiniment\n- Shepard Down: descend infiniment\n- Pipe Organ: accords majestueux\n- Spectral Swarm: texture etheree\n- Resonator: cloches cristallines\n\nLorenz module le Swarm et le VCF.\nTuring Machines controlent orgue et cloches.\n\nReverb massive (95% time, 55% mix)."
+        }
       }
     ],
     "connections": [

@@ -260,6 +260,15 @@
         "params": {
           "level": 1.0
         }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 18, "y": 0 },
+        "params": {
+          "text": "TURING CHAOS TRIO\n\nTrois voix en polyrythmie 4:2:1.\n\n- High: 1/16 (rapide, aigu)\n- Lead: 1/8 (medium)\n- Bass: 1/4 (lent, grave)\n\nToutes en Pentatonique Mineur.\nChaos module les 3 VCF et positions.\n\nAjustez le mixer pour equilibrer."
+        }
       }
     ],
     "connections": [

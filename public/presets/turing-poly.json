@@ -178,6 +178,15 @@
         "params": {
           "level": 0.75
         }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 0, "y": 4 },
+        "params": {
+          "text": "TURING TECHNO\n\n2 Turing Machines: Lead FM + Bass Acid.\n\n- Lead TM: sequence rapide (18% mutation)\n- Bass TM: sequence stable (5% mutation)\n- VCF Ladder avec envmod pour squelch acid\n- Distortion sur la basse\n\nAjustez les Probability pour varier.\nVCF cutoff/resonance pour plus d'acid."
+        }
       }
     ],
     "connections": [

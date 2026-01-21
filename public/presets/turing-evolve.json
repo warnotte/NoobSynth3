@@ -126,6 +126,15 @@
         "params": {
           "level": 0.7
         }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 0, "y": 4 },
+        "params": {
+          "text": "TURING AMBIENT\n\nPads wavetable evolutifs pour ambiance profonde.\n\n- Clock lent (60 BPM, 1/4)\n- LFO module la position wavetable\n- LFO module le filtre\n- Granular delay pour texture\n\nAjustez les LFOs pour changer le mouvement.\nProbability basse = sequence stable."
+        }
       }
     ],
     "connections": [

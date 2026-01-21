@@ -329,6 +329,15 @@
         "params": {
           "level": 1.0
         }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 0, "y": 10 },
+        "params": {
+          "text": "THE GENERATIVE FACTORY\n\n25 modules - Techno generatif complet.\n\n- Shepard: lead infini\n- TB-303: acid bass\n- Resonator: percussion metallique\n- Karplus: plucks\n- 909: kick, snare, hihat, clap\n\nLorenz Chaos module tout en continu.\nJamais deux mesures identiques.\n\nAjustez Master Mix pour balance synths/drums."
+        }
       }
     ],
     "connections": [

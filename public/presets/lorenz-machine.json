@@ -228,6 +228,15 @@
         "params": {
           "level": 1.0
         }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 0, "y": 10 },
+        "params": {
+          "text": "THE LORENZ MACHINE\n\nSynthese pure chaos - aucun sequenceur.\n\n2 Lorenz (rapide + lent) controlent TOUT:\n- CV quantise -> pitch\n- Derivative Gate -> rythme\n- X/Y/Z -> filtres\n- Z -> position wavetable\n- Y lent -> index FM\n\n4 voix: Wavetable, FM, Swarm, Resonator\nWavefolder sur le lead.\n\nOrganisme sonique auto-evolutif."
+        }
       }
     ],
     "connections": [

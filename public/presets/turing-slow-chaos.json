@@ -178,6 +178,15 @@
         "params": {
           "level": 0.75
         }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 0, "y": 4 },
+        "params": {
+          "text": "TURING DUAL BAND\n\nSeparation frequentielle des voix.\n\n- HIGH: Karplus rapide (1/16)\n  -> HPF 800Hz -> Delay\n- LOW: Drone lent (1/1)\n  -> LPF 400Hz -> pas de delay\n\nLes deux ne se marchent pas dessus.\nMix equilibre highs/lows."
+        }
       }
     ],
     "connections": [

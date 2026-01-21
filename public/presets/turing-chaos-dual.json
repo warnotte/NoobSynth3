@@ -202,6 +202,15 @@
         "params": {
           "level": 1.0
         }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 16, "y": 0 },
+        "params": {
+          "text": "TURING CHAOS DUAL\n\nDeux voix en polyrythmie 2:1.\n\n- Lead: 1/8 notes (100 BPM)\n- Bass: 1/4 notes (100 BPM)\n- Lorenz X -> Lead position\n- Lorenz Y -> Lead VCF\n- Lorenz Z -> Bass VCF\n\nLes deux clocks sont independantes\nmais au meme tempo = phase stable."
+        }
       }
     ],
     "connections": [

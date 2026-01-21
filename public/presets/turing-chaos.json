@@ -125,6 +125,15 @@
         "params": {
           "level": 0.75
         }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 0, "y": 4 },
+        "params": {
+          "text": "TURING CHAOS\n\nLorenz chaos module le timbre en continu.\n\n- Chaos X -> Position wavetable\n- Chaos Y -> Cutoff VCF\n- Turing -> Pitch + Gate\n\nLe chaos Lorenz est deterministe mais\nimpredictible - meme parametres = meme son.\n\nAjustez Speed du chaos pour tempo different."
+        }
       }
     ],
     "connections": [

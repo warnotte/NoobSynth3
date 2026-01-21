@@ -247,6 +247,15 @@
         "params": {
           "level": 1.0
         }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 0, "y": 8 },
+        "params": {
+          "text": "TURING TECHNO 909\n\nTechno complet avec drums 909.\n\n- Lead TM -> FM Op\n- Bass TM -> VCO + Acid VCF\n- Drum Sequencer -> Kick, Snare, HiHat\n\nEditez le Drum Sequencer pour\nmodifier les patterns de batterie.\n\nTuring probability ajuste la variation melodique."
+        }
       }
     ],
     "connections": [

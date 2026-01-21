@@ -1195,6 +1195,10 @@ Turing Machine (cv) → VCO (pitch)
 - **Turing Chaos Dual** - Deux voix (lead + bass) en polyrythmie 2:1
 - **Turing Chaos Trio** - Trois voix (high, lead, bass) en polyrythmie
 - **Turing Dual Band** - Deux bandes de fréquences, rates différents
+- **The Generative Factory** - Techno génératif complet (Shepard + TB-303 + Resonator + Karplus + 909)
+- **The Infinite Cathedral** - Ambient cathédrale (Dual Shepard + Pipe Organ + Spectral Swarm + Resonator)
+- **Resonator Swarm** - Textures otherworldly (4 Resonators + Swarm + Shepard + Euclidean)
+- **The Lorenz Machine** - Organisme sonique auto-évolutif (Chaos contrôle tout)
 
 ### Main Out
 

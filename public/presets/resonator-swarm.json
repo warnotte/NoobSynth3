@@ -303,6 +303,15 @@
         "params": {
           "level": 1.0
         }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 0, "y": 10 },
+        "params": {
+          "text": "RESONATOR SWARM\n\n4 Resonators + Spectral Swarm + Shepard.\n\n- Bells: haute freq, decay long\n- Strings: mode sympathique, 6 voix\n- Metallic: inharmonique, brillant\n- Pluck: court, percussif\n\n5 patterns Euclidiens decales:\nE(5,16), E(3,8), E(7,12), E(4,7), E(2,5)\n\nLorenz module pitch et filtres.\nGranular delay +7 semitones."
+        }
       }
     ],
     "connections": [

@@ -90,6 +90,15 @@
         "params": {
           "level": 0.8
         }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 0, "y": 2 },
+        "params": {
+          "text": "TURING PLUCKS\n\nMelodies generatives avec Karplus-Strong.\n\n- Probability: controle la mutation (bas = sequence fixe)\n- Length: longueur de la sequence (8 steps)\n- Range: etendue des notes (2 octaves)\n- Scale: Pentatonique mineur\n\nAugmentez Probability pour plus de variation.\nBaissez pour verrouiller la sequence."
+        }
       }
     ],
     "connections": [

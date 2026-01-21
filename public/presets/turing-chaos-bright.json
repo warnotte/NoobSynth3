@@ -126,6 +126,15 @@
         "params": {
           "level": 1.0
         }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 0, "y": 4 },
+        "params": {
+          "text": "TURING CHAOS BRIGHT\n\nVersion brillante du Turing Chaos.\n\n- VCF cutoff eleve (3150 Hz)\n- Resonance basse (0.06)\n- Chaos rapide (speed 1.27)\n- Parametres chaos modifies (sigma/beta)\n\nPlus de hautes frequences passent.\nTimbre vocal plus present."
+        }
       }
     ],
     "connections": [
