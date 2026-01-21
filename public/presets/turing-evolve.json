@@ -1,0 +1,144 @@
+{
+  "id": "turing-evolve",
+  "name": "Turing Ambient",
+  "description": "Slowly evolving wavetable pads with granular delay. Deep and atmospheric.",
+  "group": "Turing Machine",
+  "graph": {
+    "modules": [
+      {
+        "id": "clock-1",
+        "type": "clock",
+        "name": "Clock",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "running": true,
+          "tempo": 60,
+          "rate": 2,
+          "swing": 0
+        }
+      },
+      {
+        "id": "turing-1",
+        "type": "turing-machine",
+        "name": "Turing Machine",
+        "position": { "x": 2, "y": 0 },
+        "params": {
+          "probability": 0.08,
+          "length": 12,
+          "range": 1.5,
+          "scale": 7,
+          "root": 0
+        }
+      },
+      {
+        "id": "lfo-1",
+        "type": "lfo",
+        "name": "Pos LFO",
+        "position": { "x": 0, "y": 2 },
+        "params": {
+          "rate": 0.05,
+          "depth": 0.8,
+          "offset": 0.5,
+          "shape": "sine",
+          "bipolar": false
+        }
+      },
+      {
+        "id": "lfo-2",
+        "type": "lfo",
+        "name": "Filter LFO",
+        "position": { "x": 0, "y": 3 },
+        "params": {
+          "rate": 0.12,
+          "depth": 0.5,
+          "offset": 0,
+          "shape": "triangle",
+          "bipolar": true
+        }
+      },
+      {
+        "id": "osc-1",
+        "type": "wavetable",
+        "name": "Wavetable",
+        "position": { "x": 4, "y": 0 },
+        "params": {
+          "frequency": 220,
+          "bank": 0,
+          "position": 0.3,
+          "unison": 4,
+          "detune": 12,
+          "spread": 0.8,
+          "morphSpeed": 0,
+          "subMix": 0.3,
+          "attack": 0.3,
+          "release": 1.5
+        }
+      },
+      {
+        "id": "vcf-1",
+        "type": "vcf",
+        "name": "VCF",
+        "position": { "x": 6, "y": 0 },
+        "params": {
+          "cutoff": 1200,
+          "resonance": 0.2,
+          "drive": 0.05,
+          "envAmount": 0,
+          "modAmount": 0.4,
+          "keyTrack": 0.5,
+          "model": "svf",
+          "mode": "lp",
+          "slope": 12
+        }
+      },
+      {
+        "id": "granular-1",
+        "type": "granular-delay",
+        "name": "Granular",
+        "position": { "x": 8, "y": 0 },
+        "params": {
+          "time": 400,
+          "feedback": 0.5,
+          "mix": 0.4,
+          "grainSize": 80,
+          "pitch": 0,
+          "spread": 0.3,
+          "density": 0.7
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "x": 10, "y": 0 },
+        "params": {
+          "time": 0.85,
+          "damp": 0.3,
+          "preDelay": 40,
+          "mix": 0.45
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Out",
+        "position": { "x": 12, "y": 0 },
+        "params": {
+          "level": 0.7
+        }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "turing-1", "portId": "clock" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "reset" }, "to": { "moduleId": "turing-1", "portId": "reset" }, "kind": "sync" },
+      { "from": { "moduleId": "turing-1", "portId": "cv" }, "to": { "moduleId": "osc-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "turing-1", "portId": "gate" }, "to": { "moduleId": "osc-1", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "lfo-1", "portId": "cv-out" }, "to": { "moduleId": "osc-1", "portId": "position" }, "kind": "cv" },
+      { "from": { "moduleId": "lfo-2", "portId": "cv-out" }, "to": { "moduleId": "vcf-1", "portId": "mod" }, "kind": "cv" },
+      { "from": { "moduleId": "osc-1", "portId": "out" }, "to": { "moduleId": "vcf-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "vcf-1", "portId": "out" }, "to": { "moduleId": "granular-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "granular-1", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}

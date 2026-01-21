@@ -169,6 +169,11 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
     ModuleType::Chaos => vec![
       PortInfo { channels: 1 },  // speed
     ],
+    // Turing Machine - 2 inputs (clock, reset)
+    ModuleType::TuringMachine => vec![
+      PortInfo { channels: 1 },  // clock
+      PortInfo { channels: 1 },  // reset
+    ],
   }
 }
 
@@ -349,6 +354,12 @@ pub fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // y
       PortInfo { channels: 1 },  // z
       PortInfo { channels: 1 },  // gate
+    ],
+    // Turing Machine - 3 outputs (cv, gate, pulse)
+    ModuleType::TuringMachine => vec![
+      PortInfo { channels: 1 },  // cv
+      PortInfo { channels: 1 },  // gate
+      PortInfo { channels: 1 },  // pulse
     ],
   }
 }
@@ -598,6 +609,11 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
     },
     ModuleType::Chaos => match port_id {
       "speed" => Some(0),
+      _ => None,
+    },
+    ModuleType::TuringMachine => match port_id {
+      "clock" | "clk" => Some(0),
+      "reset" | "rst" => Some(1),
       _ => None,
     },
     _ => None,
@@ -880,6 +896,12 @@ pub fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize
       "y" => Some(1),
       "z" => Some(2),
       "gate" => Some(3),
+      _ => None,
+    },
+    ModuleType::TuringMachine => match port_id {
+      "cv" | "cv-out" => Some(0),
+      "gate" | "gate-out" => Some(1),
+      "pulse" | "trig" => Some(2),
       _ => None,
     },
   }

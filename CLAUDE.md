@@ -148,7 +148,7 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 - [ ] `public/presets/` - Preset de démonstration
 - [ ] `npm run build:wasm` - Rebuild WASM après modifs Rust
 
-## Module Types (59 total)
+## Module Types (60 total)
 
 ### Sources (13)
 oscillator, supersaw, karplus, fm-op, nes-osc, snes-osc, noise, tb-303, shepard, pipe-organ, spectral-swarm, resonator, wavetable
@@ -165,8 +165,8 @@ chorus, ensemble, choir, vocoder, delay, granular-delay, tape-delay, spring-reve
 ### Modulators (7)
 adsr, lfo, mod-router, sample-hold, slew, quantizer, chaos
 
-### Sequencers (7)
-clock, arpeggiator, step-sequencer, euclidean, drum-sequencer, midi-file-sequencer, mario
+### Sequencers (8)
+clock, arpeggiator, step-sequencer, euclidean, drum-sequencer, midi-file-sequencer, turing-machine, mario
 
 ### TR-909 Drums (6)
 909-kick, 909-snare, 909-hihat, 909-clap, 909-tom, 909-rimshot

@@ -64,6 +64,7 @@ pub mod drum_sequencer;
 pub mod euclidean;
 pub mod mario;
 pub mod midi_file_sequencer;
+pub mod turing;
 
 // ============================================================================
 // Shared Rate Divisions
@@ -157,3 +158,4 @@ pub use midi_file_sequencer::{
     MidiFileSequencer, MidiFileSequencerInputs, MidiFileSequencerParams, MidiFileSequencerOutputs,
     MidiNote, MidiTrack, MIDI_TRACKS, MAX_NOTES_PER_TRACK,
 };
+pub use turing::{TuringMachine, TuringInputs, TuringParams};

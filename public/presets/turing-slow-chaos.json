@@ -1,0 +1,204 @@
+{
+  "id": "turing-slow-chaos",
+  "name": "Turing Dual Band",
+  "description": "Two Turing Machines at different rates: slow bass drone + fast high melody. Frequency separated.",
+  "group": "Turing Machine",
+  "graph": {
+    "modules": [
+      {
+        "id": "clock-1",
+        "type": "clock",
+        "name": "Fast Clock",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "running": true,
+          "tempo": 110,
+          "rate": 4,
+          "swing": 10
+        }
+      },
+      {
+        "id": "clock-2",
+        "type": "clock",
+        "name": "Slow Clock",
+        "position": { "x": 0, "y": 2 },
+        "params": {
+          "running": true,
+          "tempo": 110,
+          "rate": 1,
+          "swing": 0
+        }
+      },
+      {
+        "id": "turing-1",
+        "type": "turing-machine",
+        "name": "High TM",
+        "position": { "x": 2, "y": 0 },
+        "params": {
+          "probability": 0.15,
+          "length": 8,
+          "range": 2,
+          "scale": 7,
+          "root": 0
+        }
+      },
+      {
+        "id": "turing-2",
+        "type": "turing-machine",
+        "name": "Low TM",
+        "position": { "x": 2, "y": 2 },
+        "params": {
+          "probability": 0.05,
+          "length": 4,
+          "range": 1,
+          "scale": 7,
+          "root": 0
+        }
+      },
+      {
+        "id": "karplus-1",
+        "type": "karplus",
+        "name": "High Pluck",
+        "position": { "x": 4, "y": 0 },
+        "params": {
+          "frequency": 440,
+          "damping": 0.01,
+          "brightness": 0.9,
+          "stretch": 0.0,
+          "feedback": 0.997,
+          "position": 0.1,
+          "noise": "white"
+        }
+      },
+      {
+        "id": "osc-2",
+        "type": "oscillator",
+        "name": "Low Drone",
+        "position": { "x": 4, "y": 2 },
+        "params": {
+          "frequency": 55,
+          "type": "sawtooth",
+          "pwm": 0.5,
+          "unison": 2,
+          "detune": 5,
+          "fmLin": 0,
+          "fmExp": 0,
+          "subMix": 0.6,
+          "subOct": 1
+        }
+      },
+      {
+        "id": "adsr-2",
+        "type": "adsr",
+        "name": "Low Env",
+        "position": { "x": 6, "y": 2 },
+        "params": {
+          "attack": 0.1,
+          "decay": 0.5,
+          "sustain": 0.6,
+          "release": 0.8
+        }
+      },
+      {
+        "id": "hpf-1",
+        "type": "hpf",
+        "name": "High Pass",
+        "position": { "x": 6, "y": 0 },
+        "params": {
+          "cutoff": 800,
+          "resonance": 0.1
+        }
+      },
+      {
+        "id": "vcf-2",
+        "type": "vcf",
+        "name": "Low Pass",
+        "position": { "x": 6, "y": 3 },
+        "params": {
+          "cutoff": 400,
+          "resonance": 0.3,
+          "drive": 0.15,
+          "envAmount": 0.4,
+          "modAmount": 0,
+          "keyTrack": 0.3,
+          "model": "ladder",
+          "mode": "lp",
+          "slope": 24
+        }
+      },
+      {
+        "id": "gain-2",
+        "type": "gain",
+        "name": "Low VCA",
+        "position": { "x": 8, "y": 2 },
+        "params": {
+          "gain": 0.7
+        }
+      },
+      {
+        "id": "delay-1",
+        "type": "delay",
+        "name": "High Delay",
+        "position": { "x": 8, "y": 0 },
+        "params": {
+          "time": 272,
+          "feedback": 0.4,
+          "mix": 0.3,
+          "tone": 0.6,
+          "pingPong": true
+        }
+      },
+      {
+        "id": "mixer-1",
+        "type": "mixer",
+        "name": "Mix",
+        "position": { "x": 10, "y": 1 },
+        "params": {
+          "levelA": 0.5,
+          "levelB": 0.7
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "x": 12, "y": 0 },
+        "params": {
+          "time": 0.7,
+          "damp": 0.4,
+          "preDelay": 30,
+          "mix": 0.35
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Out",
+        "position": { "x": 14, "y": 0 },
+        "params": {
+          "level": 0.75
+        }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "turing-1", "portId": "clock" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "reset" }, "to": { "moduleId": "turing-1", "portId": "reset" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-2", "portId": "clock" }, "to": { "moduleId": "turing-2", "portId": "clock" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-2", "portId": "reset" }, "to": { "moduleId": "turing-2", "portId": "reset" }, "kind": "sync" },
+      { "from": { "moduleId": "turing-1", "portId": "cv" }, "to": { "moduleId": "karplus-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "turing-1", "portId": "gate" }, "to": { "moduleId": "karplus-1", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "turing-2", "portId": "cv" }, "to": { "moduleId": "osc-2", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "turing-2", "portId": "gate" }, "to": { "moduleId": "adsr-2", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "karplus-1", "portId": "out" }, "to": { "moduleId": "hpf-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "osc-2", "portId": "out" }, "to": { "moduleId": "vcf-2", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-2", "portId": "env" }, "to": { "moduleId": "vcf-2", "portId": "env" }, "kind": "cv" },
+      { "from": { "moduleId": "adsr-2", "portId": "env" }, "to": { "moduleId": "gain-2", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "vcf-2", "portId": "out" }, "to": { "moduleId": "gain-2", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "hpf-1", "portId": "out" }, "to": { "moduleId": "delay-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "delay-1", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "gain-2", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-b" }, "kind": "audio" },
+      { "from": { "moduleId": "mixer-1", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}

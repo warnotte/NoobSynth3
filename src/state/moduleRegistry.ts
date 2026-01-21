@@ -68,6 +68,8 @@ export const moduleSizes: Record<ModuleType, string> = {
   clock: '2x2',
   // MIDI File Sequencer
   'midi-file-sequencer': '2x5',
+  // Turing Machine
+  'turing-machine': '2x4',
 }
 
 export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>> = {
@@ -113,6 +115,8 @@ export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>>
   clock: 'strip',
   // MIDI File Sequencer
   'midi-file-sequencer': 'strip',
+  // Turing Machine
+  'turing-machine': 'strip',
 }
 
 export type ModuleCategory =
@@ -200,6 +204,7 @@ export const moduleCatalog: { type: ModuleType; label: string; category: ModuleC
   { type: 'euclidean', label: 'Euclidean', category: 'sequencers' },
   { type: 'drum-sequencer', label: 'Drum Seq', category: 'sequencers' },
   { type: 'midi-file-sequencer', label: 'MIDI File', category: 'sequencers' },
+  { type: 'turing-machine', label: 'Turing Machine', category: 'sequencers' },
   { type: 'mario', label: 'Mario IO', category: 'sequencers' },
   // TR-909 Drums
   { type: '909-kick', label: 'Kick', category: 'drums' },
@@ -284,6 +289,8 @@ export const modulePrefixes: Record<ModuleType, string> = {
   clock: 'clock',
   // MIDI File Sequencer
   'midi-file-sequencer': 'midiseq',
+  // Turing Machine
+  'turing-machine': 'turing',
 }
 
 export const moduleLabels: Record<ModuleType, string> = {
@@ -353,6 +360,8 @@ export const moduleLabels: Record<ModuleType, string> = {
   clock: 'Master Clock',
   // MIDI File Sequencer
   'midi-file-sequencer': 'MIDI File Seq',
+  // Turing Machine
+  'turing-machine': 'Turing Machine',
 }
 
 export const moduleDefaults: Record<ModuleType, Record<string, number | string | boolean>> = {
@@ -749,6 +758,14 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     mute6: false,
     mute7: false,
     mute8: false,
+  },
+  // Turing Machine
+  'turing-machine': {
+    probability: 0.5,   // 0=locked loop, 0.5=evolving, 1=random
+    length: 8,          // Loop length in bits (2-16)
+    range: 2,           // Output range in octaves (1-5)
+    scale: 0,           // Scale index (0=chromatic)
+    root: 0,            // Root note (0-11)
   },
 }
 

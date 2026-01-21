@@ -68,6 +68,8 @@ export type ModuleType =
   | 'pitch-shifter'
   // Master Clock
   | 'clock'
+  // Turing Machine
+  | 'turing-machine'
 
 export interface ModuleSpec {
   id: string

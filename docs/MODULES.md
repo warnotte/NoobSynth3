@@ -1140,6 +1140,58 @@ MIDI File Seq → cv-1 → Pipe Organ (pitch)
 
 **Note** : Le fichier MIDI est parsé en JavaScript et les données sont transmises au DSP sous forme JSON. Jusqu'à 8192 notes par piste sont supportées.
 
+### Turing Machine
+
+Séquenceur basé sur un registre à décalage inspiré du Music Thing Modular Turing Machine. Génère des séquences semi-aléatoires qui peuvent être "verrouillées" pour se répéter.
+
+Le module utilise un registre à décalage de 16 bits. À chaque pulse de clock, le bit sortant est réinjecté avec une probabilité de mutation. Quand la probabilité est à 0%, la séquence se répète parfaitement. À 100%, c'est complètement aléatoire. Entre les deux, la séquence "évolue" progressivement.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `probability` | 0-1 | Probabilité de mutation (0=locked, 0.5=evolving, 1=random) |
+| `length` | 2-16 | Longueur de la boucle en bits |
+| `range` | 1-5 oct | Plage de sortie en octaves |
+| `scale` | 0-6 | Gamme de quantification (0=off, 1=Major, 2=Minor, etc.) |
+| `root` | 0-11 | Note fondamentale (C à B) |
+
+**Entrées :**
+| Port | ID | Description |
+|------|----|-------------|
+| Clock | `clock` | Avance le registre d'un step |
+| Reset | `reset` | Réinitialise le registre au pattern initial |
+
+**Sorties :**
+| Port | ID | Description |
+|------|----|-------------|
+| CV | `cv` | Pitch CV dérivé du registre (±range octaves) |
+| Gate | `gate` | Gate basé sur le LSB du registre |
+| Pulse | `pulse` | Trigger de 5ms à chaque step |
+
+**Conseils d'utilisation :**
+
+- **Séquence fixe** : probability = 0, la séquence se répète à l'infini
+- **Évolution lente** : probability = 0.1-0.3, la séquence change graduellement
+- **Génératif** : probability = 0.5, bon équilibre entre répétition et variation
+- **Chaos contrôlé** : probability = 0.8+, très variable mais avec des patterns qui reviennent
+- **Totalement aléatoire** : probability = 1.0, jamais la même séquence
+
+**Utilisation type :**
+```
+Master Clock → clock → Turing Machine (clock)
+                     → reset → Turing Machine (reset)
+
+Turing Machine (cv) → VCO (pitch)
+                (gate) → ADSR (gate)
+                (pulse) → Drum (trigger)
+```
+
+**Presets (groupe "Turing Machine") :**
+- **Turing Plucks** - Mélodies Karplus-Strong avec chorus et delay
+- **Turing Ambient** - Pads wavetable évolutifs avec granular delay
+- **Turing Techno** - FM lead + acid bass, deux Turing Machines
+- **Turing Chaos** - Lorenz chaos module le filtre et le wavetable
+- **Turing Dual Band** - Deux bandes de fréquences, rates différents
+
 ### Main Out
 
 Sortie audio principale.

@@ -63,6 +63,7 @@ pub enum ModuleType {
     Euclidean,
     Mario,
     MidiFileSequencer,
+    TuringMachine,
 
     // TR-909 Drums
     Kick909,

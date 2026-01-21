@@ -1,0 +1,144 @@
+{
+  "id": "turing-chaos",
+  "name": "Turing Chaos",
+  "description": "Lorenz chaos modulates filter and wavetable. Turing Machine drives the melody. Unpredictable beauty.",
+  "group": "Turing Machine",
+  "graph": {
+    "modules": [
+      {
+        "id": "clock-1",
+        "type": "clock",
+        "name": "Clock",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "running": true,
+          "tempo": 100,
+          "rate": 3,
+          "swing": 12
+        }
+      },
+      {
+        "id": "turing-1",
+        "type": "turing-machine",
+        "name": "Turing",
+        "position": { "x": 2, "y": 0 },
+        "params": {
+          "probability": 0.15,
+          "length": 8,
+          "range": 2,
+          "scale": 8,
+          "root": 0
+        }
+      },
+      {
+        "id": "chaos-1",
+        "type": "chaos",
+        "name": "Lorenz",
+        "position": { "x": 0, "y": 2 },
+        "params": {
+          "speed": 0.3,
+          "sigma": 10,
+          "rho": 28,
+          "beta": 2.67,
+          "scale": 0.5
+        }
+      },
+      {
+        "id": "osc-1",
+        "type": "wavetable",
+        "name": "Wavetable",
+        "position": { "x": 4, "y": 0 },
+        "params": {
+          "frequency": 220,
+          "bank": 1,
+          "position": 0.5,
+          "unison": 3,
+          "detune": 10,
+          "spread": 0.6,
+          "morphSpeed": 0,
+          "subMix": 0.2,
+          "attack": 0.01,
+          "release": 0.4
+        }
+      },
+      {
+        "id": "vcf-1",
+        "type": "vcf",
+        "name": "VCF",
+        "position": { "x": 6, "y": 0 },
+        "params": {
+          "cutoff": 2100,
+          "resonance": 0.5,
+          "drive": 0.15,
+          "envAmount": 0,
+          "modAmount": 0.6,
+          "keyTrack": 0.4,
+          "model": "ladder",
+          "mode": "lp",
+          "slope": 24
+        }
+      },
+      {
+        "id": "chorus-1",
+        "type": "chorus",
+        "name": "Chorus",
+        "position": { "x": 8, "y": 0 },
+        "params": {
+          "rate": 0.6,
+          "depth": 0.4,
+          "mix": 0.3,
+          "voices": 3
+        }
+      },
+      {
+        "id": "delay-1",
+        "type": "tape-delay",
+        "name": "Tape",
+        "position": { "x": 10, "y": 0 },
+        "params": {
+          "time": 300,
+          "feedback": 0.4,
+          "mix": 0.3,
+          "tone": 0.5,
+          "wow": 0.2,
+          "flutter": 0.15,
+          "drive": 0.2
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "x": 12, "y": 0 },
+        "params": {
+          "time": 0.7,
+          "damp": 0.4,
+          "preDelay": 30,
+          "mix": 0.35
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Out",
+        "position": { "x": 14, "y": 0 },
+        "params": {
+          "level": 0.75
+        }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "turing-1", "portId": "clock" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "reset" }, "to": { "moduleId": "turing-1", "portId": "reset" }, "kind": "sync" },
+      { "from": { "moduleId": "turing-1", "portId": "cv" }, "to": { "moduleId": "osc-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "turing-1", "portId": "gate" }, "to": { "moduleId": "osc-1", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "chaos-1", "portId": "x" }, "to": { "moduleId": "osc-1", "portId": "position" }, "kind": "cv" },
+      { "from": { "moduleId": "chaos-1", "portId": "y" }, "to": { "moduleId": "vcf-1", "portId": "mod" }, "kind": "cv" },
+      { "from": { "moduleId": "osc-1", "portId": "out" }, "to": { "moduleId": "vcf-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "vcf-1", "portId": "out" }, "to": { "moduleId": "chorus-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "chorus-1", "portId": "out" }, "to": { "moduleId": "delay-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "delay-1", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}

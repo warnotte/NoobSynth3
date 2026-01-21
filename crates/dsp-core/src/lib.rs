@@ -99,6 +99,7 @@ pub use sequencers::{
     Mario, MarioOutputs, MARIO_CHANNELS,
     MidiFileSequencer, MidiFileSequencerParams, MidiFileSequencerInputs, MidiFileSequencerOutputs,
     MidiNote, MidiTrack, MIDI_TRACKS, MAX_NOTES_PER_TRACK,
+    TuringMachine, TuringParams, TuringInputs,
 };
 
 // Re-export drums

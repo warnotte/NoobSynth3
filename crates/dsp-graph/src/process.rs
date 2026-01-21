@@ -31,6 +31,7 @@ use dsp_core::{
     TapeDelayInputs, TapeDelayParams,
     Tb303Inputs, Tb303Outputs, Tb303Params,
     Tom909Inputs, Tom909Params,
+    TuringInputs, TuringParams,
     Vca, VcfInputs, VcfParams, VcoInputs, VcoParams,
     VocoderInputs, VocoderParams, Wavefolder, WavefolderParams,
     WavetableInputs, WavetableParams,
@@ -1501,6 +1502,31 @@ pub(crate) fn process_module(
                 };
                 out[i] = state.wavetable.process(params, wt_inputs);
             }
+        }
+        ModuleState::TuringMachine(state) => {
+            let clock = if !connections[0].is_empty() { Some(inputs[0].channel(0)) } else { None };
+            let reset = if connections.len() > 1 && !connections[1].is_empty() {
+                Some(inputs[1].channel(0))
+            } else {
+                None
+            };
+
+            let turing_inputs = TuringInputs { clock, reset };
+            let params = TuringParams {
+                probability: state.probability.slice(frames),
+                length: state.length.slice(frames),
+                range: state.range.slice(frames),
+                scale: state.scale.slice(frames),
+                root: state.root.slice(frames),
+            };
+
+            let (cv_group, rest) = outputs.split_at_mut(1);
+            let (gate_group, pulse_group) = rest.split_at_mut(1);
+            let cv_out = cv_group[0].channel_mut(0);
+            let gate_out = gate_group[0].channel_mut(0);
+            let pulse_out = pulse_group[0].channel_mut(0);
+
+            state.turing.process_block(cv_out, gate_out, pulse_out, turing_inputs, params);
         }
         ModuleState::Notes => {
             // UI-only module, no audio processing

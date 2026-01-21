@@ -5,7 +5,7 @@ use dsp_core::{
     EuclideanSequencer, FmOperator, GranularDelay, HiHat909, Hpf, KarplusStrong,
     Kick909, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, Phaser, PipeOrgan, PitchShifter,
     Resonator, Reverb, Rimshot909, SampleHold, Shepard, SlewLimiter, Snare909, SnesOsc, SpectralSwarm, SpringReverb,
-    StepSequencer, Supersaw, TapeDelay, Tb303, Tom909, Vcf, Vco, Vocoder, Wavetable,
+    StepSequencer, Supersaw, TapeDelay, Tb303, Tom909, TuringMachine, Vcf, Vco, Vocoder, Wavetable,
 };
 
 use crate::types::ParamBuffer;
@@ -502,6 +502,15 @@ pub struct MidiFileSequencerState {
     pub mute8: ParamBuffer,
 }
 
+pub struct TuringState {
+    pub turing: TuringMachine,
+    pub probability: ParamBuffer,
+    pub length: ParamBuffer,
+    pub range: ParamBuffer,
+    pub scale: ParamBuffer,
+    pub root: ParamBuffer,
+}
+
 // =============================================================================
 // TR-909 Drum States
 // =============================================================================
@@ -644,6 +653,7 @@ pub enum ModuleState {
     Euclidean(EuclideanState),
     Mario(MarioState),
     MidiFileSequencer(MidiFileSequencerState),
+    TuringMachine(TuringState),
 
     // TR-909 Drums
     Kick909(Kick909State),

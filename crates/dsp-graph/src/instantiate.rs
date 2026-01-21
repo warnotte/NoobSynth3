@@ -7,7 +7,7 @@ use dsp_core::{
   EuclideanSequencer, FmOperator, GranularDelay, HiHat909, Hpf, KarplusStrong,
   Kick909, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, Phaser, PipeOrgan, PitchShifter,
   Resonator, Reverb, Rimshot909, SampleHold, Shepard, SlewLimiter, Snare909, SnesOsc, SpectralSwarm, SpringReverb,
-  StepSequencer, Supersaw, TapeDelay, Tb303, Tom909, Vcf, Vco, Vocoder, Wavetable,
+  StepSequencer, Supersaw, TapeDelay, Tb303, Tom909, TuringMachine, Vcf, Vco, Vocoder, Wavetable,
 };
 
 use crate::state::*;
@@ -541,6 +541,14 @@ pub(crate) fn create_state(
       release: ParamBuffer::new(param_number(params, "release", 0.3)),
     }),
     ModuleType::Notes => ModuleState::Notes,  // UI-only, no DSP
+    ModuleType::TuringMachine => ModuleState::TuringMachine(TuringState {
+      turing: TuringMachine::new(sample_rate),
+      probability: ParamBuffer::new(param_number(params, "probability", 0.5)),
+      length: ParamBuffer::new(param_number(params, "length", 8.0)),
+      range: ParamBuffer::new(param_number(params, "range", 2.0)),
+      scale: ParamBuffer::new(param_number(params, "scale", 0.0)),
+      root: ParamBuffer::new(param_number(params, "root", 0.0)),
+    }),
   }
 }
 
@@ -1054,6 +1062,14 @@ pub(crate) fn apply_param(state: &mut ModuleState, param: &str, value: f32) {
       "subMix" => state.sub_mix.set(value),
       "attack" => state.attack.set(value),
       "release" => state.release.set(value),
+      _ => {}
+    },
+    ModuleState::TuringMachine(state) => match param {
+      "probability" => state.probability.set(value),
+      "length" => state.length.set(value),
+      "range" => state.range.set(value),
+      "scale" => state.scale.set(value),
+      "root" => state.root.set(value),
       _ => {}
     },
     _ => {}

@@ -1057,6 +1057,40 @@
       "description": "Ghostly vocals. Chaos quantizer drives pitch, Chaos X/Y modulate vowel formants.",
       "file": "chaos-singing.json",
       "group": "Lorenz Experiment"
-    }
-  ]
+    },
+    {
+      "id": "turing-basic",
+      "name": "Turing Plucks",
+      "description": "Generative plucked melodies with Karplus-Strong. Hypnotic and evolving.",
+      "file": "turing-basic.json",
+      "group": "Turing Machine"
+    },
+    {
+      "id": "turing-evolve",
+      "name": "Turing Ambient",
+      "description": "Slowly evolving wavetable pads with granular delay. Deep and atmospheric.",
+      "file": "turing-evolve.json",
+      "group": "Turing Machine"
+    },
+    {
+      "id": "turing-poly",
+      "name": "Turing Techno",
+      "description": "Acid bassline + FM lead. Two Turing Machines creating evolving techno patterns.",
+      "file": "turing-poly.json",
+      "group": "Turing Machine"
+    },
+    {
+      "id": "turing-chaos",
+      "name": "Turing Chaos",
+      "description": "Lorenz chaos modulates filter and wavetable. Turing Machine drives the melody. Unpredictable beauty.",
+      "file": "turing-chaos.json",
+      "group": "Turing Machine"
+    },
+    {
+      "id": "turing-slow-chaos",
+      "name": "Turing Dual Band",
+      "description": "Two Turing Machines at different rates: slow bass drone + fast high melody. Frequency separated.",
+      "file": "turing-slow-chaos.json",
+      "group": "Turing Machine"
+    }  ]
 }
