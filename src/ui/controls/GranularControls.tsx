@@ -148,6 +148,8 @@ export function GranularControls({ module, engine, updateParam }: GranularContro
         shape={shape}
         hasBuffer={hasBuffer}
         waveformData={waveformData}
+        onPositionChange={(value) => updateParam(module.id, 'position', value)}
+        onSprayChange={(value) => updateParam(module.id, 'spray', value)}
       />
 
       {/* Load and Test button row */}

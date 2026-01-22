@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef, useCallback, useState } from 'react'
 
 type GranularWaveformProps = {
   position: number        // 0-1 playback position
@@ -8,6 +8,8 @@ type GranularWaveformProps = {
   shape: number           // grain envelope shape (0-3)
   hasBuffer: boolean      // whether a sample is loaded
   waveformData?: Float32Array | null  // optional waveform data for visualization
+  onPositionChange?: (position: number) => void  // callback when position is changed via mouse
+  onSprayChange?: (spray: number) => void        // callback when spray is changed via mouse
 }
 
 // Grain envelope shapes matching Rust
@@ -49,6 +51,8 @@ export const GranularWaveform = ({
   shape,
   hasBuffer,
   waveformData,
+  onPositionChange,
+  onSprayChange,
 }: GranularWaveformProps) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const frameRef = useRef<number | null>(null)
@@ -56,6 +60,27 @@ export const GranularWaveform = ({
   const spawnAccRef = useRef(0)
   const grainIdRef = useRef(0)
   const lastTimeRef = useRef(performance.now())
+  const isDraggingRef = useRef<'position' | 'spray-left' | 'spray-right' | null>(null)
+  const dragStartXRef = useRef(0)
+  const dragStartValueRef = useRef(0)
+  const cursorRef = useRef<string>('default')
+  const [cursor, setCursor] = useState<string>('default')
+
+  // Only update cursor state if it actually changed
+  const updateCursor = useCallback((newCursor: string) => {
+    if (cursorRef.current !== newCursor) {
+      cursorRef.current = newCursor
+      setCursor(newCursor)
+    }
+  }, [])
+
+  // Store params in refs to avoid recreating draw function
+  const paramsRef = useRef({ position, size, density, spray, shape, hasBuffer, waveformData })
+  paramsRef.current = { position, size, density, spray, shape, hasBuffer, waveformData }
+
+  // Store callbacks in refs
+  const callbacksRef = useRef({ onPositionChange, onSprayChange })
+  callbacksRef.current = { onPositionChange, onSprayChange }
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current
@@ -63,6 +88,9 @@ export const GranularWaveform = ({
 
     const ctx = canvas.getContext('2d')
     if (!ctx) return
+
+    // Read current params from ref
+    const { position, size, density, spray, shape, hasBuffer, waveformData } = paramsRef.current
 
     const width = canvas.clientWidth
     const height = canvas.clientHeight
@@ -225,7 +253,116 @@ export const GranularWaveform = ({
     ctx.fillText(`${activeGrains.length} grains`, width - 4, 12)
 
     frameRef.current = requestAnimationFrame(draw)
-  }, [position, size, density, spray, shape, hasBuffer, waveformData])
+  }, []) // No dependencies - params are read from ref
+
+  // Mouse interaction handlers
+  const getMousePosition = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current
+    if (!canvas) return 0
+    const rect = canvas.getBoundingClientRect()
+    return Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width))
+  }, [])
+
+  const handleMouseDown = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!paramsRef.current.hasBuffer) return
+
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    const rect = canvas.getBoundingClientRect()
+    const x = (e.clientX - rect.left) / rect.width
+    const { position, spray } = paramsRef.current
+
+    // Check if clicking near spray edges (within 10px)
+    const sprayLeft = Math.max(0, position - spray * 0.5)
+    const sprayRight = Math.min(1, position + spray * 0.5)
+    const edgeThreshold = 10 / rect.width
+
+    if (spray > 0.01 && Math.abs(x - sprayLeft) < edgeThreshold) {
+      isDraggingRef.current = 'spray-left'
+      dragStartXRef.current = x
+      dragStartValueRef.current = spray
+      updateCursor('ew-resize')
+    } else if (spray > 0.01 && Math.abs(x - sprayRight) < edgeThreshold) {
+      isDraggingRef.current = 'spray-right'
+      dragStartXRef.current = x
+      dragStartValueRef.current = spray
+      updateCursor('ew-resize')
+    } else {
+      // Click to set position immediately
+      isDraggingRef.current = 'position'
+      updateCursor('grabbing')
+      const newPos = Math.max(0, Math.min(1, x))
+      callbacksRef.current.onPositionChange?.(newPos)
+    }
+  }, [])
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    const rect = canvas.getBoundingClientRect()
+    const x = (e.clientX - rect.left) / rect.width
+    const { position, spray, hasBuffer } = paramsRef.current
+
+    // Update cursor based on position (hover detection)
+    if (!isDraggingRef.current && hasBuffer) {
+      const sprayLeft = Math.max(0, position - spray * 0.5)
+      const sprayRight = Math.min(1, position + spray * 0.5)
+      const edgeThreshold = 10 / rect.width
+
+      if (spray > 0.01 && (Math.abs(x - sprayLeft) < edgeThreshold || Math.abs(x - sprayRight) < edgeThreshold)) {
+        updateCursor('ew-resize')
+      } else {
+        updateCursor('pointer')
+      }
+    }
+
+    // Handle dragging
+    if (isDraggingRef.current) {
+      if (isDraggingRef.current === 'position') {
+        updateCursor('grabbing')
+        if (Math.abs(x - position) > 0.005) {
+          callbacksRef.current.onPositionChange?.(x)
+        }
+      } else if (isDraggingRef.current === 'spray-left') {
+        const newSpray = Math.max(0, Math.min(1, (position - x) * 2))
+        if (Math.abs(newSpray - spray) > 0.005) {
+          callbacksRef.current.onSprayChange?.(newSpray)
+        }
+      } else if (isDraggingRef.current === 'spray-right') {
+        const newSpray = Math.max(0, Math.min(1, (x - position) * 2))
+        if (Math.abs(newSpray - spray) > 0.005) {
+          callbacksRef.current.onSprayChange?.(newSpray)
+        }
+      }
+    }
+  }, [])
+
+  const handleMouseUp = useCallback(() => {
+    isDraggingRef.current = null
+    updateCursor('pointer')
+  }, [updateCursor])
+
+  const handleMouseLeave = useCallback(() => {
+    isDraggingRef.current = null
+    updateCursor('default')
+  }, [updateCursor])
+
+  // Double-click to reset spray to default value (useful when spray is 0)
+  const handleDoubleClick = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!paramsRef.current.hasBuffer) return
+
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    const rect = canvas.getBoundingClientRect()
+    const x = (e.clientX - rect.left) / rect.width
+
+    // Set position to click location and reset spray to 0.2
+    callbacksRef.current.onPositionChange?.(Math.max(0, Math.min(1, x)))
+    callbacksRef.current.onSprayChange?.(0.2)
+  }, [])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -259,7 +396,16 @@ export const GranularWaveform = ({
 
   return (
     <div className="granular-waveform">
-      <canvas ref={canvasRef} className="granular-canvas" />
+      <canvas
+        ref={canvasRef}
+        className="granular-canvas"
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseLeave}
+        onDoubleClick={handleDoubleClick}
+        style={{ cursor: hasBuffer ? cursor : 'default' }}
+      />
     </div>
   )
 }

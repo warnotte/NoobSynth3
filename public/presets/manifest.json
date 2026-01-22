@@ -1162,6 +1162,13 @@
       "description": "Basic granular synth setup. Load a sample and play with the grain controls!",
       "file": "granular-test.json",
       "group": "Granular Synth"
+    },
+    {
+      "id": "granular-ambient",
+      "name": "Granular Ambient",
+      "description": "Ethereal granular textures with slow scanning and lush effects. Load any sample!",
+      "file": "granular-ambient.json",
+      "group": "Granular Synth"
     }
   ]
 }

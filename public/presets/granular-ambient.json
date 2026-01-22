@@ -1,0 +1,140 @@
+{
+  "id": "granular-ambient",
+  "name": "Granular Ambient",
+  "description": "Ethereal granular textures with slow scanning and lush effects. Load any sample!",
+  "group": "Granular Synth",
+  "graph": {
+    "modules": [
+      {
+        "id": "notes1",
+        "type": "notes",
+        "name": "How to use",
+        "position": { "col": 1, "row": 1 },
+        "params": {
+          "text": "GRANULAR AMBIENT\n\n1. Click 'Load Sample' on the Granular module\n2. Load any audio file (voice, piano, ambient...)\n3. The LFO slowly scans through the sample\n4. Adjust Density for more/less grains\n5. Adjust Spray for position randomization\n6. Click on the waveform to set position!\n\nTIP: Try with vocal samples or pads for best results."
+        }
+      },
+      {
+        "id": "lfo1",
+        "type": "lfo",
+        "name": "Scan LFO",
+        "position": { "col": 1, "row": 3 },
+        "params": {
+          "frequency": 0.05,
+          "shape": "triangle",
+          "bipolar": false,
+          "depth": 1
+        }
+      },
+      {
+        "id": "lfo2",
+        "type": "lfo",
+        "name": "Pitch LFO",
+        "position": { "col": 1, "row": 5 },
+        "params": {
+          "frequency": 0.2,
+          "shape": "sine",
+          "bipolar": true,
+          "depth": 0.1
+        }
+      },
+      {
+        "id": "gran1",
+        "type": "granular",
+        "name": "Granular",
+        "position": { "col": 3, "row": 1 },
+        "params": {
+          "position": 0.5,
+          "size": 150,
+          "density": 15,
+          "pitch": 1.0,
+          "spray": 0.2,
+          "scatter": 2,
+          "panSpread": 0.8,
+          "shape": 1,
+          "level": 0.7,
+          "enabled": 1
+        }
+      },
+      {
+        "id": "chorus1",
+        "type": "chorus",
+        "name": "Chorus",
+        "position": { "col": 6, "row": 1 },
+        "params": {
+          "rate": 0.5,
+          "depth": 0.4,
+          "mix": 0.3
+        }
+      },
+      {
+        "id": "delay1",
+        "type": "delay",
+        "name": "Delay",
+        "position": { "col": 7, "row": 1 },
+        "params": {
+          "time": 500,
+          "feedback": 0.4,
+          "mix": 0.25,
+          "pingPong": true,
+          "hpf": 100,
+          "lpf": 6000
+        }
+      },
+      {
+        "id": "reverb1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "col": 8, "row": 1 },
+        "params": {
+          "decay": 5,
+          "mix": 0.4,
+          "damping": 0.5,
+          "size": 0.9,
+          "predelay": 30
+        }
+      },
+      {
+        "id": "out1",
+        "type": "output",
+        "name": "Output",
+        "position": { "col": 9, "row": 1 },
+        "params": {
+          "level": 0.9
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "lfo1", "portId": "cv-out" },
+        "to": { "moduleId": "gran1", "portId": "position" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "lfo2", "portId": "cv-out" },
+        "to": { "moduleId": "gran1", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "gran1", "portId": "out" },
+        "to": { "moduleId": "chorus1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "chorus1", "portId": "out" },
+        "to": { "moduleId": "delay1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "delay1", "portId": "out" },
+        "to": { "moduleId": "reverb1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb1", "portId": "out" },
+        "to": { "moduleId": "out1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}
