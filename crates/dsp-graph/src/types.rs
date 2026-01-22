@@ -19,6 +19,7 @@ pub enum ModuleType {
     SpectralSwarm,
     Resonator,
     Wavetable,
+    Granular,
 
     // Filters
     Vcf,

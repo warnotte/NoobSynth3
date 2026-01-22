@@ -190,6 +190,13 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // clock
       PortInfo { channels: 1 },  // reset
     ],
+    // Granular - 4 inputs (audio, trigger, position CV, pitch CV)
+    ModuleType::Granular => vec![
+      PortInfo { channels: 1 },  // audio in (for recording)
+      PortInfo { channels: 1 },  // trigger
+      PortInfo { channels: 1 },  // position CV
+      PortInfo { channels: 1 },  // pitch CV
+    ],
   }
 }
 
@@ -382,6 +389,10 @@ pub fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // cv
       PortInfo { channels: 1 },  // gate
       PortInfo { channels: 1 },  // pulse
+    ],
+    // Granular - 1 stereo output
+    ModuleType::Granular => vec![
+      PortInfo { channels: 2 },  // stereo out
     ],
   }
 }
@@ -654,6 +665,14 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
     ModuleType::TuringMachine => match port_id {
       "clock" | "clk" => Some(0),
       "reset" | "rst" => Some(1),
+      _ => None,
+    },
+    // Granular - 4 inputs
+    ModuleType::Granular => match port_id {
+      "in" | "audio" | "audio-in" => Some(0),
+      "trigger" | "trig" => Some(1),
+      "position" | "pos-cv" => Some(2),
+      "pitch" | "pitch-cv" => Some(3),
       _ => None,
     },
     _ => None,
@@ -952,6 +971,11 @@ pub fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize
       "cv" | "cv-out" => Some(0),
       "gate" | "gate-out" => Some(1),
       "pulse" | "trig" => Some(2),
+      _ => None,
+    },
+    // Granular - 1 stereo output
+    ModuleType::Granular => match port_id {
+      "out" | "output" => Some(0),
       _ => None,
     },
   }

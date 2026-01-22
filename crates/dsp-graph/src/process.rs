@@ -14,6 +14,7 @@ use dsp_core::{
     EnsembleInputs, EnsembleParams, EuclideanInputs, EuclideanParams,
     FmOperatorInputs, FmOperatorParams,
     GranularDelayInputs, GranularDelayParams,
+    GranularInputs, GranularParams,
     HiHat808Inputs, HiHat808Params,
     HiHat909Inputs, HiHat909Params, HpfInputs, HpfParams,
     KarplusInputs, KarplusParams,
@@ -1633,6 +1634,51 @@ pub(crate) fn process_module(
             let pulse_out = pulse_group[0].channel_mut(0);
 
             state.turing.process_block(cv_out, gate_out, pulse_out, turing_inputs, params);
+        }
+        ModuleState::Granular(state) => {
+            // Input 0: audio in (for recording), Input 1: trigger, Input 2: position CV, Input 3: pitch CV
+            let audio_in = if !connections[0].is_empty() {
+                Some(inputs[0].channel(0))
+            } else {
+                None
+            };
+            let trigger = if connections.len() > 1 && !connections[1].is_empty() {
+                Some(inputs[1].channel(0))
+            } else {
+                None
+            };
+            let position_cv = if connections.len() > 2 && !connections[2].is_empty() {
+                Some(inputs[2].channel(0))
+            } else {
+                None
+            };
+            let pitch_cv = if connections.len() > 3 && !connections[3].is_empty() {
+                Some(inputs[3].channel(0))
+            } else {
+                None
+            };
+
+            let granular_inputs = GranularInputs {
+                audio_in,
+                trigger,
+                position_cv,
+                pitch_cv,
+            };
+            let params = GranularParams {
+                position: state.position.slice(frames),
+                size_ms: state.size.slice(frames),
+                density: state.density.slice(frames),
+                pitch: state.pitch.slice(frames),
+                spray: state.spray.slice(frames),
+                scatter: state.scatter.slice(frames),
+                pan_spread: state.pan_spread.slice(frames),
+                shape: state.shape.slice(frames),
+                level: state.level.slice(frames),
+            };
+
+            // Stereo output
+            let (out_l, out_r) = outputs[0].channels_mut_2();
+            state.granular.process_block(out_l, out_r, granular_inputs, params);
         }
         ModuleState::Notes => {
             // UI-only module, no audio processing

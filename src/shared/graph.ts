@@ -12,6 +12,7 @@ export type ModuleType =
   | 'spectral-swarm'
   | 'resonator'
   | 'wavetable'
+  | 'granular'
   | 'mod-router'
   | 'sample-hold'
   | 'slew'

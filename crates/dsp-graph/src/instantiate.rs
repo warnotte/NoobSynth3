@@ -4,7 +4,7 @@ use std::collections::HashMap;
 
 use dsp_core::{
   Adsr, Arpeggiator, Chaos, Choir, Chorus, Clap808, Clap909, Cowbell808, Delay, DrumSequencer, Ensemble,
-  EuclideanSequencer, FmOperator, GranularDelay, HiHat808, HiHat909, Hpf, KarplusStrong,
+  EuclideanSequencer, FmOperator, Granular, GranularDelay, HiHat808, HiHat909, Hpf, KarplusStrong,
   Kick808, Kick909, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, Phaser, PipeOrgan, PitchShifter,
   Resonator, Reverb, Rimshot909, SampleHold, Shepard, SlewLimiter, Snare808, Snare909, SnesOsc, SpectralSwarm, SpringReverb,
   StepSequencer, Supersaw, TapeDelay, Tb303, Tom808, Tom909, TuringMachine, Vcf, Vco, Vocoder, Wavetable,
@@ -591,6 +591,18 @@ pub(crate) fn create_state(
       attack: ParamBuffer::new(param_number(params, "attack", 0.01)),
       release: ParamBuffer::new(param_number(params, "release", 0.3)),
     }),
+    ModuleType::Granular => ModuleState::Granular(GranularState {
+      granular: Granular::new(sample_rate),
+      position: ParamBuffer::new(param_number(params, "position", 0.5)),
+      size: ParamBuffer::new(param_number(params, "size", 100.0)),
+      density: ParamBuffer::new(param_number(params, "density", 8.0)),
+      pitch: ParamBuffer::new(param_number(params, "pitch", 1.0)),
+      spray: ParamBuffer::new(param_number(params, "spray", 0.1)),
+      scatter: ParamBuffer::new(param_number(params, "scatter", 0.0)),
+      pan_spread: ParamBuffer::new(param_number(params, "panSpread", 0.5)),
+      shape: ParamBuffer::new(param_number(params, "shape", 1.0)),
+      level: ParamBuffer::new(param_number(params, "level", 0.8)),
+    }),
     ModuleType::Notes => ModuleState::Notes,  // UI-only, no DSP
     ModuleType::TuringMachine => ModuleState::TuringMachine(TuringState {
       turing: TuringMachine::new(sample_rate),
@@ -1165,6 +1177,19 @@ pub(crate) fn apply_param(state: &mut ModuleState, param: &str, value: f32) {
       "subMix" => state.sub_mix.set(value),
       "attack" => state.attack.set(value),
       "release" => state.release.set(value),
+      _ => {}
+    },
+    ModuleState::Granular(state) => match param {
+      "position" => state.position.set(value),
+      "size" => state.size.set(value),
+      "density" => state.density.set(value),
+      "pitch" => state.pitch.set(value),
+      "spray" => state.spray.set(value),
+      "scatter" => state.scatter.set(value),
+      "panSpread" => state.pan_spread.set(value),
+      "shape" => state.shape.set(value),
+      "level" => state.level.set(value),
+      "enabled" => state.granular.set_enabled(value > 0.5),
       _ => {}
     },
     ModuleState::TuringMachine(state) => match param {

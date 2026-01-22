@@ -2,7 +2,7 @@
 
 use dsp_core::{
     Adsr, Arpeggiator, Chaos, Choir, Chorus, Clap808, Clap909, Cowbell808, Delay, DrumSequencer, Ensemble,
-    EuclideanSequencer, FmOperator, GranularDelay, HiHat808, HiHat909, Hpf, KarplusStrong,
+    EuclideanSequencer, FmOperator, Granular, GranularDelay, HiHat808, HiHat909, Hpf, KarplusStrong,
     Kick808, Kick909, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, Phaser, PipeOrgan, PitchShifter,
     Resonator, Reverb, Rimshot909, SampleHold, Shepard, SlewLimiter, Snare808, Snare909, SnesOsc, SpectralSwarm, SpringReverb,
     StepSequencer, Supersaw, TapeDelay, Tb303, Tom808, Tom909, TuringMachine, Vcf, Vco, Vocoder, Wavetable,
@@ -187,6 +187,19 @@ pub struct WavetableState {
     pub sub_mix: ParamBuffer,
     pub attack: ParamBuffer,
     pub release: ParamBuffer,
+}
+
+pub struct GranularState {
+    pub granular: Granular,
+    pub position: ParamBuffer,
+    pub size: ParamBuffer,
+    pub density: ParamBuffer,
+    pub pitch: ParamBuffer,
+    pub spray: ParamBuffer,
+    pub scatter: ParamBuffer,
+    pub pan_spread: ParamBuffer,
+    pub shape: ParamBuffer,
+    pub level: ParamBuffer,
 }
 
 // =============================================================================
@@ -670,6 +683,7 @@ pub enum ModuleState {
     SpectralSwarm(SpectralSwarmState),
     Resonator(ResonatorState),
     Wavetable(WavetableState),
+    Granular(GranularState),
 
     // Filters
     Vcf(VcfState),

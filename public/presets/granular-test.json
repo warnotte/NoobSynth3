@@ -1,0 +1,128 @@
+{
+  "id": "granular-test",
+  "name": "Granular Basic",
+  "description": "Basic granular synth setup. Load a sample and play with the grain controls!",
+  "group": "Granular Synth",
+  "graph": {
+    "modules": [
+      {
+        "id": "ctrl1",
+        "type": "control",
+        "name": "Control",
+        "position": { "col": 1, "row": 1 },
+        "params": {
+          "cv": 0,
+          "cvMode": "unipolar",
+          "velocity": 1,
+          "midiVelocity": true,
+          "gate": 0,
+          "glide": 0,
+          "midiEnabled": false,
+          "midiChannel": 0,
+          "midiRoot": 48,
+          "voices": 1,
+          "seqOn": false,
+          "seqTempo": 120,
+          "seqGate": 0.5
+        }
+      },
+      {
+        "id": "lfo1",
+        "type": "lfo",
+        "name": "Position LFO",
+        "position": { "col": 1, "row": 3 },
+        "params": {
+          "frequency": 0.1,
+          "shape": "triangle",
+          "bipolar": false,
+          "depth": 1
+        }
+      },
+      {
+        "id": "gran1",
+        "type": "granular",
+        "name": "Granular",
+        "position": { "col": 3, "row": 1 },
+        "params": {
+          "position": 0.5,
+          "size": 100,
+          "density": 12,
+          "pitch": 1.0,
+          "spray": 0.15,
+          "scatter": 0,
+          "panSpread": 0.6,
+          "shape": 1,
+          "level": 0.8
+        }
+      },
+      {
+        "id": "delay1",
+        "type": "delay",
+        "name": "Delay",
+        "position": { "col": 6, "row": 1 },
+        "params": {
+          "time": 375,
+          "feedback": 0.35,
+          "mix": 0.25,
+          "pingPong": true,
+          "hpf": 80,
+          "lpf": 8000
+        }
+      },
+      {
+        "id": "reverb1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "col": 7, "row": 1 },
+        "params": {
+          "decay": 3.5,
+          "mix": 0.3,
+          "damping": 0.6,
+          "size": 0.8,
+          "predelay": 25
+        }
+      },
+      {
+        "id": "out1",
+        "type": "output",
+        "name": "Output",
+        "position": { "col": 8, "row": 1 },
+        "params": {
+          "level": 1
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "ctrl1", "portId": "cv-out" },
+        "to": { "moduleId": "gran1", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "ctrl1", "portId": "gate-out" },
+        "to": { "moduleId": "gran1", "portId": "trigger" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "lfo1", "portId": "cv-out" },
+        "to": { "moduleId": "gran1", "portId": "position" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "gran1", "portId": "out" },
+        "to": { "moduleId": "delay1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "delay1", "portId": "out" },
+        "to": { "moduleId": "reverb1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb1", "portId": "out" },
+        "to": { "moduleId": "out1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

@@ -22,6 +22,7 @@ export class AudioEngine {
   private watchedSequencers: Set<string> = new Set()
   private midiEventCallback: ((events: Array<{track: number, note: number, velocity: number, isNoteOn: boolean}>) => void) | null = null
   private watchedMidiSeq: string | null = null
+  private granularLoadCallbacks: Map<string, (length: number) => void> = new Map()
 
   async start(graph: GraphState): Promise<void> {
     await this.init()
@@ -305,6 +306,21 @@ export class AudioEngine {
     this.graphNode?.port.postMessage({ type: 'seekMidiSeq', moduleId, tick })
   }
 
+  loadGranularBuffer(moduleId: string, data: Float32Array): Promise<number> {
+    return new Promise((resolve, reject) => {
+      if (!this.graphNode) {
+        reject(new Error('Audio engine not initialized'))
+        return
+      }
+      this.granularLoadCallbacks.set(moduleId, resolve)
+      // Transfer the buffer to avoid copying
+      this.graphNode.port.postMessage(
+        { type: 'loadGranularBuffer', moduleId, data },
+        [data.buffer]
+      )
+    })
+  }
+
   private async init(): Promise<void> {
     if (this.context) {
       return
@@ -396,6 +412,13 @@ export class AudioEngine {
           })
         }
         this.midiEventCallback(events)
+      } else if (data.type === 'granularBufferLoaded') {
+        const { moduleId, length } = data as { type: string; moduleId: string; length: number }
+        const callback = this.granularLoadCallbacks.get(moduleId)
+        if (callback) {
+          callback(length)
+          this.granularLoadCallbacks.delete(moduleId)
+        }
       }
     }
 

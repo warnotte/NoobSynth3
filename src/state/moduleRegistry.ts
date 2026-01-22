@@ -12,6 +12,7 @@ export const moduleSizes: Record<ModuleType, string> = {
   'spectral-swarm': '2x3',
   'resonator': '2x3',
   'wavetable': '2x3',
+  'granular': '3x4',
   'mod-router': '2x2',
   'sample-hold': '2x1',
   slew: '1x2',
@@ -90,6 +91,7 @@ export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>>
   'spectral-swarm': 'strip',
   'resonator': 'strip',
   'wavetable': 'strip',
+  'granular': 'strip',
   vcf: 'strip',
   control: 'strip',
   lab: 'strip',
@@ -182,6 +184,7 @@ export const moduleCatalog: { type: ModuleType; label: string; category: ModuleC
   { type: 'spectral-swarm', label: 'Spectral Swarm', category: 'sources' },
   { type: 'resonator', label: 'Resonator', category: 'sources' },
   { type: 'wavetable', label: 'Wavetable', category: 'sources' },
+  { type: 'granular', label: 'Granular', category: 'sources' },
   // Filters
   { type: 'vcf', label: 'VCF', category: 'filters' },
   { type: 'hpf', label: 'HPF', category: 'filters' },
@@ -258,6 +261,7 @@ export const modulePrefixes: Record<ModuleType, string> = {
   'spectral-swarm': 'swarm',
   'resonator': 'res',
   'wavetable': 'wt',
+  'granular': 'gran',
   'mod-router': 'modr',
   'sample-hold': 'sh',
   slew: 'slew',
@@ -337,6 +341,7 @@ export const moduleLabels: Record<ModuleType, string> = {
   'spectral-swarm': 'Spectral Swarm',
   'resonator': 'Resonator',
   'wavetable': 'Wavetable',
+  'granular': 'Granular',
   'mod-router': 'Mod Router',
   'sample-hold': 'S&H',
   slew: 'Slew',
@@ -500,6 +505,18 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     subMix: 0.0,          // Sub oscillator mix (0-1)
     attack: 0.01,         // Envelope attack (0.001-2)
     release: 0.3,         // Envelope release (0.001-5)
+  },
+  'granular': {
+    position: 0.5,        // Position in buffer (0-1)
+    size: 100,            // Grain size in ms (5-500)
+    density: 8,           // Grains per second (1-100)
+    pitch: 1.0,           // Pitch ratio (0.25-4.0)
+    spray: 0.1,           // Position randomization (0-1)
+    scatter: 0,           // Pitch randomization in semitones (0-24)
+    panSpread: 0.5,       // Stereo spread (0-1)
+    shape: 1,             // 0=Triangle, 1=Hann, 2=Tukey, 3=Gauss
+    level: 0.8,           // Output level (0-1)
+    enabled: 1,           // Playback enabled (0 or 1)
   },
   'mod-router': { depthPitch: 0, depthPwm: 0, depthVcf: 0, depthVca: 0 },
   'sample-hold': { mode: 0 },

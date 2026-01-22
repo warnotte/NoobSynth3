@@ -1155,5 +1155,13 @@
       "description": "Pure chaos-driven synthesis. Lorenz attractor controls EVERYTHING: pitch (quantized), gates (derivative), filter, delay feedback, reverb. Self-evolving sonic organism.",
       "file": "lorenz-machine.json",
       "group": "Turing Machine"
-    }  ]
+    },
+    {
+      "id": "granular-test",
+      "name": "Granular Basic",
+      "description": "Basic granular synth setup. Load a sample and play with the grain controls!",
+      "file": "granular-test.json",
+      "group": "Granular Synth"
+    }
+  ]
 }

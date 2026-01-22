@@ -421,6 +421,17 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
       { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
     ],
   },
+  'granular': {
+    inputs: [
+      { id: 'in', label: 'Rec', kind: 'audio', direction: 'in' },
+      { id: 'trigger', label: 'Trig', kind: 'gate', direction: 'in' },
+      { id: 'position', label: 'Pos', kind: 'cv', direction: 'in' },
+      { id: 'pitch', label: 'Pitch', kind: 'cv', direction: 'in' },
+    ],
+    outputs: [
+      { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
+    ],
+  },
   notes: {
     inputs: [],
     outputs: [],

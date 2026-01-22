@@ -60,6 +60,7 @@ type GraphMessage =
   | { type: 'watchSequencers'; moduleIds: string[] }
   | { type: 'watchMidiSeq'; moduleId: string | null }
   | { type: 'seekMidiSeq'; moduleId: string; tick: number }
+  | { type: 'loadGranularBuffer'; moduleId: string; data: Float32Array }
 
 class WasmGraphProcessor extends AudioWorkletProcessor {
   private engine: InstanceType<NonNullable<typeof WasmGraphEngine>> | null = null
@@ -168,6 +169,14 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
         break
       case 'seekMidiSeq':
         this.engine!.seek_midi_sequencer(message.moduleId, message.tick)
+        break
+      case 'loadGranularBuffer':
+        this.engine!.load_granular_buffer(message.moduleId, message.data)
+        this.port.postMessage({
+          type: 'granularBufferLoaded',
+          moduleId: message.moduleId,
+          length: message.data.length,
+        })
         break
       default:
         break

@@ -16,6 +16,7 @@
 //! - [`SpectralSwarm`] - Additive drone synthesizer with evolving harmonics
 //! - [`Resonator`] - Sympathetic resonance module (Rings-style)
 //! - [`Wavetable`] - Wavetable oscillator with morphing
+//! - [`Granular`] - Sample-based granular synthesizer
 
 mod vco;
 mod supersaw;
@@ -31,6 +32,7 @@ mod pipe_organ;
 mod spectral_swarm;
 mod resonator;
 mod wavetable;
+mod granular;
 
 pub use vco::{Vco, VcoParams, VcoInputs};
 pub use supersaw::{Supersaw, SupersawParams, SupersawInputs};
@@ -46,3 +48,4 @@ pub use pipe_organ::{PipeOrgan, PipeOrganParams, PipeOrganInputs, OrganVoicing, 
 pub use spectral_swarm::{SpectralSwarm, SpectralSwarmParams, SpectralSwarmInputs};
 pub use resonator::{Resonator, ResonatorParams, ResonatorInputs};
 pub use wavetable::{Wavetable, WavetableParams, WavetableInputs};
+pub use granular::{Granular, GranularParams, GranularInputs, GrainShape};

@@ -288,6 +288,60 @@ impl GraphEngine {
     Vec::new()
   }
 
+  /// Load sample data into a Granular module's buffer
+  pub fn load_granular_buffer(&mut self, module_id: &str, data: &[Sample]) {
+    if let Some(index) = self.module_map.get(module_id).and_then(|list| list.first().copied()) {
+      if let Some(module) = self.modules.get_mut(index) {
+        if let ModuleState::Granular(ref mut state) = module.state {
+          state.granular.load_buffer(data);
+        }
+      }
+    }
+  }
+
+  /// Get the buffer length of a Granular module in samples
+  pub fn get_granular_buffer_length(&self, module_id: &str) -> usize {
+    if let Some(index) = self.module_map.get(module_id).and_then(|list| list.first()) {
+      if let Some(module) = self.modules.get(*index) {
+        if let ModuleState::Granular(ref state) = module.state {
+          return state.granular.buffer_length();
+        }
+      }
+    }
+    0
+  }
+
+  /// Get waveform data from a Granular module for visualization
+  /// Returns downsampled data (max 512 points) for efficient display
+  pub fn get_granular_waveform(&self, module_id: &str, max_points: usize) -> Vec<Sample> {
+    if let Some(index) = self.module_map.get(module_id).and_then(|list| list.first()) {
+      if let Some(module) = self.modules.get(*index) {
+        if let ModuleState::Granular(ref state) = module.state {
+          let buffer = state.granular.buffer_data();
+          if buffer.is_empty() {
+            return Vec::new();
+          }
+          let step = (buffer.len() / max_points).max(1);
+          let mut result = Vec::with_capacity(max_points);
+          for i in (0..buffer.len()).step_by(step) {
+            // Find min/max in this segment for accurate waveform
+            let end = (i + step).min(buffer.len());
+            let mut min_val = buffer[i];
+            let mut max_val = buffer[i];
+            for j in i..end {
+              if buffer[j] < min_val { min_val = buffer[j]; }
+              if buffer[j] > max_val { max_val = buffer[j]; }
+            }
+            // Store the value with largest absolute magnitude
+            result.push(if max_val.abs() > min_val.abs() { max_val } else { min_val });
+          }
+          return result;
+        }
+      }
+    }
+    Vec::new()
+  }
+
   pub fn render(&mut self, frames: usize) -> &[Sample] {
     if frames == 0 {
       return &[];
@@ -639,6 +693,7 @@ fn normalize_module_type(raw: &str) -> ModuleType {
     "spectral-swarm" => ModuleType::SpectralSwarm,
     "resonator" => ModuleType::Resonator,
     "wavetable" => ModuleType::Wavetable,
+    "granular" => ModuleType::Granular,
     // Documentation
     "notes" => ModuleType::Notes,
     // Effects

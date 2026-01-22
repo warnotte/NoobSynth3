@@ -11,6 +11,7 @@ import { WaveformSelector } from '../WaveformSelector'
 import { ControlBox, ControlBoxRow } from '../ControlBox'
 import { ControlButtons } from '../ControlButtons'
 import { ToggleButton } from '../ToggleButton'
+import { GranularControls } from './GranularControls'
 import {
   formatDecimal1,
   formatDecimal2,
@@ -1428,6 +1429,10 @@ export function renderSourceControls(props: ControlProps): React.ReactElement | 
         />
       </>
     )
+  }
+
+  if (module.type === 'granular') {
+    return <GranularControls module={module} engine={props.engine} updateParam={updateParam} />
   }
 
   return null

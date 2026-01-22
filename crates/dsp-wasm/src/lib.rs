@@ -100,4 +100,20 @@ impl WasmGraphEngine {
     let data = self.engine.drain_midi_events(module_id);
     Uint8Array::from(&data[..])
   }
+
+  /// Load sample data into a Granular module's buffer
+  pub fn load_granular_buffer(&mut self, module_id: &str, data: &[f32]) {
+    self.engine.load_granular_buffer(module_id, data);
+  }
+
+  /// Get the buffer length of a Granular module in samples
+  pub fn get_granular_buffer_length(&self, module_id: &str) -> usize {
+    self.engine.get_granular_buffer_length(module_id)
+  }
+
+  /// Get waveform data from a Granular module for visualization
+  pub fn get_granular_waveform(&self, module_id: &str, max_points: usize) -> Float32Array {
+    let data = self.engine.get_granular_waveform(module_id, max_points);
+    Float32Array::from(&data[..])
+  }
 }

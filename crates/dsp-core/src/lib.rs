@@ -47,6 +47,7 @@ pub use oscillators::{
     SpectralSwarm, SpectralSwarmParams, SpectralSwarmInputs,
     Resonator, ResonatorParams, ResonatorInputs,
     Wavetable, WavetableParams, WavetableInputs,
+    Granular, GranularParams, GranularInputs, GrainShape,
 };
 
 // Re-export filters
