@@ -111,6 +111,12 @@ impl WasmGraphEngine {
     self.engine.get_granular_buffer_length(module_id)
   }
 
+  /// Get effective position for a Granular module (after CV modulation)
+  /// Returns -1.0 if module not found or not a granular
+  pub fn get_granular_position(&self, module_id: &str) -> f32 {
+    self.engine.get_granular_position(module_id)
+  }
+
   /// Get waveform data from a Granular module for visualization
   pub fn get_granular_waveform(&self, module_id: &str, max_points: usize) -> Float32Array {
     let data = self.engine.get_granular_waveform(module_id, max_points);

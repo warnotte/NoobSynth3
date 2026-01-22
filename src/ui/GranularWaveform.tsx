@@ -1,13 +1,15 @@
 import { useEffect, useRef, useCallback, useState } from 'react'
 
 type GranularWaveformProps = {
-  position: number        // 0-1 playback position
+  position: number        // 0-1 playback position (base param)
   size: number            // grain size in ms
   density: number         // grains per second
   spray: number           // position randomization
   shape: number           // grain envelope shape (0-3)
   hasBuffer: boolean      // whether a sample is loaded
   waveformData?: Float32Array | null  // optional waveform data for visualization
+  effectivePosition?: number | null   // position after CV modulation (for display)
+  sampleDuration?: number             // sample duration in seconds
   onPositionChange?: (position: number) => void  // callback when position is changed via mouse
   onSprayChange?: (spray: number) => void        // callback when spray is changed via mouse
 }
@@ -51,6 +53,8 @@ export const GranularWaveform = ({
   shape,
   hasBuffer,
   waveformData,
+  effectivePosition,
+  sampleDuration = 0,
   onPositionChange,
   onSprayChange,
 }: GranularWaveformProps) => {
@@ -75,8 +79,8 @@ export const GranularWaveform = ({
   }, [])
 
   // Store params in refs to avoid recreating draw function
-  const paramsRef = useRef({ position, size, density, spray, shape, hasBuffer, waveformData })
-  paramsRef.current = { position, size, density, spray, shape, hasBuffer, waveformData }
+  const paramsRef = useRef({ position, size, density, spray, shape, hasBuffer, waveformData, effectivePosition, sampleDuration })
+  paramsRef.current = { position, size, density, spray, shape, hasBuffer, waveformData, effectivePosition, sampleDuration }
 
   // Store callbacks in refs
   const callbacksRef = useRef({ onPositionChange, onSprayChange })
@@ -90,7 +94,9 @@ export const GranularWaveform = ({
     if (!ctx) return
 
     // Read current params from ref
-    const { position, size, density, spray, shape, hasBuffer, waveformData } = paramsRef.current
+    const { position, size, density, spray, shape, hasBuffer, waveformData, effectivePosition, sampleDuration } = paramsRef.current
+    // Use effective position for display if available, otherwise fall back to base position
+    const displayPosition = (effectivePosition != null && effectivePosition >= 0) ? effectivePosition : position
 
     const width = canvas.clientWidth
     const height = canvas.clientHeight
@@ -158,13 +164,13 @@ export const GranularWaveform = ({
       ctx.fillText('No sample loaded', width / 2, height / 2)
     }
 
-    // Spawn new grains
+    // Spawn new grains (use displayPosition to match Rust behavior)
     if (hasBuffer && density > 0) {
       spawnAccRef.current += density * dt
       while (spawnAccRef.current >= 1) {
         spawnAccRef.current -= 1
         const sprayOffset = (Math.random() - 0.5) * spray
-        const grainPos = Math.max(0, Math.min(1, position + sprayOffset))
+        const grainPos = Math.max(0, Math.min(1, displayPosition + sprayOffset))
         const lifetime = size / 1000 // convert ms to seconds
         const pan = (Math.random() - 0.5) * 2
 
@@ -218,9 +224,9 @@ export const GranularWaveform = ({
       ctx.fill()
     }
 
-    // Draw position marker (playhead)
+    // Draw position marker (playhead) - uses displayPosition for CV modulation feedback
     if (hasBuffer) {
-      const playheadX = position * width
+      const playheadX = displayPosition * width
       ctx.strokeStyle = 'rgba(255, 200, 100, 0.8)'
       ctx.lineWidth = 2
       ctx.beginPath()
@@ -238,19 +244,32 @@ export const GranularWaveform = ({
       ctx.fill()
     }
 
-    // Draw spray range
+    // Draw spray range - uses displayPosition for CV modulation feedback
     if (hasBuffer && spray > 0.01) {
-      const sprayLeft = Math.max(0, position - spray * 0.5) * width
-      const sprayRight = Math.min(1, position + spray * 0.5) * width
+      const sprayLeft = Math.max(0, displayPosition - spray * 0.5) * width
+      const sprayRight = Math.min(1, displayPosition + spray * 0.5) * width
       ctx.fillStyle = 'rgba(255, 200, 100, 0.1)'
       ctx.fillRect(sprayLeft, 0, sprayRight - sprayLeft, height)
     }
 
-    // Grain count indicator
+    // Grain count indicator (top right)
     ctx.fillStyle = 'rgba(100, 255, 180, 0.7)'
     ctx.font = '10px monospace'
     ctx.textAlign = 'right'
     ctx.fillText(`${activeGrains.length} grains`, width - 4, 12)
+
+    // Time display (top left) - current position / total duration
+    if (hasBuffer && sampleDuration > 0) {
+      const currentTime = displayPosition * sampleDuration
+      const formatTime = (t: number) => {
+        const mins = Math.floor(t / 60)
+        const secs = t % 60
+        return mins > 0 ? `${mins}:${secs.toFixed(1).padStart(4, '0')}` : `${secs.toFixed(2)}s`
+      }
+      ctx.textAlign = 'left'
+      ctx.fillStyle = 'rgba(255, 200, 100, 0.8)'
+      ctx.fillText(`${formatTime(currentTime)} / ${formatTime(sampleDuration)}`, 4, 12)
+    }
 
     frameRef.current = requestAnimationFrame(draw)
   }, []) // No dependencies - params are read from ref

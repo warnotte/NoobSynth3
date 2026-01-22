@@ -128,6 +128,8 @@ pub struct Granular {
     playing: bool,
     /// Enabled from UI (parameter)
     enabled: bool,
+    /// Effective position after CV modulation (0-1, for UI feedback)
+    effective_position: f32,
 }
 
 /// Input signals for Granular.
@@ -179,6 +181,7 @@ impl Granular {
             last_trigger: 0.0,
             playing: true,
             enabled: true,
+            effective_position: 0.5,
         }
     }
 
@@ -258,6 +261,11 @@ impl Granular {
     /// Get active grain count for visualization.
     pub fn active_grain_count(&self) -> usize {
         self.grains.iter().filter(|g| g.active).count()
+    }
+
+    /// Get effective position (after CV modulation) for UI feedback.
+    pub fn effective_position(&self) -> f32 {
+        self.effective_position
     }
 
     /// Get grain positions for visualization (normalized 0-1).
@@ -409,6 +417,7 @@ impl Granular {
             };
 
             let position = (base_position + position_mod).clamp(0.0, 1.0);
+            self.effective_position = position; // Store for UI feedback
             let pitch = (base_pitch * pitch_mod).clamp(0.125, 8.0);
 
             let grain_length = (size_ms * self.sample_rate / 1000.0).max(1.0) as usize;

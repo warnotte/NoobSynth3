@@ -23,6 +23,8 @@ export class AudioEngine {
   private midiEventCallback: ((events: Array<{track: number, note: number, velocity: number, isNoteOn: boolean}>) => void) | null = null
   private watchedMidiSeq: string | null = null
   private granularLoadCallbacks: Map<string, (length: number) => void> = new Map()
+  private granularPositionCallbacks: Map<string, (position: number) => void> = new Map()
+  private watchedGranulars: Set<string> = new Set()
 
   async start(graph: GraphState): Promise<void> {
     await this.init()
@@ -288,6 +290,25 @@ export class AudioEngine {
     })
   }
 
+  watchGranularPosition(moduleId: string, callback: (position: number) => void): () => void {
+    this.granularPositionCallbacks.set(moduleId, callback)
+    this.watchedGranulars.add(moduleId)
+    this.syncWatchedGranulars()
+
+    return () => {
+      this.granularPositionCallbacks.delete(moduleId)
+      this.watchedGranulars.delete(moduleId)
+      this.syncWatchedGranulars()
+    }
+  }
+
+  private syncWatchedGranulars(): void {
+    this.graphNode?.port.postMessage({
+      type: 'watchGranulars',
+      moduleIds: Array.from(this.watchedGranulars),
+    })
+  }
+
   watchMidiSequencer(
     moduleId: string,
     callback: (events: Array<{track: number, note: number, velocity: number, isNoteOn: boolean}>) => void
@@ -382,7 +403,7 @@ export class AudioEngine {
 
     // Listen for messages from the worklet
     this.graphNode.port.onmessage = (event) => {
-      const data = event.data as { type: string; steps?: Record<string, number>; data?: number[] }
+      const data = event.data as { type: string; steps?: Record<string, number>; positions?: Record<string, number>; data?: number[] }
       if (data.type === 'sequencerSteps' && data.steps) {
         // Debug: log incoming step updates (throttled)
         const stepEntries = Object.entries(data.steps)
@@ -419,6 +440,13 @@ export class AudioEngine {
           callback(length)
           this.granularLoadCallbacks.delete(moduleId)
         }
+      } else if (data.type === 'granularPositions' && data.positions) {
+        for (const [moduleId, position] of Object.entries(data.positions)) {
+          const callback = this.granularPositionCallbacks.get(moduleId)
+          if (callback) {
+            callback(position)
+          }
+        }
       }
     }
 
@@ -430,6 +458,11 @@ export class AudioEngine {
     // Re-sync watched MIDI sequencer if any
     if (this.watchedMidiSeq) {
       this.graphNode.port.postMessage({ type: 'watchMidiSeq', moduleId: this.watchedMidiSeq })
+    }
+
+    // Re-send watched granulars if any
+    if (this.watchedGranulars.size > 0) {
+      this.syncWatchedGranulars()
     }
 
     this.buildScopeAnalysers()

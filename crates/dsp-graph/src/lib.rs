@@ -257,6 +257,19 @@ impl GraphEngine {
     0
   }
 
+  /// Get effective position for a Granular module (after CV modulation)
+  /// Returns -1.0 if module not found or not a granular
+  pub fn get_granular_position(&self, module_id: &str) -> f32 {
+    if let Some(index) = self.module_map.get(module_id).and_then(|list| list.first()) {
+      if let Some(module) = self.modules.get(*index) {
+        if let ModuleState::Granular(state) = &module.state {
+          return state.granular.effective_position();
+        }
+      }
+    }
+    -1.0
+  }
+
   /// Seek MIDI file sequencer to a specific tick position
   pub fn seek_midi_sequencer(&mut self, module_id: &str, tick: u32) {
     if let Some(index) = self.module_map.get(module_id).and_then(|list| list.first().copied()) {

@@ -61,6 +61,7 @@ type GraphMessage =
   | { type: 'watchMidiSeq'; moduleId: string | null }
   | { type: 'seekMidiSeq'; moduleId: string; tick: number }
   | { type: 'loadGranularBuffer'; moduleId: string; data: Float32Array }
+  | { type: 'watchGranulars'; moduleIds: string[] }
 
 class WasmGraphProcessor extends AudioWorkletProcessor {
   private engine: InstanceType<NonNullable<typeof WasmGraphEngine>> | null = null
@@ -71,6 +72,8 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
   private lastSteps: Map<string, number> = new Map()
   private stepPollCounter = 0
   private watchedMidiSeq: string | null = null
+  private watchedGranulars: string[] = []
+  private lastPositions: Map<string, number> = new Map()
   private debugCounter = 0
   private messageQueue: GraphMessage[] = []
 
@@ -102,6 +105,11 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
     }
     if (message.type === 'watchMidiSeq') {
       this.watchedMidiSeq = message.moduleId
+      return
+    }
+    if (message.type === 'watchGranulars') {
+      this.watchedGranulars = message.moduleIds
+      this.lastPositions.clear()
       return
     }
     // Queue other messages to be processed in process() before render()
@@ -248,10 +256,15 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
       }
     }
 
-    // Poll sequencer steps every ~20ms (at 48kHz, 128 frames = 2.67ms, so poll every 8 blocks)
+    // Poll every ~20ms (at 48kHz, 128 frames = 2.67ms, so poll every 8 blocks)
     this.stepPollCounter += 1
-    if (this.stepPollCounter >= 8 && this.watchedSequencers.length > 0) {
+    const shouldPoll = this.stepPollCounter >= 8
+    if (shouldPoll) {
       this.stepPollCounter = 0
+    }
+
+    // Poll sequencer steps
+    if (shouldPoll && this.watchedSequencers.length > 0) {
       const updates: Record<string, number> = {}
       for (const moduleId of this.watchedSequencers) {
         const step = this.engine.get_sequencer_step(moduleId)
@@ -277,6 +290,23 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
       const events = this.engine.drain_midi_events(this.watchedMidiSeq)
       if (events.length > 0) {
         this.port.postMessage({ type: 'midiEvents', data: Array.from(events) })
+      }
+    }
+
+    // Poll granular positions
+    if (shouldPoll && this.watchedGranulars.length > 0) {
+      const updates: Record<string, number> = {}
+      for (const moduleId of this.watchedGranulars) {
+        const position = this.engine.get_granular_position(moduleId)
+        const lastPosition = this.lastPositions.get(moduleId) ?? -1
+        // Only send if changed by more than 0.5% (to reduce message rate)
+        if (position >= 0 && Math.abs(position - lastPosition) > 0.005) {
+          updates[moduleId] = position
+          this.lastPositions.set(moduleId, position)
+        }
+      }
+      if (Object.keys(updates).length > 0) {
+        this.port.postMessage({ type: 'granularPositions', positions: updates })
       }
     }
 

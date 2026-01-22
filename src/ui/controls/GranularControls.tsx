@@ -2,7 +2,7 @@
  * Granular synthesizer controls with sample loading
  */
 
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import type { ControlProps } from './types'
 import { RotaryKnob } from '../RotaryKnob'
 import { ControlBox } from '../ControlBox'
@@ -22,10 +22,20 @@ export function GranularControls({ module, engine, updateParam }: GranularContro
   const [waveformData, setWaveformData] = useState<Float32Array | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [isPreviewing, setIsPreviewing] = useState(false)
+  const [effectivePosition, setEffectivePosition] = useState<number | null>(null)
+  const [sampleDuration, setSampleDuration] = useState(0) // Duration in seconds
   const fileInputRef = useRef<HTMLInputElement>(null)
   const audioContextRef = useRef<AudioContext | null>(null)
   const audioBufferRef = useRef<AudioBuffer | null>(null)
   const sourceNodeRef = useRef<AudioBufferSourceNode | null>(null)
+
+  // Subscribe to effective position updates from engine
+  useEffect(() => {
+    const unsubscribe = engine.watchGranularPosition(module.id, (pos) => {
+      setEffectivePosition(pos)
+    })
+    return unsubscribe
+  }, [engine, module.id])
 
   const position = Number(module.params.position ?? 0.5)
   const size = Number(module.params.size ?? 100)
@@ -126,6 +136,7 @@ export function GranularControls({ module, engine, updateParam }: GranularContro
 
       setWaveformData(waveform)
       setHasBuffer(true)
+      setSampleDuration(audioBuffer.duration)
     } catch (error) {
       console.error('Failed to load audio file:', error)
     } finally {
@@ -148,6 +159,8 @@ export function GranularControls({ module, engine, updateParam }: GranularContro
         shape={shape}
         hasBuffer={hasBuffer}
         waveformData={waveformData}
+        effectivePosition={effectivePosition}
+        sampleDuration={sampleDuration}
         onPositionChange={(value) => updateParam(module.id, 'position', value)}
         onSprayChange={(value) => updateParam(module.id, 'spray', value)}
       />
