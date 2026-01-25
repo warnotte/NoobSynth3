@@ -275,13 +275,6 @@ export const GranularWaveform = ({
   }, []) // No dependencies - params are read from ref
 
   // Mouse interaction handlers
-  const getMousePosition = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
-    const canvas = canvasRef.current
-    if (!canvas) return 0
-    const rect = canvas.getBoundingClientRect()
-    return Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width))
-  }, [])
-
   const handleMouseDown = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!paramsRef.current.hasBuffer) return
 
