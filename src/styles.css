@@ -2842,6 +2842,98 @@
 }
 
 /* ============================================
+   SID Player Styles
+   ============================================ */
+
+.sid-display {
+  background: linear-gradient(180deg, #1a1a2e 0%, #0a0a15 100%);
+  border: 2px solid #4a6fa5;
+  border-radius: var(--radius-md);
+  padding: 12px;
+  text-align: center;
+  box-shadow:
+    inset 0 0 20px rgba(74, 111, 165, 0.15),
+    0 0 10px rgba(74, 111, 165, 0.2);
+}
+
+.sid-title {
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  font-weight: bold;
+  color: #8fd4f9;
+  text-shadow: 0 0 6px rgba(143, 212, 249, 0.6);
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+  word-break: break-word;
+}
+
+.sid-author {
+  font-family: 'Courier New', monospace;
+  font-size: 9px;
+  color: #6ba3d6;
+  margin-bottom: 4px;
+}
+
+.sid-songs {
+  font-family: 'Courier New', monospace;
+  font-size: 9px;
+  color: #4a6fa5;
+}
+
+.sid-file-section {
+  display: flex;
+  justify-content: center;
+  margin: 8px 0;
+}
+
+.sid-load-btn {
+  font-family: 'Courier New', monospace;
+  font-size: 10px;
+  padding: 6px 12px;
+  background: linear-gradient(180deg, #2a3a5e 0%, #1a2a4e 100%);
+  border: 1px solid #4a6fa5;
+  border-radius: var(--radius-sm);
+  color: #8fd4f9;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sid-load-btn:hover {
+  background: linear-gradient(180deg, #3a4a6e 0%, #2a3a5e 100%);
+  box-shadow: 0 0 8px rgba(74, 111, 165, 0.4);
+}
+
+.sid-song-btn {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(180deg, #2a3a5e 0%, #1a2a4e 100%);
+  border: 1px solid #4a6fa5;
+  border-radius: var(--radius-sm);
+  color: #8fd4f9;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sid-song-btn:hover:not(:disabled) {
+  background: linear-gradient(180deg, #3a4a6e 0%, #2a3a5e 100%);
+}
+
+.sid-song-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.sid-song-num {
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  color: #8fd4f9;
+  min-width: 30px;
+  text-align: center;
+}
+
+/* ============================================
    SECTION 25: GLOBAL & RESPONSIVE
    ============================================ */
 

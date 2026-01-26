@@ -79,6 +79,8 @@ export type ModuleType =
   | 'clock'
   // Turing Machine
   | 'turing-machine'
+  // SID Player
+  | 'sid-player'
 
 export interface ModuleSpec {
   id: string

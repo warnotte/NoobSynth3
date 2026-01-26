@@ -4,7 +4,7 @@ use dsp_core::{
     Adsr, Arpeggiator, Chaos, Choir, Chorus, Clap808, Clap909, Cowbell808, Delay, DrumSequencer, Ensemble,
     EuclideanSequencer, FmOperator, Granular, GranularDelay, HiHat808, HiHat909, Hpf, KarplusStrong,
     Kick808, Kick909, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, Phaser, PipeOrgan, PitchShifter,
-    Resonator, Reverb, Rimshot909, SampleHold, Shepard, SlewLimiter, Snare808, Snare909, SnesOsc, SpectralSwarm, SpringReverb,
+    Resonator, Reverb, Rimshot909, SampleHold, Shepard, SidPlayer, SlewLimiter, Snare808, Snare909, SnesOsc, SpectralSwarm, SpringReverb,
     StepSequencer, Supersaw, TapeDelay, Tb303, Tom808, Tom909, TuringMachine, Vcf, Vco, Vocoder, Wavetable,
 };
 
@@ -535,6 +535,14 @@ pub struct TuringState {
     pub root: ParamBuffer,
 }
 
+pub struct SidPlayerState {
+    pub sid_player: SidPlayer,
+    pub playing: ParamBuffer,
+    pub song: ParamBuffer,
+    pub chip_model: ParamBuffer,
+    pub filter: ParamBuffer,
+}
+
 // =============================================================================
 // TR-909 Drum States
 // =============================================================================
@@ -730,6 +738,7 @@ pub enum ModuleState {
     Mario(MarioState),
     MidiFileSequencer(MidiFileSequencerState),
     TuringMachine(TuringState),
+    SidPlayer(SidPlayerState),
 
     // TR-909 Drums
     Kick909(Kick909State),

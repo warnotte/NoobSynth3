@@ -342,6 +342,18 @@ export class AudioEngine {
     })
   }
 
+  loadSidFile(moduleId: string, data: Uint8Array): void {
+    if (!this.graphNode) {
+      console.error('Audio engine not initialized')
+      return
+    }
+    // Transfer the buffer to the worklet
+    this.graphNode.port.postMessage(
+      { type: 'loadSidFile', moduleId, data },
+      [data.buffer]
+    )
+  }
+
   private async init(): Promise<void> {
     if (this.context) {
       return

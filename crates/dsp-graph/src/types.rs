@@ -66,6 +66,7 @@ pub enum ModuleType {
     Mario,
     MidiFileSequencer,
     TuringMachine,
+    SidPlayer,
 
     // TR-909 Drums
     Kick909,

@@ -29,7 +29,9 @@ use dsp_core::{
     ResonatorInputs, ResonatorParams,
     ReverbInputs, ReverbParams, RingMod, RingModParams,
     Rimshot909Inputs, Rimshot909Params, Sample,
-    SampleHoldInputs, SampleHoldParams, ShepardInputs, ShepardParams, SlewInputs, SlewParams,
+    SampleHoldInputs, SampleHoldParams, ShepardInputs, ShepardParams,
+    SidPlayerInputs, SidPlayerOutputs, SidPlayerParams,
+    SlewInputs, SlewParams,
     Snare808Inputs, Snare808Params,
     Snare909Inputs, Snare909Params, SnesOscInputs, SnesOscParams, SpectralSwarmInputs, SpectralSwarmParams,
     SpringReverbInputs, SpringReverbParams,
@@ -1679,6 +1681,27 @@ pub(crate) fn process_module(
             // Stereo output
             let (out_l, out_r) = outputs[0].channels_mut_2();
             state.granular.process_block(out_l, out_r, granular_inputs, params);
+        }
+        ModuleState::SidPlayer(state) => {
+            // Input 0: reset trigger (optional)
+            let reset = if !connections[0].is_empty() {
+                Some(inputs[0].channel(0))
+            } else {
+                None
+            };
+
+            let sid_inputs = SidPlayerInputs { reset };
+            let params = SidPlayerParams {
+                playing: state.playing.slice(frames),
+                song: state.song.slice(frames),
+                chip_model: state.chip_model.slice(frames),
+                filter: state.filter.slice(frames),
+            };
+
+            // Stereo output
+            let (out_l, out_r) = outputs[0].channels_mut_2();
+            let sid_outputs = SidPlayerOutputs { left: out_l, right: out_r };
+            state.sid_player.process_block(sid_outputs, sid_inputs, params);
         }
         ModuleState::Notes => {
             // UI-only module, no audio processing

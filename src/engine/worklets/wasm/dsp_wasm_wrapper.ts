@@ -28,6 +28,7 @@ type WasmGraphEngineCtor = new (sampleRate: number) => {
   get_granular_buffer_length(moduleId: string): number
   get_granular_position(moduleId: string): number
   get_granular_waveform(moduleId: string, maxPoints: number): Float32Array
+  load_sid_file(moduleId: string, data: Uint8Array): void
 }
 
 const WasmGraphEngine = (wasm as unknown as { WasmGraphEngine?: WasmGraphEngineCtor })

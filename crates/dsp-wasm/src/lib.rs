@@ -122,4 +122,9 @@ impl WasmGraphEngine {
     let data = self.engine.get_granular_waveform(module_id, max_points);
     Float32Array::from(&data[..])
   }
+
+  /// Load a SID file into a SidPlayer module
+  pub fn load_sid_file(&mut self, module_id: &str, data: &[u8]) {
+    self.engine.load_sid_file(module_id, data);
+  }
 }

@@ -561,6 +561,10 @@ export function renderSequencerControls(props: ControlProps): React.ReactElement
     )
   }
 
+  if (module.type === 'sid-player') {
+    return <SidPlayerUI module={module} engine={engine} updateParam={updateParam} />
+  }
+
   return null
 }
 
@@ -1381,6 +1385,127 @@ function MidiFileSequencerUI({ module, engine, status, updateParam }: Pick<Contr
           )
         })}
       </div>
+    </>
+  )
+}
+
+// SID Player sub-component
+function SidPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module' | 'engine' | 'updateParam'>) {
+  const playing = module.params.playing === 1 || module.params.playing === true
+  const song = Number(module.params.song ?? 1)
+  const chipModel = Number(module.params.chipModel ?? 0)
+  const filter = module.params.filter !== 0 && module.params.filter !== false
+  const [sidInfo, setSidInfo] = useState<{ name: string; author: string; songs: number } | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const chipModelOptions = [
+    { id: 0, label: '6581' },
+    { id: 1, label: '8580' },
+  ]
+
+  const handleFileLoad = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    try {
+      const arrayBuffer = await file.arrayBuffer()
+      const data = new Uint8Array(arrayBuffer)
+
+      // Parse SID header to get info
+      if (data.length >= 0x76) {
+        const magic = String.fromCharCode(data[0], data[1], data[2], data[3])
+        if (magic === 'PSID' || magic === 'RSID') {
+          const songs = (data[14] << 8) | data[15]
+          const startSong = (data[16] << 8) | data[17]
+
+          // Parse strings (32 bytes each)
+          const decoder = new TextDecoder('latin1')
+          const name = decoder.decode(data.slice(0x16, 0x36)).replace(/\0+$/, '')
+          const author = decoder.decode(data.slice(0x36, 0x56)).replace(/\0+$/, '')
+
+          setSidInfo({ name, author, songs })
+
+          // Send to engine
+          engine.loadSidFile(module.id, data)
+
+          // Set initial song
+          updateParam(module.id, 'song', startSong || 1)
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load SID file:', err)
+    }
+  }, [module.id, engine, updateParam])
+
+  return (
+    <>
+      <div className="sid-display">
+        <div className="sid-title">{sidInfo?.name || 'No file loaded'}</div>
+        <div className="sid-author">{sidInfo?.author || ''}</div>
+        {sidInfo && sidInfo.songs > 1 && (
+          <div className="sid-songs">Song {song} / {sidInfo.songs}</div>
+        )}
+      </div>
+
+      <ToggleGroup>
+        <ToggleButton
+          label="PLAY"
+          value={playing}
+          onChange={(value) => updateParam(module.id, 'playing', value ? 1 : 0)}
+          onLabel="STOP"
+          offLabel="PLAY"
+        />
+        <ToggleButton
+          label="FILTER"
+          value={filter}
+          onChange={(value) => updateParam(module.id, 'filter', value ? 1 : 0)}
+        />
+      </ToggleGroup>
+
+      <div className="sid-file-section">
+        <label className="sid-load-btn">
+          Load .sid
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".sid"
+            onChange={handleFileLoad}
+            style={{ display: 'none' }}
+          />
+        </label>
+      </div>
+
+      {sidInfo && sidInfo.songs > 1 && (
+        <ControlBoxRow>
+          <ControlBox label="Song" horizontal>
+            <button
+              type="button"
+              className="sid-song-btn"
+              disabled={song <= 1}
+              onClick={() => updateParam(module.id, 'song', Math.max(1, song - 1))}
+            >
+              ◀
+            </button>
+            <span className="sid-song-num">{song}</span>
+            <button
+              type="button"
+              className="sid-song-btn"
+              disabled={song >= sidInfo.songs}
+              onClick={() => updateParam(module.id, 'song', Math.min(sidInfo.songs, song + 1))}
+            >
+              ▶
+            </button>
+          </ControlBox>
+        </ControlBoxRow>
+      )}
+
+      <ControlBox label="Chip">
+        <ControlButtons
+          options={chipModelOptions}
+          value={chipModel}
+          onChange={(value) => updateParam(module.id, 'chipModel', value)}
+        />
+      </ControlBox>
     </>
   )
 }

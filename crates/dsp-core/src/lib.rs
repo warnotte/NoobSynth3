@@ -101,6 +101,7 @@ pub use sequencers::{
     MidiFileSequencer, MidiFileSequencerParams, MidiFileSequencerInputs, MidiFileSequencerOutputs,
     MidiNote, MidiTrack, MIDI_TRACKS, MAX_NOTES_PER_TRACK,
     TuringMachine, TuringParams, TuringInputs,
+    SidPlayer, SidPlayerParams, SidPlayerInputs, SidPlayerOutputs, SidHeader,
 };
 
 // Re-export drums (TR-909)

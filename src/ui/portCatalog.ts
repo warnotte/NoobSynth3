@@ -497,4 +497,12 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
       { id: 'pulse', label: 'Pulse', kind: 'sync', direction: 'out' },
     ],
   },
+  'sid-player': {
+    inputs: [
+      { id: 'reset', label: 'Rst', kind: 'sync', direction: 'in' },
+    ],
+    outputs: [
+      { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
+    ],
+  },
 }

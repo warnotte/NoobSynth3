@@ -6,7 +6,7 @@ use dsp_core::{
   Adsr, Arpeggiator, Chaos, Choir, Chorus, Clap808, Clap909, Cowbell808, Delay, DrumSequencer, Ensemble,
   EuclideanSequencer, FmOperator, Granular, GranularDelay, HiHat808, HiHat909, Hpf, KarplusStrong,
   Kick808, Kick909, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, Phaser, PipeOrgan, PitchShifter,
-  Resonator, Reverb, Rimshot909, SampleHold, Shepard, SlewLimiter, Snare808, Snare909, SnesOsc, SpectralSwarm, SpringReverb,
+  Resonator, Reverb, Rimshot909, SampleHold, Shepard, SidPlayer, SlewLimiter, Snare808, Snare909, SnesOsc, SpectralSwarm, SpringReverb,
   StepSequencer, Supersaw, TapeDelay, Tb303, Tom808, Tom909, TuringMachine, Vcf, Vco, Vocoder, Wavetable,
 };
 
@@ -612,6 +612,13 @@ pub(crate) fn create_state(
       scale: ParamBuffer::new(param_number(params, "scale", 0.0)),
       root: ParamBuffer::new(param_number(params, "root", 0.0)),
     }),
+    ModuleType::SidPlayer => ModuleState::SidPlayer(SidPlayerState {
+      sid_player: SidPlayer::new(sample_rate),
+      playing: ParamBuffer::new(param_number(params, "playing", 0.0)),
+      song: ParamBuffer::new(param_number(params, "song", 1.0)),
+      chip_model: ParamBuffer::new(param_number(params, "chipModel", 0.0)),
+      filter: ParamBuffer::new(param_number(params, "filter", 1.0)),
+    }),
   }
 }
 
@@ -1198,6 +1205,13 @@ pub(crate) fn apply_param(state: &mut ModuleState, param: &str, value: f32) {
       "range" => state.range.set(value),
       "scale" => state.scale.set(value),
       "root" => state.root.set(value),
+      _ => {}
+    },
+    ModuleState::SidPlayer(state) => match param {
+      "playing" => state.playing.set(value),
+      "song" => state.song.set(value),
+      "chipModel" => state.chip_model.set(value),
+      "filter" => state.filter.set(value),
       _ => {}
     },
     _ => {}

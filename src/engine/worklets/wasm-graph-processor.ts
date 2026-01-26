@@ -62,6 +62,7 @@ type GraphMessage =
   | { type: 'seekMidiSeq'; moduleId: string; tick: number }
   | { type: 'loadGranularBuffer'; moduleId: string; data: Float32Array }
   | { type: 'watchGranulars'; moduleIds: string[] }
+  | { type: 'loadSidFile'; moduleId: string; data: Uint8Array }
 
 class WasmGraphProcessor extends AudioWorkletProcessor {
   private engine: InstanceType<NonNullable<typeof WasmGraphEngine>> | null = null
@@ -185,6 +186,9 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
           moduleId: message.moduleId,
           length: message.data.length,
         })
+        break
+      case 'loadSidFile':
+        this.engine!.load_sid_file(message.moduleId, message.data)
         break
       default:
         break

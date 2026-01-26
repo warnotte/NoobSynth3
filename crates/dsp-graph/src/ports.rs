@@ -197,6 +197,10 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // position CV
       PortInfo { channels: 1 },  // pitch CV
     ],
+    // SidPlayer - 1 input (reset)
+    ModuleType::SidPlayer => vec![
+      PortInfo { channels: 1 },  // reset trigger
+    ],
   }
 }
 
@@ -393,6 +397,10 @@ pub fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
     // Granular - 1 stereo output
     ModuleType::Granular => vec![
       PortInfo { channels: 2 },  // stereo out
+    ],
+    // SidPlayer - 1 stereo output
+    ModuleType::SidPlayer => vec![
+      PortInfo { channels: 2 },  // stereo audio out
     ],
   }
 }
@@ -673,6 +681,11 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
       "trigger" | "trig" => Some(1),
       "position" | "pos-cv" => Some(2),
       "pitch" | "pitch-cv" => Some(3),
+      _ => None,
+    },
+    // SidPlayer - 1 input
+    ModuleType::SidPlayer => match port_id {
+      "reset" | "rst" => Some(0),
       _ => None,
     },
     _ => None,
@@ -976,6 +989,11 @@ pub fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize
     // Granular - 1 stereo output
     ModuleType::Granular => match port_id {
       "out" | "output" => Some(0),
+      _ => None,
+    },
+    // SidPlayer - 1 stereo output
+    ModuleType::SidPlayer => match port_id {
+      "out" | "output" | "audio" => Some(0),
       _ => None,
     },
   }

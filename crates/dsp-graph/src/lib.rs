@@ -355,6 +355,17 @@ impl GraphEngine {
     Vec::new()
   }
 
+  /// Load a SID file into a SidPlayer module
+  pub fn load_sid_file(&mut self, module_id: &str, data: &[u8]) {
+    if let Some(index) = self.module_map.get(module_id).and_then(|list| list.first().copied()) {
+      if let Some(module) = self.modules.get_mut(index) {
+        if let ModuleState::SidPlayer(ref mut state) = module.state {
+          state.sid_player.load_sid(data);
+        }
+      }
+    }
+  }
+
   pub fn render(&mut self, frames: usize) -> &[Sample] {
     if frames == 0 {
       return &[];
@@ -714,6 +725,8 @@ fn normalize_module_type(raw: &str) -> ModuleType {
     "clock" => ModuleType::Clock,
     "chaos" => ModuleType::Chaos,
     "turing-machine" | "turing" => ModuleType::TuringMachine,
+    // SID Player
+    "sid-player" => ModuleType::SidPlayer,
     _ => ModuleType::Oscillator,
   }
 }

@@ -1200,6 +1200,51 @@ Turing Machine (cv) → VCO (pitch)
 - **Resonator Swarm** - Textures otherworldly (4 Resonators + Swarm + Shepard + Euclidean)
 - **The Lorenz Machine** - Organisme sonique auto-évolutif (Chaos contrôle tout)
 
+### SID Player
+
+Lecteur de fichiers .sid du Commodore 64. Émule la puce sonore MOS 6581/8580 (SID) en exécutant le code 6502 original des musiques C64.
+
+Le module utilise un émulateur CPU 6502 complet (mos6502) et l'émulateur reSID pour reproduire fidèlement le son du SID avec ses 3 voix, 4 formes d'onde par voix, et son filtre analogique caractéristique.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `playing` | 0/1 | Play/Stop |
+| `song` | 1-N | Numéro de chanson (pour fichiers multi-tune) |
+| `chipModel` | 0/1 | 0=MOS 6581 (ancien), 1=MOS 8580 (nouveau) |
+| `filter` | 0/1 | Activer/désactiver le filtre SID |
+
+**Entrées :**
+| Port | ID | Description |
+|------|----|-------------|
+| Reset | `reset` | Redémarre la chanson |
+
+**Sorties :**
+| Port | ID | Description |
+|------|----|-------------|
+| Out | `out` | Audio stéréo |
+
+**Différences entre modèles de puce :**
+- **MOS 6581** (1982) : Son plus "crunchy", filtre avec plus de distorsion, utilisé dans les C64 originaux
+- **MOS 8580** (1987) : Son plus propre, filtre plus précis, moins de "bleed" entre les voix
+
+**Où trouver des fichiers .sid :**
+- [High Voltage SID Collection (HVSC)](https://www.hvsc.c64.org/) - La plus grande collection avec 50,000+ tunes
+- [Chiptune.com](https://chiptune.com/) - Collection organisée par artiste
+
+**Formats supportés :**
+- **PSID** : Format standard, fonctionne bien
+- **RSID** : Nécessite émulation CIA complète (support partiel)
+
+**Limitations connues :**
+- Les fichiers RSID qui utilisent les timers CIA pour le timing peuvent ne pas fonctionner correctement
+- Les samples digitalisés (digi) ne sont pas supportés
+- Certaines techniques de programmation avancées peuvent ne pas être émulées parfaitement
+
+**Usage typique :**
+```
+SID Player → Main Out
+```
+
 ### Main Out
 
 Sortie audio principale.
