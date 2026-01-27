@@ -1695,7 +1695,6 @@ pub(crate) fn process_module(
                 playing: state.playing.slice(frames),
                 song: state.song.slice(frames),
                 chip_model: state.chip_model.slice(frames),
-                filter: state.filter.slice(frames),
             };
 
             // Stereo output

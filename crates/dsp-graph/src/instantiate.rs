@@ -617,7 +617,6 @@ pub(crate) fn create_state(
       playing: ParamBuffer::new(param_number(params, "playing", 0.0)),
       song: ParamBuffer::new(param_number(params, "song", 1.0)),
       chip_model: ParamBuffer::new(param_number(params, "chipModel", 0.0)),
-      filter: ParamBuffer::new(param_number(params, "filter", 1.0)),
     }),
   }
 }
@@ -1211,7 +1210,6 @@ pub(crate) fn apply_param(state: &mut ModuleState, param: &str, value: f32) {
       "playing" => state.playing.set(value),
       "song" => state.song.set(value),
       "chipModel" => state.chip_model.set(value),
-      "filter" => state.filter.set(value),
       _ => {}
     },
     _ => {}

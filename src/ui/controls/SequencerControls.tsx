@@ -1389,12 +1389,25 @@ function MidiFileSequencerUI({ module, engine, status, updateParam }: Pick<Contr
   )
 }
 
+// Built-in SID presets
+const SID_PRESETS = [
+  { id: '', label: '-- Select --', file: '' },
+  { id: 'commando', label: 'Commando', file: 'Commando.sid' },
+  { id: 'monty', label: 'Monty on the Run', file: 'Monty_on_the_Run.sid' },
+  { id: 'lastninja', label: 'Last Ninja', file: 'Last_Ninja.sid' },
+  { id: 'sanxion', label: 'Sanxion', file: 'Sanxion.sid' },
+  { id: 'platoon', label: 'Platoon', file: 'Platoon.sid' },
+  { id: 'delta', label: 'Delta', file: 'Delta.sid' },
+  { id: 'ik', label: 'International Karate', file: 'International_Karate.sid' },
+  { id: 'cybernoid', label: 'Cybernoid', file: 'Cybernoid.sid' },
+  { id: 'armalyte', label: 'Armalyte', file: 'Armalyte.sid' },
+]
+
 // SID Player sub-component
 function SidPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module' | 'engine' | 'updateParam'>) {
   const playing = module.params.playing === 1 || module.params.playing === true
   const song = Number(module.params.song ?? 1)
   const chipModel = Number(module.params.chipModel ?? 0)
-  const filter = module.params.filter !== 0 && module.params.filter !== false
   const [sidInfo, setSidInfo] = useState<{ name: string; author: string; songs: number } | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -1403,51 +1416,68 @@ function SidPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module
     { id: 1, label: '8580' },
   ]
 
+  // Parse SID header and load into engine
+  const loadSidData = useCallback((data: Uint8Array) => {
+    if (data.length >= 0x76) {
+      const magic = String.fromCharCode(data[0], data[1], data[2], data[3])
+      if (magic === 'PSID' || magic === 'RSID') {
+        const songs = (data[14] << 8) | data[15]
+        const startSong = (data[16] << 8) | data[17]
+
+        const decoder = new TextDecoder('latin1')
+        const name = decoder.decode(data.slice(0x16, 0x36)).replace(/\0+$/, '')
+        const author = decoder.decode(data.slice(0x36, 0x56)).replace(/\0+$/, '')
+
+        setSidInfo({ name, author, songs })
+        engine.loadSidFile(module.id, data)
+        updateParam(module.id, 'song', startSong || 1)
+      }
+    }
+  }, [module.id, engine, updateParam])
+
   const handleFileLoad = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (!file) return
-
     try {
       const arrayBuffer = await file.arrayBuffer()
-      const data = new Uint8Array(arrayBuffer)
-
-      // Parse SID header to get info
-      if (data.length >= 0x76) {
-        const magic = String.fromCharCode(data[0], data[1], data[2], data[3])
-        if (magic === 'PSID' || magic === 'RSID') {
-          const songs = (data[14] << 8) | data[15]
-          const startSong = (data[16] << 8) | data[17]
-
-          // Parse strings (32 bytes each)
-          const decoder = new TextDecoder('latin1')
-          const name = decoder.decode(data.slice(0x16, 0x36)).replace(/\0+$/, '')
-          const author = decoder.decode(data.slice(0x36, 0x56)).replace(/\0+$/, '')
-
-          setSidInfo({ name, author, songs })
-
-          // Send to engine
-          engine.loadSidFile(module.id, data)
-
-          // Set initial song
-          updateParam(module.id, 'song', startSong || 1)
-        }
-      }
+      loadSidData(new Uint8Array(arrayBuffer))
     } catch (err) {
       console.error('Failed to load SID file:', err)
     }
-  }, [module.id, engine, updateParam])
+  }, [loadSidData])
+
+  const handlePresetChange = useCallback(async (presetId: string) => {
+    const preset = SID_PRESETS.find(p => p.id === presetId)
+    if (!preset || !preset.file) return
+    try {
+      const response = await fetch(`/sid/${preset.file}`)
+      const arrayBuffer = await response.arrayBuffer()
+      loadSidData(new Uint8Array(arrayBuffer))
+    } catch (err) {
+      console.error('Failed to load SID preset:', err)
+    }
+  }, [loadSidData])
 
   return (
     <>
       <div className="sid-display">
         <div className="sid-title">{sidInfo?.name || 'No file loaded'}</div>
         <div className="sid-author">{sidInfo?.author || ''}</div>
-        {sidInfo && sidInfo.songs > 1 && (
-          <div className="sid-songs">Song {song} / {sidInfo.songs}</div>
-        )}
       </div>
 
-      <ToggleGroup>
+      <ControlBox label="Preset">
+        <select
+          className="sid-preset-select"
+          onChange={(e) => handlePresetChange(e.target.value)}
+          defaultValue=""
+        >
+          {SID_PRESETS.map(preset => (
+            <option key={preset.id} value={preset.id}>{preset.label}</option>
+          ))}
+        </select>
+      </ControlBox>
+
+      <div className="sid-controls-row">
         <ToggleButton
           label="PLAY"
           value={playing}
@@ -1455,16 +1485,8 @@ function SidPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module
           onLabel="STOP"
           offLabel="PLAY"
         />
-        <ToggleButton
-          label="FILTER"
-          value={filter}
-          onChange={(value) => updateParam(module.id, 'filter', value ? 1 : 0)}
-        />
-      </ToggleGroup>
-
-      <div className="sid-file-section">
         <label className="sid-load-btn">
-          Load .sid
+          Load
           <input
             ref={fileInputRef}
             type="file"
@@ -1476,27 +1498,24 @@ function SidPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module
       </div>
 
       {sidInfo && sidInfo.songs > 1 && (
-        <ControlBoxRow>
-          <ControlBox label="Song" horizontal>
-            <button
-              type="button"
-              className="sid-song-btn"
-              disabled={song <= 1}
-              onClick={() => updateParam(module.id, 'song', Math.max(1, song - 1))}
-            >
-              ◀
-            </button>
-            <span className="sid-song-num">{song}</span>
-            <button
-              type="button"
-              className="sid-song-btn"
-              disabled={song >= sidInfo.songs}
-              onClick={() => updateParam(module.id, 'song', Math.min(sidInfo.songs, song + 1))}
-            >
-              ▶
-            </button>
-          </ControlBox>
-        </ControlBoxRow>
+        <ControlBox label={`Song ${song}/${sidInfo.songs}`} horizontal>
+          <button
+            type="button"
+            className="sid-song-btn"
+            disabled={song <= 1}
+            onClick={() => updateParam(module.id, 'song', Math.max(1, song - 1))}
+          >
+            ◀
+          </button>
+          <button
+            type="button"
+            className="sid-song-btn"
+            disabled={song >= sidInfo.songs}
+            onClick={() => updateParam(module.id, 'song', Math.min(sidInfo.songs, song + 1))}
+          >
+            ▶
+          </button>
+        </ControlBox>
       )}
 
       <ControlBox label="Chip">

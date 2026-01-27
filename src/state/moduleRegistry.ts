@@ -881,7 +881,6 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     playing: 0,         // 0=stopped, 1=playing
     song: 1,            // Current song number (1-based)
     chipModel: 0,       // 0=6581 (classic), 1=8580 (newer)
-    filter: 1,          // 0=filter off, 1=filter on
   },
 }
 

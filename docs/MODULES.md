@@ -1211,7 +1211,6 @@ Le module utilise un émulateur CPU 6502 complet (mos6502) et l'émulateur reSID
 | `playing` | 0/1 | Play/Stop |
 | `song` | 1-N | Numéro de chanson (pour fichiers multi-tune) |
 | `chipModel` | 0/1 | 0=MOS 6581 (ancien), 1=MOS 8580 (nouveau) |
-| `filter` | 0/1 | Activer/désactiver le filtre SID |
 
 **Entrées :**
 | Port | ID | Description |

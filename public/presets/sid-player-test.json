@@ -1,0 +1,46 @@
+{
+  "id": "sid-player-test",
+  "name": "SID Player Test",
+  "description": "Simple SID Player setup for testing C64 tunes",
+  "group": "8-Bit",
+  "graph": {
+    "modules": [
+      {
+        "id": "sid-1",
+        "type": "sid-player",
+        "name": "SID Player",
+        "position": { "col": 1, "row": 1 },
+        "params": {
+          "playing": 0,
+          "song": 1,
+          "chipModel": 0
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Main Out",
+        "position": { "col": 5, "row": 1 },
+        "params": {
+          "level": 1
+        }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "col": 1, "row": 5 },
+        "params": {
+          "text": "SID PLAYER TEST\n\nSelect a preset from the dropdown or load your own .sid file.\n\nClick PLAY to start playback.\n\nSupports PSID and RSID files (CIA + VIC raster interrupts)."
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "sid-1", "portId": "out" },
+        "to": { "moduleId": "out-1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

@@ -540,7 +540,6 @@ pub struct SidPlayerState {
     pub playing: ParamBuffer,
     pub song: ParamBuffer,
     pub chip_model: ParamBuffer,
-    pub filter: ParamBuffer,
 }
 
 // =============================================================================

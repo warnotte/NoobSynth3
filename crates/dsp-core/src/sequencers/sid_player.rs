@@ -28,11 +28,300 @@ const MAX_SID_DATA: usize = 65536;
 const PSID_MAGIC: &[u8] = b"PSID";
 const RSID_MAGIC: &[u8] = b"RSID";
 
-/// C64 Memory with SID intercept
+/// CIA1 base address
+const CIA1_BASE: u16 = 0xDC00;
+
+/// VIC-II base address
+const VIC_BASE: u16 = 0xD000;
+
+/// Cycles per raster line (PAL)
+const CYCLES_PER_LINE: u32 = 63;
+/// Total raster lines (PAL)
+const TOTAL_LINES: u16 = 312;
+
+/// VIC-II chip emulation (simplified for raster interrupts)
+#[derive(Clone)]
+pub struct Vic {
+    // Raster position
+    raster_line: u16,
+    cycle_counter: u32,
+
+    // Raster interrupt
+    raster_compare: u16,  // Line to trigger interrupt ($D012 + bit 7 of $D011)
+    raster_irq_enabled: bool,
+    irq_pending: bool,
+    irq_flag: bool,       // Set when raster matches, cleared by writing to $D019
+}
+
+impl Vic {
+    pub fn new() -> Self {
+        Self {
+            raster_line: 0,
+            cycle_counter: 0,
+            raster_compare: 0,
+            raster_irq_enabled: false,
+            irq_pending: false,
+            irq_flag: false,
+        }
+    }
+
+    /// Tick the VIC by given number of cycles
+    pub fn tick(&mut self, cycles: u32) {
+        self.cycle_counter += cycles;
+
+        while self.cycle_counter >= CYCLES_PER_LINE {
+            self.cycle_counter -= CYCLES_PER_LINE;
+            self.raster_line += 1;
+
+            // Frame wrap-around
+            if self.raster_line >= TOTAL_LINES {
+                self.raster_line = 0;
+            }
+
+            // Trigger raster IRQ when line matches compare value (like real C64)
+            if self.raster_irq_enabled && self.raster_line == self.raster_compare {
+                self.irq_flag = true;
+                self.irq_pending = true;
+            }
+        }
+    }
+
+    /// Read a VIC register
+    pub fn read(&self, reg: u8) -> u8 {
+        match reg {
+            0x11 => {
+                // $D011: Control + raster bit 8
+                let raster_bit8 = if self.raster_line > 255 { 0x80 } else { 0 };
+                raster_bit8 | 0x1B // Default control bits
+            }
+            0x12 => {
+                // $D012: Current raster line (low 8 bits)
+                (self.raster_line & 0xFF) as u8
+            }
+            0x19 => {
+                // $D019: Interrupt status
+                let mut val = 0;
+                if self.irq_flag { val |= 0x01; }
+                if self.irq_pending { val |= 0x80; }
+                val
+            }
+            0x1A => {
+                // $D01A: Interrupt enable
+                if self.raster_irq_enabled { 0x01 } else { 0x00 }
+            }
+            _ => 0,
+        }
+    }
+
+    /// Write a VIC register
+    pub fn write(&mut self, reg: u8, value: u8) {
+        match reg {
+            0x11 => {
+                // $D011: bit 7 is raster compare bit 8
+                self.raster_compare = (self.raster_compare & 0x00FF) | (((value as u16) & 0x80) << 1);
+            }
+            0x12 => {
+                // $D012: Raster compare low 8 bits
+                self.raster_compare = (self.raster_compare & 0x0100) | value as u16;
+            }
+            0x19 => {
+                // $D019: Acknowledge interrupts (write 1 to clear)
+                if value & 0x01 != 0 {
+                    self.irq_flag = false;
+                }
+            }
+            0x1A => {
+                // $D01A: Interrupt enable
+                self.raster_irq_enabled = value & 0x01 != 0;
+            }
+            _ => {}
+        }
+    }
+
+    /// Check and clear IRQ pending flag
+    pub fn take_irq(&mut self) -> bool {
+        if self.irq_pending {
+            self.irq_pending = false;
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for Vic {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// CIA chip emulation (simplified for SID playback)
+#[derive(Clone)]
+pub struct Cia {
+    // Timer A
+    timer_a: u16,
+    timer_a_latch: u16,
+    timer_a_running: bool,
+    timer_a_oneshot: bool,
+
+    // Timer B
+    timer_b: u16,
+    timer_b_latch: u16,
+    timer_b_running: bool,
+    timer_b_oneshot: bool,
+
+    // Interrupt control
+    int_mask: u8,      // Which interrupts are enabled
+    int_data: u8,      // Which interrupts have occurred
+    irq_pending: bool, // IRQ needs to be triggered
+}
+
+impl Cia {
+    pub fn new() -> Self {
+        Self {
+            timer_a: 0xFFFF,
+            timer_a_latch: 0xFFFF,
+            timer_a_running: false,
+            timer_a_oneshot: false,
+            timer_b: 0xFFFF,
+            timer_b_latch: 0xFFFF,
+            timer_b_running: false,
+            timer_b_oneshot: false,
+            int_mask: 0,
+            int_data: 0,
+            irq_pending: false,
+        }
+    }
+
+    /// Tick the CIA timers by given number of cycles
+    pub fn tick(&mut self, cycles: u32) {
+        // Timer A
+        if self.timer_a_running {
+            let (new_val, overflow) = self.timer_a.overflowing_sub(cycles as u16);
+            if overflow || new_val == 0 {
+                // Timer underflowed
+                self.int_data |= 0x01; // Set Timer A interrupt flag
+                if self.int_mask & 0x01 != 0 {
+                    self.irq_pending = true;
+                }
+                if self.timer_a_oneshot {
+                    self.timer_a_running = false;
+                }
+                // Reload from latch
+                self.timer_a = self.timer_a_latch;
+            } else {
+                self.timer_a = new_val;
+            }
+        }
+
+        // Timer B
+        if self.timer_b_running {
+            let (new_val, overflow) = self.timer_b.overflowing_sub(cycles as u16);
+            if overflow || new_val == 0 {
+                self.int_data |= 0x02;
+                if self.int_mask & 0x02 != 0 {
+                    self.irq_pending = true;
+                }
+                if self.timer_b_oneshot {
+                    self.timer_b_running = false;
+                }
+                self.timer_b = self.timer_b_latch;
+            } else {
+                self.timer_b = new_val;
+            }
+        }
+    }
+
+    /// Read a CIA register
+    pub fn read(&mut self, reg: u8) -> u8 {
+        match reg {
+            0x04 => self.timer_a as u8,
+            0x05 => (self.timer_a >> 8) as u8,
+            0x06 => self.timer_b as u8,
+            0x07 => (self.timer_b >> 8) as u8,
+            0x0D => {
+                // Reading clears interrupt flags
+                let val = self.int_data | if self.irq_pending { 0x80 } else { 0 };
+                self.int_data = 0;
+                self.irq_pending = false;
+                val
+            }
+            0x0E => {
+                let mut val = 0;
+                if self.timer_a_running { val |= 0x01; }
+                if self.timer_a_oneshot { val |= 0x08; }
+                val
+            }
+            0x0F => {
+                let mut val = 0;
+                if self.timer_b_running { val |= 0x01; }
+                if self.timer_b_oneshot { val |= 0x08; }
+                val
+            }
+            _ => 0,
+        }
+    }
+
+    /// Write a CIA register
+    pub fn write(&mut self, reg: u8, value: u8) {
+        match reg {
+            0x04 => self.timer_a_latch = (self.timer_a_latch & 0xFF00) | value as u16,
+            0x05 => self.timer_a_latch = (self.timer_a_latch & 0x00FF) | ((value as u16) << 8),
+            0x06 => self.timer_b_latch = (self.timer_b_latch & 0xFF00) | value as u16,
+            0x07 => self.timer_b_latch = (self.timer_b_latch & 0x00FF) | ((value as u16) << 8),
+            0x0D => {
+                // Interrupt control: bit 7 = set/clear, bits 0-4 = mask bits
+                if value & 0x80 != 0 {
+                    self.int_mask |= value & 0x1F;
+                } else {
+                    self.int_mask &= !(value & 0x1F);
+                }
+            }
+            0x0E => {
+                // Control Register A
+                self.timer_a_oneshot = value & 0x08 != 0;
+                if value & 0x10 != 0 {
+                    // Force load
+                    self.timer_a = self.timer_a_latch;
+                }
+                self.timer_a_running = value & 0x01 != 0;
+            }
+            0x0F => {
+                // Control Register B
+                self.timer_b_oneshot = value & 0x08 != 0;
+                if value & 0x10 != 0 {
+                    self.timer_b = self.timer_b_latch;
+                }
+                self.timer_b_running = value & 0x01 != 0;
+            }
+            _ => {}
+        }
+    }
+
+    /// Check and clear IRQ pending flag
+    pub fn take_irq(&mut self) -> bool {
+        if self.irq_pending {
+            self.irq_pending = false;
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for Cia {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// C64 Memory with SID, CIA, and VIC intercept
 pub struct C64Memory {
     ram: [u8; 65536],
-    sid_writes: [(u8, u8); 256], // Fixed buffer for SID writes
+    sid_writes: [(u8, u8); 256],
     sid_write_count: usize,
+    pub cia1: Cia,
+    pub vic: Vic,
 }
 
 impl C64Memory {
@@ -41,6 +330,8 @@ impl C64Memory {
             ram: [0; 65536],
             sid_writes: [(0, 0); 256],
             sid_write_count: 0,
+            cia1: Cia::new(),
+            vic: Vic::new(),
         }
     }
 
@@ -80,10 +371,41 @@ impl C64Memory {
         self.ram[0xFFFB] = 0x10;
         self.ram[0x1002] = 0x40; // RTI
 
-        // IRQ vector (just RTI)
+        // IRQ vector - we'll set this dynamically for RSID
         self.ram[0xFFFE] = 0x04;
         self.ram[0xFFFF] = 0x10;
-        self.ram[0x1004] = 0x40; // RTI
+        self.ram[0x1004] = 0x40; // RTI (default, RSID will override $0314/$0315)
+    }
+
+    /// Install RSID-compatible IRQ handling
+    fn install_rsid_kernal(&mut self) {
+        // For RSID, we need the IRQ vector to jump through $0314/$0315
+        // This is the C64 kernal IRQ vector that RSID tunes expect
+
+        // IRQ entry at $1004: JMP ($0314) - jump indirect through IRQ vector
+        self.ram[0x1004] = 0x6C; // JMP indirect
+        self.ram[0x1005] = 0x14; // $0314
+        self.ram[0x1006] = 0x03;
+
+        // Default IRQ handler at $1007: RTI
+        self.ram[0x1007] = 0x40; // RTI
+
+        // Set default IRQ vector to our RTI
+        self.ram[0x0314] = 0x07;
+        self.ram[0x0315] = 0x10;
+
+        // IRQ hardware vector points to our entry
+        self.ram[0xFFFE] = 0x04;
+        self.ram[0xFFFF] = 0x10;
+
+        // Set up CIA1 Timer A for default 50Hz IRQ (PAL timing)
+        // This provides a fallback for tunes that don't configure their own timing
+        // Timer value: 985248 Hz / 50 Hz = 19704 cycles ≈ $4CF8
+        self.cia1.timer_a_latch = 0x4CF8;
+        self.cia1.timer_a = 0x4CF8;
+        self.cia1.timer_a_running = true;
+        self.cia1.timer_a_oneshot = false;
+        self.cia1.int_mask = 0x01; // Enable Timer A interrupt
     }
 }
 
@@ -99,6 +421,14 @@ impl Bus for C64Memory {
         if address >= SID_BASE && address <= SID_END {
             return 0;
         }
+        // VIC-II reads ($D000-$D3FF, but we only care about $D000-$D02E)
+        if address >= VIC_BASE && address < VIC_BASE + 0x40 {
+            return self.vic.read((address - VIC_BASE) as u8);
+        }
+        // CIA1 reads
+        if address >= CIA1_BASE && address < CIA1_BASE + 0x10 {
+            return self.cia1.read((address - CIA1_BASE) as u8);
+        }
         self.ram[address as usize]
     }
 
@@ -110,6 +440,14 @@ impl Bus for C64Memory {
                 self.sid_writes[self.sid_write_count] = (reg, value);
                 self.sid_write_count += 1;
             }
+        }
+        // VIC-II writes
+        if address >= VIC_BASE && address < VIC_BASE + 0x40 {
+            self.vic.write((address - VIC_BASE) as u8, value);
+        }
+        // CIA1 writes
+        if address >= CIA1_BASE && address < CIA1_BASE + 0x10 {
+            self.cia1.write((address - CIA1_BASE) as u8, value);
         }
         self.ram[address as usize] = value;
     }
@@ -224,8 +562,6 @@ pub struct SidPlayerParams<'a> {
     pub song: &'a [Sample],
     /// Chip model (0 = 6581, 1 = 8580)
     pub chip_model: &'a [Sample],
-    /// Filter enable (0 = off, 1 = on)
-    pub filter: &'a [Sample],
 }
 
 /// Inputs for SidPlayer
@@ -318,7 +654,11 @@ impl SidPlayer {
 
         // Setup memory
         self.memory = C64Memory::new();
-        self.memory.install_kernal();
+        if header.is_rsid {
+            self.memory.install_rsid_kernal();
+        } else {
+            self.memory.install_kernal();
+        }
         self.memory.load(load_addr, code_data);
 
         // Update header with actual load address
@@ -460,16 +800,12 @@ impl SidPlayer {
         } else {
             ChipModel::Mos6581
         };
-        let filter_enabled = sample_at(params.filter, 0, 1.0) > 0.5;
 
         // Update song if changed
         self.set_song(song);
 
         // Update chip model if changed
         self.set_chip_model(chip_model);
-
-        // Update filter
-        self.sid.enable_filter(filter_enabled);
 
         // Initialize if needed
         if should_play && !self.initialized {
@@ -489,6 +825,7 @@ impl SidPlayer {
 
         // Process audio
         // We need to interleave CPU execution with SID sampling
+        let is_rsid = self.header.is_rsid;
 
         for i in 0..block_size {
             // Accumulate cycles for this sample
@@ -499,16 +836,27 @@ impl SidPlayer {
                 let cycles_to_run = self.cycle_accumulator as u32;
                 self.cycle_accumulator -= cycles_to_run as f64;
 
-                // Check if we need to call the play routine
-                self.frame_cycle_accumulator += cycles_to_run;
-                if self.frame_cycle_accumulator >= self.cycles_per_frame {
-                    self.frame_cycle_accumulator -= self.cycles_per_frame;
-                    self.call_play();
+                if is_rsid {
+                    // RSID: Tick CIA timers and VIC raster, check for IRQ
+                    self.memory.cia1.tick(cycles_to_run);
+                    self.memory.vic.tick(cycles_to_run);
+
+                    // Check for IRQ from either CIA or VIC
+                    if self.memory.cia1.take_irq() || self.memory.vic.take_irq() {
+                        self.call_irq();
+                    }
+                } else {
+                    // PSID: Check if we need to call the play routine at frame rate
+                    self.frame_cycle_accumulator += cycles_to_run;
+                    if self.frame_cycle_accumulator >= self.cycles_per_frame {
+                        self.frame_cycle_accumulator -= self.cycles_per_frame;
+                        self.call_play();
+                    }
                 }
 
                 // Apply any pending SID writes (from init or play)
-                for i in 0..self.memory.sid_write_count() {
-                    let (reg, value) = self.memory.get_sid_write(i);
+                for j in 0..self.memory.sid_write_count() {
+                    let (reg, value) = self.memory.get_sid_write(j);
                     self.sid.write(reg, value);
                 }
                 self.memory.clear_sid_writes();
@@ -526,12 +874,9 @@ impl SidPlayer {
         }
     }
 
-    /// Call the play routine
+    /// Call the play routine (PSID only)
     fn call_play(&mut self) {
         if self.header.play_address == 0 {
-            // Play address 0 means the init routine set up an interrupt
-            // For RSID files, we'd need to emulate the CIA timers
-            // For now, just skip
             return;
         }
 
@@ -563,6 +908,56 @@ impl SidPlayer {
         // Get memory back
         self.memory = cpu.memory.clone();
     }
+
+    /// Handle IRQ for RSID files
+    fn call_irq(&mut self) {
+        // Save timing state before running IRQ handler
+        let vic_cycle_counter = self.memory.vic.cycle_counter;
+        let vic_raster_line = self.memory.vic.raster_line;
+        let cia_timer_a = self.memory.cia1.timer_a;
+        let cia_timer_b = self.memory.cia1.timer_b;
+
+        // Create CPU and trigger IRQ handler
+        let mut cpu: CPU<C64Memory, Nmos6502> = CPU::new(self.memory.clone(), Nmos6502);
+
+        // Set up CPU state for IRQ
+        cpu.registers.stack_pointer = StackPointer(0xFF);
+
+        // Push return address and status for RTI
+        // We want to return to $1000 after RTI
+        let sp = cpu.registers.stack_pointer.0;
+        cpu.memory.set_byte(0x0100 + sp as u16, 0x10); // PCH = $10
+        cpu.registers.stack_pointer = StackPointer(sp.wrapping_sub(1));
+        let sp = cpu.registers.stack_pointer.0;
+        cpu.memory.set_byte(0x0100 + sp as u16, 0x00); // PCL = $00
+        cpu.registers.stack_pointer = StackPointer(sp.wrapping_sub(1));
+        let sp = cpu.registers.stack_pointer.0;
+        cpu.memory.set_byte(0x0100 + sp as u16, 0x00); // Status (I flag clear)
+        cpu.registers.stack_pointer = StackPointer(sp.wrapping_sub(1));
+
+        // Read IRQ vector from $FFFE/$FFFF
+        let irq_lo = cpu.memory.get_byte(0xFFFE);
+        let irq_hi = cpu.memory.get_byte(0xFFFF);
+        let irq_addr = (irq_hi as u16) << 8 | irq_lo as u16;
+        cpu.registers.program_counter = irq_addr;
+
+        // Run until we hit RTI and return to $1000
+        for _ in 0..50000 {
+            cpu.single_step();
+            if cpu.registers.program_counter == 0x1000 {
+                break;
+            }
+        }
+
+        // Get memory back with IRQ handler's register changes
+        self.memory = cpu.memory.clone();
+
+        // Restore timing state (cycle counters should continue from where we left off)
+        self.memory.vic.cycle_counter = vic_cycle_counter;
+        self.memory.vic.raster_line = vic_raster_line;
+        self.memory.cia1.timer_a = cia_timer_a;
+        self.memory.cia1.timer_b = cia_timer_b;
+    }
 }
 
 impl Clone for C64Memory {
@@ -571,6 +966,8 @@ impl Clone for C64Memory {
             ram: self.ram,
             sid_writes: self.sid_writes,
             sid_write_count: self.sid_write_count,
+            cia1: self.cia1.clone(),
+            vic: self.vic.clone(),
         }
     }
 }
