@@ -1392,16 +1392,49 @@ function MidiFileSequencerUI({ module, engine, status, updateParam }: Pick<Contr
 // Built-in SID presets
 const SID_PRESETS = [
   { id: '', label: '-- Select --', file: '' },
+  // Rob Hubbard classics
   { id: 'commando', label: 'Commando', file: 'Commando.sid' },
   { id: 'monty', label: 'Monty on the Run', file: 'Monty_on_the_Run.sid' },
-  { id: 'lastninja', label: 'Last Ninja', file: 'Last_Ninja.sid' },
-  { id: 'sanxion', label: 'Sanxion', file: 'Sanxion.sid' },
-  { id: 'platoon', label: 'Platoon', file: 'Platoon.sid' },
   { id: 'delta', label: 'Delta', file: 'Delta.sid' },
+  { id: 'sanxion', label: 'Sanxion', file: 'Sanxion.sid' },
   { id: 'ik', label: 'International Karate', file: 'International_Karate.sid' },
-  { id: 'cybernoid', label: 'Cybernoid', file: 'Cybernoid.sid' },
+  { id: 'zoids', label: 'Zoids', file: 'Zoids.sid' },
+  { id: 'thrust', label: 'Thrust', file: 'Thrust.sid' },
+  // Martin Galway
+  { id: 'wizball', label: 'Wizball', file: 'Wizball.sid' },
   { id: 'armalyte', label: 'Armalyte', file: 'Armalyte.sid' },
+  { id: 'rtype', label: 'R-Type', file: 'R-Type.sid' },
+  // Ben Daglish
+  { id: 'lastninja', label: 'Last Ninja', file: 'Last_Ninja.sid' },
+  { id: 'lastninja2', label: 'Last Ninja 2', file: 'Last_Ninja_2.sid' },
+  // Jeroen Tel
+  { id: 'cybernoid', label: 'Cybernoid', file: 'Cybernoid.sid' },
+  { id: 'hawkeye', label: 'Hawkeye', file: 'Hawkeye.sid' },
+  // Jonathan Dunn
+  { id: 'oceanloader', label: 'Ocean Loader 3', file: 'Ocean_Loader_3.sid' },
+  // Other classics
+  { id: 'platoon', label: 'Platoon', file: 'Platoon.sid' },
+  { id: 'greenberet', label: 'Green Beret', file: 'Green_Beret.sid' },
+  { id: 'ghostsngoblins', label: "Ghosts'n Goblins", file: 'Ghosts_n_Goblins.sid' },
+  { id: 'spellbound', label: 'Spellbound', file: 'Spellbound.sid' },
+  { id: 'ikari', label: 'Ikari Union', file: 'Ikari_Union.sid' },
 ]
+
+// Voice state type for SID visualization
+type SidVoiceState = { freq: number; gate: boolean; waveform: number }
+
+// Waveform labels
+const WAVEFORM_LABELS: Record<number, string> = {
+  0: '-',
+  1: 'TRI',
+  2: 'SAW',
+  4: 'PUL',
+  8: 'NOI',
+  3: 'T+S',
+  5: 'T+P',
+  6: 'S+P',
+  7: 'TSP',
+}
 
 // SID Player sub-component
 function SidPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module' | 'engine' | 'updateParam'>) {
@@ -1409,7 +1442,21 @@ function SidPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module
   const song = Number(module.params.song ?? 1)
   const chipModel = Number(module.params.chipModel ?? 0)
   const [sidInfo, setSidInfo] = useState<{ name: string; author: string; songs: number } | null>(null)
+  const [voices, setVoices] = useState<SidVoiceState[]>([
+    { freq: 0, gate: false, waveform: 0 },
+    { freq: 0, gate: false, waveform: 0 },
+    { freq: 0, gate: false, waveform: 0 },
+  ])
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Subscribe to voice state updates
+  useEffect(() => {
+    if (!playing) return
+    const unsubscribe = engine.watchSidVoices(module.id, (newVoices) => {
+      setVoices(newVoices)
+    })
+    return unsubscribe
+  }, [engine, module.id, playing])
 
   const chipModelOptions = [
     { id: 0, label: '6581' },
@@ -1525,6 +1572,23 @@ function SidPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module
           onChange={(value) => updateParam(module.id, 'chipModel', value)}
         />
       </ControlBox>
+
+      <div className="sid-voices">
+        {voices.map((voice, i) => {
+          // Convert frequency to a relative height (log scale for better visualization)
+          // SID freq range is 0-65535, maps to ~16Hz to ~4kHz
+          const freqPercent = voice.freq > 0 ? Math.min(100, Math.log2(voice.freq + 1) / 16 * 100) : 0
+          return (
+            <div key={i} className={`sid-voice ${voice.gate ? 'active' : ''}`}>
+              <div className="sid-voice-bar" style={{ height: `${freqPercent}%` }} />
+              <div className="sid-voice-label">
+                <span className="sid-voice-num">{i + 1}</span>
+                <span className="sid-voice-wave">{WAVEFORM_LABELS[voice.waveform] || '-'}</span>
+              </div>
+            </div>
+          )
+        })}
+      </div>
     </>
   )
 }

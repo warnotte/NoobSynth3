@@ -315,11 +315,25 @@ impl Default for Cia {
     }
 }
 
+/// Voice state for visualization
+#[derive(Clone, Copy, Default)]
+pub struct VoiceState {
+    pub frequency: u16,    // 0-65535
+    pub gate: bool,        // Gate bit
+    pub waveform: u8,      // 0=none, 1=tri, 2=saw, 4=pulse, 8=noise
+    pub pulse_width: u16,  // 0-4095
+    pub attack: u8,        // 0-15
+    pub decay: u8,         // 0-15
+    pub sustain: u8,       // 0-15
+    pub release: u8,       // 0-15
+}
+
 /// C64 Memory with SID, CIA, and VIC intercept
 pub struct C64Memory {
     ram: [u8; 65536],
     sid_writes: [(u8, u8); 256],
     sid_write_count: usize,
+    sid_registers: [u8; 32],  // Track SID register values for visualization
     pub cia1: Cia,
     pub vic: Vic,
 }
@@ -330,8 +344,35 @@ impl C64Memory {
             ram: [0; 65536],
             sid_writes: [(0, 0); 256],
             sid_write_count: 0,
+            sid_registers: [0; 32],
             cia1: Cia::new(),
             vic: Vic::new(),
+        }
+    }
+
+    /// Get voice state for visualization (voice 0, 1, or 2)
+    pub fn get_voice_state(&self, voice: usize) -> VoiceState {
+        if voice > 2 {
+            return VoiceState::default();
+        }
+        let base = voice * 7; // Each voice uses 7 registers
+        let freq_lo = self.sid_registers[base] as u16;
+        let freq_hi = self.sid_registers[base + 1] as u16;
+        let pw_lo = self.sid_registers[base + 2] as u16;
+        let pw_hi = self.sid_registers[base + 3] as u16;
+        let control = self.sid_registers[base + 4];
+        let ad = self.sid_registers[base + 5];
+        let sr = self.sid_registers[base + 6];
+
+        VoiceState {
+            frequency: freq_lo | (freq_hi << 8),
+            gate: control & 0x01 != 0,
+            waveform: (control >> 4) & 0x0F,
+            pulse_width: (pw_lo | ((pw_hi & 0x0F) << 8)) & 0x0FFF,
+            attack: (ad >> 4) & 0x0F,
+            decay: ad & 0x0F,
+            sustain: (sr >> 4) & 0x0F,
+            release: sr & 0x0F,
         }
     }
 
@@ -436,6 +477,10 @@ impl Bus for C64Memory {
         // Intercept SID writes
         if address >= SID_BASE && address <= SID_END {
             let reg = (address - SID_BASE) as u8;
+            // Track register values for visualization
+            if (reg as usize) < 32 {
+                self.sid_registers[reg as usize] = value;
+            }
             if self.sid_write_count < 256 {
                 self.sid_writes[self.sid_write_count] = (reg, value);
                 self.sid_write_count += 1;
@@ -783,6 +828,20 @@ impl SidPlayer {
         )
     }
 
+    /// Get voice states for visualization
+    /// Returns (freq, gate, waveform) for each of the 3 voices
+    /// freq: 0-65535, gate: 0 or 1, waveform: 1=tri, 2=saw, 4=pulse, 8=noise
+    pub fn get_voice_states(&self) -> [(u16, u8, u8); 3] {
+        let v0 = self.memory.get_voice_state(0);
+        let v1 = self.memory.get_voice_state(1);
+        let v2 = self.memory.get_voice_state(2);
+        [
+            (v0.frequency, v0.gate as u8, v0.waveform),
+            (v1.frequency, v1.gate as u8, v1.waveform),
+            (v2.frequency, v2.gate as u8, v2.waveform),
+        ]
+    }
+
     /// Process a block of audio
     pub fn process_block(
         &mut self,
@@ -966,6 +1025,7 @@ impl Clone for C64Memory {
             ram: self.ram,
             sid_writes: self.sid_writes,
             sid_write_count: self.sid_write_count,
+            sid_registers: self.sid_registers,
             cia1: self.cia1.clone(),
             vic: self.vic.clone(),
         }

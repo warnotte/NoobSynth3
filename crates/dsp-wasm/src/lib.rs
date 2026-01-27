@@ -117,6 +117,12 @@ impl WasmGraphEngine {
     self.engine.get_granular_position(module_id)
   }
 
+  /// Get SID voice states for visualization
+  /// Returns [freq0, gate0, wave0, freq1, gate1, wave1, freq2, gate2, wave2]
+  pub fn get_sid_voice_states(&self, module_id: &str) -> Vec<u16> {
+    self.engine.get_sid_voice_states(module_id)
+  }
+
   /// Get waveform data from a Granular module for visualization
   pub fn get_granular_waveform(&self, module_id: &str, max_points: usize) -> Float32Array {
     let data = self.engine.get_granular_waveform(module_id, max_points);

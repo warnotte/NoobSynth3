@@ -2978,6 +2978,70 @@
   margin: 0;
 }
 
+/* SID Voice Visualization */
+.sid-voices {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 4px;
+  height: 50px;
+  padding: 4px;
+  background: linear-gradient(180deg, #0a1525 0%, #0f1a30 100%);
+  border: 1px solid #2a3a5e;
+  border-radius: 4px;
+}
+
+.sid-voice {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  position: relative;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.sid-voice-bar {
+  width: 100%;
+  background: linear-gradient(180deg, #1a3a5e 0%, #0a1a2e 100%);
+  transition: height 0.05s ease-out;
+  min-height: 2px;
+}
+
+.sid-voice.active .sid-voice-bar {
+  background: linear-gradient(180deg, #4a9fcf 0%, #2a6f9f 100%);
+  box-shadow: 0 0 8px rgba(74, 159, 207, 0.5);
+}
+
+.sid-voice-label {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2px;
+  font-family: 'Courier New', monospace;
+  font-size: 8px;
+  color: #4a6fa5;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.8);
+}
+
+.sid-voice.active .sid-voice-label {
+  color: #8fd4f9;
+}
+
+.sid-voice-num {
+  font-weight: bold;
+}
+
+.sid-voice-wave {
+  font-size: 7px;
+  opacity: 0.8;
+}
+
 /* ============================================
    SECTION 25: GLOBAL & RESPONSIVE
    ============================================ */

@@ -281,6 +281,24 @@ impl GraphEngine {
     }
   }
 
+  /// Get SID voice states for visualization
+  /// Returns [freq0, gate0, wave0, freq1, gate1, wave1, freq2, gate2, wave2]
+  pub fn get_sid_voice_states(&self, module_id: &str) -> Vec<u16> {
+    if let Some(index) = self.module_map.get(module_id).and_then(|list| list.first()) {
+      if let Some(module) = self.modules.get(*index) {
+        if let ModuleState::SidPlayer(state) = &module.state {
+          let voices = state.sid_player.get_voice_states();
+          return vec![
+            voices[0].0, voices[0].1 as u16, voices[0].2 as u16,
+            voices[1].0, voices[1].1 as u16, voices[1].2 as u16,
+            voices[2].0, voices[2].1 as u16, voices[2].2 as u16,
+          ];
+        }
+      }
+    }
+    vec![0; 9]
+  }
+
   /// Drain MIDI events from a sequencer. Returns flat array: [track, note, velocity, is_on, ...]
   pub fn drain_midi_events(&mut self, module_id: &str) -> Vec<u8> {
     if let Some(index) = self.module_map.get(module_id).and_then(|list| list.first().copied()) {

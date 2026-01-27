@@ -25,6 +25,8 @@ export class AudioEngine {
   private granularLoadCallbacks: Map<string, (length: number) => void> = new Map()
   private granularPositionCallbacks: Map<string, (position: number) => void> = new Map()
   private watchedGranulars: Set<string> = new Set()
+  private sidVoiceCallbacks: Map<string, (voices: Array<{freq: number, gate: boolean, waveform: number}>) => void> = new Map()
+  private watchedSids: Set<string> = new Set()
 
   async start(graph: GraphState): Promise<void> {
     await this.init()
@@ -309,6 +311,28 @@ export class AudioEngine {
     })
   }
 
+  watchSidVoices(
+    moduleId: string,
+    callback: (voices: Array<{freq: number, gate: boolean, waveform: number}>) => void
+  ): () => void {
+    this.sidVoiceCallbacks.set(moduleId, callback)
+    this.watchedSids.add(moduleId)
+    this.syncWatchedSids()
+
+    return () => {
+      this.sidVoiceCallbacks.delete(moduleId)
+      this.watchedSids.delete(moduleId)
+      this.syncWatchedSids()
+    }
+  }
+
+  private syncWatchedSids(): void {
+    this.graphNode?.port.postMessage({
+      type: 'watchSids',
+      moduleIds: Array.from(this.watchedSids),
+    })
+  }
+
   watchMidiSequencer(
     moduleId: string,
     callback: (events: Array<{track: number, note: number, velocity: number, isNoteOn: boolean}>) => void
@@ -415,7 +439,7 @@ export class AudioEngine {
 
     // Listen for messages from the worklet
     this.graphNode.port.onmessage = (event) => {
-      const data = event.data as { type: string; steps?: Record<string, number>; positions?: Record<string, number>; data?: number[] }
+      const data = event.data as { type: string; steps?: Record<string, number>; positions?: Record<string, number>; data?: number[]; voices?: Record<string, number[]> }
       if (data.type === 'sequencerSteps' && data.steps) {
         // Debug: log incoming step updates (throttled)
         const stepEntries = Object.entries(data.steps)
@@ -459,6 +483,17 @@ export class AudioEngine {
             callback(position)
           }
         }
+      } else if (data.type === 'sidVoiceStates' && data.voices) {
+        for (const [moduleId, voiceData] of Object.entries(data.voices as Record<string, number[]>)) {
+          const callback = this.sidVoiceCallbacks.get(moduleId)
+          if (callback && voiceData.length === 9) {
+            callback([
+              { freq: voiceData[0], gate: voiceData[1] !== 0, waveform: voiceData[2] },
+              { freq: voiceData[3], gate: voiceData[4] !== 0, waveform: voiceData[5] },
+              { freq: voiceData[6], gate: voiceData[7] !== 0, waveform: voiceData[8] },
+            ])
+          }
+        }
       }
     }
 
@@ -475,6 +510,11 @@ export class AudioEngine {
     // Re-send watched granulars if any
     if (this.watchedGranulars.size > 0) {
       this.syncWatchedGranulars()
+    }
+
+    // Re-send watched SIDs if any
+    if (this.watchedSids.size > 0) {
+      this.syncWatchedSids()
     }
 
     this.buildScopeAnalysers()

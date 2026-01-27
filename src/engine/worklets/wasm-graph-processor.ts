@@ -63,6 +63,7 @@ type GraphMessage =
   | { type: 'loadGranularBuffer'; moduleId: string; data: Float32Array }
   | { type: 'watchGranulars'; moduleIds: string[] }
   | { type: 'loadSidFile'; moduleId: string; data: Uint8Array }
+  | { type: 'watchSids'; moduleIds: string[] }
 
 class WasmGraphProcessor extends AudioWorkletProcessor {
   private engine: InstanceType<NonNullable<typeof WasmGraphEngine>> | null = null
@@ -75,6 +76,7 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
   private watchedMidiSeq: string | null = null
   private watchedGranulars: string[] = []
   private lastPositions: Map<string, number> = new Map()
+  private watchedSids: string[] = []
   private debugCounter = 0
   private messageQueue: GraphMessage[] = []
 
@@ -111,6 +113,10 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
     if (message.type === 'watchGranulars') {
       this.watchedGranulars = message.moduleIds
       this.lastPositions.clear()
+      return
+    }
+    if (message.type === 'watchSids') {
+      this.watchedSids = message.moduleIds
       return
     }
     // Queue other messages to be processed in process() before render()
@@ -311,6 +317,20 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
       }
       if (Object.keys(updates).length > 0) {
         this.port.postMessage({ type: 'granularPositions', positions: updates })
+      }
+    }
+
+    // Poll SID voice states
+    if (shouldPoll && this.watchedSids.length > 0) {
+      const updates: Record<string, number[]> = {}
+      for (const moduleId of this.watchedSids) {
+        const voices = this.engine.get_sid_voice_states(moduleId)
+        if (voices.length === 9) {
+          updates[moduleId] = Array.from(voices)
+        }
+      }
+      if (Object.keys(updates).length > 0) {
+        this.port.postMessage({ type: 'sidVoiceStates', voices: updates })
       }
     }
 
