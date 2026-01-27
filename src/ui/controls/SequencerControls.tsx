@@ -1475,9 +1475,10 @@ function SidPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module
         const name = decoder.decode(data.slice(0x16, 0x36)).replace(/\0+$/, '')
         const author = decoder.decode(data.slice(0x36, 0x56)).replace(/\0+$/, '')
 
+        // Reset song to 1 BEFORE loading to avoid stale state
+        updateParam(module.id, 'song', startSong || 1)
         setSidInfo({ name, author, songs })
         engine.loadSidFile(module.id, data)
-        updateParam(module.id, 'song', startSong || 1)
       }
     }
   }, [module.id, engine, updateParam])
@@ -1497,7 +1498,7 @@ function SidPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module
     const preset = SID_PRESETS.find(p => p.id === presetId)
     if (!preset || !preset.file) return
     try {
-      const response = await fetch(`/sid/${preset.file}`)
+      const response = await fetch(`${import.meta.env.BASE_URL}sid/${preset.file}`)
       const arrayBuffer = await response.arrayBuffer()
       loadSidData(new Uint8Array(arrayBuffer))
     } catch (err) {

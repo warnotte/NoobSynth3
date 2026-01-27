@@ -125,7 +125,7 @@ export async function loadMidiPreset(presetId: string): Promise<MidiFileData> {
   const preset = manifest.presets.find(p => p.id === presetId)
   const fileName = preset?.file ?? `${presetId}.mid`
 
-  const response = await fetch(`/midi-presets/${fileName}`)
+  const response = await fetch(`${import.meta.env.BASE_URL}midi-presets/${fileName}`)
   if (!response.ok) {
     throw new Error(`Failed to load MIDI preset: ${presetId}`)
   }
@@ -155,7 +155,7 @@ export type MidiPresetManifest = {
  */
 export async function loadMidiPresetManifest(): Promise<MidiPresetManifest> {
   try {
-    const response = await fetch('/midi-presets/manifest.json')
+    const response = await fetch(`${import.meta.env.BASE_URL}midi-presets/manifest.json`)
     if (!response.ok) {
       return { version: 1, presets: [] }
     }
