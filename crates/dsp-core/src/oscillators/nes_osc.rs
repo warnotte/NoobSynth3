@@ -52,6 +52,8 @@ pub struct NesOscParams<'a> {
 pub struct NesOscInputs<'a> {
     /// Pitch CV (1V/octave)
     pub pitch: Option<&'a [Sample]>,
+    /// Waveform CV (0=pulse, 1=pulse2, 2=triangle, 3=noise) — overrides mode param when connected
+    pub wave_cv: Option<&'a [Sample]>,
 }
 
 impl NesOsc {
@@ -121,7 +123,11 @@ impl NesOsc {
             let freq = base * (2.0_f32).powf(pitch_cv + fine_cents / 1200.0);
             let freq = freq.clamp(20.0, 20000.0);
             let vol = sample_at(params.volume, i, 1.0).clamp(0.0, 1.0);
-            let mode_val = sample_at(params.mode, i, 0.0) as u8;
+            let mode_val = if let Some(wcv) = inputs.wave_cv {
+                sample_at(wcv, i, 0.0).round().clamp(0.0, 3.0) as u8
+            } else {
+                sample_at(params.mode, i, 0.0) as u8
+            };
             let duty_val = sample_at(params.duty, i, 1.0) as u8;
             let noise_loop = sample_at(params.noise_mode, i, 0.0) >= 0.5;
             let crush = sample_at(params.bitcrush, i, 1.0).clamp(0.0, 1.0);

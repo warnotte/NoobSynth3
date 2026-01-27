@@ -2882,6 +2882,18 @@
   align-items: center;
 }
 
+.sid-format-badge {
+  font-size: 8px;
+  font-weight: bold;
+  padding: 1px 4px;
+  border-radius: 3px;
+  margin-left: 6px;
+  flex-shrink: 0;
+  background: rgba(74, 111, 165, 0.3);
+  color: #7ab8e0;
+  border: 1px solid rgba(74, 111, 165, 0.5);
+}
+
 .sid-elapsed {
   color: #4a9fcf;
   font-size: 10px;

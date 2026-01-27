@@ -750,6 +750,7 @@ pub(crate) fn process_module(
         }
         ModuleState::NesOsc(state) => {
             let pitch = if connections[0].is_empty() { None } else { Some(inputs[0].channel(0)) };
+            let wave_cv = if connections[1].is_empty() { None } else { Some(inputs[1].channel(0)) };
             let params = NesOscParams {
                 base_freq: state.base_freq.slice(frames),
                 fine: state.fine.slice(frames),
@@ -759,12 +760,13 @@ pub(crate) fn process_module(
                 noise_mode: state.noise_mode.slice(frames),
                 bitcrush: state.bitcrush.slice(frames),
             };
-            let nes_inputs = NesOscInputs { pitch };
+            let nes_inputs = NesOscInputs { pitch, wave_cv };
             let output = outputs[0].channel_mut(0);
             state.nes_osc.process_block(output, nes_inputs, params);
         }
         ModuleState::SnesOsc(state) => {
             let pitch = if connections[0].is_empty() { None } else { Some(inputs[0].channel(0)) };
+            let wave_cv = if connections[1].is_empty() { None } else { Some(inputs[1].channel(0)) };
             let params = SnesOscParams {
                 base_freq: state.base_freq.slice(frames),
                 fine: state.fine.slice(frames),
@@ -774,7 +776,7 @@ pub(crate) fn process_module(
                 color: state.color.slice(frames),
                 lofi: state.lofi.slice(frames),
             };
-            let snes_inputs = SnesOscInputs { pitch };
+            let snes_inputs = SnesOscInputs { pitch, wave_cv };
             let output = outputs[0].channel_mut(0);
             state.snes_osc.process_block(output, snes_inputs, params);
         }
@@ -1697,10 +1699,53 @@ pub(crate) fn process_module(
                 chip_model: state.chip_model.slice(frames),
             };
 
-            // Stereo output
-            let (out_l, out_r) = outputs[0].channels_mut_2();
-            let sid_outputs = SidPlayerOutputs { left: out_l, right: out_r };
+            const SID_BUF_SIZE: usize = 1024;
+            let safe_frames = frames.min(SID_BUF_SIZE);
+
+            let mut buf_left: [Sample; SID_BUF_SIZE] = [0.0; SID_BUF_SIZE];
+            let mut buf_right: [Sample; SID_BUF_SIZE] = [0.0; SID_BUF_SIZE];
+            let mut buf_gate1: [Sample; SID_BUF_SIZE] = [0.0; SID_BUF_SIZE];
+            let mut buf_gate2: [Sample; SID_BUF_SIZE] = [0.0; SID_BUF_SIZE];
+            let mut buf_gate3: [Sample; SID_BUF_SIZE] = [0.0; SID_BUF_SIZE];
+            let mut buf_cv1: [Sample; SID_BUF_SIZE] = [0.0; SID_BUF_SIZE];
+            let mut buf_cv2: [Sample; SID_BUF_SIZE] = [0.0; SID_BUF_SIZE];
+            let mut buf_cv3: [Sample; SID_BUF_SIZE] = [0.0; SID_BUF_SIZE];
+            let mut buf_wf1: [Sample; SID_BUF_SIZE] = [0.0; SID_BUF_SIZE];
+            let mut buf_wf2: [Sample; SID_BUF_SIZE] = [0.0; SID_BUF_SIZE];
+            let mut buf_wf3: [Sample; SID_BUF_SIZE] = [0.0; SID_BUF_SIZE];
+
+            let sid_outputs = SidPlayerOutputs {
+                left: &mut buf_left[..safe_frames],
+                right: &mut buf_right[..safe_frames],
+                gate1: &mut buf_gate1[..safe_frames],
+                gate2: &mut buf_gate2[..safe_frames],
+                gate3: &mut buf_gate3[..safe_frames],
+                cv1: &mut buf_cv1[..safe_frames],
+                cv2: &mut buf_cv2[..safe_frames],
+                cv3: &mut buf_cv3[..safe_frames],
+                wf1: &mut buf_wf1[..safe_frames],
+                wf2: &mut buf_wf2[..safe_frames],
+                wf3: &mut buf_wf3[..safe_frames],
+            };
             state.sid_player.process_block(sid_outputs, sid_inputs, params);
+
+            // Copy stereo audio output
+            let (out_l, out_r) = outputs[0].channels_mut_2();
+            out_l[..safe_frames].copy_from_slice(&buf_left[..safe_frames]);
+            out_r[..safe_frames].copy_from_slice(&buf_right[..safe_frames]);
+
+            // Copy voice gate/CV outputs
+            outputs[1].channel_mut(0)[..safe_frames].copy_from_slice(&buf_gate1[..safe_frames]);
+            outputs[2].channel_mut(0)[..safe_frames].copy_from_slice(&buf_gate2[..safe_frames]);
+            outputs[3].channel_mut(0)[..safe_frames].copy_from_slice(&buf_gate3[..safe_frames]);
+            outputs[4].channel_mut(0)[..safe_frames].copy_from_slice(&buf_cv1[..safe_frames]);
+            outputs[5].channel_mut(0)[..safe_frames].copy_from_slice(&buf_cv2[..safe_frames]);
+            outputs[6].channel_mut(0)[..safe_frames].copy_from_slice(&buf_cv3[..safe_frames]);
+
+            // Copy voice waveform CV outputs
+            outputs[7].channel_mut(0)[..safe_frames].copy_from_slice(&buf_wf1[..safe_frames]);
+            outputs[8].channel_mut(0)[..safe_frames].copy_from_slice(&buf_wf2[..safe_frames]);
+            outputs[9].channel_mut(0)[..safe_frames].copy_from_slice(&buf_wf3[..safe_frames]);
         }
         ModuleState::Notes => {
             // UI-only module, no audio processing

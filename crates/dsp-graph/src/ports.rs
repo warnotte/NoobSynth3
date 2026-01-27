@@ -75,8 +75,14 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // pitch input
       PortInfo { channels: 1 },  // gate input
     ],
-    ModuleType::NesOsc => vec![PortInfo { channels: 1 }],  // pitch input
-    ModuleType::SnesOsc => vec![PortInfo { channels: 1 }],  // pitch input
+    ModuleType::NesOsc => vec![
+      PortInfo { channels: 1 },  // pitch input
+      PortInfo { channels: 1 },  // wave-cv input
+    ],
+    ModuleType::SnesOsc => vec![
+      PortInfo { channels: 1 },  // pitch input
+      PortInfo { channels: 1 },  // wave-cv input
+    ],
     ModuleType::AudioIn => vec![],
     ModuleType::Vocoder => vec![PortInfo { channels: 1 }, PortInfo { channels: 1 }],
     ModuleType::Control => vec![],
@@ -398,9 +404,18 @@ pub fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
     ModuleType::Granular => vec![
       PortInfo { channels: 2 },  // stereo out
     ],
-    // SidPlayer - 1 stereo output
+    // SidPlayer - 1 stereo output + 3 gates + 3 CVs + 3 waveform CVs
     ModuleType::SidPlayer => vec![
       PortInfo { channels: 2 },  // stereo audio out
+      PortInfo { channels: 1 },  // gate-1
+      PortInfo { channels: 1 },  // gate-2
+      PortInfo { channels: 1 },  // gate-3
+      PortInfo { channels: 1 },  // cv-1
+      PortInfo { channels: 1 },  // cv-2
+      PortInfo { channels: 1 },  // cv-3
+      PortInfo { channels: 1 },  // wf-1
+      PortInfo { channels: 1 },  // wf-2
+      PortInfo { channels: 1 },  // wf-3
     ],
   }
 }
@@ -538,10 +553,12 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
     },
     ModuleType::NesOsc => match port_id {
       "pitch" => Some(0),
+      "wave-cv" => Some(1),
       _ => None,
     },
     ModuleType::SnesOsc => match port_id {
       "pitch" => Some(0),
+      "wave-cv" => Some(1),
       _ => None,
     },
     ModuleType::Vocoder => match port_id {
@@ -991,9 +1008,18 @@ pub fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize
       "out" | "output" => Some(0),
       _ => None,
     },
-    // SidPlayer - 1 stereo output
+    // SidPlayer - 1 stereo output + 3 gates + 3 CVs + 3 waveform CVs
     ModuleType::SidPlayer => match port_id {
       "out" | "output" | "audio" => Some(0),
+      "gate-1" => Some(1),
+      "gate-2" => Some(2),
+      "gate-3" => Some(3),
+      "cv-1" => Some(4),
+      "cv-2" => Some(5),
+      "cv-3" => Some(6),
+      "wf-1" => Some(7),
+      "wf-2" => Some(8),
+      "wf-3" => Some(9),
       _ => None,
     },
   }

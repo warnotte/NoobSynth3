@@ -111,6 +111,8 @@ pub struct SnesOscParams<'a> {
 pub struct SnesOscInputs<'a> {
     /// Pitch CV (1V/octave)
     pub pitch: Option<&'a [Sample]>,
+    /// Waveform CV (0=SQR, 1=SAW, 2=STR, 3=SYN) — overrides wave param when connected
+    pub wave_cv: Option<&'a [Sample]>,
 }
 
 impl SnesOsc {
@@ -154,7 +156,19 @@ impl SnesOsc {
             let freq = base * (2.0_f32).powf(pitch_cv + fine_cents / 1200.0);
             let freq = freq.clamp(20.0, 20000.0);
             let vol = sample_at(params.volume, i, 1.0).clamp(0.0, 1.0);
-            let wave_idx = (sample_at(params.wave, i, 0.0) as usize).min(7);
+            let wave_idx = if let Some(wcv) = inputs.wave_cv {
+                let cv = sample_at(wcv, i, 0.0).round() as i32;
+                // Map SID encoding: 0=pulse→SQR, 1=saw→SAW, 2=tri→STR, 3=noise→SYN
+                match cv {
+                    0 => 0, // SQR
+                    1 => 1, // SAW
+                    2 => 2, // STR
+                    3 => 7, // SYN
+                    _ => (cv.clamp(0, 7)) as usize,
+                }
+            } else {
+                (sample_at(params.wave, i, 0.0) as usize).min(7)
+            };
             let gauss_amt = sample_at(params.gauss, i, 0.7).clamp(0.0, 1.0);
             let color_amt = sample_at(params.color, i, 0.5).clamp(0.0, 1.0);
             let lofi_amt = sample_at(params.lofi, i, 0.5).clamp(0.0, 1.0);

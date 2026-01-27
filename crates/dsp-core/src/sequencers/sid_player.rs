@@ -593,6 +593,9 @@ pub struct SidPlayer {
     frame_cycle_accumulator: u32, // Cycles accumulated for play routine calls
     cycles_per_sample: f64,
 
+    // Persistent CPU state across IRQ calls (RSID needs this)
+    irq_sp: u8,
+
     // Play state
     playing: bool,
     initialized: bool,
@@ -621,6 +624,52 @@ pub struct SidPlayerOutputs<'a> {
     pub left: &'a mut [Sample],
     /// Right audio output
     pub right: &'a mut [Sample],
+    /// Voice 1 gate output (0.0 or 1.0)
+    pub gate1: &'a mut [Sample],
+    /// Voice 2 gate output (0.0 or 1.0)
+    pub gate2: &'a mut [Sample],
+    /// Voice 3 gate output (0.0 or 1.0)
+    pub gate3: &'a mut [Sample],
+    /// Voice 1 pitch CV output (V/Oct, C4 = 0V)
+    pub cv1: &'a mut [Sample],
+    /// Voice 2 pitch CV output (V/Oct, C4 = 0V)
+    pub cv2: &'a mut [Sample],
+    /// Voice 3 pitch CV output (V/Oct, C4 = 0V)
+    pub cv3: &'a mut [Sample],
+    /// Voice 1 waveform CV output (0=pulse, 1=saw, 2=tri, 3=noise)
+    pub wf1: &'a mut [Sample],
+    /// Voice 2 waveform CV output (0=pulse, 1=saw, 2=tri, 3=noise)
+    pub wf2: &'a mut [Sample],
+    /// Voice 3 waveform CV output (0=pulse, 1=saw, 2=tri, 3=noise)
+    pub wf3: &'a mut [Sample],
+}
+
+/// Convert SID frequency register to V/Oct CV (C4 = 0V)
+#[inline]
+fn sid_freq_to_cv(freq_reg: u16, clock_freq: f64) -> Sample {
+    if freq_reg == 0 {
+        return -5.0;
+    }
+    let freq_hz = (freq_reg as f64) * clock_freq / 16777216.0;
+    (freq_hz / 261.63).log2() as f32
+}
+
+/// Convert SID waveform bits (bits 4-7 of control register) to CV.
+/// Priority if multiple bits set: noise > pulse > saw > tri.
+/// Output: 0.0=pulse, 1.0=saw, 2.0=tri, 3.0=noise
+#[inline]
+fn sid_waveform_to_cv(waveform_bits: u8) -> Sample {
+    if waveform_bits & 0x08 != 0 {
+        3.0 // noise (bit 7 of control = bit 3 of waveform nibble)
+    } else if waveform_bits & 0x04 != 0 {
+        0.0 // pulse (bit 6 of control = bit 2 of waveform nibble)
+    } else if waveform_bits & 0x02 != 0 {
+        1.0 // sawtooth (bit 5 of control = bit 1 of waveform nibble)
+    } else if waveform_bits & 0x01 != 0 {
+        2.0 // triangle (bit 4 of control = bit 0 of waveform nibble)
+    } else {
+        0.0 // silence/none
+    }
 }
 
 impl SidPlayer {
@@ -654,6 +703,7 @@ impl SidPlayer {
             cycle_accumulator: 0.0,
             frame_cycle_accumulator: 0,
             cycles_per_sample: C64_CLOCK_PAL as f64 / sample_rate as f64,
+            irq_sp: 0xFF,
             playing: false,
             initialized: false,
             current_chip_model: 0,
@@ -783,9 +833,10 @@ impl SidPlayer {
         }
         self.memory.clear_sid_writes();
 
-        // Reset timing for clean playback
+        // Reset timing and CPU state for clean playback
         self.cycle_accumulator = 0.0;
         self.frame_cycle_accumulator = 0;
+        self.irq_sp = 0xFF;
         self.initialized = true;
     }
 
@@ -878,6 +929,15 @@ impl SidPlayer {
             for i in 0..block_size {
                 outputs.left[i] = 0.0;
                 outputs.right[i] = 0.0;
+                outputs.gate1[i] = 0.0;
+                outputs.gate2[i] = 0.0;
+                outputs.gate3[i] = 0.0;
+                outputs.cv1[i] = 0.0;
+                outputs.cv2[i] = 0.0;
+                outputs.cv3[i] = 0.0;
+                outputs.wf1[i] = 0.0;
+                outputs.wf2[i] = 0.0;
+                outputs.wf3[i] = 0.0;
             }
             return;
         }
@@ -885,6 +945,7 @@ impl SidPlayer {
         // Process audio
         // We need to interleave CPU execution with SID sampling
         let is_rsid = self.header.is_rsid;
+        let clock_freq = if self.header.is_pal { C64_CLOCK_PAL } else { C64_CLOCK_NTSC } as f64;
 
         for i in 0..block_size {
             // Accumulate cycles for this sample
@@ -901,7 +962,10 @@ impl SidPlayer {
                     self.memory.vic.tick(cycles_to_run);
 
                     // Check for IRQ from either CIA or VIC
-                    if self.memory.cia1.take_irq() || self.memory.vic.take_irq() {
+                    // Both must be evaluated — short-circuit would skip VIC acknowledgment
+                    let cia_irq = self.memory.cia1.take_irq();
+                    let vic_irq = self.memory.vic.take_irq();
+                    if cia_irq || vic_irq {
                         self.call_irq();
                     }
                 } else {
@@ -911,6 +975,11 @@ impl SidPlayer {
                         self.frame_cycle_accumulator -= self.cycles_per_frame;
                         self.call_play();
                     }
+
+                    // Tick timers even in PSID mode — some tunes read CIA
+                    // registers for RNG or noise waveform generation
+                    self.memory.cia1.tick(cycles_to_run);
+                    self.memory.vic.tick(cycles_to_run);
                 }
 
                 // Apply any pending SID writes (from init or play)
@@ -930,6 +999,23 @@ impl SidPlayer {
 
             outputs.left[i] = normalized;
             outputs.right[i] = normalized; // SID is mono
+
+            // Output voice gate and CV
+            let v0 = self.memory.get_voice_state(0);
+            let v1 = self.memory.get_voice_state(1);
+            let v2 = self.memory.get_voice_state(2);
+
+            outputs.gate1[i] = if v0.gate { 1.0 } else { 0.0 };
+            outputs.gate2[i] = if v1.gate { 1.0 } else { 0.0 };
+            outputs.gate3[i] = if v2.gate { 1.0 } else { 0.0 };
+
+            outputs.cv1[i] = sid_freq_to_cv(v0.frequency, clock_freq);
+            outputs.cv2[i] = sid_freq_to_cv(v1.frequency, clock_freq);
+            outputs.cv3[i] = sid_freq_to_cv(v2.frequency, clock_freq);
+
+            outputs.wf1[i] = sid_waveform_to_cv(v0.waveform);
+            outputs.wf2[i] = sid_waveform_to_cv(v1.waveform);
+            outputs.wf3[i] = sid_waveform_to_cv(v2.waveform);
         }
     }
 
@@ -970,17 +1056,16 @@ impl SidPlayer {
 
     /// Handle IRQ for RSID files
     fn call_irq(&mut self) {
-        // Save timing state before running IRQ handler
+        // Save VIC timing state — the CPU clone doesn't tick VIC/CIA,
+        // so we must preserve external timing counters.
+        // CIA timers are NOT saved: the 6502 IRQ handler may reprogram
+        // them (e.g. Hülsbeck's dynamic timer modulation in Giana Sisters).
         let vic_cycle_counter = self.memory.vic.cycle_counter;
         let vic_raster_line = self.memory.vic.raster_line;
-        let cia_timer_a = self.memory.cia1.timer_a;
-        let cia_timer_b = self.memory.cia1.timer_b;
 
-        // Create CPU and trigger IRQ handler
+        // Create CPU with current memory, preserve stack pointer across calls
         let mut cpu: CPU<C64Memory, Nmos6502> = CPU::new(self.memory.clone(), Nmos6502);
-
-        // Set up CPU state for IRQ
-        cpu.registers.stack_pointer = StackPointer(0xFF);
+        cpu.registers.stack_pointer = StackPointer(self.irq_sp);
 
         // Push return address and status for RTI
         // We want to return to $1000 after RTI
@@ -1008,14 +1093,15 @@ impl SidPlayer {
             }
         }
 
-        // Get memory back with IRQ handler's register changes
+        // Persist stack pointer for next IRQ call
+        self.irq_sp = cpu.registers.stack_pointer.0;
+
+        // Get memory back — CIA timer modifications by the 6502 are preserved
         self.memory = cpu.memory.clone();
 
-        // Restore timing state (cycle counters should continue from where we left off)
+        // Restore only VIC timing (external counters not ticked by CPU clone)
         self.memory.vic.cycle_counter = vic_cycle_counter;
         self.memory.vic.raster_line = vic_raster_line;
-        self.memory.cia1.timer_a = cia_timer_a;
-        self.memory.cia1.timer_b = cia_timer_b;
     }
 }
 

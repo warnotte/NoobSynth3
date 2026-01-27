@@ -1418,6 +1418,22 @@ const SID_PRESETS = [
   { id: 'ghostsngoblins', label: "Ghosts'n Goblins", file: 'Ghosts_n_Goblins.sid' },
   { id: 'spellbound', label: 'Spellbound', file: 'Spellbound.sid' },
   { id: 'ikari', label: 'Ikari Union', file: 'Ikari_Union.sid' },
+  // RSID files (require full C64 hardware emulation)
+  { id: 'giana', label: 'Great Giana Sisters (RSID)', file: 'Great_Giana_Sisters.sid' },
+  { id: 'arkanoid', label: 'Arkanoid (RSID)', file: 'Arkanoid.sid' },
+  { id: 'combatschool', label: 'Combat School (RSID)', file: 'Combat_School.sid' },
+  { id: 'crockets', label: "Crocket's Mix (RSID)", file: 'Crockets_Mix.sid' },
+  { id: 'dexion', label: 'Dexion Demo (RSID)', file: 'Dexion_Demo.sid' },
+  { id: 'druid2', label: 'Enlightenment / Druid II (RSID)', file: 'Enlightenment_Druid_II.sid' },
+  { id: 'iball', label: 'I-Ball (RSID)', file: 'I-Ball.sid' },
+  { id: 'lastv8', label: 'Last V8 (RSID)', file: 'Last_V8.sid' },
+  { id: 'ricochet', label: 'Ricochet (RSID)', file: 'Ricochet.sid' },
+  { id: 'robocop', label: 'RoboCop (RSID)', file: 'RoboCop.sid' },
+  { id: 'rockystar', label: 'Rocky Star (RSID)', file: 'Rocky_Star.sid' },
+  { id: 'savage', label: 'Savage (RSID)', file: 'Savage.sid' },
+  { id: 'skateordie', label: 'Skate or Die (RSID)', file: 'Skate_or_Die_intro.sid' },
+  { id: 'stormlord', label: 'Stormlord (RSID)', file: 'Stormlord.sid' },
+  { id: 'explodingfist', label: 'Way of the Exploding Fist (RSID)', file: 'Way_of_the_Exploding_Fist.sid' },
 ]
 
 // Voice state type for SID visualization
@@ -1448,29 +1464,29 @@ function SidPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module
   const playing = module.params.playing === 1 || module.params.playing === true
   const song = Number(module.params.song ?? 1)
   const chipModel = Number(module.params.chipModel ?? 0)
-  const [sidInfo, setSidInfo] = useState<{ name: string; author: string; songs: number } | null>(null)
+  const [sidInfo, setSidInfo] = useState<{ name: string; author: string; songs: number; isRsid: boolean } | null>(null)
   const [voices, setVoices] = useState<SidVoiceState[]>([
     { freq: 0, gate: false, waveform: 0 },
     { freq: 0, gate: false, waveform: 0 },
     { freq: 0, gate: false, waveform: 0 },
   ])
   const [elapsed, setElapsed] = useState(0)
-  const playStartRef = useRef<number | null>(null)
+  const playStartRef = useRef<number>(Date.now())
+  const [loadGen, setLoadGen] = useState(0)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // Elapsed time counter
+  // Elapsed time counter — restarts on play or new file load
   useEffect(() => {
     if (playing) {
-      if (!playStartRef.current) {
-        playStartRef.current = Date.now() - elapsed * 1000
-      }
+      playStartRef.current = Date.now()
+      setElapsed(0)
       const interval = setInterval(() => {
-        setElapsed(Math.floor((Date.now() - playStartRef.current!) / 1000))
+        setElapsed(Math.floor((Date.now() - playStartRef.current) / 1000))
       }, 500)
       return () => clearInterval(interval)
     }
-    playStartRef.current = null
-  }, [playing]) // eslint-disable-line react-hooks/exhaustive-deps
+    setElapsed(0)
+  }, [playing, loadGen])
 
   // Subscribe to voice state updates
   useEffect(() => {
@@ -1500,9 +1516,8 @@ function SidPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module
 
         // Reset song and timer BEFORE loading to avoid stale state
         updateParam(module.id, 'song', startSong || 1)
-        setElapsed(0)
-        playStartRef.current = playing ? Date.now() : null
-        setSidInfo({ name, author, songs })
+        setLoadGen(g => g + 1)
+        setSidInfo({ name, author, songs, isRsid: magic === 'RSID' })
         engine.loadSidFile(module.id, data)
       }
     }
@@ -1537,6 +1552,7 @@ function SidPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module
         <div className="sid-title">{sidInfo?.name || 'No file loaded'}</div>
         <div className="sid-author">
           {sidInfo?.author || ''}
+          {sidInfo && <span className="sid-format-badge">{sidInfo.isRsid ? 'RSID' : 'PSID'}</span>}
           {playing && <span className="sid-elapsed">{formatElapsed(elapsed)}</span>}
         </div>
       </div>

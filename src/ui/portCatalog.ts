@@ -190,8 +190,20 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
     ],
     outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
   },
-  'nes-osc': pitchToAudio(),
-  'snes-osc': pitchToAudio(),
+  'nes-osc': {
+    inputs: [
+      { id: 'pitch', label: 'Pitch', kind: 'cv', direction: 'in' },
+      { id: 'wave-cv', label: 'Wave', kind: 'cv', direction: 'in' },
+    ],
+    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
+  },
+  'snes-osc': {
+    inputs: [
+      { id: 'pitch', label: 'Pitch', kind: 'cv', direction: 'in' },
+      { id: 'wave-cv', label: 'Wave', kind: 'cv', direction: 'in' },
+    ],
+    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
+  },
   lfo: {
     inputs: [
       { id: 'rate', label: 'Rate', kind: 'cv', direction: 'in' },
@@ -503,6 +515,15 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
     ],
     outputs: [
       { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
+      { id: 'gate-1', label: 'G1', kind: 'gate', direction: 'out' },
+      { id: 'gate-2', label: 'G2', kind: 'gate', direction: 'out' },
+      { id: 'gate-3', label: 'G3', kind: 'gate', direction: 'out' },
+      { id: 'cv-1', label: 'CV1', kind: 'cv', direction: 'out' },
+      { id: 'cv-2', label: 'CV2', kind: 'cv', direction: 'out' },
+      { id: 'cv-3', label: 'CV3', kind: 'cv', direction: 'out' },
+      { id: 'wf-1', label: 'WF1', kind: 'cv', direction: 'out' },
+      { id: 'wf-2', label: 'WF2', kind: 'cv', direction: 'out' },
+      { id: 'wf-3', label: 'WF3', kind: 'cv', direction: 'out' },
     ],
   },
 }

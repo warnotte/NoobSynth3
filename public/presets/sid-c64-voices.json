@@ -1,0 +1,277 @@
+{
+  "id": "sid-c64-voices",
+  "name": "SID C64 Voices",
+  "description": "SID Player CV/Gate outputs drive 3 SNES oscillators for re-synthesized C64 music.",
+  "graph": {
+    "modules": [
+      {
+        "id": "sid-1",
+        "type": "sid-player",
+        "name": "SID Player",
+        "position": { "col": 1, "row": 1 },
+        "params": {
+          "playing": 1,
+          "song": 1,
+          "chipModel": 0
+        }
+      },
+      {
+        "id": "snes-1",
+        "type": "snes-osc",
+        "name": "Voice 1",
+        "position": { "col": 5, "row": 1 },
+        "params": {
+          "frequency": 440,
+          "volume": 0.8,
+          "wave": 1,
+          "gauss": 1,
+          "color": 0.5,
+          "lofi": 0
+        }
+      },
+      {
+        "id": "adsr-1",
+        "type": "adsr",
+        "name": "Env 1",
+        "position": { "col": 8, "row": 1 },
+        "params": {
+          "attack": 0.005,
+          "decay": 0.1,
+          "sustain": 0.9,
+          "release": 0.05
+        }
+      },
+      {
+        "id": "gain-1",
+        "type": "gain",
+        "name": "VCA 1",
+        "position": { "col": 10, "row": 1 },
+        "params": {
+          "gain": 0.7
+        }
+      },
+      {
+        "id": "snes-2",
+        "type": "snes-osc",
+        "name": "Voice 2",
+        "position": { "col": 5, "row": 4 },
+        "params": {
+          "frequency": 440,
+          "volume": 0.8,
+          "wave": 2,
+          "gauss": 1,
+          "color": 0.5,
+          "lofi": 0
+        }
+      },
+      {
+        "id": "adsr-2",
+        "type": "adsr",
+        "name": "Env 2",
+        "position": { "col": 8, "row": 4 },
+        "params": {
+          "attack": 0.005,
+          "decay": 0.1,
+          "sustain": 0.9,
+          "release": 0.05
+        }
+      },
+      {
+        "id": "gain-2",
+        "type": "gain",
+        "name": "VCA 2",
+        "position": { "col": 10, "row": 4 },
+        "params": {
+          "gain": 0.7
+        }
+      },
+      {
+        "id": "snes-3",
+        "type": "snes-osc",
+        "name": "Voice 3",
+        "position": { "col": 5, "row": 7 },
+        "params": {
+          "frequency": 440,
+          "volume": 0.8,
+          "wave": 3,
+          "gauss": 1,
+          "color": 0.5,
+          "lofi": 0
+        }
+      },
+      {
+        "id": "adsr-3",
+        "type": "adsr",
+        "name": "Env 3",
+        "position": { "col": 8, "row": 7 },
+        "params": {
+          "attack": 0.005,
+          "decay": 0.1,
+          "sustain": 0.9,
+          "release": 0.05
+        }
+      },
+      {
+        "id": "gain-3",
+        "type": "gain",
+        "name": "VCA 3",
+        "position": { "col": 10, "row": 7 },
+        "params": {
+          "gain": 0.7
+        }
+      },
+      {
+        "id": "mixer-1",
+        "type": "mixer-8",
+        "name": "Mixer",
+        "position": { "col": 13, "row": 1 },
+        "params": {
+          "level1": 0.7,
+          "level2": 0.7,
+          "level3": 0.7,
+          "level4": 0,
+          "level5": 0,
+          "level6": 0,
+          "level7": 0,
+          "level8": 0
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "col": 16, "row": 1 },
+        "params": {
+          "time": 0.4,
+          "damp": 0.5,
+          "pre_delay": 10,
+          "mix": 0.2
+        }
+      },
+      {
+        "id": "output-1",
+        "type": "output",
+        "name": "Output",
+        "position": { "col": 19, "row": 1 },
+        "params": {
+          "level": 1
+        }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "col": 13, "row": 5 },
+        "params": {
+          "text": "SID C64 VOICES\n\nRe-synthesize C64 music!\nSID Player extracts CV/Gate and waveform type\nfrom each of the 3 SID voices.\n\n- CV1-3: Pitch (V/Oct)\n- G1-3: Gate (on/off)\n- WF1-3: Waveform CV (auto-selects SNES wave)\n\nWaveform mapping:\n  Pulse→SQR, Saw→SAW, Tri→STR, Noise→SYN\n\n1. Load a .sid file in the SID Player\n2. Press Play — SNES waves follow SID waveforms\n3. Disconnect wave-cv to pick waves manually"
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "sid-1", "portId": "cv-1" },
+        "to": { "moduleId": "snes-1", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "sid-1", "portId": "wf-1" },
+        "to": { "moduleId": "snes-1", "portId": "wave-cv" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "sid-1", "portId": "gate-1" },
+        "to": { "moduleId": "adsr-1", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "snes-1", "portId": "out" },
+        "to": { "moduleId": "gain-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "adsr-1", "portId": "env" },
+        "to": { "moduleId": "gain-1", "portId": "cv" },
+        "kind": "cv"
+      },
+
+      {
+        "from": { "moduleId": "sid-1", "portId": "cv-2" },
+        "to": { "moduleId": "snes-2", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "sid-1", "portId": "wf-2" },
+        "to": { "moduleId": "snes-2", "portId": "wave-cv" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "sid-1", "portId": "gate-2" },
+        "to": { "moduleId": "adsr-2", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "snes-2", "portId": "out" },
+        "to": { "moduleId": "gain-2", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "adsr-2", "portId": "env" },
+        "to": { "moduleId": "gain-2", "portId": "cv" },
+        "kind": "cv"
+      },
+
+      {
+        "from": { "moduleId": "sid-1", "portId": "cv-3" },
+        "to": { "moduleId": "snes-3", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "sid-1", "portId": "wf-3" },
+        "to": { "moduleId": "snes-3", "portId": "wave-cv" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "sid-1", "portId": "gate-3" },
+        "to": { "moduleId": "adsr-3", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "snes-3", "portId": "out" },
+        "to": { "moduleId": "gain-3", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "adsr-3", "portId": "env" },
+        "to": { "moduleId": "gain-3", "portId": "cv" },
+        "kind": "cv"
+      },
+
+      {
+        "from": { "moduleId": "gain-1", "portId": "out" },
+        "to": { "moduleId": "mixer-1", "portId": "in-1" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "gain-2", "portId": "out" },
+        "to": { "moduleId": "mixer-1", "portId": "in-2" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "gain-3", "portId": "out" },
+        "to": { "moduleId": "mixer-1", "portId": "in-3" },
+        "kind": "audio"
+      },
+
+      {
+        "from": { "moduleId": "mixer-1", "portId": "out" },
+        "to": { "moduleId": "reverb-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb-1", "portId": "out" },
+        "to": { "moduleId": "output-1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

@@ -301,6 +301,33 @@ Presets stockés dans `public/presets/` avec structure:
 
 Groupes existants: Basics, Leads, Bass, Pads, FX, Drums, 8-Bit, Experimental, Shepard, Drones, Wavetable
 
+### Connection Format (IMPORTANT)
+
+Chaque connexion utilise des objets imbriqués `from`/`to` avec `moduleId` et `portId`, plus un champ `kind` :
+
+```json
+{
+  "from": { "moduleId": "source-module-id", "portId": "source-port-id" },
+  "to": { "moduleId": "target-module-id", "portId": "target-port-id" },
+  "kind": "audio"
+}
+```
+
+**Champs obligatoires :**
+- `from.moduleId` / `to.moduleId` : L'`id` du module source/cible
+- `from.portId` / `to.portId` : L'`id` du port (tel que défini dans `portCatalog.ts`)
+- `kind` : Type de connexion — `"audio"`, `"cv"`, `"gate"`, ou `"sync"`
+
+**Exemples :**
+```json
+{ "from": { "moduleId": "osc-1", "portId": "out" }, "to": { "moduleId": "vcf-1", "portId": "in" }, "kind": "audio" },
+{ "from": { "moduleId": "lfo-1", "portId": "cv-out" }, "to": { "moduleId": "vcf-1", "portId": "mod" }, "kind": "cv" },
+{ "from": { "moduleId": "ctrl-1", "portId": "gate-out" }, "to": { "moduleId": "adsr-1", "portId": "gate" }, "kind": "gate" },
+{ "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "seq-1", "portId": "clock" }, "kind": "sync" }
+```
+
+**NE PAS utiliser le format plat** `{ "from": "id", "fromPort": "port" }` — ce format ne fonctionne pas.
+
 ### New Preset Checklist
 
 **IMPORTANT:** Lors de la création d'un nouveau preset, **TOUJOURS** :
@@ -429,6 +456,10 @@ Ces paramètres utilisent des **valeurs numériques** :
 | Accent non audible | CV lu en continu, pas latché | Ajout `latched_accent` |
 | Playhead UI désync | JS setInterval indépendant | Polling WASM `get_sequencer_step()` |
 | graphRef race condition | setState async vs ref sync | Update ref dans setGraph callback |
+| RSID IRQ short-circuit | `\|\|` empêchait l'acquittement VIC si CIA déjà true | Évaluer les deux `take_irq()` séparément |
+| RSID timer écrasement | `call_irq` restaurait CIA timers après exécution 6502 | Ne plus restaurer `timer_a`/`timer_b` — laisser les modifications du code persister |
+| RSID stack pointer reset | SP forcé à 0xFF à chaque IRQ, détruisant les données stack | SP persistant (`irq_sp`) dans la struct SidPlayer |
+| SID elapsed timer overflow | `playStartRef` null → `Date.now() - null` = epoch | Ref toujours `number`, reset via `loadGen` counter |
 
 ---
 
@@ -476,6 +507,7 @@ Ces paramètres utilisent des **valeurs numériques** :
 | VST Macros | Les édits UI ne modifient pas l'automation DAW |
 | WASM | `wasm-opt` désactivé (bulk memory mismatch); non optimisé |
 | **Mixers Mono** | Tous les mixers (mixer, mixer-1x2, mixer-8) sont mono. Les modules stéréo (Noise, Shepard, SpectralSwarm, Chorus, etc.) perdent leur stéréo en passant par un mixer. |
+| **RSID partiellement supporté** | Certains fichiers RSID (Great Giana Sisters, RoboCop) ne jouent pas correctement. L'émulation CPU 6502/CIA/VIC n'est pas assez précise pour les tunes RSID les plus exigeantes (timer modulation dynamique, échantillons digi). Les PSID fonctionnent tous. |
 
 ---
 

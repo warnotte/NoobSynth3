@@ -80,7 +80,7 @@ export const moduleSizes: Record<ModuleType, string> = {
   // Turing Machine
   'turing-machine': '2x4',
   // SID Player
-  'sid-player': '3x4',
+  'sid-player': '3x5',
 }
 
 export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>> = {

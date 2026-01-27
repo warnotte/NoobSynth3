@@ -1176,6 +1176,20 @@
       "description": "Simple SID Player for testing C64 .sid files. Supports PSID and RSID formats.",
       "file": "sid-player-test.json",
       "group": "8-Bit"
+    },
+    {
+      "id": "sid-c64-voices",
+      "name": "SID C64 Voices",
+      "description": "SID Player CV/Gate outputs drive 3 SNES oscillators for re-synthesized C64 music.",
+      "file": "sid-c64-voices.json",
+      "group": "8-Bit"
+    },
+    {
+      "id": "sid-c64-nes",
+      "name": "SID C64 NES Voices",
+      "description": "SID Player CV/Gate outputs drive 3 NES oscillators for chiptune C64 re-synthesis.",
+      "file": "sid-c64-nes.json",
+      "group": "8-Bit"
     }
   ]
 }
