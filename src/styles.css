@@ -2877,6 +2877,16 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sid-elapsed {
+  color: #4a9fcf;
+  font-size: 10px;
+  flex-shrink: 0;
+  margin-left: 6px;
 }
 
 .sid-songs {

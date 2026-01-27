@@ -1436,6 +1436,13 @@ const WAVEFORM_LABELS: Record<number, string> = {
   7: 'TSP',
 }
 
+// Format seconds to m:ss
+function formatElapsed(seconds: number): string {
+  const m = Math.floor(seconds / 60)
+  const s = Math.floor(seconds % 60)
+  return `${m}:${s.toString().padStart(2, '0')}`
+}
+
 // SID Player sub-component
 function SidPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module' | 'engine' | 'updateParam'>) {
   const playing = module.params.playing === 1 || module.params.playing === true
@@ -1447,7 +1454,23 @@ function SidPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module
     { freq: 0, gate: false, waveform: 0 },
     { freq: 0, gate: false, waveform: 0 },
   ])
+  const [elapsed, setElapsed] = useState(0)
+  const playStartRef = useRef<number | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Elapsed time counter
+  useEffect(() => {
+    if (playing) {
+      if (!playStartRef.current) {
+        playStartRef.current = Date.now() - elapsed * 1000
+      }
+      const interval = setInterval(() => {
+        setElapsed(Math.floor((Date.now() - playStartRef.current!) / 1000))
+      }, 500)
+      return () => clearInterval(interval)
+    }
+    playStartRef.current = null
+  }, [playing]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Subscribe to voice state updates
   useEffect(() => {
@@ -1475,8 +1498,10 @@ function SidPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module
         const name = decoder.decode(data.slice(0x16, 0x36)).replace(/\0+$/, '')
         const author = decoder.decode(data.slice(0x36, 0x56)).replace(/\0+$/, '')
 
-        // Reset song to 1 BEFORE loading to avoid stale state
+        // Reset song and timer BEFORE loading to avoid stale state
         updateParam(module.id, 'song', startSong || 1)
+        setElapsed(0)
+        playStartRef.current = playing ? Date.now() : null
         setSidInfo({ name, author, songs })
         engine.loadSidFile(module.id, data)
       }
@@ -1510,7 +1535,10 @@ function SidPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module
     <>
       <div className="sid-display">
         <div className="sid-title">{sidInfo?.name || 'No file loaded'}</div>
-        <div className="sid-author">{sidInfo?.author || ''}</div>
+        <div className="sid-author">
+          {sidInfo?.author || ''}
+          {playing && <span className="sid-elapsed">{formatElapsed(elapsed)}</span>}
+        </div>
       </div>
 
       <ControlBox label="Preset">
