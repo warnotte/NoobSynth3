@@ -7,7 +7,7 @@ use crate::common::{sample_at, Sample};
 use mos6502::cpu::CPU;
 use mos6502::memory::Bus;
 use mos6502::instruction::Nmos6502;
-use mos6502::registers::StackPointer;
+use mos6502::registers::{StackPointer, Status};
 use resid::{ChipModel, Sid, SamplingMethod};
 
 /// C64 PAL clock frequency (Hz)
@@ -193,41 +193,54 @@ impl Cia {
         }
     }
 
-    /// Tick the CIA timers by given number of cycles
+    /// Tick the CIA timers by given number of cycles.
+    /// Handles multiple underflows when cycles > timer value.
     pub fn tick(&mut self, cycles: u32) {
         // Timer A
         if self.timer_a_running {
-            let (new_val, overflow) = self.timer_a.overflowing_sub(cycles as u16);
-            if overflow || new_val == 0 {
-                // Timer underflowed
-                self.int_data |= 0x01; // Set Timer A interrupt flag
-                if self.int_mask & 0x01 != 0 {
-                    self.irq_pending = true;
+            let mut remaining = cycles;
+            while remaining > 0 {
+                let current_val = self.timer_a as u32;
+                if remaining > current_val {
+                    remaining -= current_val + 1;
+                    self.int_data |= 0x01;
+                    if self.int_mask & 0x01 != 0 {
+                        self.irq_pending = true;
+                    }
+                    if self.timer_a_oneshot {
+                        self.timer_a_running = false;
+                        self.timer_a = self.timer_a_latch;
+                        break;
+                    }
+                    self.timer_a = self.timer_a_latch;
+                } else {
+                    self.timer_a -= remaining as u16;
+                    remaining = 0;
                 }
-                if self.timer_a_oneshot {
-                    self.timer_a_running = false;
-                }
-                // Reload from latch
-                self.timer_a = self.timer_a_latch;
-            } else {
-                self.timer_a = new_val;
             }
         }
 
         // Timer B
         if self.timer_b_running {
-            let (new_val, overflow) = self.timer_b.overflowing_sub(cycles as u16);
-            if overflow || new_val == 0 {
-                self.int_data |= 0x02;
-                if self.int_mask & 0x02 != 0 {
-                    self.irq_pending = true;
+            let mut remaining = cycles;
+            while remaining > 0 {
+                let current_val = self.timer_b as u32;
+                if remaining > current_val {
+                    remaining -= current_val + 1;
+                    self.int_data |= 0x02;
+                    if self.int_mask & 0x02 != 0 {
+                        self.irq_pending = true;
+                    }
+                    if self.timer_b_oneshot {
+                        self.timer_b_running = false;
+                        self.timer_b = self.timer_b_latch;
+                        break;
+                    }
+                    self.timer_b = self.timer_b_latch;
+                } else {
+                    self.timer_b -= remaining as u16;
+                    remaining = 0;
                 }
-                if self.timer_b_oneshot {
-                    self.timer_b_running = false;
-                }
-                self.timer_b = self.timer_b_latch;
-            } else {
-                self.timer_b = new_val;
             }
         }
     }
@@ -418,30 +431,63 @@ impl C64Memory {
         self.ram[0x1004] = 0x40; // RTI (default, RSID will override $0314/$0315)
     }
 
-    /// Install RSID-compatible IRQ handling
+    /// Install RSID-compatible KERNAL stubs.
+    ///
+    /// RSID tunes contain original C64 machine code that expects real KERNAL
+    /// ROM routines at specific addresses. Without these stubs, a tune that
+    /// ends its IRQ handler with `JMP $EA31` jumps into zeros (BRK),
+    /// causing an infinite interrupt loop and crash.
+    ///
+    /// Real C64 IRQ flow:
+    ///   Hardware → $FFFE → $FF48: PHA/TXA/PHA/TYA/PHA, JMP ($0314)
+    ///   [user handler runs]
+    ///   JMP $EA31: PLA/TAY/PLA/TAX/PLA, RTI
     fn install_rsid_kernal(&mut self) {
-        // For RSID, we need the IRQ vector to jump through $0314/$0315
-        // This is the C64 kernal IRQ vector that RSID tunes expect
+        // === KERNAL IRQ entry at $FF48 (real C64 address) ===
+        // The 6502 hardware jumps here on IRQ (via $FFFE/$FFFF).
+        // Saves A/X/Y, then dispatches through user vector $0314/$0315.
+        self.ram[0xFF48] = 0x48; // PHA         — save A
+        self.ram[0xFF49] = 0x8A; // TXA         — A = X
+        self.ram[0xFF4A] = 0x48; // PHA         — save X
+        self.ram[0xFF4B] = 0x98; // TYA         — A = Y
+        self.ram[0xFF4C] = 0x48; // PHA         — save Y
+        self.ram[0xFF4D] = 0x6C; // JMP ($0314) — dispatch to user IRQ handler
+        self.ram[0xFF4E] = 0x14;
+        self.ram[0xFF4F] = 0x03;
 
-        // IRQ entry at $1004: JMP ($0314) - jump indirect through IRQ vector
-        self.ram[0x1004] = 0x6C; // JMP indirect
-        self.ram[0x1005] = 0x14; // $0314
-        self.ram[0x1006] = 0x03;
+        // === KERNAL IRQ exit at $EA31 (real C64 address) ===
+        // Standard return: restore Y/X/A and RTI.
+        // Most RSID tunes end their handler with JMP $EA31.
+        self.ram[0xEA31] = 0x68; // PLA         — pop Y value
+        self.ram[0xEA32] = 0xA8; // TAY         — restore Y
+        self.ram[0xEA33] = 0x68; // PLA         — pop X value
+        self.ram[0xEA34] = 0xAA; // TAX         — restore X
+        self.ram[0xEA35] = 0x68; // PLA         — restore A
+        self.ram[0xEA36] = 0x40; // RTI         — pop Status + PC
 
-        // Default IRQ handler at $1007: RTI
-        self.ram[0x1007] = 0x40; // RTI
+        // === Short KERNAL exit at $EA81 (just RTI) ===
+        self.ram[0xEA81] = 0x40; // RTI
 
-        // Set default IRQ vector to our RTI
-        self.ram[0x0314] = 0x07;
-        self.ram[0x0315] = 0x10;
+        // === Hardware vectors ===
+        self.ram[0xFFFA] = 0x81; // NMI  → $EA81 (just RTI)
+        self.ram[0xFFFB] = 0xEA;
+        self.ram[0xFFFC] = 0x00; // Reset → $1000
+        self.ram[0xFFFD] = 0x10;
+        self.ram[0xFFFE] = 0x48; // IRQ  → $FF48 (KERNAL entry)
+        self.ram[0xFFFF] = 0xFF;
 
-        // IRQ hardware vector points to our entry
-        self.ram[0xFFFE] = 0x04;
-        self.ram[0xFFFF] = 0x10;
+        // === User vectors (RAM) ===
+        // $0314/$0315: IRQ user vector → $EA31 (default: just restore & RTI)
+        self.ram[0x0314] = 0x31;
+        self.ram[0x0315] = 0xEA;
 
-        // Set up CIA1 Timer A for default 50Hz IRQ (PAL timing)
-        // This provides a fallback for tunes that don't configure their own timing
-        // Timer value: 985248 Hz / 50 Hz = 19704 cycles ≈ $4CF8
+        // === Return stub at $1000 ===
+        // call_irq pushes $1000 as return address; we detect PC == $1000 to stop.
+        self.ram[0x1000] = 0x60; // RTS (safety net, not normally reached)
+
+        // === CIA1 Timer A — default 50Hz IRQ (PAL) ===
+        // Fallback for tunes that don't configure their own timing.
+        // 985248 Hz / 50 Hz = 19704 cycles = $4CF8
         self.cia1.timer_a_latch = 0x4CF8;
         self.cia1.timer_a = 0x4CF8;
         self.cia1.timer_a_running = true;
@@ -594,7 +640,12 @@ pub struct SidPlayer {
     cycles_per_sample: f64,
 
     // Persistent CPU state across IRQ calls (RSID needs this)
+    // Real C64 has one CPU — registers persist between interrupts.
     irq_sp: u8,
+    irq_a: u8,
+    irq_x: u8,
+    irq_y: u8,
+    irq_status: u8,
 
     // Play state
     playing: bool,
@@ -704,6 +755,10 @@ impl SidPlayer {
             frame_cycle_accumulator: 0,
             cycles_per_sample: C64_CLOCK_PAL as f64 / sample_rate as f64,
             irq_sp: 0xFF,
+            irq_a: 0,
+            irq_x: 0,
+            irq_y: 0,
+            irq_status: 0x00,
             playing: false,
             initialized: false,
             current_chip_model: 0,
@@ -833,10 +888,17 @@ impl SidPlayer {
         }
         self.memory.clear_sid_writes();
 
-        // Reset timing and CPU state for clean playback
+        // Capture CPU register state after init — RSID tunes may
+        // leave meaningful state in registers for the IRQ handler
+        self.irq_a = cpu.registers.accumulator;
+        self.irq_x = cpu.registers.index_x;
+        self.irq_y = cpu.registers.index_y;
+        self.irq_status = cpu.registers.status.bits();
+        self.irq_sp = cpu.registers.stack_pointer.0;
+
+        // Reset timing for clean playback
         self.cycle_accumulator = 0.0;
         self.frame_cycle_accumulator = 0;
-        self.irq_sp = 0xFF;
         self.initialized = true;
     }
 
@@ -1063,11 +1125,16 @@ impl SidPlayer {
         let vic_cycle_counter = self.memory.vic.cycle_counter;
         let vic_raster_line = self.memory.vic.raster_line;
 
-        // Create CPU with current memory, preserve stack pointer across calls
+        // Create CPU with current memory, restore ALL persistent register state.
+        // Real C64 has one CPU — registers persist between interrupts.
         let mut cpu: CPU<C64Memory, Nmos6502> = CPU::new(self.memory.clone(), Nmos6502);
         cpu.registers.stack_pointer = StackPointer(self.irq_sp);
+        cpu.registers.accumulator = self.irq_a;
+        cpu.registers.index_x = self.irq_x;
+        cpu.registers.index_y = self.irq_y;
+        cpu.registers.status = Status::from_bits_truncate(self.irq_status);
 
-        // Push return address and status for RTI
+        // Push return address and status for RTI (mimics 6502 IRQ sequence)
         // We want to return to $1000 after RTI
         let sp = cpu.registers.stack_pointer.0;
         cpu.memory.set_byte(0x0100 + sp as u16, 0x10); // PCH = $10
@@ -1076,8 +1143,12 @@ impl SidPlayer {
         cpu.memory.set_byte(0x0100 + sp as u16, 0x00); // PCL = $00
         cpu.registers.stack_pointer = StackPointer(sp.wrapping_sub(1));
         let sp = cpu.registers.stack_pointer.0;
-        cpu.memory.set_byte(0x0100 + sp as u16, 0x00); // Status (I flag clear)
+        // Push actual status register (with B=0 as per real IRQ, not BRK)
+        cpu.memory.set_byte(0x0100 + sp as u16, self.irq_status & !0x10);
         cpu.registers.stack_pointer = StackPointer(sp.wrapping_sub(1));
+
+        // Set I flag (disable interrupts) as the real 6502 does on IRQ entry
+        cpu.registers.status.insert(Status::PS_DISABLE_INTERRUPTS);
 
         // Read IRQ vector from $FFFE/$FFFF
         let irq_lo = cpu.memory.get_byte(0xFFFE);
@@ -1093,8 +1164,12 @@ impl SidPlayer {
             }
         }
 
-        // Persist stack pointer for next IRQ call
+        // Persist ALL CPU registers for next IRQ call
         self.irq_sp = cpu.registers.stack_pointer.0;
+        self.irq_a = cpu.registers.accumulator;
+        self.irq_x = cpu.registers.index_x;
+        self.irq_y = cpu.registers.index_y;
+        self.irq_status = cpu.registers.status.bits();
 
         // Get memory back — CIA timer modifications by the 6502 are preserved
         self.memory = cpu.memory.clone();
