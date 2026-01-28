@@ -67,6 +67,7 @@ pub enum ModuleType {
     MidiFileSequencer,
     TuringMachine,
     SidPlayer,
+    AyPlayer,
 
     // TR-909 Drums
     Kick909,

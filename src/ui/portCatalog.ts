@@ -526,4 +526,18 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
       { id: 'wf-3', label: 'WF3', kind: 'cv', direction: 'out' },
     ],
   },
+  'ay-player': {
+    inputs: [
+      { id: 'gate', label: 'Gate', kind: 'gate', direction: 'in' },
+    ],
+    outputs: [
+      { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
+      { id: 'gate-a', label: 'GA', kind: 'gate', direction: 'out' },
+      { id: 'gate-b', label: 'GB', kind: 'gate', direction: 'out' },
+      { id: 'gate-c', label: 'GC', kind: 'gate', direction: 'out' },
+      { id: 'cv-a', label: 'CVA', kind: 'cv', direction: 'out' },
+      { id: 'cv-b', label: 'CVB', kind: 'cv', direction: 'out' },
+      { id: 'cv-c', label: 'CVC', kind: 'cv', direction: 'out' },
+    ],
+  },
 }

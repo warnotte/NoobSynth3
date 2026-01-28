@@ -64,6 +64,8 @@ type GraphMessage =
   | { type: 'watchGranulars'; moduleIds: string[] }
   | { type: 'loadSidFile'; moduleId: string; data: Uint8Array }
   | { type: 'watchSids'; moduleIds: string[] }
+  | { type: 'loadYmFile'; moduleId: string; data: Uint8Array }
+  | { type: 'watchAyVoices'; moduleIds: string[] }
 
 class WasmGraphProcessor extends AudioWorkletProcessor {
   private engine: InstanceType<NonNullable<typeof WasmGraphEngine>> | null = null
@@ -77,6 +79,7 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
   private watchedGranulars: string[] = []
   private lastPositions: Map<string, number> = new Map()
   private watchedSids: string[] = []
+  private watchedAys: string[] = []
   private debugCounter = 0
   private messageQueue: GraphMessage[] = []
 
@@ -117,6 +120,10 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
     }
     if (message.type === 'watchSids') {
       this.watchedSids = message.moduleIds
+      return
+    }
+    if (message.type === 'watchAyVoices') {
+      this.watchedAys = message.moduleIds
       return
     }
     // Queue other messages to be processed in process() before render()
@@ -195,6 +202,9 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
         break
       case 'loadSidFile':
         this.engine!.load_sid_file(message.moduleId, message.data)
+        break
+      case 'loadYmFile':
+        this.engine!.load_ym_file(message.moduleId, message.data)
         break
       default:
         break
@@ -331,6 +341,20 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
       }
       if (Object.keys(updates).length > 0) {
         this.port.postMessage({ type: 'sidVoiceStates', voices: updates })
+      }
+    }
+
+    // Poll AY voice states
+    if (shouldPoll && this.watchedAys.length > 0) {
+      const updates: Record<string, number[]> = {}
+      for (const moduleId of this.watchedAys) {
+        const voices = this.engine.get_ay_voice_states(moduleId)
+        if (voices.length === 9) {
+          updates[moduleId] = Array.from(voices)
+        }
+      }
+      if (Object.keys(updates).length > 0) {
+        this.port.postMessage({ type: 'ayVoiceStates', voices: updates })
       }
     }
 

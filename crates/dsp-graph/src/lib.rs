@@ -384,6 +384,39 @@ impl GraphEngine {
     }
   }
 
+  /// Get AY voice states for visualization
+  /// Returns [period0, active0, flags0, period1, active1, flags1, period2, active2, flags2]
+  pub fn get_ay_voice_states(&self, module_id: &str) -> Vec<u16> {
+    if let Some(index) = self.module_map.get(module_id).and_then(|list| list.first()) {
+      if let Some(module) = self.modules.get(*index) {
+        if let ModuleState::AyPlayer(state) = &module.state {
+          let voices = state.ay_player.voice_states();
+          return vec![
+            voices[0].0, voices[0].1 as u16, voices[0].2 as u16,
+            voices[1].0, voices[1].1 as u16, voices[1].2 as u16,
+            voices[2].0, voices[2].1 as u16, voices[2].2 as u16,
+          ];
+        }
+      }
+    }
+    vec![0; 9]
+  }
+
+  /// Load a YM file into an AyPlayer module
+  pub fn load_ym_file(&mut self, module_id: &str, data: &[u8]) {
+    if let Some(index) = self.module_map.get(module_id).and_then(|list| list.first().copied()) {
+      if let Some(module) = self.modules.get_mut(index) {
+        if let ModuleState::AyPlayer(ref mut state) = module.state {
+          if let Err(e) = state.ay_player.load_ym(data) {
+            // Log error but don't crash
+            #[cfg(debug_assertions)]
+            eprintln!("Failed to load YM file: {}", e);
+          }
+        }
+      }
+    }
+  }
+
   pub fn render(&mut self, frames: usize) -> &[Sample] {
     if frames == 0 {
       return &[];
@@ -745,6 +778,8 @@ fn normalize_module_type(raw: &str) -> ModuleType {
     "turing-machine" | "turing" => ModuleType::TuringMachine,
     // SID Player
     "sid-player" => ModuleType::SidPlayer,
+    // AY Player
+    "ay-player" => ModuleType::AyPlayer,
     _ => ModuleType::Oscillator,
   }
 }

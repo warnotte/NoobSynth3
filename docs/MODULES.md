@@ -1244,6 +1244,60 @@ Le module utilise un émulateur CPU 6502 complet (mos6502) et l'émulateur reSID
 SID Player → Main Out
 ```
 
+### AY Player
+
+Lecteur de fichiers chiptune pour les puces sonores AY-3-8910 (ZX Spectrum 128, Amstrad CPC, MSX) et YM2149 (Atari ST). Ces puces sont des PSG (Programmable Sound Generator) à 3 voix avec générateur de bruit et enveloppe.
+
+Le module lit des fichiers de dump de registres (YM, VTX, PSG) et rejoue les données à travers une émulation cycle-accurate de la puce AY.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `playing` | 0/1 | Play/Stop |
+| `loop` | 0/1 | Boucler à la fin |
+
+**Entrées :**
+| Port | ID | Description |
+|------|----|-------------|
+| Gate | `gate` | Trigger externe (optionnel) |
+
+**Sorties :**
+| Port | ID | Description |
+|------|----|-------------|
+| Out L/R | `out-l`, `out-r` | Audio stéréo |
+| CV A/B/C | `cv-a`, `cv-b`, `cv-c` | Fréquence par voix |
+| Gate A/B/C | `gate-a`, `gate-b`, `gate-c` | Gate par voix |
+
+**Formats supportés :**
+
+| Format | Extension | Plateforme | Description |
+|--------|-----------|------------|-------------|
+| YM | `.ym` | Atari ST | YM2!, YM3!, YM5!, YM6! - Dump registres LHA compressé |
+| VTX | `.vtx` | ZX Spectrum, CPC | Header + données LHA-5 compressées |
+| PSG | `.psg` | MSX, Spectrum | Log de commandes registres brut |
+
+**Formats non supportés :**
+- `.ay` - Contient du code Z80 (nécessite émulation CPU)
+- `.sndh` - Contient du code 68000 (nécessite émulation CPU)
+
+**Différences entre puces :**
+- **AY-3-8910** (GI, 1978) : Original, 3 voix carrées + bruit + enveloppe
+- **YM2149** (Yamaha, 1983) : Clone avec DAC amélioré, utilisé dans l'Atari ST
+
+**Où trouver des fichiers :**
+- [Bulba's Archive](https://bulba.untergrund.net/music_e.htm) - 20,000+ fichiers ZX Spectrum
+- [Project AY](https://worldofspectrum.org/projectay/) - Collection AY/VTX
+
+**Usage typique :**
+```
+AY Player → Main Out
+```
+
+Ou pour utiliser les CV/Gate individuels :
+```
+AY Player [cv-a] → NES Osc [freq-cv]
+AY Player [gate-a] → ADSR [gate]
+```
+
 ### Main Out
 
 Sortie audio principale.

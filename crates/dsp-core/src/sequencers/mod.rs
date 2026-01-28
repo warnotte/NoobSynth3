@@ -66,6 +66,7 @@ pub mod mario;
 pub mod midi_file_sequencer;
 pub mod turing;
 pub mod sid_player;
+pub mod ay_player;
 
 // ============================================================================
 // Shared Rate Divisions
@@ -161,3 +162,4 @@ pub use midi_file_sequencer::{
 };
 pub use turing::{TuringMachine, TuringInputs, TuringParams};
 pub use sid_player::{SidPlayer, SidPlayerParams, SidPlayerInputs, SidPlayerOutputs, SidHeader};
+pub use ay_player::{AyPlayer, AyPlayerParams, AyPlayerInputs, AyPlayerOutputs, YmHeader};

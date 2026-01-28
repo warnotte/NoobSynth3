@@ -1,7 +1,7 @@
 //! Module state definitions for all DSP modules.
 
 use dsp_core::{
-    Adsr, Arpeggiator, Chaos, Choir, Chorus, Clap808, Clap909, Cowbell808, Delay, DrumSequencer, Ensemble,
+    Adsr, Arpeggiator, AyPlayer, Chaos, Choir, Chorus, Clap808, Clap909, Cowbell808, Delay, DrumSequencer, Ensemble,
     EuclideanSequencer, FmOperator, Granular, GranularDelay, HiHat808, HiHat909, Hpf, KarplusStrong,
     Kick808, Kick909, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, Phaser, PipeOrgan, PitchShifter,
     Resonator, Reverb, Rimshot909, SampleHold, Shepard, SidPlayer, SlewLimiter, Snare808, Snare909, SnesOsc, SpectralSwarm, SpringReverb,
@@ -542,6 +542,12 @@ pub struct SidPlayerState {
     pub chip_model: ParamBuffer,
 }
 
+pub struct AyPlayerState {
+    pub ay_player: AyPlayer,
+    pub playing: ParamBuffer,
+    pub loop_enabled: ParamBuffer,
+}
+
 // =============================================================================
 // TR-909 Drum States
 // =============================================================================
@@ -738,6 +744,7 @@ pub enum ModuleState {
     MidiFileSequencer(MidiFileSequencerState),
     TuringMachine(TuringState),
     SidPlayer(SidPlayerState),
+    AyPlayer(AyPlayerState),
 
     // TR-909 Drums
     Kick909(Kick909State),

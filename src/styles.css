@@ -2901,6 +2901,18 @@
   margin-left: 6px;
 }
 
+.sid-error {
+  grid-column: 1 / -1;
+  font-family: 'Courier New', monospace;
+  font-size: 9px;
+  color: #ff6b6b;
+  background: rgba(255, 80, 80, 0.1);
+  border: 1px solid rgba(255, 80, 80, 0.3);
+  border-radius: var(--radius-sm);
+  padding: 6px 8px;
+  line-height: 1.4;
+}
+
 .sid-songs {
   font-family: 'Courier New', monospace;
   font-size: 9px;

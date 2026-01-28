@@ -81,6 +81,8 @@ export const moduleSizes: Record<ModuleType, string> = {
   'turing-machine': '2x4',
   // SID Player
   'sid-player': '3x5',
+  // AY Player
+  'ay-player': '3x5',
 }
 
 export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>> = {
@@ -139,6 +141,7 @@ export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>>
   'turing-machine': 'strip',
   // SID Player
   'sid-player': 'strip',
+  'ay-player': 'strip',
 }
 
 export type ModuleCategory =
@@ -230,6 +233,7 @@ export const moduleCatalog: { type: ModuleType; label: string; category: ModuleC
   { type: 'midi-file-sequencer', label: 'MIDI File', category: 'sequencers' },
   { type: 'turing-machine', label: 'Turing Machine', category: 'sequencers' },
   { type: 'sid-player', label: 'SID Player', category: 'sequencers' },
+  { type: 'ay-player', label: 'AY Player', category: 'sequencers' },
   { type: 'mario', label: 'Mario IO', category: 'sequencers' },
   // TR-909 Drums
   { type: '909-kick', label: '909 Kick', category: 'drums' },
@@ -333,6 +337,7 @@ export const modulePrefixes: Record<ModuleType, string> = {
   // Turing Machine
   'turing-machine': 'turing',
   'sid-player': 'sid',
+  'ay-player': 'ay',
 }
 
 export const moduleLabels: Record<ModuleType, string> = {
@@ -414,6 +419,7 @@ export const moduleLabels: Record<ModuleType, string> = {
   // Turing Machine
   'turing-machine': 'Turing Machine',
   'sid-player': 'SID Player',
+  'ay-player': 'AY Player',
 }
 
 export const moduleDefaults: Record<ModuleType, Record<string, number | string | boolean>> = {
@@ -881,6 +887,10 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     playing: 0,         // 0=stopped, 1=playing
     song: 1,            // Current song number (1-based)
     chipModel: 0,       // 0=6581 (classic), 1=8580 (newer)
+  },
+  'ay-player': {
+    playing: 0,         // 0=stopped, 1=playing
+    loop: 1,            // 1=loop enabled
   },
 }
 

@@ -31,6 +31,7 @@ use dsp_core::{
     Rimshot909Inputs, Rimshot909Params, Sample,
     SampleHoldInputs, SampleHoldParams, ShepardInputs, ShepardParams,
     SidPlayerInputs, SidPlayerOutputs, SidPlayerParams,
+    AyPlayerInputs, AyPlayerOutputs, AyPlayerParams,
     SlewInputs, SlewParams,
     Snare808Inputs, Snare808Params,
     Snare909Inputs, Snare909Params, SnesOscInputs, SnesOscParams, SpectralSwarmInputs, SpectralSwarmParams,
@@ -1746,6 +1747,59 @@ pub(crate) fn process_module(
             outputs[7].channel_mut(0)[..safe_frames].copy_from_slice(&buf_wf1[..safe_frames]);
             outputs[8].channel_mut(0)[..safe_frames].copy_from_slice(&buf_wf2[..safe_frames]);
             outputs[9].channel_mut(0)[..safe_frames].copy_from_slice(&buf_wf3[..safe_frames]);
+        }
+        ModuleState::AyPlayer(state) => {
+            // Input 0: gate trigger (optional)
+            let gate = if !connections[0].is_empty() {
+                Some(inputs[0].channel(0))
+            } else {
+                None
+            };
+
+            let ay_inputs = AyPlayerInputs { gate };
+            let params = AyPlayerParams {
+                playing: state.playing.slice(frames),
+                loop_enabled: state.loop_enabled.slice(frames),
+            };
+
+            const AY_BUF_SIZE: usize = 1024;
+            let safe_frames = frames.min(AY_BUF_SIZE);
+
+            let mut buf_left: [Sample; AY_BUF_SIZE] = [0.0; AY_BUF_SIZE];
+            let mut buf_right: [Sample; AY_BUF_SIZE] = [0.0; AY_BUF_SIZE];
+            let mut buf_cv_a: [Sample; AY_BUF_SIZE] = [0.0; AY_BUF_SIZE];
+            let mut buf_cv_b: [Sample; AY_BUF_SIZE] = [0.0; AY_BUF_SIZE];
+            let mut buf_cv_c: [Sample; AY_BUF_SIZE] = [0.0; AY_BUF_SIZE];
+            let mut buf_gate_a: [Sample; AY_BUF_SIZE] = [0.0; AY_BUF_SIZE];
+            let mut buf_gate_b: [Sample; AY_BUF_SIZE] = [0.0; AY_BUF_SIZE];
+            let mut buf_gate_c: [Sample; AY_BUF_SIZE] = [0.0; AY_BUF_SIZE];
+
+            let ay_outputs = AyPlayerOutputs {
+                out_l: &mut buf_left[..safe_frames],
+                out_r: &mut buf_right[..safe_frames],
+                cv_a: &mut buf_cv_a[..safe_frames],
+                cv_b: &mut buf_cv_b[..safe_frames],
+                cv_c: &mut buf_cv_c[..safe_frames],
+                gate_a: &mut buf_gate_a[..safe_frames],
+                gate_b: &mut buf_gate_b[..safe_frames],
+                gate_c: &mut buf_gate_c[..safe_frames],
+            };
+            state.ay_player.process_block_full(ay_outputs, ay_inputs, params);
+
+            // Copy stereo audio output
+            let (out_l, out_r) = outputs[0].channels_mut_2();
+            out_l[..safe_frames].copy_from_slice(&buf_left[..safe_frames]);
+            out_r[..safe_frames].copy_from_slice(&buf_right[..safe_frames]);
+
+            // Copy voice gate outputs
+            outputs[1].channel_mut(0)[..safe_frames].copy_from_slice(&buf_gate_a[..safe_frames]);
+            outputs[2].channel_mut(0)[..safe_frames].copy_from_slice(&buf_gate_b[..safe_frames]);
+            outputs[3].channel_mut(0)[..safe_frames].copy_from_slice(&buf_gate_c[..safe_frames]);
+
+            // Copy voice CV outputs (frequency)
+            outputs[4].channel_mut(0)[..safe_frames].copy_from_slice(&buf_cv_a[..safe_frames]);
+            outputs[5].channel_mut(0)[..safe_frames].copy_from_slice(&buf_cv_b[..safe_frames]);
+            outputs[6].channel_mut(0)[..safe_frames].copy_from_slice(&buf_cv_c[..safe_frames]);
         }
         ModuleState::Notes => {
             // UI-only module, no audio processing

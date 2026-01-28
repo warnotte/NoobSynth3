@@ -24,6 +24,7 @@ crates/
 
 public/presets/         # Preset JSON files
 public/sid/             # SID files + manifest.json
+public/ay/              # YM/VTX files + manifest.json (AY-3-8910)
 public/midi-presets/    # MIDI files + manifest.json
 ```
 
@@ -152,7 +153,7 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 - [ ] `public/presets/` - Preset de démonstration
 - [ ] `npm run build:wasm` - Rebuild WASM après modifs Rust
 
-## Module Types (69 total)
+## Module Types (70 total)
 
 ### Sources (14)
 oscillator, supersaw, karplus, fm-op, nes-osc, snes-osc, noise, tb-303, shepard, pipe-organ, spectral-swarm, resonator, wavetable, granular
@@ -169,8 +170,8 @@ chorus, ensemble, choir, vocoder, delay, granular-delay, tape-delay, spring-reve
 ### Modulators (7)
 adsr, lfo, mod-router, sample-hold, slew, quantizer, chaos
 
-### Sequencers (9)
-clock, arpeggiator, step-sequencer, euclidean, drum-sequencer, midi-file-sequencer, turing-machine, mario, sid-player
+### Sequencers (10)
+clock, arpeggiator, step-sequencer, euclidean, drum-sequencer, midi-file-sequencer, turing-machine, mario, sid-player, ay-player
 
 ### TR-909 Drums (6)
 909-kick, 909-snare, 909-hihat, 909-clap, 909-tom, 909-rimshot
@@ -203,6 +204,27 @@ Le MIDI File Sequencer supporte la polyphonie par piste via le système de voix 
 **Fichiers clés:**
 - `crates/dsp-core/src/sequencers/midi_file_sequencer.rs` - DSP avec voice_index
 - `crates/dsp-graph/src/lib.rs` - is_poly_type() et resolve_voice_count()
+
+### AY Player (AY-3-8910 / YM2149)
+Lecteur de fichiers chiptune pour les puces sonores AY-3-8910 (ZX Spectrum, Amstrad CPC, MSX) et YM2149 (Atari ST).
+
+**Formats supportés:**
+
+| Format | Extension | Plateforme | Description |
+|--------|-----------|------------|-------------|
+| YM | `.ym` | Atari ST | Dump de registres, souvent LHA compressé |
+| VTX | `.vtx` | ZX Spectrum, CPC | Header + données LHA-5 compressées |
+| PSG | `.psg` | MSX, Spectrum | Log de commandes registres |
+
+**Formats non supportés (nécessitent émulation CPU):**
+- `.ay` - Code Z80 embarqué (Spectrum/CPC)
+- `.sndh` - Code 68000 embarqué (Atari ST)
+
+**Fichiers clés:**
+- `crates/dsp-core/src/sequencers/ay_player.rs` - Émulation AY + parseurs YM/VTX/PSG
+- `crates/dsp-core/src/chips/ay3_8910.rs` - Émulation puce AY-3-8910
+- `src/utils/lhaDecompress.ts` - Décompression LHA pour YM et VTX
+- `public/ay/manifest.json` - Presets (10 YM Atari ST + 8 VTX Spectrum)
 
 ### TR-909 Drums - Accent Latching
 Les drums 909 utilisent un mécanisme de "latching" pour l'accent:

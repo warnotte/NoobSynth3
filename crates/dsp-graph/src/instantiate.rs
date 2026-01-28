@@ -3,7 +3,7 @@
 use std::collections::HashMap;
 
 use dsp_core::{
-  Adsr, Arpeggiator, Chaos, Choir, Chorus, Clap808, Clap909, Cowbell808, Delay, DrumSequencer, Ensemble,
+  Adsr, Arpeggiator, AyPlayer, Chaos, Choir, Chorus, Clap808, Clap909, Cowbell808, Delay, DrumSequencer, Ensemble,
   EuclideanSequencer, FmOperator, Granular, GranularDelay, HiHat808, HiHat909, Hpf, KarplusStrong,
   Kick808, Kick909, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, Phaser, PipeOrgan, PitchShifter,
   Resonator, Reverb, Rimshot909, SampleHold, Shepard, SidPlayer, SlewLimiter, Snare808, Snare909, SnesOsc, SpectralSwarm, SpringReverb,
@@ -618,6 +618,11 @@ pub(crate) fn create_state(
       song: ParamBuffer::new(param_number(params, "song", 1.0)),
       chip_model: ParamBuffer::new(param_number(params, "chipModel", 0.0)),
     }),
+    ModuleType::AyPlayer => ModuleState::AyPlayer(AyPlayerState {
+      ay_player: AyPlayer::new(sample_rate),
+      playing: ParamBuffer::new(param_number(params, "playing", 0.0)),
+      loop_enabled: ParamBuffer::new(param_number(params, "loop", 1.0)),
+    }),
   }
 }
 
@@ -1210,6 +1215,11 @@ pub(crate) fn apply_param(state: &mut ModuleState, param: &str, value: f32) {
       "playing" => state.playing.set(value),
       "song" => state.song.set(value),
       "chipModel" => state.chip_model.set(value),
+      _ => {}
+    },
+    ModuleState::AyPlayer(state) => match param {
+      "playing" => state.playing.set(value),
+      "loop" => state.loop_enabled.set(value),
       _ => {}
     },
     _ => {}

@@ -23,6 +23,7 @@ pub mod effects;
 pub mod modulators;
 pub mod sequencers;
 pub mod drums;
+pub mod chips;
 
 // Re-export common types at crate root for convenience
 pub use common::{
@@ -102,7 +103,11 @@ pub use sequencers::{
     MidiNote, MidiTrack, MIDI_TRACKS, MAX_NOTES_PER_TRACK,
     TuringMachine, TuringParams, TuringInputs,
     SidPlayer, SidPlayerParams, SidPlayerInputs, SidPlayerOutputs, SidHeader,
+    AyPlayer, AyPlayerParams, AyPlayerInputs, AyPlayerOutputs, YmHeader,
 };
+
+// Re-export chips
+pub use chips::Ay3_8910;
 
 // Re-export drums (TR-909)
 pub use drums::{

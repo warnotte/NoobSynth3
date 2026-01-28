@@ -207,6 +207,10 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
     ModuleType::SidPlayer => vec![
       PortInfo { channels: 1 },  // reset trigger
     ],
+    // AyPlayer - 1 input (gate)
+    ModuleType::AyPlayer => vec![
+      PortInfo { channels: 1 },  // gate trigger
+    ],
   }
 }
 
@@ -416,6 +420,16 @@ pub fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // wf-1
       PortInfo { channels: 1 },  // wf-2
       PortInfo { channels: 1 },  // wf-3
+    ],
+    // AyPlayer - 1 stereo output + 3 gates + 3 CVs
+    ModuleType::AyPlayer => vec![
+      PortInfo { channels: 2 },  // stereo audio out
+      PortInfo { channels: 1 },  // gate-a
+      PortInfo { channels: 1 },  // gate-b
+      PortInfo { channels: 1 },  // gate-c
+      PortInfo { channels: 1 },  // cv-a
+      PortInfo { channels: 1 },  // cv-b
+      PortInfo { channels: 1 },  // cv-c
     ],
   }
 }
@@ -703,6 +717,11 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
     // SidPlayer - 1 input
     ModuleType::SidPlayer => match port_id {
       "reset" | "rst" => Some(0),
+      _ => None,
+    },
+    // AyPlayer - 1 input
+    ModuleType::AyPlayer => match port_id {
+      "gate" | "trigger" | "trig" => Some(0),
       _ => None,
     },
     _ => None,
@@ -1020,6 +1039,17 @@ pub fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize
       "wf-1" => Some(7),
       "wf-2" => Some(8),
       "wf-3" => Some(9),
+      _ => None,
+    },
+    // AyPlayer - 1 stereo output + 3 gates + 3 CVs
+    ModuleType::AyPlayer => match port_id {
+      "out" | "output" | "audio" => Some(0),
+      "gate-a" => Some(1),
+      "gate-b" => Some(2),
+      "gate-c" => Some(3),
+      "cv-a" => Some(4),
+      "cv-b" => Some(5),
+      "cv-c" => Some(6),
       _ => None,
     },
   }

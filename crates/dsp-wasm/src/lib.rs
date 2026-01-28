@@ -133,4 +133,15 @@ impl WasmGraphEngine {
   pub fn load_sid_file(&mut self, module_id: &str, data: &[u8]) {
     self.engine.load_sid_file(module_id, data);
   }
+
+  /// Get AY voice states for visualization
+  /// Returns [period0, active0, flags0, period1, active1, flags1, period2, active2, flags2]
+  pub fn get_ay_voice_states(&self, module_id: &str) -> Vec<u16> {
+    self.engine.get_ay_voice_states(module_id)
+  }
+
+  /// Load a YM file into an AyPlayer module
+  pub fn load_ym_file(&mut self, module_id: &str, data: &[u8]) {
+    self.engine.load_ym_file(module_id, data);
+  }
 }

@@ -81,6 +81,8 @@ export type ModuleType =
   | 'turing-machine'
   // SID Player
   | 'sid-player'
+  // AY Player (ZX Spectrum, Amstrad CPC, MSX, Atari ST)
+  | 'ay-player'
 
 export interface ModuleSpec {
   id: string

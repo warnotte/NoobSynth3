@@ -27,6 +27,8 @@ export class AudioEngine {
   private watchedGranulars: Set<string> = new Set()
   private sidVoiceCallbacks: Map<string, (voices: Array<{freq: number, gate: boolean, waveform: number}>) => void> = new Map()
   private watchedSids: Set<string> = new Set()
+  private ayVoiceCallbacks: Map<string, (voices: Array<{period: number, active: boolean, flags: number}>) => void> = new Map()
+  private watchedAys: Set<string> = new Set()
 
   async start(graph: GraphState): Promise<void> {
     await this.init()
@@ -378,6 +380,41 @@ export class AudioEngine {
     )
   }
 
+  watchAyVoices(
+    moduleId: string,
+    callback: (voices: Array<{period: number, active: boolean, flags: number}>) => void
+  ): () => void {
+    this.ayVoiceCallbacks.set(moduleId, callback)
+    this.watchedAys.add(moduleId)
+    this.syncWatchedAys()
+
+    return () => {
+      this.ayVoiceCallbacks.delete(moduleId)
+      this.watchedAys.delete(moduleId)
+      this.syncWatchedAys()
+    }
+  }
+
+  private syncWatchedAys(): void {
+    if (!this.graphNode) return
+    this.graphNode.port.postMessage({
+      type: 'watchAyVoices',
+      moduleIds: Array.from(this.watchedAys),
+    })
+  }
+
+  loadYmFile(moduleId: string, data: Uint8Array): void {
+    if (!this.graphNode) {
+      console.error('Audio engine not initialized')
+      return
+    }
+    // Transfer the buffer to the worklet
+    this.graphNode.port.postMessage(
+      { type: 'loadYmFile', moduleId, data },
+      [data.buffer]
+    )
+  }
+
   private async init(): Promise<void> {
     if (this.context) {
       return
@@ -494,6 +531,17 @@ export class AudioEngine {
             ])
           }
         }
+      } else if (data.type === 'ayVoiceStates' && data.voices) {
+        for (const [moduleId, voiceData] of Object.entries(data.voices as Record<string, number[]>)) {
+          const callback = this.ayVoiceCallbacks.get(moduleId)
+          if (callback && voiceData.length === 9) {
+            callback([
+              { period: voiceData[0], active: voiceData[1] !== 0, flags: voiceData[2] },
+              { period: voiceData[3], active: voiceData[4] !== 0, flags: voiceData[5] },
+              { period: voiceData[6], active: voiceData[7] !== 0, flags: voiceData[8] },
+            ])
+          }
+        }
       }
     }
 
@@ -515,6 +563,11 @@ export class AudioEngine {
     // Re-send watched SIDs if any
     if (this.watchedSids.size > 0) {
       this.syncWatchedSids()
+    }
+
+    // Re-send watched AYs if any
+    if (this.watchedAys.size > 0) {
+      this.syncWatchedAys()
     }
 
     this.buildScopeAnalysers()

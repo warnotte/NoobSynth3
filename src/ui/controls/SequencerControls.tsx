@@ -15,6 +15,8 @@ import { formatInt } from '../formatters'
 import { marioSongs } from '../../state/marioSongs'
 import { getRateOptions, DEFAULT_RATES } from '../../shared/rates'
 import { loadSidPresetManifest, loadSidPreset, type SidPresetEntry } from '../../utils/sidLoader'
+import { loadAyPresetManifest, loadAyPreset, type AyPresetEntry } from '../../utils/ayLoader'
+import { isLhaCompressed, decompressLha, isVtxFile, decompressVtx } from '../../utils/lhaDecompress'
 
 // Shared rate options for sequencers
 const seqRateOptions = getRateOptions('sequencer')
@@ -564,6 +566,10 @@ export function renderSequencerControls(props: ControlProps): React.ReactElement
 
   if (module.type === 'sid-player') {
     return <SidPlayerUI module={module} engine={engine} updateParam={updateParam} />
+  }
+
+  if (module.type === 'ay-player') {
+    return <AyPlayerUI module={module} engine={engine} updateParam={updateParam} />
   }
 
   return null
@@ -1590,6 +1596,251 @@ function SidPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module
               <div className="sid-voice-label">
                 <span className="sid-voice-num">{i + 1}</span>
                 <span className="sid-voice-wave">{WAVEFORM_LABELS[voice.waveform] || '-'}</span>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </>
+  )
+}
+
+// Voice state type for AY visualization
+type AyVoiceState = { period: number; active: boolean; flags: number }
+
+// AY mode labels
+const AY_MODE_LABELS: Record<number, string> = {
+  0: '-',
+  1: 'T',    // Tone only
+  2: 'N',    // Noise only
+  3: 'T+N',  // Tone + Noise
+  5: 'Te',   // Tone + Envelope
+  6: 'Ne',   // Noise + Envelope
+  7: 'TNe',  // Tone + Noise + Envelope
+}
+
+// AY Player sub-component
+function AyPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module' | 'engine' | 'updateParam'>) {
+  const playing = module.params.playing === 1 || module.params.playing === true
+  const loopEnabled = module.params.loop === 1 || module.params.loop === true
+  const [ymInfo, setYmInfo] = useState<{ name: string; author: string; frames: number; format: string } | null>(null)
+  const [voices, setVoices] = useState<AyVoiceState[]>([
+    { period: 0, active: false, flags: 0 },
+    { period: 0, active: false, flags: 0 },
+    { period: 0, active: false, flags: 0 },
+  ])
+  const [elapsed, setElapsed] = useState(0)
+  const playStartRef = useRef<number>(Date.now())
+  const [loadGen, setLoadGen] = useState(0)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [ayPresets, setAyPresets] = useState<AyPresetEntry[]>([])
+  const [loadError, setLoadError] = useState<string | null>(null)
+
+  // Load AY presets manifest on mount
+  useEffect(() => {
+    loadAyPresetManifest().then(manifest => {
+      setAyPresets(manifest.presets)
+    })
+  }, [])
+
+  // Elapsed time counter
+  useEffect(() => {
+    if (playing) {
+      playStartRef.current = Date.now()
+      setElapsed(0)
+      const interval = setInterval(() => {
+        setElapsed(Math.floor((Date.now() - playStartRef.current) / 1000))
+      }, 500)
+      return () => clearInterval(interval)
+    }
+    setElapsed(0)
+  }, [playing, loadGen])
+
+  // Subscribe to voice state updates
+  useEffect(() => {
+    if (!playing) return
+    const unsubscribe = engine.watchAyVoices(module.id, (newVoices) => {
+      setVoices(newVoices)
+    })
+    return unsubscribe
+  }, [engine, module.id, playing])
+
+  // Load YM/VTX/PSG data into engine
+  const loadYmData = useCallback((rawData: Uint8Array) => {
+    setLoadError(null)
+    let data = rawData
+
+    // Check format and decompress if needed
+    if (isVtxFile(data)) {
+      // VTX file - decompress embedded LHA-5 data
+      try {
+        data = decompressVtx(data)
+        setLoadGen(g => g + 1)
+        setYmInfo({ name: 'VTX File', author: '', frames: 0, format: 'VTX' })
+        engine.loadYmFile(module.id, data)
+        return
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : 'VTX decompression failed'
+        setLoadError(msg)
+        setYmInfo(null)
+        return
+      }
+    }
+
+    // Check if LHA compressed (YM files)
+    if (isLhaCompressed(data)) {
+      try {
+        data = decompressLha(data)
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : 'LHA decompression failed'
+        setLoadError(msg)
+        setYmInfo(null)
+        return
+      }
+    }
+
+    // Check for PSG magic
+    if (data.length >= 4 && data[0] === 0x50 && data[1] === 0x53 && data[2] === 0x47 && data[3] === 0x1A) {
+      setLoadGen(g => g + 1)
+      setYmInfo({ name: 'PSG File', author: '', frames: 0, format: 'PSG' })
+      engine.loadYmFile(module.id, data)
+      return
+    }
+
+    // Check for YM magic
+    if (data.length >= 4) {
+      const magic = String.fromCharCode(data[0], data[1], data[2], data[3])
+      if (magic.startsWith('YM')) {
+        // Reset and load
+        setLoadGen(g => g + 1)
+        setYmInfo({ name: 'YM File', author: '', frames: 0, format: 'YM' })
+        engine.loadYmFile(module.id, data)
+      } else {
+        setLoadError(`Unknown format (magic: ${magic})`)
+        setYmInfo(null)
+      }
+    } else {
+      setLoadError('File too short')
+      setYmInfo(null)
+    }
+  }, [module.id, engine])
+
+  const handleFileLoad = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+    try {
+      const arrayBuffer = await file.arrayBuffer()
+      loadYmData(new Uint8Array(arrayBuffer))
+    } catch (err) {
+      console.error('Failed to load YM file:', err)
+    }
+  }, [loadYmData])
+
+  const handlePresetChange = useCallback(async (presetId: string) => {
+    if (!presetId) return
+    try {
+      const preset = ayPresets.find(p => p.id === presetId)
+      let data = await loadAyPreset(presetId)
+
+      // Detect format from file extension
+      const fileExt = preset?.file?.split('.').pop()?.toLowerCase() || 'ym'
+      const format = fileExt === 'vtx' ? 'VTX' : fileExt === 'psg' ? 'PSG' : 'YM'
+
+      // Decompress based on format
+      if (isVtxFile(data)) {
+        // VTX has embedded LHA-5 compressed data
+        data = decompressVtx(data)
+      } else if (isLhaCompressed(data)) {
+        // YM files are typically LHA compressed
+        data = decompressLha(data)
+      }
+
+      setLoadError(null)
+      setLoadGen(g => g + 1)
+      setYmInfo({
+        name: preset?.name || 'File',
+        author: preset?.author || '',
+        frames: 0,
+        format
+      })
+      engine.loadYmFile(module.id, data)
+    } catch (err) {
+      console.error('Failed to load AY preset:', err)
+      setLoadError('Failed to load preset')
+    }
+  }, [ayPresets, engine, module.id])
+
+  return (
+    <>
+      <div className="sid-display">
+        <div className="sid-title">{ymInfo?.name || 'No file loaded'}</div>
+        <div className="sid-author">
+          {ymInfo?.author || ''}
+          {ymInfo && <span className="sid-format-badge">{ymInfo.format}</span>}
+          {playing && <span className="sid-elapsed">{formatElapsed(elapsed)}</span>}
+        </div>
+      </div>
+
+      {loadError && (
+        <div className="sid-error">{loadError}</div>
+      )}
+
+      {ayPresets.length > 0 && (
+        <ControlBox label="Preset">
+          <select
+            className="sid-preset-select"
+            onChange={(e) => handlePresetChange(e.target.value)}
+            defaultValue=""
+          >
+            <option value="">Select...</option>
+            {ayPresets.map(preset => {
+              const ext = preset.file?.split('.').pop()?.toUpperCase() || 'YM'
+              return (
+                <option key={preset.id} value={preset.id}>
+                  [{ext}] {preset.name}{preset.author ? ` - ${preset.author}` : ''}
+                </option>
+              )
+            })}
+          </select>
+        </ControlBox>
+      )}
+
+      <div className="sid-controls-row">
+        <ToggleButton
+          label="PLAY"
+          value={playing}
+          onChange={(value) => updateParam(module.id, 'playing', value ? 1 : 0)}
+          onLabel="STOP"
+          offLabel="PLAY"
+        />
+        <ToggleButton
+          label="LOOP"
+          value={loopEnabled}
+          onChange={(value) => updateParam(module.id, 'loop', value ? 1 : 0)}
+        />
+        <label className="sid-load-btn">
+          Load
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".ym,.vtx,.psg"
+            onChange={handleFileLoad}
+            style={{ display: 'none' }}
+          />
+        </label>
+      </div>
+
+      <div className="sid-voices">
+        {voices.map((voice, i) => {
+          // Convert period to a relative height
+          const periodPercent = voice.period > 0 ? Math.min(100, Math.log2(voice.period + 1) / 12 * 100) : 0
+          const label = ['A', 'B', 'C'][i]
+          return (
+            <div key={i} className={`sid-voice ${voice.active ? 'active' : ''}`}>
+              <div className="sid-voice-bar" style={{ height: `${periodPercent}%` }} />
+              <div className="sid-voice-label">
+                <span className="sid-voice-num">{label}</span>
+                <span className="sid-voice-wave">{AY_MODE_LABELS[voice.flags] || '-'}</span>
               </div>
             </div>
           )

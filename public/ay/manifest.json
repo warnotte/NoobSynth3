@@ -1,0 +1,131 @@
+{
+  "version": 1,
+  "presets": [
+    {
+      "id": "knucklebusters",
+      "name": "Knucklebusters",
+      "author": "Mad Max (Jochen Hippel)",
+      "file": "Knucklebusters.ym",
+      "platform": "atari-st"
+    },
+    {
+      "id": "synergy-polygons-2",
+      "name": "Synergy Wicked Polygons 2",
+      "author": "Scavenger (Joris de Man)",
+      "file": "Synergy Wicked Polygons 2.ym",
+      "platform": "atari-st"
+    },
+    {
+      "id": "synergy-polygons-1",
+      "name": "Synergy Wicked Polygons 1",
+      "author": "Scavenger (Joris de Man)",
+      "file": "Synergy Wicked Polygons 1.ym",
+      "platform": "atari-st"
+    },
+    {
+      "id": "synergy-odyssey",
+      "name": "Synergy Odyssey",
+      "author": "Scavenger (Joris de Man)",
+      "file": "Synergy Odyssey.ym",
+      "platform": "atari-st"
+    },
+    {
+      "id": "see-you-falcon",
+      "name": "See You on the Falcon",
+      "author": "Jess (Jean-Sebastien Gerard)",
+      "file": "See you on the Falcon.ym",
+      "platform": "atari-st"
+    },
+    {
+      "id": "st-news-61",
+      "name": "ST News 6.1",
+      "author": "The Mind (Laurens VanderKlis)",
+      "file": "ST News 61.ym",
+      "platform": "atari-st"
+    },
+    {
+      "id": "ninja-warriors",
+      "name": "Ninja Warriors",
+      "author": "Sound Images (Tony Williams)",
+      "file": "Ninja Warriors.ym",
+      "platform": "atari-st"
+    },
+    {
+      "id": "kult",
+      "name": "Kult",
+      "author": "Unknown",
+      "file": "Kult.ym",
+      "platform": "atari-st"
+    },
+    {
+      "id": "return-medusa",
+      "name": "Return of Medusa - Title",
+      "author": "Mad Max (Jochen Hippel)",
+      "file": "Return of Medusa 1 - title.ym",
+      "platform": "atari-st"
+    },
+    {
+      "id": "new-religion",
+      "name": "New Religion",
+      "author": "Gary Wheaton",
+      "file": "New Religion.ym",
+      "platform": "atari-st"
+    },
+    {
+      "id": "turrican-2",
+      "name": "Turrican 2",
+      "author": "Unknown",
+      "file": "Turrican 2.vtx",
+      "platform": "spectrum"
+    },
+    {
+      "id": "commando",
+      "name": "Commando",
+      "author": "Unknown",
+      "file": "Commando.vtx",
+      "platform": "spectrum"
+    },
+    {
+      "id": "genetic-error",
+      "name": "Genetic Error",
+      "author": "TDM",
+      "file": "Genetic Error.vtx",
+      "platform": "spectrum"
+    },
+    {
+      "id": "resound",
+      "name": "Resound",
+      "author": "Jerrs",
+      "file": "Resound.vtx",
+      "platform": "spectrum"
+    },
+    {
+      "id": "second-reality",
+      "name": "Second Reality",
+      "author": "Unknown",
+      "file": "Second Reality.vtx",
+      "platform": "bk"
+    },
+    {
+      "id": "ay-not-doorbell",
+      "name": "AY Is Not A Doorbell",
+      "author": "Yerzmyey",
+      "file": "AY Is Not A Doorbell.vtx",
+      "platform": "spectrum"
+    },
+    {
+      "id": "alex-tears",
+      "name": "Alex Tears",
+      "author": "Yerzmyey",
+      "file": "Alex Tears.vtx",
+      "platform": "spectrum"
+    },
+    {
+      "id": "aleste",
+      "name": "Aleste",
+      "author": "Unknown",
+      "file": "Aleste.vtx",
+      "platform": "spectrum"
+    }
+  ]
+}
