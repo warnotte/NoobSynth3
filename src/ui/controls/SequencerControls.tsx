@@ -14,6 +14,7 @@ import { ControlButtons } from '../ControlButtons'
 import { formatInt } from '../formatters'
 import { marioSongs } from '../../state/marioSongs'
 import { getRateOptions, DEFAULT_RATES } from '../../shared/rates'
+import { loadSidPresetManifest, loadSidPreset, type SidPresetEntry } from '../../utils/sidLoader'
 
 // Shared rate options for sequencers
 const seqRateOptions = getRateOptions('sequencer')
@@ -1389,53 +1390,6 @@ function MidiFileSequencerUI({ module, engine, status, updateParam }: Pick<Contr
   )
 }
 
-// Built-in SID presets
-const SID_PRESETS = [
-  { id: '', label: '-- Select --', file: '' },
-  // Rob Hubbard classics
-  { id: 'commando', label: 'Commando', file: 'Commando.sid' },
-  { id: 'monty', label: 'Monty on the Run', file: 'Monty_on_the_Run.sid' },
-  { id: 'delta', label: 'Delta', file: 'Delta.sid' },
-  { id: 'sanxion', label: 'Sanxion', file: 'Sanxion.sid' },
-  { id: 'ik', label: 'International Karate', file: 'International_Karate.sid' },
-  { id: 'zoids', label: 'Zoids', file: 'Zoids.sid' },
-  { id: 'thrust', label: 'Thrust', file: 'Thrust.sid' },
-  // Martin Galway
-  { id: 'wizball', label: 'Wizball', file: 'Wizball.sid' },
-  { id: 'armalyte', label: 'Armalyte', file: 'Armalyte.sid' },
-  { id: 'rtype', label: 'R-Type', file: 'R-Type.sid' },
-  // Ben Daglish
-  { id: 'lastninja', label: 'Last Ninja', file: 'Last_Ninja.sid' },
-  { id: 'lastninja2', label: 'Last Ninja 2', file: 'Last_Ninja_2.sid' },
-  // Jeroen Tel
-  { id: 'cybernoid', label: 'Cybernoid', file: 'Cybernoid.sid' },
-  { id: 'hawkeye', label: 'Hawkeye', file: 'Hawkeye.sid' },
-  // Jonathan Dunn
-  { id: 'oceanloader', label: 'Ocean Loader 3', file: 'Ocean_Loader_3.sid' },
-  // Other classics
-  { id: 'platoon', label: 'Platoon', file: 'Platoon.sid' },
-  { id: 'greenberet', label: 'Green Beret', file: 'Green_Beret.sid' },
-  { id: 'ghostsngoblins', label: "Ghosts'n Goblins", file: 'Ghosts_n_Goblins.sid' },
-  { id: 'spellbound', label: 'Spellbound', file: 'Spellbound.sid' },
-  { id: 'ikari', label: 'Ikari Union', file: 'Ikari_Union.sid' },
-  // RSID files (require full C64 hardware emulation)
-  { id: 'giana', label: 'Great Giana Sisters (RSID)', file: 'Great_Giana_Sisters.sid' },
-  { id: 'arkanoid', label: 'Arkanoid (RSID)', file: 'Arkanoid.sid' },
-  { id: 'combatschool', label: 'Combat School (RSID)', file: 'Combat_School.sid' },
-  { id: 'crockets', label: "Crocket's Mix (RSID)", file: 'Crockets_Mix.sid' },
-  { id: 'dexion', label: 'Dexion Demo (RSID)', file: 'Dexion_Demo.sid' },
-  { id: 'druid2', label: 'Enlightenment / Druid II (RSID)', file: 'Enlightenment_Druid_II.sid' },
-  { id: 'iball', label: 'I-Ball (RSID)', file: 'I-Ball.sid' },
-  { id: 'lastv8', label: 'Last V8 (RSID)', file: 'Last_V8.sid' },
-  { id: 'ricochet', label: 'Ricochet (RSID)', file: 'Ricochet.sid' },
-  { id: 'robocop', label: 'RoboCop (RSID)', file: 'RoboCop.sid' },
-  { id: 'rockystar', label: 'Rocky Star (RSID)', file: 'Rocky_Star.sid' },
-  { id: 'savage', label: 'Savage (RSID)', file: 'Savage.sid' },
-  { id: 'skateordie', label: 'Skate or Die (RSID)', file: 'Skate_or_Die_intro.sid' },
-  { id: 'stormlord', label: 'Stormlord (RSID)', file: 'Stormlord.sid' },
-  { id: 'explodingfist', label: 'Way of the Exploding Fist (RSID)', file: 'Way_of_the_Exploding_Fist.sid' },
-]
-
 // Voice state type for SID visualization
 type SidVoiceState = { freq: number; gate: boolean; waveform: number }
 
@@ -1474,6 +1428,14 @@ function SidPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module
   const playStartRef = useRef<number>(Date.now())
   const [loadGen, setLoadGen] = useState(0)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [sidPresets, setSidPresets] = useState<SidPresetEntry[]>([])
+
+  // Load SID presets manifest on mount
+  useEffect(() => {
+    loadSidPresetManifest().then(manifest => {
+      setSidPresets(manifest.presets)
+    })
+  }, [])
 
   // Elapsed time counter — restarts on play or new file load
   useEffect(() => {
@@ -1535,12 +1497,10 @@ function SidPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module
   }, [loadSidData])
 
   const handlePresetChange = useCallback(async (presetId: string) => {
-    const preset = SID_PRESETS.find(p => p.id === presetId)
-    if (!preset || !preset.file) return
+    if (!presetId) return
     try {
-      const response = await fetch(`${import.meta.env.BASE_URL}sid/${preset.file}`)
-      const arrayBuffer = await response.arrayBuffer()
-      loadSidData(new Uint8Array(arrayBuffer))
+      const data = await loadSidPreset(presetId)
+      loadSidData(data)
     } catch (err) {
       console.error('Failed to load SID preset:', err)
     }
@@ -1563,8 +1523,9 @@ function SidPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module
           onChange={(e) => handlePresetChange(e.target.value)}
           defaultValue=""
         >
-          {SID_PRESETS.map(preset => (
-            <option key={preset.id} value={preset.id}>{preset.label}</option>
+          <option value="">Select...</option>
+          {sidPresets.map(preset => (
+            <option key={preset.id} value={preset.id}>{preset.name}</option>
           ))}
         </select>
       </ControlBox>

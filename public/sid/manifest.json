@@ -1,0 +1,215 @@
+{
+  "version": 1,
+  "presets": [
+    {
+      "id": "commando",
+      "name": "Commando",
+      "file": "Commando.sid",
+      "composer": "Rob Hubbard"
+    },
+    {
+      "id": "monty-on-the-run",
+      "name": "Monty on the Run",
+      "file": "Monty_on_the_Run.sid",
+      "composer": "Rob Hubbard"
+    },
+    {
+      "id": "delta",
+      "name": "Delta",
+      "file": "Delta.sid",
+      "composer": "Rob Hubbard"
+    },
+    {
+      "id": "sanxion",
+      "name": "Sanxion",
+      "file": "Sanxion.sid",
+      "composer": "Rob Hubbard"
+    },
+    {
+      "id": "international-karate",
+      "name": "International Karate",
+      "file": "International_Karate.sid",
+      "composer": "Rob Hubbard"
+    },
+    {
+      "id": "last-ninja",
+      "name": "The Last Ninja",
+      "file": "Last_Ninja.sid",
+      "composer": "Ben Daglish"
+    },
+    {
+      "id": "last-ninja-2",
+      "name": "Last Ninja 2",
+      "file": "Last_Ninja_2.sid",
+      "composer": "Matt Gray"
+    },
+    {
+      "id": "last-v8",
+      "name": "The Last V8",
+      "file": "Last_V8.sid",
+      "composer": "Rob Hubbard"
+    },
+    {
+      "id": "great-giana-sisters",
+      "name": "Great Giana Sisters",
+      "file": "Great_Giana_Sisters.sid",
+      "composer": "Chris Hülsbeck"
+    },
+    {
+      "id": "r-type",
+      "name": "R-Type",
+      "file": "R-Type.sid",
+      "composer": "Chris Hülsbeck"
+    },
+    {
+      "id": "cybernoid",
+      "name": "Cybernoid",
+      "file": "Cybernoid.sid",
+      "composer": "Jeroen Tel"
+    },
+    {
+      "id": "hawkeye",
+      "name": "Hawkeye",
+      "file": "Hawkeye.sid",
+      "composer": "Jeroen Tel"
+    },
+    {
+      "id": "armalyte",
+      "name": "Armalyte",
+      "file": "Armalyte.sid",
+      "composer": "Martin Walker"
+    },
+    {
+      "id": "platoon",
+      "name": "Platoon",
+      "file": "Platoon.sid",
+      "composer": "Jonathan Dunn"
+    },
+    {
+      "id": "ocean-loader-3",
+      "name": "Ocean Loader 3",
+      "file": "Ocean_Loader_3.sid",
+      "composer": "Jonathan Dunn"
+    },
+    {
+      "id": "robocop",
+      "name": "RoboCop",
+      "file": "RoboCop.sid",
+      "composer": "Jonathan Dunn"
+    },
+    {
+      "id": "wizball",
+      "name": "Wizball",
+      "file": "Wizball.sid",
+      "composer": "Martin Galway"
+    },
+    {
+      "id": "ghosts-n-goblins",
+      "name": "Ghosts'n Goblins",
+      "file": "Ghosts_n_Goblins.sid",
+      "composer": "Mark Cooksey"
+    },
+    {
+      "id": "green-beret",
+      "name": "Green Beret",
+      "file": "Green_Beret.sid",
+      "composer": "Martin Galway"
+    },
+    {
+      "id": "thrust",
+      "name": "Thrust",
+      "file": "Thrust.sid",
+      "composer": "Rob Hubbard"
+    },
+    {
+      "id": "zoids",
+      "name": "Zoids",
+      "file": "Zoids.sid",
+      "composer": "Rob Hubbard"
+    },
+    {
+      "id": "spellbound",
+      "name": "Spellbound",
+      "file": "Spellbound.sid",
+      "composer": "Rob Hubbard"
+    },
+    {
+      "id": "ikari-union",
+      "name": "Ikari Union",
+      "file": "Ikari_Union.sid",
+      "composer": "Rob Hubbard"
+    },
+    {
+      "id": "arkanoid",
+      "name": "Arkanoid",
+      "file": "Arkanoid.sid",
+      "composer": "Martin Galway"
+    },
+    {
+      "id": "combat-school",
+      "name": "Combat School",
+      "file": "Combat_School.sid",
+      "composer": "Martin Galway"
+    },
+    {
+      "id": "crockets-mix",
+      "name": "Crockett's Mix",
+      "file": "Crockets_Mix.sid",
+      "composer": "Rob Hubbard"
+    },
+    {
+      "id": "dexion-demo",
+      "name": "Dexion Demo",
+      "file": "Dexion_Demo.sid",
+      "composer": "Unknown"
+    },
+    {
+      "id": "enlightenment-druid-ii",
+      "name": "Enlightenment (Druid II)",
+      "file": "Enlightenment_Druid_II.sid",
+      "composer": "David Hanlon"
+    },
+    {
+      "id": "i-ball",
+      "name": "I-Ball",
+      "file": "I-Ball.sid",
+      "composer": "Unknown"
+    },
+    {
+      "id": "ricochet",
+      "name": "Ricochet",
+      "file": "Ricochet.sid",
+      "composer": "Unknown"
+    },
+    {
+      "id": "rocky-star",
+      "name": "Rocky Star",
+      "file": "Rocky_Star.sid",
+      "composer": "Unknown"
+    },
+    {
+      "id": "savage",
+      "name": "Savage",
+      "file": "Savage.sid",
+      "composer": "Jeroen Tel"
+    },
+    {
+      "id": "skate-or-die-intro",
+      "name": "Skate or Die (Intro)",
+      "file": "Skate_or_Die_intro.sid",
+      "composer": "Rob Hubbard"
+    },
+    {
+      "id": "stormlord",
+      "name": "Stormlord",
+      "file": "Stormlord.sid",
+      "composer": "Jeroen Tel"
+    },
+    {
+      "id": "way-of-the-exploding-fist",
+      "name": "Way of the Exploding Fist",
+      "file": "Way_of_the_Exploding_Fist.sid",
+      "composer": "Neil Brennan"
+    }
+  ]
+}

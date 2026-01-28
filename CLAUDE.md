@@ -23,6 +23,8 @@ crates/
   dsp-wasm/             # WASM bindings
 
 public/presets/         # Preset JSON files
+public/sid/             # SID files + manifest.json
+public/midi-presets/    # MIDI files + manifest.json
 ```
 
 ## UI Component Structure
@@ -96,6 +98,8 @@ Voir `src/hooks/HOOKS.md` pour la documentation détaillée.
 | `state/midiUtils.ts` | Conversions note/fréquence |
 | `state/sequencerPattern.ts` | Pattern par défaut du séquenceur |
 | `state/marioSongs.ts` | Mélodies pour le module Mario |
+| `utils/midiParser.ts` | Parser MIDI + chargement presets MIDI |
+| `utils/sidLoader.ts` | Chargement presets SID depuis manifest |
 
 ## Key Files
 
