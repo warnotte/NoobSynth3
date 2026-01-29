@@ -238,6 +238,27 @@ Les drums 909 utilisent un mécanisme de "latching" pour l'accent:
 - Les updates sont envoyées via `postMessage` au main thread
 - L'UI utilise `engine.watchSequencer()` pour s'abonner
 
+### Tauri Standalone Mode (Native Audio)
+Le mode Tauri utilise `cpal` (WASAPI/CoreAudio/ALSA) au lieu de Web Audio. Les fonctionnalités suivantes nécessitent des bridges natifs spécifiques:
+
+**Bridges disponibles (`src/ui/controls/types.ts`):**
+
+| Bridge | Fonctionnalités |
+|--------|-----------------|
+| `NativeScopeBridge` | Oscilloscope data polling |
+| `NativeChiptuneBridge` | SID/AY voice states + elapsed time |
+| `NativeSequencerBridge` | Playhead position (Step, Drum, MIDI) + MIDI seek |
+| `NativeGranularBridge` | Position polling + buffer loading |
+
+**Pattern d'implémentation:**
+1. Mode Web: `engine.watchXxx()` (subscription via AudioWorklet messages)
+2. Mode Native: Polling dans `useEffect` avec `invokeTauri()` (~20-50ms interval)
+
+**Fichiers clés:**
+- `src-tauri/src/lib.rs` - Commandes Tauri + AudioCommand variants
+- `src/App.tsx` - Création des bridges (`useMemo`)
+- `src/ui/controls/*.tsx` - Detection `isNativeMode` + polling
+
 ### Unified Rate Divisions
 Tous les séquenceurs utilisent un système de rate divisions unifié défini dans:
 - **Rust:** `crates/dsp-core/src/sequencers/mod.rs` → `RATE_DIVISIONS[16]`
@@ -486,6 +507,7 @@ Ces paramètres utilisent des **valeurs numériques** :
 | RSID timer écrasement | `call_irq` restaurait CIA timers après exécution 6502 | Ne plus restaurer `timer_a`/`timer_b` — laisser les modifications du code persister |
 | RSID stack pointer reset | SP forcé à 0xFF à chaque IRQ, détruisant les données stack | SP persistant (`irq_sp`) dans la struct SidPlayer |
 | SID elapsed timer overflow | `playStartRef` null → `Date.now() - null` = epoch | Ref toujours `number`, reset via `loadGen` counter |
+| WASAPI buffer overflow | `&[0.0; 128][..frames]` trop petit pour WASAPI (480-4096 frames) | `const ZERO_BUFFER: [f32; 4096]` dans `process.rs` |
 
 ---
 

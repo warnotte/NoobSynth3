@@ -93,6 +93,53 @@ enum AudioCommand {
   Status {
     reply: mpsc::Sender<Result<NativeStatus, String>>,
   },
+  // SID/AY Player commands
+  LoadSidFile {
+    module_id: String,
+    data: Vec<u8>,
+    reply: mpsc::Sender<Result<(), String>>,
+  },
+  LoadYmFile {
+    module_id: String,
+    data: Vec<u8>,
+    reply: mpsc::Sender<Result<(), String>>,
+  },
+  GetSidVoiceStates {
+    module_id: String,
+    reply: mpsc::Sender<Result<Vec<u16>, String>>,
+  },
+  GetAyVoiceStates {
+    module_id: String,
+    reply: mpsc::Sender<Result<Vec<u16>, String>>,
+  },
+  GetSidElapsed {
+    module_id: String,
+    reply: mpsc::Sender<Result<f32, String>>,
+  },
+  GetAyElapsed {
+    module_id: String,
+    reply: mpsc::Sender<Result<f32, String>>,
+  },
+  // Sequencer commands
+  GetSequencerStep {
+    module_id: String,
+    reply: mpsc::Sender<Result<i32, String>>,
+  },
+  SeekMidiSequencer {
+    module_id: String,
+    tick: u32,
+    reply: mpsc::Sender<Result<(), String>>,
+  },
+  // Granular commands
+  GetGranularPosition {
+    module_id: String,
+    reply: mpsc::Sender<Result<f32, String>>,
+  },
+  LoadGranularBuffer {
+    module_id: String,
+    data: Vec<f32>,
+    reply: mpsc::Sender<Result<usize, String>>,
+  },
 }
 
 const SCOPE_FRAMES: usize = 2048;
@@ -457,6 +504,115 @@ fn audio_thread(rx: mpsc::Receiver<AudioCommand>, scope: Arc<Mutex<ScopeSnapshot
       }
       AudioCommand::Status { reply } => {
         let _ = reply.send(Ok(state.status()));
+      }
+      // SID/AY Player commands
+      AudioCommand::LoadSidFile {
+        module_id,
+        data,
+        reply,
+      } => {
+        let result = with_graph_mut(&mut state, |engine| {
+          engine.load_sid_file(&module_id, &data);
+        });
+        let _ = reply.send(result);
+      }
+      AudioCommand::LoadYmFile {
+        module_id,
+        data,
+        reply,
+      } => {
+        let result = with_graph_mut(&mut state, |engine| {
+          engine.load_ym_file(&module_id, &data);
+        });
+        let _ = reply.send(result);
+      }
+      AudioCommand::GetSidVoiceStates { module_id, reply } => {
+        let result = if let Some(graph) = &state.graph {
+          match graph.lock() {
+            Ok(engine) => Ok(engine.get_sid_voice_states(&module_id)),
+            Err(_) => Err("graph engine unavailable".to_string()),
+          }
+        } else {
+          Ok(vec![0; 9])
+        };
+        let _ = reply.send(result);
+      }
+      AudioCommand::GetAyVoiceStates { module_id, reply } => {
+        let result = if let Some(graph) = &state.graph {
+          match graph.lock() {
+            Ok(engine) => Ok(engine.get_ay_voice_states(&module_id)),
+            Err(_) => Err("graph engine unavailable".to_string()),
+          }
+        } else {
+          Ok(vec![0; 9])
+        };
+        let _ = reply.send(result);
+      }
+      AudioCommand::GetSidElapsed { module_id, reply } => {
+        let result = if let Some(graph) = &state.graph {
+          match graph.lock() {
+            Ok(engine) => Ok(engine.get_sid_elapsed(&module_id)),
+            Err(_) => Err("graph engine unavailable".to_string()),
+          }
+        } else {
+          Ok(0.0)
+        };
+        let _ = reply.send(result);
+      }
+      AudioCommand::GetAyElapsed { module_id, reply } => {
+        let result = if let Some(graph) = &state.graph {
+          match graph.lock() {
+            Ok(engine) => Ok(engine.get_ay_elapsed(&module_id)),
+            Err(_) => Err("graph engine unavailable".to_string()),
+          }
+        } else {
+          Ok(0.0)
+        };
+        let _ = reply.send(result);
+      }
+      // Sequencer commands
+      AudioCommand::GetSequencerStep { module_id, reply } => {
+        let result = if let Some(graph) = &state.graph {
+          match graph.lock() {
+            Ok(engine) => Ok(engine.get_sequencer_step(&module_id)),
+            Err(_) => Err("graph engine unavailable".to_string()),
+          }
+        } else {
+          Ok(-1)
+        };
+        let _ = reply.send(result);
+      }
+      AudioCommand::SeekMidiSequencer { module_id, tick, reply } => {
+        let result = with_graph_mut(&mut state, |engine| {
+          engine.seek_midi_sequencer(&module_id, tick);
+        });
+        let _ = reply.send(result);
+      }
+      // Granular commands
+      AudioCommand::GetGranularPosition { module_id, reply } => {
+        let result = if let Some(graph) = &state.graph {
+          match graph.lock() {
+            Ok(engine) => Ok(engine.get_granular_position(&module_id)),
+            Err(_) => Err("graph engine unavailable".to_string()),
+          }
+        } else {
+          Ok(0.0)
+        };
+        let _ = reply.send(result);
+      }
+      AudioCommand::LoadGranularBuffer { module_id, data, reply } => {
+        let result = if let Some(graph) = &state.graph {
+          match graph.lock() {
+            Ok(mut engine) => {
+              engine.load_granular_buffer(&module_id, &data);
+              Ok(engine.get_granular_buffer_length(&module_id))
+            }
+            Err(_) => Err("graph engine unavailable".to_string()),
+          }
+        } else {
+          Err("no graph".to_string())
+        };
+        let _ = reply.send(result);
       }
     }
   }
@@ -1091,6 +1247,198 @@ fn native_get_scope(state: State<NativeAudioState>) -> Result<ScopePacket, Strin
 }
 
 // ============================================================================
+// SID/AY Player Support
+// ============================================================================
+
+#[tauri::command]
+fn native_load_sid_file(
+  state: State<NativeAudioState>,
+  module_id: String,
+  data: Vec<u8>,
+) -> Result<(), String> {
+  let (reply_tx, reply_rx) = mpsc::channel();
+  state
+    .tx
+    .send(AudioCommand::LoadSidFile {
+      module_id,
+      data,
+      reply: reply_tx,
+    })
+    .map_err(|_| "native audio thread unavailable".to_string())?;
+  reply_rx
+    .recv()
+    .map_err(|_| "native audio thread unavailable".to_string())?
+}
+
+#[tauri::command]
+fn native_load_ym_file(
+  state: State<NativeAudioState>,
+  module_id: String,
+  data: Vec<u8>,
+) -> Result<(), String> {
+  let (reply_tx, reply_rx) = mpsc::channel();
+  state
+    .tx
+    .send(AudioCommand::LoadYmFile {
+      module_id,
+      data,
+      reply: reply_tx,
+    })
+    .map_err(|_| "native audio thread unavailable".to_string())?;
+  reply_rx
+    .recv()
+    .map_err(|_| "native audio thread unavailable".to_string())?
+}
+
+#[tauri::command]
+fn native_get_sid_voice_states(
+  state: State<NativeAudioState>,
+  module_id: String,
+) -> Result<Vec<u16>, String> {
+  let (reply_tx, reply_rx) = mpsc::channel();
+  state
+    .tx
+    .send(AudioCommand::GetSidVoiceStates {
+      module_id,
+      reply: reply_tx,
+    })
+    .map_err(|_| "native audio thread unavailable".to_string())?;
+  reply_rx
+    .recv()
+    .map_err(|_| "native audio thread unavailable".to_string())?
+}
+
+#[tauri::command]
+fn native_get_ay_voice_states(
+  state: State<NativeAudioState>,
+  module_id: String,
+) -> Result<Vec<u16>, String> {
+  let (reply_tx, reply_rx) = mpsc::channel();
+  state
+    .tx
+    .send(AudioCommand::GetAyVoiceStates {
+      module_id,
+      reply: reply_tx,
+    })
+    .map_err(|_| "native audio thread unavailable".to_string())?;
+  reply_rx
+    .recv()
+    .map_err(|_| "native audio thread unavailable".to_string())?
+}
+
+#[tauri::command]
+fn native_get_sid_elapsed(
+  state: State<NativeAudioState>,
+  module_id: String,
+) -> Result<f32, String> {
+  let (reply_tx, reply_rx) = mpsc::channel();
+  state
+    .tx
+    .send(AudioCommand::GetSidElapsed {
+      module_id,
+      reply: reply_tx,
+    })
+    .map_err(|_| "native audio thread unavailable".to_string())?;
+  reply_rx
+    .recv()
+    .map_err(|_| "native audio thread unavailable".to_string())?
+}
+
+#[tauri::command]
+fn native_get_ay_elapsed(
+  state: State<NativeAudioState>,
+  module_id: String,
+) -> Result<f32, String> {
+  let (reply_tx, reply_rx) = mpsc::channel();
+  state
+    .tx
+    .send(AudioCommand::GetAyElapsed {
+      module_id,
+      reply: reply_tx,
+    })
+    .map_err(|_| "native audio thread unavailable".to_string())?;
+  reply_rx
+    .recv()
+    .map_err(|_| "native audio thread unavailable".to_string())?
+}
+
+#[tauri::command]
+fn native_get_sequencer_step(
+  state: State<NativeAudioState>,
+  module_id: String,
+) -> Result<i32, String> {
+  let (reply_tx, reply_rx) = mpsc::channel();
+  state
+    .tx
+    .send(AudioCommand::GetSequencerStep {
+      module_id,
+      reply: reply_tx,
+    })
+    .map_err(|_| "native audio thread unavailable".to_string())?;
+  reply_rx
+    .recv()
+    .map_err(|_| "native audio thread unavailable".to_string())?
+}
+
+#[tauri::command]
+fn native_seek_midi_sequencer(
+  state: State<NativeAudioState>,
+  module_id: String,
+  tick: u32,
+) -> Result<(), String> {
+  let (reply_tx, reply_rx) = mpsc::channel();
+  state
+    .tx
+    .send(AudioCommand::SeekMidiSequencer {
+      module_id,
+      tick,
+      reply: reply_tx,
+    })
+    .map_err(|_| "native audio thread unavailable".to_string())?;
+  reply_rx
+    .recv()
+    .map_err(|_| "native audio thread unavailable".to_string())?
+}
+
+#[tauri::command]
+fn native_get_granular_position(
+  state: State<NativeAudioState>,
+  module_id: String,
+) -> Result<f32, String> {
+  let (reply_tx, reply_rx) = mpsc::channel();
+  state
+    .tx
+    .send(AudioCommand::GetGranularPosition {
+      module_id,
+      reply: reply_tx,
+    })
+    .map_err(|_| "native audio thread unavailable".to_string())?;
+  reply_rx
+    .recv()
+    .map_err(|_| "native audio thread unavailable".to_string())?
+}
+
+#[tauri::command]
+fn native_load_granular_buffer(
+  state: State<NativeAudioState>,
+  module_id: String,
+  data: Vec<f32>,
+) -> Result<usize, String> {
+  let (reply_tx, reply_rx) = mpsc::channel();
+  state
+    .tx
+    .send(AudioCommand::LoadGranularBuffer {
+      module_id,
+      data,
+      reply: reply_tx,
+    })
+    .map_err(|_| "native audio thread unavailable".to_string())?;
+  reply_rx
+    .recv()
+    .map_err(|_| "native audio thread unavailable".to_string())?
+}
+
+// ============================================================================
 // VST Mode Support
 // ============================================================================
 
@@ -1449,6 +1797,19 @@ pub fn run() {
       native_stop_graph,
       native_status,
       native_get_scope,
+      // SID/AY Player commands
+      native_load_sid_file,
+      native_load_ym_file,
+      native_get_sid_voice_states,
+      native_get_ay_voice_states,
+      native_get_sid_elapsed,
+      native_get_ay_elapsed,
+      // Sequencer commands
+      native_get_sequencer_step,
+      native_seek_midi_sequencer,
+      // Granular commands
+      native_get_granular_position,
+      native_load_granular_buffer,
       // VST mode commands
       is_vst_mode,
       vst_connect,

@@ -52,6 +52,10 @@ use crate::buffer::{mix_buffers, Buffer};
 use crate::state::*;
 use crate::types::ConnectionEdge;
 
+/// Static zero buffer for default input values.
+/// Size 4096 to handle WASAPI and other backends with large buffer sizes.
+const ZERO_BUFFER: [f32; 4096] = [0.0; 4096];
+
 /// Process a module's audio given its state and connections.
 ///
 /// This function dispatches to the appropriate DSP processing based on the module state.
@@ -1524,27 +1528,27 @@ pub(crate) fn process_module(
             let audio_in = if !connections[0].is_empty() {
                 inputs[0].channel(0)
             } else {
-                &[0.0; 128][..frames]
+                &ZERO_BUFFER[..frames]
             };
             let pitch_cv = if connections.len() > 1 && !connections[1].is_empty() {
                 inputs[1].channel(0)
             } else {
-                &[0.0; 128][..frames]
+                &ZERO_BUFFER[..frames]
             };
             let gate = if connections.len() > 2 && !connections[2].is_empty() {
                 inputs[2].channel(0)
             } else {
-                &[0.0; 128][..frames]
+                &ZERO_BUFFER[..frames]
             };
             let strum = if connections.len() > 3 && !connections[3].is_empty() {
                 inputs[3].channel(0)
             } else {
-                &[0.0; 128][..frames]
+                &ZERO_BUFFER[..frames]
             };
             let damp = if connections.len() > 4 && !connections[4].is_empty() {
                 inputs[4].channel(0)
             } else {
-                &[0.0; 128][..frames]
+                &ZERO_BUFFER[..frames]
             };
 
             // Get parameter slices
@@ -1586,22 +1590,22 @@ pub(crate) fn process_module(
             let pitch_cv = if !connections[0].is_empty() {
                 inputs[0].channel(0)
             } else {
-                &[0.0; 128][..frames]
+                &ZERO_BUFFER[..frames]
             };
             let gate = if connections.len() > 1 && !connections[1].is_empty() {
                 inputs[1].channel(0)
             } else {
-                &[0.0; 128][..frames]
+                &ZERO_BUFFER[..frames]
             };
             let position_cv = if connections.len() > 2 && !connections[2].is_empty() {
                 inputs[2].channel(0)
             } else {
-                &[0.0; 128][..frames]
+                &ZERO_BUFFER[..frames]
             };
             let sync = if connections.len() > 3 && !connections[3].is_empty() {
                 inputs[3].channel(0)
             } else {
-                &[0.0; 128][..frames]
+                &ZERO_BUFFER[..frames]
             };
 
             // Get parameter slices

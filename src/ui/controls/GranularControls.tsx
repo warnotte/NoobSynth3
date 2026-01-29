@@ -15,9 +15,9 @@ import {
   formatPercent,
 } from '../formatters'
 
-type GranularControlsProps = Pick<ControlProps, 'module' | 'engine' | 'updateParam'>
+type GranularControlsProps = Pick<ControlProps, 'module' | 'engine' | 'audioMode' | 'nativeGranular' | 'updateParam'>
 
-export function GranularControls({ module, engine, updateParam }: GranularControlsProps) {
+export function GranularControls({ module, engine, audioMode, nativeGranular, updateParam }: GranularControlsProps) {
   const [hasBuffer, setHasBuffer] = useState(false)
   const [waveformData, setWaveformData] = useState<Float32Array | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -29,13 +29,36 @@ export function GranularControls({ module, engine, updateParam }: GranularContro
   const audioBufferRef = useRef<AudioBuffer | null>(null)
   const sourceNodeRef = useRef<AudioBufferSourceNode | null>(null)
 
-  // Subscribe to effective position updates from engine
+  const isNativeMode = audioMode === 'native' && nativeGranular?.isActive
+
+  // Web mode: Subscribe to effective position updates from engine
   useEffect(() => {
+    if (isNativeMode) return // Native mode uses polling below
     const unsubscribe = engine.watchGranularPosition(module.id, (pos) => {
       setEffectivePosition(pos)
     })
     return unsubscribe
-  }, [engine, module.id])
+  }, [engine, module.id, isNativeMode])
+
+  // Native mode: polling-based position updates
+  useEffect(() => {
+    if (!isNativeMode || !nativeGranular) return
+    let active = true
+    const poll = async () => {
+      while (active) {
+        try {
+          const pos = await nativeGranular.getGranularPosition(module.id)
+          if (!active) break
+          setEffectivePosition(pos)
+        } catch (err) {
+          console.error('Failed to poll granular position:', err)
+        }
+        await new Promise(resolve => setTimeout(resolve, 50)) // Poll every 50ms
+      }
+    }
+    void poll()
+    return () => { active = false }
+  }, [module.id, isNativeMode, nativeGranular])
 
   const position = Number(module.params.position ?? 0.5)
   const size = Number(module.params.size ?? 100)
@@ -117,7 +140,12 @@ export function GranularControls({ module, engine, updateParam }: GranularContro
 
       // Load into engine - need to copy since we transfer the buffer
       const samplesCopy = new Float32Array(samples)
-      const loadedLength = await engine.loadGranularBuffer(module.id, samplesCopy)
+      let loadedLength: number
+      if (isNativeMode && nativeGranular) {
+        loadedLength = await nativeGranular.loadGranularBuffer(module.id, samplesCopy)
+      } else {
+        loadedLength = await engine.loadGranularBuffer(module.id, samplesCopy)
+      }
       console.log(`[Granular] Buffer loaded: ${loadedLength} samples (${(loadedLength / 48000).toFixed(2)}s)`)
 
       // Store waveform data for visualization (downsampled)

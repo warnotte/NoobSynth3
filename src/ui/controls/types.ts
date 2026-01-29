@@ -19,6 +19,37 @@ export type NativeScopeBridge = {
 }
 
 /**
+ * Bridge for native chiptune player operations (Tauri mode)
+ */
+export type NativeChiptuneBridge = {
+  isActive: boolean
+  loadSidFile: (moduleId: string, data: Uint8Array) => Promise<void>
+  loadYmFile: (moduleId: string, data: Uint8Array) => Promise<void>
+  getSidVoiceStates: (moduleId: string) => Promise<number[]>
+  getAyVoiceStates: (moduleId: string) => Promise<number[]>
+  getSidElapsed: (moduleId: string) => Promise<number>
+  getAyElapsed: (moduleId: string) => Promise<number>
+}
+
+/**
+ * Bridge for native sequencer operations (Tauri mode)
+ */
+export type NativeSequencerBridge = {
+  isActive: boolean
+  getSequencerStep: (moduleId: string) => Promise<number>
+  seekMidiSequencer: (moduleId: string, tick: number) => Promise<void>
+}
+
+/**
+ * Bridge for native granular operations (Tauri mode)
+ */
+export type NativeGranularBridge = {
+  isActive: boolean
+  getGranularPosition: (moduleId: string) => Promise<number>
+  loadGranularBuffer: (moduleId: string, data: Float32Array) => Promise<number>
+}
+
+/**
  * Props passed to all control render functions
  */
 export type ControlProps = {
@@ -34,6 +65,12 @@ export type ControlProps = {
   audioMode: 'web' | 'native' | 'vst'
   /** Native scope data bridge (for Tauri/VST) */
   nativeScope?: NativeScopeBridge | null
+  /** Native chiptune bridge for SID/AY players (Tauri mode) */
+  nativeChiptune?: NativeChiptuneBridge | null
+  /** Native sequencer bridge for step/drum/midi sequencers (Tauri mode) */
+  nativeSequencer?: NativeSequencerBridge | null
+  /** Native granular bridge (Tauri mode) */
+  nativeGranular?: NativeGranularBridge | null
   /** Update a module parameter */
   updateParam: (
     moduleId: string,

@@ -1530,7 +1530,7 @@ export function renderSourceControls(props: ControlProps): React.ReactElement | 
   }
 
   if (module.type === 'granular') {
-    return <GranularControls module={module} engine={props.engine} updateParam={updateParam} />
+    return <GranularControls module={module} engine={props.engine} audioMode={props.audioMode} nativeGranular={props.nativeGranular} updateParam={updateParam} />
   }
 
   return null

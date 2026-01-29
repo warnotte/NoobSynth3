@@ -24,7 +24,7 @@ const clockRateOptions = getRateOptions('clock')
 const drumRateOptions = getRateOptions('drums')
 
 export function renderSequencerControls(props: ControlProps): React.ReactElement | null {
-  const { module, engine, status, updateParam, marioStep } = props
+  const { module, engine, status, audioMode, nativeChiptune, nativeSequencer, updateParam, marioStep } = props
 
   if (module.type === 'arpeggiator') {
     const enabled = module.params.enabled !== false
@@ -212,11 +212,11 @@ export function renderSequencerControls(props: ControlProps): React.ReactElement
   }
 
   if (module.type === 'step-sequencer') {
-    return <StepSequencerUI module={module} engine={engine} status={status} updateParam={updateParam} />
+    return <StepSequencerUI module={module} engine={engine} status={status} audioMode={audioMode} nativeSequencer={nativeSequencer} updateParam={updateParam} />
   }
 
   if (module.type === 'drum-sequencer') {
-    return <DrumSequencerUI module={module} engine={engine} status={status} updateParam={updateParam} />
+    return <DrumSequencerUI module={module} engine={engine} status={status} audioMode={audioMode} nativeSequencer={nativeSequencer} updateParam={updateParam} />
   }
 
   if (module.type === 'euclidean') {
@@ -463,7 +463,7 @@ export function renderSequencerControls(props: ControlProps): React.ReactElement
   }
 
   if (module.type === 'midi-file-sequencer') {
-    return <MidiFileSequencerUI module={module} engine={engine} status={status} updateParam={updateParam} />
+    return <MidiFileSequencerUI module={module} engine={engine} status={status} audioMode={audioMode} nativeSequencer={nativeSequencer} updateParam={updateParam} />
   }
 
   if (module.type === 'turing-machine') {
@@ -565,19 +565,20 @@ export function renderSequencerControls(props: ControlProps): React.ReactElement
   }
 
   if (module.type === 'sid-player') {
-    return <SidPlayerUI module={module} engine={engine} updateParam={updateParam} />
+    return <SidPlayerUI module={module} engine={engine} audioMode={audioMode} nativeChiptune={nativeChiptune} updateParam={updateParam} />
   }
 
   if (module.type === 'ay-player') {
-    return <AyPlayerUI module={module} engine={engine} updateParam={updateParam} />
+    return <AyPlayerUI module={module} engine={engine} audioMode={audioMode} nativeChiptune={nativeChiptune} updateParam={updateParam} />
   }
 
   return null
 }
 
 // Step Sequencer sub-component with hooks
-function StepSequencerUI({ module, engine, status, updateParam }: Pick<ControlProps, 'module' | 'engine' | 'status' | 'updateParam'>) {
+function StepSequencerUI({ module, engine, status, audioMode, nativeSequencer, updateParam }: Pick<ControlProps, 'module' | 'engine' | 'status' | 'audioMode' | 'nativeSequencer' | 'updateParam'>) {
   const enabled = module.params.enabled !== false
+  const isNativeMode = audioMode === 'native' && nativeSequencer?.isActive
   const tempo = Number(module.params.tempo ?? 120)
   const rate = Number(module.params.rate ?? DEFAULT_RATES.stepSequencer)
   const gateLength = Number(module.params.gateLength ?? 50)
@@ -678,7 +679,9 @@ function StepSequencerUI({ module, engine, status, updateParam }: Pick<ControlPr
     stepRef.current = step
   }, [])
 
+  // Web mode: subscription-based playhead updates
   useEffect(() => {
+    if (isNativeMode) return // Native mode uses polling below
     if (!enabled || status !== 'running') {
       if (gridRef.current) {
         gridRef.current.querySelectorAll('.seq-step.playing').forEach(el => {
@@ -691,7 +694,36 @@ function StepSequencerUI({ module, engine, status, updateParam }: Pick<ControlPr
 
     const unsubscribe = engine.watchSequencer(module.id, updatePlayhead)
     return unsubscribe
-  }, [enabled, status, module.id, engine, updatePlayhead])
+  }, [enabled, status, module.id, engine, updatePlayhead, isNativeMode])
+
+  // Native mode: polling-based playhead updates
+  useEffect(() => {
+    if (!isNativeMode || !nativeSequencer) return
+    if (!enabled || status !== 'running') {
+      if (gridRef.current) {
+        gridRef.current.querySelectorAll('.seq-step.playing').forEach(el => {
+          el.classList.remove('playing')
+        })
+      }
+      stepRef.current = -1
+      return
+    }
+    let active = true
+    const poll = async () => {
+      while (active) {
+        try {
+          const step = await nativeSequencer.getSequencerStep(module.id)
+          if (!active) break
+          updatePlayhead(step)
+        } catch (err) {
+          console.error('Failed to poll sequencer step:', err)
+        }
+        await new Promise(resolve => setTimeout(resolve, 30)) // Poll every 30ms
+      }
+    }
+    void poll()
+    return () => { active = false }
+  }, [enabled, status, module.id, isNativeMode, nativeSequencer, updatePlayhead])
 
   return (
     <>
@@ -864,8 +896,9 @@ function StepSequencerUI({ module, engine, status, updateParam }: Pick<ControlPr
 }
 
 // Drum Sequencer sub-component with hooks
-function DrumSequencerUI({ module, engine, status, updateParam }: Pick<ControlProps, 'module' | 'engine' | 'status' | 'updateParam'>) {
+function DrumSequencerUI({ module, engine, status, audioMode, nativeSequencer, updateParam }: Pick<ControlProps, 'module' | 'engine' | 'status' | 'audioMode' | 'nativeSequencer' | 'updateParam'>) {
   const enabled = module.params.enabled !== false
+  const isNativeMode = audioMode === 'native' && nativeSequencer?.isActive
   const tempo = Number(module.params.tempo ?? 120)
   const rate = Number(module.params.rate ?? DEFAULT_RATES.drumSequencer)
   const swing = Number(module.params.swing ?? 0)
@@ -1050,7 +1083,9 @@ function DrumSequencerUI({ module, engine, status, updateParam }: Pick<ControlPr
     stepRef.current = step
   }, [])
 
+  // Web mode: subscription-based playhead updates
   useEffect(() => {
+    if (isNativeMode) return // Native mode uses polling below
     if (!enabled || status !== 'running') {
       if (gridRef.current) {
         gridRef.current.querySelectorAll('.drum-step.playing').forEach(el => {
@@ -1063,7 +1098,36 @@ function DrumSequencerUI({ module, engine, status, updateParam }: Pick<ControlPr
 
     const unsubscribe = engine.watchSequencer(module.id, updatePlayhead)
     return unsubscribe
-  }, [enabled, status, module.id, engine, updatePlayhead])
+  }, [enabled, status, module.id, engine, updatePlayhead, isNativeMode])
+
+  // Native mode: polling-based playhead updates
+  useEffect(() => {
+    if (!isNativeMode || !nativeSequencer) return
+    if (!enabled || status !== 'running') {
+      if (gridRef.current) {
+        gridRef.current.querySelectorAll('.drum-step.playing').forEach(el => {
+          el.classList.remove('playing')
+        })
+      }
+      stepRef.current = -1
+      return
+    }
+    let active = true
+    const poll = async () => {
+      while (active) {
+        try {
+          const step = await nativeSequencer.getSequencerStep(module.id)
+          if (!active) break
+          updatePlayhead(step)
+        } catch (err) {
+          console.error('Failed to poll drum sequencer step:', err)
+        }
+        await new Promise(resolve => setTimeout(resolve, 30)) // Poll every 30ms
+      }
+    }
+    void poll()
+    return () => { active = false }
+  }, [enabled, status, module.id, isNativeMode, nativeSequencer, updatePlayhead])
 
   return (
     <>
@@ -1177,7 +1241,7 @@ function DrumSequencerUI({ module, engine, status, updateParam }: Pick<ControlPr
 }
 
 // MIDI File Sequencer sub-component
-function MidiFileSequencerUI({ module, engine, status, updateParam }: Pick<ControlProps, 'module' | 'engine' | 'status' | 'updateParam'>) {
+function MidiFileSequencerUI({ module, engine, status, audioMode, nativeSequencer, updateParam }: Pick<ControlProps, 'module' | 'engine' | 'status' | 'audioMode' | 'nativeSequencer' | 'updateParam'>) {
   const enabled = module.params.enabled !== false
   const loopEnabled = module.params.loop !== false
   const tempo = Number(module.params.tempo ?? 120)
@@ -1185,6 +1249,7 @@ function MidiFileSequencerUI({ module, engine, status, updateParam }: Pick<Contr
   const voices = Number(module.params.voices ?? 4)
   const selectedFile = String(module.params.selectedFile ?? '')
   const midiDataStr = String(module.params.midiData ?? '')
+  const isNativeMode = audioMode === 'native' && nativeSequencer?.isActive
 
   // Parse track info and total ticks from stored MIDI data
   const trackInfo = useMidiTrackInfo(midiDataStr)
@@ -1210,8 +1275,9 @@ function MidiFileSequencerUI({ module, engine, status, updateParam }: Pick<Contr
     loadPresets()
   }, [])
 
-  // Watch sequencer for playhead updates
+  // Web mode: Watch sequencer for playhead updates
   useEffect(() => {
+    if (isNativeMode) return // Native mode uses polling below
     if (!enabled || status !== 'running') {
       setCurrentTick(0)
       return
@@ -1231,7 +1297,31 @@ function MidiFileSequencerUI({ module, engine, status, updateParam }: Pick<Contr
       console.log('[MidiFileSeq] Unsubscribing from', module.id)
       unsubscribe()
     }
-  }, [enabled, status, module.id, engine, totalTicks])
+  }, [enabled, status, module.id, engine, totalTicks, isNativeMode])
+
+  // Native mode: polling-based playhead updates
+  useEffect(() => {
+    if (!isNativeMode || !nativeSequencer) return
+    if (!enabled || status !== 'running') {
+      setCurrentTick(0)
+      return
+    }
+    let active = true
+    const poll = async () => {
+      while (active) {
+        try {
+          const tick = await nativeSequencer.getSequencerStep(module.id)
+          if (!active) break
+          setCurrentTick(tick)
+        } catch (err) {
+          console.error('Failed to poll MIDI sequencer tick:', err)
+        }
+        await new Promise(resolve => setTimeout(resolve, 50)) // Poll every 50ms
+      }
+    }
+    void poll()
+    return () => { active = false }
+  }, [enabled, status, module.id, isNativeMode, nativeSequencer])
 
   const handleFileLoad = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -1331,7 +1421,11 @@ function MidiFileSequencerUI({ module, engine, status, updateParam }: Pick<Contr
             const x = e.clientX - rect.left
             const ratio = Math.max(0, Math.min(1, x / rect.width))
             const targetTick = Math.floor(ratio * totalTicks)
-            engine.seekMidiSequencer(module.id, targetTick)
+            if (isNativeMode && nativeSequencer) {
+              void nativeSequencer.seekMidiSequencer(module.id, targetTick)
+            } else {
+              engine.seekMidiSequencer(module.id, targetTick)
+            }
             setCurrentTick(targetTick)
           }}
           style={{ cursor: totalTicks > 0 ? 'pointer' : 'default' }}
@@ -1420,7 +1514,7 @@ function formatElapsed(seconds: number): string {
 }
 
 // SID Player sub-component
-function SidPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module' | 'engine' | 'updateParam'>) {
+function SidPlayerUI({ module, engine, audioMode, nativeChiptune, updateParam }: Pick<ControlProps, 'module' | 'engine' | 'audioMode' | 'nativeChiptune' | 'updateParam'>) {
   const playing = module.params.playing === 1 || module.params.playing === true
   const song = Number(module.params.song ?? 1)
   const chipModel = Number(module.params.chipModel ?? 0)
@@ -1434,6 +1528,8 @@ function SidPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [sidPresets, setSidPresets] = useState<SidPresetEntry[]>([])
 
+  const isNativeMode = audioMode === 'native' && nativeChiptune?.isActive
+
   // Load SID presets manifest on mount
   useEffect(() => {
     loadSidPresetManifest().then(manifest => {
@@ -1441,8 +1537,9 @@ function SidPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module
     })
   }, [])
 
-  // Subscribe to voice state updates and elapsed time from Rust
+  // Subscribe to voice state updates and elapsed time - Web mode (AudioWorklet)
   useEffect(() => {
+    if (isNativeMode) return // Native mode uses polling below
     if (!playing) {
       setElapsed(0)
       return
@@ -1452,7 +1549,41 @@ function SidPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module
       setElapsed(Math.floor(elapsedSecs))
     })
     return unsubscribe
-  }, [engine, module.id, playing])
+  }, [engine, module.id, playing, isNativeMode])
+
+  // Poll voice state updates - Native mode (Tauri)
+  useEffect(() => {
+    if (!isNativeMode || !nativeChiptune) return
+    if (!playing) {
+      setElapsed(0)
+      return
+    }
+    let active = true
+    const poll = async () => {
+      while (active) {
+        try {
+          const [voiceData, elapsedSecs] = await Promise.all([
+            nativeChiptune.getSidVoiceStates(module.id),
+            nativeChiptune.getSidElapsed(module.id),
+          ])
+          if (!active) break
+          if (voiceData.length === 9) {
+            setVoices([
+              { freq: voiceData[0], gate: voiceData[1] !== 0, waveform: voiceData[2] },
+              { freq: voiceData[3], gate: voiceData[4] !== 0, waveform: voiceData[5] },
+              { freq: voiceData[6], gate: voiceData[7] !== 0, waveform: voiceData[8] },
+            ])
+          }
+          setElapsed(Math.floor(elapsedSecs))
+        } catch (err) {
+          console.error('Failed to poll SID state:', err)
+        }
+        await new Promise(resolve => setTimeout(resolve, 50)) // Poll every 50ms
+      }
+    }
+    void poll()
+    return () => { active = false }
+  }, [module.id, playing, isNativeMode, nativeChiptune])
 
   const chipModelOptions = [
     { id: 0, label: '6581' },
@@ -1474,10 +1605,16 @@ function SidPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module
         // Reset song BEFORE loading to avoid stale state
         updateParam(module.id, 'song', startSong || 1)
         setSidInfo({ name, author, songs, isRsid: magic === 'RSID' })
-        engine.loadSidFile(module.id, data)
+
+        // Load into appropriate engine based on mode
+        if (isNativeMode && nativeChiptune) {
+          void nativeChiptune.loadSidFile(module.id, data)
+        } else {
+          engine.loadSidFile(module.id, data)
+        }
       }
     }
-  }, [module.id, engine, updateParam])
+  }, [module.id, engine, updateParam, isNativeMode, nativeChiptune])
 
   const handleFileLoad = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -1608,7 +1745,7 @@ const AY_MODE_LABELS: Record<number, string> = {
 }
 
 // AY Player sub-component
-function AyPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module' | 'engine' | 'updateParam'>) {
+function AyPlayerUI({ module, engine, audioMode, nativeChiptune, updateParam }: Pick<ControlProps, 'module' | 'engine' | 'audioMode' | 'nativeChiptune' | 'updateParam'>) {
   const playing = module.params.playing === 1 || module.params.playing === true
   const loopEnabled = module.params.loop === 1 || module.params.loop === true
   const [ymInfo, setYmInfo] = useState<{ name: string; author: string; frames: number; format: string } | null>(null)
@@ -1622,6 +1759,8 @@ function AyPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module'
   const [ayPresets, setAyPresets] = useState<AyPresetEntry[]>([])
   const [loadError, setLoadError] = useState<string | null>(null)
 
+  const isNativeMode = audioMode === 'native' && nativeChiptune?.isActive
+
   // Load AY presets manifest on mount
   useEffect(() => {
     loadAyPresetManifest().then(manifest => {
@@ -1629,8 +1768,9 @@ function AyPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module'
     })
   }, [])
 
-  // Subscribe to voice state updates and elapsed time from Rust
+  // Subscribe to voice state updates and elapsed time - Web mode (AudioWorklet)
   useEffect(() => {
+    if (isNativeMode) return // Native mode uses polling below
     if (!playing) {
       setElapsed(0)
       return
@@ -1640,12 +1780,55 @@ function AyPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module'
       setElapsed(Math.floor(elapsedSecs))
     })
     return unsubscribe
-  }, [engine, module.id, playing])
+  }, [engine, module.id, playing, isNativeMode])
+
+  // Poll voice state updates - Native mode (Tauri)
+  useEffect(() => {
+    if (!isNativeMode || !nativeChiptune) return
+    if (!playing) {
+      setElapsed(0)
+      return
+    }
+    let active = true
+    const poll = async () => {
+      while (active) {
+        try {
+          const [voiceData, elapsedSecs] = await Promise.all([
+            nativeChiptune.getAyVoiceStates(module.id),
+            nativeChiptune.getAyElapsed(module.id),
+          ])
+          if (!active) break
+          if (voiceData.length === 9) {
+            setVoices([
+              { period: voiceData[0], active: voiceData[1] !== 0, flags: voiceData[2] },
+              { period: voiceData[3], active: voiceData[4] !== 0, flags: voiceData[5] },
+              { period: voiceData[6], active: voiceData[7] !== 0, flags: voiceData[8] },
+            ])
+          }
+          setElapsed(Math.floor(elapsedSecs))
+        } catch (err) {
+          console.error('Failed to poll AY state:', err)
+        }
+        await new Promise(resolve => setTimeout(resolve, 50)) // Poll every 50ms
+      }
+    }
+    void poll()
+    return () => { active = false }
+  }, [module.id, playing, isNativeMode, nativeChiptune])
 
   // Load YM/VTX/PSG data into engine
   const loadYmData = useCallback((rawData: Uint8Array) => {
     setLoadError(null)
     let data = rawData
+
+    // Helper to load into appropriate engine
+    const loadIntoEngine = (d: Uint8Array) => {
+      if (isNativeMode && nativeChiptune) {
+        void nativeChiptune.loadYmFile(module.id, d)
+      } else {
+        engine.loadYmFile(module.id, d)
+      }
+    }
 
     // Check format and decompress if needed
     if (isVtxFile(data)) {
@@ -1653,7 +1836,7 @@ function AyPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module'
       try {
         data = decompressVtx(data)
         setYmInfo({ name: 'VTX File', author: '', frames: 0, format: 'VTX' })
-        engine.loadYmFile(module.id, data)
+        loadIntoEngine(data)
         return
       } catch (err) {
         const msg = err instanceof Error ? err.message : 'VTX decompression failed'
@@ -1678,7 +1861,7 @@ function AyPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module'
     // Check for PSG magic
     if (data.length >= 4 && data[0] === 0x50 && data[1] === 0x53 && data[2] === 0x47 && data[3] === 0x1A) {
       setYmInfo({ name: 'PSG File', author: '', frames: 0, format: 'PSG' })
-      engine.loadYmFile(module.id, data)
+      loadIntoEngine(data)
       return
     }
 
@@ -1688,7 +1871,7 @@ function AyPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module'
       if (magic.startsWith('YM')) {
         // Load file
         setYmInfo({ name: 'YM File', author: '', frames: 0, format: 'YM' })
-        engine.loadYmFile(module.id, data)
+        loadIntoEngine(data)
       } else {
         setLoadError(`Unknown format (magic: ${magic})`)
         setYmInfo(null)
@@ -1697,7 +1880,7 @@ function AyPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module'
       setLoadError('File too short')
       setYmInfo(null)
     }
-  }, [module.id, engine])
+  }, [module.id, engine, isNativeMode, nativeChiptune])
 
   const handleFileLoad = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -1736,12 +1919,17 @@ function AyPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module'
         frames: 0,
         format
       })
-      engine.loadYmFile(module.id, data)
+      // Load into appropriate engine based on mode
+      if (isNativeMode && nativeChiptune) {
+        void nativeChiptune.loadYmFile(module.id, data)
+      } else {
+        engine.loadYmFile(module.id, data)
+      }
     } catch (err) {
       console.error('Failed to load AY preset:', err)
       setLoadError('Failed to load preset')
     }
-  }, [ayPresets, engine, module.id])
+  }, [ayPresets, engine, module.id, isNativeMode, nativeChiptune])
 
   return (
     <>
