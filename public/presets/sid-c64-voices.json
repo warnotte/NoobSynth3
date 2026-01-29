@@ -1,6 +1,6 @@
 {
   "id": "sid-c64-voices",
-  "name": "SID C64 Voices",
+  "name": "[C64] SID → SNES Voices",
   "description": "SID Player CV/Gate outputs drive 3 SNES oscillators for re-synthesized C64 music.",
   "graph": {
     "modules": [

@@ -1,7 +1,7 @@
 {
   "version": 1,
   "id": "8bit-mario-nes",
-  "name": "8-Bit Mario (NES Authentic)",
+  "name": "[NES] Mario (2A03 Chip)",
   "description": "Authentic NES 2A03 chip emulation with Mario IO sequencer.",
   "graph": {
     "modules": [

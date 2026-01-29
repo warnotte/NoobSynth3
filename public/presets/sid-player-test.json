@@ -1,6 +1,6 @@
 {
   "id": "sid-player-test",
-  "name": "SID Player Test",
+  "name": "[C64] SID Player",
   "description": "Simple SID Player setup for testing C64 tunes",
   "group": "Chiptune",
   "graph": {

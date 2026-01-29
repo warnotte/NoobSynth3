@@ -1,7 +1,7 @@
 {
   "version": 1,
   "id": "8bit-mario",
-  "name": "8-Bit Mario",
+  "name": "[NES] Mario Tunes",
   "description": "NES-authentic 5-channel setup with Mario IO sequencer.",
   "graph": {
     "modules": [
