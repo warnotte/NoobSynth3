@@ -153,6 +153,45 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 - [ ] `public/presets/` - Preset de démonstration
 - [ ] `npm run build:wasm` - Rebuild WASM après modifs Rust
 
+## UI ↔ Audio Communication Checklist (IMPORTANT)
+
+**Quand une feature nécessite une communication entre l'UI et le moteur audio**, elle doit être implémentée pour les DEUX modes :
+
+| Type de feature | Mode Web | Mode Tauri |
+|-----------------|----------|------------|
+| Polling de données (position, step, states) | `engine.watchXxx()` via AudioWorklet | `invokeTauri('native_xxx')` + polling `useEffect` |
+| Chargement de données (buffer, fichier) | `engine.loadXxx()` | `invokeTauri('native_load_xxx')` |
+| Commandes (seek, reset) | `engine.xxxCommand()` | `invokeTauri('native_xxx')` |
+
+### Checklist pour nouvelles features UI↔Audio
+
+**Web Audio (obligatoire):**
+- [ ] `src/engine/WasmGraphEngine.ts` - Méthode `watchXxx()` ou `loadXxx()`
+- [ ] `src/engine/worklets/wasm-graph-processor.ts` - Handler message + polling si nécessaire
+- [ ] `src/ui/controls/XxxControls.tsx` - `useEffect` avec subscription
+
+**Tauri Standalone (obligatoire si la feature existe en Web):**
+- [ ] `src-tauri/src/lib.rs` - `AudioCommand::Xxx` variant + handler dans audio_thread
+- [ ] `src-tauri/src/lib.rs` - `#[tauri::command] fn native_xxx()` + register dans `invoke_handler`
+- [ ] `src/ui/controls/types.ts` - Type `NativeXxxBridge` avec méthodes
+- [ ] `src/App.tsx` - `useMemo` pour créer le bridge + passer à `moduleControls`
+- [ ] `src/ui/controls/index.tsx` - Passer le bridge aux sub-controls
+- [ ] `src/ui/controls/XxxControls.tsx` - Détection `isNativeMode` + polling `useEffect`
+
+### Modules avec communication UI↔Audio
+
+| Module | Feature | Web | Tauri |
+|--------|---------|-----|-------|
+| Scope | Waveform data | ✅ | ✅ `NativeScopeBridge` |
+| SID Player | Voice states, elapsed | ✅ | ✅ `NativeChiptuneBridge` |
+| AY Player | Voice states, elapsed | ✅ | ✅ `NativeChiptuneBridge` |
+| Step Sequencer | Playhead position | ✅ | ✅ `NativeSequencerBridge` |
+| Drum Sequencer | Playhead position | ✅ | ✅ `NativeSequencerBridge` |
+| MIDI Sequencer | Playhead + seek | ✅ | ✅ `NativeSequencerBridge` |
+| Granular | Position + buffer load | ✅ | ✅ `NativeGranularBridge` |
+
+**⚠️ RÈGLE:** Toute nouvelle feature UI↔Audio DOIT être implémentée pour Tauri en même temps que Web. Ne jamais merger une feature Web-only.
+
 ## Module Types (71 total)
 
 ### Sources (14)
