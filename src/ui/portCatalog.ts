@@ -528,7 +528,7 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
   },
   'ay-player': {
     inputs: [
-      { id: 'gate', label: 'Gate', kind: 'gate', direction: 'in' },
+      { id: 'reset', label: 'Rst', kind: 'sync', direction: 'in' },
     ],
     outputs: [
       { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },

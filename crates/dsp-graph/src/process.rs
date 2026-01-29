@@ -1749,14 +1749,14 @@ pub(crate) fn process_module(
             outputs[9].channel_mut(0)[..safe_frames].copy_from_slice(&buf_wf3[..safe_frames]);
         }
         ModuleState::AyPlayer(state) => {
-            // Input 0: gate trigger (optional)
-            let gate = if !connections[0].is_empty() {
+            // Input 0: reset trigger (optional)
+            let reset = if !connections[0].is_empty() {
                 Some(inputs[0].channel(0))
             } else {
                 None
             };
 
-            let ay_inputs = AyPlayerInputs { gate };
+            let ay_inputs = AyPlayerInputs { reset };
             let params = AyPlayerParams {
                 playing: state.playing.slice(frames),
                 loop_enabled: state.loop_enabled.slice(frames),

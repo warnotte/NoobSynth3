@@ -207,9 +207,9 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
     ModuleType::SidPlayer => vec![
       PortInfo { channels: 1 },  // reset trigger
     ],
-    // AyPlayer - 1 input (gate)
+    // AyPlayer - 1 input (reset)
     ModuleType::AyPlayer => vec![
-      PortInfo { channels: 1 },  // gate trigger
+      PortInfo { channels: 1 },  // reset trigger
     ],
   }
 }
@@ -719,9 +719,9 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
       "reset" | "rst" => Some(0),
       _ => None,
     },
-    // AyPlayer - 1 input
+    // AyPlayer - 1 input (reset)
     ModuleType::AyPlayer => match port_id {
-      "gate" | "trigger" | "trig" => Some(0),
+      "reset" | "rst" => Some(0),
       _ => None,
     },
     _ => None,

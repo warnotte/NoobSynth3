@@ -88,6 +88,9 @@ pub struct AyPlayer {
 
     /// Elapsed frames (for time display)
     elapsed_frames: u32,
+
+    /// Previous reset input value (for edge detection)
+    prev_reset: f32,
 }
 
 impl AyPlayer {
@@ -106,6 +109,7 @@ impl AyPlayer {
             loop_enabled: true,
             data_loaded: false,
             elapsed_frames: 0,
+            prev_reset: 0.0,
         }
     }
 
@@ -619,7 +623,8 @@ pub struct AyPlayerParams<'a> {
 
 /// Inputs for AY Player
 pub struct AyPlayerInputs<'a> {
-    pub gate: Option<&'a [Sample]>,
+    /// Reset trigger - resets playback to beginning on rising edge
+    pub reset: Option<&'a [Sample]>,
 }
 
 /// Outputs for AY Player
@@ -639,10 +644,20 @@ impl AyPlayer {
     pub fn process_block_full(
         &mut self,
         outputs: AyPlayerOutputs,
-        _inputs: AyPlayerInputs,
+        inputs: AyPlayerInputs,
         params: AyPlayerParams,
     ) {
         use crate::common::sample_at;
+
+        // Check for reset trigger (rising edge detection)
+        if let Some(reset_buf) = inputs.reset {
+            let reset_val = sample_at(reset_buf, 0, 0.0);
+            if reset_val > 0.5 && self.prev_reset <= 0.5 {
+                // Rising edge detected - reset playback
+                self.reset();
+            }
+            self.prev_reset = reset_val;
+        }
 
         // Update params
         let playing = sample_at(params.playing, 0, 0.0) > 0.5;

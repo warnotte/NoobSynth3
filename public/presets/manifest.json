@@ -1211,6 +1211,13 @@
       "description": "AY Player CV/Gate outputs drive 3 SNES oscillators for Spectrum/CPC re-synthesis.",
       "file": "ay-spectrum-snes.json",
       "group": "Chiptune"
+    },
+    {
+      "id": "commando-comparison",
+      "name": "[C64/AY] Commando Comparison",
+      "description": "Compare SID (C64) vs AY (Spectrum) versions of Commando. Sync both players together.",
+      "file": "commando-comparison.json",
+      "group": "Chiptune"
     }
   ]
 }
