@@ -12,6 +12,10 @@ type ControlButtonsProps<T extends string | number | boolean> = {
   onChange: (value: T) => void
   /** Number of buttons per row (auto-calculates rows) */
   columns?: number
+  /** Index of button to highlight as CV-controlled (e.g. from SID waveform) */
+  cvHighlightIndex?: number | null
+  /** Whether wave-cv is connected (dims manual selection when true) */
+  hasWaveCv?: boolean
 }
 
 /**
@@ -46,7 +50,28 @@ export function ControlButtons<T extends string | number | boolean>({
   value,
   onChange,
   columns,
+  cvHighlightIndex,
+  hasWaveCv,
 }: ControlButtonsProps<T>) {
+  // Helper to build button class
+  const getButtonClass = (option: ButtonOption<T>) => {
+    const classes = ['control-btn']
+    const isSelected = value === option.id
+    const isCvActive = hasWaveCv && cvHighlightIndex != null && option.id === cvHighlightIndex
+
+    if (isCvActive) {
+      classes.push('cv-active')
+    }
+    if (isSelected) {
+      if (hasWaveCv) {
+        classes.push('user-active') // Dimmed when CV is connected
+      } else {
+        classes.push('active')
+      }
+    }
+    return classes.join(' ')
+  }
+
   // If columns specified, split into rows
   if (columns && options.length > columns) {
     const rows: ButtonOption<T>[][] = []
@@ -66,7 +91,7 @@ export function ControlButtons<T extends string | number | boolean>({
               <button
                 key={String(option.id)}
                 type="button"
-                className={`control-btn ${value === option.id ? 'active' : ''}`}
+                className={getButtonClass(option)}
                 onClick={() => onChange(option.id)}
               >
                 {option.label}
@@ -88,7 +113,7 @@ export function ControlButtons<T extends string | number | boolean>({
         <button
           key={String(option.id)}
           type="button"
-          className={`control-btn ${value === option.id ? 'active' : ''}`}
+          className={getButtonClass(option)}
           onClick={() => onChange(option.id)}
         >
           {option.label}

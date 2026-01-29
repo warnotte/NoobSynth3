@@ -199,17 +199,17 @@
     },
     {
       "id": "8bit-mario",
-      "name": "8-Bit Mario",
+      "name": "[NES] Mario Tunes",
       "description": "NES-authentic 5-channel setup with 8 classic Mario tunes.",
       "file": "8bit-mario.json",
-      "group": "Demos & Fun"
+      "group": "Chiptune"
     },
     {
       "id": "8bit-mario-nes",
-      "name": "8-Bit Mario (NES Chip)",
+      "name": "[NES] Mario (2A03 Chip)",
       "description": "True 2A03 chip emulation with NES Osc modules.",
       "file": "8bit-mario-nes.json",
-      "group": "Demos & Fun"
+      "group": "Chiptune"
     },
     {
       "id": "sample-hold-test",
@@ -1172,24 +1172,45 @@
     },
     {
       "id": "sid-player-test",
-      "name": "SID Player Test",
+      "name": "[C64] SID Player",
       "description": "Simple SID Player for testing C64 .sid files. Supports PSID and RSID formats.",
       "file": "sid-player-test.json",
-      "group": "8-Bit"
+      "group": "Chiptune"
     },
     {
       "id": "sid-c64-voices",
-      "name": "SID C64 Voices",
+      "name": "[C64] SID → SNES Voices",
       "description": "SID Player CV/Gate outputs drive 3 SNES oscillators for re-synthesized C64 music.",
       "file": "sid-c64-voices.json",
-      "group": "8-Bit"
+      "group": "Chiptune"
     },
     {
       "id": "sid-c64-nes",
-      "name": "SID C64 NES Voices",
+      "name": "[C64] SID → NES Voices",
       "description": "SID Player CV/Gate outputs drive 3 NES oscillators for chiptune C64 re-synthesis.",
       "file": "sid-c64-nes.json",
-      "group": "8-Bit"
+      "group": "Chiptune"
+    },
+    {
+      "id": "ay-player-test",
+      "name": "[AY] AY Player",
+      "description": "Simple AY Player for Spectrum/CPC/Atari ST tunes (.ym, .vtx, .psg).",
+      "file": "ay-player-test.json",
+      "group": "Chiptune"
+    },
+    {
+      "id": "ay-spectrum-nes",
+      "name": "[AY] Spectrum → NES Voices",
+      "description": "AY Player CV/Gate outputs drive 3 NES oscillators for Spectrum/CPC re-synthesis.",
+      "file": "ay-spectrum-nes.json",
+      "group": "Chiptune"
+    },
+    {
+      "id": "ay-spectrum-snes",
+      "name": "[AY] Spectrum → SNES Voices",
+      "description": "AY Player CV/Gate outputs drive 3 SNES oscillators for Spectrum/CPC re-synthesis.",
+      "file": "ay-spectrum-snes.json",
+      "group": "Chiptune"
     }
   ]
 }

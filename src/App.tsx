@@ -2079,6 +2079,7 @@ function App() {
 
   const moduleControls = {
     engine,
+    connections: graph.connections,
     status: audioStatus,
     audioMode,
     nativeScope: nativeScopeBridge,

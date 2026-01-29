@@ -9,7 +9,7 @@
 
 import { useComputerKeyboard } from '../../hooks/useComputerKeyboard'
 import type { AudioEngine } from '../../engine/WasmGraphEngine'
-import type { ModuleSpec } from '../../shared/graph'
+import type { Connection, ModuleSpec } from '../../shared/graph'
 import type { ControlProps, NativeScopeBridge } from './types'
 
 import { renderSourceControls } from './SourceControls'
@@ -24,6 +24,7 @@ import { renderIOControls } from './IOControls'
 export type ModuleControlsProps = {
   module: ModuleSpec
   engine: AudioEngine
+  connections: Connection[]
   status: 'idle' | 'running' | 'error'
   audioMode: 'web' | 'native' | 'vst'
   nativeScope?: NativeScopeBridge | null
@@ -56,6 +57,7 @@ export type ModuleControlsProps = {
 export const ModuleControls = ({
   module,
   engine,
+  connections,
   status,
   audioMode,
   nativeScope,
@@ -95,6 +97,7 @@ export const ModuleControls = ({
   const props: ControlProps = {
     module,
     engine,
+    connections,
     status,
     audioMode,
     nativeScope,

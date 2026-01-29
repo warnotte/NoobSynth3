@@ -3365,6 +3365,19 @@
   box-shadow: 0 2px 8px rgba(66, 226, 177, 0.4);
 }
 
+/* CV-controlled button highlight (cyan glow for SID waveform etc) */
+.control-btn.cv-active {
+  border-color: #00e5ff;
+  box-shadow: 0 0 6px rgba(0, 229, 255, 0.4);
+  background: rgba(0, 229, 255, 0.15);
+  color: #00e5ff;
+}
+
+/* User selection when CV is connected (dimmed) */
+.control-btn.user-active {
+  opacity: 0.35;
+}
+
 /* Pattern preset row */
 .seq-pattern-row {
   grid-column: 1 / -1;

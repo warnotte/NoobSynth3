@@ -6,7 +6,7 @@
  */
 
 import type { AudioEngine } from '../../engine/WasmGraphEngine'
-import type { ModuleSpec } from '../../shared/graph'
+import type { Connection, ModuleSpec } from '../../shared/graph'
 
 /**
  * Bridge for native scope data (Tauri/VST mode)
@@ -26,6 +26,8 @@ export type ControlProps = {
   module: ModuleSpec
   /** Audio engine instance */
   engine: AudioEngine
+  /** All connections in the graph (for CV indicator detection) */
+  connections: Connection[]
   /** Current engine status */
   status: 'idle' | 'running' | 'error'
   /** Audio backend mode */

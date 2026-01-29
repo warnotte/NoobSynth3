@@ -1,0 +1,262 @@
+{
+  "id": "ay-spectrum-snes",
+  "name": "[AY] Spectrum → SNES Voices",
+  "description": "AY Player CV/Gate outputs drive 3 SNES oscillators for Spectrum/CPC re-synthesis.",
+  "group": "Chiptune",
+  "graph": {
+    "modules": [
+      {
+        "id": "ay-1",
+        "type": "ay-player",
+        "name": "AY Player",
+        "position": { "col": 1, "row": 1 },
+        "params": {
+          "playing": 1,
+          "loop": 1
+        }
+      },
+      {
+        "id": "snes-1",
+        "type": "snes-osc",
+        "name": "Voice A",
+        "position": { "col": 5, "row": 1 },
+        "params": {
+          "frequency": 440,
+          "volume": 0.8,
+          "wave": 0,
+          "gauss": 1,
+          "color": 0.5,
+          "lofi": 0
+        }
+      },
+      {
+        "id": "adsr-1",
+        "type": "adsr",
+        "name": "Env A",
+        "position": { "col": 8, "row": 1 },
+        "params": {
+          "attack": 0.005,
+          "decay": 0.1,
+          "sustain": 0.9,
+          "release": 0.05
+        }
+      },
+      {
+        "id": "gain-1",
+        "type": "gain",
+        "name": "VCA A",
+        "position": { "col": 10, "row": 1 },
+        "params": {
+          "gain": 0.7
+        }
+      },
+      {
+        "id": "snes-2",
+        "type": "snes-osc",
+        "name": "Voice B",
+        "position": { "col": 5, "row": 4 },
+        "params": {
+          "frequency": 440,
+          "volume": 0.8,
+          "wave": 1,
+          "gauss": 1,
+          "color": 0.5,
+          "lofi": 0
+        }
+      },
+      {
+        "id": "adsr-2",
+        "type": "adsr",
+        "name": "Env B",
+        "position": { "col": 8, "row": 4 },
+        "params": {
+          "attack": 0.005,
+          "decay": 0.1,
+          "sustain": 0.9,
+          "release": 0.05
+        }
+      },
+      {
+        "id": "gain-2",
+        "type": "gain",
+        "name": "VCA B",
+        "position": { "col": 10, "row": 4 },
+        "params": {
+          "gain": 0.7
+        }
+      },
+      {
+        "id": "snes-3",
+        "type": "snes-osc",
+        "name": "Voice C",
+        "position": { "col": 5, "row": 7 },
+        "params": {
+          "frequency": 440,
+          "volume": 0.8,
+          "wave": 2,
+          "gauss": 1,
+          "color": 0.5,
+          "lofi": 0
+        }
+      },
+      {
+        "id": "adsr-3",
+        "type": "adsr",
+        "name": "Env C",
+        "position": { "col": 8, "row": 7 },
+        "params": {
+          "attack": 0.005,
+          "decay": 0.1,
+          "sustain": 0.9,
+          "release": 0.05
+        }
+      },
+      {
+        "id": "gain-3",
+        "type": "gain",
+        "name": "VCA C",
+        "position": { "col": 10, "row": 7 },
+        "params": {
+          "gain": 0.7
+        }
+      },
+      {
+        "id": "mixer-1",
+        "type": "mixer-8",
+        "name": "Mixer",
+        "position": { "col": 13, "row": 1 },
+        "params": {
+          "level1": 0.7,
+          "level2": 0.7,
+          "level3": 0.7,
+          "level4": 0,
+          "level5": 0,
+          "level6": 0,
+          "level7": 0,
+          "level8": 0
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "col": 16, "row": 1 },
+        "params": {
+          "time": 0.3,
+          "damp": 0.6,
+          "pre_delay": 5,
+          "mix": 0.15
+        }
+      },
+      {
+        "id": "output-1",
+        "type": "output",
+        "name": "Output",
+        "position": { "col": 19, "row": 1 },
+        "params": {
+          "level": 1
+        }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "col": 13, "row": 5 },
+        "params": {
+          "text": "AY SPECTRUM → SNES VOICES\n\nSpectrum/CPC meets Super Nintendo!\nAY Player extracts CV/Gate from each voice.\n\n- CV A/B/C: Pitch (1V/Oct)\n- Gate A/B/C: Voice on/off\n\nSNES oscillators add warmth with\nGaussian interpolation.\n\n1. Load a .ym or .vtx file\n2. Press Play\n3. Each AY voice drives a SNES oscillator"
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "ay-1", "portId": "cv-a" },
+        "to": { "moduleId": "snes-1", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "ay-1", "portId": "gate-a" },
+        "to": { "moduleId": "adsr-1", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "snes-1", "portId": "out" },
+        "to": { "moduleId": "gain-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "adsr-1", "portId": "env" },
+        "to": { "moduleId": "gain-1", "portId": "cv" },
+        "kind": "cv"
+      },
+
+      {
+        "from": { "moduleId": "ay-1", "portId": "cv-b" },
+        "to": { "moduleId": "snes-2", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "ay-1", "portId": "gate-b" },
+        "to": { "moduleId": "adsr-2", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "snes-2", "portId": "out" },
+        "to": { "moduleId": "gain-2", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "adsr-2", "portId": "env" },
+        "to": { "moduleId": "gain-2", "portId": "cv" },
+        "kind": "cv"
+      },
+
+      {
+        "from": { "moduleId": "ay-1", "portId": "cv-c" },
+        "to": { "moduleId": "snes-3", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "ay-1", "portId": "gate-c" },
+        "to": { "moduleId": "adsr-3", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "snes-3", "portId": "out" },
+        "to": { "moduleId": "gain-3", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "adsr-3", "portId": "env" },
+        "to": { "moduleId": "gain-3", "portId": "cv" },
+        "kind": "cv"
+      },
+
+      {
+        "from": { "moduleId": "gain-1", "portId": "out" },
+        "to": { "moduleId": "mixer-1", "portId": "in-1" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "gain-2", "portId": "out" },
+        "to": { "moduleId": "mixer-1", "portId": "in-2" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "gain-3", "portId": "out" },
+        "to": { "moduleId": "mixer-1", "portId": "in-3" },
+        "kind": "audio"
+      },
+
+      {
+        "from": { "moduleId": "mixer-1", "portId": "out" },
+        "to": { "moduleId": "reverb-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb-1", "portId": "out" },
+        "to": { "moduleId": "output-1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

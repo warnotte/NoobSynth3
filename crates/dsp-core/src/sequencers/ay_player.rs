@@ -661,22 +661,31 @@ impl AyPlayer {
             // Voice A
             let (period_a, active_a, _) = states[0];
             let freq_a = self.ay.period_to_freq(period_a);
-            outputs.cv_a[i] = freq_a;
+            outputs.cv_a[i] = freq_to_voct(freq_a);
             outputs.gate_a[i] = if active_a && self.playing { 1.0 } else { 0.0 };
 
             // Voice B
             let (period_b, active_b, _) = states[1];
             let freq_b = self.ay.period_to_freq(period_b);
-            outputs.cv_b[i] = freq_b;
+            outputs.cv_b[i] = freq_to_voct(freq_b);
             outputs.gate_b[i] = if active_b && self.playing { 1.0 } else { 0.0 };
 
             // Voice C
             let (period_c, active_c, _) = states[2];
             let freq_c = self.ay.period_to_freq(period_c);
-            outputs.cv_c[i] = freq_c;
+            outputs.cv_c[i] = freq_to_voct(freq_c);
             outputs.gate_c[i] = if active_c && self.playing { 1.0 } else { 0.0 };
         }
     }
+}
+
+/// Convert frequency in Hz to V/Oct CV (C4 = 0V, 261.63 Hz)
+#[inline]
+fn freq_to_voct(freq_hz: f32) -> f32 {
+    if freq_hz <= 0.0 {
+        return -5.0; // Very low CV for zero/invalid frequency
+    }
+    (freq_hz / 261.63).log2()
 }
 
 #[cfg(test)]

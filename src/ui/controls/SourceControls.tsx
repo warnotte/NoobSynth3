@@ -4,6 +4,7 @@
  * Modules: oscillator, supersaw, karplus, nes-osc, snes-osc, noise, tb-303, fm-op, shepard, pipe-organ, spectral-swarm, resonator, wavetable
  */
 
+import { useEffect, useState } from 'react'
 import type React from 'react'
 import type { ControlProps } from './types'
 import { RotaryKnob } from '../RotaryKnob'
@@ -20,6 +21,261 @@ import {
   formatFreq,
   formatMs,
 } from '../formatters'
+
+// =============================================================================
+// SID Waveform CV Helpers
+// =============================================================================
+
+/**
+ * Convert SID waveform bits to NES mode index.
+ * SID: 1=tri, 2=saw, 4=pulse, 8=noise
+ * NES: 0=PLS1, 1=PLS2, 2=TRI, 3=NSE
+ */
+function sidWaveformToNes(wfBits: number): number {
+  if (wfBits & 4) return 0  // pulse → PLS1
+  if (wfBits & 2) return 1  // saw → PLS2 (closest)
+  if (wfBits & 1) return 2  // tri → TRI
+  if (wfBits & 8) return 3  // noise → NSE
+  return 0 // default
+}
+
+/**
+ * Convert SID waveform bits to SNES wave index.
+ * SID: 1=tri, 2=saw, 4=pulse, 8=noise
+ * SNES: 0=SQR, 1=SAW, 2=STR, 7=SYN
+ */
+function sidWaveformToSnes(wfBits: number): number {
+  if (wfBits & 4) return 0  // pulse → SQR
+  if (wfBits & 2) return 1  // saw → SAW
+  if (wfBits & 1) return 2  // tri → STR
+  if (wfBits & 8) return 7  // noise → SYN
+  return 0 // default
+}
+
+/**
+ * Hook to track waveform CV from a connected SID Player.
+ * Returns { hasWaveCv, cvHighlightIndex } for use in button highlighting.
+ */
+function useWaveCvFromSid(
+  props: ControlProps,
+  converter: (wfBits: number) => number,
+): { hasWaveCv: boolean; cvHighlightIndex: number | null } {
+  const { module, connections, engine } = props
+  const [cvHighlightIndex, setCvHighlightIndex] = useState<number | null>(null)
+
+  // Find wave-cv connection to this module
+  const waveCvConnection = connections.find(
+    (c) => c.to.moduleId === module.id && c.to.portId === 'wave-cv'
+  )
+
+  // Extract SID module ID and voice index if connected to SID waveform output
+  const sidSource = waveCvConnection?.from
+  const isSidWf = sidSource && sidSource.portId.startsWith('wf-')
+  const sidModuleId = isSidWf ? sidSource.moduleId : null
+  const voiceIndex = isSidWf ? parseInt(sidSource.portId.slice(3), 10) - 1 : -1 // wf-1 → 0, wf-2 → 1, wf-3 → 2
+
+  useEffect(() => {
+    if (!sidModuleId || voiceIndex < 0 || voiceIndex > 2) {
+      setCvHighlightIndex(null)
+      return
+    }
+
+    const unsubscribe = engine.watchSidVoices(sidModuleId, (voices) => {
+      if (voices[voiceIndex]) {
+        const wf = voices[voiceIndex].waveform
+        setCvHighlightIndex(converter(wf))
+      }
+    })
+
+    return unsubscribe
+  }, [engine, sidModuleId, voiceIndex, converter])
+
+  return {
+    hasWaveCv: !!waveCvConnection,
+    cvHighlightIndex: waveCvConnection ? cvHighlightIndex : null,
+  }
+}
+
+// =============================================================================
+// NES/SNES Oscillator Components (need hooks for CV tracking)
+// =============================================================================
+
+function NesOscControls(props: ControlProps): React.ReactElement {
+  const { module, updateParam } = props
+  const { hasWaveCv, cvHighlightIndex } = useWaveCvFromSid(props, sidWaveformToNes)
+
+  const nesMode = Number(module.params.mode ?? 0)
+  const nesDuty = Number(module.params.duty ?? 1)
+  const nesNoiseMode = Number(module.params.noiseMode ?? 0)
+
+  return (
+    <>
+      <RotaryKnob
+        label="Freq"
+        min={40}
+        max={2000}
+        step={1}
+        unit="Hz"
+        value={Number(module.params.frequency ?? 220)}
+        onChange={(value) => updateParam(module.id, 'frequency', value)}
+        format={formatInt}
+      />
+      <RotaryKnob
+        label="Fine"
+        min={-100}
+        max={100}
+        step={1}
+        unit="ct"
+        value={Number(module.params.fine ?? 0)}
+        onChange={(value) => updateParam(module.id, 'fine', value)}
+        format={formatInt}
+      />
+      <RotaryKnob
+        label="Vol"
+        min={0}
+        max={1}
+        step={0.01}
+        value={Number(module.params.volume ?? 1)}
+        onChange={(value) => updateParam(module.id, 'volume', value)}
+        format={(value) => `${Math.round(value * 100)}%`}
+      />
+      <ControlBox label="Mode" compact>
+        <ControlButtons
+          options={[
+            { id: 0, label: 'PLS1' },
+            { id: 1, label: 'PLS2' },
+            { id: 2, label: 'TRI' },
+            { id: 3, label: 'NSE' },
+          ]}
+          value={nesMode}
+          onChange={(value) => updateParam(module.id, 'mode', value)}
+          hasWaveCv={hasWaveCv}
+          cvHighlightIndex={cvHighlightIndex}
+        />
+      </ControlBox>
+      {nesMode < 2 && (
+        <ControlBox label="Duty" compact>
+          <ControlButtons
+            options={[
+              { id: 0, label: '12%' },
+              { id: 1, label: '25%' },
+              { id: 2, label: '50%' },
+              { id: 3, label: '75%' },
+            ]}
+            value={nesDuty}
+            onChange={(value) => updateParam(module.id, 'duty', value)}
+          />
+        </ControlBox>
+      )}
+      {nesMode === 3 && (
+        <ControlBox label="Noise" compact>
+          <ControlButtons
+            options={[
+              { id: 0, label: 'RAND' },
+              { id: 1, label: 'LOOP' },
+            ]}
+            value={nesNoiseMode}
+            onChange={(value) => updateParam(module.id, 'noiseMode', value)}
+          />
+        </ControlBox>
+      )}
+      <RotaryKnob
+        label="Crush"
+        min={0}
+        max={1}
+        step={0.01}
+        value={Number(module.params.bitcrush ?? 1)}
+        onChange={(value) => updateParam(module.id, 'bitcrush', value)}
+        format={(value) => `${Math.round(value * 100)}%`}
+      />
+    </>
+  )
+}
+
+function SnesOscControls(props: ControlProps): React.ReactElement {
+  const { module, updateParam } = props
+  const { hasWaveCv, cvHighlightIndex } = useWaveCvFromSid(props, sidWaveformToSnes)
+
+  return (
+    <>
+      <RotaryKnob
+        label="Freq"
+        min={40}
+        max={2000}
+        step={1}
+        unit="Hz"
+        value={Number(module.params.frequency ?? 220)}
+        onChange={(value) => updateParam(module.id, 'frequency', value)}
+        format={formatInt}
+      />
+      <RotaryKnob
+        label="Fine"
+        min={-100}
+        max={100}
+        step={1}
+        unit="ct"
+        value={Number(module.params.fine ?? 0)}
+        onChange={(value) => updateParam(module.id, 'fine', value)}
+        format={formatInt}
+      />
+      <RotaryKnob
+        label="Vol"
+        min={0}
+        max={1}
+        step={0.01}
+        value={Number(module.params.volume ?? 1)}
+        onChange={(value) => updateParam(module.id, 'volume', value)}
+        format={(value) => `${Math.round(value * 100)}%`}
+      />
+      <ControlBox label="Wave" compact>
+        <ControlButtons
+          options={[
+            { id: 0, label: 'SQR' },
+            { id: 1, label: 'SAW' },
+            { id: 2, label: 'STR' },
+            { id: 3, label: 'BEL' },
+            { id: 4, label: 'ORG' },
+            { id: 5, label: 'PAD' },
+            { id: 6, label: 'BAS' },
+            { id: 7, label: 'SYN' },
+          ]}
+          value={Number(module.params.wave ?? 0)}
+          onChange={(value) => updateParam(module.id, 'wave', value)}
+          columns={4}
+          hasWaveCv={hasWaveCv}
+          cvHighlightIndex={cvHighlightIndex}
+        />
+      </ControlBox>
+      <RotaryKnob
+        label="Gauss"
+        min={0}
+        max={1}
+        step={0.01}
+        value={Number(module.params.gauss ?? 0.7)}
+        onChange={(value) => updateParam(module.id, 'gauss', value)}
+        format={(value) => `${Math.round(value * 100)}%`}
+      />
+      <RotaryKnob
+        label="Color"
+        min={0}
+        max={1}
+        step={0.01}
+        value={Number(module.params.color ?? 0.5)}
+        onChange={(value) => updateParam(module.id, 'color', value)}
+        format={(value) => `${Math.round(value * 100)}%`}
+      />
+      <RotaryKnob
+        label="Lo-Fi"
+        min={0}
+        max={1}
+        step={0.01}
+        value={Number(module.params.lofi ?? 0.5)}
+        onChange={(value) => updateParam(module.id, 'lofi', value)}
+        format={(value) => `${Math.round(value * 100)}%`}
+      />
+    </>
+  )
+}
 
 export function renderSourceControls(props: ControlProps): React.ReactElement | null {
   const { module, updateParam } = props
@@ -250,169 +506,11 @@ export function renderSourceControls(props: ControlProps): React.ReactElement | 
   }
 
   if (module.type === 'nes-osc') {
-    const nesMode = Number(module.params.mode ?? 0)
-    const nesDuty = Number(module.params.duty ?? 1)
-    const nesNoiseMode = Number(module.params.noiseMode ?? 0)
-    return (
-      <>
-        <RotaryKnob
-          label="Freq"
-          min={40}
-          max={2000}
-          step={1}
-          unit="Hz"
-          value={Number(module.params.frequency ?? 220)}
-          onChange={(value) => updateParam(module.id, 'frequency', value)}
-          format={formatInt}
-        />
-        <RotaryKnob
-          label="Fine"
-          min={-100}
-          max={100}
-          step={1}
-          unit="ct"
-          value={Number(module.params.fine ?? 0)}
-          onChange={(value) => updateParam(module.id, 'fine', value)}
-          format={formatInt}
-        />
-        <RotaryKnob
-          label="Vol"
-          min={0}
-          max={1}
-          step={0.01}
-          value={Number(module.params.volume ?? 1)}
-          onChange={(value) => updateParam(module.id, 'volume', value)}
-          format={(value) => `${Math.round(value * 100)}%`}
-        />
-        <ControlBox label="Mode" compact>
-          <ControlButtons
-            options={[
-              { id: 0, label: 'PLS1' },
-              { id: 1, label: 'PLS2' },
-              { id: 2, label: 'TRI' },
-              { id: 3, label: 'NSE' },
-            ]}
-            value={nesMode}
-            onChange={(value) => updateParam(module.id, 'mode', value)}
-          />
-        </ControlBox>
-        {nesMode < 2 && (
-          <ControlBox label="Duty" compact>
-            <ControlButtons
-              options={[
-                { id: 0, label: '12%' },
-                { id: 1, label: '25%' },
-                { id: 2, label: '50%' },
-                { id: 3, label: '75%' },
-              ]}
-              value={nesDuty}
-              onChange={(value) => updateParam(module.id, 'duty', value)}
-            />
-          </ControlBox>
-        )}
-        {nesMode === 3 && (
-          <ControlBox label="Noise" compact>
-            <ControlButtons
-              options={[
-                { id: 0, label: 'RAND' },
-                { id: 1, label: 'LOOP' },
-              ]}
-              value={nesNoiseMode}
-              onChange={(value) => updateParam(module.id, 'noiseMode', value)}
-            />
-          </ControlBox>
-        )}
-        <RotaryKnob
-          label="Crush"
-          min={0}
-          max={1}
-          step={0.01}
-          value={Number(module.params.bitcrush ?? 1)}
-          onChange={(value) => updateParam(module.id, 'bitcrush', value)}
-          format={(value) => `${Math.round(value * 100)}%`}
-        />
-      </>
-    )
+    return <NesOscControls {...props} />
   }
 
   if (module.type === 'snes-osc') {
-    return (
-      <>
-        <RotaryKnob
-          label="Freq"
-          min={40}
-          max={2000}
-          step={1}
-          unit="Hz"
-          value={Number(module.params.frequency ?? 220)}
-          onChange={(value) => updateParam(module.id, 'frequency', value)}
-          format={formatInt}
-        />
-        <RotaryKnob
-          label="Fine"
-          min={-100}
-          max={100}
-          step={1}
-          unit="ct"
-          value={Number(module.params.fine ?? 0)}
-          onChange={(value) => updateParam(module.id, 'fine', value)}
-          format={formatInt}
-        />
-        <RotaryKnob
-          label="Vol"
-          min={0}
-          max={1}
-          step={0.01}
-          value={Number(module.params.volume ?? 1)}
-          onChange={(value) => updateParam(module.id, 'volume', value)}
-          format={(value) => `${Math.round(value * 100)}%`}
-        />
-        <ControlBox label="Wave" compact>
-          <ControlButtons
-            options={[
-              { id: 0, label: 'SQR' },
-              { id: 1, label: 'SAW' },
-              { id: 2, label: 'STR' },
-              { id: 3, label: 'BEL' },
-              { id: 4, label: 'ORG' },
-              { id: 5, label: 'PAD' },
-              { id: 6, label: 'BAS' },
-              { id: 7, label: 'SYN' },
-            ]}
-            value={Number(module.params.wave ?? 0)}
-            onChange={(value) => updateParam(module.id, 'wave', value)}
-            columns={4}
-          />
-        </ControlBox>
-        <RotaryKnob
-          label="Gauss"
-          min={0}
-          max={1}
-          step={0.01}
-          value={Number(module.params.gauss ?? 0.7)}
-          onChange={(value) => updateParam(module.id, 'gauss', value)}
-          format={(value) => `${Math.round(value * 100)}%`}
-        />
-        <RotaryKnob
-          label="Color"
-          min={0}
-          max={1}
-          step={0.01}
-          value={Number(module.params.color ?? 0.5)}
-          onChange={(value) => updateParam(module.id, 'color', value)}
-          format={(value) => `${Math.round(value * 100)}%`}
-        />
-        <RotaryKnob
-          label="Lo-Fi"
-          min={0}
-          max={1}
-          step={0.01}
-          value={Number(module.params.lofi ?? 0.5)}
-          onChange={(value) => updateParam(module.id, 'lofi', value)}
-          format={(value) => `${Math.round(value * 100)}%`}
-        />
-      </>
-    )
+    return <SnesOscControls {...props} />
   }
 
   if (module.type === 'tb-303') {
