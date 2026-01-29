@@ -32,6 +32,7 @@ export type ModuleType =
   | 'mixer'
   | 'mixer-1x2'
   | 'mixer-8'
+  | 'crossfader'
   | 'chorus'
   | 'ensemble'
   | 'choir'

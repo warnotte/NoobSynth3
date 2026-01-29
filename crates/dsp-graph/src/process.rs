@@ -23,7 +23,7 @@ use dsp_core::{
     LfoInputs, LfoParams,
     MasterClockInputs, MasterClockOutputs, MasterClockParams,
     MidiFileSequencerInputs, MidiFileSequencerOutputs, MidiFileSequencerParams,
-    Mixer, NesOscInputs, NesOscParams, NoiseParams,
+    Mixer, Crossfader, NesOscInputs, NesOscParams, NoiseParams,
     PhaserInputs, PhaserParams, PipeOrganInputs, PipeOrganParams, PitchShifterInputs, PitchShifterParams,
     Quantizer, QuantizerInputs, QuantizerParams,
     ResonatorInputs, ResonatorParams,
@@ -481,6 +481,30 @@ pub(crate) fn process_module(
                 state.level8.slice(frames),
             ];
             Mixer::process_block_multi(output, &mixer_inputs, &levels);
+        }
+        ModuleState::Crossfader(state) => {
+            // Crossfader: output = A * (1 - mix) + B * mix
+            let a_connected = !connections[0].is_empty();
+            let b_connected = !connections[1].is_empty();
+            let output = outputs[0].channel_mut(0);
+
+            // If nothing connected, output silence
+            if !a_connected && !b_connected {
+                for sample in output.iter_mut() {
+                    *sample = 0.0;
+                }
+                return;
+            }
+
+            let input_a = if a_connected { Some(inputs[0].channel(0)) } else { None };
+            let input_b = if b_connected { Some(inputs[1].channel(0)) } else { None };
+            let mix_cv = if connections.len() > 2 && !connections[2].is_empty() {
+                Some(inputs[2].channel(0))
+            } else {
+                None
+            };
+            let mix = state.mix.slice(frames);
+            Crossfader::process_block(output, input_a, input_b, mix, mix_cv);
         }
         ModuleState::Chorus(state) => {
             let input_connected = !connections[0].is_empty();

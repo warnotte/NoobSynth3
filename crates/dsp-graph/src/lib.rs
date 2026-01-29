@@ -417,6 +417,30 @@ impl GraphEngine {
     }
   }
 
+  /// Get elapsed time in seconds for a SID player
+  pub fn get_sid_elapsed(&self, module_id: &str) -> f32 {
+    if let Some(index) = self.module_map.get(module_id).and_then(|list| list.first()) {
+      if let Some(module) = self.modules.get(*index) {
+        if let ModuleState::SidPlayer(state) = &module.state {
+          return state.sid_player.elapsed_seconds();
+        }
+      }
+    }
+    0.0
+  }
+
+  /// Get elapsed time in seconds for an AY player
+  pub fn get_ay_elapsed(&self, module_id: &str) -> f32 {
+    if let Some(index) = self.module_map.get(module_id).and_then(|list| list.first()) {
+      if let Some(module) = self.modules.get(*index) {
+        if let ModuleState::AyPlayer(state) = &module.state {
+          return state.ay_player.elapsed_seconds();
+        }
+      }
+    }
+    0.0
+  }
+
   pub fn render(&mut self, frames: usize) -> &[Sample] {
     if frames == 0 {
       return &[];
@@ -723,6 +747,7 @@ fn normalize_module_type(raw: &str) -> ModuleType {
     "mixer" => ModuleType::Mixer,
     "mixer-1x2" => ModuleType::MixerWide,
     "mixer-8" => ModuleType::Mixer8,
+    "crossfader" => ModuleType::Crossfader,
     "chorus" => ModuleType::Chorus,
     "ensemble" => ModuleType::Ensemble,
     "choir" => ModuleType::Choir,

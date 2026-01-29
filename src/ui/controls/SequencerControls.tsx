@@ -1431,8 +1431,6 @@ function SidPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module
     { freq: 0, gate: false, waveform: 0 },
   ])
   const [elapsed, setElapsed] = useState(0)
-  const playStartRef = useRef<number>(Date.now())
-  const [loadGen, setLoadGen] = useState(0)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [sidPresets, setSidPresets] = useState<SidPresetEntry[]>([])
 
@@ -1443,24 +1441,15 @@ function SidPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module
     })
   }, [])
 
-  // Elapsed time counter — restarts on play or new file load
+  // Subscribe to voice state updates and elapsed time from Rust
   useEffect(() => {
-    if (playing) {
-      playStartRef.current = Date.now()
+    if (!playing) {
       setElapsed(0)
-      const interval = setInterval(() => {
-        setElapsed(Math.floor((Date.now() - playStartRef.current) / 1000))
-      }, 500)
-      return () => clearInterval(interval)
+      return
     }
-    setElapsed(0)
-  }, [playing, loadGen])
-
-  // Subscribe to voice state updates
-  useEffect(() => {
-    if (!playing) return
-    const unsubscribe = engine.watchSidVoices(module.id, (newVoices) => {
+    const unsubscribe = engine.watchSidVoices(module.id, (newVoices, elapsedSecs) => {
       setVoices(newVoices)
+      setElapsed(Math.floor(elapsedSecs))
     })
     return unsubscribe
   }, [engine, module.id, playing])
@@ -1482,9 +1471,8 @@ function SidPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module
         const name = decoder.decode(data.slice(0x16, 0x36)).replace(/\0+$/, '')
         const author = decoder.decode(data.slice(0x36, 0x56)).replace(/\0+$/, '')
 
-        // Reset song and timer BEFORE loading to avoid stale state
+        // Reset song BEFORE loading to avoid stale state
         updateParam(module.id, 'song', startSong || 1)
-        setLoadGen(g => g + 1)
         setSidInfo({ name, author, songs, isRsid: magic === 'RSID' })
         engine.loadSidFile(module.id, data)
       }
@@ -1630,8 +1618,6 @@ function AyPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module'
     { period: 0, active: false, flags: 0 },
   ])
   const [elapsed, setElapsed] = useState(0)
-  const playStartRef = useRef<number>(Date.now())
-  const [loadGen, setLoadGen] = useState(0)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [ayPresets, setAyPresets] = useState<AyPresetEntry[]>([])
   const [loadError, setLoadError] = useState<string | null>(null)
@@ -1643,24 +1629,15 @@ function AyPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module'
     })
   }, [])
 
-  // Elapsed time counter
+  // Subscribe to voice state updates and elapsed time from Rust
   useEffect(() => {
-    if (playing) {
-      playStartRef.current = Date.now()
+    if (!playing) {
       setElapsed(0)
-      const interval = setInterval(() => {
-        setElapsed(Math.floor((Date.now() - playStartRef.current) / 1000))
-      }, 500)
-      return () => clearInterval(interval)
+      return
     }
-    setElapsed(0)
-  }, [playing, loadGen])
-
-  // Subscribe to voice state updates
-  useEffect(() => {
-    if (!playing) return
-    const unsubscribe = engine.watchAyVoices(module.id, (newVoices) => {
+    const unsubscribe = engine.watchAyVoices(module.id, (newVoices, elapsedSecs) => {
       setVoices(newVoices)
+      setElapsed(Math.floor(elapsedSecs))
     })
     return unsubscribe
   }, [engine, module.id, playing])
@@ -1675,7 +1652,6 @@ function AyPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module'
       // VTX file - decompress embedded LHA-5 data
       try {
         data = decompressVtx(data)
-        setLoadGen(g => g + 1)
         setYmInfo({ name: 'VTX File', author: '', frames: 0, format: 'VTX' })
         engine.loadYmFile(module.id, data)
         return
@@ -1701,7 +1677,6 @@ function AyPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module'
 
     // Check for PSG magic
     if (data.length >= 4 && data[0] === 0x50 && data[1] === 0x53 && data[2] === 0x47 && data[3] === 0x1A) {
-      setLoadGen(g => g + 1)
       setYmInfo({ name: 'PSG File', author: '', frames: 0, format: 'PSG' })
       engine.loadYmFile(module.id, data)
       return
@@ -1711,8 +1686,7 @@ function AyPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module'
     if (data.length >= 4) {
       const magic = String.fromCharCode(data[0], data[1], data[2], data[3])
       if (magic.startsWith('YM')) {
-        // Reset and load
-        setLoadGen(g => g + 1)
+        // Load file
         setYmInfo({ name: 'YM File', author: '', frames: 0, format: 'YM' })
         engine.loadYmFile(module.id, data)
       } else {
@@ -1756,7 +1730,6 @@ function AyPlayerUI({ module, engine, updateParam }: Pick<ControlProps, 'module'
       }
 
       setLoadError(null)
-      setLoadGen(g => g + 1)
       setYmInfo({
         name: preset?.name || 'File',
         author: preset?.author || '',

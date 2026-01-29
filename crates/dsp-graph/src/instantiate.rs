@@ -136,6 +136,9 @@ pub(crate) fn create_state(
       level7: ParamBuffer::new(param_number(params, "level7", 0.6)),
       level8: ParamBuffer::new(param_number(params, "level8", 0.6)),
     }),
+    ModuleType::Crossfader => ModuleState::Crossfader(CrossfaderState {
+      mix: ParamBuffer::new(param_number(params, "mix", 0.5)),
+    }),
     ModuleType::Chorus => ModuleState::Chorus(ChorusState {
       chorus: Chorus::new(sample_rate),
       rate: ParamBuffer::new(param_number(params, "rate", 0.3)),
@@ -752,6 +755,10 @@ pub(crate) fn apply_param(state: &mut ModuleState, param: &str, value: f32) {
       "level6" => state.level6.set(value),
       "level7" => state.level7.set(value),
       "level8" => state.level8.set(value),
+      _ => {}
+    },
+    ModuleState::Crossfader(state) => match param {
+      "mix" => state.mix.set(value),
       _ => {}
     },
     ModuleState::Chorus(state) => match param {

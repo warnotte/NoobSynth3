@@ -154,6 +154,14 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
     ],
     outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
   },
+  crossfader: {
+    inputs: [
+      { id: 'in-a', label: 'A', kind: 'audio', direction: 'in' },
+      { id: 'in-b', label: 'B', kind: 'audio', direction: 'in' },
+      { id: 'mix', label: 'Mix', kind: 'cv', direction: 'in' },
+    ],
+    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
+  },
   chorus: simpleAudioEffect(),
   ensemble: simpleAudioEffect(),
   choir: {

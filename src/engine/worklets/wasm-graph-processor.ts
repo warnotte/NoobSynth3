@@ -330,31 +330,35 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
       }
     }
 
-    // Poll SID voice states
+    // Poll SID voice states and elapsed time
     if (shouldPoll && this.watchedSids.length > 0) {
       const updates: Record<string, number[]> = {}
+      const elapsed: Record<string, number> = {}
       for (const moduleId of this.watchedSids) {
         const voices = this.engine.get_sid_voice_states(moduleId)
         if (voices.length === 9) {
           updates[moduleId] = Array.from(voices)
         }
+        elapsed[moduleId] = this.engine.get_sid_elapsed(moduleId)
       }
       if (Object.keys(updates).length > 0) {
-        this.port.postMessage({ type: 'sidVoiceStates', voices: updates })
+        this.port.postMessage({ type: 'sidVoiceStates', voices: updates, elapsed })
       }
     }
 
-    // Poll AY voice states
+    // Poll AY voice states and elapsed time
     if (shouldPoll && this.watchedAys.length > 0) {
       const updates: Record<string, number[]> = {}
+      const elapsed: Record<string, number> = {}
       for (const moduleId of this.watchedAys) {
         const voices = this.engine.get_ay_voice_states(moduleId)
         if (voices.length === 9) {
           updates[moduleId] = Array.from(voices)
         }
+        elapsed[moduleId] = this.engine.get_ay_elapsed(moduleId)
       }
       if (Object.keys(updates).length > 0) {
-        this.port.postMessage({ type: 'ayVoiceStates', voices: updates })
+        this.port.postMessage({ type: 'ayVoiceStates', voices: updates, elapsed })
       }
     }
 

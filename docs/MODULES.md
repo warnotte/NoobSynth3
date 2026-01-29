@@ -1215,12 +1215,17 @@ Le module utilise un émulateur CPU 6502 complet (mos6502) et l'émulateur reSID
 **Entrées :**
 | Port | ID | Description |
 |------|----|-------------|
-| Reset | `reset` | Redémarre la chanson |
+| Reset | `reset` | Redémarre la chanson depuis le début (front montant) |
 
 **Sorties :**
 | Port | ID | Description |
 |------|----|-------------|
 | Out | `out` | Audio stéréo |
+| Gate 1/2/3 | `gate-1`, `gate-2`, `gate-3` | Gate par voix SID |
+| CV 1/2/3 | `cv-1`, `cv-2`, `cv-3` | Pitch CV par voix (V/Oct, C4 = 0V) |
+| WF 1/2/3 | `wf-1`, `wf-2`, `wf-3` | Waveform CV par voix (0=pulse, 1=saw, 2=tri, 3=noise) |
+
+**Multi-tune :** Les fichiers .sid peuvent contenir plusieurs chansons. Le paramètre `song` permet de sélectionner laquelle jouer. Le compteur de temps et la lecture se réinitialisent automatiquement lors d'un changement de chanson ou d'un reset.
 
 **Différences entre modèles de puce :**
 - **MOS 6581** (1982) : Son plus "crunchy", filtre avec plus de distorsion, utilisé dans les C64 originaux
@@ -1258,14 +1263,16 @@ Le module lit des fichiers de dump de registres (YM, VTX, PSG) et rejoue les don
 **Entrées :**
 | Port | ID | Description |
 |------|----|-------------|
-| Gate | `gate` | Trigger externe (optionnel) |
+| Reset | `reset` | Redémarre la lecture depuis le début (front montant) |
 
 **Sorties :**
 | Port | ID | Description |
 |------|----|-------------|
 | Out L/R | `out-l`, `out-r` | Audio stéréo |
-| CV A/B/C | `cv-a`, `cv-b`, `cv-c` | Fréquence par voix |
+| CV A/B/C | `cv-a`, `cv-b`, `cv-c` | Pitch CV par voix (V/Oct, C4 = 0V) |
 | Gate A/B/C | `gate-a`, `gate-b`, `gate-c` | Gate par voix |
+
+**Single-tune :** Contrairement aux fichiers .sid qui peuvent contenir plusieurs chansons, les formats YM/VTX/PSG ne contiennent qu'une seule chanson par fichier (dump de registres frame-par-frame). Pour avoir plusieurs morceaux, il faut plusieurs fichiers.
 
 **Formats supportés :**
 

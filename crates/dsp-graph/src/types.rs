@@ -31,6 +31,7 @@ pub enum ModuleType {
     Mixer,
     MixerWide,
     Mixer8,
+    Crossfader,
     RingMod,
 
     // Modulators

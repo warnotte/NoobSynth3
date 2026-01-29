@@ -221,3 +221,35 @@ impl Mixer {
         }
     }
 }
+
+/// Crossfader for A/B mixing between two audio sources.
+///
+/// mix = 0: 100% input A
+/// mix = 1: 100% input B
+/// mix = 0.5: 50% A + 50% B
+pub struct Crossfader;
+
+impl Crossfader {
+    pub fn process_block(
+        output: &mut [Sample],
+        input_a: Option<&[Sample]>,
+        input_b: Option<&[Sample]>,
+        mix: &[Sample],
+        mix_cv: Option<&[Sample]>,
+    ) {
+        // Early exit: if no inputs connected, output silence
+        if input_a.is_none() && input_b.is_none() {
+            output.fill(0.0);
+            return;
+        }
+
+        for i in 0..output.len() {
+            let base = sample_at(mix, i, 0.5);
+            let cv = input_at(mix_cv, i);
+            let m = (base + cv).clamp(0.0, 1.0);
+            let a = input_at(input_a, i);
+            let b = input_at(input_b, i);
+            output[i] = a * (1.0 - m) + b * m;
+        }
+    }
+}

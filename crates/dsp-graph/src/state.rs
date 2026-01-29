@@ -257,6 +257,11 @@ pub struct Mixer8State {
     pub level8: ParamBuffer,
 }
 
+/// Crossfader: mix between two audio inputs (0 = 100% A, 1 = 100% B)
+pub struct CrossfaderState {
+    pub mix: ParamBuffer,
+}
+
 pub struct RingModState {
     pub level: ParamBuffer,
 }
@@ -708,6 +713,7 @@ pub enum ModuleState {
     Mixer(MixerState),
     MixerWide(MixerWideState),
     Mixer8(Mixer8State),
+    Crossfader(CrossfaderState),
     RingMod(RingModState),
 
     // Modulators

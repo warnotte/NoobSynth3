@@ -1,7 +1,7 @@
 /**
  * Amplifier and mixer module controls
  *
- * Modules: gain, cv-vca, mixer, mixer-1x2, mixer-8, ring-mod
+ * Modules: gain, cv-vca, mixer, mixer-1x2, mixer-8, crossfader, ring-mod
  */
 
 import type React from 'react'
@@ -91,6 +91,20 @@ export function renderAmplifierControls(props: ControlProps): React.ReactElement
           />
         ))}
       </>
+    )
+  }
+
+  if (module.type === 'crossfader') {
+    return (
+      <RotaryKnob
+        label="A ↔ B"
+        min={0}
+        max={1}
+        step={0.01}
+        value={Number(module.params.mix ?? 0.5)}
+        onChange={(value) => updateParam(module.id, 'mix', value)}
+        format={formatDecimal2}
+      />
     )
   }
 

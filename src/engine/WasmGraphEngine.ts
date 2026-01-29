@@ -25,9 +25,9 @@ export class AudioEngine {
   private granularLoadCallbacks: Map<string, (length: number) => void> = new Map()
   private granularPositionCallbacks: Map<string, (position: number) => void> = new Map()
   private watchedGranulars: Set<string> = new Set()
-  private sidVoiceCallbacks: Map<string, (voices: Array<{freq: number, gate: boolean, waveform: number}>) => void> = new Map()
+  private sidVoiceCallbacks: Map<string, (voices: Array<{freq: number, gate: boolean, waveform: number}>, elapsed: number) => void> = new Map()
   private watchedSids: Set<string> = new Set()
-  private ayVoiceCallbacks: Map<string, (voices: Array<{period: number, active: boolean, flags: number}>) => void> = new Map()
+  private ayVoiceCallbacks: Map<string, (voices: Array<{period: number, active: boolean, flags: number}>, elapsed: number) => void> = new Map()
   private watchedAys: Set<string> = new Set()
 
   async start(graph: GraphState): Promise<void> {
@@ -315,7 +315,7 @@ export class AudioEngine {
 
   watchSidVoices(
     moduleId: string,
-    callback: (voices: Array<{freq: number, gate: boolean, waveform: number}>) => void
+    callback: (voices: Array<{freq: number, gate: boolean, waveform: number}>, elapsed: number) => void
   ): () => void {
     this.sidVoiceCallbacks.set(moduleId, callback)
     this.watchedSids.add(moduleId)
@@ -382,7 +382,7 @@ export class AudioEngine {
 
   watchAyVoices(
     moduleId: string,
-    callback: (voices: Array<{period: number, active: boolean, flags: number}>) => void
+    callback: (voices: Array<{period: number, active: boolean, flags: number}>, elapsed: number) => void
   ): () => void {
     this.ayVoiceCallbacks.set(moduleId, callback)
     this.watchedAys.add(moduleId)
@@ -476,7 +476,7 @@ export class AudioEngine {
 
     // Listen for messages from the worklet
     this.graphNode.port.onmessage = (event) => {
-      const data = event.data as { type: string; steps?: Record<string, number>; positions?: Record<string, number>; data?: number[]; voices?: Record<string, number[]> }
+      const data = event.data as { type: string; steps?: Record<string, number>; positions?: Record<string, number>; data?: number[]; voices?: Record<string, number[]>; elapsed?: Record<string, number> }
       if (data.type === 'sequencerSteps' && data.steps) {
         // Debug: log incoming step updates (throttled)
         const stepEntries = Object.entries(data.steps)
@@ -521,25 +521,29 @@ export class AudioEngine {
           }
         }
       } else if (data.type === 'sidVoiceStates' && data.voices) {
+        const elapsedMap = (data.elapsed || {}) as Record<string, number>
         for (const [moduleId, voiceData] of Object.entries(data.voices as Record<string, number[]>)) {
           const callback = this.sidVoiceCallbacks.get(moduleId)
           if (callback && voiceData.length === 9) {
+            const elapsed = elapsedMap[moduleId] ?? 0
             callback([
               { freq: voiceData[0], gate: voiceData[1] !== 0, waveform: voiceData[2] },
               { freq: voiceData[3], gate: voiceData[4] !== 0, waveform: voiceData[5] },
               { freq: voiceData[6], gate: voiceData[7] !== 0, waveform: voiceData[8] },
-            ])
+            ], elapsed)
           }
         }
       } else if (data.type === 'ayVoiceStates' && data.voices) {
+        const elapsedMap = (data.elapsed || {}) as Record<string, number>
         for (const [moduleId, voiceData] of Object.entries(data.voices as Record<string, number[]>)) {
           const callback = this.ayVoiceCallbacks.get(moduleId)
           if (callback && voiceData.length === 9) {
+            const elapsed = elapsedMap[moduleId] ?? 0
             callback([
               { period: voiceData[0], active: voiceData[1] !== 0, flags: voiceData[2] },
               { period: voiceData[3], active: voiceData[4] !== 0, flags: voiceData[5] },
               { period: voiceData[6], active: voiceData[7] !== 0, flags: voiceData[8] },
-            ])
+            ], elapsed)
           }
         }
       }

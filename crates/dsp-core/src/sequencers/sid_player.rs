@@ -651,6 +651,12 @@ pub struct SidPlayer {
     playing: bool,
     initialized: bool,
     current_chip_model: u8, // 0 = 6581, 1 = 8580
+
+    // Reset input tracking
+    prev_reset: f32,
+
+    // Elapsed time tracking
+    elapsed_samples: u64,
 }
 
 /// Parameters for SidPlayer
@@ -762,7 +768,16 @@ impl SidPlayer {
             playing: false,
             initialized: false,
             current_chip_model: 0,
+            prev_reset: 0.0,
+            elapsed_samples: 0,
         }
+    }
+
+    /// Reset playback to beginning (re-init song)
+    pub fn reset(&mut self) {
+        self.initialized = false;
+        self.elapsed_samples = 0;
+        // init_song will be called on next process if playing
     }
 
     /// Set the sample rate
@@ -899,6 +914,7 @@ impl SidPlayer {
         // Reset timing for clean playback
         self.cycle_accumulator = 0.0;
         self.frame_cycle_accumulator = 0;
+        self.elapsed_samples = 0;
         self.initialized = true;
     }
 
@@ -955,13 +971,27 @@ impl SidPlayer {
         ]
     }
 
+    /// Get elapsed playback time in seconds
+    pub fn elapsed_seconds(&self) -> f32 {
+        self.elapsed_samples as f32 / self.sample_rate
+    }
+
     /// Process a block of audio
     pub fn process_block(
         &mut self,
         outputs: SidPlayerOutputs,
-        _inputs: SidPlayerInputs,
+        inputs: SidPlayerInputs,
         params: SidPlayerParams,
     ) {
+        // Check for reset trigger (rising edge detection)
+        if let Some(reset_buf) = inputs.reset {
+            let reset_val = sample_at(reset_buf, 0, 0.0);
+            if reset_val > 0.5 && self.prev_reset <= 0.5 {
+                // Rising edge detected - reset playback
+                self.reset();
+            }
+            self.prev_reset = reset_val;
+        }
         let block_size = outputs.left.len();
 
         // Handle params
@@ -1078,6 +1108,9 @@ impl SidPlayer {
             outputs.wf1[i] = sid_waveform_to_cv(v0.waveform);
             outputs.wf2[i] = sid_waveform_to_cv(v1.waveform);
             outputs.wf3[i] = sid_waveform_to_cv(v2.waveform);
+
+            // Track elapsed time
+            self.elapsed_samples += 1;
         }
     }
 

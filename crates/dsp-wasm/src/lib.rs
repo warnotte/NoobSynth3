@@ -144,4 +144,14 @@ impl WasmGraphEngine {
   pub fn load_ym_file(&mut self, module_id: &str, data: &[u8]) {
     self.engine.load_ym_file(module_id, data);
   }
+
+  /// Get elapsed playback time for a SID player (in seconds)
+  pub fn get_sid_elapsed(&self, module_id: &str) -> f32 {
+    self.engine.get_sid_elapsed(module_id)
+  }
+
+  /// Get elapsed playback time for an AY player (in seconds)
+  pub fn get_ay_elapsed(&self, module_id: &str) -> f32 {
+    self.engine.get_ay_elapsed(module_id)
+  }
 }

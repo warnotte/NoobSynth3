@@ -54,6 +54,12 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },
       PortInfo { channels: 1 },
     ],
+    // Crossfader - 2 audio inputs (A and B) + mix CV
+    ModuleType::Crossfader => vec![
+      PortInfo { channels: 1 },  // in-a
+      PortInfo { channels: 1 },  // in-b
+      PortInfo { channels: 1 },  // mix CV
+    ],
     ModuleType::Chorus
     | ModuleType::Ensemble
     | ModuleType::Delay
@@ -244,6 +250,7 @@ pub fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
     ModuleType::Mixer => vec![PortInfo { channels: 1 }],
     ModuleType::MixerWide => vec![PortInfo { channels: 1 }],
     ModuleType::Mixer8 => vec![PortInfo { channels: 1 }],
+    ModuleType::Crossfader => vec![PortInfo { channels: 1 }],  // audio output
     ModuleType::Chorus
     | ModuleType::Ensemble
     | ModuleType::Choir
@@ -532,6 +539,12 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
       "in-8" => Some(7),
       _ => None,
     },
+    ModuleType::Crossfader => match port_id {
+      "in-a" | "a" => Some(0),
+      "in-b" | "b" => Some(1),
+      "mix" | "cv" => Some(2),
+      _ => None,
+    },
     ModuleType::Chorus
     | ModuleType::Ensemble
     | ModuleType::Delay
@@ -806,6 +819,10 @@ pub fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize
       _ => None,
     },
     ModuleType::Mixer8 => match port_id {
+      "out" => Some(0),
+      _ => None,
+    },
+    ModuleType::Crossfader => match port_id {
       "out" => Some(0),
       _ => None,
     },
