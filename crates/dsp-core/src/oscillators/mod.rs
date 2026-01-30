@@ -17,6 +17,7 @@
 //! - [`Resonator`] - Sympathetic resonance module (Rings-style)
 //! - [`Wavetable`] - Wavetable oscillator with morphing
 //! - [`Granular`] - Sample-based granular synthesizer
+//! - [`FmMatrix`] - 4-operator FM synthesizer (DX7 style)
 
 mod vco;
 mod supersaw;
@@ -27,6 +28,7 @@ mod snes_osc;
 mod tb303;
 mod karplus;
 mod fm_op;
+mod fm_matrix;
 mod shepard;
 mod pipe_organ;
 mod spectral_swarm;
@@ -43,6 +45,7 @@ pub use snes_osc::{SnesOsc, SnesOscParams, SnesOscInputs};
 pub use tb303::{Tb303, Tb303Params, Tb303Inputs, Tb303Outputs};
 pub use karplus::{KarplusStrong, KarplusParams, KarplusInputs};
 pub use fm_op::{FmOperator, FmOperatorParams, FmOperatorInputs};
+pub use fm_matrix::{FmMatrix, FmMatrixParams, OpParams};
 pub use shepard::{Shepard, ShepardParams, ShepardInputs};
 pub use pipe_organ::{PipeOrgan, PipeOrganParams, PipeOrganInputs, OrganVoicing, ORGAN_DRAWBARS, DRAWBAR_NAMES};
 pub use spectral_swarm::{SpectralSwarm, SpectralSwarmParams, SpectralSwarmInputs};

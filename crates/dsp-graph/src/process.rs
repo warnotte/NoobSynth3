@@ -12,7 +12,7 @@ use dsp_core::{
     DelayInputs, DelayParams, Distortion, DistortionParams,
     DrumSequencerInputs, DrumSequencerOutputs, DrumSequencerParams,
     EnsembleInputs, EnsembleParams, EuclideanInputs, EuclideanParams,
-    FmOperatorInputs, FmOperatorParams,
+    FmMatrixParams, FmOperatorInputs, FmOperatorParams, OpParams,
     GranularDelayInputs, GranularDelayParams,
     GranularInputs, GranularParams,
     HiHat808Inputs, HiHat808Params,
@@ -1399,6 +1399,139 @@ pub(crate) fn process_module(
 
             let out = outputs[0].channel_mut(0);
             state.op.process_block(out, fm_inputs, params);
+        }
+        ModuleState::FmMatrix(state) => {
+            // 6 inputs: pitch, gate, velocity, fm-in, mod, ratio-cv
+            let pitch_cv = if !connections[0].is_empty() { Some(inputs[0].channel(0)) } else { None };
+            let gate_cv = if connections.len() > 1 && !connections[1].is_empty() {
+                Some(inputs[1].channel(0))
+            } else {
+                None
+            };
+            let velocity_cv = if connections.len() > 2 && !connections[2].is_empty() {
+                Some(inputs[2].channel(0))
+            } else {
+                None
+            };
+            let fm_in = if connections.len() > 3 && !connections[3].is_empty() {
+                Some(inputs[3].channel(0))
+            } else {
+                None
+            };
+            let _mod_cv = if connections.len() > 4 && !connections[4].is_empty() {
+                Some(inputs[4].channel(0))
+            } else {
+                None
+            };
+            let _ratio_cv = if connections.len() > 5 && !connections[5].is_empty() {
+                Some(inputs[5].channel(0))
+            } else {
+                None
+            };
+
+            // Get param slices
+            let algorithm = state.algorithm.slice(frames);
+            let feedback = state.feedback.slice(frames);
+            let brightness = state.brightness.slice(frames);
+            let master = state.master.slice(frames);
+
+            // Operator params
+            let op1_ratio = state.op1_ratio.slice(frames);
+            let op1_level = state.op1_level.slice(frames);
+            let op1_detune = state.op1_detune.slice(frames);
+            let op1_attack = state.op1_attack.slice(frames);
+            let op1_decay = state.op1_decay.slice(frames);
+            let op1_sustain = state.op1_sustain.slice(frames);
+            let op1_release = state.op1_release.slice(frames);
+
+            let op2_ratio = state.op2_ratio.slice(frames);
+            let op2_level = state.op2_level.slice(frames);
+            let op2_detune = state.op2_detune.slice(frames);
+            let op2_attack = state.op2_attack.slice(frames);
+            let op2_decay = state.op2_decay.slice(frames);
+            let op2_sustain = state.op2_sustain.slice(frames);
+            let op2_release = state.op2_release.slice(frames);
+
+            let op3_ratio = state.op3_ratio.slice(frames);
+            let op3_level = state.op3_level.slice(frames);
+            let op3_detune = state.op3_detune.slice(frames);
+            let op3_attack = state.op3_attack.slice(frames);
+            let op3_decay = state.op3_decay.slice(frames);
+            let op3_sustain = state.op3_sustain.slice(frames);
+            let op3_release = state.op3_release.slice(frames);
+
+            let op4_ratio = state.op4_ratio.slice(frames);
+            let op4_level = state.op4_level.slice(frames);
+            let op4_detune = state.op4_detune.slice(frames);
+            let op4_attack = state.op4_attack.slice(frames);
+            let op4_decay = state.op4_decay.slice(frames);
+            let op4_sustain = state.op4_sustain.slice(frames);
+            let op4_release = state.op4_release.slice(frames);
+
+            // Split outputs to avoid borrow conflicts
+            let (audio_out, mod_outputs) = outputs.split_at_mut(1);
+            let audio_buf = &mut audio_out[0];
+            let mod_out = mod_outputs[0].channel_mut(0);
+
+            for i in 0..frames {
+                // Get pitch from CV (octaves relative to base) - base freq is A3 (220Hz)
+                let base_freq = 220.0_f32;
+                let pitch_offset = pitch_cv.map(|p| p[i]).unwrap_or(0.0);
+                let freq_hz = base_freq * (2.0_f32).powf(pitch_offset);
+                let gate = gate_cv.map(|g| g[i]).unwrap_or(0.0);
+                let velocity = velocity_cv.map(|v| v[i]).unwrap_or(1.0);
+                let fm_ext = fm_in.map(|f| f[i]).unwrap_or(0.0);
+
+                let params = FmMatrixParams {
+                    algorithm: algorithm[i] as usize,
+                    feedback: feedback[i],
+                    brightness: brightness[i],
+                    master: master[i],
+                    ops: [
+                        OpParams {
+                            ratio: op1_ratio[i],
+                            level: op1_level[i],
+                            detune: op1_detune[i],
+                            attack_ms: op1_attack[i],
+                            decay_ms: op1_decay[i],
+                            sustain: op1_sustain[i],
+                            release_ms: op1_release[i],
+                        },
+                        OpParams {
+                            ratio: op2_ratio[i],
+                            level: op2_level[i],
+                            detune: op2_detune[i],
+                            attack_ms: op2_attack[i],
+                            decay_ms: op2_decay[i],
+                            sustain: op2_sustain[i],
+                            release_ms: op2_release[i],
+                        },
+                        OpParams {
+                            ratio: op3_ratio[i],
+                            level: op3_level[i],
+                            detune: op3_detune[i],
+                            attack_ms: op3_attack[i],
+                            decay_ms: op3_decay[i],
+                            sustain: op3_sustain[i],
+                            release_ms: op3_release[i],
+                        },
+                        OpParams {
+                            ratio: op4_ratio[i],
+                            level: op4_level[i],
+                            detune: op4_detune[i],
+                            attack_ms: op4_attack[i],
+                            decay_ms: op4_decay[i],
+                            sustain: op4_sustain[i],
+                            release_ms: op4_release[i],
+                        },
+                    ],
+                };
+
+                let sample = state.matrix.process_sample(freq_hz, gate, velocity, fm_ext, &params);
+                audio_buf.channel_mut(0)[i] = sample;
+                audio_buf.channel_mut(1)[i] = sample;
+                mod_out[i] = state.matrix.get_env_level();
+            }
         }
         ModuleState::Shepard(state) => {
             let rate_cv = if !connections[0].is_empty() { Some(inputs[0].channel(0)) } else { None };

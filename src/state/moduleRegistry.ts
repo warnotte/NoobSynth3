@@ -70,6 +70,7 @@ export const moduleSizes: Record<ModuleType, string> = {
   euclidean: '2x3',
   // FM Synthesis
   'fm-op': '2x3',
+  'fm-matrix': '3x5',
   // Documentation
   notes: '3x2',
   // Effects
@@ -132,6 +133,7 @@ export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>>
   euclidean: 'strip',
   // FM Synthesis
   'fm-op': 'strip',
+  'fm-matrix': 'strip',
   // Documentation (no ports)
   notes: 'strip',
   // Master Clock
@@ -187,6 +189,7 @@ export const moduleCatalog: { type: ModuleType; label: string; category: ModuleC
   { type: 'noise', label: 'Noise', category: 'sources' },
   { type: 'tb-303', label: 'TB-303', category: 'sources' },
   { type: 'fm-op', label: 'FM Op', category: 'sources' },
+  { type: 'fm-matrix', label: 'FM Matrix', category: 'sources' },
   { type: 'shepard', label: 'Shepard', category: 'sources' },
   { type: 'pipe-organ', label: 'Pipe Organ', category: 'sources' },
   { type: 'spectral-swarm', label: 'Spectral Swarm', category: 'sources' },
@@ -331,6 +334,7 @@ export const modulePrefixes: Record<ModuleType, string> = {
   euclidean: 'euclid',
   // FM Synthesis
   'fm-op': 'fmop',
+  'fm-matrix': 'fm',
   // Documentation
   notes: 'notes',
   // Master Clock
@@ -414,6 +418,7 @@ export const moduleLabels: Record<ModuleType, string> = {
   euclidean: 'Euclidean',
   // FM Synthesis
   'fm-op': 'FM Op',
+  'fm-matrix': 'FM Matrix',
   // Documentation
   notes: 'Notes',
   // Master Clock
@@ -849,6 +854,45 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     decay: 200,
     sustain: 0.7,
     release: 300,
+  },
+  // FM Matrix 4-Operator
+  'fm-matrix': {
+    algorithm: 0,
+    feedback: 0.5,
+    brightness: 0.7,
+    master: 0.8,
+    // Operator 1
+    op1_ratio: 1,
+    op1_level: 1,
+    op1_detune: 0,
+    op1_attack: 10,
+    op1_decay: 300,
+    op1_sustain: 0.7,
+    op1_release: 500,
+    // Operator 2
+    op2_ratio: 2,
+    op2_level: 0.5,
+    op2_detune: 0,
+    op2_attack: 10,
+    op2_decay: 200,
+    op2_sustain: 0.3,
+    op2_release: 300,
+    // Operator 3
+    op3_ratio: 3,
+    op3_level: 0.3,
+    op3_detune: 0,
+    op3_attack: 10,
+    op3_decay: 150,
+    op3_sustain: 0.2,
+    op3_release: 200,
+    // Operator 4
+    op4_ratio: 4,
+    op4_level: 0.2,
+    op4_detune: 0,
+    op4_attack: 10,
+    op4_decay: 100,
+    op4_sustain: 0.1,
+    op4_release: 150,
   },
   // Notes (documentation)
   notes: {

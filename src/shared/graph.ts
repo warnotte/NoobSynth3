@@ -72,6 +72,7 @@ export type ModuleType =
   | 'midi-file-sequencer'
   // FM Synthesis
   | 'fm-op'
+  | 'fm-matrix'
   // Documentation
   | 'notes'
   // Effects

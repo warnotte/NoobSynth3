@@ -135,6 +135,7 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 ### Code (obligatoire)
 - [ ] `crates/dsp-core/src/lib.rs` - Implémentation DSP Rust
 - [ ] `crates/dsp-graph/src/types.rs` - Ajouter variante à `ModuleType` enum
+- [ ] `crates/dsp-graph/src/lib.rs` - **CRITIQUE:** Ajouter `"module-name" => ModuleType::...` dans `parse_module_type()`
 - [ ] `crates/dsp-graph/src/state.rs` - Struct d'état du module
 - [ ] `crates/dsp-graph/src/instantiate.rs` - `create_state()` + `apply_param()`
 - [ ] `crates/dsp-graph/src/process.rs` - Logique DSP dans `process_module()`
@@ -192,10 +193,10 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 
 **⚠️ RÈGLE:** Toute nouvelle feature UI↔Audio DOIT être implémentée pour Tauri en même temps que Web. Ne jamais merger une feature Web-only.
 
-## Module Types (71 total)
+## Module Types (72 total)
 
-### Sources (14)
-oscillator, supersaw, karplus, fm-op, nes-osc, snes-osc, noise, tb-303, shepard, pipe-organ, spectral-swarm, resonator, wavetable, granular
+### Sources (15)
+oscillator, supersaw, karplus, fm-op, fm-matrix, nes-osc, snes-osc, noise, tb-303, shepard, pipe-organ, spectral-swarm, resonator, wavetable, granular
 
 ### Filters (2)
 vcf, hpf

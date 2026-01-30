@@ -1,0 +1,133 @@
+{
+  "id": "fm-matrix-branch",
+  "name": "FM Branch Strings",
+  "description": "Algorithm 4: Branching for string-like textures",
+  "group": "FM",
+  "graph": {
+    "modules": [
+      {
+        "id": "ctrl-1",
+        "type": "control",
+        "name": "Control",
+        "position": { "col": 1, "row": 1 },
+        "params": {
+          "voices": 4,
+          "glide": 20
+        }
+      },
+      {
+        "id": "fm-1",
+        "type": "fm-matrix",
+        "name": "FM Branch",
+        "position": { "col": 3, "row": 1 },
+        "params": {
+          "algorithm": 4,
+          "feedback": 0.15,
+          "brightness": 0.55,
+          "master": 0.65,
+          "op1_ratio": 1,
+          "op1_level": 1,
+          "op1_detune": 3,
+          "op1_attack": 200,
+          "op1_decay": 800,
+          "op1_sustain": 0.7,
+          "op1_release": 600,
+          "op2_ratio": 2,
+          "op2_level": 0.6,
+          "op2_detune": -3,
+          "op2_attack": 250,
+          "op2_decay": 700,
+          "op2_sustain": 0.6,
+          "op2_release": 500,
+          "op3_ratio": 3,
+          "op3_level": 0.4,
+          "op3_detune": 5,
+          "op3_attack": 300,
+          "op3_decay": 600,
+          "op3_sustain": 0.5,
+          "op3_release": 450,
+          "op4_ratio": 4,
+          "op4_level": 0.3,
+          "op4_detune": -5,
+          "op4_attack": 350,
+          "op4_decay": 500,
+          "op4_sustain": 0.4,
+          "op4_release": 400
+        }
+      },
+      {
+        "id": "chorus-1",
+        "type": "chorus",
+        "name": "Chorus",
+        "position": { "col": 6, "row": 1 },
+        "params": {
+          "rate": 0.4,
+          "depth": 0.45,
+          "mix": 0.35
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "col": 8, "row": 1 },
+        "params": {
+          "time": 0.65,
+          "damp": 0.35,
+          "preDelay": 25,
+          "mix": 0.4
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Output",
+        "position": { "col": 10, "row": 1 },
+        "params": {
+          "level": 1
+        }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "col": 1, "row": 6 },
+        "params": {
+          "text": "FM BRANCH STRINGS\n\nAlgorithm 4: Branch\nOp4 splits to modulate Op2+Op3\nOp2 and Op3 are both carriers\n\n- Two independent carrier paths\n- Detuning creates ensemble\n- Staggered attacks = bow swell\n\nTry:\n- Adjust detune for width\n- Longer attacks for realism\n- Less brightness for warmth"
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "cv-out" },
+        "to": { "moduleId": "fm-1", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "gate-out" },
+        "to": { "moduleId": "fm-1", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "vel-out" },
+        "to": { "moduleId": "fm-1", "portId": "velocity" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "fm-1", "portId": "out" },
+        "to": { "moduleId": "chorus-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "chorus-1", "portId": "out" },
+        "to": { "moduleId": "reverb-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb-1", "portId": "out" },
+        "to": { "moduleId": "out-1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

@@ -43,6 +43,7 @@ pub use oscillators::{
     Tb303, Tb303Params, Tb303Inputs, Tb303Outputs,
     KarplusStrong, KarplusParams, KarplusInputs,
     FmOperator, FmOperatorParams, FmOperatorInputs,
+    FmMatrix, FmMatrixParams, OpParams,
     Shepard, ShepardParams, ShepardInputs,
     PipeOrgan, PipeOrganParams, PipeOrganInputs, OrganVoicing, ORGAN_DRAWBARS, DRAWBAR_NAMES,
     SpectralSwarm, SpectralSwarmParams, SpectralSwarmInputs,

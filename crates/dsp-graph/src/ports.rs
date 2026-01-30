@@ -143,6 +143,15 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // gate
       PortInfo { channels: 1 },  // FM input
     ],
+    // FM Matrix - 6 inputs (pitch, gate, velocity, fm-in, mod, ratio-cv)
+    ModuleType::FmMatrix => vec![
+      PortInfo { channels: 1 },  // pitch CV
+      PortInfo { channels: 1 },  // gate
+      PortInfo { channels: 1 },  // velocity
+      PortInfo { channels: 1 },  // FM external input
+      PortInfo { channels: 1 },  // mod CV
+      PortInfo { channels: 1 },  // ratio CV
+    ],
     // Notes - no inputs (UI only)
     ModuleType::Notes => vec![],
     // Pitch Shifter - 2 inputs (audio, pitch CV)
@@ -340,6 +349,11 @@ pub fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
     // FM Operator - 1 output (audio)
     ModuleType::FmOp => vec![
       PortInfo { channels: 1 },  // audio out
+    ],
+    // FM Matrix - 2 outputs (audio stereo, mod-out)
+    ModuleType::FmMatrix => vec![
+      PortInfo { channels: 2 },  // stereo audio out
+      PortInfo { channels: 1 },  // envelope out (mod)
     ],
     // Notes - no outputs (UI only)
     ModuleType::Notes => vec![],
@@ -658,6 +672,16 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
       "fm" | "fm-in" => Some(2),
       _ => None,
     },
+    // FM Matrix - 6 inputs
+    ModuleType::FmMatrix => match port_id {
+      "pitch" | "1volt" => Some(0),
+      "gate" => Some(1),
+      "velocity" | "vel" => Some(2),
+      "fm-in" | "fm" => Some(3),
+      "mod" => Some(4),
+      "ratio-cv" | "ratio" => Some(5),
+      _ => None,
+    },
     // Notes - no inputs
     ModuleType::Notes => None,
     // Clock - 3 inputs
@@ -960,6 +984,12 @@ pub fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize
     // FM Operator - 1 output
     ModuleType::FmOp => match port_id {
       "out" | "output" => Some(0),
+      _ => None,
+    },
+    // FM Matrix - 2 outputs
+    ModuleType::FmMatrix => match port_id {
+      "out" | "output" => Some(0),
+      "mod-out" | "env" => Some(1),
       _ => None,
     },
     // Notes - no outputs

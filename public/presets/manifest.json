@@ -576,6 +576,83 @@
       "group": "FM Synthesis"
     },
     {
+      "id": "fm-matrix-bells",
+      "name": "FM Matrix Bells",
+      "description": "Shimmering FM bells with inharmonic ratios",
+      "file": "fm-matrix-bells.json",
+      "group": "FM"
+    },
+    {
+      "id": "fm-matrix-epiano",
+      "name": "FM Electric Piano",
+      "description": "Classic DX7 Rhodes-style electric piano",
+      "file": "fm-matrix-epiano.json",
+      "group": "FM"
+    },
+    {
+      "id": "fm-matrix-bass",
+      "name": "FM Slap Bass",
+      "description": "Punchy FM bass with bright attack",
+      "file": "fm-matrix-bass.json",
+      "group": "FM"
+    },
+    {
+      "id": "fm-matrix-brass",
+      "name": "FM Brass",
+      "description": "Bright FM brass stabs",
+      "file": "fm-matrix-brass.json",
+      "group": "FM"
+    },
+    {
+      "id": "fm-matrix-pad",
+      "name": "FM Ethereal Pad",
+      "description": "Evolving ambient FM pad",
+      "file": "fm-matrix-pad.json",
+      "group": "FM"
+    },
+    {
+      "id": "fm-matrix-lfo-mod",
+      "name": "FM LFO Wobble",
+      "description": "Dubstep wobble bass with LFO on MOD input",
+      "file": "fm-matrix-lfo-mod.json",
+      "group": "FM"
+    },
+    {
+      "id": "fm-matrix-ratio-sweep",
+      "name": "FM Ratio Sweep",
+      "description": "Evolving timbre via RATIO CV modulation",
+      "file": "fm-matrix-ratio-sweep.json",
+      "group": "FM"
+    },
+    {
+      "id": "fm-matrix-cross-mod",
+      "name": "FM Cross Modulation",
+      "description": "Two FM modules cross-modulating via FM input",
+      "file": "fm-matrix-cross-mod.json",
+      "group": "FM"
+    },
+    {
+      "id": "fm-matrix-yshape",
+      "name": "FM Y-Shape Organ",
+      "description": "Algorithm 2: Y-Shape for organ-like tones",
+      "file": "fm-matrix-yshape.json",
+      "group": "FM"
+    },
+    {
+      "id": "fm-matrix-branch",
+      "name": "FM Branch Strings",
+      "description": "Algorithm 4: Branching for string-like textures",
+      "file": "fm-matrix-branch.json",
+      "group": "FM"
+    },
+    {
+      "id": "fm-matrix-dualstack",
+      "name": "FM Dual Stack Pluck",
+      "description": "Algorithm 5: Two parallel stacks for plucked sounds",
+      "file": "fm-matrix-dualstack.json",
+      "group": "FM"
+    },
+    {
       "id": "synthwave-nightdrive",
       "name": "Synthwave Nightdrive",
       "description": "Complex fully sequenced synthwave anthem with layered bass, lead, pad, and 909 groove. Step patterns derived from CC0 MIDI 'movin-on.mid' (m-malandro/CC0-midis).",

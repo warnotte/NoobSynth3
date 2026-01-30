@@ -1,0 +1,117 @@
+{
+  "id": "fm-matrix-brass",
+  "name": "FM Brass",
+  "description": "Bright FM brass stabs",
+  "group": "FM",
+  "graph": {
+    "modules": [
+      {
+        "id": "ctrl-1",
+        "type": "control",
+        "name": "Control",
+        "position": { "col": 1, "row": 1 },
+        "params": {
+          "voices": 6,
+          "glide": 0
+        }
+      },
+      {
+        "id": "fm-1",
+        "type": "fm-matrix",
+        "name": "FM Brass",
+        "position": { "col": 3, "row": 1 },
+        "params": {
+          "algorithm": 2,
+          "feedback": 0.5,
+          "brightness": 0.9,
+          "master": 0.7,
+          "op1_ratio": 1,
+          "op1_level": 1,
+          "op1_detune": 0,
+          "op1_attack": 30,
+          "op1_decay": 200,
+          "op1_sustain": 0.8,
+          "op1_release": 200,
+          "op2_ratio": 1,
+          "op2_level": 0.85,
+          "op2_detune": 3,
+          "op2_attack": 50,
+          "op2_decay": 300,
+          "op2_sustain": 0.6,
+          "op2_release": 150,
+          "op3_ratio": 1,
+          "op3_level": 0.6,
+          "op3_detune": -3,
+          "op3_attack": 80,
+          "op3_decay": 400,
+          "op3_sustain": 0.4,
+          "op3_release": 100,
+          "op4_ratio": 1.001,
+          "op4_level": 0.7,
+          "op4_detune": 7,
+          "op4_attack": 40,
+          "op4_decay": 250,
+          "op4_sustain": 0.5,
+          "op4_release": 120
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "col": 6, "row": 1 },
+        "params": {
+          "time": 0.4,
+          "damp": 0.5,
+          "preDelay": 20,
+          "mix": 0.25
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Output",
+        "position": { "col": 8, "row": 1 },
+        "params": {
+          "level": 1
+        }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "col": 1, "row": 6 },
+        "params": {
+          "text": "FM BRASS\n\nBright, punchy brass stabs.\n\nAlgorithm 3: Y-Shape (3→2→1, 4→1)\nTwo modulation paths converge.\n\n- All ratios ~1 (unison)\n- Slight detune = richness\n- Slow attack = brass swell\n- High brightness = bite\n- Feedback adds edge\n\nPlay chords for big stabs!\nVelocity controls brightness."
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "cv-out" },
+        "to": { "moduleId": "fm-1", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "gate-out" },
+        "to": { "moduleId": "fm-1", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "vel-out" },
+        "to": { "moduleId": "fm-1", "portId": "velocity" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "fm-1", "portId": "out" },
+        "to": { "moduleId": "reverb-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb-1", "portId": "out" },
+        "to": { "moduleId": "out-1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

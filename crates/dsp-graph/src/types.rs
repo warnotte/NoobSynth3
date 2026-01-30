@@ -14,6 +14,7 @@ pub enum ModuleType {
     Noise,
     Tb303,
     FmOp,
+    FmMatrix,
     Shepard,
     PipeOrgan,
     SpectralSwarm,

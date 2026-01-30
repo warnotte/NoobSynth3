@@ -1,0 +1,134 @@
+{
+  "id": "fm-matrix-lfo-mod",
+  "name": "FM LFO Wobble",
+  "description": "FM bass with LFO modulating brightness",
+  "group": "FM",
+  "graph": {
+    "modules": [
+      {
+        "id": "ctrl-1",
+        "type": "control",
+        "name": "Control",
+        "position": { "col": 1, "row": 1 },
+        "params": {
+          "voices": 4,
+          "glide": 15
+        }
+      },
+      {
+        "id": "lfo-1",
+        "type": "lfo",
+        "name": "Mod LFO",
+        "position": { "col": 1, "row": 4 },
+        "params": {
+          "rate": 2.5,
+          "shape": "sine",
+          "depth": 0.6,
+          "offset": 0.3,
+          "bipolar": false
+        }
+      },
+      {
+        "id": "fm-1",
+        "type": "fm-matrix",
+        "name": "FM Wobble",
+        "position": { "col": 3, "row": 1 },
+        "params": {
+          "algorithm": 6,
+          "feedback": 0.4,
+          "brightness": 0.7,
+          "master": 0.75,
+          "op1_ratio": 0.5,
+          "op1_level": 1,
+          "op1_detune": 0,
+          "op1_attack": 5,
+          "op1_decay": 400,
+          "op1_sustain": 0.7,
+          "op1_release": 200,
+          "op2_ratio": 1,
+          "op2_level": 0.8,
+          "op2_detune": 0,
+          "op2_attack": 5,
+          "op2_decay": 300,
+          "op2_sustain": 0.5,
+          "op2_release": 150,
+          "op3_ratio": 2,
+          "op3_level": 0.6,
+          "op3_detune": 0,
+          "op3_attack": 5,
+          "op3_decay": 200,
+          "op3_sustain": 0.3,
+          "op3_release": 100,
+          "op4_ratio": 3,
+          "op4_level": 0.5,
+          "op4_detune": 0,
+          "op4_attack": 5,
+          "op4_decay": 150,
+          "op4_sustain": 0.2,
+          "op4_release": 80
+        }
+      },
+      {
+        "id": "dist-1",
+        "type": "distortion",
+        "name": "Distortion",
+        "position": { "col": 6, "row": 1 },
+        "params": {
+          "drive": 0.25,
+          "tone": 0.5,
+          "mix": 0.4
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Output",
+        "position": { "col": 8, "row": 1 },
+        "params": {
+          "level": 1
+        }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "col": 1, "row": 7 },
+        "params": {
+          "text": "FM LFO WOBBLE\n\nDubstep-style wobble bass.\n\nLFO → MOD input controls\nmodulator levels in real-time.\n\n- LFO rate = wobble speed\n- LFO depth = wobble intensity\n- Offset keeps some brightness\n\nTry:\n- Change LFO rate (0.5-8 Hz)\n- Change LFO shape (sine/saw)\n- Adjust feedback for growl"
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "cv-out" },
+        "to": { "moduleId": "fm-1", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "gate-out" },
+        "to": { "moduleId": "fm-1", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "vel-out" },
+        "to": { "moduleId": "fm-1", "portId": "velocity" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "lfo-1", "portId": "cv-out" },
+        "to": { "moduleId": "fm-1", "portId": "mod" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "fm-1", "portId": "out" },
+        "to": { "moduleId": "dist-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "dist-1", "portId": "out" },
+        "to": { "moduleId": "out-1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

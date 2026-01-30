@@ -1,0 +1,133 @@
+{
+  "id": "fm-matrix-epiano",
+  "name": "FM Electric Piano",
+  "description": "Classic DX7 Rhodes-style electric piano",
+  "group": "FM",
+  "graph": {
+    "modules": [
+      {
+        "id": "ctrl-1",
+        "type": "control",
+        "name": "Control",
+        "position": { "col": 1, "row": 1 },
+        "params": {
+          "voices": 6,
+          "glide": 0
+        }
+      },
+      {
+        "id": "fm-1",
+        "type": "fm-matrix",
+        "name": "FM E-Piano",
+        "position": { "col": 3, "row": 1 },
+        "params": {
+          "algorithm": 0,
+          "feedback": 0.15,
+          "brightness": 0.6,
+          "master": 0.75,
+          "op1_ratio": 1,
+          "op1_level": 1,
+          "op1_detune": 0,
+          "op1_attack": 1,
+          "op1_decay": 800,
+          "op1_sustain": 0.3,
+          "op1_release": 400,
+          "op2_ratio": 1,
+          "op2_level": 0.7,
+          "op2_detune": 0,
+          "op2_attack": 1,
+          "op2_decay": 600,
+          "op2_sustain": 0.2,
+          "op2_release": 300,
+          "op3_ratio": 1,
+          "op3_level": 0.5,
+          "op3_detune": 1,
+          "op3_attack": 1,
+          "op3_decay": 400,
+          "op3_sustain": 0.1,
+          "op3_release": 200,
+          "op4_ratio": 14,
+          "op4_level": 0.25,
+          "op4_detune": 0,
+          "op4_attack": 1,
+          "op4_decay": 80,
+          "op4_sustain": 0,
+          "op4_release": 50
+        }
+      },
+      {
+        "id": "chorus-1",
+        "type": "chorus",
+        "name": "Chorus",
+        "position": { "col": 6, "row": 1 },
+        "params": {
+          "rate": 0.8,
+          "depth": 0.3,
+          "mix": 0.25
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "col": 8, "row": 1 },
+        "params": {
+          "time": 0.5,
+          "damp": 0.6,
+          "preDelay": 10,
+          "mix": 0.2
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Output",
+        "position": { "col": 10, "row": 1 },
+        "params": {
+          "level": 1
+        }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "col": 1, "row": 6 },
+        "params": {
+          "text": "FM ELECTRIC PIANO\n\nClassic DX7 Rhodes sound.\n\nAlgorithm 1: Stack (4→3→2→1)\n\n- OP1-3: Ratio 1 (fundamental)\n- OP4: Ratio 14 (bark/tine attack)\n- Short OP4 decay = key click\n- Low feedback = clean tone\n\nVelocity sensitive!\nPlay softly for mellow,\nhard for bright attack."
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "cv-out" },
+        "to": { "moduleId": "fm-1", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "gate-out" },
+        "to": { "moduleId": "fm-1", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "vel-out" },
+        "to": { "moduleId": "fm-1", "portId": "velocity" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "fm-1", "portId": "out" },
+        "to": { "moduleId": "chorus-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "chorus-1", "portId": "out" },
+        "to": { "moduleId": "reverb-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb-1", "portId": "out" },
+        "to": { "moduleId": "out-1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

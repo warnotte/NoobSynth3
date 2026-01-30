@@ -1,0 +1,133 @@
+{
+  "id": "fm-matrix-yshape",
+  "name": "FM Y-Shape Organ",
+  "description": "Algorithm 2: Y-Shape for organ-like tones",
+  "group": "FM",
+  "graph": {
+    "modules": [
+      {
+        "id": "ctrl-1",
+        "type": "control",
+        "name": "Control",
+        "position": { "col": 1, "row": 1 },
+        "params": {
+          "voices": 4,
+          "glide": 0
+        }
+      },
+      {
+        "id": "fm-1",
+        "type": "fm-matrix",
+        "name": "FM Y-Shape",
+        "position": { "col": 3, "row": 1 },
+        "params": {
+          "algorithm": 2,
+          "feedback": 0.2,
+          "brightness": 0.6,
+          "master": 0.7,
+          "op1_ratio": 1,
+          "op1_level": 1,
+          "op1_detune": 0,
+          "op1_attack": 10,
+          "op1_decay": 300,
+          "op1_sustain": 0.8,
+          "op1_release": 200,
+          "op2_ratio": 2,
+          "op2_level": 0.7,
+          "op2_detune": 0,
+          "op2_attack": 10,
+          "op2_decay": 250,
+          "op2_sustain": 0.7,
+          "op2_release": 180,
+          "op3_ratio": 4,
+          "op3_level": 0.5,
+          "op3_detune": 0,
+          "op3_attack": 10,
+          "op3_decay": 200,
+          "op3_sustain": 0.5,
+          "op3_release": 150,
+          "op4_ratio": 6,
+          "op4_level": 0.3,
+          "op4_detune": 0,
+          "op4_attack": 10,
+          "op4_decay": 150,
+          "op4_sustain": 0.3,
+          "op4_release": 120
+        }
+      },
+      {
+        "id": "chorus-1",
+        "type": "chorus",
+        "name": "Chorus",
+        "position": { "col": 6, "row": 1 },
+        "params": {
+          "rate": 0.8,
+          "depth": 0.3,
+          "mix": 0.25
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "col": 8, "row": 1 },
+        "params": {
+          "time": 0.5,
+          "damp": 0.4,
+          "preDelay": 15,
+          "mix": 0.3
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Output",
+        "position": { "col": 10, "row": 1 },
+        "params": {
+          "level": 1
+        }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "col": 1, "row": 6 },
+        "params": {
+          "text": "FM Y-SHAPE ORGAN\n\nAlgorithm 2: Y-Shape\nOp4 modulates both Op2 and Op3\nOp2 and Op3 modulate Op1 (carrier)\n\n- Creates organ-like drawbar tones\n- Integer ratios = harmonic series\n- Op4 affects two paths = richer\n\nTry:\n- Feedback for brightness\n- Op4 level for upper harmonics\n- Longer attacks for swell"
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "cv-out" },
+        "to": { "moduleId": "fm-1", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "gate-out" },
+        "to": { "moduleId": "fm-1", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "vel-out" },
+        "to": { "moduleId": "fm-1", "portId": "velocity" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "fm-1", "portId": "out" },
+        "to": { "moduleId": "chorus-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "chorus-1", "portId": "out" },
+        "to": { "moduleId": "reverb-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb-1", "portId": "out" },
+        "to": { "moduleId": "out-1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

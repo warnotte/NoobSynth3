@@ -788,6 +788,7 @@ fn normalize_module_type(raw: &str) -> ModuleType {
     "midi-file-sequencer" => ModuleType::MidiFileSequencer,
     // FM Synthesis
     "fm-op" => ModuleType::FmOp,
+    "fm-matrix" => ModuleType::FmMatrix,
     "shepard" => ModuleType::Shepard,
     "pipe-organ" => ModuleType::PipeOrgan,
     "spectral-swarm" => ModuleType::SpectralSwarm,
@@ -836,6 +837,7 @@ fn is_poly_type(module_type: ModuleType) -> bool {
       | ModuleType::MixerWide
       | ModuleType::Distortion
       | ModuleType::Wavefolder
+      | ModuleType::FmMatrix
       | ModuleType::Control
       | ModuleType::MidiFileSequencer
   )

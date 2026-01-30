@@ -2,7 +2,7 @@
 
 use dsp_core::{
     Adsr, Arpeggiator, AyPlayer, Chaos, Choir, Chorus, Clap808, Clap909, Cowbell808, Delay, DrumSequencer, Ensemble,
-    EuclideanSequencer, FmOperator, Granular, GranularDelay, HiHat808, HiHat909, Hpf, KarplusStrong,
+    EuclideanSequencer, FmMatrix, FmOperator, Granular, GranularDelay, HiHat808, HiHat909, Hpf, KarplusStrong,
     Kick808, Kick909, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, Phaser, PipeOrgan, PitchShifter,
     Resonator, Reverb, Rimshot909, SampleHold, Shepard, SidPlayer, SlewLimiter, Snare808, Snare909, SnesOsc, SpectralSwarm, SpringReverb,
     StepSequencer, Supersaw, TapeDelay, Tb303, Tom808, Tom909, TuringMachine, Vcf, Vco, Vocoder, Wavetable,
@@ -93,6 +93,47 @@ pub struct FmOpState {
     pub decay: ParamBuffer,
     pub sustain: ParamBuffer,
     pub release: ParamBuffer,
+}
+
+pub struct FmMatrixState {
+    pub matrix: FmMatrix,
+    // Global params
+    pub algorithm: ParamBuffer,
+    pub feedback: ParamBuffer,
+    pub brightness: ParamBuffer,
+    pub master: ParamBuffer,
+    // Operator 1
+    pub op1_ratio: ParamBuffer,
+    pub op1_level: ParamBuffer,
+    pub op1_detune: ParamBuffer,
+    pub op1_attack: ParamBuffer,
+    pub op1_decay: ParamBuffer,
+    pub op1_sustain: ParamBuffer,
+    pub op1_release: ParamBuffer,
+    // Operator 2
+    pub op2_ratio: ParamBuffer,
+    pub op2_level: ParamBuffer,
+    pub op2_detune: ParamBuffer,
+    pub op2_attack: ParamBuffer,
+    pub op2_decay: ParamBuffer,
+    pub op2_sustain: ParamBuffer,
+    pub op2_release: ParamBuffer,
+    // Operator 3
+    pub op3_ratio: ParamBuffer,
+    pub op3_level: ParamBuffer,
+    pub op3_detune: ParamBuffer,
+    pub op3_attack: ParamBuffer,
+    pub op3_decay: ParamBuffer,
+    pub op3_sustain: ParamBuffer,
+    pub op3_release: ParamBuffer,
+    // Operator 4
+    pub op4_ratio: ParamBuffer,
+    pub op4_level: ParamBuffer,
+    pub op4_detune: ParamBuffer,
+    pub op4_attack: ParamBuffer,
+    pub op4_decay: ParamBuffer,
+    pub op4_sustain: ParamBuffer,
+    pub op4_release: ParamBuffer,
 }
 
 pub struct ShepardState {
@@ -696,6 +737,7 @@ pub enum ModuleState {
     Noise(NoiseState),
     Tb303(Tb303State),
     FmOp(FmOpState),
+    FmMatrix(FmMatrixState),
     Shepard(ShepardState),
     PipeOrgan(PipeOrganState),
     SpectralSwarm(SpectralSwarmState),

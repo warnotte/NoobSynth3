@@ -360,6 +360,43 @@ FM Op (carrier) ← FM Op (modulator)
 
 Connecter plusieurs FM Op en cascade pour créer des algorithmes FM complexes.
 
+### FM Matrix (4-Operator FM Synth)
+
+Synthétiseur FM complet à 4 opérateurs inspiré du DX7. Chaque opérateur a sa propre enveloppe ADSR et ses paramètres de ratio/niveau/détune.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `algorithm` | 0-7 | Topologie de modulation (voir ci-dessous) |
+| `feedback` | 0-1 | Auto-modulation du dernier modulateur |
+| `brightness` | 0-1 | Intensité globale de modulation |
+| `master` | 0-1 | Volume de sortie |
+| `op1_ratio` | 0.5-16 | Ratio de fréquence Op1 |
+| `op1_level` | 0-1 | Niveau Op1 |
+| `op1_detune` | -50 à 50 cents | Désaccord Op1 |
+| `op1_attack/decay/sustain/release` | ms/0-1 | Enveloppe Op1 |
+| (idem pour op2, op3, op4) | | |
+
+**Algorithmes :**
+
+| # | Nom | Description |
+|---|-----|-------------|
+| 0 | Stack | 4→3→2→1 (chaîne série) |
+| 1 | Parallel | 2,3,4→1 (modulateurs parallèles) |
+| 2 | Y-Shape | 4→2,3→1 (fourche) |
+| 3 | Diamond | 4→2,3 puis 2,3→1 (losange) |
+| 4 | Branch | 4→2,3 avec 2,3 carriers |
+| 5 | Dual Stack | 2→1, 4→3 (deux paires) |
+| 6 | Triple | 4→1, 2→1, 3→1 (3 modulateurs) |
+| 7 | Additive | Tous carriers (pas de FM) |
+
+**Entrées** : pitch (CV), gate (gate), velocity (CV), fm-in (audio), mod (CV), ratio-cv (CV)
+**Sorties** : out (audio)
+
+**Entrées CV spéciales :**
+- **fm-in** : Modulation FM externe (cross-modulation entre modules)
+- **mod** : Contrôle la brightness en temps réel (wobble bass)
+- **ratio-cv** : Modifie tous les ratios ensemble (sweep harmonique)
+
 ---
 
 ## Filtres

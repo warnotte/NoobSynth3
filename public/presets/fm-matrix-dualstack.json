@@ -1,0 +1,133 @@
+{
+  "id": "fm-matrix-dualstack",
+  "name": "FM Dual Stack Pluck",
+  "description": "Algorithm 5: Two parallel stacks for plucked sounds",
+  "group": "FM",
+  "graph": {
+    "modules": [
+      {
+        "id": "ctrl-1",
+        "type": "control",
+        "name": "Control",
+        "position": { "col": 1, "row": 1 },
+        "params": {
+          "voices": 4,
+          "glide": 0
+        }
+      },
+      {
+        "id": "fm-1",
+        "type": "fm-matrix",
+        "name": "FM Dual Stack",
+        "position": { "col": 3, "row": 1 },
+        "params": {
+          "algorithm": 5,
+          "feedback": 0.25,
+          "brightness": 0.7,
+          "master": 0.7,
+          "op1_ratio": 1,
+          "op1_level": 1,
+          "op1_detune": 0,
+          "op1_attack": 2,
+          "op1_decay": 400,
+          "op1_sustain": 0.2,
+          "op1_release": 300,
+          "op2_ratio": 3,
+          "op2_level": 0.8,
+          "op2_detune": 7,
+          "op2_attack": 2,
+          "op2_decay": 300,
+          "op2_sustain": 0.1,
+          "op2_release": 200,
+          "op3_ratio": 2,
+          "op3_level": 0.9,
+          "op3_detune": -5,
+          "op3_attack": 2,
+          "op3_decay": 350,
+          "op3_sustain": 0.15,
+          "op3_release": 250,
+          "op4_ratio": 5,
+          "op4_level": 0.6,
+          "op4_detune": 10,
+          "op4_attack": 2,
+          "op4_decay": 250,
+          "op4_sustain": 0.05,
+          "op4_release": 150
+        }
+      },
+      {
+        "id": "delay-1",
+        "type": "delay",
+        "name": "Delay",
+        "position": { "col": 6, "row": 1 },
+        "params": {
+          "time": 0.3,
+          "feedback": 0.35,
+          "mix": 0.25
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "col": 8, "row": 1 },
+        "params": {
+          "time": 0.45,
+          "damp": 0.5,
+          "preDelay": 10,
+          "mix": 0.3
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Output",
+        "position": { "col": 10, "row": 1 },
+        "params": {
+          "level": 1
+        }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "col": 1, "row": 6 },
+        "params": {
+          "text": "FM DUAL STACK PLUCK\n\nAlgorithm 5: Dual Stack\nTwo parallel mod-carrier pairs:\nOp2→Op1 and Op4→Op3\n\n- Like two FM synths mixed\n- Fast decays = plucky attack\n- Detuning = stereo width feel\n\nTry:\n- Op2/Op4 ratios for timbre\n- More feedback for metallic\n- Longer decay for sustain"
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "cv-out" },
+        "to": { "moduleId": "fm-1", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "gate-out" },
+        "to": { "moduleId": "fm-1", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "vel-out" },
+        "to": { "moduleId": "fm-1", "portId": "velocity" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "fm-1", "portId": "out" },
+        "to": { "moduleId": "delay-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "delay-1", "portId": "out" },
+        "to": { "moduleId": "reverb-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb-1", "portId": "out" },
+        "to": { "moduleId": "out-1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

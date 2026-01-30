@@ -389,6 +389,20 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
       { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
     ],
   },
+  'fm-matrix': {
+    inputs: [
+      { id: 'pitch', label: '1V', kind: 'cv', direction: 'in' },
+      { id: 'gate', label: 'Gate', kind: 'gate', direction: 'in' },
+      { id: 'velocity', label: 'Vel', kind: 'cv', direction: 'in' },
+      { id: 'fm-in', label: 'FM', kind: 'audio', direction: 'in' },
+      { id: 'mod', label: 'Mod', kind: 'cv', direction: 'in' },
+      { id: 'ratio-cv', label: 'Ratio', kind: 'cv', direction: 'in' },
+    ],
+    outputs: [
+      { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
+      { id: 'mod-out', label: 'Env', kind: 'cv', direction: 'out' },
+    ],
+  },
   shepard: {
     inputs: [
       { id: 'rate-cv', label: 'Rate', kind: 'cv', direction: 'in' },
