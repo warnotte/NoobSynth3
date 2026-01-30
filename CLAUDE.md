@@ -574,6 +574,7 @@ Ces paramètres utilisent des **valeurs numériques** :
 ### Roadmaps (features en attente)
 | Document | Description |
 |----------|-------------|
+| [docs/FUTURE_ROADMAP.md](./docs/FUTURE_ROADMAP.md) | Plan de développement complet (Control v2, refactoring, nouveaux modules) |
 | [docs/UNDO_REDO_ROADMAP.md](./docs/UNDO_REDO_ROADMAP.md) | Plan d'implémentation Undo/Redo |
 
 ### Crates Rust
