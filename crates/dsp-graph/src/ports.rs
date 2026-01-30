@@ -35,29 +35,29 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },
     ],
     ModuleType::Hpf => vec![PortInfo { channels: 1 }],
-    ModuleType::Mixer => vec![PortInfo { channels: 1 }, PortInfo { channels: 1 }],
+    ModuleType::Mixer => vec![PortInfo { channels: 2 }, PortInfo { channels: 2 }],  // stereo inputs
     ModuleType::MixerWide => vec![
-      PortInfo { channels: 1 },
-      PortInfo { channels: 1 },
-      PortInfo { channels: 1 },
-      PortInfo { channels: 1 },
-      PortInfo { channels: 1 },
-      PortInfo { channels: 1 },
+      PortInfo { channels: 2 },
+      PortInfo { channels: 2 },
+      PortInfo { channels: 2 },
+      PortInfo { channels: 2 },
+      PortInfo { channels: 2 },
+      PortInfo { channels: 2 },
     ],
     ModuleType::Mixer8 => vec![
-      PortInfo { channels: 1 },
-      PortInfo { channels: 1 },
-      PortInfo { channels: 1 },
-      PortInfo { channels: 1 },
-      PortInfo { channels: 1 },
-      PortInfo { channels: 1 },
-      PortInfo { channels: 1 },
-      PortInfo { channels: 1 },
+      PortInfo { channels: 2 },
+      PortInfo { channels: 2 },
+      PortInfo { channels: 2 },
+      PortInfo { channels: 2 },
+      PortInfo { channels: 2 },
+      PortInfo { channels: 2 },
+      PortInfo { channels: 2 },
+      PortInfo { channels: 2 },
     ],
     // Crossfader - 2 audio inputs (A and B) + mix CV
     ModuleType::Crossfader => vec![
-      PortInfo { channels: 1 },  // in-a
-      PortInfo { channels: 1 },  // in-b
+      PortInfo { channels: 2 },  // in-a (stereo)
+      PortInfo { channels: 2 },  // in-b (stereo)
       PortInfo { channels: 1 },  // mix CV
     ],
     ModuleType::Chorus
@@ -256,10 +256,10 @@ pub fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
     ModuleType::Adsr => vec![PortInfo { channels: 1 }],
     ModuleType::Vcf => vec![PortInfo { channels: 1 }],
     ModuleType::Hpf => vec![PortInfo { channels: 1 }],
-    ModuleType::Mixer => vec![PortInfo { channels: 1 }],
-    ModuleType::MixerWide => vec![PortInfo { channels: 1 }],
-    ModuleType::Mixer8 => vec![PortInfo { channels: 1 }],
-    ModuleType::Crossfader => vec![PortInfo { channels: 1 }],  // audio output
+    ModuleType::Mixer => vec![PortInfo { channels: 2 }],      // stereo output
+    ModuleType::MixerWide => vec![PortInfo { channels: 2 }],  // stereo output
+    ModuleType::Mixer8 => vec![PortInfo { channels: 2 }],     // stereo output
+    ModuleType::Crossfader => vec![PortInfo { channels: 2 }], // stereo output
     ModuleType::Chorus
     | ModuleType::Ensemble
     | ModuleType::Choir

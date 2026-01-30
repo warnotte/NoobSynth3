@@ -221,6 +221,73 @@ impl Mixer {
             output[i] = sum * scale;
         }
     }
+
+    /// Stereo version of process_block for 2-channel mixer.
+    pub fn process_block_stereo(
+        output_l: &mut [Sample],
+        output_r: &mut [Sample],
+        input_a_l: Option<&[Sample]>,
+        input_a_r: Option<&[Sample]>,
+        input_b_l: Option<&[Sample]>,
+        input_b_r: Option<&[Sample]>,
+        level_a: &[Sample],
+        level_b: &[Sample],
+    ) {
+        if output_l.is_empty() {
+            return;
+        }
+
+        for i in 0..output_l.len() {
+            let level_a_value = sample_at(level_a, i, 0.6);
+            let level_b_value = sample_at(level_b, i, 0.6);
+            let a_l = input_at(input_a_l, i) * level_a_value;
+            let a_r = input_at(input_a_r, i) * level_a_value;
+            let b_l = input_at(input_b_l, i) * level_b_value;
+            let b_r = input_at(input_b_r, i) * level_b_value;
+            output_l[i] = (a_l + b_l) * 0.5;
+            output_r[i] = (a_r + b_r) * 0.5;
+        }
+    }
+
+    /// Stereo version of process_block_multi for multi-channel mixers.
+    pub fn process_block_multi_stereo(
+        output_l: &mut [Sample],
+        output_r: &mut [Sample],
+        inputs_l: &[Option<&[Sample]>],
+        inputs_r: &[Option<&[Sample]>],
+        levels: &[&[Sample]],
+    ) {
+        if output_l.is_empty() {
+            return;
+        }
+        if inputs_l.len() != levels.len() || inputs_r.len() != levels.len() {
+            return;
+        }
+
+        let mut active_count = 0;
+        for input in inputs_l {
+            if input.is_some() {
+                active_count += 1;
+            }
+        }
+        let scale = if active_count > 0 {
+            1.0 / active_count as Sample
+        } else {
+            0.0
+        };
+
+        for i in 0..output_l.len() {
+            let mut sum_l = 0.0;
+            let mut sum_r = 0.0;
+            for (index, (input_l, input_r)) in inputs_l.iter().zip(inputs_r.iter()).enumerate() {
+                let level = sample_at(levels[index], i, 0.6);
+                sum_l += input_at(*input_l, i) * level;
+                sum_r += input_at(*input_r, i) * level;
+            }
+            output_l[i] = sum_l * scale;
+            output_r[i] = sum_r * scale;
+        }
+    }
 }
 
 /// Crossfader for A/B mixing between two audio sources.
@@ -251,6 +318,37 @@ impl Crossfader {
             let a = input_at(input_a, i);
             let b = input_at(input_b, i);
             output[i] = a * (1.0 - m) + b * m;
+        }
+    }
+
+    /// Stereo version of process_block for crossfader.
+    pub fn process_block_stereo(
+        output_l: &mut [Sample],
+        output_r: &mut [Sample],
+        input_a_l: Option<&[Sample]>,
+        input_a_r: Option<&[Sample]>,
+        input_b_l: Option<&[Sample]>,
+        input_b_r: Option<&[Sample]>,
+        mix: &[Sample],
+        mix_cv: Option<&[Sample]>,
+    ) {
+        // Early exit: if no inputs connected, output silence
+        if input_a_l.is_none() && input_b_l.is_none() {
+            output_l.fill(0.0);
+            output_r.fill(0.0);
+            return;
+        }
+
+        for i in 0..output_l.len() {
+            let base = sample_at(mix, i, 0.5);
+            let cv = input_at(mix_cv, i);
+            let m = (base + cv).clamp(0.0, 1.0);
+            let a_l = input_at(input_a_l, i);
+            let a_r = input_at(input_a_r, i);
+            let b_l = input_at(input_b_l, i);
+            let b_r = input_at(input_b_r, i);
+            output_l[i] = a_l * (1.0 - m) + b_l * m;
+            output_r[i] = a_r * (1.0 - m) + b_r * m;
         }
     }
 }

@@ -1,0 +1,79 @@
+{
+  "id": "stereo-mixer-test",
+  "name": "Stereo Mixer Test",
+  "description": "Test preset to validate stereo signal path through mixers",
+  "group": "Test",
+  "graph": {
+    "modules": [
+      {
+        "id": "noise-left",
+        "type": "noise",
+        "name": "Noise L",
+        "position": { "col": 1, "row": 1 },
+        "params": {
+          "level": 0.5,
+          "noiseType": "white",
+          "stereo": 1,
+          "pan": -1
+        }
+      },
+      {
+        "id": "noise-right",
+        "type": "noise",
+        "name": "Noise R",
+        "position": { "col": 1, "row": 3 },
+        "params": {
+          "level": 0.5,
+          "noiseType": "pink",
+          "stereo": 1,
+          "pan": 1
+        }
+      },
+      {
+        "id": "mixer-1",
+        "type": "mixer",
+        "name": "Mixer",
+        "position": { "col": 4, "row": 2 },
+        "params": {
+          "levelA": 0.8,
+          "levelB": 0.8
+        }
+      },
+      {
+        "id": "output-1",
+        "type": "output",
+        "name": "Output",
+        "position": { "col": 6, "row": 2 },
+        "params": {
+          "level": 0.7
+        }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "col": 1, "row": 5 },
+        "params": {
+          "text": "STEREO MIXER TEST\n\nCe preset teste si la stereo passe a travers les mixers.\n\n- Noise L: Pan = -1 (gauche) = White noise\n- Noise R: Pan = +1 (droite) = Pink noise\n\nSi stereo OK:\n- Oreille gauche = bruit blanc (aigu)\n- Oreille droite = bruit rose (grave)\n\nSi mono (KO):\n- Les deux bruits dans les deux oreilles"
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "noise-left", "portId": "out" },
+        "to": { "moduleId": "mixer-1", "portId": "in-a" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "noise-right", "portId": "out" },
+        "to": { "moduleId": "mixer-1", "portId": "in-b" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "mixer-1", "portId": "out" },
+        "to": { "moduleId": "output-1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

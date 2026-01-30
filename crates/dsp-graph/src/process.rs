@@ -426,34 +426,26 @@ pub(crate) fn process_module(
             state.hpf.process_block(output, hpf_inputs, params);
         }
         ModuleState::Mixer(state) => {
-            let input_a = if connections[0].is_empty() {
-                None
-            } else {
-                Some(inputs[0].channel(0))
-            };
-            let input_b = if connections[1].is_empty() {
-                None
-            } else {
-                Some(inputs[1].channel(0))
-            };
-            let output = outputs[0].channel_mut(0);
-            Mixer::process_block(
-                output,
-                input_a,
-                input_b,
-                state.level_a.slice(frames),
-                state.level_b.slice(frames),
-            );
+            // Stereo mixer: process L and R channels separately
+            let a_conn = !connections[0].is_empty();
+            let b_conn = !connections[1].is_empty();
+            let level_a = state.level_a.slice(frames);
+            let level_b = state.level_b.slice(frames);
+
+            // Process left channel
+            let in_a_l = if a_conn { Some(inputs[0].channel(0)) } else { None };
+            let in_b_l = if b_conn { Some(inputs[1].channel(0)) } else { None };
+            let out_l = outputs[0].channel_mut(0);
+            Mixer::process_block(out_l, in_a_l, in_b_l, level_a, level_b);
+
+            // Process right channel
+            let in_a_r = if a_conn { Some(inputs[0].channel(1)) } else { None };
+            let in_b_r = if b_conn { Some(inputs[1].channel(1)) } else { None };
+            let out_r = outputs[0].channel_mut(1);
+            Mixer::process_block(out_r, in_a_r, in_b_r, level_a, level_b);
         }
         ModuleState::MixerWide(state) => {
-            let input_a = if connections[0].is_empty() { None } else { Some(inputs[0].channel(0)) };
-            let input_b = if connections[1].is_empty() { None } else { Some(inputs[1].channel(0)) };
-            let input_c = if connections[2].is_empty() { None } else { Some(inputs[2].channel(0)) };
-            let input_d = if connections[3].is_empty() { None } else { Some(inputs[3].channel(0)) };
-            let input_e = if connections[4].is_empty() { None } else { Some(inputs[4].channel(0)) };
-            let input_f = if connections[5].is_empty() { None } else { Some(inputs[5].channel(0)) };
-            let output = outputs[0].channel_mut(0);
-            let mixer_inputs = [input_a, input_b, input_c, input_d, input_e, input_f];
+            // Stereo mixer: process L and R channels separately
             let levels = [
                 state.level_a.slice(frames),
                 state.level_b.slice(frames),
@@ -462,19 +454,33 @@ pub(crate) fn process_module(
                 state.level_e.slice(frames),
                 state.level_f.slice(frames),
             ];
-            Mixer::process_block_multi(output, &mixer_inputs, &levels);
+
+            // Process left channel
+            let inputs_l: [Option<&[f32]>; 6] = [
+                if connections[0].is_empty() { None } else { Some(inputs[0].channel(0)) },
+                if connections[1].is_empty() { None } else { Some(inputs[1].channel(0)) },
+                if connections[2].is_empty() { None } else { Some(inputs[2].channel(0)) },
+                if connections[3].is_empty() { None } else { Some(inputs[3].channel(0)) },
+                if connections[4].is_empty() { None } else { Some(inputs[4].channel(0)) },
+                if connections[5].is_empty() { None } else { Some(inputs[5].channel(0)) },
+            ];
+            let out_l = outputs[0].channel_mut(0);
+            Mixer::process_block_multi(out_l, &inputs_l, &levels);
+
+            // Process right channel
+            let inputs_r: [Option<&[f32]>; 6] = [
+                if connections[0].is_empty() { None } else { Some(inputs[0].channel(1)) },
+                if connections[1].is_empty() { None } else { Some(inputs[1].channel(1)) },
+                if connections[2].is_empty() { None } else { Some(inputs[2].channel(1)) },
+                if connections[3].is_empty() { None } else { Some(inputs[3].channel(1)) },
+                if connections[4].is_empty() { None } else { Some(inputs[4].channel(1)) },
+                if connections[5].is_empty() { None } else { Some(inputs[5].channel(1)) },
+            ];
+            let out_r = outputs[0].channel_mut(1);
+            Mixer::process_block_multi(out_r, &inputs_r, &levels);
         }
         ModuleState::Mixer8(state) => {
-            let input1 = if connections[0].is_empty() { None } else { Some(inputs[0].channel(0)) };
-            let input2 = if connections[1].is_empty() { None } else { Some(inputs[1].channel(0)) };
-            let input3 = if connections[2].is_empty() { None } else { Some(inputs[2].channel(0)) };
-            let input4 = if connections[3].is_empty() { None } else { Some(inputs[3].channel(0)) };
-            let input5 = if connections[4].is_empty() { None } else { Some(inputs[4].channel(0)) };
-            let input6 = if connections[5].is_empty() { None } else { Some(inputs[5].channel(0)) };
-            let input7 = if connections[6].is_empty() { None } else { Some(inputs[6].channel(0)) };
-            let input8 = if connections[7].is_empty() { None } else { Some(inputs[7].channel(0)) };
-            let output = outputs[0].channel_mut(0);
-            let mixer_inputs = [input1, input2, input3, input4, input5, input6, input7, input8];
+            // Stereo mixer: process L and R channels separately
             let levels = [
                 state.level1.slice(frames),
                 state.level2.slice(frames),
@@ -485,31 +491,65 @@ pub(crate) fn process_module(
                 state.level7.slice(frames),
                 state.level8.slice(frames),
             ];
-            Mixer::process_block_multi(output, &mixer_inputs, &levels);
+
+            // Process left channel
+            let inputs_l: [Option<&[f32]>; 8] = [
+                if connections[0].is_empty() { None } else { Some(inputs[0].channel(0)) },
+                if connections[1].is_empty() { None } else { Some(inputs[1].channel(0)) },
+                if connections[2].is_empty() { None } else { Some(inputs[2].channel(0)) },
+                if connections[3].is_empty() { None } else { Some(inputs[3].channel(0)) },
+                if connections[4].is_empty() { None } else { Some(inputs[4].channel(0)) },
+                if connections[5].is_empty() { None } else { Some(inputs[5].channel(0)) },
+                if connections[6].is_empty() { None } else { Some(inputs[6].channel(0)) },
+                if connections[7].is_empty() { None } else { Some(inputs[7].channel(0)) },
+            ];
+            let out_l = outputs[0].channel_mut(0);
+            Mixer::process_block_multi(out_l, &inputs_l, &levels);
+
+            // Process right channel
+            let inputs_r: [Option<&[f32]>; 8] = [
+                if connections[0].is_empty() { None } else { Some(inputs[0].channel(1)) },
+                if connections[1].is_empty() { None } else { Some(inputs[1].channel(1)) },
+                if connections[2].is_empty() { None } else { Some(inputs[2].channel(1)) },
+                if connections[3].is_empty() { None } else { Some(inputs[3].channel(1)) },
+                if connections[4].is_empty() { None } else { Some(inputs[4].channel(1)) },
+                if connections[5].is_empty() { None } else { Some(inputs[5].channel(1)) },
+                if connections[6].is_empty() { None } else { Some(inputs[6].channel(1)) },
+                if connections[7].is_empty() { None } else { Some(inputs[7].channel(1)) },
+            ];
+            let out_r = outputs[0].channel_mut(1);
+            Mixer::process_block_multi(out_r, &inputs_r, &levels);
         }
         ModuleState::Crossfader(state) => {
-            // Crossfader: output = A * (1 - mix) + B * mix
-            let a_connected = !connections[0].is_empty();
-            let b_connected = !connections[1].is_empty();
-            let output = outputs[0].channel_mut(0);
+            // Stereo crossfader: process L and R channels separately
+            let a_conn = !connections[0].is_empty();
+            let b_conn = !connections[1].is_empty();
 
-            // If nothing connected, output silence
-            if !a_connected && !b_connected {
-                for sample in output.iter_mut() {
-                    *sample = 0.0;
-                }
+            // If nothing connected, output silence on both channels
+            if !a_conn && !b_conn {
+                outputs[0].channel_mut(0).fill(0.0);
+                outputs[0].channel_mut(1).fill(0.0);
                 return;
             }
 
-            let input_a = if a_connected { Some(inputs[0].channel(0)) } else { None };
-            let input_b = if b_connected { Some(inputs[1].channel(0)) } else { None };
+            let mix = state.mix.slice(frames);
             let mix_cv = if connections.len() > 2 && !connections[2].is_empty() {
                 Some(inputs[2].channel(0))
             } else {
                 None
             };
-            let mix = state.mix.slice(frames);
-            Crossfader::process_block(output, input_a, input_b, mix, mix_cv);
+
+            // Process left channel
+            let in_a_l = if a_conn { Some(inputs[0].channel(0)) } else { None };
+            let in_b_l = if b_conn { Some(inputs[1].channel(0)) } else { None };
+            let out_l = outputs[0].channel_mut(0);
+            Crossfader::process_block(out_l, in_a_l, in_b_l, mix, mix_cv);
+
+            // Process right channel
+            let in_a_r = if a_conn { Some(inputs[0].channel(1)) } else { None };
+            let in_b_r = if b_conn { Some(inputs[1].channel(1)) } else { None };
+            let out_r = outputs[0].channel_mut(1);
+            Crossfader::process_block(out_r, in_a_r, in_b_r, mix, mix_cv);
         }
         ModuleState::Chorus(state) => {
             let input_connected = !connections[0].is_empty();

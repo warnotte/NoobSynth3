@@ -1295,6 +1295,13 @@
       "description": "Compare SID (C64) vs AY (Spectrum) versions of Commando. Sync both players together.",
       "file": "commando-comparison.json",
       "group": "Chiptune"
+    },
+    {
+      "id": "stereo-mixer-test",
+      "name": "Stereo Mixer Test",
+      "description": "Test preset to validate stereo signal path through mixers.",
+      "file": "stereo-mixer-test.json",
+      "group": "Module Tests"
     }
   ]
 }
