@@ -1,7 +1,7 @@
 # Plan de Refactoring: Controls Files
 
 **Date:** 30 janvier 2026
-**Statut:** Proposition - En attente d'approbation
+**Statut:** Phase 1 Complétée - Phase 2/3 en attente
 
 ---
 
@@ -12,7 +12,7 @@
 | Fichier | Lignes | Modules | État |
 |---------|--------|---------|------|
 | `SequencerControls.tsx` | 2052 | 10 | ⚠️ Trop gros |
-| `SourceControls.tsx` | 1695 | 15 | ⚠️ Trop gros |
+| `sources/` (15 fichiers) | ~1700 | 15 | ✅ **FAIT** (Phase 1) |
 | `IOControls.tsx` | 840 | 6 | ⚠️ Limite |
 | `EffectControls.tsx` | 756 | 14 | ✅ Acceptable |
 | `GranularControls.tsx` | 315 | 1 | ✅ Déjà extrait |
@@ -21,16 +21,20 @@
 | `index.tsx` | 164 | - | ✅ Router |
 | `AmplifierControls.tsx` | 112 | 5 | ✅ OK |
 | `DrumControls.tsx` | 111 | 12 | ✅ OK |
-| **Total** | **6511** | **72** | |
+| **Total** | **~6500** | **72** | |
 
-### 1.2 Architecture existante
+### 1.2 Architecture actuelle
 
 ```
 src/ui/controls/
 ├── ARCHITECTURE.md      # Documentation (existe)
 ├── types.ts             # Types partagés (existe)
 ├── index.tsx            # Router principal (existe)
-├── SourceControls.tsx   # 15 modules → À SPLITTER
+├── sources/             # ✅ FAIT - 15 fichiers + shared/
+│   ├── index.tsx
+│   ├── OscillatorControls.tsx
+│   ├── NoiseControls.tsx
+│   └── ... (15 modules)
 ├── SequencerControls.tsx # 10 modules → À SPLITTER
 ├── EffectControls.tsx   # 14 modules → GARDER (756 lignes OK)
 ├── IOControls.tsx       # 6 modules → À SPLITTER (840 lignes)
@@ -192,7 +196,7 @@ src/ui/controls/
 git add -A && git commit -m "checkpoint: before controls refactoring"
 ```
 
-### 4.2 Phase 1: Sources (Priorité haute)
+### 4.2 Phase 1: Sources ✅ COMPLÉTÉE
 
 **Étape 1.1: Créer la structure**
 ```bash
@@ -396,14 +400,14 @@ git reset --hard HEAD~1  # Revenir au commit précédent (perte des changes)
 
 ## 8. Estimation de Travail
 
-| Phase | Fichiers | Temps estimé |
-|-------|----------|--------------|
-| Phase 0 (Checkpoint) | 0 | 5 min |
-| Phase 1 (Sources) | 15 | 45-60 min |
-| Phase 2 (Sequencers) | 12 | 30-45 min |
-| Phase 3 (IO) | 6 | 20-30 min |
-| Phase 4 (Nettoyage) | 2 | 10 min |
-| **Total** | **35** | **~2 heures** |
+| Phase | Fichiers | Statut |
+|-------|----------|--------|
+| Phase 0 (Checkpoint) | 0 | ✅ Fait |
+| Phase 1 (Sources) | 15 | ✅ **Fait** |
+| Phase 2 (Sequencers) | 12 | ⏳ En attente |
+| Phase 3 (IO) | 6 | ⏳ En attente |
+| Phase 4 (Nettoyage) | 2 | ⏳ En attente |
+| **Total** | **35** | **1/4 phases** |
 
 ---
 
@@ -424,4 +428,4 @@ Attente de validation avant de commencer la Phase 1.
 
 ---
 
-*Document créé par Claude Opus 4.5 - 30 janvier 2026*
+*Dernière mise à jour: 30 janvier 2026*

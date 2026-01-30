@@ -38,7 +38,11 @@ App.tsx                          # Root component, state management
 │   ├── ModuleCard.tsx           # Single module frame (header, ports, body)
 │   │   └── controls/            # Module-specific controls
 │   │       ├── index.tsx        # Router → category files
-│   │       ├── SourceControls.tsx
+│   │       ├── sources/         # Source modules (15 files)
+│   │       │   ├── index.tsx    # Router for sources
+│   │       │   ├── OscillatorControls.tsx
+│   │       │   ├── NoiseControls.tsx
+│   │       │   └── ... (15 modules total)
 │   │       ├── FilterControls.tsx
 │   │       ├── AmplifierControls.tsx
 │   │       ├── EffectControls.tsx

@@ -2,9 +2,8 @@
 
 ## Vue d'ensemble
 
-`ModuleControls.tsx` est subdivisé en fichiers par catégorie pour améliorer la lisibilité
-et faciliter la maintenance. Chaque fichier contient les contrôles UI pour une catégorie
-de modules.
+Les contrôles UI des modules sont organisés par catégorie pour améliorer la lisibilité
+et faciliter la maintenance. Les catégories volumineuses sont subdivisées en sous-dossiers.
 
 ## Structure des fichiers
 
@@ -13,44 +12,82 @@ src/ui/controls/
 ├── ARCHITECTURE.md          # Ce fichier
 ├── types.ts                 # Types partagés (ControlProps, etc.)
 ├── index.tsx                # Composant principal + router
-├── SourceControls.tsx       # oscillator, supersaw, karplus, nes-osc, snes-osc, noise, tb-303, fm-op
+│
+├── sources/                 # Oscillateurs et générateurs (15 modules)
+│   ├── index.tsx            # Router pour sources
+│   ├── OscillatorControls.tsx
+│   ├── NoiseControls.tsx
+│   ├── SupersawControls.tsx
+│   ├── KarplusControls.tsx
+│   ├── NesOscControls.tsx
+│   ├── SnesOscControls.tsx
+│   ├── Tb303Controls.tsx
+│   ├── FmOpControls.tsx
+│   ├── FmMatrixControls.tsx
+│   ├── ShepardControls.tsx
+│   ├── PipeOrganControls.tsx
+│   ├── SpectralSwarmControls.tsx
+│   ├── ResonatorControls.tsx
+│   ├── WavetableControls.tsx
+│   └── shared/
+│       └── sidWaveformHelpers.ts  # Helpers CV pour NES/SNES
+│
 ├── FilterControls.tsx       # vcf, hpf
 ├── AmplifierControls.tsx    # gain, cv-vca, mixer, mixer-1x2, ring-mod
 ├── EffectControls.tsx       # chorus, ensemble, choir, vocoder, delay, granular-delay, tape-delay, spring-reverb, reverb, phaser, distortion, wavefolder, pitch-shifter
-├── ModulatorControls.tsx    # adsr, lfo, mod-router, sample-hold, slew, quantizer
-├── SequencerControls.tsx    # arpeggiator, step-sequencer, drum-sequencer, euclidean, clock, mario
-├── DrumControls.tsx         # 909-kick, 909-snare, 909-hihat, 909-clap, 909-tom, 909-rimshot
-└── IOControls.tsx           # control, output, audio-in, scope, lab, notes
+├── ModulatorControls.tsx    # adsr, lfo, mod-router, sample-hold, slew, quantizer, chaos
+├── SequencerControls.tsx    # arpeggiator, step-sequencer, drum-sequencer, euclidean, clock, mario, midi-file-sequencer, turing-machine, sid-player, ay-player
+├── DrumControls.tsx         # 909-*, 808-*
+├── IOControls.tsx           # control, output, audio-in, scope, lab, notes
+└── GranularControls.tsx     # granular (extrait car complexe)
 ```
 
 ## Lab Panel (layout test)
 
-Le module `lab` sert de banc d’essai UI : il affiche un layout complet (Osc/Env/Mod/Util)
+Le module `lab` sert de banc d'essai UI : il affiche un layout complet (Osc/Env/Mod/Util)
 dans `IOControls.tsx` afin de tester la responsivité des grilles, knobs et groupes de boutons.
 Les paramètres UI utilisent `updateParam(..., { skipEngine: true })`.
 
 ## Pattern d'implémentation
 
-Chaque fichier de catégorie exporte une fonction `render[Category]Controls` :
+### Catégories avec sous-dossier (sources/)
+
+Chaque module a son propre fichier, et un `index.tsx` fait le routing :
 
 ```tsx
-// SourceControls.tsx
-import type { ControlProps } from './types'
+// sources/index.tsx
+import { OscillatorControls } from './OscillatorControls'
+import { NoiseControls } from './NoiseControls'
+// ...
 
-export function renderSourceControls(props: ControlProps): JSX.Element | null {
+export function renderSourceControls(props: ControlProps): React.ReactElement | null {
+  switch (props.module.type) {
+    case 'oscillator': return <OscillatorControls {...props} />
+    case 'noise': return <NoiseControls {...props} />
+    // ...
+    default: return null
+  }
+}
+```
+
+### Catégories sans sous-dossier
+
+Les fichiers plus petits utilisent des `if` statements :
+
+```tsx
+// FilterControls.tsx
+export function renderFilterControls(props: ControlProps): JSX.Element | null {
   const { module, updateParam } = props
 
-  if (module.type === 'oscillator') {
-    return (/* JSX pour oscillator */)
+  if (module.type === 'vcf') {
+    return (/* JSX pour VCF */)
   }
 
-  if (module.type === 'supersaw') {
-    return (/* JSX pour supersaw */)
+  if (module.type === 'hpf') {
+    return (/* JSX pour HPF */)
   }
 
-  // ... autres sources
-
-  return null  // Pas un module source
+  return null
 }
 ```
 
@@ -58,14 +95,11 @@ Le fichier principal (`index.tsx`) orchestre les appels :
 
 ```tsx
 // index.tsx
-import { renderSourceControls } from './SourceControls'
+import { renderSourceControls } from './sources'
 import { renderFilterControls } from './FilterControls'
-// ... autres imports
+// ...
 
 export const ModuleControls = (props: ModuleControlsProps) => {
-  // État partagé (micEnabled, etc.) reste ici
-
-  // Router - essaie chaque catégorie
   return (
     renderSourceControls(props) ||
     renderFilterControls(props) ||
@@ -83,49 +117,43 @@ export const ModuleControls = (props: ModuleControlsProps) => {
 ## Types partagés (types.ts)
 
 ```tsx
-import type { AudioEngine } from '../../engine/WasmGraphEngine'
-import type { ModuleSpec } from '../../shared/graph'
-
 export type ControlProps = {
   module: ModuleSpec
   engine: AudioEngine
+  connections: Connection[]
   status: 'idle' | 'running' | 'error'
   audioMode: 'web' | 'native' | 'vst'
   nativeScope?: NativeScopeBridge | null
+  nativeChiptune?: NativeChiptuneBridge | null
+  nativeSequencer?: NativeSequencerBridge | null
+  nativeGranular?: NativeGranularBridge | null
   updateParam: (moduleId: string, paramId: string, value: number | string | boolean, options?: { skipEngine?: boolean }) => void
-  setManualGate: (moduleId: string, isOn: boolean) => void
-  triggerManualSync: (moduleId: string) => void
-  // ... autres props
+  // ... autres props (voir types.ts pour la liste complète)
 }
 ```
 
 ## Conventions
 
-1. **Nommage** : `render[Category]Controls` pour les fonctions de rendu
+1. **Nommage** : `render[Category]Controls` pour les fonctions de rendu, `[Module]Controls` pour les composants
 2. **Retour** : `JSX.Element | null` - retourne `null` si le module n'appartient pas à cette catégorie
 3. **Props** : Utiliser le type `ControlProps` de `types.ts`
 4. **Imports UI** : Les composants communs (RotaryKnob, ControlBox, ControlButtons, etc.) sont importés dans chaque fichier
+5. **Taille** : Viser 100-400 lignes par fichier. Au-delà de 800 lignes, envisager une subdivision.
 
 ## Ajout d'un nouveau module
 
-1. Identifier la catégorie du module
-2. Ajouter le bloc `if (module.type === 'new-module')` dans le fichier de catégorie approprié
-3. Si nouvelle catégorie nécessaire, créer un nouveau fichier `[Category]Controls.tsx`
+### Dans une catégorie avec sous-dossier (ex: sources/)
 
-## Fichiers volumineux
+1. Créer `sources/NewModuleControls.tsx`
+2. Ajouter le case dans `sources/index.tsx`
+3. Exporter le composant si nécessaire
 
-Si un fichier de catégorie devient trop grand (>800 lignes), envisager une sous-division :
+### Dans une catégorie sans sous-dossier
 
-```
-controls/
-├── sequencers/
-│   ├── index.tsx           # Router pour séquenceurs
-│   ├── ArpeggiatorUI.tsx
-│   ├── StepSequencerUI.tsx
-│   └── DrumSequencerUI.tsx
-```
+1. Ajouter le bloc `if (module.type === 'new-module')` dans le fichier de catégorie
+2. Si le fichier dépasse 800 lignes, envisager de le convertir en sous-dossier
 
-## Migration depuis ModuleControls.tsx
+## Historique
 
-L'ancien fichier `ModuleControls.tsx` est conservé à `ModuleControls.old.tsx` pendant
-la transition. Une fois la migration validée, il peut être supprimé.
+- **Janvier 2026** : Extraction de `SourceControls.tsx` (1695 lignes) vers `sources/` (15 fichiers)
+- Les catégories `SequencerControls.tsx` et `IOControls.tsx` sont candidates pour une extraction future

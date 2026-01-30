@@ -176,13 +176,13 @@ Si on garde le séquenceur interne:
 
 **Problème:** Fichiers trop volumineux
 
-| Fichier | Lignes | Modules |
-|---------|--------|---------|
-| SourceControls.tsx | 1686 | 14 modules |
-| SequencerControls.tsx | 2052 | 10 modules |
-| IOControls.tsx | 840 | 6 modules |
+| Fichier | Lignes | Modules | Statut |
+|---------|--------|---------|--------|
+| sources/ | ~1700 | 15 modules | ✅ Fait |
+| SequencerControls.tsx | 2052 | 10 modules | ⏳ À faire |
+| IOControls.tsx | 840 | 6 modules | ⏳ À faire |
 
-**Solution:** Structure modulaire
+**Solution:** Structure modulaire (voir `docs/CONTROLS_REFACTORING_PLAN.md`)
 
 ```
 src/ui/controls/
@@ -190,8 +190,8 @@ src/ui/controls/
 ├── types.ts                     # Types partagés
 ├── ARCHITECTURE.md              # Documentation
 │
-├── sources/                     # 14 fichiers
-│   ├── index.ts                 # Re-exports
+├── sources/                     # ✅ FAIT - 15 fichiers
+│   ├── index.tsx                # Router switch
 │   ├── OscillatorControls.tsx
 │   ├── SupersawControls.tsx
 │   ├── KarplusControls.tsx
@@ -206,7 +206,7 @@ src/ui/controls/
 │   ├── SpectralSwarmControls.tsx
 │   ├── ResonatorControls.tsx
 │   ├── WavetableControls.tsx
-│   └── GranularControls.tsx
+│   └── shared/sidWaveformHelpers.ts
 │
 ├── sequencers/                  # 10 fichiers
 │   ├── index.ts
@@ -978,7 +978,7 @@ jobs:
 ## Calendrier Suggéré
 
 ### Phase 1: Fondations (2-3 semaines)
-- [ ] Split SourceControls.tsx → 14 fichiers
+- [x] Split SourceControls.tsx → sources/ (15 fichiers) ✅
 - [ ] Split SequencerControls.tsx → 10 fichiers
 - [ ] Extraire hooks de App.tsx
 - [ ] Setup tests unitaires basiques

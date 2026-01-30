@@ -12,7 +12,7 @@ import type { AudioEngine } from '../../engine/WasmGraphEngine'
 import type { Connection, ModuleSpec } from '../../shared/graph'
 import type { ControlProps, NativeScopeBridge, NativeChiptuneBridge, NativeSequencerBridge, NativeGranularBridge } from './types'
 
-import { renderSourceControls } from './SourceControls'
+import { renderSourceControls } from './sources'
 import { renderFilterControls } from './FilterControls'
 import { renderAmplifierControls } from './AmplifierControls'
 import { renderEffectControls } from './EffectControls'
