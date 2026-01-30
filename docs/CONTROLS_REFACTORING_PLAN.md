@@ -1,7 +1,7 @@
 # Plan de Refactoring: Controls Files
 
 **Date:** 30 janvier 2026
-**Statut:** Phase 1 Complétée - Phase 2/3 en attente
+**Statut:** ✅ Terminé - Phases 1, 2, 3 complétées
 
 ---
 
@@ -11,9 +11,9 @@
 
 | Fichier | Lignes | Modules | État |
 |---------|--------|---------|------|
-| `SequencerControls.tsx` | 2052 | 10 | ⚠️ Trop gros |
+| `sequencers/` (10 fichiers) | ~2050 | 10 | ✅ **FAIT** (Phase 2) |
 | `sources/` (15 fichiers) | ~1700 | 15 | ✅ **FAIT** (Phase 1) |
-| `IOControls.tsx` | 840 | 6 | ⚠️ Limite |
+| `io/` (6 fichiers) | ~840 | 6 | ✅ **FAIT** (Phase 3) |
 | `EffectControls.tsx` | 756 | 14 | ✅ Acceptable |
 | `GranularControls.tsx` | 315 | 1 | ✅ Déjà extrait |
 | `ModulatorControls.tsx` | 304 | 6 | ✅ OK |
@@ -35,9 +35,9 @@ src/ui/controls/
 │   ├── OscillatorControls.tsx
 │   ├── NoiseControls.tsx
 │   └── ... (15 modules)
-├── SequencerControls.tsx # 10 modules → À SPLITTER
+├── sequencers/          # ✅ FAIT - 10 fichiers + shared/
 ├── EffectControls.tsx   # 14 modules → GARDER (756 lignes OK)
-├── IOControls.tsx       # 6 modules → À SPLITTER (840 lignes)
+├── io/                  # ✅ FAIT - 6 fichiers
 ├── FilterControls.tsx   # OK
 ├── AmplifierControls.tsx # OK
 ├── ModulatorControls.tsx # OK
@@ -261,7 +261,7 @@ rm src/ui/controls/SourceControls.tsx
 git add -A && git commit -m "refactor: remove old SourceControls.tsx"
 ```
 
-### 4.3 Phase 2: Sequencers
+### 4.3 Phase 2: Sequencers ✅ COMPLÉTÉE
 
 Même processus que Phase 1, mais pour `SequencerControls.tsx`:
 
@@ -278,7 +278,7 @@ Même processus que Phase 1, mais pour `SequencerControls.tsx`:
 4. Test & Commit
 5. Supprimer ancien fichier
 
-### 4.4 Phase 3: IO Controls
+### 4.4 Phase 3: IO Controls ✅ COMPLÉTÉE
 
 Pour `IOControls.tsx`:
 
@@ -403,11 +403,11 @@ git reset --hard HEAD~1  # Revenir au commit précédent (perte des changes)
 | Phase | Fichiers | Statut |
 |-------|----------|--------|
 | Phase 0 (Checkpoint) | 0 | ✅ Fait |
-| Phase 1 (Sources) | 15 | ✅ **Fait** |
-| Phase 2 (Sequencers) | 12 | ⏳ En attente |
-| Phase 3 (IO) | 6 | ⏳ En attente |
-| Phase 4 (Nettoyage) | 2 | ⏳ En attente |
-| **Total** | **35** | **1/4 phases** |
+| Phase 1 (Sources) | 15 | ✅ Fait |
+| Phase 2 (Sequencers) | 10 | ✅ Fait |
+| Phase 3 (IO) | 6 | ✅ Fait |
+| Phase 4 (Nettoyage) | - | ✅ Fait |
+| **Total** | **31** | **✅ Terminé** |
 
 ---
 

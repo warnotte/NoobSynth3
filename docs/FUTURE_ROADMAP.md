@@ -979,7 +979,8 @@ jobs:
 
 ### Phase 1: Fondations (2-3 semaines)
 - [x] Split SourceControls.tsx → sources/ (15 fichiers) ✅
-- [ ] Split SequencerControls.tsx → 10 fichiers
+- [x] Split SequencerControls.tsx → sequencers/ (10 fichiers) ✅
+- [x] Split IOControls.tsx → io/ (6 fichiers) ✅
 - [ ] Extraire hooks de App.tsx
 - [ ] Setup tests unitaires basiques
 

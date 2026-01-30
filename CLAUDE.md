@@ -39,17 +39,16 @@ App.tsx                          # Root component, state management
 │   │   └── controls/            # Module-specific controls
 │   │       ├── index.tsx        # Router → category files
 │   │       ├── sources/         # Source modules (15 files)
-│   │       │   ├── index.tsx    # Router for sources
-│   │       │   ├── OscillatorControls.tsx
-│   │       │   ├── NoiseControls.tsx
-│   │       │   └── ... (15 modules total)
+│   │       │   └── ... (15 modules)
+│   │       ├── sequencers/      # Sequencer modules (10 files)
+│   │       │   └── ... (10 modules)
+│   │       ├── io/              # I/O modules (6 files)
+│   │       │   └── ... (6 modules)
 │   │       ├── FilterControls.tsx
 │   │       ├── AmplifierControls.tsx
 │   │       ├── EffectControls.tsx
 │   │       ├── ModulatorControls.tsx
-│   │       ├── SequencerControls.tsx
-│   │       ├── DrumControls.tsx
-│   │       └── IOControls.tsx
+│   │       └── DrumControls.tsx
 │   └── PatchLayer.tsx           # SVG cable rendering
 └── MacroPanel.tsx               # VST macro controls (optional)
 

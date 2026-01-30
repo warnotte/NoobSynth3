@@ -32,13 +32,37 @@ src/ui/controls/
 │   └── shared/
 │       └── sidWaveformHelpers.ts  # Helpers CV pour NES/SNES
 │
+├── sequencers/              # Sequenceurs (10 modules)
+│   ├── index.tsx            # Router pour sequencers
+│   ├── ArpeggiatorControls.tsx
+│   ├── StepSequencerControls.tsx
+│   ├── DrumSequencerControls.tsx
+│   ├── EuclideanControls.tsx
+│   ├── ClockControls.tsx
+│   ├── MarioControls.tsx
+│   ├── MidiFileSequencerControls.tsx
+│   ├── TuringMachineControls.tsx
+│   ├── SidPlayerControls.tsx
+│   ├── AyPlayerControls.tsx
+│   └── shared/
+│       ├── rateOptions.ts       # Rate divisions partagées
+│       ├── midiHelpers.ts       # Helpers MIDI
+│       └── chiptuneHelpers.ts   # Helpers SID/AY
+│
+├── io/                      # I/O et utilitaires (6 modules)
+│   ├── index.tsx            # Router pour io
+│   ├── OutputControls.tsx
+│   ├── AudioInControls.tsx
+│   ├── ControlModuleControls.tsx
+│   ├── ScopeControls.tsx
+│   ├── LabControls.tsx
+│   └── NotesControls.tsx
+│
 ├── FilterControls.tsx       # vcf, hpf
 ├── AmplifierControls.tsx    # gain, cv-vca, mixer, mixer-1x2, ring-mod
 ├── EffectControls.tsx       # chorus, ensemble, choir, vocoder, delay, granular-delay, tape-delay, spring-reverb, reverb, phaser, distortion, wavefolder, pitch-shifter
 ├── ModulatorControls.tsx    # adsr, lfo, mod-router, sample-hold, slew, quantizer, chaos
-├── SequencerControls.tsx    # arpeggiator, step-sequencer, drum-sequencer, euclidean, clock, mario, midi-file-sequencer, turing-machine, sid-player, ay-player
 ├── DrumControls.tsx         # 909-*, 808-*
-├── IOControls.tsx           # control, output, audio-in, scope, lab, notes
 └── GranularControls.tsx     # granular (extrait car complexe)
 ```
 
@@ -156,4 +180,5 @@ export type ControlProps = {
 ## Historique
 
 - **Janvier 2026** : Extraction de `SourceControls.tsx` (1695 lignes) vers `sources/` (15 fichiers)
-- Les catégories `SequencerControls.tsx` et `IOControls.tsx` sont candidates pour une extraction future
+- **Janvier 2026** : Extraction de `SequencerControls.tsx` (2052 lignes) vers `sequencers/` (10 fichiers)
+- **Janvier 2026** : Extraction de `IOControls.tsx` (840 lignes) vers `io/` (6 fichiers)

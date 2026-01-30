@@ -17,9 +17,9 @@ import { renderFilterControls } from './FilterControls'
 import { renderAmplifierControls } from './AmplifierControls'
 import { renderEffectControls } from './EffectControls'
 import { renderModulatorControls } from './ModulatorControls'
-import { renderSequencerControls } from './SequencerControls'
+import { renderSequencerControls } from './sequencers'
 import { renderDrumControls } from './DrumControls'
-import { renderIOControls } from './IOControls'
+import { renderIOControls } from './io'
 
 export type ModuleControlsProps = {
   module: ModuleSpec
