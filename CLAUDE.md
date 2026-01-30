@@ -198,7 +198,7 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 
 **⚠️ RÈGLE:** Toute nouvelle feature UI↔Audio DOIT être implémentée pour Tauri en même temps que Web. Ne jamais merger une feature Web-only.
 
-## Module Types (72 total)
+## Module Types (73 total)
 
 ### Sources (15)
 oscillator, supersaw, karplus, fm-op, fm-matrix, nes-osc, snes-osc, noise, tb-303, shepard, pipe-organ, spectral-swarm, resonator, wavetable, granular
@@ -209,8 +209,8 @@ vcf, hpf
 ### Amplifiers (6)
 gain, cv-vca, mixer, mixer-1x2, mixer-8, crossfader
 
-### Effects (14)
-chorus, ensemble, choir, vocoder, delay, granular-delay, tape-delay, spring-reverb, reverb, phaser, distortion, wavefolder, ring-mod, pitch-shifter
+### Effects (15)
+chorus, ensemble, choir, vocoder, delay, granular-delay, tape-delay, spring-reverb, reverb, phaser, distortion, wavefolder, ring-mod, pitch-shifter, compressor
 
 ### Modulators (7)
 adsr, lfo, mod-router, sample-hold, slew, quantizer, chaos

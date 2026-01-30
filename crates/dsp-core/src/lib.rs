@@ -76,6 +76,7 @@ pub use effects::{
     Choir, ChoirParams, ChoirInputs, FormantFilter,
     Vocoder, VocoderParams, VocoderInputs,
     PitchShifter, PitchShifterParams, PitchShifterInputs,
+    Compressor, CompressorParams,
 };
 
 // Re-export modulators

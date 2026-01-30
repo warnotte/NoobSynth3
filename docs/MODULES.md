@@ -755,6 +755,29 @@ Pitch shifting granulaire avec contrôle CV.
 - Des grains courts = meilleure réponse mais plus de granularité audible
 - L'entrée pitch-cv permet une modulation en temps réel du pitch
 
+### Compressor
+
+Compresseur de dynamique stéréo avec détection liée.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `threshold` | -60 à 0 dB | Seuil de compression |
+| `ratio` | 1:1 à 20:1 | Taux de compression |
+| `attack` | 0.5-200 ms | Temps d'attaque |
+| `release` | 10-2000 ms | Temps de relâchement |
+| `makeup` | -24 à +24 dB | Gain de compensation |
+| `mix` | 0-1 | Dry/Wet (compression parallèle) |
+
+**Entrées** : in (audio stéréo)
+**Sorties** : out (audio stéréo)
+
+**Notes** :
+- Détection liée : utilise le max des deux canaux pour préserver l'image stéréo
+- Attack court (< 5ms) = écrase les transients, utile pour le limiting
+- Attack moyen (10-30ms) = laisse passer les transients, compression musicale
+- Mix à 50% = compression parallèle (NY compression)
+- Ratio élevé (10:1+) = effet de limiting
+
 ---
 
 ## Utilitaires

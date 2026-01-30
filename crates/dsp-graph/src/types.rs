@@ -58,6 +58,7 @@ pub enum ModuleType {
     Distortion,
     Wavefolder,
     PitchShifter,
+    Compressor,
 
     // Sequencers
     Clock,

@@ -1,0 +1,187 @@
+{
+  "version": 1,
+  "id": "compressor-bass",
+  "name": "Compressor Bass",
+  "description": "Test compressor on sustained bass with long attack envelope.",
+  "graph": {
+    "modules": [
+      {
+        "id": "osc-1",
+        "type": "oscillator",
+        "name": "VCO",
+        "position": {
+          "x": 120,
+          "y": 120
+        },
+        "params": {
+          "frequency": 110,
+          "type": "sawtooth",
+          "pwm": 0.5,
+          "unison": 1,
+          "detune": 0,
+          "subMix": 0.4,
+          "subOct": 1
+        }
+      },
+      {
+        "id": "vcf-1",
+        "type": "vcf",
+        "name": "VCF",
+        "position": {
+          "x": 320,
+          "y": 120
+        },
+        "params": {
+          "cutoff": 800,
+          "resonance": 0.2,
+          "drive": 0.1,
+          "envAmount": 0.4,
+          "modAmount": 0,
+          "keyTrack": 0.3,
+          "model": "ladder",
+          "mode": "lp",
+          "slope": 24
+        }
+      },
+      {
+        "id": "comp-1",
+        "type": "compressor",
+        "name": "Compressor",
+        "position": {
+          "x": 520,
+          "y": 120
+        },
+        "params": {
+          "threshold": -20,
+          "ratio": 6,
+          "attack": 10,
+          "release": 100,
+          "makeup": 3,
+          "mix": 1
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Main Out",
+        "position": {
+          "x": 720,
+          "y": 120
+        },
+        "params": {
+          "level": 1
+        }
+      },
+      {
+        "id": "adsr-1",
+        "type": "adsr",
+        "name": "Amp ADSR",
+        "position": {
+          "x": 320,
+          "y": 320
+        },
+        "params": {
+          "attack": 0.3,
+          "decay": 0.4,
+          "sustain": 0.8,
+          "release": 0.5
+        }
+      },
+      {
+        "id": "ctrl-1",
+        "type": "control",
+        "name": "Control IO",
+        "position": {
+          "x": 120,
+          "y": 320
+        },
+        "params": {
+          "cv": 0,
+          "cvMode": "unipolar",
+          "velocity": 1,
+          "midiVelocity": true,
+          "gate": 0,
+          "glide": 0.02,
+          "midiEnabled": false,
+          "midiChannel": 0,
+          "midiRoot": 36,
+          "voices": 1,
+          "seqOn": true,
+          "seqTempo": 80,
+          "seqGate": 0.8
+        }
+      },
+      {
+        "id": "gain-1",
+        "type": "gain",
+        "name": "VCA",
+        "position": {
+          "x": 320,
+          "y": 520
+        },
+        "params": {
+          "gain": 0.8
+        }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": {
+          "x": 520,
+          "y": 320
+        },
+        "params": {
+          "text": "COMPRESSOR BASS TEST\n\nSustained bass through compressor.\n\n- Threshold: -20dB (compresses peaks)\n- Ratio: 6:1 (medium compression)\n- Attack: 10ms (lets transient through)\n- Release: 100ms (smooth recovery)\n- Makeup: +3dB (compensate gain)\n\nTry:\n- Lower threshold = more squash\n- Higher ratio = more limiting\n- Mix 50% = parallel compression"
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "cv-out" },
+        "to": { "moduleId": "osc-1", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "cv-out" },
+        "to": { "moduleId": "vcf-1", "portId": "key" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "gate-out" },
+        "to": { "moduleId": "adsr-1", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "osc-1", "portId": "out" },
+        "to": { "moduleId": "gain-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "adsr-1", "portId": "env" },
+        "to": { "moduleId": "gain-1", "portId": "cv" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "gain-1", "portId": "out" },
+        "to": { "moduleId": "vcf-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "adsr-1", "portId": "env" },
+        "to": { "moduleId": "vcf-1", "portId": "env" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "vcf-1", "portId": "out" },
+        "to": { "moduleId": "comp-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "comp-1", "portId": "out" },
+        "to": { "moduleId": "out-1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

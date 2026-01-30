@@ -1,0 +1,240 @@
+{
+  "version": 1,
+  "id": "compressor-drums",
+  "name": "Compressor Drums",
+  "description": "Test compressor on 909 drum transients.",
+  "graph": {
+    "modules": [
+      {
+        "id": "clock-1",
+        "type": "clock",
+        "name": "Clock",
+        "position": {
+          "x": 120,
+          "y": 120
+        },
+        "params": {
+          "bpm": 120,
+          "running": true,
+          "rate": 4
+        }
+      },
+      {
+        "id": "drum-seq-1",
+        "type": "drum-sequencer",
+        "name": "Drum Seq",
+        "position": {
+          "x": 320,
+          "y": 120
+        },
+        "params": {
+          "swing": 0.15,
+          "rate": 4,
+          "steps": [
+            { "kick": true, "snare": false, "hhc": true, "hho": false, "clap": false, "tom": false, "rim": false, "aux": false, "accKick": false, "accSnare": false, "accHhc": false, "accHho": false, "accClap": false, "accTom": false, "accRim": false, "accAux": false },
+            { "kick": false, "snare": false, "hhc": true, "hho": false, "clap": false, "tom": false, "rim": false, "aux": false, "accKick": false, "accSnare": false, "accHhc": false, "accHho": false, "accClap": false, "accTom": false, "accRim": false, "accAux": false },
+            { "kick": false, "snare": false, "hhc": true, "hho": false, "clap": false, "tom": false, "rim": false, "aux": false, "accKick": false, "accSnare": false, "accHhc": false, "accHho": false, "accClap": false, "accTom": false, "accRim": false, "accAux": false },
+            { "kick": false, "snare": false, "hhc": true, "hho": false, "clap": false, "tom": false, "rim": false, "aux": false, "accKick": false, "accSnare": false, "accHhc": false, "accHho": false, "accClap": false, "accTom": false, "accRim": false, "accAux": false },
+            { "kick": false, "snare": true, "hhc": true, "hho": false, "clap": false, "tom": false, "rim": false, "aux": false, "accKick": false, "accSnare": true, "accHhc": false, "accHho": false, "accClap": false, "accTom": false, "accRim": false, "accAux": false },
+            { "kick": false, "snare": false, "hhc": true, "hho": false, "clap": false, "tom": false, "rim": false, "aux": false, "accKick": false, "accSnare": false, "accHhc": false, "accHho": false, "accClap": false, "accTom": false, "accRim": false, "accAux": false },
+            { "kick": false, "snare": false, "hhc": true, "hho": false, "clap": false, "tom": false, "rim": false, "aux": false, "accKick": false, "accSnare": false, "accHhc": false, "accHho": false, "accClap": false, "accTom": false, "accRim": false, "accAux": false },
+            { "kick": false, "snare": false, "hhc": true, "hho": false, "clap": false, "tom": false, "rim": false, "aux": false, "accKick": false, "accSnare": false, "accHhc": false, "accHho": false, "accClap": false, "accTom": false, "accRim": false, "accAux": false },
+            { "kick": true, "snare": false, "hhc": true, "hho": false, "clap": false, "tom": false, "rim": false, "aux": false, "accKick": false, "accSnare": false, "accHhc": false, "accHho": false, "accClap": false, "accTom": false, "accRim": false, "accAux": false },
+            { "kick": false, "snare": false, "hhc": true, "hho": false, "clap": false, "tom": false, "rim": false, "aux": false, "accKick": false, "accSnare": false, "accHhc": false, "accHho": false, "accClap": false, "accTom": false, "accRim": false, "accAux": false },
+            { "kick": true, "snare": false, "hhc": true, "hho": false, "clap": false, "tom": false, "rim": false, "aux": false, "accKick": false, "accSnare": false, "accHhc": false, "accHho": false, "accClap": false, "accTom": false, "accRim": false, "accAux": false },
+            { "kick": false, "snare": false, "hhc": true, "hho": false, "clap": false, "tom": false, "rim": false, "aux": false, "accKick": false, "accSnare": false, "accHhc": false, "accHho": false, "accClap": false, "accTom": false, "accRim": false, "accAux": false },
+            { "kick": false, "snare": true, "hhc": true, "hho": false, "clap": false, "tom": false, "rim": false, "aux": false, "accKick": false, "accSnare": true, "accHhc": false, "accHho": false, "accClap": false, "accTom": false, "accRim": false, "accAux": false },
+            { "kick": false, "snare": false, "hhc": true, "hho": false, "clap": false, "tom": false, "rim": false, "aux": false, "accKick": false, "accSnare": false, "accHhc": false, "accHho": false, "accClap": false, "accTom": false, "accRim": false, "accAux": false },
+            { "kick": false, "snare": false, "hhc": true, "hho": false, "clap": false, "tom": false, "rim": true, "aux": false, "accKick": false, "accSnare": false, "accHhc": false, "accHho": false, "accClap": false, "accTom": false, "accRim": false, "accAux": false },
+            { "kick": false, "snare": false, "hhc": true, "hho": false, "clap": false, "tom": false, "rim": false, "aux": false, "accKick": false, "accSnare": false, "accHhc": false, "accHho": false, "accClap": false, "accTom": false, "accRim": false, "accAux": false }
+          ]
+        }
+      },
+      {
+        "id": "kick-1",
+        "type": "909-kick",
+        "name": "909 Kick",
+        "position": {
+          "x": 720,
+          "y": 120
+        },
+        "params": {
+          "tune": 0,
+          "attack": 0.3,
+          "decay": 0.5,
+          "level": 0.9
+        }
+      },
+      {
+        "id": "snare-1",
+        "type": "909-snare",
+        "name": "909 Snare",
+        "position": {
+          "x": 720,
+          "y": 320
+        },
+        "params": {
+          "tune": 0,
+          "tone": 0.5,
+          "snappy": 0.6,
+          "level": 0.8
+        }
+      },
+      {
+        "id": "hihat-1",
+        "type": "909-hihat",
+        "name": "909 HiHat",
+        "position": {
+          "x": 720,
+          "y": 520
+        },
+        "params": {
+          "tune": 0.1,
+          "decay": 0.3,
+          "open": 0,
+          "level": 0.5
+        }
+      },
+      {
+        "id": "rim-1",
+        "type": "909-rimshot",
+        "name": "909 Rim",
+        "position": {
+          "x": 920,
+          "y": 520
+        },
+        "params": {
+          "tune": 0,
+          "level": 0.6
+        }
+      },
+      {
+        "id": "mixer-1",
+        "type": "mixer-8",
+        "name": "Drum Bus",
+        "position": {
+          "x": 1120,
+          "y": 120
+        },
+        "params": {
+          "level1": 1,
+          "level2": 0.8,
+          "level3": 0.5,
+          "level4": 0.6,
+          "level5": 0,
+          "level6": 0,
+          "level7": 0,
+          "level8": 0
+        }
+      },
+      {
+        "id": "comp-1",
+        "type": "compressor",
+        "name": "Compressor",
+        "position": {
+          "x": 1320,
+          "y": 120
+        },
+        "params": {
+          "threshold": -15,
+          "ratio": 4,
+          "attack": 5,
+          "release": 80,
+          "makeup": 2,
+          "mix": 1
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Main Out",
+        "position": {
+          "x": 1520,
+          "y": 120
+        },
+        "params": {
+          "level": 1
+        }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": {
+          "x": 1120,
+          "y": 320
+        },
+        "params": {
+          "text": "COMPRESSOR DRUMS TEST\n\n909 drums through bus compressor.\n\n- Threshold: -15dB (catches transients)\n- Ratio: 4:1 (glue compression)\n- Attack: 5ms (fast for drums)\n- Release: 80ms (recovers before next hit)\n- Makeup: +2dB\n\nTry:\n- Ratio 10:1+ = limiting effect\n- Attack 0.5ms = crush transients\n- Mix 50% = parallel drum compression"
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "clock-1", "portId": "clock" },
+        "to": { "moduleId": "drum-seq-1", "portId": "clock" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "drum-seq-1", "portId": "gate-kick" },
+        "to": { "moduleId": "kick-1", "portId": "trigger" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "drum-seq-1", "portId": "acc-kick" },
+        "to": { "moduleId": "kick-1", "portId": "accent" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "drum-seq-1", "portId": "gate-snare" },
+        "to": { "moduleId": "snare-1", "portId": "trigger" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "drum-seq-1", "portId": "acc-snare" },
+        "to": { "moduleId": "snare-1", "portId": "accent" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "drum-seq-1", "portId": "gate-hhc" },
+        "to": { "moduleId": "hihat-1", "portId": "trigger" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "drum-seq-1", "portId": "gate-rim" },
+        "to": { "moduleId": "rim-1", "portId": "trigger" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "kick-1", "portId": "out" },
+        "to": { "moduleId": "mixer-1", "portId": "in-1" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "snare-1", "portId": "out" },
+        "to": { "moduleId": "mixer-1", "portId": "in-2" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "hihat-1", "portId": "out" },
+        "to": { "moduleId": "mixer-1", "portId": "in-3" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "rim-1", "portId": "out" },
+        "to": { "moduleId": "mixer-1", "portId": "in-4" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "mixer-1", "portId": "out" },
+        "to": { "moduleId": "comp-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "comp-1", "portId": "out" },
+        "to": { "moduleId": "out-1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

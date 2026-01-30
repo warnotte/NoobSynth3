@@ -75,6 +75,7 @@ export const moduleSizes: Record<ModuleType, string> = {
   notes: '3x2',
   // Effects
   'pitch-shifter': '2x2',
+  compressor: '2x2',
   // Master Clock
   clock: '2x2',
   // MIDI File Sequencer
@@ -221,6 +222,7 @@ export const moduleCatalog: { type: ModuleType; label: string; category: ModuleC
   { type: 'wavefolder', label: 'Wavefolder', category: 'effects' },
   { type: 'ring-mod', label: 'Ring Mod', category: 'effects' },
   { type: 'pitch-shifter', label: 'Pitch Shifter', category: 'effects' },
+  { type: 'compressor', label: 'Compressor', category: 'effects' },
   // Modulators
   { type: 'adsr', label: 'ADSR', category: 'modulators' },
   { type: 'lfo', label: 'LFO', category: 'modulators' },
@@ -304,6 +306,7 @@ export const modulePrefixes: Record<ModuleType, string> = {
   distortion: 'dist',
   wavefolder: 'fold',
   'pitch-shifter': 'pitch',
+  compressor: 'comp',
   adsr: 'adsr',
   lfo: 'lfo',
   scope: 'scope',
@@ -388,6 +391,7 @@ export const moduleLabels: Record<ModuleType, string> = {
   distortion: 'Distortion',
   wavefolder: 'Wavefolder',
   'pitch-shifter': 'Pitch Shifter',
+  compressor: 'Compressor',
   adsr: 'ADSR',
   lfo: 'LFO',
   scope: 'Scope',
@@ -628,6 +632,7 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
   distortion: { drive: 0.5, tone: 0.5, mix: 1.0, mode: 'soft' },
   wavefolder: { drive: 0.4, fold: 0.5, bias: 0, mix: 0.8 },
   'pitch-shifter': { pitch: 0, fine: 0, grain: 50, mix: 1.0 },
+  compressor: { threshold: -20, ratio: 4, attack: 10, release: 100, makeup: 0, mix: 1.0 },
   supersaw: { frequency: 220, detune: 25, mix: 1.0 },
   karplus: {
     frequency: 220,

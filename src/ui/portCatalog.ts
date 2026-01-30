@@ -190,6 +190,7 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
   phaser: simpleAudioEffect(),
   distortion: simpleAudioEffect(),
   wavefolder: simpleAudioEffect(),
+  compressor: simpleAudioEffect(),
   supersaw: pitchToAudio(),
   karplus: {
     inputs: [

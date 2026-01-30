@@ -8,6 +8,7 @@ use dsp_core::{
     ChaosInputs, ChaosParams,
     ChoirInputs, ChoirParams, ChorusInputs, ChorusParams,
     Clap808Inputs, Clap808Params, Clap909Inputs, Clap909Params,
+    CompressorParams,
     Cowbell808Inputs, Cowbell808Params,
     DelayInputs, DelayParams, Distortion, DistortionParams,
     DrumSequencerInputs, DrumSequencerOutputs, DrumSequencerParams,
@@ -2002,6 +2003,25 @@ pub(crate) fn process_module(
             outputs[4].channel_mut(0)[..safe_frames].copy_from_slice(&buf_cv_a[..safe_frames]);
             outputs[5].channel_mut(0)[..safe_frames].copy_from_slice(&buf_cv_b[..safe_frames]);
             outputs[6].channel_mut(0)[..safe_frames].copy_from_slice(&buf_cv_c[..safe_frames]);
+        }
+        ModuleState::Compressor(state) => {
+            let input_connected = !connections[0].is_empty();
+            let input_l = if input_connected { Some(inputs[0].channel(0)) } else { None };
+            let input_r = if input_connected {
+                Some(if inputs[0].channel_count() == 1 { inputs[0].channel(0) } else { inputs[0].channel(1) })
+            } else {
+                None
+            };
+            let params = CompressorParams {
+                threshold: state.threshold.slice(frames),
+                ratio: state.ratio.slice(frames),
+                attack: state.attack.slice(frames),
+                release: state.release.slice(frames),
+                makeup: state.makeup.slice(frames),
+                mix: state.mix.slice(frames),
+            };
+            let (out_l, out_r) = outputs[0].channels_mut_2();
+            state.compressor.process_block_stereo(out_l, out_r, input_l, input_r, params);
         }
         ModuleState::Notes => {
             // UI-only module, no audio processing

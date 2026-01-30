@@ -226,6 +226,10 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
     ModuleType::AyPlayer => vec![
       PortInfo { channels: 1 },  // reset trigger
     ],
+    // Compressor - 1 stereo input
+    ModuleType::Compressor => vec![
+      PortInfo { channels: 2 },  // audio in (stereo)
+    ],
   }
 }
 
@@ -451,6 +455,10 @@ pub fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // cv-a
       PortInfo { channels: 1 },  // cv-b
       PortInfo { channels: 1 },  // cv-c
+    ],
+    // Compressor - 1 stereo output
+    ModuleType::Compressor => vec![
+      PortInfo { channels: 2 },  // stereo audio out
     ],
   }
 }
@@ -759,6 +767,11 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
     // AyPlayer - 1 input (reset)
     ModuleType::AyPlayer => match port_id {
       "reset" | "rst" => Some(0),
+      _ => None,
+    },
+    // Compressor - 1 input
+    ModuleType::Compressor => match port_id {
+      "in" | "input" | "audio" => Some(0),
       _ => None,
     },
     _ => None,
@@ -1097,6 +1110,11 @@ pub fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize
       "cv-a" => Some(4),
       "cv-b" => Some(5),
       "cv-c" => Some(6),
+      _ => None,
+    },
+    // Compressor - 1 output
+    ModuleType::Compressor => match port_id {
+      "out" | "output" => Some(0),
       _ => None,
     },
   }

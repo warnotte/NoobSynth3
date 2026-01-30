@@ -1,7 +1,7 @@
 //! Module state definitions for all DSP modules.
 
 use dsp_core::{
-    Adsr, Arpeggiator, AyPlayer, Chaos, Choir, Chorus, Clap808, Clap909, Cowbell808, Delay, DrumSequencer, Ensemble,
+    Adsr, Arpeggiator, AyPlayer, Chaos, Choir, Chorus, Clap808, Clap909, Compressor, Cowbell808, Delay, DrumSequencer, Ensemble,
     EuclideanSequencer, FmMatrix, FmOperator, Granular, GranularDelay, HiHat808, HiHat909, Hpf, KarplusStrong,
     Kick808, Kick909, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, Phaser, PipeOrgan, PitchShifter,
     Resonator, Reverb, Rimshot909, SampleHold, Shepard, SidPlayer, SlewLimiter, Snare808, Snare909, SnesOsc, SpectralSwarm, SpringReverb,
@@ -484,6 +484,16 @@ pub struct PitchShifterState {
     pub mix: ParamBuffer,
 }
 
+pub struct CompressorState {
+    pub compressor: Compressor,
+    pub threshold: ParamBuffer,
+    pub ratio: ParamBuffer,
+    pub attack: ParamBuffer,
+    pub release: ParamBuffer,
+    pub makeup: ParamBuffer,
+    pub mix: ParamBuffer,
+}
+
 // =============================================================================
 // Sequencer States
 // =============================================================================
@@ -782,6 +792,7 @@ pub enum ModuleState {
     Distortion(DistortionState),
     Wavefolder(WavefolderState),
     PitchShifter(PitchShifterState),
+    Compressor(CompressorState),
 
     // Sequencers
     Clock(ClockState),

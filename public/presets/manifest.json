@@ -1302,6 +1302,20 @@
       "description": "Test preset to validate stereo signal path through mixers.",
       "file": "stereo-mixer-test.json",
       "group": "Module Tests"
+    },
+    {
+      "id": "compressor-bass",
+      "name": "Compressor Bass",
+      "description": "Test compressor on sustained bass with long attack envelope.",
+      "file": "compressor-bass.json",
+      "group": "Module Tests"
+    },
+    {
+      "id": "compressor-drums",
+      "name": "Compressor Drums",
+      "description": "Test compressor on 909 drum transients.",
+      "file": "compressor-drums.json",
+      "group": "Module Tests"
     }
   ]
 }

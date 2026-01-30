@@ -3,7 +3,7 @@
 use std::collections::HashMap;
 
 use dsp_core::{
-  Adsr, Arpeggiator, AyPlayer, Chaos, Choir, Chorus, Clap808, Clap909, Cowbell808, Delay, DrumSequencer, Ensemble,
+  Adsr, Arpeggiator, AyPlayer, Chaos, Choir, Chorus, Clap808, Clap909, Compressor, Cowbell808, Delay, DrumSequencer, Ensemble,
   EuclideanSequencer, FmMatrix, FmOperator, Granular, GranularDelay, HiHat808, HiHat909, Hpf, KarplusStrong,
   Kick808, Kick909, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, Phaser, PipeOrgan, PitchShifter,
   Resonator, Reverb, Rimshot909, SampleHold, Shepard, SidPlayer, SlewLimiter, Snare808, Snare909, SnesOsc, SpectralSwarm, SpringReverb,
@@ -666,6 +666,15 @@ pub(crate) fn create_state(
       playing: ParamBuffer::new(param_number(params, "playing", 0.0)),
       loop_enabled: ParamBuffer::new(param_number(params, "loop", 1.0)),
     }),
+    ModuleType::Compressor => ModuleState::Compressor(CompressorState {
+      compressor: Compressor::new(sample_rate),
+      threshold: ParamBuffer::new(param_number(params, "threshold", -20.0)),
+      ratio: ParamBuffer::new(param_number(params, "ratio", 4.0)),
+      attack: ParamBuffer::new(param_number(params, "attack", 10.0)),
+      release: ParamBuffer::new(param_number(params, "release", 100.0)),
+      makeup: ParamBuffer::new(param_number(params, "makeup", 0.0)),
+      mix: ParamBuffer::new(param_number(params, "mix", 1.0)),
+    }),
   }
 }
 
@@ -1308,6 +1317,15 @@ pub(crate) fn apply_param(state: &mut ModuleState, param: &str, value: f32) {
     ModuleState::AyPlayer(state) => match param {
       "playing" => state.playing.set(value),
       "loop" => state.loop_enabled.set(value),
+      _ => {}
+    },
+    ModuleState::Compressor(state) => match param {
+      "threshold" => state.threshold.set(value),
+      "ratio" => state.ratio.set(value),
+      "attack" => state.attack.set(value),
+      "release" => state.release.set(value),
+      "makeup" => state.makeup.set(value),
+      "mix" => state.mix.set(value),
       _ => {}
     },
     _ => {}

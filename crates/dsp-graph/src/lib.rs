@@ -761,6 +761,7 @@ fn normalize_module_type(raw: &str) -> ModuleType {
     "phaser" => ModuleType::Phaser,
     "distortion" => ModuleType::Distortion,
     "wavefolder" => ModuleType::Wavefolder,
+    "compressor" => ModuleType::Compressor,
     "control" => ModuleType::Control,
     "scope" => ModuleType::Scope,
     "mario" => ModuleType::Mario,

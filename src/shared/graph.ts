@@ -77,6 +77,7 @@ export type ModuleType =
   | 'notes'
   // Effects
   | 'pitch-shifter'
+  | 'compressor'
   // Master Clock
   | 'clock'
   // Turing Machine
