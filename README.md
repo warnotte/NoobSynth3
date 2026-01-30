@@ -9,7 +9,7 @@ Synthétiseur modulaire inspiré de VCV Rack, construit avec React + Rust/WASM.
 ## Caractéristiques
 
 - **Interface Eurorack** : Rails, panneaux métal brossé, câbles patchables
-- **70 modules** : VCO, Supersaw, Karplus-Strong, NES/SNES Osc, TB-303, FM Op, FM Matrix (4-op), Shepard Tone, Pipe Organ, Spectral Swarm, Resonator, Wavetable, Granular Sampler, SID Player (C64), TR-909/808 Drums, Drum Sequencer (8-track), Euclidean Sequencer, MIDI File Sequencer, Turing Machine, Noise, Audio In, Sample & Hold, Slew, Quantizer, Chaos Engine, VCF (SVF/Ladder), LFO, ADSR, Step Sequencer, Arpeggiator, Ensemble/Choir, Delay/Tape/Granular, Spring/Reverb, Pitch Shifter, Wavefolder...
+- **73 modules** : VCO, Supersaw, Karplus-Strong, NES/SNES Osc, TB-303, FM Op, FM Matrix (4-op), Shepard Tone, Pipe Organ, Spectral Swarm, Resonator, Wavetable, Granular Sampler, SID Player (C64), AY Player (Spectrum/CPC), TR-909/808 Drums, Drum Sequencer (8-track), Euclidean Sequencer, MIDI File Sequencer, Turing Machine, Noise, Audio In, Sample & Hold, Slew, Quantizer, Chaos Engine, VCF (SVF/Ladder), LFO, ADSR, Step Sequencer, Arpeggiator, Ensemble/Choir, Delay/Tape/Granular, Spring/Reverb, Pitch Shifter, Wavefolder, Compressor...
 - **Polyphonie** : 1/2/4/8 voix avec voice stealing
 - **MIDI** : Entrée Web MIDI avec vélocité
 - **Presets** : 100+ patches inclus (Jupiter, Juno, Moog, Prophet, Jarre, Acid, Moroder, 909, Shepard, MIDI Organ...)
