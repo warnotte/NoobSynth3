@@ -145,7 +145,8 @@ export const useControlVoices = ({
       const useVelocity = options?.useVelocity ?? true
       const clampedVelocity = Math.max(0, Math.min(1, velocity))
       const voiceIndex = allocateVoice(note, clampedVelocity)
-      const cv = (note - midiRoot) / 12
+      // Use fixed reference (MIDI 60 = C4) so octave changes affect pitch
+      const cv = (note - 60) / 12
       updateParam(controlModuleId, 'cv', cv, { skipEngine: true })
       if (useVelocity) {
         updateParam(controlModuleId, 'velocity', clampedVelocity, { skipEngine: true })
@@ -171,7 +172,7 @@ export const useControlVoices = ({
       nativeControl?.triggerControlVoiceGate(controlModuleId, voiceIndex)
       nativeControl?.triggerControlVoiceSync(controlModuleId, voiceIndex)
     },
-    [allocateVoice, controlModuleId, engine, midiRoot, nativeControl, updateParam],
+    [allocateVoice, controlModuleId, engine, nativeControl, updateParam],
   )
 
   const releaseVoiceNote = useCallback(

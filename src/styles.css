@@ -1304,7 +1304,8 @@
 .module-controls .poly-panel,
 .module-controls .mini-keys,
 .module-controls .control-buttons,
-.module-controls .granular-waveform {
+.module-controls .granular-waveform,
+.module-controls .control-keyboard-section {
   grid-column: 1 / -1;
 }
 
@@ -3950,7 +3951,379 @@
 }
 
 /* ============================================
-   SECTION 26: ACCESSIBILITY
+   SECTION 26: PIANO KEYBOARD
+   ============================================ */
+
+/* Inline Piano Keyboard */
+.piano-keyboard {
+  position: relative;
+  width: 100%;
+  height: 60px;
+  user-select: none;
+  touch-action: none;
+}
+
+.piano-keyboard--compact {
+  height: 48px;
+}
+
+.piano-white-keys {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+}
+
+.piano-black-keys {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60%;
+  pointer-events: none;
+}
+
+.piano-key {
+  border: none;
+  cursor: pointer;
+  transition: background 0.05s ease;
+  touch-action: none;
+}
+
+.piano-key--white {
+  height: 100%;
+  background: linear-gradient(180deg, #f8f8f8 0%, #e8e8e8 100%);
+  border-right: 1px solid rgba(60, 70, 90, 0.3);
+  border-bottom: 2px solid rgba(60, 70, 90, 0.4);
+  border-radius: 0 0 3px 3px;
+}
+
+.piano-key--white:first-child {
+  border-radius: 0 0 3px 3px;
+}
+
+.piano-key--white:last-child {
+  border-right: none;
+}
+
+.piano-key--white:hover {
+  background: linear-gradient(180deg, #fff 0%, #f0f0f0 100%);
+}
+
+.piano-key--white.active {
+  background: linear-gradient(180deg, #6fd4a8 0%, #42e2b1 100%);
+  box-shadow: inset 0 -3px 6px rgba(0, 0, 0, 0.15);
+}
+
+.piano-key--black {
+  position: absolute;
+  height: 100%;
+  background: linear-gradient(180deg, #3a3a3a 0%, #1a1a1a 85%, #0a0a0a 100%);
+  border-radius: 0 0 3px 3px;
+  box-shadow:
+    inset 0 -2px 4px rgba(0, 0, 0, 0.4),
+    0 2px 4px rgba(0, 0, 0, 0.3);
+  pointer-events: auto;
+  z-index: 1;
+}
+
+.piano-key--black:hover {
+  background: linear-gradient(180deg, #4a4a4a 0%, #2a2a2a 85%, #1a1a1a 100%);
+}
+
+.piano-key--black.active {
+  background: linear-gradient(180deg, #4ecfa0 0%, #32b882 85%, #28a070 100%);
+  box-shadow:
+    inset 0 -1px 2px rgba(0, 0, 0, 0.3),
+    0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Keyboard section in Control module */
+.control-keyboard-section {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.control-keyboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.control-keyboard-footer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.control-keyboard-octave {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.control-octave-btn {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(40, 50, 70, 0.6);
+  border: 1px solid rgba(80, 100, 130, 0.5);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+.control-octave-btn:hover:not(:disabled) {
+  background: rgba(60, 80, 110, 0.8);
+  border-color: rgba(100, 130, 170, 0.6);
+  color: #fff;
+}
+
+.control-octave-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.control-octave-display {
+  min-width: 32px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent-mint);
+  font-family: var(--font-mono);
+}
+
+.control-expand-btn {
+  padding: 4px 8px;
+  background: rgba(40, 50, 70, 0.6);
+  border: 1px solid rgba(80, 100, 130, 0.5);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+.control-expand-btn:hover {
+  background: rgba(60, 80, 110, 0.8);
+  border-color: var(--accent-cool);
+  color: #fff;
+}
+
+.control-action-btns {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.control-action-btn {
+  padding: 4px 8px;
+  background: rgba(40, 50, 70, 0.6);
+  border: 1px solid rgba(80, 100, 130, 0.5);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+.control-action-btn:hover {
+  background: rgba(60, 80, 110, 0.8);
+  border-color: rgba(100, 130, 170, 0.6);
+}
+
+.control-action-btn:active {
+  border-color: var(--accent-mint);
+  box-shadow: 0 0 8px rgba(66, 226, 177, 0.4);
+}
+
+/* ============================================
+   SECTION 27: KEYBOARD POPUP
+   ============================================ */
+
+.keyboard-popup-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  backdrop-filter: blur(4px);
+}
+
+.keyboard-popup {
+  width: 90%;
+  max-width: 900px;
+  background: var(--panel-bg);
+  border: 1px solid rgba(100, 120, 150, 0.4);
+  border-radius: 12px;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.5),
+    0 0 40px rgba(66, 226, 177, 0.1);
+  overflow: hidden;
+}
+
+.keyboard-popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: rgba(30, 40, 55, 0.8);
+  border-bottom: 1px solid rgba(80, 100, 130, 0.3);
+}
+
+.keyboard-popup-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--text-primary);
+}
+
+.keyboard-popup-close {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(60, 70, 90, 0.5);
+  border: 1px solid rgba(100, 120, 150, 0.4);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+.keyboard-popup-close:hover {
+  background: rgba(255, 100, 100, 0.3);
+  border-color: rgba(255, 100, 100, 0.5);
+  color: #fff;
+}
+
+.keyboard-popup-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: rgba(25, 35, 50, 0.6);
+  border-bottom: 1px solid rgba(80, 100, 130, 0.2);
+}
+
+.keyboard-popup-octave {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.keyboard-popup-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(50, 60, 80, 0.8);
+  border: 1px solid rgba(100, 120, 150, 0.5);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+.keyboard-popup-btn:hover:not(:disabled) {
+  background: rgba(70, 90, 120, 0.9);
+  border-color: var(--accent-cool);
+}
+
+.keyboard-popup-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.keyboard-popup-octave-display {
+  min-width: 48px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent-mint);
+  font-family: var(--font-mono);
+}
+
+.keyboard-popup-toggle {
+  padding: 8px 16px;
+  background: rgba(50, 60, 80, 0.6);
+  border: 1px solid rgba(100, 120, 150, 0.5);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.keyboard-popup-toggle:hover {
+  background: rgba(70, 90, 120, 0.8);
+  border-color: rgba(140, 160, 190, 0.6);
+}
+
+.keyboard-popup-toggle.active {
+  background: rgba(66, 226, 177, 0.2);
+  border-color: var(--accent-mint);
+  color: var(--accent-mint);
+}
+
+.keyboard-popup-piano {
+  padding: 16px;
+  background: rgba(20, 28, 40, 0.8);
+}
+
+.keyboard-popup-piano .piano-keyboard {
+  height: 120px;
+}
+
+.keyboard-popup-hint {
+  padding: 12px 16px;
+  background: rgba(25, 35, 50, 0.6);
+  border-top: 1px solid rgba(80, 100, 130, 0.2);
+}
+
+.keyboard-popup-hint-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  line-height: 1.6;
+}
+
+.keyboard-popup-hint-label {
+  min-width: 44px;
+  font-weight: 600;
+  color: var(--accent-cool);
+}
+
+/* ============================================
+   SECTION 28: ACCESSIBILITY
    ============================================ */
 
 button:focus-visible,
@@ -3987,7 +4360,7 @@ textarea:focus-visible,
 }
 
 /* ============================================
-   SECTION 27: RESPONSIVE TUNING
+   SECTION 29: RESPONSIVE TUNING
    ============================================ */
 
 @media (max-width: 1200px) {

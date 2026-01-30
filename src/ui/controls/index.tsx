@@ -88,7 +88,7 @@ export const ModuleControls = ({
   const keyboardEnabled = isControlModule && Boolean(module.params.keyboardEnabled)
   const keyboardBaseNote = isControlModule ? Number(module.params.midiRoot ?? 60) : 60
 
-  useComputerKeyboard({
+  const { activeKeys: pcKeyboardActiveKeys } = useComputerKeyboard({
     enabled: keyboardEnabled,
     baseNote: keyboardBaseNote,
     onNoteOn: (note, velocity) => {
@@ -98,6 +98,24 @@ export const ModuleControls = ({
       releaseVoiceNote(note)
     },
   })
+
+  // Convert key codes to MIDI notes for visual feedback
+  const pcActiveNotes = new Set<number>()
+  if (keyboardEnabled) {
+    const KEY_MAP: Record<string, number> = {
+      'KeyZ': 0, 'KeyX': 2, 'KeyC': 4, 'KeyV': 5, 'KeyB': 7, 'KeyN': 9, 'KeyM': 11,
+      'KeyS': 1, 'KeyD': 3, 'KeyG': 6, 'KeyH': 8, 'KeyJ': 10,
+      'KeyQ': 12, 'KeyW': 14, 'KeyE': 16, 'KeyR': 17, 'KeyT': 19, 'KeyY': 21, 'KeyU': 23,
+      'Digit2': 13, 'Digit3': 15, 'Digit5': 18, 'Digit6': 20, 'Digit7': 22,
+      'KeyI': 24, 'KeyO': 26, 'KeyP': 28,
+    }
+    for (const code of pcKeyboardActiveKeys) {
+      const semitone = KEY_MAP[code]
+      if (semitone !== undefined) {
+        pcActiveNotes.add(keyboardBaseNote + semitone)
+      }
+    }
+  }
 
   // Build props for category render functions
   const props: ControlProps = {
@@ -125,6 +143,7 @@ export const ModuleControls = ({
     seqGateRatio,
     activeStep,
     marioStep,
+    pcKeyboardActiveKeys: pcActiveNotes,
   }
 
   // Router - try each category in order

@@ -110,6 +110,8 @@ export type ControlProps = {
   activeStep: number | null
   /** Active step for Mario sequencer playhead */
   marioStep: number | null
+  /** Active keys from PC keyboard (for visual feedback) */
+  pcKeyboardActiveKeys?: Set<number>
 }
 
 /**

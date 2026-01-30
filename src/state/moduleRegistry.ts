@@ -21,7 +21,7 @@ export const moduleSizes: Record<ModuleType, string> = {
   'ring-mod': '1x1',
   vcf: '2x2',
   hpf: '1x1',
-  control: '2x6',
+  control: '3x6',
   scope: '2x3',
   adsr: '1x2',
   lfo: '2x2',

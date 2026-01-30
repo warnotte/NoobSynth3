@@ -8,13 +8,15 @@ import type React from 'react'
 import { useEffect, useState, type CSSProperties } from 'react'
 import type { ControlProps } from './types'
 import { RotaryKnob } from '../RotaryKnob'
-import { ToggleButton, ToggleGroup } from '../ToggleButton'
+import { ToggleButton } from '../ToggleButton'
 import { ControlBox, ControlBoxRow } from '../ControlBox'
 import { ControlButtons } from '../ControlButtons'
 import { Oscilloscope } from '../Oscilloscope'
 import { formatDecimal2, formatInt } from '../formatters'
 import { clampMidiNote, clampVoiceCount, formatMidiNote } from '../../state/midiUtils'
 import { DEFAULT_SEQUENCER_PATTERN } from '../../state/sequencerPattern'
+import { PianoKeyboard } from '../components/PianoKeyboard'
+import { KeyboardPopup } from '../components/KeyboardPopup'
 
 export function renderIOControls(props: ControlProps): React.ReactElement | null {
   const {
@@ -37,6 +39,7 @@ export function renderIOControls(props: ControlProps): React.ReactElement | null
     seqTempo,
     seqGateRatio,
     activeStep,
+    pcKeyboardActiveKeys,
   } = props
 
   const isWebAudio = audioMode === 'web'
@@ -77,6 +80,7 @@ export function renderIOControls(props: ControlProps): React.ReactElement | null
         seqTempo={seqTempo}
         seqGateRatio={seqGateRatio}
         activeStep={activeStep}
+        pcKeyboardActiveKeys={pcKeyboardActiveKeys}
       />
     )
   }
@@ -508,7 +512,12 @@ function ControlModuleUI({
   seqTempo,
   seqGateRatio,
   activeStep,
-}: Pick<ControlProps, 'module' | 'updateParam' | 'setManualGate' | 'triggerManualSync' | 'triggerVoiceNote' | 'releaseVoiceNote' | 'handleMidiToggle' | 'midiSupported' | 'midiAccess' | 'midiInputs' | 'midiError' | 'seqOn' | 'seqTempo' | 'seqGateRatio' | 'activeStep'>) {
+  pcKeyboardActiveKeys,
+}: Pick<ControlProps, 'module' | 'updateParam' | 'setManualGate' | 'triggerManualSync' | 'triggerVoiceNote' | 'releaseVoiceNote' | 'handleMidiToggle' | 'midiSupported' | 'midiAccess' | 'midiInputs' | 'midiError' | 'seqOn' | 'seqTempo' | 'seqGateRatio' | 'activeStep' | 'pcKeyboardActiveKeys'>) {
+  // State for keyboard popup
+  const [keyboardPopupOpen, setKeyboardPopupOpen] = useState(false)
+
+  // Extract params
   const cvMode = String(module.params.cvMode ?? 'bipolar')
   const cvMin = cvMode === 'unipolar' ? 0 : -1
   const cvValue = Number(module.params.cv ?? 0)
@@ -521,119 +530,168 @@ function ControlModuleUI({
   const voices = clampVoiceCount(Number(module.params.voices ?? 4))
   const midiInputId = typeof module.params.midiInputId === 'string' ? module.params.midiInputId : ''
   const keyboardEnabled = Boolean(module.params.keyboardEnabled)
+  const glideTime = Number(module.params.glide ?? 0)
+
+  // Calculate current octave from midiRoot (C4 = 60 -> octave 4)
+  const currentOctave = Math.floor(midiRoot / 12) - 1
 
   const handleGateDown = () => setManualGate(module.id, true)
   const handleGateUp = () => setManualGate(module.id, false)
-  const handleKeyDown = (semitone: number) => {
-    const noteNumber = midiRoot + semitone
-    triggerVoiceNote(noteNumber, manualVelocity, { useVelocity: true, velocitySlew: 0 })
+
+  // Handlers for piano keyboard (click/touch)
+  const handlePianoKeyDown = (note: number) => {
+    triggerVoiceNote(note, manualVelocity, { useVelocity: true, velocitySlew: 0 })
   }
-  const handleKeyUp = (semitone: number) => {
-    const noteNumber = midiRoot + semitone
-    releaseVoiceNote(noteNumber)
+
+  const handlePianoKeyUp = (note: number) => {
+    releaseVoiceNote(note)
+  }
+
+  // Octave change handler
+  const handleOctaveChange = (newOctave: number) => {
+    // Convert octave to MIDI root note (C of that octave)
+    const newRoot = (newOctave + 1) * 12
+    updateParam(module.id, 'midiRoot', clampMidiNote(newRoot))
   }
 
   return (
     <>
-      <RotaryKnob
-        label="CV Out"
-        min={cvMin}
-        max={1}
-        step={0.01}
-        value={cvValue}
-        onChange={(value) => updateParam(module.id, 'cv', value)}
-        format={formatDecimal2}
-      />
-      <RotaryKnob
-        label="Vel Out"
-        min={0}
-        max={1}
-        step={0.01}
-        value={Number(module.params.velocity ?? 1)}
-        onChange={(value) => updateParam(module.id, 'velocity', value)}
-        format={formatDecimal2}
-      />
-      <RotaryKnob
-        label="Glide"
-        min={0}
-        max={0.5}
-        step={0.01}
-        unit="s"
-        value={Number(module.params.glide ?? 0)}
-        onChange={(value) => updateParam(module.id, 'glide', value)}
-        format={formatDecimal2}
-      />
-      <ControlBox label="CV Mode" compact>
-        <ControlButtons
-          options={[
-            { id: 'bipolar', label: 'Bipolar' },
-            { id: 'unipolar', label: 'Unipolar' },
-          ]}
-          value={cvMode}
-          onChange={(value) => updateParam(module.id, 'cvMode', value)}
+      {/* ═══════════════════════════════════════════════════════════════
+          SECTION 1: OUTPUTS
+          ═══════════════════════════════════════════════════════════════ */}
+      <ControlBox label="Outputs" horizontal>
+        <RotaryKnob
+          label="CV"
+          min={cvMin}
+          max={1}
+          step={0.01}
+          value={cvValue}
+          onChange={(value) => updateParam(module.id, 'cv', value)}
+          format={formatDecimal2}
+        />
+        <RotaryKnob
+          label="Vel"
+          min={0}
+          max={1}
+          step={0.01}
+          value={manualVelocity}
+          onChange={(value) => updateParam(module.id, 'velocity', value)}
+          format={formatDecimal2}
+        />
+        <RotaryKnob
+          label="Glide"
+          min={0}
+          max={0.5}
+          step={0.01}
+          unit="s"
+          value={glideTime}
+          onChange={(value) => updateParam(module.id, 'glide', value)}
+          format={formatDecimal2}
         />
       </ControlBox>
-      <div className="control-buttons">
-        <button
-          type="button"
-          className="ui-btn control-button"
-          onPointerDown={handleGateDown}
-          onPointerUp={handleGateUp}
-          onPointerCancel={handleGateUp}
-          onPointerLeave={handleGateUp}
-        >
-          Gate
-        </button>
-        <button
-          type="button"
-          className="ui-btn control-button"
-          onClick={() => triggerManualSync(module.id)}
-        >
-          Sync
-        </button>
-      </div>
-      <ToggleGroup>
-        <ToggleButton
-          label="PC Keyboard"
-          value={keyboardEnabled}
-          onChange={(value) => updateParam(module.id, 'keyboardEnabled', value)}
-          title="Use computer keyboard as piano (Z-M = lower octave, Q-U = upper octave)"
-        />
-      </ToggleGroup>
-      {keyboardEnabled && (
-        <div className="keyboard-hint" style={{ fontSize: 10, color: '#8af', marginBottom: 8, textAlign: 'center', lineHeight: 1.4 }}>
-          <div>QWERTY: Z X C V B N M | Q W E R T Y U</div>
-          <div>AZERTY: W X C V B N , | A Z E R T Y U</div>
-          <div style={{ color: '#6a8' }}>S D _ G H J = dièses</div>
-        </div>
-      )}
-      <div className="mini-keys">
-        {[
-          { label: 'C', semitone: 0 },
-          { label: 'D', semitone: 2 },
-          { label: 'E', semitone: 4 },
-          { label: 'F', semitone: 5 },
-          { label: 'G', semitone: 7 },
-          { label: 'A', semitone: 9 },
-          { label: 'B', semitone: 11 },
-          { label: 'C+', semitone: 12 },
-        ].map((key) => (
+
+      <ControlBoxRow>
+        <ControlBox label="CV Mode" compact flex={1.5}>
+          <ControlButtons
+            options={[
+              { id: 'bipolar', label: 'Bi' },
+              { id: 'unipolar', label: 'Uni' },
+            ]}
+            value={cvMode}
+            onChange={(value) => updateParam(module.id, 'cvMode', value)}
+          />
+        </ControlBox>
+        <ControlBox label="Voices" compact>
+          <ControlButtons
+            options={[
+              { id: 1, label: '1' },
+              { id: 2, label: '2' },
+              { id: 4, label: '4' },
+              { id: 8, label: '8' },
+            ]}
+            value={voices}
+            onChange={(value) => updateParam(module.id, 'voices', value)}
+          />
+        </ControlBox>
+      </ControlBoxRow>
+
+      {/* ═══════════════════════════════════════════════════════════════
+          SECTION 2: KEYBOARD
+          ═══════════════════════════════════════════════════════════════ */}
+      <ControlBox label="Keyboard">
+        <div className="control-keyboard-header">
+          <ToggleButton
+            label="PC Keys"
+            value={keyboardEnabled}
+            onChange={(value) => updateParam(module.id, 'keyboardEnabled', value)}
+            title="Use computer keyboard as piano"
+          />
           <button
-            key={key.label}
             type="button"
-            className="mini-key"
-            onPointerDown={() => handleKeyDown(key.semitone)}
-            onPointerUp={() => handleKeyUp(key.semitone)}
-            onPointerCancel={() => handleKeyUp(key.semitone)}
-            onPointerLeave={() => handleKeyUp(key.semitone)}
+            className="control-expand-btn"
+            onClick={() => setKeyboardPopupOpen(true)}
+            title="Open expanded keyboard"
           >
-            {key.label}
+            Expand
           </button>
-        ))}
-      </div>
-      <div className="midi-panel">
+        </div>
+
+        <PianoKeyboard
+          octaves={2}
+          startNote={midiRoot}
+          activeKeys={pcKeyboardActiveKeys || new Set()}
+          onKeyDown={handlePianoKeyDown}
+          onKeyUp={handlePianoKeyUp}
+          compact
+        />
+
+        <div className="control-keyboard-footer">
+          <div className="control-keyboard-octave">
+            <button
+              type="button"
+              className="control-octave-btn"
+              onClick={() => handleOctaveChange(currentOctave - 1)}
+              disabled={currentOctave <= 1}
+            >
+              -
+            </button>
+            <span className="control-octave-display">{formatMidiNote(midiRoot)}</span>
+            <button
+              type="button"
+              className="control-octave-btn"
+              onClick={() => handleOctaveChange(currentOctave + 1)}
+              disabled={currentOctave >= 6}
+            >
+              +
+            </button>
+          </div>
+          <div className="control-action-btns">
+            <button
+              type="button"
+              className="control-action-btn"
+              onPointerDown={handleGateDown}
+              onPointerUp={handleGateUp}
+              onPointerCancel={handleGateUp}
+              onPointerLeave={handleGateUp}
+            >
+              Gate
+            </button>
+            <button
+              type="button"
+              className="control-action-btn"
+              onClick={() => triggerManualSync(module.id)}
+            >
+              Sync
+            </button>
+          </div>
+        </div>
+      </ControlBox>
+
+      {/* ═══════════════════════════════════════════════════════════════
+          SECTION 3: MIDI
+          ═══════════════════════════════════════════════════════════════ */}
+      <ControlBox label="MIDI">
         <div className="midi-header">
-          <span className="midi-title">MIDI</span>
           <button
             type="button"
             className={`ui-btn ui-btn--pill midi-toggle ${midiEnabled ? 'active' : ''}`}
@@ -641,6 +699,15 @@ function ControlModuleUI({
             disabled={!midiSupported}
           >
             {midiEnabled ? 'On' : 'Enable'}
+          </button>
+          <button
+            type="button"
+            className={`ui-btn ui-btn--pill ui-btn--blue midi-option ${midiVelocity ? 'active' : ''}`}
+            onClick={() => updateParam(module.id, 'midiVelocity', !midiVelocity)}
+            disabled={!midiAccess}
+            style={{ marginLeft: 'auto' }}
+          >
+            Velocity
           </button>
         </div>
         <div className="midi-controls">
@@ -690,28 +757,7 @@ function ControlModuleUI({
             </select>
           </div>
         </div>
-        <div className="midi-options">
-          <button
-            type="button"
-            className={`ui-btn ui-btn--pill ui-btn--blue midi-option ${
-              midiVelocity ? 'active' : ''
-            }`}
-            onClick={() => updateParam(module.id, 'midiVelocity', !midiVelocity)}
-            disabled={!midiAccess}
-          >
-            Velocity
-          </button>
-        </div>
         <div className="midi-knobs">
-          <RotaryKnob
-            label="Root"
-            min={24}
-            max={84}
-            step={1}
-            value={midiRoot}
-            onChange={(value) => updateParam(module.id, 'midiRoot', value)}
-            format={(value) => `${formatMidiNote(value)} (${value})`}
-          />
           <RotaryKnob
             label="Vel Slew"
             min={0}
@@ -729,25 +775,13 @@ function ControlModuleUI({
             'No MIDI inputs detected.'}
           {midiSupported && !midiError && !midiEnabled && 'MIDI is off.'}
         </div>
-      </div>
-      <div className="poly-panel">
-        <span className="poly-label">Voices</span>
-        <div className="poly-buttons">
-          {[1, 2, 4, 8].map((count) => (
-            <button
-              key={count}
-              type="button"
-              className={`ui-btn ui-btn--blue poly-btn ${voices === count ? 'active' : ''}`}
-              onClick={() => updateParam(module.id, 'voices', count)}
-            >
-              {count}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className="seq-panel">
+      </ControlBox>
+
+      {/* ═══════════════════════════════════════════════════════════════
+          SECTION 4: SEQUENCER
+          ═══════════════════════════════════════════════════════════════ */}
+      <ControlBox label="Sequencer">
         <div className="seq-header">
-          <span className="seq-title">Sequencer</span>
           <button
             type="button"
             className={`ui-btn ui-btn--pill seq-toggle ${seqOn ? 'active' : ''}`}
@@ -776,18 +810,31 @@ function ControlModuleUI({
             onChange={(value) => updateParam(module.id, 'seqGate', value)}
             format={(value) => `${Math.round(value * 100)}%`}
           />
-      </div>
-      <div className="seq-steps">
-        {DEFAULT_SEQUENCER_PATTERN.map((step, index) => (
-          <div
-            key={index}
-            className={`seq-step ${activeStep === index ? 'active' : ''}`}
-          >
-            {step.label}
-          </div>
-        ))}
-      </div>
-      </div>
+        </div>
+        <div className="seq-steps">
+          {DEFAULT_SEQUENCER_PATTERN.map((step, index) => (
+            <div
+              key={index}
+              className={`seq-step ${activeStep === index ? 'active' : ''}`}
+            >
+              {step.label}
+            </div>
+          ))}
+        </div>
+      </ControlBox>
+
+      {/* Keyboard Popup */}
+      <KeyboardPopup
+        isOpen={keyboardPopupOpen}
+        onClose={() => setKeyboardPopupOpen(false)}
+        octave={currentOctave}
+        activeKeys={pcKeyboardActiveKeys || new Set()}
+        onKeyDown={handlePianoKeyDown}
+        onKeyUp={handlePianoKeyUp}
+        onOctaveChange={handleOctaveChange}
+        keyboardEnabled={keyboardEnabled}
+        onKeyboardToggle={(value) => updateParam(module.id, 'keyboardEnabled', value)}
+      />
     </>
   )
 }

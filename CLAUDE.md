@@ -57,7 +57,9 @@ Shared UI components:
 ├── ToggleButton.tsx             # On/off toggle
 ├── WaveformSelector.tsx         # Waveform picker
 ├── PanelSection.tsx             # Collapsible section
-└── Oscilloscope.tsx             # Scope display
+├── Oscilloscope.tsx             # Scope display
+├── PianoKeyboard.tsx            # Interactive piano keyboard (black/white keys, drag-to-play)
+└── KeyboardPopup.tsx            # 61-key expanded keyboard modal (React Portal)
 ```
 
 ## UI Dev Tools
@@ -79,7 +81,7 @@ Shared UI components:
 |------|------|---------|
 | `usePatching` | Gestion des câbles (drag & drop) | `hooks/usePatching.tsx` |
 | `useModuleDrag` | Déplacement des modules | `hooks/useModuleDrag.ts` |
-| `useControlVoices` | Polyphonie, voice stealing | `hooks/useControlVoices.ts` |
+| `useControlVoices` | Polyphonie, voice stealing, CV output (note 60 = CV 0) | `hooks/useControlVoices.ts` |
 | `useMidi` | Web MIDI input | `hooks/useMidi.ts` |
 | `useComputerKeyboard` | Clavier AZERTY/QWERTY | `hooks/useComputerKeyboard.ts` |
 | `useMarioSequencer` | Séquenceur module Mario | `hooks/useMarioSequencer.ts` |
@@ -548,6 +550,7 @@ Ces paramètres utilisent des **valeurs numériques** :
 | RSID stack pointer reset | SP forcé à 0xFF à chaque IRQ, détruisant les données stack | SP persistant (`irq_sp`) dans la struct SidPlayer |
 | SID elapsed timer overflow | `playStartRef` null → `Date.now() - null` = epoch | Ref toujours `number`, reset via `loadGen` counter |
 | WASAPI buffer overflow | `&[0.0; 128][..frames]` trop petit pour WASAPI (480-4096 frames) | `const ZERO_BUFFER: [f32; 4096]` dans `process.rs` |
+| Octave ne change pas le pitch | CV calculé comme `(note - midiRoot) / 12` → toujours relatif | CV fixe: `(note - 60) / 12` (MIDI 60 = C4 = référence) |
 
 ---
 
