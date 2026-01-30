@@ -106,6 +106,7 @@ pub(crate) fn process_module(
                 level: state.level.slice(frames),
                 noise_type: state.noise_type.slice(frames),
                 stereo: state.stereo.slice(frames),
+                pan: state.pan.slice(frames),
             };
             state.noise.process_block_stereo(out_l, out_r, params);
         }

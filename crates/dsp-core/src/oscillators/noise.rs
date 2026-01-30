@@ -51,6 +51,8 @@ pub struct NoiseParams<'a> {
     pub noise_type: &'a [Sample],
     /// Stereo width (0.0 = mono, 1.0 = full stereo)
     pub stereo: &'a [Sample],
+    /// Pan position (-1.0 = left, 0.0 = center, 1.0 = right)
+    pub pan: &'a [Sample],
 }
 
 impl Noise {
@@ -239,6 +241,8 @@ impl Noise {
         output_r: &mut [Sample],
         params: NoiseParams<'_>,
     ) {
+        use std::f32::consts::FRAC_PI_4;
+
         if output_l.is_empty() {
             return;
         }
@@ -246,6 +250,7 @@ impl Noise {
             let level = sample_at(params.level, i, 0.4).clamp(0.0, 1.0);
             let color = sample_at(params.noise_type, i, 0.0);
             let stereo = sample_at(params.stereo, i, 0.0).clamp(0.0, 1.0);
+            let pan = sample_at(params.pan, i, 0.0).clamp(-1.0, 1.0);
 
             let noise_l = self.sample_l(color);
             let noise_r = self.sample_r(color);
@@ -255,8 +260,14 @@ impl Noise {
             let out_l = mono * (1.0 - stereo) + noise_l * stereo;
             let out_r = mono * (1.0 - stereo) + noise_r * stereo;
 
-            output_l[i] = out_l * level;
-            output_r[i] = out_r * level;
+            // Apply equal-power panning
+            // pan -1 = left only, pan 0 = center, pan +1 = right only
+            let angle = (pan + 1.0) * FRAC_PI_4; // 0 to PI/2
+            let pan_l = angle.cos();
+            let pan_r = angle.sin();
+
+            output_l[i] = out_l * level * pan_l;
+            output_r[i] = out_r * level * pan_r;
         }
     }
 }

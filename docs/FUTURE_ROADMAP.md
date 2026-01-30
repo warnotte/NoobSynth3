@@ -589,46 +589,40 @@ fn advance_step(&mut self, mode: ArpMode) -> usize {
 />
 ```
 
-### 3.3 Stereo Mixers (Priorité: Haute)
+### 3.3 Stereo Mixers ✅ FAIT
 
-**Problème critique:** Tous les mixers sont mono, perte de stéréo
+**Statut:** ✅ Implémenté le 30 janvier 2026
 
-**Modules stéréo existants:**
-- Noise (L/R outputs)
-- Shepard Tone (stereo spread)
-- Spectral Swarm (stereo panning)
-- Chorus (stereo output)
-- Ensemble (stereo)
-- Reverb (stereo)
-- Delay (ping-pong stereo)
+**Ce qui a été fait:**
+- Tous les mixers (mixer, mixer-1x2, mixer-8, crossfader) traitent maintenant les deux canaux (L/R)
+- Les sources mono sont automatiquement dupliquées L→R (comportement standard)
+- Les sources stéréo passent correctement à travers les mixers
+- Aucun changement de ports nécessaire (le port `out` transporte 2 canaux en interne)
 
-**Solution:**
+**Fichiers modifiés:**
+- `crates/dsp-core/src/lib.rs` - Nouvelles méthodes `process_block_stereo` et `process_block_multi_stereo`
+- `crates/dsp-graph/src/process.rs` - Utilisation de `channels_mut_2()` pour les sorties stéréo
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│  MIXER (Stereo)                                             │
-│  ═══════════════                                            │
-│                                                             │
-│  [In 1]  [In 2]  [In 3]  [In 4]        [Out L] [Out R]     │
-│    ◎       ◎       ◎       ◎                                │
-│   Vol     Vol     Vol     Vol                               │
-│                                                             │
-│    ◎       ◎       ◎       ◎                                │
-│   Pan     Pan     Pan     Pan                               │
-│  L──R    L──R    L──R    L──R                              │
-│                                                             │
-│  [Solo 1] [Solo 2] [Solo 3] [Solo 4]                       │
-│  [Mute 1] [Mute 2] [Mute 3] [Mute 4]                       │
-│                                                             │
-│  Master: ◎        [Mono Sum]                                │
-└─────────────────────────────────────────────────────────────┘
+**Problème restant - Division de volume:**
+
+Le code divise le signal pour éviter le clipping:
+
+```rust
+// Mixer 2ch - TOUJOURS divise par 2
+output[i] = (a + b) * 0.5;
+
+// Mixer multi-canaux (6ch, 8ch) - divise par entrées CONNECTÉES
+let scale = 1.0 / active_count as Sample;
 ```
 
-**Fichiers à modifier:**
-1. `crates/dsp-graph/src/ports.rs` - Ajouter Out L/R
-2. `crates/dsp-graph/src/process.rs` - Stereo mixing logic
-3. `src/state/portCatalog.ts` - UI ports
-4. `src/ui/controls/AmplifierControls.tsx` - Pan knobs
+**Comportement:**
+- **Mixer 2ch**: Divise toujours par 2 (-6dB), même avec 1 seule entrée → problématique
+- **Mixer 6ch/8ch**: Divise par nombre d'entrées connectées → plus intelligent
+
+**Solutions futures possibles:**
+1. **Fix Mixer 2ch**: Utiliser la même logique que multi-canaux (diviser par `active_count`)
+2. **Mode "Unity Gain"**: Option pour désactiver la division
+3. **Makeup Gain**: Knob de compensation sur chaque mixer
 
 ### 3.4 Preset Export/Import (Priorité: Moyenne)
 

@@ -378,7 +378,7 @@ export function renderSourceControls(props: ControlProps): React.ReactElement | 
 
   if (module.type === 'noise') {
     return (
-      <ControlBoxRow>
+      <>
         <ControlBox horizontal>
           <RotaryKnob
             label="Level"
@@ -394,9 +394,18 @@ export function renderSourceControls(props: ControlProps): React.ReactElement | 
             min={0}
             max={1}
             step={0.01}
-            value={Number(module.params.stereo ?? 0)}
+            value={Number(module.params.stereo ?? 1)}
             onChange={(value) => updateParam(module.id, 'stereo', value)}
             format={formatPercent}
+          />
+          <RotaryKnob
+            label="Pan"
+            min={-1}
+            max={1}
+            step={0.01}
+            value={Number(module.params.pan ?? 0)}
+            onChange={(value) => updateParam(module.id, 'pan', value)}
+            format={(v) => v < -0.01 ? `L${Math.round(Math.abs(v) * 100)}` : v > 0.01 ? `R${Math.round(v * 100)}` : 'C'}
           />
         </ControlBox>
         <ControlBox label="Type" compact>
@@ -413,7 +422,7 @@ export function renderSourceControls(props: ControlProps): React.ReactElement | 
             columns={3}
           />
         </ControlBox>
-      </ControlBoxRow>
+      </>
     )
   }
 

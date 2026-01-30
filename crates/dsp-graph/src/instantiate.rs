@@ -39,6 +39,7 @@ pub(crate) fn create_state(
       level: ParamBuffer::new(param_number(params, "level", 0.4)),
       noise_type: ParamBuffer::new(param_number(params, "noiseType", 0.0)),
       stereo: ParamBuffer::new(param_number(params, "stereo", 0.0)),
+      pan: ParamBuffer::new(param_number(params, "pan", 0.0)),
     }),
     ModuleType::ModRouter => ModuleState::ModRouter(ModRouterState {
       depth_pitch: ParamBuffer::new(param_number(params, "depthPitch", 0.0)),
@@ -686,6 +687,8 @@ pub(crate) fn apply_param(state: &mut ModuleState, param: &str, value: f32) {
     ModuleState::Noise(state) => match param {
       "level" => state.level.set(value),
       "noiseType" => state.noise_type.set(value),
+      "stereo" => state.stereo.set(value),
+      "pan" => state.pan.set(value),
       _ => {}
     },
     ModuleState::ModRouter(state) => match param {

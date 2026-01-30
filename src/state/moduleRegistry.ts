@@ -6,7 +6,7 @@ export const moduleSizes: Record<ModuleType, string> = {
   karplus: '2x2',
   'nes-osc': '2x3',
   'snes-osc': '2x2',
-  noise: '2x1',
+  noise: '2x2',
   shepard: '2x3',
   'pipe-organ': '2x3',
   'spectral-swarm': '2x3',
@@ -443,7 +443,7 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     subMix: 0,
     subOct: 1,
   },
-  noise: { level: 0.4, noiseType: 'white', stereo: 0 },
+  noise: { level: 0.4, noiseType: 'white', stereo: 1, pan: 0 },
   shepard: {
     voices: 8,        // Number of octave-spaced voices (2-12)
     rate: 0.1,        // Climb rate (-4 to 4, cycles/second)

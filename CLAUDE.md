@@ -551,6 +551,7 @@ Ces paramètres utilisent des **valeurs numériques** :
 | SID elapsed timer overflow | `playStartRef` null → `Date.now() - null` = epoch | Ref toujours `number`, reset via `loadGen` counter |
 | WASAPI buffer overflow | `&[0.0; 128][..frames]` trop petit pour WASAPI (480-4096 frames) | `const ZERO_BUFFER: [f32; 4096]` dans `process.rs` |
 | Octave ne change pas le pitch | CV calculé comme `(note - midiRoot) / 12` → toujours relatif | CV fixe: `(note - 60) / 12` (MIDI 60 = C4 = référence) |
+| Mixers perdent la stéréo | Mixers ne traitaient que `channel(0)` | Méthodes `process_block_stereo` + `channels_mut_2()` pour L/R |
 
 ---
 
@@ -598,7 +599,7 @@ Ces paramètres utilisent des **valeurs numériques** :
 | VST UI | L'éditeur est un launcher; UI complète dans fenêtre Tauri externe |
 | VST Macros | Les édits UI ne modifient pas l'automation DAW |
 | WASM | `wasm-opt` désactivé (bulk memory mismatch); non optimisé |
-| **Mixers Mono** | Tous les mixers (mixer, mixer-1x2, mixer-8) sont mono. Les modules stéréo (Noise, Shepard, SpectralSwarm, Chorus, etc.) perdent leur stéréo en passant par un mixer. |
+| **Mixers Division Volume** | Le mixer 2ch divise toujours par 2 (`*0.5`), même avec une seule entrée. Les mixers multi-canaux (6ch, 8ch) divisent par le nombre d'entrées *connectées*. Chaîner plusieurs mixers cause perte de volume. Workaround: ajouter un Gain en sortie. |
 | **RSID partiellement supporté** | Certains fichiers RSID (Great Giana Sisters, RoboCop) ne jouent pas correctement. L'émulation CPU 6502/CIA/VIC n'est pas assez précise pour les tunes RSID les plus exigeantes (timer modulation dynamique, échantillons digi). Les PSID fonctionnent tous. |
 
 ---
