@@ -8,6 +8,7 @@ import type { ControlProps } from '../types'
 import { RotaryKnob } from '../../RotaryKnob'
 import { ControlBox, ControlBoxRow } from '../../ControlBox'
 import { ControlButtons } from '../../ControlButtons'
+import { WaveformButtons, WAVE_OPTIONS_WITH_NOISE } from '../../WaveformSelector'
 import { ParticleVisualization } from '../../ParticleVisualization'
 import { formatDecimal2, formatInt, formatPercent } from '../../formatters'
 
@@ -174,14 +175,8 @@ export function ParticleCloudControls({
         </ControlBox>
         {mode === 0 && (
           <ControlBox label="Shape" compact>
-            <ControlButtons
-              options={[
-                { id: 0, label: 'SIN' },
-                { id: 1, label: 'TRI' },
-                { id: 2, label: 'SAW' },
-                { id: 3, label: 'SQR' },
-                { id: 4, label: 'NSE' },
-              ]}
+            <WaveformButtons
+              options={[...WAVE_OPTIONS_WITH_NOISE]}
               value={oscShape}
               onChange={(value) => updateParam(module.id, 'oscShape', value)}
             />

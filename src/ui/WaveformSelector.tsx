@@ -130,3 +130,12 @@ export const WAVE_OPTIONS_303 = [
   { value: 0, label: 'SAW', icon: 'saw' },
   { value: 1, label: 'SQR', icon: 'square' },
 ] as const
+
+/** Standard 5 waveforms with noise: SIN, TRI, SAW, SQR, NSE (numeric IDs 0-4) */
+export const WAVE_OPTIONS_WITH_NOISE = [
+  { value: 0, label: 'SIN', icon: 'sine' },
+  { value: 1, label: 'TRI', icon: 'triangle' },
+  { value: 2, label: 'SAW', icon: 'saw' },
+  { value: 3, label: 'SQR', icon: 'square' },
+  { value: 4, label: 'NSE', icon: 'noise' },
+] as const
