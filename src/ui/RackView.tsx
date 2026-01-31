@@ -30,6 +30,7 @@ type RackViewProps = {
   onToggleCollapsed: () => void
   getModuleGridStyle: (module: ModuleSpec) => CSSProperties
   onRemoveModule: (moduleId: string) => void
+  onModuleContextMenu?: (moduleId: string, x: number, y: number) => void
   onHeaderPointerDown: (moduleId: string, event: ReactPointerEvent<HTMLDivElement>) => void
   getModuleSize: (module: ModuleSpec) => string
   showResizeHandles?: boolean
@@ -57,6 +58,7 @@ export const RackView = ({
   onToggleCollapsed,
   getModuleGridStyle,
   onRemoveModule,
+  onModuleContextMenu,
   onHeaderPointerDown,
   getModuleSize,
   showResizeHandles = false,
@@ -102,6 +104,7 @@ export const RackView = ({
             portLayout={modulePortLayouts[module.type] ?? 'stacked'}
             style={getModuleGridStyle(module)}
             onRemove={onRemoveModule}
+            onContextMenu={onModuleContextMenu}
             onHeaderPointerDown={onHeaderPointerDown}
             showResizeHandle={showResizeHandles}
             onResizeHandlePointerDown={onResizeHandlePointerDown}

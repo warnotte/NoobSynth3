@@ -1159,27 +1159,33 @@
 }
 
 .wave-button {
-  border-radius: var(--radius-lg);
-  background: var(--glass-overlay);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  padding: 6px 4px;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  color: rgba(255, 255, 255, 0.9);
+  border-radius: var(--btn-icon-radius);
+  background: var(--btn-inactive-bg);
+  border: 1px solid var(--btn-inactive-border);
+  padding: var(--btn-padding-y) 4px;
+  color: var(--btn-inactive-text);
+  cursor: pointer;
+  transition: var(--transition-normal);
+}
+
+.wave-button:hover {
+  background: var(--btn-hover-bg);
+  border-color: var(--btn-hover-border);
 }
 
 .wave-button.active {
   background: linear-gradient(180deg, var(--accent-mint), var(--accent-mint-dark));
   border-color: var(--accent-mint);
   color: #0a0a0a;
-  box-shadow: 0 4px 12px rgba(66, 226, 177, 0.4);
+  box-shadow: var(--btn-active-shadow);
 }
 
 /* Compact waveform in module controls */
-.module-controls .waveform { grid-column: 1 / -1; gap: 2px; }
+.module-controls .waveform { grid-column: 1 / -1; gap: var(--btn-compact-gap); }
 .module-controls .waveform-label { font-size: 6px; }
-.module-controls .waveform-buttons { grid-template-columns: repeat(4, 1fr); gap: 2px; }
-.module-controls .wave-button { display: grid; place-items: center; padding: 4px; border-radius: var(--radius-md); gap: 0; line-height: 1; }
-.module-controls .wave-icon { width: 18px; height: 18px; }
+.module-controls .waveform-buttons { grid-template-columns: repeat(4, 1fr); gap: var(--btn-compact-gap); }
+.module-controls .wave-button { display: grid; place-items: center; padding: var(--btn-compact-padding-y); border-radius: var(--btn-radius); gap: 0; line-height: 1; }
+.module-controls .wave-icon { width: var(--btn-compact-icon-size); height: var(--btn-compact-icon-size); }
 .module-controls .wave-button-label { display: none; }
 
 /* ============================================
@@ -1214,13 +1220,6 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
-/* Compact filter in module controls */
-.module-controls .filter-row { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 4px; }
-.module-controls .filter-row .filter-group { flex: 1 1 auto; min-width: 60px; gap: 2px; }
-.module-controls .filter-row .filter-label { font-size: 6px; }
-.module-controls .filter-row .filter-buttons { gap: 2px; }
-.module-controls .filter-row .filter-btn { padding: 2px 3px; font-size: 6px; border-radius: var(--radius-sm); }
-
 /* ============================================
    SECTION 13: TOGGLE & CONTROL BUTTONS
    ============================================ */
@@ -1233,10 +1232,10 @@
 }
 
 .toggle-btn {
-  --ui-btn-padding: 6px 8px;
+  --ui-btn-padding: var(--btn-padding-y) 8px;
   --ui-btn-letter: 0.18em;
-  --ui-btn-text: rgba(198, 212, 228, 0.85);
-  --ui-btn-bg: rgba(18, 24, 32, 0.88);
+  --ui-btn-text: var(--btn-inactive-text);
+  --ui-btn-bg: var(--btn-inactive-bg);
 }
 
 .meter-row {
@@ -1268,27 +1267,6 @@
   width: 0%;
   background: linear-gradient(90deg, #6fe9a7 0%, #f5d17a 70%, #f08f5a 100%);
   box-shadow: 0 0 6px rgba(111, 233, 167, 0.55);
-}
-
-.control-buttons {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-  grid-column: 1 / -1;
-}
-
-.control-button {
-  --ui-btn-radius: 12px;
-  --ui-btn-padding: 8px 10px;
-  --ui-btn-font: 0.65rem;
-  --ui-btn-letter: 0.14em;
-  --ui-btn-bg: rgba(18, 24, 32, 0.9);
-  --ui-btn-text: rgba(214, 226, 242, 0.92);
-}
-
-.control-button:active {
-  border-color: rgba(66, 226, 177, 0.9);
-  box-shadow: 0 0 12px rgba(66, 226, 177, 0.6);
 }
 
 /* Compact toggle in module controls */
@@ -1413,7 +1391,7 @@
 .scope-buttons {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 6px;
+  gap: var(--btn-gap);
 }
 
 .scope-toggle {
@@ -1670,17 +1648,17 @@
    ============================================ */
 
 .ui-btn {
-  --ui-btn-radius: 4px;
-  --ui-btn-padding: 5px 8px;
-  --ui-btn-border: rgba(255, 255, 255, 0.15);
-  --ui-btn-bg: rgba(0, 0, 0, 0.4);
-  --ui-btn-text: rgba(255, 255, 255, 0.7);
-  --ui-btn-font: 9px;
+  --ui-btn-radius: var(--btn-radius);
+  --ui-btn-padding: var(--btn-padding-y) 8px;
+  --ui-btn-border: var(--btn-inactive-border);
+  --ui-btn-bg: var(--btn-inactive-bg);
+  --ui-btn-text: var(--btn-inactive-text);
+  --ui-btn-font: var(--btn-font-size);
   --ui-btn-letter: 0.08em;
   --ui-btn-active-text: #0a0a0a;
   --ui-btn-active-bg: linear-gradient(180deg, var(--accent-mint), var(--accent-mint-dark));
   --ui-btn-active-border: var(--accent-mint);
-  --ui-btn-active-shadow: 0 2px 8px rgba(66, 226, 177, 0.4);
+  --ui-btn-active-shadow: var(--btn-active-shadow);
 
   border-radius: var(--ui-btn-radius);
   padding: var(--ui-btn-padding);
@@ -1696,8 +1674,8 @@
 }
 
 .ui-btn:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--ui-btn-bg) 80%, #fff 20%);
-  border-color: color-mix(in srgb, var(--ui-btn-border) 60%, #fff 40%);
+  background: var(--btn-hover-bg);
+  border-color: var(--btn-hover-border);
 }
 
 .ui-btn.active {
@@ -3308,8 +3286,8 @@
 }
 
 .control-box.control-box-compact .control-btn {
-  font-size: 8px;
-  padding: 3px 4px;
+  font-size: var(--btn-compact-font-size);
+  padding: var(--btn-compact-padding-y) var(--btn-compact-padding-x);
 }
 
 /* Standalone control box spans full grid width */
@@ -3378,12 +3356,12 @@
 
 /* Individual button */
 .control-btn {
-  padding: 5px 6px;
-  border: 1px solid rgba(80, 100, 130, 0.4);
-  border-radius: var(--radius-md);
-  background: var(--glass-4);
-  color: rgba(198, 212, 228, 0.9);
-  font-size: 9px;
+  padding: var(--btn-padding-y) var(--btn-padding-x);
+  border: 1px solid var(--btn-inactive-border);
+  border-radius: var(--btn-radius);
+  background: var(--btn-inactive-bg);
+  color: var(--btn-inactive-text);
+  font-size: var(--btn-font-size);
   font-weight: 700;
   letter-spacing: 0.08em;
   cursor: pointer;
@@ -3393,15 +3371,15 @@
 }
 
 .control-btn:hover {
-  background: var(--glass-panel);
-  border-color: rgba(100, 130, 170, 0.6);
+  background: var(--btn-hover-bg);
+  border-color: var(--btn-hover-border);
 }
 
 .control-btn.active {
   background: linear-gradient(180deg, var(--accent-mint) 0%, var(--accent-mint-dark) 100%);
   border-color: var(--accent-mint);
   color: #0a0a0a;
-  box-shadow: 0 2px 8px rgba(66, 226, 177, 0.4);
+  box-shadow: var(--btn-active-shadow);
 }
 
 /* CV-controlled button highlight (cyan glow for SID waveform etc) */
@@ -4469,4 +4447,62 @@ textarea:focus-visible,
     --rack-unit-x: 130px;
     --rack-unit-y: 92px;
   }
+}
+
+/* ============================================
+   CONTEXT MENU
+   ============================================ */
+
+.context-menu {
+  min-width: 160px;
+  padding: 4px;
+  background: var(--glass-3);
+  border: 1px solid var(--btn-inactive-border);
+  border-radius: var(--btn-radius);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(12px);
+}
+
+.context-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--btn-inactive-text);
+  font-size: 11px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.1s ease;
+}
+
+.context-menu-item:hover:not(:disabled) {
+  background: var(--btn-hover-bg);
+}
+
+.context-menu-item:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.context-menu-item--danger {
+  color: #ff6b6b;
+}
+
+.context-menu-item--danger:hover:not(:disabled) {
+  background: rgba(255, 107, 107, 0.15);
+}
+
+.context-menu-label {
+  flex: 1;
+}
+
+.context-menu-shortcut {
+  margin-left: 16px;
+  font-size: 9px;
+  opacity: 0.5;
 }
