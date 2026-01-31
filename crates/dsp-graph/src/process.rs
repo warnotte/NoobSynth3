@@ -25,6 +25,7 @@ use dsp_core::{
     MasterClockInputs, MasterClockOutputs, MasterClockParams,
     MidiFileSequencerInputs, MidiFileSequencerOutputs, MidiFileSequencerParams,
     Mixer, Crossfader, NesOscInputs, NesOscParams, NoiseParams,
+    ParticleCloudInputs, ParticleCloudParams,
     PhaserInputs, PhaserParams, PipeOrganInputs, PipeOrganParams, PitchShifterInputs, PitchShifterParams,
     Quantizer, QuantizerInputs, QuantizerParams,
     ResonatorInputs, ResonatorParams,
@@ -1887,6 +1888,40 @@ pub(crate) fn process_module(
             // Stereo output
             let (out_l, out_r) = outputs[0].channels_mut_2();
             state.granular.process_block(out_l, out_r, granular_inputs, params);
+        }
+        ModuleState::ParticleCloud(state) => {
+            // Input 0: audio in (for Input mode), Input 1: trigger
+            let audio_in = if !connections[0].is_empty() {
+                Some(inputs[0].channel(0))
+            } else {
+                None
+            };
+            let trigger = if connections.len() > 1 && !connections[1].is_empty() {
+                Some(inputs[1].channel(0))
+            } else {
+                None
+            };
+
+            let cloud_inputs = ParticleCloudInputs {
+                audio_in,
+                trigger,
+            };
+            let params = ParticleCloudParams {
+                count: state.count.slice(frames),
+                gravity: state.gravity.slice(frames),
+                turbulence: state.turbulence.slice(frames),
+                friction: state.friction.slice(frames),
+                grain_size: state.grain_size.slice(frames),
+                pitch: state.pitch.slice(frames),
+                spread: state.spread.slice(frames),
+                level: state.level.slice(frames),
+                mode: state.mode.slice(frames),
+                osc_shape: state.osc_shape.slice(frames),
+            };
+
+            // Stereo output
+            let (out_l, out_r) = outputs[0].channels_mut_2();
+            state.cloud.process_block(out_l, out_r, cloud_inputs, params);
         }
         ModuleState::SidPlayer(state) => {
             // Input 0: reset trigger (optional)

@@ -29,6 +29,8 @@ export class AudioEngine {
   private watchedSids: Set<string> = new Set()
   private ayVoiceCallbacks: Map<string, (voices: Array<{period: number, active: boolean, flags: number}>, elapsed: number) => void> = new Map()
   private watchedAys: Set<string> = new Set()
+  private particlePositionCallbacks: Map<string, (positions: Float32Array, activeCount: number) => void> = new Map()
+  private watchedParticles: Set<string> = new Set()
 
   async start(graph: GraphState): Promise<void> {
     await this.init()
@@ -313,6 +315,40 @@ export class AudioEngine {
     })
   }
 
+  watchParticlePositions(
+    moduleId: string,
+    callback: (positions: Float32Array, activeCount: number) => void
+  ): () => void {
+    this.particlePositionCallbacks.set(moduleId, callback)
+    this.watchedParticles.add(moduleId)
+    this.syncWatchedParticles()
+
+    return () => {
+      this.particlePositionCallbacks.delete(moduleId)
+      this.watchedParticles.delete(moduleId)
+      this.syncWatchedParticles()
+    }
+  }
+
+  private syncWatchedParticles(): void {
+    this.graphNode?.port.postMessage({
+      type: 'watchParticles',
+      moduleIds: Array.from(this.watchedParticles),
+    })
+  }
+
+  loadParticleBuffer(moduleId: string, data: Float32Array): Promise<number> {
+    return new Promise((resolve) => {
+      this.graphNode?.port.postMessage({
+        type: 'loadParticleBuffer',
+        moduleId,
+        data: Array.from(data),
+      })
+      // Buffer loading is async, just resolve with length
+      resolve(data.length)
+    })
+  }
+
   watchSidVoices(
     moduleId: string,
     callback: (voices: Array<{freq: number, gate: boolean, waveform: number}>, elapsed: number) => void
@@ -520,6 +556,14 @@ export class AudioEngine {
             callback(position)
           }
         }
+      } else if (data.type === 'particlePositions' && data.moduleId) {
+        const callback = this.particlePositionCallbacks.get(data.moduleId)
+        if (callback && data.positions) {
+          // Positions is [x0, y0, x1, y1, ..., x31, y31, activeCount]
+          const positions = new Float32Array(data.positions.slice(0, 64))
+          const activeCount = data.positions[64] ?? 0
+          callback(positions, activeCount)
+        }
       } else if (data.type === 'sidVoiceStates' && data.voices) {
         const elapsedMap = (data.elapsed || {}) as Record<string, number>
         for (const [moduleId, voiceData] of Object.entries(data.voices as Record<string, number[]>)) {
@@ -572,6 +616,11 @@ export class AudioEngine {
     // Re-send watched AYs if any
     if (this.watchedAys.size > 0) {
       this.syncWatchedAys()
+    }
+
+    // Re-send watched particles if any
+    if (this.watchedParticles.size > 0) {
+      this.syncWatchedParticles()
     }
 
     this.buildScopeAnalysers()

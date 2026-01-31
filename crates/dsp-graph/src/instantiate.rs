@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use dsp_core::{
   Adsr, Arpeggiator, AyPlayer, Chaos, Choir, Chorus, Clap808, Clap909, Compressor, Cowbell808, Delay, DrumSequencer, Ensemble,
   EuclideanSequencer, FmMatrix, FmOperator, Granular, GranularDelay, HiHat808, HiHat909, Hpf, KarplusStrong,
-  Kick808, Kick909, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, Phaser, PipeOrgan, PitchShifter,
+  Kick808, Kick909, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, ParticleCloud, Phaser, PipeOrgan, PitchShifter,
   Resonator, Reverb, Rimshot909, SampleHold, Shepard, SidPlayer, SlewLimiter, Snare808, Snare909, SnesOsc, SpectralSwarm, SpringReverb,
   StepSequencer, Supersaw, TapeDelay, Tb303, Tom808, Tom909, TuringMachine, Vcf, Vco, Vocoder, Wavetable,
 };
@@ -645,6 +645,19 @@ pub(crate) fn create_state(
       pan_spread: ParamBuffer::new(param_number(params, "panSpread", 0.5)),
       shape: ParamBuffer::new(param_number(params, "shape", 1.0)),
       level: ParamBuffer::new(param_number(params, "level", 0.8)),
+    }),
+    ModuleType::ParticleCloud => ModuleState::ParticleCloud(ParticleCloudState {
+      cloud: ParticleCloud::new(sample_rate),
+      count: ParamBuffer::new(param_number(params, "count", 16.0)),
+      gravity: ParamBuffer::new(param_number(params, "gravity", 0.0)),
+      turbulence: ParamBuffer::new(param_number(params, "turbulence", 0.3)),
+      friction: ParamBuffer::new(param_number(params, "friction", 0.1)),
+      grain_size: ParamBuffer::new(param_number(params, "grainSize", 100.0)),
+      pitch: ParamBuffer::new(param_number(params, "pitch", 1.0)),
+      spread: ParamBuffer::new(param_number(params, "spread", 0.8)),
+      level: ParamBuffer::new(param_number(params, "level", 0.8)),
+      mode: ParamBuffer::new(param_number(params, "mode", 0.0)),
+      osc_shape: ParamBuffer::new(param_number(params, "oscShape", 0.0)),
     }),
     ModuleType::Notes => ModuleState::Notes,  // UI-only, no DSP
     ModuleType::TuringMachine => ModuleState::TuringMachine(TuringState {
@@ -1298,6 +1311,19 @@ pub(crate) fn apply_param(state: &mut ModuleState, param: &str, value: f32) {
       "shape" => state.shape.set(value),
       "level" => state.level.set(value),
       "enabled" => state.granular.set_enabled(value > 0.5),
+      _ => {}
+    },
+    ModuleState::ParticleCloud(state) => match param {
+      "count" => state.count.set(value),
+      "gravity" => state.gravity.set(value),
+      "turbulence" => state.turbulence.set(value),
+      "friction" => state.friction.set(value),
+      "grainSize" => state.grain_size.set(value),
+      "pitch" => state.pitch.set(value),
+      "spread" => state.spread.set(value),
+      "level" => state.level.set(value),
+      "mode" => state.mode.set(value),
+      "oscShape" => state.osc_shape.set(value),
       _ => {}
     },
     ModuleState::TuringMachine(state) => match param {

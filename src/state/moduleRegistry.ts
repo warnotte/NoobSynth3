@@ -13,6 +13,7 @@ export const moduleSizes: Record<ModuleType, string> = {
   'resonator': '2x3',
   'wavetable': '2x3',
   'granular': '3x4',
+  'particle-cloud': '3x4',
   'mod-router': '2x2',
   'sample-hold': '2x1',
   slew: '1x2',
@@ -99,6 +100,7 @@ export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>>
   'resonator': 'strip',
   'wavetable': 'strip',
   'granular': 'strip',
+  'particle-cloud': 'strip',
   vcf: 'strip',
   control: 'strip',
   lab: 'strip',
@@ -197,6 +199,7 @@ export const moduleCatalog: { type: ModuleType; label: string; category: ModuleC
   { type: 'resonator', label: 'Resonator', category: 'sources' },
   { type: 'wavetable', label: 'Wavetable', category: 'sources' },
   { type: 'granular', label: 'Granular', category: 'sources' },
+  { type: 'particle-cloud', label: 'Particle Cloud', category: 'sources' },
   // Filters
   { type: 'vcf', label: 'VCF', category: 'filters' },
   { type: 'hpf', label: 'HPF', category: 'filters' },
@@ -278,6 +281,7 @@ export const modulePrefixes: Record<ModuleType, string> = {
   'resonator': 'res',
   'wavetable': 'wt',
   'granular': 'gran',
+  'particle-cloud': 'pcloud',
   'mod-router': 'modr',
   'sample-hold': 'sh',
   slew: 'slew',
@@ -363,6 +367,7 @@ export const moduleLabels: Record<ModuleType, string> = {
   'resonator': 'Resonator',
   'wavetable': 'Wavetable',
   'granular': 'Granular',
+  'particle-cloud': 'Particle Cloud',
   'mod-router': 'Mod Router',
   'sample-hold': 'S&H',
   slew: 'Slew',
@@ -543,6 +548,18 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     shape: 1,             // 0=Triangle, 1=Hann, 2=Tukey, 3=Gauss
     level: 0.8,           // Output level (0-1)
     enabled: 1,           // Playback enabled (0 or 1)
+  },
+  'particle-cloud': {
+    count: 16,            // Number of particles (1-32)
+    gravity: 0,           // Gravity force (-1 to +1)
+    turbulence: 0.3,      // Turbulence/chaos (0-1)
+    friction: 0.1,        // Friction/damping (0-1)
+    grainSize: 100,       // Grain size in ms (10-500)
+    pitch: 1.0,           // Base pitch multiplier (0.25-4)
+    spread: 0.8,          // Stereo spread (0-1)
+    level: 0.8,           // Output level (0-1)
+    mode: 0,              // 0=Osc, 1=Sample, 2=Input
+    oscShape: 0,          // 0=Sine, 1=Tri, 2=Saw, 3=Square, 4=Noise
   },
   'mod-router': { depthPitch: 0, depthPwm: 0, depthVcf: 0, depthVca: 0 },
   'sample-hold': { mode: 0 },

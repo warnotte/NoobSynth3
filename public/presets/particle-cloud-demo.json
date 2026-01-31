@@ -1,0 +1,97 @@
+{
+  "id": "particle-cloud-demo",
+  "name": "Particle Cloud Demo",
+  "description": "Animated particle granular synthesis with physics-driven panning and pitch.",
+  "group": "Granular Synth",
+  "graph": {
+    "modules": [
+      {
+        "id": "ctrl1",
+        "type": "control",
+        "name": "Control",
+        "position": { "col": 1, "row": 1 },
+        "params": {
+          "cv": 0,
+          "cvMode": "unipolar",
+          "velocity": 1,
+          "midiVelocity": true,
+          "gate": 0,
+          "glide": 0.02,
+          "midiEnabled": false,
+          "midiChannel": 0,
+          "midiRoot": 48,
+          "voices": 1,
+          "seqOn": false,
+          "seqTempo": 120,
+          "seqGate": 0.5
+        }
+      },
+      {
+        "id": "pcloud1",
+        "type": "particle-cloud",
+        "name": "Particle Cloud",
+        "position": { "col": 3, "row": 1 },
+        "params": {
+          "count": 16,
+          "gravity": 0,
+          "turbulence": 0.4,
+          "friction": 0.1,
+          "grainSize": 120,
+          "pitch": 1.0,
+          "spread": 0.85,
+          "level": 0.7,
+          "mode": 0,
+          "oscShape": 0
+        }
+      },
+      {
+        "id": "reverb1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "col": 6, "row": 1 },
+        "params": {
+          "decay": 4.5,
+          "mix": 0.4,
+          "damping": 0.5,
+          "size": 0.85,
+          "predelay": 30
+        }
+      },
+      {
+        "id": "out1",
+        "type": "output",
+        "name": "Output",
+        "position": { "col": 8, "row": 1 },
+        "params": {
+          "level": 1
+        }
+      },
+      {
+        "id": "notes1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "col": 1, "row": 4 },
+        "params": {
+          "text": "PARTICLE CLOUD DEMO\n\nParticles create animated grain textures.\nX position = stereo pan\nY position = pitch variation\n\n- Turb: Chaos of particle movement\n- Gravity: Pull up/down (-1 to +1)\n- Mode: OSC uses internal oscillator\n         SMPL for sample loading\n         IN for external audio\n\nPlay keyboard to trigger burst.\nWatch particles dance in the canvas!"
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "ctrl1", "portId": "gate-out" },
+        "to": { "moduleId": "pcloud1", "portId": "trigger" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "pcloud1", "portId": "out" },
+        "to": { "moduleId": "reverb1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb1", "portId": "out" },
+        "to": { "moduleId": "out1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

@@ -66,6 +66,8 @@ type GraphMessage =
   | { type: 'watchSids'; moduleIds: string[] }
   | { type: 'loadYmFile'; moduleId: string; data: Uint8Array }
   | { type: 'watchAyVoices'; moduleIds: string[] }
+  | { type: 'watchParticles'; moduleIds: string[] }
+  | { type: 'loadParticleBuffer'; moduleId: string; data: number[] }
 
 class WasmGraphProcessor extends AudioWorkletProcessor {
   private engine: InstanceType<NonNullable<typeof WasmGraphEngine>> | null = null
@@ -80,6 +82,7 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
   private lastPositions: Map<string, number> = new Map()
   private watchedSids: string[] = []
   private watchedAys: string[] = []
+  private watchedParticles: string[] = []
   private debugCounter = 0
   private messageQueue: GraphMessage[] = []
 
@@ -124,6 +127,10 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
     }
     if (message.type === 'watchAyVoices') {
       this.watchedAys = message.moduleIds
+      return
+    }
+    if (message.type === 'watchParticles') {
+      this.watchedParticles = message.moduleIds
       return
     }
     // Queue other messages to be processed in process() before render()
@@ -205,6 +212,9 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
         break
       case 'loadYmFile':
         this.engine!.load_ym_file(message.moduleId, message.data)
+        break
+      case 'loadParticleBuffer':
+        this.engine!.load_particle_buffer(message.moduleId, new Float32Array(message.data))
         break
       default:
         break
@@ -359,6 +369,21 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
       }
       if (Object.keys(updates).length > 0) {
         this.port.postMessage({ type: 'ayVoiceStates', voices: updates, elapsed })
+      }
+    }
+
+    // Poll particle positions
+    if (shouldPoll && this.watchedParticles.length > 0) {
+      for (const moduleId of this.watchedParticles) {
+        const positions = this.engine.get_particle_positions(moduleId)
+        if (positions.length === 65) {
+          // [x0, y0, x1, y1, ..., x31, y31, activeCount]
+          this.port.postMessage({
+            type: 'particlePositions',
+            moduleId,
+            positions: Array.from(positions),
+          })
+        }
       }
     }
 

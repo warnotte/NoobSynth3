@@ -50,6 +50,7 @@ pub use oscillators::{
     Resonator, ResonatorParams, ResonatorInputs,
     Wavetable, WavetableParams, WavetableInputs,
     Granular, GranularParams, GranularInputs, GrainShape,
+    ParticleCloud, ParticleCloudParams, ParticleCloudInputs, ParticleMode, OscShape,
 };
 
 // Re-export filters

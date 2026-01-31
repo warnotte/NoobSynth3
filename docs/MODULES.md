@@ -397,6 +397,40 @@ Synthétiseur FM complet à 4 opérateurs inspiré du DX7. Chaque opérateur a s
 - **mod** : Contrôle la brightness en temps réel (wobble bass)
 - **ratio-cv** : Modifie tous les ratios ensemble (sweep harmonique)
 
+### Particle Cloud
+
+Synthèse granulaire visuelle où des particules animées génèrent des grains audio.
+Chaque particule représente un grain : position X → panoramique, position Y → hauteur.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `count` | 1-32 | Nombre de particules actives |
+| `gravity` | -1 à 1 | Force gravitationnelle (négatif = monte) |
+| `turbulence` | 0-1 | Mouvement chaotique aléatoire |
+| `friction` | 0-1 | Amortissement des mouvements |
+| `grainSize` | 10-500 ms | Taille des grains |
+| `pitch` | 0.25-4 | Ratio de pitch de base |
+| `spread` | 0-1 | Largeur stéréo |
+| `level` | 0-1 | Volume de sortie |
+| `mode` | 0-2 | Source audio (voir ci-dessous) |
+| `oscShape` | 0-4 | Forme d'onde (mode OSC uniquement) |
+
+**Modes audio :**
+- **OSC** (0) : Oscillateur interne (sine, tri, saw, square, noise)
+- **SAMPLE** (1) : Grains lus depuis un buffer audio chargé
+- **INPUT** (2) : Granulation de l'entrée audio externe
+
+**Mapping position → son :**
+- Position X (gauche-droite) → Pan stéréo (-1 à +1)
+- Position Y (bas-haut) → Pitch (0.5x à 2x, soit ±1 octave)
+
+**Entrées** : in (audio - pour mode INPUT), trigger (gate - burst/reset)
+**Sorties** : out (audio stéréo)
+
+**Visualisation :**
+Le module affiche un canvas animé montrant les particules en mouvement.
+Couleur basée sur la hauteur (bleu=grave, orange=aigu).
+
 ---
 
 ## Filtres

@@ -129,6 +129,18 @@ impl WasmGraphEngine {
     Float32Array::from(&data[..])
   }
 
+  /// Get particle positions for a ParticleCloud module
+  /// Returns flattened array: [x0, y0, x1, y1, ..., x31, y31, active_count]
+  pub fn get_particle_positions(&self, module_id: &str) -> Float32Array {
+    let data = self.engine.get_particle_positions(module_id);
+    Float32Array::from(&data[..])
+  }
+
+  /// Load sample buffer into a ParticleCloud module
+  pub fn load_particle_buffer(&mut self, module_id: &str, data: &[f32]) {
+    self.engine.load_particle_buffer(module_id, data);
+  }
+
   /// Load a SID file into a SidPlayer module
   pub fn load_sid_file(&mut self, module_id: &str, data: &[u8]) {
     self.engine.load_sid_file(module_id, data);

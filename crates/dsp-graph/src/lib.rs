@@ -270,6 +270,36 @@ impl GraphEngine {
     -1.0
   }
 
+  /// Get particle positions for a ParticleCloud module
+  /// Returns flattened array: [x0, y0, x1, y1, ..., x31, y31, active_count]
+  /// Returns empty vec if module not found or not a particle cloud
+  pub fn get_particle_positions(&self, module_id: &str) -> Vec<f32> {
+    if let Some(index) = self.module_map.get(module_id).and_then(|list| list.first()) {
+      if let Some(module) = self.modules.get(*index) {
+        if let ModuleState::ParticleCloud(state) = &module.state {
+          let positions = state.cloud.get_positions();
+          let active = state.cloud.get_active_count();
+          let mut result = Vec::with_capacity(65);
+          result.extend_from_slice(positions);
+          result.push(active as f32);
+          return result;
+        }
+      }
+    }
+    Vec::new()
+  }
+
+  /// Load sample buffer into a ParticleCloud module
+  pub fn load_particle_buffer(&mut self, module_id: &str, data: &[f32]) {
+    if let Some(index) = self.module_map.get(module_id).and_then(|list| list.first().copied()) {
+      if let Some(module) = self.modules.get_mut(index) {
+        if let ModuleState::ParticleCloud(ref mut state) = module.state {
+          state.cloud.load_buffer(data);
+        }
+      }
+    }
+  }
+
   /// Seek MIDI file sequencer to a specific tick position
   pub fn seek_midi_sequencer(&mut self, module_id: &str, tick: u32) {
     if let Some(index) = self.module_map.get(module_id).and_then(|list| list.first().copied()) {
@@ -796,6 +826,7 @@ fn normalize_module_type(raw: &str) -> ModuleType {
     "resonator" => ModuleType::Resonator,
     "wavetable" => ModuleType::Wavetable,
     "granular" => ModuleType::Granular,
+    "particle-cloud" => ModuleType::ParticleCloud,
     // Documentation
     "notes" => ModuleType::Notes,
     // Effects

@@ -50,6 +50,15 @@ export type NativeGranularBridge = {
 }
 
 /**
+ * Bridge for native particle cloud operations (Tauri mode)
+ */
+export type NativeParticleBridge = {
+  isActive: boolean
+  getParticlePositions: (moduleId: string) => Promise<Float32Array>
+  loadParticleBuffer: (moduleId: string, data: Float32Array) => Promise<number>
+}
+
+/**
  * Props passed to all control render functions
  */
 export type ControlProps = {
@@ -71,6 +80,8 @@ export type ControlProps = {
   nativeSequencer?: NativeSequencerBridge | null
   /** Native granular bridge (Tauri mode) */
   nativeGranular?: NativeGranularBridge | null
+  /** Native particle cloud bridge (Tauri mode) */
+  nativeParticle?: NativeParticleBridge | null
   /** Update a module parameter */
   updateParam: (
     moduleId: string,

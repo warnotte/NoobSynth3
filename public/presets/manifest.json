@@ -1248,6 +1248,13 @@
       "group": "Granular Synth"
     },
     {
+      "id": "particle-cloud-demo",
+      "name": "Particle Cloud Demo",
+      "description": "Animated particle granular synthesis with physics-driven panning and pitch.",
+      "file": "particle-cloud-demo.json",
+      "group": "Granular Synth"
+    },
+    {
       "id": "sid-player-test",
       "name": "[C64] SID Player",
       "description": "Simple SID Player for testing C64 .sid files. Supports PSID and RSID formats.",

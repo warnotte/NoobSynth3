@@ -218,6 +218,11 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // position CV
       PortInfo { channels: 1 },  // pitch CV
     ],
+    // ParticleCloud - 2 inputs (audio in for Input mode, trigger)
+    ModuleType::ParticleCloud => vec![
+      PortInfo { channels: 1 },  // audio in (for Input mode)
+      PortInfo { channels: 1 },  // trigger
+    ],
     // SidPlayer - 1 input (reset)
     ModuleType::SidPlayer => vec![
       PortInfo { channels: 1 },  // reset trigger
@@ -431,6 +436,10 @@ pub fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
     ],
     // Granular - 1 stereo output
     ModuleType::Granular => vec![
+      PortInfo { channels: 2 },  // stereo out
+    ],
+    // ParticleCloud - 1 stereo output
+    ModuleType::ParticleCloud => vec![
       PortInfo { channels: 2 },  // stereo out
     ],
     // SidPlayer - 1 stereo output + 3 gates + 3 CVs + 3 waveform CVs
@@ -759,6 +768,12 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
       "pitch" | "pitch-cv" => Some(3),
       _ => None,
     },
+    // ParticleCloud - 2 inputs
+    ModuleType::ParticleCloud => match port_id {
+      "in" | "audio" | "audio-in" => Some(0),
+      "trigger" | "trig" => Some(1),
+      _ => None,
+    },
     // SidPlayer - 1 input
     ModuleType::SidPlayer => match port_id {
       "reset" | "rst" => Some(0),
@@ -1084,6 +1099,11 @@ pub fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize
     },
     // Granular - 1 stereo output
     ModuleType::Granular => match port_id {
+      "out" | "output" => Some(0),
+      _ => None,
+    },
+    // ParticleCloud - 1 stereo output
+    ModuleType::ParticleCloud => match port_id {
       "out" | "output" => Some(0),
       _ => None,
     },

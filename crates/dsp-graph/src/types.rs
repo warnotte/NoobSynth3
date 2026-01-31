@@ -21,6 +21,7 @@ pub enum ModuleType {
     Resonator,
     Wavetable,
     Granular,
+    ParticleCloud,
 
     // Filters
     Vcf,

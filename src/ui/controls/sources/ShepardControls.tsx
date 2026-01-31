@@ -9,6 +9,7 @@ import type { ControlProps } from '../types'
 import { RotaryKnob } from '../../RotaryKnob'
 import { ControlBox } from '../../ControlBox'
 import { ControlButtons } from '../../ControlButtons'
+import { WaveformButtons, WAVE_OPTIONS_STANDARD } from '../../WaveformSelector'
 import { formatInt, formatPercent, formatDecimal2 } from '../../formatters'
 
 export function ShepardControls({ module, updateParam }: ControlProps) {
@@ -143,13 +144,8 @@ export function ShepardControls({ module, updateParam }: ControlProps) {
         format={formatPercent}
       />
       <ControlBox label="Wave" compact>
-        <ControlButtons
-          options={[
-            { id: 0, label: 'SIN' },
-            { id: 1, label: 'TRI' },
-            { id: 2, label: 'SAW' },
-            { id: 3, label: 'SQR' },
-          ]}
+        <WaveformButtons
+          options={WAVE_OPTIONS_STANDARD}
           value={waveform}
           onChange={(value) => updateParam(module.id, 'waveform', value)}
         />

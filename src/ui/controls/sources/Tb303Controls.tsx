@@ -8,7 +8,7 @@
 import type { ControlProps } from '../types'
 import { RotaryKnob } from '../../RotaryKnob'
 import { ControlBox } from '../../ControlBox'
-import { ControlButtons } from '../../ControlButtons'
+import { WaveformButtons, WAVE_OPTIONS_303 } from '../../WaveformSelector'
 import { formatFreq, formatPercent, formatDecimal2, formatMs } from '../../formatters'
 
 export function Tb303Controls({ module, updateParam }: ControlProps) {
@@ -23,11 +23,8 @@ export function Tb303Controls({ module, updateParam }: ControlProps) {
   return (
     <>
       <ControlBox label="Wave" compact>
-        <ControlButtons
-          options={[
-            { id: 0, label: 'SAW' },
-            { id: 1, label: 'SQ' },
-          ]}
+        <WaveformButtons
+          options={WAVE_OPTIONS_303}
           value={waveform < 0.5 ? 0 : 1}
           onChange={(value) => updateParam(module.id, 'waveform', value)}
         />

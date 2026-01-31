@@ -3,7 +3,7 @@
 use dsp_core::{
     Adsr, Arpeggiator, AyPlayer, Chaos, Choir, Chorus, Clap808, Clap909, Compressor, Cowbell808, Delay, DrumSequencer, Ensemble,
     EuclideanSequencer, FmMatrix, FmOperator, Granular, GranularDelay, HiHat808, HiHat909, Hpf, KarplusStrong,
-    Kick808, Kick909, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, Phaser, PipeOrgan, PitchShifter,
+    Kick808, Kick909, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, ParticleCloud, Phaser, PipeOrgan, PitchShifter,
     Resonator, Reverb, Rimshot909, SampleHold, Shepard, SidPlayer, SlewLimiter, Snare808, Snare909, SnesOsc, SpectralSwarm, SpringReverb,
     StepSequencer, Supersaw, TapeDelay, Tb303, Tom808, Tom909, TuringMachine, Vcf, Vco, Vocoder, Wavetable,
 };
@@ -242,6 +242,20 @@ pub struct GranularState {
     pub pan_spread: ParamBuffer,
     pub shape: ParamBuffer,
     pub level: ParamBuffer,
+}
+
+pub struct ParticleCloudState {
+    pub cloud: ParticleCloud,
+    pub count: ParamBuffer,
+    pub gravity: ParamBuffer,
+    pub turbulence: ParamBuffer,
+    pub friction: ParamBuffer,
+    pub grain_size: ParamBuffer,
+    pub pitch: ParamBuffer,
+    pub spread: ParamBuffer,
+    pub level: ParamBuffer,
+    pub mode: ParamBuffer,
+    pub osc_shape: ParamBuffer,
 }
 
 // =============================================================================
@@ -755,6 +769,7 @@ pub enum ModuleState {
     Resonator(ResonatorState),
     Wavetable(WavetableState),
     Granular(GranularState),
+    ParticleCloud(ParticleCloudState),
 
     // Filters
     Vcf(VcfState),

@@ -23,6 +23,7 @@ import { PipeOrganControls } from './PipeOrganControls'
 import { SpectralSwarmControls } from './SpectralSwarmControls'
 import { ResonatorControls } from './ResonatorControls'
 import { WavetableControls } from './WavetableControls'
+import { ParticleCloudControls } from './ParticleCloudControls'
 
 // Granular is already extracted to its own file
 import { GranularControls } from '../GranularControls'
@@ -89,6 +90,17 @@ export function renderSourceControls(props: ControlProps): React.ReactElement | 
         />
       )
 
+    case 'particle-cloud':
+      return (
+        <ParticleCloudControls
+          module={module}
+          engine={props.engine}
+          audioMode={props.audioMode}
+          nativeParticle={props.nativeParticle}
+          updateParam={props.updateParam}
+        />
+      )
+
     default:
       return null
   }
@@ -110,4 +122,5 @@ export {
   SpectralSwarmControls,
   ResonatorControls,
   WavetableControls,
+  ParticleCloudControls,
 }

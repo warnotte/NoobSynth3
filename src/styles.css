@@ -1604,6 +1604,28 @@
   cursor: not-allowed;
 }
 
+/* Particle Cloud module layout - vertical stacking like granular */
+.module-card[data-module-type="particle-cloud"] .module-controls {
+  display: flex !important;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-height: 0;
+}
+
+.particle-cloud-viz {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: center;
+  padding: 8px 0;
+}
+
+.particle-cloud-viz canvas {
+  box-shadow:
+    inset 0 2px 8px rgba(0, 0, 0, 0.4),
+    0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
 /* ============================================
    SECTION 15: PATCH CABLES
    ============================================ */
