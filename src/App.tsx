@@ -41,6 +41,7 @@ import { PatchLayer } from './ui/PatchLayer'
 import { RackView } from './ui/RackView'
 import { SidePanel } from './ui/SidePanel'
 import { TopBar } from './ui/TopBar'
+import { ContextMenu, type ContextMenuAction } from './ui/ContextMenu'
 import './styles.css'
 
 type NativeTap = {
@@ -353,6 +354,11 @@ function App() {
   const [cablesVisible, setCablesVisible] = useState(true)
   const [moduleSizeOverrides, setModuleSizeOverrides] = useState<Record<string, string>>({})
   const [moduleResizePreview, setModuleResizePreview] = useState<ModuleResizePreview | null>(null)
+  const [contextMenu, setContextMenu] = useState<{
+    moduleId: string
+    x: number
+    y: number
+  } | null>(null)
   const rackRef = useRef<HTMLDivElement | null>(null)
   const modulesRef = useRef<HTMLDivElement | null>(null)
   const presetFileRef = useRef<HTMLInputElement | null>(null)
@@ -2130,6 +2136,59 @@ function App() {
     })
   }
 
+  const handleModuleContextMenu = (moduleId: string, x: number, y: number) => {
+    setContextMenu({ moduleId, x, y })
+  }
+
+  const handleContextMenuAction = (actionId: string) => {
+    if (!contextMenu) return
+    const { moduleId } = contextMenu
+
+    switch (actionId) {
+      case 'duplicate': {
+        const current = graphRef.current
+        const module = current.modules.find((m) => m.id === moduleId)
+        if (module) {
+          const newModule = buildModuleSpec(module.type as ModuleType, current.modules)
+          newModule.params = { ...module.params }
+          newModule.name = `${module.name} Copy`
+          // Use layoutGraph to find a free position
+          const nextGraph = layoutGraph(
+            { ...current, modules: [...current.modules, newModule] },
+            moduleSizes,
+            gridMetricsRef.current,
+            { getModuleSize }
+          )
+          applyGraphUpdate(nextGraph)
+        }
+        break
+      }
+      case 'disconnect': {
+        const current = graphRef.current
+        const nextConnections = current.connections.filter(
+          (c) => c.from.moduleId !== moduleId && c.to.moduleId !== moduleId
+        )
+        applyGraphUpdate({ ...current, connections: nextConnections })
+        break
+      }
+      case 'delete':
+        handleRemoveModule(moduleId)
+        break
+    }
+  }
+
+  const getContextMenuActions = (): ContextMenuAction[] => {
+    if (!contextMenu) return []
+    const module = graphRef.current.modules.find((m) => m.id === contextMenu.moduleId)
+    const isOutput = module?.type === 'output'
+
+    return [
+      { id: 'duplicate', label: 'Duplicate', shortcut: 'Ctrl+D' },
+      { id: 'disconnect', label: 'Disconnect All' },
+      { id: 'delete', label: 'Delete', shortcut: 'Del', danger: true, disabled: isOutput },
+    ]
+  }
+
   const handleClearRack = () => {
     setGridError(null)
     applyGraphUpdate({ modules: [], connections: [] })
@@ -2202,6 +2261,7 @@ function App() {
           onToggleCollapsed={() => setRackCollapsed((prev) => !prev)}
           getModuleGridStyle={getModuleGridStyle}
           onRemoveModule={handleRemoveModule}
+          onModuleContextMenu={handleModuleContextMenu}
           onHeaderPointerDown={handleModulePointerDown}
           getModuleSize={getModuleSize}
           showResizeHandles={devResizeEnabled}
@@ -2272,6 +2332,15 @@ function App() {
         renderCable={renderCable}
         renderGhostCable={renderGhostCable}
       />
+      {contextMenu && (
+        <ContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          actions={getContextMenuActions()}
+          onAction={handleContextMenuAction}
+          onClose={() => setContextMenu(null)}
+        />
+      )}
     </div>
   )
 }

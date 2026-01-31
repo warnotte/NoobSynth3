@@ -4448,3 +4448,61 @@ textarea:focus-visible,
     --rack-unit-y: 92px;
   }
 }
+
+/* ============================================
+   CONTEXT MENU
+   ============================================ */
+
+.context-menu {
+  min-width: 160px;
+  padding: 4px;
+  background: var(--glass-3);
+  border: 1px solid var(--btn-inactive-border);
+  border-radius: var(--btn-radius);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(12px);
+}
+
+.context-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--btn-inactive-text);
+  font-size: 11px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.1s ease;
+}
+
+.context-menu-item:hover:not(:disabled) {
+  background: var(--btn-hover-bg);
+}
+
+.context-menu-item:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.context-menu-item--danger {
+  color: #ff6b6b;
+}
+
+.context-menu-item--danger:hover:not(:disabled) {
+  background: rgba(255, 107, 107, 0.15);
+}
+
+.context-menu-label {
+  flex: 1;
+}
+
+.context-menu-shortcut {
+  margin-left: 16px;
+  font-size: 9px;
+  opacity: 0.5;
+}

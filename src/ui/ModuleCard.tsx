@@ -11,6 +11,7 @@ type ModuleCardProps = {
   portLayout?: 'stacked' | 'strip'
   removable?: boolean
   onRemove?: (moduleId: string) => void
+  onContextMenu?: (moduleId: string, x: number, y: number) => void
   onHeaderPointerDown?: (
     moduleId: string,
     event: React.PointerEvent<HTMLDivElement>,
@@ -41,6 +42,7 @@ export const ModuleCard = ({
   portLayout = 'stacked',
   removable = true,
   onRemove,
+  onContextMenu,
   onHeaderPointerDown,
   showResizeHandle = false,
   onResizeHandlePointerDown,
@@ -55,6 +57,12 @@ export const ModuleCard = ({
     className={`module-card module-size-${size} layout-${portLayout}`}
     data-module-type={module.type}
     style={style}
+    onContextMenu={(e) => {
+      if (onContextMenu) {
+        e.preventDefault()
+        onContextMenu(module.id, e.clientX, e.clientY)
+      }
+    }}
   >
     <div className="module-header" onPointerDown={(event) => onHeaderPointerDown?.(module.id, event)}>
       <div>
