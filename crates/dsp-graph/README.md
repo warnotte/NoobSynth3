@@ -14,14 +14,16 @@ Moteur d'exécution du graphe modulaire. Parse le JSON et exécute les modules D
 
 ```
 src/
-├── lib.rs          # GraphEngine, routing, ModuleType enum (737 lignes)
-├── process.rs      # Traitement DSP de tous les modules (1118 lignes)
-├── instantiate.rs  # Création des modules et paramètres (835 lignes)
-├── state.rs        # Structs d'état pour chaque module (535 lignes)
-├── ports.rs        # Définitions des ports I/O (675 lignes)
-├── types.rs        # Types de base (ModuleType, PortKind) (132 lignes)
-└── buffer.rs       # Gestion des buffers audio (127 lignes)
+├── lib.rs          # GraphEngine, routing, ModuleType enum (~1020 lignes)
+├── process.rs      # Traitement DSP de tous les modules (~2065 lignes)
+├── instantiate.rs  # Création des modules et paramètres (~1380 lignes)
+├── state.rs        # Structs d'état pour chaque module (~850 lignes)
+├── ports.rs        # Définitions des ports I/O (~1140 lignes)
+├── types.rs        # Types de base (ModuleType, PortKind) (~156 lignes)
+└── buffer.rs       # Gestion des buffers audio (~133 lignes)
 ```
+
+**Total : ~6745 lignes**
 
 | Fichier | Responsabilité |
 |---------|----------------|

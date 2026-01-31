@@ -29,6 +29,7 @@ src/ui/controls/
 │   ├── SpectralSwarmControls.tsx
 │   ├── ResonatorControls.tsx
 │   ├── WavetableControls.tsx
+│   ├── ParticleCloudControls.tsx
 │   └── shared/
 │       └── sidWaveformHelpers.ts  # Helpers CV pour NES/SNES
 │

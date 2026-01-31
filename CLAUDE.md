@@ -152,7 +152,7 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 
 ### Documentation (obligatoire)
 - [ ] `docs/MODULES.md` - Documentation complète du module
-- [ ] `README.md` - Mettre à jour le compte de modules (actuellement 69)
+- [ ] `README.md` - Mettre à jour le compte de modules (actuellement 74)
 - [ ] `CLAUDE.md` - Ajouter à la liste "Module Types" si pertinent
 
 ### Optionnel

@@ -13,28 +13,37 @@ Bibliothèque DSP (Digital Signal Processing) pure Rust, sans dépendances exter
 
 ```
 src/
-├── lib.rs              # Exports publics (197 lignes)
-├── common.rs           # Utilitaires partagés (223 lignes)
-├── oscillators/        # Sources sonores (~1500 lignes)
+├── lib.rs              # Exports publics
+├── common.rs           # Utilitaires partagés
+├── oscillators/        # Sources sonores (18 modules)
 │   ├── vco.rs          # VCO principal (unison, PWM, FM, sub, sync)
 │   ├── supersaw.rs     # 7 voix désaccordées
 │   ├── karplus.rs      # Karplus-Strong (cordes pincées)
 │   ├── fm_op.rs        # Opérateur FM avec ADSR
+│   ├── fm_matrix.rs    # Matrice FM 4 opérateurs
 │   ├── tb303.rs        # Émulation TB-303 (osc + filtre intégré)
 │   ├── nes_osc.rs      # Émulation 2A03 (pulse, triangle, noise)
 │   ├── snes_osc.rs     # Émulation S-DSP avec wavetables
 │   ├── noise.rs        # Bruit white/pink/brown
-│   └── sine_osc.rs     # Oscillateur sinusoïdal simple
-├── filters/            # Filtres (~426 lignes)
+│   ├── sine_osc.rs     # Oscillateur sinusoïdal simple
+│   ├── shepard.rs      # Tons Shepard (illusion auditive)
+│   ├── pipe_organ.rs   # Orgue à tuyaux (8 registres)
+│   ├── spectral_swarm.rs # Essaim d'oscillateurs
+│   ├── resonator.rs    # Résonance sympathique (Rings-style)
+│   ├── wavetable.rs    # Synthèse wavetable
+│   ├── granular.rs     # Synthèse granulaire
+│   └── particle_cloud.rs # Nuage de particules sonores
+├── filters/            # Filtres
 │   ├── vcf.rs          # VCF multi-mode (SVF/Ladder, LP/HP/BP/Notch)
 │   └── hpf.rs          # High-pass 1-pole
-├── modulators/         # Modulation (~657 lignes)
+├── modulators/         # Modulation
 │   ├── adsr.rs         # Enveloppe ADSR
 │   ├── lfo.rs          # LFO (4 formes d'onde)
 │   ├── sample_hold.rs  # Sample & Hold / Track & Hold
 │   ├── slew.rs         # Slew limiter (portamento)
-│   └── quantizer.rs    # Quantification de notes
-├── effects/            # Effets audio (~2000 lignes)
+│   ├── quantizer.rs    # Quantification de notes
+│   └── chaos.rs        # Chaos generator (Lorenz)
+├── effects/            # Effets audio (15 modules)
 │   ├── chorus.rs       # Chorus stéréo BBD-style
 │   ├── ensemble.rs     # Chorus large (strings)
 │   ├── choir.rs        # Formant filter (voyelles)
@@ -48,28 +57,43 @@ src/
 │   ├── distortion.rs   # Saturation soft/hard/foldback
 │   ├── wavefolder.rs   # Wavefolding (Buchla-style)
 │   ├── pitch_shifter.rs # Pitch shifter granulaire
-│   └── ring_mod.rs     # Ring modulation
-├── drums/              # TR-909 drums (~1000 lignes)
-│   ├── kick.rs         # Kick drum
-│   ├── snare.rs        # Snare drum
-│   ├── hihat.rs        # Hi-hat (closed/open)
-│   ├── clap.rs         # Handclap
-│   ├── tom.rs          # Tom
-│   └── rimshot.rs      # Rimshot
-└── sequencers/         # Séquenceurs (~2700 lignes)
+│   ├── ring_mod.rs     # Ring modulation
+│   └── compressor.rs   # Compresseur dynamique
+├── drums/              # TR-909 + TR-808 drums (13 modules)
+│   ├── kick.rs         # 909 Kick drum
+│   ├── snare.rs        # 909 Snare drum
+│   ├── hihat.rs        # 909 Hi-hat (closed/open)
+│   ├── clap.rs         # 909 Handclap
+│   ├── tom.rs          # 909 Tom
+│   ├── rimshot.rs      # 909 Rimshot
+│   ├── kick808.rs      # 808 Kick drum
+│   ├── snare808.rs     # 808 Snare drum
+│   ├── hihat808.rs     # 808 Hi-hat
+│   ├── clap808.rs      # 808 Handclap
+│   ├── cowbell808.rs   # 808 Cowbell
+│   └── tom808.rs       # 808 Tom
+├── chips/              # Émulations de puces
+│   ├── sid.rs          # MOS 6581/8580 (C64)
+│   ├── ay3_8910.rs     # AY-3-8910 (ZX Spectrum, CPC, MSX)
+│   └── cpu6502.rs      # Émulation CPU 6502 (pour SID)
+└── sequencers/         # Séquenceurs (11 modules)
     ├── clock.rs        # Master clock
-    ├── arpeggiator.rs  # Arpégiateur (757 lignes)
-    ├── step_sequencer.rs # Séquenceur 16 steps (567 lignes)
-    ├── drum_sequencer.rs # Séquenceur drums 8 pistes (494 lignes)
+    ├── arpeggiator.rs  # Arpégiateur
+    ├── step_sequencer.rs # Séquenceur 16 steps
+    ├── drum_sequencer.rs # Séquenceur drums 8 pistes
     ├── euclidean.rs    # Séquenceur euclidien
-    └── mario.rs        # Séquenceur Mario (Easter egg)
+    ├── mario.rs        # Séquenceur Mario (Easter egg)
+    ├── midi_file_sequencer.rs # Lecteur MIDI
+    ├── sid_player.rs   # Lecteur SID (C64)
+    ├── ay_player.rs    # Lecteur AY (Spectrum/CPC/Atari)
+    └── turing.rs       # Machine de Turing (aléatoire)
 ```
 
-**Total : ~9200 lignes en 48 fichiers**
+**Total : ~18000 lignes en 70+ fichiers**
 
 ## Modules
 
-### Oscillateurs
+### Oscillateurs (16)
 
 | Struct | Description |
 |--------|-------------|
@@ -77,19 +101,27 @@ src/
 | `Supersaw` | 7 voix désaccordées |
 | `KarplusStrong` | Cordes pincées (physical modeling) |
 | `FmOperator` | Opérateur FM avec enveloppe ADSR |
+| `FmMatrix` | Matrice FM 4 opérateurs |
 | `Tb303` | Émulation TB-303 (oscillateur + filtre intégré) |
 | `NesOsc` | Émulation 2A03 (pulse, triangle, noise) |
 | `SnesOsc` | Émulation S-DSP avec wavetables |
 | `Noise` | Bruit white/pink/brown |
+| `Shepard` | Tons Shepard (illusion ascendante infinie) |
+| `PipeOrgan` | Orgue à tuyaux 8 registres |
+| `SpectralSwarm` | Essaim d'oscillateurs |
+| `Resonator` | Résonance sympathique (Rings-style) |
+| `Wavetable` | Synthèse wavetable |
+| `Granular` | Synthèse granulaire |
+| `ParticleCloud` | Nuage de particules audio |
 
-### Filtres
+### Filtres (2)
 
 | Struct | Description |
 |--------|-------------|
 | `Vcf` | VCF multi-mode (SVF/Ladder, LP/HP/BP/Notch, 12/24dB) |
 | `Hpf` | High-pass simple 1-pole |
 
-### Modulation
+### Modulation (6)
 
 | Struct | Description |
 |--------|-------------|
@@ -98,8 +130,9 @@ src/
 | `SampleHold` | Sample & Hold / Track & Hold |
 | `SlewLimiter` | Limiteur de pente (portamento) |
 | `Quantizer` | Quantification de notes (12 gammes) |
+| `Chaos` | Générateur chaotique (Lorenz) |
 
-### Effets
+### Effets (15)
 
 | Struct | Description |
 |--------|-------------|
@@ -117,8 +150,9 @@ src/
 | `Wavefolder` | Wavefolding (Buchla-style) |
 | `PitchShifter` | Pitch shifter granulaire (-24 à +24 semitones) |
 | `RingMod` | Multiplication de signaux (ring modulation) |
+| `Compressor` | Compresseur dynamique |
 
-### TR-909 Drums
+### TR-909 Drums (6)
 
 | Struct | Description |
 |--------|-------------|
@@ -129,7 +163,18 @@ src/
 | `Tom909` | Tom avec tune/decay |
 | `Rimshot909` | Rimshot avec tune |
 
-### Séquenceurs
+### TR-808 Drums (6)
+
+| Struct | Description |
+|--------|-------------|
+| `Kick808` | Kick drum avec tune/decay/click/level |
+| `Snare808` | Snare avec tune/tone/snappy/decay |
+| `HiHat808` | Hi-hat avec tune/decay |
+| `Clap808` | Handclap avec tone/decay |
+| `Cowbell808` | Cowbell avec tune/decay |
+| `Tom808` | Tom avec tune/decay |
+
+### Séquenceurs (10)
 
 | Struct | Description |
 |--------|-------------|
@@ -139,6 +184,10 @@ src/
 | `DrumSequencer` | Séquenceur drums 8 pistes × 16 steps |
 | `EuclideanSequencer` | Générateur de patterns euclidiens |
 | `Mario` | Séquenceur Mario (Easter egg) |
+| `MidiFileSequencer` | Lecteur de fichiers MIDI |
+| `SidPlayer` | Lecteur de fichiers SID (C64) |
+| `AyPlayer` | Lecteur de fichiers YM/VTX (Spectrum/CPC/Atari) |
+| `Turing` | Machine de Turing (séquences pseudo-aléatoires) |
 
 ## Utilisation
 

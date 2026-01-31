@@ -226,34 +226,6 @@ Synthèse additive avec essaim de partiels évolutifs. Crée des textures organi
 - Sawtooth Chorus, Formant Voice, Frozen Pad
 - Odd Hollow, Evolving Bass
 
-### Bowed String
-
-Synthèse par modélisation physique d'instruments à cordes frottées (violon, violoncelle, erhu).
-Utilise un guide d'onde avec modèle de friction d'archet et résonances de corps modales.
-
-| Paramètre | Range | Description |
-|-----------|-------|-------------|
-| `frequency` | 40-880 Hz | Fréquence de base |
-| `bowPressure` | 0-1 | Pression de l'archet sur la corde |
-| `bowPosition` | 0-1 | Position sur la corde (0=chevalet, 1=touche) |
-| `bowVelocity` | 0-1 | Vitesse de l'archet |
-| `brightness` | 0-1 | Brillance / contenu hautes fréquences |
-| `body` | 0-1 | Résonance du corps de l'instrument |
-| `vibratoRate` | 0-10 Hz | Vitesse du vibrato |
-| `vibratoDepth` | 0-1 | Profondeur du vibrato (en demi-tons) |
-| `attack` | 0.01-2 s | Temps d'attaque de l'enveloppe |
-| `release` | 0.01-5 s | Temps de relâchement |
-
-**Entrées** : pitch (CV), gate (gate), pressure (CV), bow (CV)
-**Sorties** : out (audio)
-
-**Conseils son :**
-- **Violon** : bowPosition 0.3-0.4, brightness 0.7-0.8, body 0.5-0.6
-- **Violoncelle** : frequency basse, bowPressure élevé, body 0.7+
-- **Erhu** : bowPosition 0.2-0.3, brightness 0.9, body faible, vibrato via LFO
-
-**Presets (3)** : bowed-violin, bowed-cello, bowed-erhu
-
 ### Resonator
 
 Module de résonance sympathique inspiré de Mutable Instruments Rings.
