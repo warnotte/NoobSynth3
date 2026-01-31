@@ -13,7 +13,7 @@ export const moduleSizes: Record<ModuleType, string> = {
   'resonator': '2x3',
   'wavetable': '2x3',
   'granular': '3x4',
-  'particle-cloud': '3x4',
+  'particle-cloud': '2x3',
   'mod-router': '2x2',
   'sample-hold': '2x1',
   slew: '1x2',
