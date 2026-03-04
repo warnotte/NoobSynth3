@@ -1,0 +1,215 @@
+{
+  "id": "vocal-cathedral",
+  "name": "Vocal Cathedral",
+  "description": "Ethereal choral pad morphing through vowels A→E→I→O→U with cathedral reverb.",
+  "group": "Vocal Synthesis",
+  "graph": {
+    "modules": [
+      {
+        "id": "ctrl-1",
+        "type": "control",
+        "name": "Control",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "cv": 0,
+          "cvMode": "unipolar",
+          "velocity": 1,
+          "midiVelocity": true,
+          "gate": 0,
+          "glide": 0.02,
+          "voices": 4
+        }
+      },
+      {
+        "id": "supersaw-1",
+        "type": "supersaw",
+        "name": "Supersaw",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "frequency": 220,
+          "detune": 30,
+          "mix": 0.9
+        }
+      },
+      {
+        "id": "vcf-1",
+        "type": "vcf",
+        "name": "VCF",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "cutoff": 1200,
+          "resonance": 0.25,
+          "drive": 0.05,
+          "envAmount": 0.4,
+          "modAmount": 0,
+          "keyTrack": 0.5,
+          "model": "svf",
+          "mode": "lp",
+          "slope": 12
+        }
+      },
+      {
+        "id": "vca-1",
+        "type": "gain",
+        "name": "VCA",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "gain": 0.8
+        }
+      },
+      {
+        "id": "choir-1",
+        "type": "choir",
+        "name": "Choir",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "vowel": 0,
+          "rate": 0.15,
+          "depth": 0.4,
+          "mix": 0.65
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Cathedral",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "time": 0.92,
+          "damp": 0.2,
+          "preDelay": 25,
+          "mix": 0.45
+        }
+      },
+      {
+        "id": "adsr-1",
+        "type": "adsr",
+        "name": "Amp Env",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "attack": 0.8,
+          "decay": 0.5,
+          "sustain": 0.75,
+          "release": 2.0
+        }
+      },
+      {
+        "id": "adsr-2",
+        "type": "adsr",
+        "name": "Filter Env",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "attack": 1.2,
+          "decay": 0.8,
+          "sustain": 0.5,
+          "release": 1.5
+        }
+      },
+      {
+        "id": "lfo-1",
+        "type": "lfo",
+        "name": "Vowel LFO",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "rate": 0.08,
+          "depth": 1.0,
+          "offset": 0,
+          "shape": "sine",
+          "bipolar": true
+        }
+      },
+      {
+        "id": "output-1",
+        "type": "output",
+        "name": "Output",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "level": 1
+        }
+      },
+      {
+        "id": "scope-1",
+        "type": "scope",
+        "name": "Scope",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "time": 1,
+          "gain": 1,
+          "freeze": false,
+          "mode": "scope"
+        }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 0, "y": 10 },
+        "params": {
+          "text": "VOCAL CATHEDRAL\n\nEthereal choral pad that slowly morphs through all vowels (A-E-I-O-U).\n\nSignal: Supersaw → VCF (LP 12dB) → VCA → Choir → Cathedral Reverb → Output\n\n- Supersaw: Rich harmonics (detune 30, mix 0.9)\n- VCF: Shaped by slow filter envelope (ADSR-2)\n- VCA: Controlled by amp envelope (ADSR-1) with slow attack\n- Choir: Vowel swept by very slow LFO (0.08Hz = ~12s cycle)\n- Reverb: Long decay (0.92) with low damping = cathedral ambiance\n\nPlay sustained chords (C3-C5) and listen to the vowels morph.\nTry adjusting LFO rate for faster/slower vowel sweeps."
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "cv-out" },
+        "to": { "moduleId": "supersaw-1", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "gate-out" },
+        "to": { "moduleId": "adsr-1", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "gate-out" },
+        "to": { "moduleId": "adsr-2", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "supersaw-1", "portId": "out" },
+        "to": { "moduleId": "vcf-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "adsr-2", "portId": "env" },
+        "to": { "moduleId": "vcf-1", "portId": "env" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "vcf-1", "portId": "out" },
+        "to": { "moduleId": "vca-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "adsr-1", "portId": "env" },
+        "to": { "moduleId": "vca-1", "portId": "cv" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "vca-1", "portId": "out" },
+        "to": { "moduleId": "choir-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "lfo-1", "portId": "cv-out" },
+        "to": { "moduleId": "choir-1", "portId": "vowel" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "choir-1", "portId": "out" },
+        "to": { "moduleId": "reverb-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb-1", "portId": "out" },
+        "to": { "moduleId": "output-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb-1", "portId": "out" },
+        "to": { "moduleId": "scope-1", "portId": "in-a" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

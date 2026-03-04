@@ -1330,6 +1330,27 @@
       "description": "Test compressor on 909 drum transients.",
       "file": "compressor-drums.json",
       "group": "Module Tests"
+    },
+    {
+      "id": "vocal-cathedral",
+      "name": "Vocal Cathedral",
+      "description": "Ethereal choral pad morphing through vowels A→E→I→O→U with cathedral reverb.",
+      "file": "vocal-cathedral.json",
+      "group": "Vocal Synthesis"
+    },
+    {
+      "id": "android-dreams",
+      "name": "Android Dreams",
+      "description": "Robotic singing voice with arpeggiator, chaos engine, and glitchy pitch shifting.",
+      "file": "android-dreams.json",
+      "group": "Vocal Synthesis"
+    },
+    {
+      "id": "throat-singer",
+      "name": "Throat Singer",
+      "description": "Diphonic overtone singing simulation with parallel formants and spectral harmonics.",
+      "file": "throat-singer.json",
+      "group": "Vocal Synthesis"
     }
   ]
 }

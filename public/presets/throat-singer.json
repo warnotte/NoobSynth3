@@ -1,0 +1,374 @@
+{
+  "id": "throat-singer",
+  "name": "Throat Singer",
+  "description": "Diphonic overtone singing simulation with parallel formants and spectral harmonics.",
+  "group": "Vocal Synthesis",
+  "graph": {
+    "modules": [
+      {
+        "id": "ctrl-1",
+        "type": "control",
+        "name": "Control",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "cv": 0,
+          "cvMode": "unipolar",
+          "velocity": 1,
+          "midiVelocity": true,
+          "gate": 0,
+          "glide": 0.05,
+          "voices": 4
+        }
+      },
+      {
+        "id": "swarm-1",
+        "type": "spectral-swarm",
+        "name": "Spectral Swarm",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "frequency": 110,
+          "partials": 24,
+          "detune": 8,
+          "drift": 0.15,
+          "density": 0.9,
+          "evolution": 2.5,
+          "inharmonic": 0,
+          "tilt": -2,
+          "spread": 0.5,
+          "shimmer": 0.15,
+          "attack": 1.5,
+          "release": 2.5,
+          "waveform": 0,
+          "oddEven": -0.4,
+          "fundamentalMix": 0.6,
+          "formantFreq": 1200,
+          "formantQ": 8,
+          "freeze": 0,
+          "chorus": 0
+        }
+      },
+      {
+        "id": "osc-1",
+        "type": "oscillator",
+        "name": "Sine Osc",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "frequency": 220,
+          "type": "sine",
+          "pwm": 0.5,
+          "unison": 1,
+          "detune": 0,
+          "fmLin": 0,
+          "fmExp": 0,
+          "subMix": 0,
+          "subOct": 1
+        }
+      },
+      {
+        "id": "choir-a",
+        "type": "choir",
+        "name": "Choir A",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "vowel": 0,
+          "rate": 0.12,
+          "depth": 0.2,
+          "mix": 0.6
+        }
+      },
+      {
+        "id": "choir-b",
+        "type": "choir",
+        "name": "Choir O",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "vowel": 3,
+          "rate": 0.08,
+          "depth": 0.15,
+          "mix": 0.55
+        }
+      },
+      {
+        "id": "ring-1",
+        "type": "ring-mod",
+        "name": "Ring Mod",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "level": 0.9
+        }
+      },
+      {
+        "id": "vca-a",
+        "type": "gain",
+        "name": "VCA A",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "gain": 0.8
+        }
+      },
+      {
+        "id": "vca-b",
+        "type": "gain",
+        "name": "VCA B",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "gain": 0.7
+        }
+      },
+      {
+        "id": "vca-c",
+        "type": "gain",
+        "name": "VCA Ring",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "gain": 0.25
+        }
+      },
+      {
+        "id": "adsr-1",
+        "type": "adsr",
+        "name": "ADSR",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "attack": 0.6,
+          "decay": 0.4,
+          "sustain": 0.8,
+          "release": 1.8
+        }
+      },
+      {
+        "id": "lfo-1",
+        "type": "lfo",
+        "name": "Vowel LFO",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "rate": 0.04,
+          "depth": 0.8,
+          "offset": 0,
+          "shape": "sine",
+          "bipolar": true
+        }
+      },
+      {
+        "id": "chaos-1",
+        "type": "chaos",
+        "name": "Chaos",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "speed": 0.2,
+          "rho": 28,
+          "sigma": 10,
+          "beta": 2.66,
+          "scale": 0,
+          "root": 0
+        }
+      },
+      {
+        "id": "mix-1",
+        "type": "mixer-8",
+        "name": "Mixer",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "level1": 0.7,
+          "level2": 0.6,
+          "level3": 0.35,
+          "level4": 0,
+          "level5": 0,
+          "level6": 0,
+          "level7": 0,
+          "level8": 0
+        }
+      },
+      {
+        "id": "fold-1",
+        "type": "wavefolder",
+        "name": "Wavefolder",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "drive": 0.3,
+          "fold": 0.35,
+          "bias": 0,
+          "mix": 0.4
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "time": 0.78,
+          "damp": 0.3,
+          "preDelay": 20,
+          "mix": 0.35
+        }
+      },
+      {
+        "id": "comp-1",
+        "type": "compressor",
+        "name": "Compressor",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "threshold": -18,
+          "ratio": 3.5,
+          "attack": 15,
+          "release": 120,
+          "makeup": 3,
+          "mix": 1.0
+        }
+      },
+      {
+        "id": "output-1",
+        "type": "output",
+        "name": "Output",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "level": 1
+        }
+      },
+      {
+        "id": "scope-1",
+        "type": "scope",
+        "name": "Scope",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "time": 1,
+          "gain": 1,
+          "freeze": false,
+          "mode": "scope"
+        }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 0, "y": 10 },
+        "params": {
+          "text": "THROAT SINGER\n\nDiphonic / overtone singing simulation with parallel formants.\n\nSignal:\n  Spectral Swarm (24 partials, formant 1200Hz) splits 3 ways:\n  → Choir A (vowel A) → VCA A ─┐\n  → Choir O (vowel O) → VCA B ─├→ Mixer → Wavefolder → Reverb → Compressor → Output\n  → Ring-Mod (× Sine Osc) → VCA C (25%) ─┘\n\n- Spectral Swarm: 24 partials, formantFreq=1200, formantQ=8, oddEven=-0.4\n- Two Choir modules in parallel with different vowels (A and O)\n- Ring-Mod adds metallic harmonic overtones (mixed subtly at 25%)\n- Wavefolder adds harmonic complexity\n- Compressor glues the mix together\n\nPlay LOW notes (C2-C3) for the best throat singing effect.\nSlow LFO modulates Choir A vowel; Chaos X modulates Choir O."
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "cv-out" },
+        "to": { "moduleId": "swarm-1", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "gate-out" },
+        "to": { "moduleId": "swarm-1", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "cv-out" },
+        "to": { "moduleId": "osc-1", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "gate-out" },
+        "to": { "moduleId": "adsr-1", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "swarm-1", "portId": "out" },
+        "to": { "moduleId": "choir-a", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "swarm-1", "portId": "out" },
+        "to": { "moduleId": "choir-b", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "swarm-1", "portId": "out" },
+        "to": { "moduleId": "ring-1", "portId": "in-a" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "osc-1", "portId": "out" },
+        "to": { "moduleId": "ring-1", "portId": "in-b" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "lfo-1", "portId": "cv-out" },
+        "to": { "moduleId": "choir-a", "portId": "vowel" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "chaos-1", "portId": "x" },
+        "to": { "moduleId": "choir-b", "portId": "vowel" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "choir-a", "portId": "out" },
+        "to": { "moduleId": "vca-a", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "choir-b", "portId": "out" },
+        "to": { "moduleId": "vca-b", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "ring-1", "portId": "out" },
+        "to": { "moduleId": "vca-c", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "adsr-1", "portId": "env" },
+        "to": { "moduleId": "vca-a", "portId": "cv" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "adsr-1", "portId": "env" },
+        "to": { "moduleId": "vca-b", "portId": "cv" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "adsr-1", "portId": "env" },
+        "to": { "moduleId": "vca-c", "portId": "cv" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "vca-a", "portId": "out" },
+        "to": { "moduleId": "mix-1", "portId": "in-1" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "vca-b", "portId": "out" },
+        "to": { "moduleId": "mix-1", "portId": "in-2" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "vca-c", "portId": "out" },
+        "to": { "moduleId": "mix-1", "portId": "in-3" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "mix-1", "portId": "out" },
+        "to": { "moduleId": "fold-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "fold-1", "portId": "out" },
+        "to": { "moduleId": "reverb-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb-1", "portId": "out" },
+        "to": { "moduleId": "comp-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "comp-1", "portId": "out" },
+        "to": { "moduleId": "output-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "comp-1", "portId": "out" },
+        "to": { "moduleId": "scope-1", "portId": "in-a" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

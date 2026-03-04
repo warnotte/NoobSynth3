@@ -1,0 +1,328 @@
+{
+  "id": "android-dreams",
+  "name": "Android Dreams",
+  "description": "Robotic singing voice with arpeggiator, chaos engine, and glitchy pitch shifting.",
+  "group": "Vocal Synthesis",
+  "graph": {
+    "modules": [
+      {
+        "id": "ctrl-1",
+        "type": "control",
+        "name": "Control",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "cv": 0,
+          "cvMode": "unipolar",
+          "velocity": 1,
+          "midiVelocity": true,
+          "gate": 0,
+          "glide": 0.02,
+          "voices": 1
+        }
+      },
+      {
+        "id": "clock-1",
+        "type": "clock",
+        "name": "Clock",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "running": true,
+          "tempo": 128,
+          "rate": 4,
+          "swing": 0
+        }
+      },
+      {
+        "id": "arp-1",
+        "type": "arpeggiator",
+        "name": "Arpeggiator",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "enabled": true,
+          "hold": false,
+          "mode": 4,
+          "octaves": 2,
+          "rate": 3,
+          "gate": 70,
+          "swing": 0,
+          "tempo": 128,
+          "ratchet": 2,
+          "ratchetDecay": 40,
+          "probability": 100,
+          "velocityMode": 0,
+          "accentPattern": 2,
+          "euclidSteps": 8,
+          "euclidFill": 4,
+          "euclidRotate": 0,
+          "euclidEnabled": false,
+          "mutate": 30,
+          "preset": 0
+        }
+      },
+      {
+        "id": "wt-1",
+        "type": "wavetable",
+        "name": "Vocal WT",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "frequency": 220,
+          "bank": 1,
+          "position": 0.3,
+          "unison": 3,
+          "detune": 12,
+          "spread": 0.6,
+          "morphSpeed": 0.0,
+          "subMix": 0.0,
+          "attack": 0.005,
+          "release": 0.15
+        }
+      },
+      {
+        "id": "noise-1",
+        "type": "noise",
+        "name": "Breath",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "level": 0.25,
+          "noiseType": "white",
+          "stereo": 1,
+          "pan": 0
+        }
+      },
+      {
+        "id": "xfade-1",
+        "type": "crossfader",
+        "name": "Voice/Breath",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "mix": 0.3
+        }
+      },
+      {
+        "id": "chaos-1",
+        "type": "chaos",
+        "name": "Chaos",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "speed": 0.35,
+          "rho": 28,
+          "sigma": 10,
+          "beta": 2.66,
+          "scale": 0,
+          "root": 0
+        }
+      },
+      {
+        "id": "adsr-1",
+        "type": "adsr",
+        "name": "Amp Env",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "attack": 0.01,
+          "decay": 0.3,
+          "sustain": 0.6,
+          "release": 0.4
+        }
+      },
+      {
+        "id": "vca-1",
+        "type": "gain",
+        "name": "VCA",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "gain": 0.8
+        }
+      },
+      {
+        "id": "choir-1",
+        "type": "choir",
+        "name": "Choir",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "vowel": 0,
+          "rate": 0.3,
+          "depth": 0.4,
+          "mix": 0.55
+        }
+      },
+      {
+        "id": "cv-vca-1",
+        "type": "cv-vca",
+        "name": "Pitch Att",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "gain": 0.15
+        }
+      },
+      {
+        "id": "pitch-1",
+        "type": "pitch-shifter",
+        "name": "Pitch Shift",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "pitch": 0,
+          "fine": 0,
+          "grain": 40,
+          "mix": 0.6
+        }
+      },
+      {
+        "id": "delay-1",
+        "type": "delay",
+        "name": "Delay",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "time": 280,
+          "feedback": 0.35,
+          "mix": 0.25,
+          "tone": 0.55,
+          "pingPong": true
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "time": 0.65,
+          "damp": 0.35,
+          "preDelay": 15,
+          "mix": 0.3
+        }
+      },
+      {
+        "id": "output-1",
+        "type": "output",
+        "name": "Output",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "level": 1
+        }
+      },
+      {
+        "id": "scope-1",
+        "type": "scope",
+        "name": "Scope",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "time": 1,
+          "gain": 1,
+          "freeze": false,
+          "mode": "scope"
+        }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 0, "y": 10 },
+        "params": {
+          "text": "ANDROID DREAMS\n\nRobotic singing voice driven by arpeggiator and Lorenz chaos engine.\n\nSignal: Wavetable (Vocal bank) + Noise → Crossfader → VCA → Choir → Pitch Shifter → Delay → Reverb → Output\n\n- Wavetable: Bank 1 (Vocal), 3-voice unison\n- Arpeggiator: Diverge mode, ratchet 2x with 40% decay, mutate 30%, accent Sync\n- Crossfader: Mixes voice/breath noise, driven by Chaos Y\n- Choir: Vowel driven by Chaos X for organic variation\n- Pitch Shifter: Subtle glitches via Chaos Z (attenuated through CV-VCA)\n- Delay: Ping-pong for stereo width\n\nPlay notes with HOLD enabled for best arpeggiator effect.\nAdjust Chaos speed for slower/faster evolution."
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "cv-out" },
+        "to": { "moduleId": "arp-1", "portId": "cv-in" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "gate-out" },
+        "to": { "moduleId": "arp-1", "portId": "gate-in" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "clock-1", "portId": "clock" },
+        "to": { "moduleId": "arp-1", "portId": "clock" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "arp-1", "portId": "cv-out" },
+        "to": { "moduleId": "wt-1", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "arp-1", "portId": "gate-out" },
+        "to": { "moduleId": "wt-1", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "arp-1", "portId": "gate-out" },
+        "to": { "moduleId": "adsr-1", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "wt-1", "portId": "out" },
+        "to": { "moduleId": "xfade-1", "portId": "in-a" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "noise-1", "portId": "out" },
+        "to": { "moduleId": "xfade-1", "portId": "in-b" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "chaos-1", "portId": "y" },
+        "to": { "moduleId": "xfade-1", "portId": "mix" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "xfade-1", "portId": "out" },
+        "to": { "moduleId": "vca-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "adsr-1", "portId": "env" },
+        "to": { "moduleId": "vca-1", "portId": "cv" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "vca-1", "portId": "out" },
+        "to": { "moduleId": "choir-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "chaos-1", "portId": "x" },
+        "to": { "moduleId": "choir-1", "portId": "vowel" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "choir-1", "portId": "out" },
+        "to": { "moduleId": "pitch-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "chaos-1", "portId": "z" },
+        "to": { "moduleId": "cv-vca-1", "portId": "in" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "cv-vca-1", "portId": "out" },
+        "to": { "moduleId": "pitch-1", "portId": "pitch-cv" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "pitch-1", "portId": "out" },
+        "to": { "moduleId": "delay-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "delay-1", "portId": "out" },
+        "to": { "moduleId": "reverb-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb-1", "portId": "out" },
+        "to": { "moduleId": "output-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb-1", "portId": "out" },
+        "to": { "moduleId": "scope-1", "portId": "in-a" },
+        "kind": "audio"
+      }
+    ]
+  }
+}
