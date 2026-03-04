@@ -347,7 +347,6 @@ Ces features ont les structures de données en place mais la logique n'est pas c
 | Champ | Feature prévue |
 |-------|----------------|
 | `direction` | Mode ping-pong (up-down alternating) |
-| `ratchet_phase` | Ratcheting (rapid note repeats) |
 | `strum_index/delay/counter` | Strum (chord notes spread like guitar) |
 
 ### StepSequencer

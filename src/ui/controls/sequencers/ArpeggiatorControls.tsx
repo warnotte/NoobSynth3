@@ -22,7 +22,10 @@ export function ArpeggiatorControls({ module, updateParam }: ControlProps) {
   const swing = Number(module.params.swing ?? 0)
   const tempo = Number(module.params.tempo ?? 120)
   const ratchet = Number(module.params.ratchet ?? 1)
+  const ratchetDecay = Number(module.params.ratchetDecay ?? 0)
   const probability = Number(module.params.probability ?? 100)
+  const accentPattern = Number(module.params.accentPattern ?? 0)
+  const mutate = Number(module.params.mutate ?? 0)
   const euclidEnabled = Boolean(module.params.euclidEnabled)
   const euclidSteps = Number(module.params.euclidSteps ?? 8)
   const euclidFill = Number(module.params.euclidFill ?? 4)
@@ -55,6 +58,17 @@ export function ArpeggiatorControls({ module, updateParam }: ControlProps) {
     { id: 2, label: '2x' },
     { id: 3, label: '3x' },
     { id: 4, label: '4x' },
+  ]
+
+  const accentPatterns = [
+    { id: 0, label: 'Off' },
+    { id: 1, label: '1/2' },
+    { id: 2, label: '1/3' },
+    { id: 3, label: '1/4' },
+    { id: 4, label: '1&3' },
+    { id: 5, label: 'Sync' },
+    { id: 6, label: 'Trnce' },
+    { id: 7, label: 'Cust' },
   ]
 
   return (
@@ -152,6 +166,40 @@ export function ArpeggiatorControls({ module, updateParam }: ControlProps) {
           />
         </ControlBox>
       </ControlBoxRow>
+
+      <ControlBoxRow>
+        <ControlBox label="Expression" horizontal>
+          <RotaryKnob
+            label="Mutate"
+            min={0}
+            max={100}
+            step={1}
+            unit="%"
+            value={mutate}
+            onChange={(value) => updateParam(module.id, 'mutate', value)}
+            format={formatInt}
+          />
+          <RotaryKnob
+            label="Decay"
+            min={0}
+            max={100}
+            step={1}
+            unit="%"
+            value={ratchetDecay}
+            onChange={(value) => updateParam(module.id, 'ratchetDecay', value)}
+            format={formatInt}
+          />
+        </ControlBox>
+      </ControlBoxRow>
+
+      <ControlBox label="Accent">
+        <ControlButtons
+          options={accentPatterns}
+          value={accentPattern}
+          onChange={(value) => updateParam(module.id, 'accentPattern', value)}
+          columns={4}
+        />
+      </ControlBox>
 
       <ControlBox label="Euclidean" horizontal>
         <ToggleButton

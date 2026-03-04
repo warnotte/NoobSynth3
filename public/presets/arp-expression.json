@@ -1,0 +1,239 @@
+{
+  "version": 1,
+  "id": "arp-expression",
+  "name": "Arp Expression Lab",
+  "description": "Test preset for Mutate, Accent Pattern, and Ratchet Decay features.",
+  "graph": {
+    "modules": [
+      {
+        "id": "ctrl-1",
+        "type": "control",
+        "name": "Keyboard",
+        "position": { "col": 1, "row": 1 },
+        "params": {
+          "cv": 0,
+          "cvMode": "unipolar",
+          "velocity": 1,
+          "midiVelocity": true,
+          "gate": 0,
+          "glide": 0,
+          "midiEnabled": true,
+          "midiChannel": 0,
+          "midiRoot": 48,
+          "voices": 1
+        }
+      },
+      {
+        "id": "arp-1",
+        "type": "arpeggiator",
+        "name": "Arpeggiator",
+        "position": { "col": 5, "row": 1 },
+        "params": {
+          "enabled": true,
+          "hold": true,
+          "mode": 2,
+          "octaves": 2,
+          "rate": 4,
+          "gate": 65,
+          "swing": 15,
+          "tempo": 130,
+          "ratchet": 3,
+          "ratchetDecay": 50,
+          "probability": 100,
+          "accentPattern": 5,
+          "mutate": 20,
+          "euclidEnabled": false
+        }
+      },
+      {
+        "id": "osc-1",
+        "type": "oscillator",
+        "name": "Saw Osc",
+        "position": { "col": 9, "row": 1 },
+        "params": {
+          "frequency": 220,
+          "type": "sawtooth",
+          "pwm": 0.5,
+          "unison": 3,
+          "detune": 10,
+          "subMix": 0.2
+        }
+      },
+      {
+        "id": "adsr-amp",
+        "type": "adsr",
+        "name": "Amp Env",
+        "position": { "col": 9, "row": 5 },
+        "params": {
+          "attack": 0.003,
+          "decay": 0.2,
+          "sustain": 0.5,
+          "release": 0.15
+        }
+      },
+      {
+        "id": "adsr-filt",
+        "type": "adsr",
+        "name": "Filter Env",
+        "position": { "col": 12, "row": 5 },
+        "params": {
+          "attack": 0.001,
+          "decay": 0.25,
+          "sustain": 0.15,
+          "release": 0.1
+        }
+      },
+      {
+        "id": "vcf-1",
+        "type": "vcf",
+        "name": "VCF",
+        "position": { "col": 12, "row": 1 },
+        "params": {
+          "cutoff": 800,
+          "resonance": 0.4,
+          "drive": 0.15,
+          "envAmount": 0.5,
+          "model": "svf",
+          "mode": "lp",
+          "slope": 24
+        }
+      },
+      {
+        "id": "accent-vca",
+        "type": "cv-vca",
+        "name": "Accent VCA",
+        "position": { "col": 15, "row": 5 },
+        "params": {
+          "gain": 1
+        }
+      },
+      {
+        "id": "gain-1",
+        "type": "gain",
+        "name": "Main VCA",
+        "position": { "col": 15, "row": 1 },
+        "params": {
+          "gain": 0.7
+        }
+      },
+      {
+        "id": "delay-1",
+        "type": "delay",
+        "name": "Delay",
+        "position": { "col": 18, "row": 1 },
+        "params": {
+          "time": 190,
+          "feedback": 0.35,
+          "mix": 0.2,
+          "tone": 0.55,
+          "pingPong": true
+        }
+      },
+      {
+        "id": "scope-1",
+        "type": "scope",
+        "name": "Scope",
+        "position": { "col": 18, "row": 5 },
+        "params": {
+          "time": 1,
+          "gain": 1
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Output",
+        "position": { "col": 21, "row": 1 },
+        "params": {
+          "level": 1
+        }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "col": 21, "row": 5 },
+        "params": {
+          "text": "ARP EXPRESSION LAB\n\nTest des nouvelles features Arpeggiator.\n\n- MUTATE (20%): randomise ~1 note sur 5\n- ACCENT (Sync): pattern syncope sur accent out\n- RATCHET 3x + DECAY 50%: re-triggers decroissants\n\nL'accent CV module le cutoff du filtre via l'Accent VCA.\nSteps accentes = filtre plus ouvert = son plus brillant.\n\nEssayez:\n1. Jouez C3+E3+G3 (accord) avec HOLD\n2. Montez Mutate a 80% pour du chaos\n3. Changez Accent: 1/2, 1/4, Trance\n4. Decay 0% vs 100% avec Ratchet 4x\n5. Coupez Ratchet (1x) pour entendre Accent seul"
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "cv-out" },
+        "to": { "moduleId": "arp-1", "portId": "cv-in" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "gate-out" },
+        "to": { "moduleId": "arp-1", "portId": "gate-in" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "arp-1", "portId": "cv-out" },
+        "to": { "moduleId": "osc-1", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "arp-1", "portId": "gate-out" },
+        "to": { "moduleId": "adsr-amp", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "arp-1", "portId": "gate-out" },
+        "to": { "moduleId": "adsr-filt", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "arp-1", "portId": "accent" },
+        "to": { "moduleId": "accent-vca", "portId": "in" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "adsr-filt", "portId": "env" },
+        "to": { "moduleId": "accent-vca", "portId": "cv" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "accent-vca", "portId": "out" },
+        "to": { "moduleId": "vcf-1", "portId": "mod" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "osc-1", "portId": "out" },
+        "to": { "moduleId": "vcf-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "adsr-filt", "portId": "env" },
+        "to": { "moduleId": "vcf-1", "portId": "env" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "vcf-1", "portId": "out" },
+        "to": { "moduleId": "gain-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "adsr-amp", "portId": "env" },
+        "to": { "moduleId": "gain-1", "portId": "cv" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "gain-1", "portId": "out" },
+        "to": { "moduleId": "delay-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "delay-1", "portId": "out" },
+        "to": { "moduleId": "out-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "delay-1", "portId": "out" },
+        "to": { "moduleId": "scope-1", "portId": "in-a" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

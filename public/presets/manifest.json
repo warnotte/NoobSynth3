@@ -338,6 +338,13 @@
       "group": "Arpeggiator / Sequences"
     },
     {
+      "id": "arp-expression",
+      "name": "Arp Expression Lab",
+      "description": "Test Mutate, Accent Pattern, and Ratchet Decay features.",
+      "file": "arp-expression.json",
+      "group": "Arpeggiator / Sequences"
+    },
+    {
       "id": "morodor-chase",
       "name": "Moroder Chase",
       "description": "Giorgio Moroder style pulsing synth arp - Midnight Express / Scarface vibes.",

@@ -509,6 +509,7 @@ impl Arpeggiator {
         let swing = sample_at(params.swing, 0, 0.0).clamp(0.0, 100.0) / 100.0;
         let tempo = sample_at(params.tempo, 0, 120.0).clamp(40.0, 300.0);
         let ratchet = (sample_at(params.ratchet, 0, 1.0) as usize).clamp(1, 8);
+        let ratchet_decay = sample_at(params.ratchet_decay, 0, 0.0).clamp(0.0, 100.0) / 100.0;
         let probability = sample_at(params.probability, 0, 100.0).clamp(0.0, 100.0) / 100.0;
         let accent_pattern = sample_at(params.accent_pattern, 0, 0.0) as usize;
         let euclid_enabled = sample_at(params.euclid_enabled, 0, 0.0) >= 0.5;
@@ -701,7 +702,16 @@ impl Arpeggiator {
 
                 // Gate on/off within step
                 if self.gate_samples < self.gate_length_samples {
-                    self.current_gate = 1.0;
+                    // Apply ratchet decay: each retrig gets quieter
+                    // decay=0 → all retrigs at full volume, decay=1 → last retrig silent
+                    let gate_level = if ratchet_decay > 0.0 && self.ratchet_count > 1 {
+                        let attenuation = 1.0 - ratchet_decay;
+                        // attenuation^retrig_index gives decreasing amplitude
+                        attenuation.powi(self.ratchet_current as i32)
+                    } else {
+                        1.0
+                    };
+                    self.current_gate = gate_level;
                 } else {
                     self.current_gate = 0.0;
                     if self.ratchet_current >= self.ratchet_count - 1 {

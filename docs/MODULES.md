@@ -1131,6 +1131,9 @@ Arpeggiateur CV/Gate synchronisable (tempo interne ou clock externe).
 | `swing` | 0-90 % | Swing sur steps impairs |
 | `probability` | 0-100 % | Probabilité de déclenchement |
 | `ratchet` | 1-4 | Ratcheting (répétitions rapides) |
+| `ratchet_decay` | 0-100 % | Décroissance des ratchets : chaque retrigger est progressivement plus faible. Formule : amplitude = (1 - decay)^retrig_index. À 0% tous les retrigs sont égaux, à 100% seul le premier est audible |
+| `mutate` | 0-100 % | Randomisation du pattern : à chaque step, probabilité que la note soit remplacée par une autre note aléatoire du pattern |
+| `accent_pattern` | 0-7 | Pattern d'accent : 0=Off, 1=Every 2nd, 2=Every 3rd, 3=Every 4th, 4=1&3, 5=Syncopated, 6=Trance, 7=Custom. Émet un CV sur le port accent quand un step est accentué |
 
 **Entrées :**
 | Port | ID | Description |
@@ -1145,6 +1148,9 @@ Arpeggiateur CV/Gate synchronisable (tempo interne ou clock externe).
 |------|----|-------------|
 | CV Out | `cv-out` | Pitch CV arpégié |
 | Gate Out | `gate-out` | Gate arpégié |
+| Accent | `accent` | CV d'accent (0 ou 1) selon le pattern d'accent sélectionné |
+
+**Note accent** : la sortie accent est un signal CV qui doit être routé vers un VCA (gain) ou une entrée de modulation de filtre pour être audible. Par exemple : `accent → VCA cv-in` ou `accent → VCF mod`.
 
 **Note** : les micro-coupures de gate (retrigger) sont ignorees ; avec HOLD desactive, l'arp s'arrete quand aucune note n'est tenue.
 
