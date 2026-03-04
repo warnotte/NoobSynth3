@@ -36,6 +36,7 @@ mod resonator;
 mod wavetable;
 mod granular;
 mod particle_cloud;
+mod speech_synth;
 
 pub use vco::{Vco, VcoParams, VcoInputs};
 pub use supersaw::{Supersaw, SupersawParams, SupersawInputs};
@@ -54,3 +55,4 @@ pub use resonator::{Resonator, ResonatorParams, ResonatorInputs};
 pub use wavetable::{Wavetable, WavetableParams, WavetableInputs};
 pub use granular::{Granular, GranularParams, GranularInputs, GrainShape};
 pub use particle_cloud::{ParticleCloud, ParticleCloudParams, ParticleCloudInputs, ParticleMode, OscShape};
+pub use speech_synth::{SpeechSynth, SpeechSynthParams, SpeechSynthInputs};

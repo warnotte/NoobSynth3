@@ -24,6 +24,7 @@ import { SpectralSwarmControls } from './SpectralSwarmControls'
 import { ResonatorControls } from './ResonatorControls'
 import { WavetableControls } from './WavetableControls'
 import { ParticleCloudControls } from './ParticleCloudControls'
+import { SpeechSynthControls } from './SpeechSynthControls'
 
 // Granular is already extracted to its own file
 import { GranularControls } from '../GranularControls'
@@ -101,6 +102,9 @@ export function renderSourceControls(props: ControlProps): React.ReactElement | 
         />
       )
 
+    case 'speech-synth':
+      return <SpeechSynthControls {...props} />
+
     default:
       return null
   }
@@ -123,4 +127,5 @@ export {
   ResonatorControls,
   WavetableControls,
   ParticleCloudControls,
+  SpeechSynthControls,
 }

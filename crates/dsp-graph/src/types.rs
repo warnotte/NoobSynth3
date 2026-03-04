@@ -22,6 +22,7 @@ pub enum ModuleType {
     Wavetable,
     Granular,
     ParticleCloud,
+    SpeechSynth,
 
     // Filters
     Vcf,

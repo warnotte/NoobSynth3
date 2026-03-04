@@ -87,6 +87,8 @@ export type ModuleType =
   | 'sid-player'
   // AY Player (ZX Spectrum, Amstrad CPC, MSX, Atari ST)
   | 'ay-player'
+  // Speech Synth (robotic voice)
+  | 'speech-synth'
 
 export interface ModuleSpec {
   id: string

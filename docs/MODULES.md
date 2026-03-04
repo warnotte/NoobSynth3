@@ -405,6 +405,34 @@ Couleur basée sur la hauteur (bleu=grave, orange=aigu).
 
 ---
 
+### Speech Synth
+
+Synthèse vocale robotique par séquençage de phonèmes et filtrage formantique.
+Style Daft Punk / Kraftwerk — convertit du texte en voix chantée robotique.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `speechText` | string | Texte à vocaliser (auto-uppercase) |
+| `speed` | 1-20 ph/s | Vitesse des phonèmes (sans clock) |
+| `formantShift` | -12 à +12 st | Décalage des formants |
+| `smoothing` | 0-1 | Lissage des transitions |
+| `buzz` | 0-1 | Brillance de l'excitation (sine→saw) |
+| `noise` | 0-1 | Mix de bruit additionnel |
+
+**Fonctionnement :**
+- Le texte est converti en séquence de phonèmes (voyelles, consonnes, silences)
+- Chaque phonème définit 3 fréquences de formants (F1, F2, F3) et un ratio voix/bruit
+- L'excitation est un buzz (sawtooth pitché via CV) pour les voyelles, du bruit pour les consonnes
+- Gate rising edge = reset au début du texte
+- Avance au phonème suivant sur timer interne OU trigger clock externe
+
+**Entrées** : pitch (CV), gate (gate), clock (sync)
+**Sorties** : out (audio mono)
+
+**Polyphonie** : Oui (`is_poly_type`) — accords robotiques possibles.
+
+---
+
 ## Filtres
 
 ### VCF (Voltage Controlled Filter)

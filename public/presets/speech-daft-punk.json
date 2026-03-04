@@ -1,0 +1,198 @@
+{
+  "id": "speech-daft-punk",
+  "name": "Daft Punk Voice",
+  "description": "Robotic singing voice with Speech Synth, vocoder-style formant filtering. Around The World!",
+  "group": "Vocal Synthesis",
+  "graph": {
+    "modules": [
+      {
+        "id": "ctrl-1",
+        "type": "control",
+        "name": "Control",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "cv": 0,
+          "cvMode": "unipolar",
+          "velocity": 1,
+          "midiVelocity": true,
+          "gate": 0,
+          "glide": 0.03,
+          "voices": 4
+        }
+      },
+      {
+        "id": "clock-1",
+        "type": "clock",
+        "name": "Clock",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "running": true,
+          "tempo": 120,
+          "rate": 3,
+          "swing": 0
+        }
+      },
+      {
+        "id": "speech-1",
+        "type": "speech-synth",
+        "name": "Speech Synth",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "speechText": "AROUND THE WORLD",
+          "speed": 6,
+          "formantShift": 0,
+          "smoothing": 0.25,
+          "buzz": 0.8,
+          "noise": 0.1
+        }
+      },
+      {
+        "id": "adsr-1",
+        "type": "adsr",
+        "name": "Amp Env",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "attack": 0.005,
+          "decay": 0.15,
+          "sustain": 0.8,
+          "release": 0.2
+        }
+      },
+      {
+        "id": "vca-1",
+        "type": "gain",
+        "name": "VCA",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "gain": 0.9
+        }
+      },
+      {
+        "id": "chorus-1",
+        "type": "chorus",
+        "name": "Chorus",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "rate": 0.4,
+          "depth": 6,
+          "delay": 15,
+          "mix": 0.3,
+          "spread": 0.7,
+          "feedback": 0.1
+        }
+      },
+      {
+        "id": "delay-1",
+        "type": "delay",
+        "name": "Delay",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "time": 250,
+          "feedback": 0.3,
+          "mix": 0.2,
+          "tone": 0.5,
+          "pingPong": true
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "time": 0.5,
+          "damp": 0.4,
+          "preDelay": 12,
+          "mix": 0.2
+        }
+      },
+      {
+        "id": "output-1",
+        "type": "output",
+        "name": "Output",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "level": 1
+        }
+      },
+      {
+        "id": "scope-1",
+        "type": "scope",
+        "name": "Scope",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "time": 1,
+          "gain": 1,
+          "freeze": false,
+          "mode": "scope"
+        }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 0, "y": 10 },
+        "params": {
+          "text": "DAFT PUNK VOICE\n\nRobotic singing voice using the Speech Synth module.\n\nSignal: Control → Speech Synth → VCA → Chorus → Delay → Reverb → Output\n\n- Speech Synth: Text \"AROUND THE WORLD\", clock-synced phoneme advance\n- Clock: 120 BPM, 1/8 notes driving phoneme rhythm\n- ADSR: Fast attack, smooth sustain for held notes\n- Chorus: Slight thickening for stereo width\n- Delay: Ping-pong for space\n\nTry changing the text! Use short words for rhythmic effect.\nConnect clock to Speech Synth clock input for tight sync.\nPlay chords for polyphonic robot choir (4 voices)."
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "cv-out" },
+        "to": { "moduleId": "speech-1", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "gate-out" },
+        "to": { "moduleId": "speech-1", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "gate-out" },
+        "to": { "moduleId": "adsr-1", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "clock-1", "portId": "clock" },
+        "to": { "moduleId": "speech-1", "portId": "clock" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "speech-1", "portId": "out" },
+        "to": { "moduleId": "vca-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "adsr-1", "portId": "env" },
+        "to": { "moduleId": "vca-1", "portId": "cv" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "vca-1", "portId": "out" },
+        "to": { "moduleId": "chorus-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "chorus-1", "portId": "out" },
+        "to": { "moduleId": "delay-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "delay-1", "portId": "out" },
+        "to": { "moduleId": "reverb-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb-1", "portId": "out" },
+        "to": { "moduleId": "output-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb-1", "portId": "out" },
+        "to": { "moduleId": "scope-1", "portId": "in-a" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

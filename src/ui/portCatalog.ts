@@ -476,6 +476,16 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
       { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
     ],
   },
+  'speech-synth': {
+    inputs: [
+      { id: 'pitch', label: 'Pitch', kind: 'cv', direction: 'in' },
+      { id: 'gate', label: 'Gate', kind: 'gate', direction: 'in' },
+      { id: 'clock', label: 'Clock', kind: 'sync', direction: 'in' },
+    ],
+    outputs: [
+      { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
+    ],
+  },
   notes: {
     inputs: [],
     outputs: [],

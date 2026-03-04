@@ -928,7 +928,7 @@ function App() {
 
       if (status === 'running' && !options?.skipEngine) {
         // String params like stepData/drumData/midiData go through setParamString
-        if (typeof value === 'string' && (paramId === 'stepData' || paramId === 'drumData' || paramId === 'midiData')) {
+        if (typeof value === 'string' && (paramId === 'stepData' || paramId === 'drumData' || paramId === 'midiData' || paramId === 'speechText')) {
           engine.setParamString(moduleId, paramId, value)
         } else {
           engine.setParam(moduleId, paramId, value)
@@ -936,7 +936,7 @@ function App() {
       }
       if (isTauri && tauriNativeRunning && !options?.skipEngine) {
         // String params like stepData/drumData/midiData need special handling
-        if (typeof value === 'string' && (paramId === 'stepData' || paramId === 'drumData' || paramId === 'midiData')) {
+        if (typeof value === 'string' && (paramId === 'stepData' || paramId === 'drumData' || paramId === 'midiData' || paramId === 'speechText')) {
           void invokeTauri('native_set_param_string', { moduleId, paramId, value })
         } else {
           const numeric = normalizeNativeParamValue(paramId, value)

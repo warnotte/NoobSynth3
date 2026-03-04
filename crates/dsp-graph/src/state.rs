@@ -4,8 +4,8 @@ use dsp_core::{
     Adsr, Arpeggiator, AyPlayer, Chaos, Choir, Chorus, Clap808, Clap909, Compressor, Cowbell808, Delay, DrumSequencer, Ensemble,
     EuclideanSequencer, FmMatrix, FmOperator, Granular, GranularDelay, HiHat808, HiHat909, Hpf, KarplusStrong,
     Kick808, Kick909, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, ParticleCloud, Phaser, PipeOrgan, PitchShifter,
-    Resonator, Reverb, Rimshot909, SampleHold, Shepard, SidPlayer, SlewLimiter, Snare808, Snare909, SnesOsc, SpectralSwarm, SpringReverb,
-    StepSequencer, Supersaw, TapeDelay, Tb303, Tom808, Tom909, TuringMachine, Vcf, Vco, Vocoder, Wavetable,
+    Resonator, Reverb, Rimshot909, SampleHold, Shepard, SidPlayer, SlewLimiter, Snare808, Snare909, SnesOsc, SpectralSwarm, SpeechSynth,
+    SpringReverb, StepSequencer, Supersaw, TapeDelay, Tb303, Tom808, Tom909, TuringMachine, Vcf, Vco, Vocoder, Wavetable,
 };
 
 use crate::types::ParamBuffer;
@@ -256,6 +256,15 @@ pub struct ParticleCloudState {
     pub level: ParamBuffer,
     pub mode: ParamBuffer,
     pub osc_shape: ParamBuffer,
+}
+
+pub struct SpeechSynthState {
+    pub synth: SpeechSynth,
+    pub speed: ParamBuffer,
+    pub formant_shift: ParamBuffer,
+    pub smoothing: ParamBuffer,
+    pub buzz: ParamBuffer,
+    pub noise_mix: ParamBuffer,
 }
 
 // =============================================================================
@@ -770,6 +779,7 @@ pub enum ModuleState {
     Wavetable(WavetableState),
     Granular(GranularState),
     ParticleCloud(ParticleCloudState),
+    SpeechSynth(SpeechSynthState),
 
     // Filters
     Vcf(VcfState),

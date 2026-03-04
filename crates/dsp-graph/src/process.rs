@@ -33,6 +33,7 @@ use dsp_core::{
     Rimshot909Inputs, Rimshot909Params, Sample,
     SampleHoldInputs, SampleHoldParams, ShepardInputs, ShepardParams,
     SidPlayerInputs, SidPlayerOutputs, SidPlayerParams,
+    SpeechSynthInputs, SpeechSynthParams,
     AyPlayerInputs, AyPlayerOutputs, AyPlayerParams,
     SlewInputs, SlewParams,
     Snare808Inputs, Snare808Params,
@@ -1922,6 +1923,36 @@ pub(crate) fn process_module(
             // Stereo output
             let (out_l, out_r) = outputs[0].channels_mut_2();
             state.cloud.process_block(out_l, out_r, cloud_inputs, params);
+        }
+        ModuleState::SpeechSynth(state) => {
+            // Input 0: pitch CV, Input 1: gate, Input 2: clock
+            let pitch = if !connections[0].is_empty() {
+                Some(inputs[0].channel(0))
+            } else {
+                None
+            };
+            let gate = if connections.len() > 1 && !connections[1].is_empty() {
+                Some(inputs[1].channel(0))
+            } else {
+                None
+            };
+            let clock = if connections.len() > 2 && !connections[2].is_empty() {
+                Some(inputs[2].channel(0))
+            } else {
+                None
+            };
+
+            let synth_inputs = SpeechSynthInputs { pitch, gate, clock };
+            let params = SpeechSynthParams {
+                speed: state.speed.slice(frames),
+                formant_shift: state.formant_shift.slice(frames),
+                smoothing: state.smoothing.slice(frames),
+                buzz: state.buzz.slice(frames),
+                noise_mix: state.noise_mix.slice(frames),
+            };
+
+            let out = outputs[0].channel_mut(0);
+            state.synth.process_block(out, synth_inputs, params);
         }
         ModuleState::SidPlayer(state) => {
             // Input 0: reset trigger (optional)

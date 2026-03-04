@@ -235,6 +235,12 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
     ModuleType::Compressor => vec![
       PortInfo { channels: 2 },  // audio in (stereo)
     ],
+    // SpeechSynth - 3 inputs (pitch CV, gate, clock)
+    ModuleType::SpeechSynth => vec![
+      PortInfo { channels: 1 },  // pitch CV
+      PortInfo { channels: 1 },  // gate
+      PortInfo { channels: 1 },  // clock
+    ],
   }
 }
 
@@ -468,6 +474,10 @@ pub fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
     // Compressor - 1 stereo output
     ModuleType::Compressor => vec![
       PortInfo { channels: 2 },  // stereo audio out
+    ],
+    // SpeechSynth - 1 mono output
+    ModuleType::SpeechSynth => vec![
+      PortInfo { channels: 1 },  // audio out
     ],
   }
 }
@@ -787,6 +797,13 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
     // Compressor - 1 input
     ModuleType::Compressor => match port_id {
       "in" | "input" | "audio" => Some(0),
+      _ => None,
+    },
+    // SpeechSynth - 3 inputs
+    ModuleType::SpeechSynth => match port_id {
+      "pitch" | "pitch-cv" | "1volt" => Some(0),
+      "gate" => Some(1),
+      "clock" | "clk" => Some(2),
       _ => None,
     },
     _ => None,
@@ -1134,6 +1151,11 @@ pub fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize
     },
     // Compressor - 1 output
     ModuleType::Compressor => match port_id {
+      "out" | "output" => Some(0),
+      _ => None,
+    },
+    // SpeechSynth - 1 output
+    ModuleType::SpeechSynth => match port_id {
       "out" | "output" => Some(0),
       _ => None,
     },

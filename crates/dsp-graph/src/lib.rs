@@ -838,6 +838,8 @@ fn normalize_module_type(raw: &str) -> ModuleType {
     "sid-player" => ModuleType::SidPlayer,
     // AY Player
     "ay-player" => ModuleType::AyPlayer,
+    // Speech Synth
+    "speech-synth" => ModuleType::SpeechSynth,
     _ => ModuleType::Oscillator,
   }
 }
@@ -872,6 +874,7 @@ fn is_poly_type(module_type: ModuleType) -> bool {
       | ModuleType::FmMatrix
       | ModuleType::Control
       | ModuleType::MidiFileSequencer
+      | ModuleType::SpeechSynth
   )
 }
 

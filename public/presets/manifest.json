@@ -1351,6 +1351,13 @@
       "description": "Diphonic overtone singing simulation with parallel formants and spectral harmonics.",
       "file": "throat-singer.json",
       "group": "Vocal Synthesis"
+    },
+    {
+      "id": "speech-daft-punk",
+      "name": "Daft Punk Voice",
+      "description": "Robotic singing voice with Speech Synth formant sequencing. Around The World!",
+      "file": "speech-daft-punk.json",
+      "group": "Vocal Synthesis"
     }
   ]
 }

@@ -6,8 +6,8 @@ use dsp_core::{
   Adsr, Arpeggiator, AyPlayer, Chaos, Choir, Chorus, Clap808, Clap909, Compressor, Cowbell808, Delay, DrumSequencer, Ensemble,
   EuclideanSequencer, FmMatrix, FmOperator, Granular, GranularDelay, HiHat808, HiHat909, Hpf, KarplusStrong,
   Kick808, Kick909, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, ParticleCloud, Phaser, PipeOrgan, PitchShifter,
-  Resonator, Reverb, Rimshot909, SampleHold, Shepard, SidPlayer, SlewLimiter, Snare808, Snare909, SnesOsc, SpectralSwarm, SpringReverb,
-  StepSequencer, Supersaw, TapeDelay, Tb303, Tom808, Tom909, TuringMachine, Vcf, Vco, Vocoder, Wavetable,
+  Resonator, Reverb, Rimshot909, SampleHold, Shepard, SidPlayer, SlewLimiter, Snare808, Snare909, SnesOsc, SpectralSwarm, SpeechSynth,
+  SpringReverb, StepSequencer, Supersaw, TapeDelay, Tb303, Tom808, Tom909, TuringMachine, Vcf, Vco, Vocoder, Wavetable,
 };
 
 use crate::state::*;
@@ -659,6 +659,21 @@ pub(crate) fn create_state(
       mode: ParamBuffer::new(param_number(params, "mode", 0.0)),
       osc_shape: ParamBuffer::new(param_number(params, "oscShape", 0.0)),
     }),
+    ModuleType::SpeechSynth => {
+      let mut synth = SpeechSynth::new(sample_rate);
+      // Apply initial text if provided
+      if let Some(serde_json::Value::String(text)) = params.get("speechText") {
+        synth.set_text(text);
+      }
+      ModuleState::SpeechSynth(SpeechSynthState {
+        synth,
+        speed: ParamBuffer::new(param_number(params, "speed", 8.0)),
+        formant_shift: ParamBuffer::new(param_number(params, "formantShift", 0.0)),
+        smoothing: ParamBuffer::new(param_number(params, "smoothing", 0.3)),
+        buzz: ParamBuffer::new(param_number(params, "buzz", 0.7)),
+        noise_mix: ParamBuffer::new(param_number(params, "noise", 0.15)),
+      })
+    }
     ModuleType::Notes => ModuleState::Notes,  // UI-only, no DSP
     ModuleType::TuringMachine => ModuleState::TuringMachine(TuringState {
       turing: TuringMachine::new(sample_rate),
@@ -1326,6 +1341,14 @@ pub(crate) fn apply_param(state: &mut ModuleState, param: &str, value: f32) {
       "oscShape" => state.osc_shape.set(value),
       _ => {}
     },
+    ModuleState::SpeechSynth(state) => match param {
+      "speed" => state.speed.set(value),
+      "formantShift" => state.formant_shift.set(value),
+      "smoothing" => state.smoothing.set(value),
+      "buzz" => state.buzz.set(value),
+      "noise" => state.noise_mix.set(value),
+      _ => {}
+    },
     ModuleState::TuringMachine(state) => match param {
       "probability" => state.probability.set(value),
       "length" => state.length.set(value),
@@ -1374,6 +1397,11 @@ pub(crate) fn apply_param_str(state: &mut ModuleState, param: &str, value: &str)
     ModuleState::MidiFileSequencer(state) => {
       if param == "midiData" {
         state.seq.parse_midi_data(value);
+      }
+    }
+    ModuleState::SpeechSynth(state) => {
+      if param == "speechText" {
+        state.synth.set_text(value);
       }
     }
     _ => {}

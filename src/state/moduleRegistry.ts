@@ -14,6 +14,7 @@ export const moduleSizes: Record<ModuleType, string> = {
   'wavetable': '2x3',
   'granular': '3x4',
   'particle-cloud': '2x3',
+  'speech-synth': '3x3',
   'mod-router': '2x2',
   'sample-hold': '2x1',
   slew: '1x2',
@@ -101,6 +102,7 @@ export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>>
   'wavetable': 'strip',
   'granular': 'strip',
   'particle-cloud': 'strip',
+  'speech-synth': 'strip',
   vcf: 'strip',
   control: 'strip',
   lab: 'strip',
@@ -200,6 +202,7 @@ export const moduleCatalog: { type: ModuleType; label: string; category: ModuleC
   { type: 'wavetable', label: 'Wavetable', category: 'sources' },
   { type: 'granular', label: 'Granular', category: 'sources' },
   { type: 'particle-cloud', label: 'Particle Cloud', category: 'sources' },
+  { type: 'speech-synth', label: 'Speech Synth', category: 'sources' },
   // Filters
   { type: 'vcf', label: 'VCF', category: 'filters' },
   { type: 'hpf', label: 'HPF', category: 'filters' },
@@ -282,6 +285,7 @@ export const modulePrefixes: Record<ModuleType, string> = {
   'wavetable': 'wt',
   'granular': 'gran',
   'particle-cloud': 'pcloud',
+  'speech-synth': 'speech',
   'mod-router': 'modr',
   'sample-hold': 'sh',
   slew: 'slew',
@@ -368,6 +372,7 @@ export const moduleLabels: Record<ModuleType, string> = {
   'wavetable': 'Wavetable',
   'granular': 'Granular',
   'particle-cloud': 'Particle Cloud',
+  'speech-synth': 'Speech Synth',
   'mod-router': 'Mod Router',
   'sample-hold': 'S&H',
   slew: 'Slew',
@@ -560,6 +565,14 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     level: 0.8,           // Output level (0-1)
     mode: 0,              // 0=Osc, 1=Sample, 2=Input
     oscShape: 0,          // 0=Sine, 1=Tri, 2=Saw, 3=Square, 4=Noise
+  },
+  'speech-synth': {
+    speechText: 'HELLO WORLD',
+    speed: 8,             // Phonemes per second (1-20)
+    formantShift: 0,      // Semitones (-12 to +12)
+    smoothing: 0.3,       // Transition smoothing (0-1)
+    buzz: 0.7,            // Buzz brightness (0-1)
+    noise: 0.15,          // Noise mix (0-1)
   },
   'mod-router': { depthPitch: 0, depthPwm: 0, depthVcf: 0, depthVca: 0 },
   'sample-hold': { mode: 0 },

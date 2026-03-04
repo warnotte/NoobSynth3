@@ -51,6 +51,7 @@ pub use oscillators::{
     Wavetable, WavetableParams, WavetableInputs,
     Granular, GranularParams, GranularInputs, GrainShape,
     ParticleCloud, ParticleCloudParams, ParticleCloudInputs, ParticleMode, OscShape,
+    SpeechSynth, SpeechSynthParams, SpeechSynthInputs,
 };
 
 // Re-export filters
