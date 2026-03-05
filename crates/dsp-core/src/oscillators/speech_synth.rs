@@ -418,16 +418,21 @@ fn g2p_rules(letter: u8) -> &'static [G2pRule] {
     }
 }
 
-static G2P_A: [G2pRule; 10] = [
+static G2P_A: [G2pRule; 15] = [
     g2p!("", "ATION", "" => EY, SH, AX, N),
     g2p!("", "AUGH", "" => AO, F),
     g2p!("", "IGHT", "" => AY, T),
     g2p!("", "ANGE", " " => EY, N, JH),
+    g2p!("", "ABLE", " " => EY, B, AX, L),
     g2p!("", "AGE", " " => IH, JH),
     g2p!("", "ATE", " " => EY, T),
     g2p!("", "ACE", " " => EY, S),
     g2p!("", "AKE", " " => EY, K),
     g2p!("", "ANE", " " => EY, N),
+    g2p!("", "ARE", " " => EH, R),
+    g2p!("", "AIR", "" => EH, R),
+    g2p!("", "AI", "" => EY),
+    g2p!(" ", "A", "^" => AX),          // word-initial A before consonant = schwa
     g2p!("", "A", "" => AE),           // default A
 ];
 
@@ -454,7 +459,7 @@ static G2P_D: [G2pRule; 3] = [
     g2p!("", "D", "" => D),
 ];
 
-static G2P_E: [G2pRule; 12] = [
+static G2P_E: [G2pRule; 14] = [
     g2p!("", "EIGH", "" => EY),
     g2p!("", "ENCE", " " => AX, N, S),
     g2p!("", "ENSE", " " => EH, N, S),
@@ -466,6 +471,8 @@ static G2P_E: [G2pRule; 12] = [
     g2p!("", "EE", "" => IY),
     g2p!("", "EA", "" => IY),
     g2p!("", "ED", " " => D),          // past tense
+    g2p!("", "ES", " " => Z),          // plural -ES
+    g2p!("^", "E", " " =>),            // silent final E after consonant
     g2p!("", "E", "" => EH),           // default E
 ];
 
@@ -528,7 +535,7 @@ static G2P_N: [G2pRule; 4] = [
     g2p!("", "N", "" => N),
 ];
 
-static G2P_O: [G2pRule; 14] = [
+static G2P_O: [G2pRule; 22] = [
     g2p!("", "OUGH", "T" => AO),
     g2p!("", "OUGH", "" => AH, F),     // enough, tough
     g2p!("", "OULD", "" => UH, D),
@@ -536,12 +543,20 @@ static G2P_O: [G2pRule; 14] = [
     g2p!("", "OUSE", "" => AW, S),
     g2p!("", "OUR", " " => AO, R),
     g2p!("", "TION", "" => SH, AX, N),
+    g2p!("", "OOR", "" => AO, R),
+    g2p!("", "ORK", "" => ER, K),      // work, fork
+    g2p!("", "ORL", "" => ER, L),      // world
+    g2p!("", "ORM", "" => AO, R, M),   // form, storm
+    g2p!("", "ORD", "" => ER, D),      // word
+    g2p!("", "OR", "^" => AO, R),      // or + consonant (for, port)
     g2p!("", "OO", "" => UW),
     g2p!("", "OW", " " => OW),
     g2p!("", "OW", "^" => AW),
     g2p!("", "OI", "" => OY),
     g2p!("", "OY", "" => OY),
+    g2p!("", "OA", "" => OW),          // boat, road
     g2p!("", "ONE", " " => W, AH, N),
+    g2p!("", "O", " " => OW),          // word-final O = OW (hello, go)
     g2p!("", "O", "" => AA),           // default O
 ];
 
@@ -646,16 +661,113 @@ fn check_magic_e(word: &[u8], vowel_pos: usize) -> Option<&'static [Phoneme]> {
     }
 }
 
+/// Exception dictionary for common irregular words.
+fn lexical_exception(word: &str) -> Option<Vec<Phoneme>> {
+    Some(match word {
+        "THE"     => vec![DH, AX],
+        "A"       => vec![AX],
+        "AN"      => vec![AX, N],
+        "TO"      => vec![T, UW],
+        "OF"      => vec![AH, V],
+        "WAS"     => vec![W, AA, Z],
+        "IS"      => vec![IH, Z],
+        "ARE"     => vec![AA, R],
+        "WERE"    => vec![W, ER],
+        "BEEN"    => vec![B, IH, N],
+        "HAVE"    => vec![HH, AE, V],
+        "HAS"     => vec![HH, AE, Z],
+        "DO"      => vec![D, UW],
+        "DOES"    => vec![D, AH, Z],
+        "DONE"    => vec![D, AH, N],
+        "GONE"    => vec![G, AO, N],
+        "ONE"     => vec![W, AH, N],
+        "ONCE"    => vec![W, AH, N, S],
+        "COME"    => vec![K, AH, M],
+        "SOME"    => vec![S, AH, M],
+        "LOVE"    => vec![L, AH, V],
+        "MOVE"    => vec![M, UW, V],
+        "GIVE"    => vec![G, IH, V],
+        "LIVE"    => vec![L, IH, V],
+        "SAID"    => vec![S, EH, D],
+        "SAYS"    => vec![S, EH, Z],
+        "COULD"   => vec![K, UH, D],
+        "WOULD"   => vec![W, UH, D],
+        "SHOULD"  => vec![SH, UH, D],
+        "THEIR"   => vec![DH, EH, R],
+        "THERE"   => vec![DH, EH, R],
+        "WHERE"   => vec![W, EH, R],
+        "HERE"    => vec![HH, IH, R],
+        "WHAT"    => vec![W, AH, T],
+        "WHO"     => vec![HH, UW],
+        "WHOM"    => vec![HH, UW, M],
+        "WHOSE"   => vec![HH, UW, Z],
+        "PEOPLE"  => vec![P, IY, P, AX, L],
+        "WORLD"   => vec![W, ER, L, D],
+        "WORK"    => vec![W, ER, K],
+        "WORD"    => vec![W, ER, D],
+        "WORM"    => vec![W, ER, M],
+        "WORST"   => vec![W, ER, S, T],
+        "WORTH"   => vec![W, ER, TH],
+        "WATER"   => vec![W, AO, T, ER],
+        "WANT"    => vec![W, AA, N, T],
+        "WOMEN"   => vec![W, IH, M, IH, N],
+        "WOMAN"   => vec![W, UH, M, AX, N],
+        "HEART"   => vec![HH, AA, R, T],
+        "GREAT"   => vec![G, R, EY, T],
+        "FRIEND"  => vec![F, R, EH, N, D],
+        "MACHINE" => vec![M, AX, SH, IY, N],
+        "AROUND"  => vec![AX, R, AW, N, D],
+        "ABOUT"   => vec![AX, B, AW, T],
+        "ABOVE"   => vec![AX, B, AH, V],
+        "AGAIN"   => vec![AX, G, EH, N],
+        "AGAINST" => vec![AX, G, EH, N, S, T],
+        "AWAY"    => vec![AX, W, EY],
+        "ENOUGH"  => vec![IH, N, AH, F],
+        "THROUGH" => vec![TH, R, UW],
+        "THOUGH"  => vec![DH, OW],
+        "THOUGHT" => vec![TH, AO, T],
+        "BECAUSE" => vec![B, IH, K, AH, Z],
+        "BEFORE"  => vec![B, IH, F, AO, R],
+        "TOGETHER"=> vec![T, AX, G, EH, DH, ER],
+        "EVERY"   => vec![EH, V, R, IY],
+        "NOTHING" => vec![N, AH, TH, IH, NG],
+        "SOMETHING"=>vec![S, AH, M, TH, IH, NG],
+        "EVERYTHING"=>vec![EH, V, R, IY, TH, IH, NG],
+        "BEAUTIFUL"=>vec![B, UW, T, IH, F, AX, L],
+        "ROBOT"   => vec![R, OW, B, AA, T],
+        "HUMAN"   => vec![HH, UW, M, AX, N],
+        "MUSIC"   => vec![M, UW, Z, IH, K],
+        "POWER"   => vec![P, AW, ER],
+        "NEVER"   => vec![N, EH, V, ER],
+        "EVER"    => vec![EH, V, ER],
+        "OVER"    => vec![OW, V, ER],
+        "AFTER"   => vec![AE, F, T, ER],
+        "OTHER"   => vec![AH, DH, ER],
+        "UNDER"   => vec![AH, N, D, ER],
+        "ONLY"    => vec![OW, N, L, IY],
+        "MANY"    => vec![M, EH, N, IY],
+        "ANY"     => vec![EH, N, IY],
+        "VERY"    => vec![V, EH, R, IY],
+        _ => return None,
+    })
+}
+
 fn apply_g2p_rules(word: &str) -> Vec<Phoneme> {
     let bytes = word.as_bytes();
     let len = bytes.len();
     if len == 0 { return vec![]; }
+
+    // Exception dictionary first — handles irregular words
+    if let Some(phonemes) = lexical_exception(word) {
+        return phonemes;
+    }
 
     // Check for voiced TH words
     let is_voiced_th = VOICED_TH_WORDS.iter().any(|w| *w == word);
 
     let mut result = Vec::with_capacity(len * 2);
     let mut pos = 0;
+    let mut magic_e_active = false; // true when magic-E consumed the final E
 
     while pos < len {
         let ch = bytes[pos];
@@ -664,10 +776,17 @@ fn apply_g2p_rules(word: &str) -> Vec<Phoneme> {
             continue;
         }
 
+        // Skip trailing E if magic-E already used it
+        if magic_e_active && pos == len - 1 && ch == b'E' {
+            pos += 1;
+            continue;
+        }
+
         // Try magic-E first for vowels
         if is_vowel_letter(ch) && ch != b'Y' {
             if let Some(long_vowel) = check_magic_e(bytes, pos) {
                 result.extend_from_slice(long_vowel);
+                magic_e_active = true;
                 pos += 1;
                 continue;
             }
