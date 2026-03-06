@@ -1407,6 +1407,13 @@
       "description": "Dual chord sequencers: SuperSaw pad + strummed Karplus strings + FM bass. Cinematic reverb.",
       "file": "cinematic-chords.json",
       "group": "Chord Sequencer"
+    },
+    {
+      "id": "cinematic-dreams",
+      "name": "Cinematic Dreams",
+      "description": "5 layers: SuperSaw pad + strummed strings (spring reverb) + triangle melody + FM bass + gentle 909 beat.",
+      "file": "cinematic-dreams.json",
+      "group": "Chord Sequencer"
     }
   ]
 }
