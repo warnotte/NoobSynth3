@@ -1,8 +1,8 @@
 {
   "version": 1,
-  "id": "polyrhythm-test",
-  "name": "Polyrhythm Test",
-  "description": "4-track polyrhythm sequencer with different lengths creating evolving patterns.",
+  "id": "polyrhythm-ambient",
+  "name": "Polyrhythm Ambient",
+  "description": "Slow evolving polyrhythm with wavetable pads and lush reverb.",
   "graph": {
     "modules": [
       {
@@ -10,7 +10,7 @@
         "type": "clock",
         "name": "Clock",
         "position": { "x": 0, "y": 0 },
-        "params": { "running": true, "tempo": 130, "rate": 4, "swing": 0 }
+        "params": { "running": true, "tempo": 72, "rate": 4, "swing": 0 }
       },
       {
         "id": "polyseq-1",
@@ -19,90 +19,90 @@
         "position": { "x": 3, "y": 0 },
         "params": {
           "enabled": true,
-          "tempo": 130,
-          "rate": 3,
-          "gateLength": 50,
+          "tempo": 72,
+          "rate": 2,
+          "gateLength": 80,
           "swing": 0,
           "track1Length": 8,
-          "track2Length": 12,
+          "track2Length": 5,
           "track3Length": 7,
-          "track4Length": 4,
+          "track4Length": 12,
           "track1Mute": false,
           "track2Mute": false,
           "track3Mute": false,
           "track4Mute": false,
-          "stepData": "[{\"track\":0,\"step\":0,\"pitch\":0,\"gate\":true,\"velocity\":100},{\"track\":0,\"step\":1,\"pitch\":3,\"gate\":true,\"velocity\":80},{\"track\":0,\"step\":2,\"pitch\":5,\"gate\":true,\"velocity\":100},{\"track\":0,\"step\":3,\"pitch\":7,\"gate\":false,\"velocity\":80},{\"track\":0,\"step\":4,\"pitch\":0,\"gate\":true,\"velocity\":90},{\"track\":0,\"step\":5,\"pitch\":-2,\"gate\":true,\"velocity\":80},{\"track\":0,\"step\":6,\"pitch\":3,\"gate\":true,\"velocity\":70},{\"track\":0,\"step\":7,\"pitch\":5,\"gate\":true,\"velocity\":100},{\"track\":1,\"step\":0,\"pitch\":12,\"gate\":true,\"velocity\":100},{\"track\":1,\"step\":1,\"pitch\":15,\"gate\":true,\"velocity\":80},{\"track\":1,\"step\":2,\"pitch\":14,\"gate\":false,\"velocity\":80},{\"track\":1,\"step\":3,\"pitch\":10,\"gate\":true,\"velocity\":90},{\"track\":1,\"step\":4,\"pitch\":12,\"gate\":true,\"velocity\":80},{\"track\":1,\"step\":5,\"pitch\":7,\"gate\":true,\"velocity\":70},{\"track\":1,\"step\":6,\"pitch\":10,\"gate\":false,\"velocity\":80},{\"track\":1,\"step\":7,\"pitch\":12,\"gate\":true,\"velocity\":90},{\"track\":1,\"step\":8,\"pitch\":15,\"gate\":true,\"velocity\":100},{\"track\":1,\"step\":9,\"pitch\":14,\"gate\":false,\"velocity\":80},{\"track\":1,\"step\":10,\"pitch\":10,\"gate\":true,\"velocity\":70},{\"track\":1,\"step\":11,\"pitch\":7,\"gate\":true,\"velocity\":80},{\"track\":2,\"step\":0,\"pitch\":-12,\"gate\":true,\"velocity\":100},{\"track\":2,\"step\":1,\"pitch\":-12,\"gate\":false,\"velocity\":80},{\"track\":2,\"step\":2,\"pitch\":-5,\"gate\":true,\"velocity\":90},{\"track\":2,\"step\":3,\"pitch\":-7,\"gate\":true,\"velocity\":80},{\"track\":2,\"step\":4,\"pitch\":-12,\"gate\":true,\"velocity\":100},{\"track\":2,\"step\":5,\"pitch\":-10,\"gate\":false,\"velocity\":80},{\"track\":2,\"step\":6,\"pitch\":-5,\"gate\":true,\"velocity\":70},{\"track\":3,\"step\":0,\"pitch\":7,\"gate\":true,\"velocity\":100},{\"track\":3,\"step\":1,\"pitch\":5,\"gate\":true,\"velocity\":80},{\"track\":3,\"step\":2,\"pitch\":3,\"gate\":true,\"velocity\":90},{\"track\":3,\"step\":3,\"pitch\":0,\"gate\":true,\"velocity\":70}]"
+          "stepData": "[{\"track\":0,\"step\":0,\"pitch\":0,\"gate\":true,\"velocity\":100},{\"track\":0,\"step\":1,\"pitch\":7,\"gate\":true,\"velocity\":80},{\"track\":0,\"step\":2,\"pitch\":12,\"gate\":true,\"velocity\":90},{\"track\":0,\"step\":3,\"pitch\":7,\"gate\":true,\"velocity\":70},{\"track\":0,\"step\":4,\"pitch\":5,\"gate\":true,\"velocity\":85},{\"track\":0,\"step\":5,\"pitch\":0,\"gate\":false,\"velocity\":0},{\"track\":0,\"step\":6,\"pitch\":3,\"gate\":true,\"velocity\":75},{\"track\":0,\"step\":7,\"pitch\":5,\"gate\":true,\"velocity\":80},{\"track\":1,\"step\":0,\"pitch\":12,\"gate\":true,\"velocity\":100},{\"track\":1,\"step\":1,\"pitch\":16,\"gate\":true,\"velocity\":70},{\"track\":1,\"step\":2,\"pitch\":19,\"gate\":true,\"velocity\":85},{\"track\":1,\"step\":3,\"pitch\":16,\"gate\":false,\"velocity\":0},{\"track\":1,\"step\":4,\"pitch\":14,\"gate\":true,\"velocity\":75},{\"track\":2,\"step\":0,\"pitch\":-12,\"gate\":true,\"velocity\":100},{\"track\":2,\"step\":1,\"pitch\":-12,\"gate\":false,\"velocity\":0},{\"track\":2,\"step\":2,\"pitch\":-5,\"gate\":true,\"velocity\":90},{\"track\":2,\"step\":3,\"pitch\":-7,\"gate\":true,\"velocity\":80},{\"track\":2,\"step\":4,\"pitch\":-12,\"gate\":true,\"velocity\":85},{\"track\":2,\"step\":5,\"pitch\":-9,\"gate\":false,\"velocity\":0},{\"track\":2,\"step\":6,\"pitch\":-5,\"gate\":true,\"velocity\":70},{\"track\":3,\"step\":0,\"pitch\":0,\"gate\":true,\"velocity\":100},{\"track\":3,\"step\":1,\"pitch\":4,\"gate\":true,\"velocity\":70},{\"track\":3,\"step\":2,\"pitch\":7,\"gate\":true,\"velocity\":80},{\"track\":3,\"step\":3,\"pitch\":0,\"gate\":false,\"velocity\":0},{\"track\":3,\"step\":4,\"pitch\":5,\"gate\":true,\"velocity\":75},{\"track\":3,\"step\":5,\"pitch\":7,\"gate\":true,\"velocity\":85},{\"track\":3,\"step\":6,\"pitch\":12,\"gate\":true,\"velocity\":70},{\"track\":3,\"step\":7,\"pitch\":0,\"gate\":false,\"velocity\":0},{\"track\":3,\"step\":8,\"pitch\":3,\"gate\":true,\"velocity\":80},{\"track\":3,\"step\":9,\"pitch\":7,\"gate\":true,\"velocity\":75},{\"track\":3,\"step\":10,\"pitch\":5,\"gate\":false,\"velocity\":0},{\"track\":3,\"step\":11,\"pitch\":0,\"gate\":true,\"velocity\":90}]"
         }
       },
       {
         "id": "osc-1",
-        "type": "oscillator",
-        "name": "Track 1",
+        "type": "wavetable",
+        "name": "Pad 1",
         "position": { "x": 8, "y": 0 },
-        "params": { "frequency": 220, "type": "square", "pwm": 0.5 }
+        "params": { "frequency": 220, "bank": 2, "position": 0.3, "detune": 8, "voices": 3 }
       },
       {
         "id": "osc-2",
-        "type": "oscillator",
-        "name": "Track 2",
+        "type": "wavetable",
+        "name": "Pad 2",
         "position": { "x": 8, "y": 3 },
-        "params": { "frequency": 220, "type": "sawtooth" }
+        "params": { "frequency": 220, "bank": 2, "position": 0.6, "detune": 12, "voices": 3 }
       },
       {
         "id": "osc-3",
         "type": "oscillator",
-        "name": "Track 3",
+        "name": "Bass",
         "position": { "x": 8, "y": 6 },
-        "params": { "frequency": 220, "type": "triangle" }
+        "params": { "frequency": 110, "type": "triangle" }
       },
       {
         "id": "osc-4",
-        "type": "oscillator",
-        "name": "Track 4",
+        "type": "wavetable",
+        "name": "Pad 3",
         "position": { "x": 8, "y": 9 },
-        "params": { "frequency": 220, "type": "sine" }
+        "params": { "frequency": 220, "bank": 0, "position": 0.5, "detune": 6, "voices": 2 }
       },
       {
         "id": "adsr-1",
         "type": "adsr",
         "name": "Env 1",
-        "position": { "x": 14, "y": 0 },
-        "params": { "attack": 0.005, "decay": 0.15, "sustain": 0.3, "release": 0.1 }
+        "position": { "x": 11, "y": 0 },
+        "params": { "attack": 0.3, "decay": 0.8, "sustain": 0.5, "release": 1.0 }
       },
       {
         "id": "adsr-2",
         "type": "adsr",
         "name": "Env 2",
-        "position": { "x": 14, "y": 3 },
-        "params": { "attack": 0.005, "decay": 0.1, "sustain": 0.4, "release": 0.08 }
+        "position": { "x": 11, "y": 3 },
+        "params": { "attack": 0.4, "decay": 1.0, "sustain": 0.4, "release": 1.2 }
       },
       {
         "id": "adsr-3",
         "type": "adsr",
         "name": "Env 3",
-        "position": { "x": 14, "y": 6 },
-        "params": { "attack": 0.005, "decay": 0.3, "sustain": 0.5, "release": 0.2 }
+        "position": { "x": 11, "y": 6 },
+        "params": { "attack": 0.005, "decay": 0.3, "sustain": 0.4, "release": 0.2 }
       },
       {
         "id": "adsr-4",
         "type": "adsr",
         "name": "Env 4",
-        "position": { "x": 14, "y": 9 },
-        "params": { "attack": 0.005, "decay": 0.08, "sustain": 0.2, "release": 0.06 }
+        "position": { "x": 11, "y": 9 },
+        "params": { "attack": 0.5, "decay": 0.6, "sustain": 0.5, "release": 0.8 }
       },
       {
         "id": "gain-1",
         "type": "gain",
         "name": "VCA 1",
         "position": { "x": 14, "y": 0 },
-        "params": { "gain": 0.4 }
+        "params": { "gain": 0.3 }
       },
       {
         "id": "gain-2",
         "type": "gain",
         "name": "VCA 2",
         "position": { "x": 14, "y": 3 },
-        "params": { "gain": 0.3 }
+        "params": { "gain": 0.25 }
       },
       {
         "id": "gain-3",
@@ -116,7 +116,7 @@
         "type": "gain",
         "name": "VCA 4",
         "position": { "x": 14, "y": 9 },
-        "params": { "gain": 0.25 }
+        "params": { "gain": 0.2 }
       },
       {
         "id": "mixer-1",
@@ -129,17 +129,24 @@
         }
       },
       {
-        "id": "delay-1",
-        "type": "delay",
-        "name": "Delay",
+        "id": "ensemble-1",
+        "type": "ensemble",
+        "name": "Ensemble",
         "position": { "x": 20, "y": 0 },
-        "params": { "time": 375, "feedback": 0.3, "mix": 0.25 }
+        "params": { "rate": 0.5, "depth": 0.6, "mix": 0.3, "voices": 3 }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "x": 23, "y": 0 },
+        "params": { "mix": 0.5, "decay": 4.0, "damping": 0.3 }
       },
       {
         "id": "out-1",
         "type": "output",
         "name": "Output",
-        "position": { "x": 23, "y": 0 },
+        "position": { "x": 26, "y": 0 },
         "params": { "level": 1 }
       },
       {
@@ -148,7 +155,7 @@
         "name": "Info",
         "position": { "x": 0, "y": 12 },
         "params": {
-          "text": "POLYRHYTHM TEST\n\n4 tracks with different lengths:\n- Track 1: 8 steps (square)\n- Track 2: 12 steps (saw)\n- Track 3: 7 steps (triangle)\n- Track 4: 4 steps (sine)\n\nEach track wraps independently,\ncreating shifting polyrhythmic patterns.\nFull cycle: 8×12×7×4 = 2688 steps!\n\nTry: mute tracks, change lengths,\nadjust tempo, edit pitches (drag)."
+          "text": "POLYRHYTHM AMBIENT\n\nSlow evolving @ 72 BPM, 1/4 rate\n\n4 tracks, different lengths:\n- T1: 8 steps — wavetable pad (organic)\n- T2: 5 steps — wavetable pad (organic)\n- T3: 7 steps — triangle bass\n- T4: 12 steps — wavetable pad (classic)\n\nSlow ADSR envelopes for smooth pads.\nEnsemble + long reverb (4s).\n\nMute tracks to hear the\npolyrhythmic interplay."
         }
       }
     ],
@@ -175,8 +182,9 @@
       { "from": { "moduleId": "gain-2", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-2" }, "kind": "audio" },
       { "from": { "moduleId": "gain-3", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-3" }, "kind": "audio" },
       { "from": { "moduleId": "gain-4", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-4" }, "kind": "audio" },
-      { "from": { "moduleId": "mixer-1", "portId": "out" }, "to": { "moduleId": "delay-1", "portId": "in" }, "kind": "audio" },
-      { "from": { "moduleId": "delay-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+      { "from": { "moduleId": "mixer-1", "portId": "out" }, "to": { "moduleId": "ensemble-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "ensemble-1", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
     ]
   }
 }

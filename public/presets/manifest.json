@@ -1371,7 +1371,21 @@
       "name": "Polyrhythm Test",
       "description": "4-track polyrhythm sequencer with different lengths creating evolving patterns.",
       "file": "polyrhythm-test.json",
-      "group": "Module Tests"
+      "group": "Polyrhythm"
+    },
+    {
+      "id": "polyrhythm-ambient",
+      "name": "Polyrhythm Ambient",
+      "description": "Slow evolving polyrhythm with wavetable pads and lush reverb.",
+      "file": "polyrhythm-ambient.json",
+      "group": "Polyrhythm"
+    },
+    {
+      "id": "polyrhythm-techno",
+      "name": "Polyrhythm Techno",
+      "description": "Hard-hitting techno with FM synthesis and 909 drums in polyrhythmic patterns.",
+      "file": "polyrhythm-techno.json",
+      "group": "Polyrhythm"
     },
     {
       "id": "plucked-chords",

@@ -1,0 +1,233 @@
+{
+  "version": 1,
+  "id": "polyrhythm-techno",
+  "name": "Polyrhythm Techno",
+  "description": "Fast polyrhythmic techno with 909 drums, acid bass, and FM lead.",
+  "graph": {
+    "modules": [
+      {
+        "id": "clock-1",
+        "type": "clock",
+        "name": "Clock",
+        "position": { "x": 0, "y": 0 },
+        "params": { "running": true, "tempo": 138, "rate": 4, "swing": 5 }
+      },
+      {
+        "id": "polyseq-1",
+        "type": "polyrhythm-sequencer",
+        "name": "Polyrhythm",
+        "position": { "x": 3, "y": 0 },
+        "params": {
+          "enabled": true,
+          "tempo": 138,
+          "rate": 4,
+          "gateLength": 55,
+          "swing": 5,
+          "track1Length": 16,
+          "track2Length": 12,
+          "track3Length": 7,
+          "track4Length": 5,
+          "track1Mute": false,
+          "track2Mute": false,
+          "track3Mute": false,
+          "track4Mute": false,
+          "stepData": "[{\"track\":0,\"step\":0,\"pitch\":0,\"gate\":true,\"velocity\":100},{\"track\":0,\"step\":1,\"pitch\":0,\"gate\":false,\"velocity\":0},{\"track\":0,\"step\":2,\"pitch\":0,\"gate\":true,\"velocity\":80},{\"track\":0,\"step\":3,\"pitch\":3,\"gate\":true,\"velocity\":90},{\"track\":0,\"step\":4,\"pitch\":0,\"gate\":false,\"velocity\":0},{\"track\":0,\"step\":5,\"pitch\":5,\"gate\":true,\"velocity\":70},{\"track\":0,\"step\":6,\"pitch\":0,\"gate\":true,\"velocity\":85},{\"track\":0,\"step\":7,\"pitch\":7,\"gate\":false,\"velocity\":0},{\"track\":0,\"step\":8,\"pitch\":0,\"gate\":true,\"velocity\":100},{\"track\":0,\"step\":9,\"pitch\":-5,\"gate\":true,\"velocity\":80},{\"track\":0,\"step\":10,\"pitch\":0,\"gate\":false,\"velocity\":0},{\"track\":0,\"step\":11,\"pitch\":3,\"gate\":true,\"velocity\":75},{\"track\":0,\"step\":12,\"pitch\":0,\"gate\":true,\"velocity\":90},{\"track\":0,\"step\":13,\"pitch\":0,\"gate\":false,\"velocity\":0},{\"track\":0,\"step\":14,\"pitch\":5,\"gate\":true,\"velocity\":85},{\"track\":0,\"step\":15,\"pitch\":7,\"gate\":true,\"velocity\":100},{\"track\":1,\"step\":0,\"pitch\":-12,\"gate\":true,\"velocity\":100},{\"track\":1,\"step\":1,\"pitch\":-12,\"gate\":false,\"velocity\":0},{\"track\":1,\"step\":2,\"pitch\":-12,\"gate\":true,\"velocity\":80},{\"track\":1,\"step\":3,\"pitch\":-12,\"gate\":true,\"velocity\":90},{\"track\":1,\"step\":4,\"pitch\":-5,\"gate\":true,\"velocity\":70},{\"track\":1,\"step\":5,\"pitch\":-5,\"gate\":false,\"velocity\":0},{\"track\":1,\"step\":6,\"pitch\":-7,\"gate\":true,\"velocity\":85},{\"track\":1,\"step\":7,\"pitch\":-12,\"gate\":true,\"velocity\":100},{\"track\":1,\"step\":8,\"pitch\":-10,\"gate\":true,\"velocity\":80},{\"track\":1,\"step\":9,\"pitch\":-12,\"gate\":false,\"velocity\":0},{\"track\":1,\"step\":10,\"pitch\":-7,\"gate\":true,\"velocity\":75},{\"track\":1,\"step\":11,\"pitch\":-12,\"gate\":true,\"velocity\":90},{\"track\":2,\"step\":0,\"pitch\":12,\"gate\":true,\"velocity\":100},{\"track\":2,\"step\":1,\"pitch\":15,\"gate\":true,\"velocity\":70},{\"track\":2,\"step\":2,\"pitch\":19,\"gate\":false,\"velocity\":0},{\"track\":2,\"step\":3,\"pitch\":12,\"gate\":true,\"velocity\":80},{\"track\":2,\"step\":4,\"pitch\":17,\"gate\":true,\"velocity\":90},{\"track\":2,\"step\":5,\"pitch\":15,\"gate\":false,\"velocity\":0},{\"track\":2,\"step\":6,\"pitch\":12,\"gate\":true,\"velocity\":85},{\"track\":3,\"step\":0,\"pitch\":7,\"gate\":true,\"velocity\":100},{\"track\":3,\"step\":1,\"pitch\":5,\"gate\":true,\"velocity\":80},{\"track\":3,\"step\":2,\"pitch\":3,\"gate\":false,\"velocity\":0},{\"track\":3,\"step\":3,\"pitch\":0,\"gate\":true,\"velocity\":90},{\"track\":3,\"step\":4,\"pitch\":5,\"gate\":true,\"velocity\":75}]"
+        }
+      },
+      {
+        "id": "osc-lead",
+        "type": "fm-op",
+        "name": "FM Lead",
+        "position": { "x": 8, "y": 0 },
+        "params": { "frequency": 440, "ratio": 2, "level": 1, "feedback": 0.2, "attack": 0.003, "decay": 0.15, "sustain": 0.3, "release": 0.08 }
+      },
+      {
+        "id": "osc-bass",
+        "type": "tb-303",
+        "name": "Acid Bass",
+        "position": { "x": 8, "y": 3 },
+        "params": { "waveform": 1, "cutoff": 600, "resonance": 0.6, "envMod": 0.5, "decay": 0.2, "accent": 0.4 }
+      },
+      {
+        "id": "osc-high",
+        "type": "fm-op",
+        "name": "FM High",
+        "position": { "x": 8, "y": 6 },
+        "params": { "frequency": 880, "ratio": 3, "level": 1, "feedback": 0.3, "attack": 0.001, "decay": 0.08, "sustain": 0.1, "release": 0.05 }
+      },
+      {
+        "id": "osc-perc",
+        "type": "fm-op",
+        "name": "FM Perc",
+        "position": { "x": 8, "y": 9 },
+        "params": { "frequency": 440, "ratio": 5, "level": 1, "feedback": 0.4, "attack": 0.001, "decay": 0.06, "sustain": 0, "release": 0.03 }
+      },
+      {
+        "id": "gain-lead",
+        "type": "gain",
+        "name": "Lead Vol",
+        "position": { "x": 11, "y": 0 },
+        "params": { "gain": 0.25 }
+      },
+      {
+        "id": "gain-bass",
+        "type": "gain",
+        "name": "Bass Vol",
+        "position": { "x": 11, "y": 3 },
+        "params": { "gain": 0.35 }
+      },
+      {
+        "id": "gain-high",
+        "type": "gain",
+        "name": "High Vol",
+        "position": { "x": 11, "y": 6 },
+        "params": { "gain": 0.15 }
+      },
+      {
+        "id": "gain-perc",
+        "type": "gain",
+        "name": "Perc Vol",
+        "position": { "x": 11, "y": 9 },
+        "params": { "gain": 0.2 }
+      },
+      {
+        "id": "drumseq-1",
+        "type": "drum-sequencer",
+        "name": "Drums",
+        "position": { "x": 3, "y": 12 },
+        "params": {
+          "enabled": true,
+          "tempo": 138,
+          "rate": 4,
+          "gateLength": 50,
+          "swing": 5,
+          "length": 16,
+          "drumData": "{\"tracks\":[[{\"g\":1,\"a\":1},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":1},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":1},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":1,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}]]}"
+        }
+      },
+      {
+        "id": "kick-1",
+        "type": "909-kick",
+        "name": "Kick",
+        "position": { "x": 8, "y": 12 },
+        "params": { "tune": 50, "attack": 0.5, "decay": 0.6, "drive": 0.2 }
+      },
+      {
+        "id": "snare-1",
+        "type": "909-snare",
+        "name": "Snare",
+        "position": { "x": 10, "y": 12 },
+        "params": { "tune": 200, "tone": 0.5, "snappy": 0.6, "decay": 0.35 }
+      },
+      {
+        "id": "hihat-1",
+        "type": "909-hihat",
+        "name": "HiHat",
+        "position": { "x": 12, "y": 12 },
+        "params": { "tune": 9000, "decay": 0.08, "tone": 0.5 }
+      },
+      {
+        "id": "clap-1",
+        "type": "909-clap",
+        "name": "Clap",
+        "position": { "x": 14, "y": 12 },
+        "params": { "tone": 0.45, "decay": 0.2, "spread": 0.3 }
+      },
+      {
+        "id": "rim-1",
+        "type": "909-rimshot",
+        "name": "Rim",
+        "position": { "x": 16, "y": 12 },
+        "params": { "tune": 800, "decay": 0.15, "snap": 0.6 }
+      },
+      {
+        "id": "mixer-drums",
+        "type": "mixer-1x2",
+        "name": "Drum Mix",
+        "position": { "x": 18, "y": 12 },
+        "params": { "levelA": 0.5, "levelB": 0.35, "levelC": 0.2, "levelD": 0.3, "levelE": 0.25, "levelF": 0.6 }
+      },
+      {
+        "id": "mixer-main",
+        "type": "mixer-8",
+        "name": "Main Mix",
+        "position": { "x": 15, "y": 0 },
+        "params": {
+          "level1": 0.4, "level2": 0.5, "level3": 0.2, "level4": 0.2, "level5": 0.35,
+          "level6": 0, "level7": 0, "level8": 0
+        }
+      },
+      {
+        "id": "delay-1",
+        "type": "delay",
+        "name": "Delay",
+        "position": { "x": 18, "y": 0 },
+        "params": { "time": 217, "feedback": 0.3, "mix": 0.2 }
+      },
+      {
+        "id": "distortion-1",
+        "type": "distortion",
+        "name": "Dist",
+        "position": { "x": 21, "y": 0 },
+        "params": { "drive": 0.15, "tone": 0.5, "mix": 0.2 }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Output",
+        "position": { "x": 24, "y": 0 },
+        "params": { "level": 1 }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 0, "y": 16 },
+        "params": {
+          "text": "POLYRHYTHM TECHNO\n\n138 BPM — 1/16 rate\n\n4 polyrhythmic tracks:\n- T1: 16 steps — FM lead\n- T2: 12 steps — TB-303 acid bass\n- T3: 7 steps — FM high stabs\n- T4: 5 steps — FM percussion\n\n+ 909 drums (kick, snare, hihat,\nclap, rimshot)\n\nTracks drift against each other\nand the drums for evolving grooves.\n\nTry: mute T3/T4 for minimal,\nunmute for chaos!"
+        }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "polyseq-1", "portId": "clock" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "reset" }, "to": { "moduleId": "polyseq-1", "portId": "reset" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "drumseq-1", "portId": "clock" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "reset" }, "to": { "moduleId": "drumseq-1", "portId": "reset" }, "kind": "sync" },
+
+      { "from": { "moduleId": "polyseq-1", "portId": "cv-1" }, "to": { "moduleId": "osc-lead", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "polyseq-1", "portId": "gate-1" }, "to": { "moduleId": "osc-lead", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "polyseq-1", "portId": "cv-2" }, "to": { "moduleId": "osc-bass", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "polyseq-1", "portId": "gate-2" }, "to": { "moduleId": "osc-bass", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "polyseq-1", "portId": "cv-3" }, "to": { "moduleId": "osc-high", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "polyseq-1", "portId": "gate-3" }, "to": { "moduleId": "osc-high", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "polyseq-1", "portId": "cv-4" }, "to": { "moduleId": "osc-perc", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "polyseq-1", "portId": "gate-4" }, "to": { "moduleId": "osc-perc", "portId": "gate" }, "kind": "gate" },
+
+      { "from": { "moduleId": "osc-lead", "portId": "out" }, "to": { "moduleId": "gain-lead", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "osc-bass", "portId": "out" }, "to": { "moduleId": "gain-bass", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "osc-high", "portId": "out" }, "to": { "moduleId": "gain-high", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "osc-perc", "portId": "out" }, "to": { "moduleId": "gain-perc", "portId": "in" }, "kind": "audio" },
+
+      { "from": { "moduleId": "gain-lead", "portId": "out" }, "to": { "moduleId": "mixer-main", "portId": "in-1" }, "kind": "audio" },
+      { "from": { "moduleId": "gain-bass", "portId": "out" }, "to": { "moduleId": "mixer-main", "portId": "in-2" }, "kind": "audio" },
+      { "from": { "moduleId": "gain-high", "portId": "out" }, "to": { "moduleId": "mixer-main", "portId": "in-3" }, "kind": "audio" },
+      { "from": { "moduleId": "gain-perc", "portId": "out" }, "to": { "moduleId": "mixer-main", "portId": "in-4" }, "kind": "audio" },
+
+      { "from": { "moduleId": "drumseq-1", "portId": "gate-kick" }, "to": { "moduleId": "kick-1", "portId": "trigger" }, "kind": "gate" },
+      { "from": { "moduleId": "drumseq-1", "portId": "gate-snare" }, "to": { "moduleId": "snare-1", "portId": "trigger" }, "kind": "gate" },
+      { "from": { "moduleId": "drumseq-1", "portId": "gate-hhc" }, "to": { "moduleId": "hihat-1", "portId": "trigger" }, "kind": "gate" },
+      { "from": { "moduleId": "drumseq-1", "portId": "gate-clap" }, "to": { "moduleId": "clap-1", "portId": "trigger" }, "kind": "gate" },
+      { "from": { "moduleId": "drumseq-1", "portId": "gate-rim" }, "to": { "moduleId": "rim-1", "portId": "trigger" }, "kind": "gate" },
+      { "from": { "moduleId": "kick-1", "portId": "out" }, "to": { "moduleId": "mixer-drums", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "snare-1", "portId": "out" }, "to": { "moduleId": "mixer-drums", "portId": "in-b" }, "kind": "audio" },
+      { "from": { "moduleId": "hihat-1", "portId": "out" }, "to": { "moduleId": "mixer-drums", "portId": "in-c" }, "kind": "audio" },
+      { "from": { "moduleId": "clap-1", "portId": "out" }, "to": { "moduleId": "mixer-drums", "portId": "in-d" }, "kind": "audio" },
+      { "from": { "moduleId": "rim-1", "portId": "out" }, "to": { "moduleId": "mixer-drums", "portId": "in-e" }, "kind": "audio" },
+      { "from": { "moduleId": "mixer-drums", "portId": "out" }, "to": { "moduleId": "mixer-main", "portId": "in-5" }, "kind": "audio" },
+
+      { "from": { "moduleId": "mixer-main", "portId": "out" }, "to": { "moduleId": "delay-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "delay-1", "portId": "out" }, "to": { "moduleId": "distortion-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "distortion-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}

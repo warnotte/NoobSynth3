@@ -4,6 +4,7 @@
  * 4 independent tracks with different lengths for polyrhythmic patterns.
  */
 
+import type React from 'react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { ControlProps } from '../types'
 import { RotaryKnob } from '../../RotaryKnob'
@@ -14,6 +15,31 @@ import { formatInt } from '../../formatters'
 import { seqRateOptions, DEFAULT_RATES } from './shared/rateOptions'
 
 type PolyStepData = { track: number; step: number; pitch: number; gate: boolean; velocity: number }
+
+/** Pointer-drag helpers for pitch editing. */
+const dragState = { startY: 0, startVal: 0 }
+
+function makeDragHandlers(
+  getVal: () => number,
+  setVal: (v: number) => void,
+  min: number,
+  max: number,
+  sensitivity = 4,
+) {
+  const onPointerDown = (e: React.PointerEvent) => {
+    e.preventDefault()
+    dragState.startY = e.clientY
+    dragState.startVal = getVal()
+    ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
+  }
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (!(e.currentTarget as HTMLElement).hasPointerCapture(e.pointerId)) return
+    const dy = dragState.startY - e.clientY
+    const delta = Math.round(dy / sensitivity)
+    setVal(Math.max(min, Math.min(max, dragState.startVal + delta)))
+  }
+  return { onPointerDown, onPointerMove }
+}
 
 const TRACK_COLORS = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12']
 const TRACK_LABELS = ['Track 1', 'Track 2', 'Track 3', 'Track 4']
@@ -217,12 +243,15 @@ export function PolyrhythmSequencerControls({ module, engine, status, audioMode,
         <ControlBox label={`${TRACK_LABELS[activeTrack]} Length`}>
           <ControlButtons
             options={[
+              { id: 3, label: '3' },
               { id: 4, label: '4' },
+              { id: 5, label: '5' },
               { id: 7, label: '7' },
               { id: 8, label: '8' },
               { id: 12, label: '12' },
               { id: 16, label: '16' },
             ]}
+            columns={4}
             value={currentLength}
             onChange={(value) => updateParam(module.id, trackLengthParamNames[activeTrack], value)}
           />
@@ -267,17 +296,20 @@ export function PolyrhythmSequencerControls({ module, engine, status, audioMode,
                   </button>
                   <div
                     className="seq-step-pitch"
-                    onWheel={(e) => {
-                      e.preventDefault()
-                      const delta = e.deltaY < 0 ? 1 : -1
-                      const newTrackSteps = trackSteps.map(t => [...t])
-                      newTrackSteps[activeTrack] = [...newTrackSteps[activeTrack]]
-                      newTrackSteps[activeTrack][stepIndex] = {
-                        ...newTrackSteps[activeTrack][stepIndex],
-                        pitch: Math.max(-24, Math.min(24, step.pitch + delta)),
-                      }
-                      updateAllSteps(newTrackSteps)
-                    }}
+                    style={{ cursor: 'ns-resize' }}
+                    {...makeDragHandlers(
+                      () => step.pitch,
+                      (v) => {
+                        const newTrackSteps = trackSteps.map(t => [...t])
+                        newTrackSteps[activeTrack] = [...newTrackSteps[activeTrack]]
+                        newTrackSteps[activeTrack][stepIndex] = {
+                          ...newTrackSteps[activeTrack][stepIndex],
+                          pitch: v,
+                        }
+                        updateAllSteps(newTrackSteps)
+                      },
+                      -24, 24
+                    )}
                   >
                     {formatPitch(step.pitch)}
                   </div>
