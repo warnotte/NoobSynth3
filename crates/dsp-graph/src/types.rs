@@ -73,6 +73,8 @@ pub enum ModuleType {
     TuringMachine,
     SidPlayer,
     AyPlayer,
+    ChordSequencer,
+    PolyrhythmSequencer,
 
     // TR-909 Drums
     Kick909,

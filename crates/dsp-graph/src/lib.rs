@@ -237,6 +237,8 @@ impl GraphEngine {
           ModuleState::StepSequencer(state) => return state.seq.current_step() as i32,
           ModuleState::DrumSequencer(state) => return state.seq.current_step() as i32,
           ModuleState::MidiFileSequencer(state) => return state.seq.current_tick() as i32,
+          ModuleState::ChordSequencer(state) => return state.seq.current_step() as i32,
+          ModuleState::PolyrhythmSequencer(state) => return state.seq.current_step() as i32,
           _ => {}
         }
       }
@@ -840,6 +842,10 @@ fn normalize_module_type(raw: &str) -> ModuleType {
     "ay-player" => ModuleType::AyPlayer,
     // Speech Synth
     "speech-synth" => ModuleType::SpeechSynth,
+    // Chord Sequencer
+    "chord-sequencer" => ModuleType::ChordSequencer,
+    // Polyrhythm Sequencer
+    "polyrhythm-sequencer" => ModuleType::PolyrhythmSequencer,
     _ => ModuleType::Oscillator,
   }
 }

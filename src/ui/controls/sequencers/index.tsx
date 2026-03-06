@@ -17,6 +17,8 @@ import { MidiFileSequencerControls } from './MidiFileSequencerControls'
 import { TuringMachineControls } from './TuringMachineControls'
 import { SidPlayerControls } from './SidPlayerControls'
 import { AyPlayerControls } from './AyPlayerControls'
+import { ChordSequencerControls } from './ChordSequencerControls'
+import { PolyrhythmSequencerControls } from './PolyrhythmSequencerControls'
 
 export function renderSequencerControls(props: ControlProps): React.ReactElement | null {
   const { module } = props
@@ -42,6 +44,10 @@ export function renderSequencerControls(props: ControlProps): React.ReactElement
       return <SidPlayerControls {...props} />
     case 'ay-player':
       return <AyPlayerControls {...props} />
+    case 'chord-sequencer':
+      return <ChordSequencerControls {...props} />
+    case 'polyrhythm-sequencer':
+      return <PolyrhythmSequencerControls {...props} />
     default:
       return null
   }

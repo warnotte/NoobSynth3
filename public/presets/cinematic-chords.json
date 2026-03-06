@@ -1,0 +1,270 @@
+{
+  "version": 1,
+  "id": "cinematic-chords",
+  "name": "Cinematic Chords",
+  "description": "Two chord sequencers in parallel: lush SuperSaw pad + strummed Karplus strings, FM sub bass, phaser, and cinematic reverb.",
+  "graph": {
+    "modules": [
+      {
+        "id": "chordseq-pad",
+        "type": "chord-sequencer",
+        "name": "Pad Chords",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "enabled": 1,
+          "tempo": 68,
+          "rate": 0,
+          "gateLength": 95,
+          "swing": 0,
+          "length": 8,
+          "strumSpeed": 0,
+          "strumDirection": 0,
+          "voicing": 1,
+          "stepData": "[{\"root\":60,\"chordType\":4,\"inversion\":0,\"gate\":true},{\"root\":60,\"chordType\":4,\"inversion\":0,\"gate\":true},{\"root\":65,\"chordType\":4,\"inversion\":0,\"gate\":true},{\"root\":65,\"chordType\":4,\"inversion\":0,\"gate\":true},{\"root\":57,\"chordType\":3,\"inversion\":0,\"gate\":true},{\"root\":57,\"chordType\":3,\"inversion\":0,\"gate\":true},{\"root\":62,\"chordType\":3,\"inversion\":0,\"gate\":true},{\"root\":55,\"chordType\":4,\"inversion\":1,\"gate\":true}]"
+        }
+      },
+      {
+        "id": "saw-1",
+        "type": "supersaw",
+        "name": "Pad 1",
+        "position": { "x": 5, "y": 0 },
+        "params": { "frequency": 220, "detune": 22, "mix": 0.75 }
+      },
+      {
+        "id": "saw-2",
+        "type": "supersaw",
+        "name": "Pad 2",
+        "position": { "x": 5, "y": 2 },
+        "params": { "frequency": 220, "detune": 30, "mix": 0.8 }
+      },
+      {
+        "id": "saw-3",
+        "type": "supersaw",
+        "name": "Pad 3",
+        "position": { "x": 5, "y": 4 },
+        "params": { "frequency": 220, "detune": 26, "mix": 0.75 }
+      },
+      {
+        "id": "saw-4",
+        "type": "supersaw",
+        "name": "Pad 4",
+        "position": { "x": 5, "y": 6 },
+        "params": { "frequency": 220, "detune": 35, "mix": 0.8 }
+      },
+      {
+        "id": "adsr-pad",
+        "type": "adsr",
+        "name": "Pad Env",
+        "position": { "x": 8, "y": 5 },
+        "params": { "attack": 1.5, "decay": 1.0, "sustain": 0.6, "release": 2.5 }
+      },
+      {
+        "id": "mixer-pad",
+        "type": "mixer-8",
+        "name": "Pad Mix",
+        "position": { "x": 9, "y": 0 },
+        "params": {
+          "level1": 0.2, "level2": 0.2, "level3": 0.2, "level4": 0.2,
+          "level5": 0, "level6": 0, "level7": 0, "level8": 0
+        }
+      },
+      {
+        "id": "gain-pad",
+        "type": "gain",
+        "name": "Pad VCA",
+        "position": { "x": 12, "y": 0 },
+        "params": { "gain": 0.25 }
+      },
+      {
+        "id": "vcf-pad",
+        "type": "vcf",
+        "name": "Pad Filter",
+        "position": { "x": 15, "y": 0 },
+        "params": { "cutoff": 700, "resonance": 0.2, "model": "svf", "mode": "lp", "slope": 24 }
+      },
+      {
+        "id": "lfo-filt",
+        "type": "lfo",
+        "name": "Filt LFO",
+        "position": { "x": 12, "y": 3 },
+        "params": { "rate": 0.05, "depth": 0.3, "offset": 0, "shape": "sine", "bipolar": true }
+      },
+      {
+        "id": "phaser-1",
+        "type": "phaser",
+        "name": "Phaser",
+        "position": { "x": 18, "y": 0 },
+        "params": { "rate": 0.15, "depth": 0.6, "feedback": 0.4, "mix": 0.35, "stages": 6, "spread": 0.5 }
+      },
+
+      {
+        "id": "chordseq-str",
+        "type": "chord-sequencer",
+        "name": "Strum Chords",
+        "position": { "x": 0, "y": 8 },
+        "params": {
+          "enabled": 1,
+          "tempo": 68,
+          "rate": 1,
+          "gateLength": 65,
+          "swing": 10,
+          "length": 8,
+          "strumSpeed": 50,
+          "strumDirection": 2,
+          "voicing": 0,
+          "stepData": "[{\"root\":60,\"chordType\":4,\"inversion\":0,\"gate\":true},{\"root\":60,\"chordType\":4,\"inversion\":0,\"gate\":false},{\"root\":65,\"chordType\":4,\"inversion\":0,\"gate\":true},{\"root\":65,\"chordType\":4,\"inversion\":0,\"gate\":false},{\"root\":57,\"chordType\":3,\"inversion\":0,\"gate\":true},{\"root\":57,\"chordType\":3,\"inversion\":0,\"gate\":false},{\"root\":62,\"chordType\":3,\"inversion\":0,\"gate\":true},{\"root\":55,\"chordType\":4,\"inversion\":1,\"gate\":true}]"
+        }
+      },
+      {
+        "id": "karp-1",
+        "type": "karplus",
+        "name": "Str 1",
+        "position": { "x": 5, "y": 8 },
+        "params": { "frequency": 220, "damping": 0.18, "decay": 0.997, "brightness": 0.65, "pluckPos": 0.35 }
+      },
+      {
+        "id": "karp-2",
+        "type": "karplus",
+        "name": "Str 2",
+        "position": { "x": 5, "y": 10 },
+        "params": { "frequency": 220, "damping": 0.22, "decay": 0.996, "brightness": 0.55, "pluckPos": 0.45 }
+      },
+      {
+        "id": "karp-3",
+        "type": "karplus",
+        "name": "Str 3",
+        "position": { "x": 5, "y": 12 },
+        "params": { "frequency": 220, "damping": 0.28, "decay": 0.995, "brightness": 0.5, "pluckPos": 0.55 }
+      },
+      {
+        "id": "karp-4",
+        "type": "karplus",
+        "name": "Str 4",
+        "position": { "x": 5, "y": 14 },
+        "params": { "frequency": 220, "damping": 0.15, "decay": 0.998, "brightness": 0.7, "pluckPos": 0.3 }
+      },
+      {
+        "id": "mixer-str",
+        "type": "mixer-8",
+        "name": "String Mix",
+        "position": { "x": 9, "y": 8 },
+        "params": {
+          "level1": 0.3, "level2": 0.3, "level3": 0.3, "level4": 0.3,
+          "level5": 0, "level6": 0, "level7": 0, "level8": 0
+        }
+      },
+      {
+        "id": "chorus-1",
+        "type": "chorus",
+        "name": "Chorus",
+        "position": { "x": 12, "y": 8 },
+        "params": { "rate": 0.35, "depth": 4, "delay": 10, "mix": 0.25, "spread": 0.7, "feedback": 0.05 }
+      },
+      {
+        "id": "delay-str",
+        "type": "delay",
+        "name": "Str Delay",
+        "position": { "x": 15, "y": 8 },
+        "params": { "time": 440, "feedback": 0.3, "mix": 0.2 }
+      },
+
+      {
+        "id": "osc-bass",
+        "type": "fm-op",
+        "name": "FM Bass",
+        "position": { "x": 5, "y": 16 },
+        "params": { "frequency": 110, "ratio": 1, "level": 1, "feedback": 0.15, "attack": 0.005, "decay": 0.4, "sustain": 0.4, "release": 0.2 }
+      },
+      {
+        "id": "vcf-bass",
+        "type": "vcf",
+        "name": "Bass Filter",
+        "position": { "x": 9, "y": 16 },
+        "params": { "cutoff": 400, "resonance": 0.3, "model": "svf", "mode": "lp", "slope": 24 }
+      },
+      {
+        "id": "gain-bass",
+        "type": "gain",
+        "name": "Bass Vol",
+        "position": { "x": 12, "y": 16 },
+        "params": { "gain": 0.3 }
+      },
+
+      {
+        "id": "mixer-main",
+        "type": "mixer-8",
+        "name": "Main Mix",
+        "position": { "x": 21, "y": 0 },
+        "params": {
+          "level1": 0.7, "level2": 0.45, "level3": 0.35,
+          "level4": 0, "level5": 0, "level6": 0, "level7": 0, "level8": 0
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "x": 24, "y": 0 },
+        "params": { "mix": 0.45, "decay": 4.0, "damping": 0.3 }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Output",
+        "position": { "x": 27, "y": 0 },
+        "params": { "level": 1 }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 18, "y": 8 },
+        "params": {
+          "text": "CINEMATIC CHORDS\n\n2 Chord Sequencers in parallel @ 68 BPM:\n\nPAD (1/1): 4 SuperSaws, spread voicing\n→ VCA (1.5s atk) → LP Filter (LFO)\n→ Phaser → Main Mix\n\nSTRINGS (1/2): 4 Karplus-Strong\nStrum 50ms alt + swing, close voicing\n→ Chorus → Delay → Main Mix\n\nBASS: FM-op follows chord roots\n→ LP 400Hz → Main Mix\n\nSame progression, different feels:\nCMaj7-CMaj7-FMaj7-FMaj7-Am7-Am7-Dm7-GMaj7\n\n→ Long cinematic reverb (4s decay)"
+        }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "chordseq-pad", "portId": "cv-1" }, "to": { "moduleId": "saw-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "chordseq-pad", "portId": "cv-2" }, "to": { "moduleId": "saw-2", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "chordseq-pad", "portId": "cv-3" }, "to": { "moduleId": "saw-3", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "chordseq-pad", "portId": "cv-4" }, "to": { "moduleId": "saw-4", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "chordseq-pad", "portId": "gate-1" }, "to": { "moduleId": "adsr-pad", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "saw-1", "portId": "out" }, "to": { "moduleId": "mixer-pad", "portId": "in-1" }, "kind": "audio" },
+      { "from": { "moduleId": "saw-2", "portId": "out" }, "to": { "moduleId": "mixer-pad", "portId": "in-2" }, "kind": "audio" },
+      { "from": { "moduleId": "saw-3", "portId": "out" }, "to": { "moduleId": "mixer-pad", "portId": "in-3" }, "kind": "audio" },
+      { "from": { "moduleId": "saw-4", "portId": "out" }, "to": { "moduleId": "mixer-pad", "portId": "in-4" }, "kind": "audio" },
+      { "from": { "moduleId": "mixer-pad", "portId": "out" }, "to": { "moduleId": "gain-pad", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-pad", "portId": "env" }, "to": { "moduleId": "gain-pad", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "gain-pad", "portId": "out" }, "to": { "moduleId": "vcf-pad", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "lfo-filt", "portId": "cv-out" }, "to": { "moduleId": "vcf-pad", "portId": "mod" }, "kind": "cv" },
+      { "from": { "moduleId": "vcf-pad", "portId": "out" }, "to": { "moduleId": "phaser-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "phaser-1", "portId": "out" }, "to": { "moduleId": "mixer-main", "portId": "in-1" }, "kind": "audio" },
+
+      { "from": { "moduleId": "chordseq-str", "portId": "cv-1" }, "to": { "moduleId": "karp-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "chordseq-str", "portId": "gate-1" }, "to": { "moduleId": "karp-1", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "chordseq-str", "portId": "cv-2" }, "to": { "moduleId": "karp-2", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "chordseq-str", "portId": "gate-2" }, "to": { "moduleId": "karp-2", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "chordseq-str", "portId": "cv-3" }, "to": { "moduleId": "karp-3", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "chordseq-str", "portId": "gate-3" }, "to": { "moduleId": "karp-3", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "chordseq-str", "portId": "cv-4" }, "to": { "moduleId": "karp-4", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "chordseq-str", "portId": "gate-4" }, "to": { "moduleId": "karp-4", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "karp-1", "portId": "out" }, "to": { "moduleId": "mixer-str", "portId": "in-1" }, "kind": "audio" },
+      { "from": { "moduleId": "karp-2", "portId": "out" }, "to": { "moduleId": "mixer-str", "portId": "in-2" }, "kind": "audio" },
+      { "from": { "moduleId": "karp-3", "portId": "out" }, "to": { "moduleId": "mixer-str", "portId": "in-3" }, "kind": "audio" },
+      { "from": { "moduleId": "karp-4", "portId": "out" }, "to": { "moduleId": "mixer-str", "portId": "in-4" }, "kind": "audio" },
+      { "from": { "moduleId": "mixer-str", "portId": "out" }, "to": { "moduleId": "chorus-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "chorus-1", "portId": "out" }, "to": { "moduleId": "delay-str", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "delay-str", "portId": "out" }, "to": { "moduleId": "mixer-main", "portId": "in-2" }, "kind": "audio" },
+
+      { "from": { "moduleId": "chordseq-pad", "portId": "root-cv" }, "to": { "moduleId": "osc-bass", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "chordseq-pad", "portId": "gate-1" }, "to": { "moduleId": "osc-bass", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "osc-bass", "portId": "out" }, "to": { "moduleId": "vcf-bass", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "vcf-bass", "portId": "out" }, "to": { "moduleId": "gain-bass", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "gain-bass", "portId": "out" }, "to": { "moduleId": "mixer-main", "portId": "in-3" }, "kind": "audio" },
+
+      { "from": { "moduleId": "mixer-main", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}

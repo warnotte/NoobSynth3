@@ -1,0 +1,214 @@
+{
+  "version": 1,
+  "id": "chord-wash-beat",
+  "name": "Chord Wash Beat",
+  "description": "Ambient SuperSaw pad with minimal 909 beat, tape delay, and long reverb.",
+  "graph": {
+    "modules": [
+      {
+        "id": "chordseq-1",
+        "type": "chord-sequencer",
+        "name": "Chord Seq",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "enabled": 1,
+          "tempo": 78,
+          "rate": 0,
+          "gateLength": 95,
+          "swing": 0,
+          "length": 4,
+          "strumSpeed": 0,
+          "strumDirection": 0,
+          "voicing": 1,
+          "stepData": "[{\"root\":60,\"chordType\":4,\"inversion\":0,\"gate\":true},{\"root\":64,\"chordType\":3,\"inversion\":1,\"gate\":true},{\"root\":65,\"chordType\":4,\"inversion\":0,\"gate\":true},{\"root\":62,\"chordType\":3,\"inversion\":0,\"gate\":true},{\"root\":60,\"chordType\":0,\"inversion\":0,\"gate\":false},{\"root\":60,\"chordType\":0,\"inversion\":0,\"gate\":false},{\"root\":60,\"chordType\":0,\"inversion\":0,\"gate\":false},{\"root\":60,\"chordType\":0,\"inversion\":0,\"gate\":false}]"
+        }
+      },
+      {
+        "id": "saw-1",
+        "type": "supersaw",
+        "name": "Pad 1",
+        "position": { "x": 5, "y": 0 },
+        "params": { "frequency": 220, "detune": 18, "mix": 0.75 }
+      },
+      {
+        "id": "saw-2",
+        "type": "supersaw",
+        "name": "Pad 2",
+        "position": { "x": 5, "y": 2 },
+        "params": { "frequency": 220, "detune": 28, "mix": 0.8 }
+      },
+      {
+        "id": "saw-3",
+        "type": "supersaw",
+        "name": "Pad 3",
+        "position": { "x": 5, "y": 4 },
+        "params": { "frequency": 220, "detune": 22, "mix": 0.75 }
+      },
+      {
+        "id": "saw-4",
+        "type": "supersaw",
+        "name": "Pad 4",
+        "position": { "x": 5, "y": 6 },
+        "params": { "frequency": 220, "detune": 32, "mix": 0.85 }
+      },
+      {
+        "id": "adsr-pad",
+        "type": "adsr",
+        "name": "Pad Env",
+        "position": { "x": 8, "y": 5 },
+        "params": { "attack": 1.2, "decay": 0.8, "sustain": 0.65, "release": 2.0 }
+      },
+      {
+        "id": "mixer-pad",
+        "type": "mixer-8",
+        "name": "Pad Mix",
+        "position": { "x": 9, "y": 0 },
+        "params": {
+          "level1": 0.25, "level2": 0.25, "level3": 0.25, "level4": 0.25,
+          "level5": 0, "level6": 0, "level7": 0, "level8": 0
+        }
+      },
+      {
+        "id": "gain-pad",
+        "type": "gain",
+        "name": "Pad VCA",
+        "position": { "x": 12, "y": 0 },
+        "params": { "gain": 0.3 }
+      },
+      {
+        "id": "vcf-1",
+        "type": "vcf",
+        "name": "VCF",
+        "position": { "x": 15, "y": 0 },
+        "params": { "cutoff": 900, "resonance": 0.25, "model": "svf", "mode": "lp", "slope": 24 }
+      },
+      {
+        "id": "lfo-1",
+        "type": "lfo",
+        "name": "Filt LFO",
+        "position": { "x": 12, "y": 4 },
+        "params": { "rate": 0.08, "depth": 0.4, "offset": 0, "shape": "sine", "bipolar": true }
+      },
+      {
+        "id": "ensemble-1",
+        "type": "ensemble",
+        "name": "Ensemble",
+        "position": { "x": 18, "y": 0 },
+        "params": { "rate": 0.18, "depth": 11, "delay": 15, "mix": 0.55, "spread": 0.85 }
+      },
+      {
+        "id": "drumseq-1",
+        "type": "drum-sequencer",
+        "name": "Drums",
+        "position": { "x": 0, "y": 8 },
+        "params": {
+          "enabled": true,
+          "tempo": 78,
+          "rate": 4,
+          "gateLength": 50,
+          "swing": 8,
+          "length": 16,
+          "drumData": "{\"tracks\":[[{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}]]}"
+        }
+      },
+      {
+        "id": "kick-1",
+        "type": "909-kick",
+        "name": "Kick",
+        "position": { "x": 5, "y": 8 },
+        "params": { "tune": 45, "attack": 0.4, "decay": 0.6, "drive": 0.2 }
+      },
+      {
+        "id": "hh-1",
+        "type": "909-hihat",
+        "name": "HiHat",
+        "position": { "x": 7, "y": 8 },
+        "params": { "openDecay": 0.3, "closedDecay": 0.06, "tone": 0.55, "mix": 0.5 }
+      },
+      {
+        "id": "clap-1",
+        "type": "909-clap",
+        "name": "Clap",
+        "position": { "x": 9, "y": 8 },
+        "params": { "tone": 0.45, "decay": 0.3, "spread": 0.4 }
+      },
+      {
+        "id": "mixer-drum",
+        "type": "mixer-1x2",
+        "name": "Drum Mix",
+        "position": { "x": 11, "y": 8 },
+        "params": { "levelA": 0.35, "levelB": 0.12, "levelC": 0.15, "levelD": 0.6, "levelE": 0.6, "levelF": 0.6 }
+      },
+      {
+        "id": "delay-1",
+        "type": "tape-delay",
+        "name": "Tape Dly",
+        "position": { "x": 14, "y": 8 },
+        "params": { "time": 385, "feedback": 0.2, "mix": 0.15, "wow": 0.15, "flutter": 0.1, "drive": 0.1, "tone": 0.6 }
+      },
+      {
+        "id": "mixer-main",
+        "type": "mixer-8",
+        "name": "Main Mix",
+        "position": { "x": 21, "y": 0 },
+        "params": {
+          "level1": 0.9, "level2": 0.12,
+          "level3": 0, "level4": 0, "level5": 0, "level6": 0, "level7": 0, "level8": 0
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "x": 24, "y": 0 },
+        "params": { "mix": 0.4, "decay": 3.5, "damping": 0.35 }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Output",
+        "position": { "x": 27, "y": 0 },
+        "params": { "level": 1 }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 0, "y": 12 },
+        "params": {
+          "text": "CHORD WASH BEAT\n\nAmbient pad + subtle 909 @ 78 BPM.\n\nPAD: 4 SuperSaws → VCA → Filter\n→ Ensemble → Main Mix (loud)\n\nDRUMS: Sparse kick + hihat + clap\n→ Drum Mix (quiet) → Tape Delay\n→ Main Mix → Reverb\n\nDrums sit behind the pad.\nTry: drum mix level, filter cutoff."
+        }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "chordseq-1", "portId": "cv-1" }, "to": { "moduleId": "saw-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "chordseq-1", "portId": "cv-2" }, "to": { "moduleId": "saw-2", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "chordseq-1", "portId": "cv-3" }, "to": { "moduleId": "saw-3", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "chordseq-1", "portId": "cv-4" }, "to": { "moduleId": "saw-4", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "chordseq-1", "portId": "gate-1" }, "to": { "moduleId": "adsr-pad", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "saw-1", "portId": "out" }, "to": { "moduleId": "mixer-pad", "portId": "in-1" }, "kind": "audio" },
+      { "from": { "moduleId": "saw-2", "portId": "out" }, "to": { "moduleId": "mixer-pad", "portId": "in-2" }, "kind": "audio" },
+      { "from": { "moduleId": "saw-3", "portId": "out" }, "to": { "moduleId": "mixer-pad", "portId": "in-3" }, "kind": "audio" },
+      { "from": { "moduleId": "saw-4", "portId": "out" }, "to": { "moduleId": "mixer-pad", "portId": "in-4" }, "kind": "audio" },
+      { "from": { "moduleId": "mixer-pad", "portId": "out" }, "to": { "moduleId": "gain-pad", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-pad", "portId": "env" }, "to": { "moduleId": "gain-pad", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "gain-pad", "portId": "out" }, "to": { "moduleId": "vcf-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "lfo-1", "portId": "cv-out" }, "to": { "moduleId": "vcf-1", "portId": "mod" }, "kind": "cv" },
+      { "from": { "moduleId": "vcf-1", "portId": "out" }, "to": { "moduleId": "ensemble-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "ensemble-1", "portId": "out" }, "to": { "moduleId": "mixer-main", "portId": "in-1" }, "kind": "audio" },
+      { "from": { "moduleId": "drumseq-1", "portId": "gate-kick" }, "to": { "moduleId": "kick-1", "portId": "trigger" }, "kind": "gate" },
+      { "from": { "moduleId": "drumseq-1", "portId": "gate-hhc" }, "to": { "moduleId": "hh-1", "portId": "trigger" }, "kind": "gate" },
+      { "from": { "moduleId": "drumseq-1", "portId": "gate-clap" }, "to": { "moduleId": "clap-1", "portId": "trigger" }, "kind": "gate" },
+      { "from": { "moduleId": "drumseq-1", "portId": "acc-kick" }, "to": { "moduleId": "kick-1", "portId": "accent" }, "kind": "cv" },
+      { "from": { "moduleId": "drumseq-1", "portId": "acc-hhc" }, "to": { "moduleId": "hh-1", "portId": "accent" }, "kind": "cv" },
+      { "from": { "moduleId": "drumseq-1", "portId": "acc-clap" }, "to": { "moduleId": "clap-1", "portId": "accent" }, "kind": "cv" },
+      { "from": { "moduleId": "kick-1", "portId": "out" }, "to": { "moduleId": "mixer-drum", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "hh-1", "portId": "out" }, "to": { "moduleId": "mixer-drum", "portId": "in-b" }, "kind": "audio" },
+      { "from": { "moduleId": "clap-1", "portId": "out" }, "to": { "moduleId": "mixer-drum", "portId": "in-c" }, "kind": "audio" },
+      { "from": { "moduleId": "mixer-drum", "portId": "out" }, "to": { "moduleId": "delay-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "delay-1", "portId": "out" }, "to": { "moduleId": "mixer-main", "portId": "in-2" }, "kind": "audio" },
+      { "from": { "moduleId": "mixer-main", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}

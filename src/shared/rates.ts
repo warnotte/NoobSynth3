@@ -68,6 +68,9 @@ export const RATE_PRESETS = {
   /** Common sequencer rates: 1/4, 1/8, 1/16 + triplets */
   sequencer: [2, 3, 4, 7, 8, 9] as const,
 
+  /** Chord sequencer rates: 1/1, 1/2, 1/4, 1/8 + dotted */
+  chordSequencer: [0, 1, 2, 3, 12, 13] as const,
+
   /** Arpeggiator rates: 1/4, 1/8, 1/16 + triplets */
   arpeggiator: [2, 3, 4, 7, 8, 9] as const,
 

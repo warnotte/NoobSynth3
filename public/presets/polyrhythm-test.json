@@ -1,0 +1,173 @@
+{
+  "version": 1,
+  "id": "polyrhythm-test",
+  "name": "Polyrhythm Test",
+  "description": "4-track polyrhythm sequencer with different lengths creating evolving patterns.",
+  "graph": {
+    "modules": [
+      {
+        "id": "polyseq-1",
+        "type": "polyrhythm-sequencer",
+        "name": "Polyrhythm",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "enabled": 1,
+          "tempo": 130,
+          "rate": 3,
+          "gateLength": 50,
+          "swing": 0,
+          "track1Length": 8,
+          "track2Length": 5,
+          "track3Length": 7,
+          "track4Length": 3,
+          "track1Mute": false,
+          "track2Mute": false,
+          "track3Mute": false,
+          "track4Mute": false,
+          "stepData": "[{\"track\":0,\"step\":0,\"pitch\":0,\"gate\":true,\"velocity\":100},{\"track\":0,\"step\":1,\"pitch\":3,\"gate\":true,\"velocity\":80},{\"track\":0,\"step\":2,\"pitch\":5,\"gate\":true,\"velocity\":100},{\"track\":0,\"step\":3,\"pitch\":7,\"gate\":false,\"velocity\":80},{\"track\":0,\"step\":4,\"pitch\":0,\"gate\":true,\"velocity\":90},{\"track\":0,\"step\":5,\"pitch\":-2,\"gate\":true,\"velocity\":80},{\"track\":0,\"step\":6,\"pitch\":3,\"gate\":true,\"velocity\":70},{\"track\":0,\"step\":7,\"pitch\":5,\"gate\":true,\"velocity\":100},{\"track\":1,\"step\":0,\"pitch\":12,\"gate\":true,\"velocity\":100},{\"track\":1,\"step\":1,\"pitch\":15,\"gate\":true,\"velocity\":80},{\"track\":1,\"step\":2,\"pitch\":14,\"gate\":false,\"velocity\":80},{\"track\":1,\"step\":3,\"pitch\":10,\"gate\":true,\"velocity\":90},{\"track\":1,\"step\":4,\"pitch\":12,\"gate\":true,\"velocity\":80},{\"track\":2,\"step\":0,\"pitch\":-12,\"gate\":true,\"velocity\":100},{\"track\":2,\"step\":1,\"pitch\":-12,\"gate\":false,\"velocity\":80},{\"track\":2,\"step\":2,\"pitch\":-5,\"gate\":true,\"velocity\":90},{\"track\":2,\"step\":3,\"pitch\":-7,\"gate\":true,\"velocity\":80},{\"track\":2,\"step\":4,\"pitch\":-12,\"gate\":true,\"velocity\":100},{\"track\":2,\"step\":5,\"pitch\":-10,\"gate\":false,\"velocity\":80},{\"track\":2,\"step\":6,\"pitch\":-5,\"gate\":true,\"velocity\":70},{\"track\":3,\"step\":0,\"pitch\":7,\"gate\":true,\"velocity\":100},{\"track\":3,\"step\":1,\"pitch\":5,\"gate\":true,\"velocity\":80},{\"track\":3,\"step\":2,\"pitch\":3,\"gate\":true,\"velocity\":90}]"
+        }
+      },
+      {
+        "id": "osc-1",
+        "type": "oscillator",
+        "name": "Track 1",
+        "position": { "x": 5, "y": 0 },
+        "params": { "frequency": 220, "type": "square", "pwm": 0.5 }
+      },
+      {
+        "id": "osc-2",
+        "type": "oscillator",
+        "name": "Track 2",
+        "position": { "x": 5, "y": 3 },
+        "params": { "frequency": 220, "type": "sawtooth" }
+      },
+      {
+        "id": "osc-3",
+        "type": "oscillator",
+        "name": "Track 3",
+        "position": { "x": 5, "y": 6 },
+        "params": { "frequency": 220, "type": "triangle" }
+      },
+      {
+        "id": "osc-4",
+        "type": "oscillator",
+        "name": "Track 4",
+        "position": { "x": 5, "y": 9 },
+        "params": { "frequency": 220, "type": "sine" }
+      },
+      {
+        "id": "adsr-1",
+        "type": "adsr",
+        "name": "Env 1",
+        "position": { "x": 8, "y": 0 },
+        "params": { "attack": 5, "decay": 150, "sustain": 0.3, "release": 100 }
+      },
+      {
+        "id": "adsr-2",
+        "type": "adsr",
+        "name": "Env 2",
+        "position": { "x": 8, "y": 3 },
+        "params": { "attack": 5, "decay": 100, "sustain": 0.4, "release": 80 }
+      },
+      {
+        "id": "adsr-3",
+        "type": "adsr",
+        "name": "Env 3",
+        "position": { "x": 8, "y": 6 },
+        "params": { "attack": 5, "decay": 300, "sustain": 0.5, "release": 200 }
+      },
+      {
+        "id": "adsr-4",
+        "type": "adsr",
+        "name": "Env 4",
+        "position": { "x": 8, "y": 9 },
+        "params": { "attack": 5, "decay": 80, "sustain": 0.2, "release": 60 }
+      },
+      {
+        "id": "gain-1",
+        "type": "gain",
+        "name": "VCA 1",
+        "position": { "x": 11, "y": 0 },
+        "params": { "gain": 0.7 }
+      },
+      {
+        "id": "gain-2",
+        "type": "gain",
+        "name": "VCA 2",
+        "position": { "x": 11, "y": 3 },
+        "params": { "gain": 0.5 }
+      },
+      {
+        "id": "gain-3",
+        "type": "gain",
+        "name": "VCA 3",
+        "position": { "x": 11, "y": 6 },
+        "params": { "gain": 0.6 }
+      },
+      {
+        "id": "gain-4",
+        "type": "gain",
+        "name": "VCA 4",
+        "position": { "x": 11, "y": 9 },
+        "params": { "gain": 0.4 }
+      },
+      {
+        "id": "mixer-1",
+        "type": "mixer-8",
+        "name": "Mixer",
+        "position": { "x": 14, "y": 0 },
+        "params": {
+          "level1": 0.7, "level2": 0.6, "level3": 0.7, "level4": 0.5,
+          "level5": 0, "level6": 0, "level7": 0, "level8": 0
+        }
+      },
+      {
+        "id": "delay-1",
+        "type": "delay",
+        "name": "Delay",
+        "position": { "x": 17, "y": 0 },
+        "params": { "time": 375, "feedback": 0.3, "mix": 0.25 }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Output",
+        "position": { "x": 20, "y": 0 },
+        "params": { "level": 1 }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 0, "y": 12 },
+        "params": {
+          "text": "POLYRHYTHM TEST\n\n4 tracks with different lengths:\n- Track 1: 8 steps (square)\n- Track 2: 5 steps (saw)\n- Track 3: 7 steps (triangle)\n- Track 4: 3 steps (sine)\n\nEach track wraps independently,\ncreating shifting polyrhythmic patterns.\n\nTry: mute tracks, change lengths, adjust tempo."
+        }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "polyseq-1", "portId": "cv-1" }, "to": { "moduleId": "osc-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "polyseq-1", "portId": "gate-1" }, "to": { "moduleId": "adsr-1", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "polyseq-1", "portId": "cv-2" }, "to": { "moduleId": "osc-2", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "polyseq-1", "portId": "gate-2" }, "to": { "moduleId": "adsr-2", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "polyseq-1", "portId": "cv-3" }, "to": { "moduleId": "osc-3", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "polyseq-1", "portId": "gate-3" }, "to": { "moduleId": "adsr-3", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "polyseq-1", "portId": "cv-4" }, "to": { "moduleId": "osc-4", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "polyseq-1", "portId": "gate-4" }, "to": { "moduleId": "adsr-4", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "osc-1", "portId": "out" }, "to": { "moduleId": "gain-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-1", "portId": "env" }, "to": { "moduleId": "gain-1", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "osc-2", "portId": "out" }, "to": { "moduleId": "gain-2", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-2", "portId": "env" }, "to": { "moduleId": "gain-2", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "osc-3", "portId": "out" }, "to": { "moduleId": "gain-3", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-3", "portId": "env" }, "to": { "moduleId": "gain-3", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "osc-4", "portId": "out" }, "to": { "moduleId": "gain-4", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-4", "portId": "env" }, "to": { "moduleId": "gain-4", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "gain-1", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-1" }, "kind": "audio" },
+      { "from": { "moduleId": "gain-2", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-2" }, "kind": "audio" },
+      { "from": { "moduleId": "gain-3", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-3" }, "kind": "audio" },
+      { "from": { "moduleId": "gain-4", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-4" }, "kind": "audio" },
+      { "from": { "moduleId": "mixer-1", "portId": "out" }, "to": { "moduleId": "delay-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "delay-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}

@@ -108,6 +108,10 @@ pub use sequencers::{
     TuringMachine, TuringParams, TuringInputs,
     SidPlayer, SidPlayerParams, SidPlayerInputs, SidPlayerOutputs, SidHeader,
     AyPlayer, AyPlayerParams, AyPlayerInputs, AyPlayerOutputs, YmHeader,
+    ChordSequencer, ChordSequencerParams, ChordSequencerInputs, ChordSequencerOutputs,
+    ChordStep,
+    PolyrhythmSequencer, PolyrhythmParams, PolyrhythmInputs, PolyrhythmOutputs,
+    PolyStep, POLY_MAX_STEPS, POLY_TRACKS,
 };
 
 // Re-export chips

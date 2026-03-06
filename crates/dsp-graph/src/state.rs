@@ -1,10 +1,10 @@
 //! Module state definitions for all DSP modules.
 
 use dsp_core::{
-    Adsr, Arpeggiator, AyPlayer, Chaos, Choir, Chorus, Clap808, Clap909, Compressor, Cowbell808, Delay, DrumSequencer, Ensemble,
+    Adsr, Arpeggiator, AyPlayer, Chaos, ChordSequencer, Choir, Chorus, Clap808, Clap909, Compressor, Cowbell808, Delay, DrumSequencer, Ensemble,
     EuclideanSequencer, FmMatrix, FmOperator, Granular, GranularDelay, HiHat808, HiHat909, Hpf, KarplusStrong,
     Kick808, Kick909, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, ParticleCloud, Phaser, PipeOrgan, PitchShifter,
-    Resonator, Reverb, Rimshot909, SampleHold, Shepard, SidPlayer, SlewLimiter, Snare808, Snare909, SnesOsc, SpectralSwarm, SpeechSynth,
+    PolyrhythmSequencer, Resonator, Reverb, Rimshot909, SampleHold, Shepard, SidPlayer, SlewLimiter, Snare808, Snare909, SnesOsc, SpectralSwarm, SpeechSynth,
     SpringReverb, StepSequencer, Supersaw, TapeDelay, Tb303, Tom808, Tom909, TuringMachine, Vcf, Vco, Vocoder, Wavetable,
 };
 
@@ -628,6 +628,36 @@ pub struct AyPlayerState {
     pub loop_enabled: ParamBuffer,
 }
 
+pub struct ChordSequencerState {
+    pub seq: ChordSequencer,
+    pub enabled: ParamBuffer,
+    pub tempo: ParamBuffer,
+    pub rate: ParamBuffer,
+    pub gate_length: ParamBuffer,
+    pub swing: ParamBuffer,
+    pub length: ParamBuffer,
+    pub strum_speed: ParamBuffer,
+    pub strum_direction: ParamBuffer,
+    pub voicing: ParamBuffer,
+}
+
+pub struct PolyrhythmSequencerState {
+    pub seq: PolyrhythmSequencer,
+    pub enabled: ParamBuffer,
+    pub tempo: ParamBuffer,
+    pub rate: ParamBuffer,
+    pub gate_length: ParamBuffer,
+    pub swing: ParamBuffer,
+    pub track1_length: ParamBuffer,
+    pub track2_length: ParamBuffer,
+    pub track3_length: ParamBuffer,
+    pub track4_length: ParamBuffer,
+    pub track1_mute: ParamBuffer,
+    pub track2_mute: ParamBuffer,
+    pub track3_mute: ParamBuffer,
+    pub track4_mute: ParamBuffer,
+}
+
 // =============================================================================
 // TR-909 Drum States
 // =============================================================================
@@ -830,6 +860,8 @@ pub enum ModuleState {
     TuringMachine(TuringState),
     SidPlayer(SidPlayerState),
     AyPlayer(AyPlayerState),
+    ChordSequencer(ChordSequencerState),
+    PolyrhythmSequencer(PolyrhythmSequencerState),
 
     // TR-909 Drums
     Kick909(Kick909State),

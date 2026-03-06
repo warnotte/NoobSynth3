@@ -67,6 +67,8 @@ pub mod midi_file_sequencer;
 pub mod turing;
 pub mod sid_player;
 pub mod ay_player;
+pub mod chord_sequencer;
+pub mod polyrhythm_sequencer;
 
 // ============================================================================
 // Shared Rate Divisions
@@ -163,3 +165,11 @@ pub use midi_file_sequencer::{
 pub use turing::{TuringMachine, TuringInputs, TuringParams};
 pub use sid_player::{SidPlayer, SidPlayerParams, SidPlayerInputs, SidPlayerOutputs, SidHeader};
 pub use ay_player::{AyPlayer, AyPlayerParams, AyPlayerInputs, AyPlayerOutputs, YmHeader};
+pub use chord_sequencer::{
+    ChordSequencer, ChordSequencerInputs, ChordSequencerParams, ChordSequencerOutputs,
+    ChordStep,
+};
+pub use polyrhythm_sequencer::{
+    PolyrhythmSequencer, PolyrhythmInputs, PolyrhythmParams, PolyrhythmOutputs,
+    PolyStep, POLY_MAX_STEPS, POLY_TRACKS,
+};

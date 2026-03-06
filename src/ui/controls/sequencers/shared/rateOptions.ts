@@ -5,6 +5,7 @@
 import { getRateOptions, DEFAULT_RATES } from '../../../../shared/rates'
 
 export const seqRateOptions = getRateOptions('sequencer')
+export const chordSeqRateOptions = getRateOptions('chordSequencer')
 export const clockRateOptions = getRateOptions('clock')
 export const drumRateOptions = getRateOptions('drums')
 

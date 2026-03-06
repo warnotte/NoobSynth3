@@ -1,0 +1,177 @@
+{
+  "version": 1,
+  "id": "chord-sequencer-test",
+  "name": "Chord Sequencer Test",
+  "description": "Chord Sequencer driving 4 oscillators with per-voice envelopes, strum, filter, and reverb.",
+  "graph": {
+    "modules": [
+      {
+        "id": "chordseq-1",
+        "type": "chord-sequencer",
+        "name": "Chord Seq",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "enabled": 1,
+          "tempo": 110,
+          "rate": 2,
+          "gateLength": 70,
+          "swing": 0,
+          "length": 4,
+          "strumSpeed": 50,
+          "strumDirection": 0,
+          "voicing": 0,
+          "stepData": "[{\"root\":60,\"chordType\":0,\"inversion\":0,\"gate\":true},{\"root\":57,\"chordType\":1,\"inversion\":0,\"gate\":true},{\"root\":65,\"chordType\":0,\"inversion\":0,\"gate\":true},{\"root\":67,\"chordType\":0,\"inversion\":0,\"gate\":true},{\"root\":60,\"chordType\":0,\"inversion\":0,\"gate\":false},{\"root\":60,\"chordType\":0,\"inversion\":0,\"gate\":false},{\"root\":60,\"chordType\":0,\"inversion\":0,\"gate\":false},{\"root\":60,\"chordType\":0,\"inversion\":0,\"gate\":false}]"
+        }
+      },
+      {
+        "id": "osc-1",
+        "type": "oscillator",
+        "name": "Voice 1",
+        "position": { "x": 5, "y": 0 },
+        "params": { "frequency": 220, "type": "sawtooth" }
+      },
+      {
+        "id": "osc-2",
+        "type": "oscillator",
+        "name": "Voice 2",
+        "position": { "x": 5, "y": 3 },
+        "params": { "frequency": 220, "type": "sawtooth" }
+      },
+      {
+        "id": "osc-3",
+        "type": "oscillator",
+        "name": "Voice 3",
+        "position": { "x": 5, "y": 6 },
+        "params": { "frequency": 220, "type": "sawtooth" }
+      },
+      {
+        "id": "osc-4",
+        "type": "oscillator",
+        "name": "Voice 4",
+        "position": { "x": 5, "y": 9 },
+        "params": { "frequency": 220, "type": "sawtooth" }
+      },
+      {
+        "id": "adsr-1",
+        "type": "adsr",
+        "name": "Env 1",
+        "position": { "x": 8, "y": 0 },
+        "params": { "attack": 0.002, "decay": 0.3, "sustain": 0.15, "release": 0.2 }
+      },
+      {
+        "id": "adsr-2",
+        "type": "adsr",
+        "name": "Env 2",
+        "position": { "x": 8, "y": 3 },
+        "params": { "attack": 0.002, "decay": 0.3, "sustain": 0.15, "release": 0.2 }
+      },
+      {
+        "id": "adsr-3",
+        "type": "adsr",
+        "name": "Env 3",
+        "position": { "x": 8, "y": 6 },
+        "params": { "attack": 0.002, "decay": 0.3, "sustain": 0.15, "release": 0.2 }
+      },
+      {
+        "id": "adsr-4",
+        "type": "adsr",
+        "name": "Env 4",
+        "position": { "x": 8, "y": 9 },
+        "params": { "attack": 0.002, "decay": 0.3, "sustain": 0.15, "release": 0.2 }
+      },
+      {
+        "id": "gain-1",
+        "type": "gain",
+        "name": "VCA 1",
+        "position": { "x": 11, "y": 0 },
+        "params": { "gain": 0.3 }
+      },
+      {
+        "id": "gain-2",
+        "type": "gain",
+        "name": "VCA 2",
+        "position": { "x": 11, "y": 3 },
+        "params": { "gain": 0.3 }
+      },
+      {
+        "id": "gain-3",
+        "type": "gain",
+        "name": "VCA 3",
+        "position": { "x": 11, "y": 6 },
+        "params": { "gain": 0.3 }
+      },
+      {
+        "id": "gain-4",
+        "type": "gain",
+        "name": "VCA 4",
+        "position": { "x": 11, "y": 9 },
+        "params": { "gain": 0.3 }
+      },
+      {
+        "id": "mixer-1",
+        "type": "mixer-8",
+        "name": "Mixer",
+        "position": { "x": 14, "y": 0 },
+        "params": {
+          "level1": 0.25, "level2": 0.25, "level3": 0.25, "level4": 0.25,
+          "level5": 0, "level6": 0, "level7": 0, "level8": 0
+        }
+      },
+      {
+        "id": "vcf-1",
+        "type": "vcf",
+        "name": "VCF",
+        "position": { "x": 17, "y": 0 },
+        "params": { "cutoff": 3000, "resonance": 0.2, "model": "svf", "mode": "lp", "slope": 24 }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "x": 20, "y": 0 },
+        "params": { "mix": 0.3, "decay": 2.5, "damping": 0.5 }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Output",
+        "position": { "x": 23, "y": 0 },
+        "params": { "level": 1 }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 0, "y": 12 },
+        "params": {
+          "text": "CHORD SEQUENCER TEST\n\nProgression C-Am-F-G, 4 voices.\n\n- Each voice: CV→Osc, Gate→ADSR→VCA\n- Strum: 30ms delay between voices\n- All 4 VCAs → Mixer → VCF → Reverb\n\nTry: change strum speed/direction,\nvoicing (Close/Spread), chord types."
+        }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "chordseq-1", "portId": "cv-1" }, "to": { "moduleId": "osc-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "chordseq-1", "portId": "cv-2" }, "to": { "moduleId": "osc-2", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "chordseq-1", "portId": "cv-3" }, "to": { "moduleId": "osc-3", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "chordseq-1", "portId": "cv-4" }, "to": { "moduleId": "osc-4", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "chordseq-1", "portId": "gate-1" }, "to": { "moduleId": "adsr-1", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "chordseq-1", "portId": "gate-2" }, "to": { "moduleId": "adsr-2", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "chordseq-1", "portId": "gate-3" }, "to": { "moduleId": "adsr-3", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "chordseq-1", "portId": "gate-4" }, "to": { "moduleId": "adsr-4", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "osc-1", "portId": "out" }, "to": { "moduleId": "gain-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-1", "portId": "env" }, "to": { "moduleId": "gain-1", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "osc-2", "portId": "out" }, "to": { "moduleId": "gain-2", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-2", "portId": "env" }, "to": { "moduleId": "gain-2", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "osc-3", "portId": "out" }, "to": { "moduleId": "gain-3", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-3", "portId": "env" }, "to": { "moduleId": "gain-3", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "osc-4", "portId": "out" }, "to": { "moduleId": "gain-4", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-4", "portId": "env" }, "to": { "moduleId": "gain-4", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "gain-1", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-1" }, "kind": "audio" },
+      { "from": { "moduleId": "gain-2", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-2" }, "kind": "audio" },
+      { "from": { "moduleId": "gain-3", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-3" }, "kind": "audio" },
+      { "from": { "moduleId": "gain-4", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-4" }, "kind": "audio" },
+      { "from": { "moduleId": "mixer-1", "portId": "out" }, "to": { "moduleId": "vcf-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "vcf-1", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}

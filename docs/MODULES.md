@@ -1405,6 +1405,103 @@ AY Player [cv-a] → NES Osc [freq-cv]
 AY Player [gate-a] → ADSR [gate]
 ```
 
+### Chord Sequencer
+
+Séquenceur de progressions d'accords avec 8 steps. Chaque step définit un accord (root + type + inversion). 4 sorties CV/Gate polyphoniques avec mode strum (notes décalées comme une guitare).
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `enabled` | true/false | Lecture active |
+| `tempo` | 40-300 BPM | Tempo (ignoré si clock externe) |
+| `rate` | 0-15 | Division de tempo (UI: 0=1/1, 1=1/2, 2=1/4, 3=1/8, 12=1/4., 13=1/8.) |
+| `gateLength` | 10-100 % | Durée du gate |
+| `swing` | 0-90 % | Swing sur steps impairs |
+| `length` | 1-8 | Longueur du pattern |
+| `strumSpeed` | 0-100 ms | Délai entre chaque voix (strum guitare) |
+| `strumDirection` | 0-2 | 0=Down, 1=Up, 2=Alternate |
+| `voicing` | 0-1 | 0=Close (serré), 1=Spread (étalé) |
+| `stepData` | JSON | Données des 8 steps |
+
+**Types d'accords (10) :**
+
+| Index | Nom | Intervalles |
+|-------|-----|-------------|
+| 0 | Major | [0, 4, 7] |
+| 1 | Minor | [0, 3, 7] |
+| 2 | Dom7 | [0, 4, 7, 10] |
+| 3 | Min7 | [0, 3, 7, 10] |
+| 4 | Maj7 | [0, 4, 7, 11] |
+| 5 | Dim | [0, 3, 6] |
+| 6 | Aug | [0, 4, 8] |
+| 7 | Sus2 | [0, 2, 7] |
+| 8 | Sus4 | [0, 5, 7] |
+| 9 | Power | [0, 7] |
+
+**Step Data (par step) :** `root` (MIDI note), `chordType` (0-9), `inversion` (0-3), `gate` (true/false)
+
+**Strum :** Voice 0 est immédiate, voice N est retardée de N × strumSpeed samples. Direction "Up" inverse l'ordre. "Alternate" alterne à chaque step.
+
+**Inversion :** Inversion N prend les N premières notes et les monte d'une octave (+12 demi-tons).
+
+**Entrées :**
+| Port | ID | Description |
+|------|----|-------------|
+| Clock | `clock` | Horloge externe |
+| Reset | `reset` | Reset à step 1 |
+
+**Sorties :**
+| Port | ID | Description |
+|------|----|-------------|
+| CV 1-4 | `cv-1` à `cv-4` | Pitch CV par voix (MIDI 60 = 0V) |
+| Gate 1-4 | `gate-1` à `gate-4` | Gate par voix |
+| Step | `step-out` | Position du step courant |
+| Root CV | `root-cv` | CV de la fondamentale (pour piloter une basse) |
+
+**Usage typique :**
+```
+Chord Seq [cv-1..4] → 4× Osc [pitch]
+Chord Seq [gate-1..4] → 4× ADSR [gate]
+Chord Seq [root-cv] → Bass Osc [pitch]
+```
+
+### Polyrhythm Sequencer
+
+Séquenceur polyrythmique avec 4 pistes indépendantes. Chaque piste a sa propre longueur (1-16 steps) et wrape indépendamment, créant des patterns polyrythmiques complexes.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `enabled` | true/false | Lecture active |
+| `tempo` | 40-300 BPM | Tempo (ignoré si clock externe) |
+| `rate` | 0-15 | Division de tempo |
+| `gateLength` | 10-100 % | Durée du gate |
+| `swing` | 0-90 % | Swing sur steps impairs |
+| `track1Length`..`track4Length` | 1-16 | Longueur par piste |
+| `track1Mute`..`track4Mute` | 0/1 | Mute par piste (gate=0, CV reste actif) |
+| `stepData` | JSON | Données des 4×16 steps |
+
+**Longueurs par défaut :** Piste 1=8, Piste 2=12, Piste 3=16, Piste 4=7 (polyrythmie classique)
+
+**Entrées :**
+| Port | ID | Description |
+|------|----|-------------|
+| Clock | `clock` | Horloge externe |
+| Reset | `reset` | Reset toutes les pistes à step 1 |
+
+**Sorties :**
+| Port | ID | Description |
+|------|----|-------------|
+| CV 1-4 | `cv-1` à `cv-4` | Pitch CV par piste |
+| Gate 1-4 | `gate-1` à `gate-4` | Gate par piste |
+| Step | `step-out` | Position du step courant (piste 1) |
+
+**Usage typique :**
+```
+Polyrhythm [cv-1..4] → 4× Osc [pitch]
+Polyrhythm [gate-1..4] → 4× ADSR [gate]
+```
+
+Les différentes longueurs de pistes créent des cycles qui ne se répètent qu'après le PPCM (ex: 8×12×16×7 = 1344 steps avant répétition exacte).
+
 ### Main Out
 
 Sortie audio principale.

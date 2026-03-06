@@ -1,0 +1,113 @@
+{
+  "version": 1,
+  "id": "plucked-chords",
+  "name": "Plucked Chords",
+  "description": "Acoustic guitar-like strumming with Karplus-Strong, chorus, and spring reverb.",
+  "graph": {
+    "modules": [
+      {
+        "id": "chordseq-1",
+        "type": "chord-sequencer",
+        "name": "Chord Seq",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "enabled": 1,
+          "tempo": 100,
+          "rate": 2,
+          "gateLength": 70,
+          "swing": 12,
+          "length": 8,
+          "strumSpeed": 40,
+          "strumDirection": 2,
+          "voicing": 0,
+          "stepData": "[{\"root\":60,\"chordType\":0,\"inversion\":0,\"gate\":true},{\"root\":67,\"chordType\":0,\"inversion\":0,\"gate\":true},{\"root\":57,\"chordType\":1,\"inversion\":0,\"gate\":true},{\"root\":57,\"chordType\":1,\"inversion\":0,\"gate\":true},{\"root\":65,\"chordType\":0,\"inversion\":0,\"gate\":true},{\"root\":60,\"chordType\":0,\"inversion\":1,\"gate\":true},{\"root\":62,\"chordType\":1,\"inversion\":0,\"gate\":true},{\"root\":67,\"chordType\":8,\"inversion\":0,\"gate\":true}]"
+        }
+      },
+      {
+        "id": "karp-1",
+        "type": "karplus",
+        "name": "String 1",
+        "position": { "x": 5, "y": 0 },
+        "params": { "frequency": 220, "damping": 0.2, "decay": 0.997, "brightness": 0.65, "pluckPos": 0.35 }
+      },
+      {
+        "id": "karp-2",
+        "type": "karplus",
+        "name": "String 2",
+        "position": { "x": 5, "y": 2 },
+        "params": { "frequency": 220, "damping": 0.25, "decay": 0.996, "brightness": 0.55, "pluckPos": 0.45 }
+      },
+      {
+        "id": "karp-3",
+        "type": "karplus",
+        "name": "String 3",
+        "position": { "x": 5, "y": 4 },
+        "params": { "frequency": 220, "damping": 0.3, "decay": 0.995, "brightness": 0.5, "pluckPos": 0.55 }
+      },
+      {
+        "id": "karp-4",
+        "type": "karplus",
+        "name": "String 4",
+        "position": { "x": 5, "y": 6 },
+        "params": { "frequency": 220, "damping": 0.15, "decay": 0.998, "brightness": 0.7, "pluckPos": 0.3 }
+      },
+      {
+        "id": "mixer-1",
+        "type": "mixer-8",
+        "name": "Mixer",
+        "position": { "x": 9, "y": 0 },
+        "params": {
+          "level1": 0.4, "level2": 0.35, "level3": 0.35, "level4": 0.4,
+          "level5": 0, "level6": 0, "level7": 0, "level8": 0
+        }
+      },
+      {
+        "id": "chorus-1",
+        "type": "chorus",
+        "name": "Chorus",
+        "position": { "x": 12, "y": 0 },
+        "params": { "rate": 0.4, "depth": 5, "delay": 12, "mix": 0.3, "spread": 0.7, "feedback": 0.05 }
+      },
+      {
+        "id": "spring-1",
+        "type": "spring-reverb",
+        "name": "Spring",
+        "position": { "x": 15, "y": 0 },
+        "params": { "decay": 0.5, "tone": 0.55, "mix": 0.3, "drive": 0.1 }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Output",
+        "position": { "x": 18, "y": 0 },
+        "params": { "level": 1 }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 0, "y": 8 },
+        "params": {
+          "text": "PLUCKED CHORDS\n\nGuitar strumming with Karplus-Strong.\n\n4 strings with varied damping/brightness.\nGate triggers pluck directly — no ADSR.\nAlternating strum + swing for feel.\n\nC - G - Am - Am - F - C/E - Dm - Gsus4\n\nTry: strum speed (40ms),\ndamping per string, spring drive."
+        }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "chordseq-1", "portId": "cv-1" }, "to": { "moduleId": "karp-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "chordseq-1", "portId": "gate-1" }, "to": { "moduleId": "karp-1", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "chordseq-1", "portId": "cv-2" }, "to": { "moduleId": "karp-2", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "chordseq-1", "portId": "gate-2" }, "to": { "moduleId": "karp-2", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "chordseq-1", "portId": "cv-3" }, "to": { "moduleId": "karp-3", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "chordseq-1", "portId": "gate-3" }, "to": { "moduleId": "karp-3", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "chordseq-1", "portId": "cv-4" }, "to": { "moduleId": "karp-4", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "chordseq-1", "portId": "gate-4" }, "to": { "moduleId": "karp-4", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "karp-1", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-1" }, "kind": "audio" },
+      { "from": { "moduleId": "karp-2", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-2" }, "kind": "audio" },
+      { "from": { "moduleId": "karp-3", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-3" }, "kind": "audio" },
+      { "from": { "moduleId": "karp-4", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-4" }, "kind": "audio" },
+      { "from": { "moduleId": "mixer-1", "portId": "out" }, "to": { "moduleId": "chorus-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "chorus-1", "portId": "out" }, "to": { "moduleId": "spring-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "spring-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}

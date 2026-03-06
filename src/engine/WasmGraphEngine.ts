@@ -512,7 +512,7 @@ export class AudioEngine {
 
     // Listen for messages from the worklet
     this.graphNode.port.onmessage = (event) => {
-      const data = event.data as { type: string; steps?: Record<string, number>; positions?: Record<string, number>; data?: number[]; voices?: Record<string, number[]>; elapsed?: Record<string, number> }
+      const data = event.data as { type: string; steps?: Record<string, number>; positions?: Record<string, number> | number[]; data?: number[]; voices?: Record<string, number[]>; elapsed?: Record<string, number>; moduleId?: string }
       if (data.type === 'sequencerSteps' && data.steps) {
         // Debug: log incoming step updates (throttled)
         const stepEntries = Object.entries(data.steps)
@@ -550,7 +550,8 @@ export class AudioEngine {
           this.granularLoadCallbacks.delete(moduleId)
         }
       } else if (data.type === 'granularPositions' && data.positions) {
-        for (const [moduleId, position] of Object.entries(data.positions)) {
+        const posMap = data.positions as Record<string, number>
+        for (const [moduleId, position] of Object.entries(posMap)) {
           const callback = this.granularPositionCallbacks.get(moduleId)
           if (callback) {
             callback(position)
@@ -560,8 +561,9 @@ export class AudioEngine {
         const callback = this.particlePositionCallbacks.get(data.moduleId)
         if (callback && data.positions) {
           // Positions is [x0, y0, x1, y1, ..., x31, y31, activeCount]
-          const positions = new Float32Array(data.positions.slice(0, 64))
-          const activeCount = data.positions[64] ?? 0
+          const posArr = data.positions as number[]
+          const positions = new Float32Array(posArr.slice(0, 64))
+          const activeCount = posArr[64] ?? 0
           callback(positions, activeCount)
         }
       } else if (data.type === 'sidVoiceStates' && data.voices) {

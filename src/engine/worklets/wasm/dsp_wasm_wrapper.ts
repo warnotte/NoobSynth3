@@ -34,6 +34,8 @@ type WasmGraphEngineCtor = new (sampleRate: number) => {
   load_ym_file(moduleId: string, data: Uint8Array): void
   get_ay_voice_states(moduleId: string): Uint16Array
   get_ay_elapsed(moduleId: string): number
+  load_particle_buffer(moduleId: string, data: Float32Array): void
+  get_particle_positions(moduleId: string): Float32Array
 }
 
 const WasmGraphEngine = (wasm as unknown as { WasmGraphEngine?: WasmGraphEngineCtor })

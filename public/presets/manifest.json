@@ -1358,6 +1358,55 @@
       "description": "Robotic singing voice with Speech Synth formant sequencing. Around The World!",
       "file": "speech-daft-punk.json",
       "group": "Vocal Synthesis"
+    },
+    {
+      "id": "chord-sequencer-test",
+      "name": "Chord Seq Test",
+      "description": "Chord Sequencer C-Am-F-G driving 4 oscillators with strum and reverb.",
+      "file": "chord-sequencer-test.json",
+      "group": "Chord Sequencer"
+    },
+    {
+      "id": "polyrhythm-test",
+      "name": "Polyrhythm Test",
+      "description": "4-track polyrhythm sequencer with different lengths creating evolving patterns.",
+      "file": "polyrhythm-test.json",
+      "group": "Module Tests"
+    },
+    {
+      "id": "plucked-chords",
+      "name": "Plucked Chords",
+      "description": "Strummed guitar-like chords using Karplus-Strong synthesis and spring reverb.",
+      "file": "plucked-chords.json",
+      "group": "Chord Sequencer"
+    },
+    {
+      "id": "chord-wash",
+      "name": "Chord Wash",
+      "description": "Lush ambient pad with SuperSaw chords, sweeping filter, and ensemble.",
+      "file": "chord-wash.json",
+      "group": "Chord Sequencer"
+    },
+    {
+      "id": "chord-wash-beat",
+      "name": "Chord Wash Beat",
+      "description": "Ambient SuperSaw pad with subtle 909 beat and tape delay.",
+      "file": "chord-wash-beat.json",
+      "group": "Chord Sequencer"
+    },
+    {
+      "id": "chord-odyssey",
+      "name": "Chord Odyssey",
+      "description": "Multi-sequencer ambient track: chord pad + melody + bass + 909 beat.",
+      "file": "chord-odyssey.json",
+      "group": "Chord Sequencer"
+    },
+    {
+      "id": "cinematic-chords",
+      "name": "Cinematic Chords",
+      "description": "Dual chord sequencers: SuperSaw pad + strummed Karplus strings + FM bass. Cinematic reverb.",
+      "file": "cinematic-chords.json",
+      "group": "Chord Sequencer"
     }
   ]
 }

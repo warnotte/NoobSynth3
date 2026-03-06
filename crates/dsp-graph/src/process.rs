@@ -35,6 +35,8 @@ use dsp_core::{
     SidPlayerInputs, SidPlayerOutputs, SidPlayerParams,
     SpeechSynthInputs, SpeechSynthParams,
     AyPlayerInputs, AyPlayerOutputs, AyPlayerParams,
+    ChordSequencerInputs, ChordSequencerOutputs, ChordSequencerParams,
+    PolyrhythmInputs, PolyrhythmOutputs, PolyrhythmParams,
     SlewInputs, SlewParams,
     Snare808Inputs, Snare808Params,
     Snare909Inputs, Snare909Params, SnesOscInputs, SnesOscParams, SpectralSwarmInputs, SpectralSwarmParams,
@@ -2088,6 +2090,86 @@ pub(crate) fn process_module(
             };
             let (out_l, out_r) = outputs[0].channels_mut_2();
             state.compressor.process_block_stereo(out_l, out_r, input_l, input_r, params);
+        }
+        ModuleState::ChordSequencer(state) => {
+            let clock = if connections[0].is_empty() { None } else { Some(inputs[0].channel(0)) };
+            let reset = if connections[1].is_empty() { None } else { Some(inputs[1].channel(0)) };
+            // 10 outputs: cv1,gate1,cv2,gate2,cv3,gate3,cv4,gate4,step,root_cv
+            let (o0, rest) = outputs.split_at_mut(1);
+            let (o1, rest) = rest.split_at_mut(1);
+            let (o2, rest) = rest.split_at_mut(1);
+            let (o3, rest) = rest.split_at_mut(1);
+            let (o4, rest) = rest.split_at_mut(1);
+            let (o5, rest) = rest.split_at_mut(1);
+            let (o6, rest) = rest.split_at_mut(1);
+            let (o7, rest) = rest.split_at_mut(1);
+            let (o8, o9) = rest.split_at_mut(1);
+            let seq_inputs = ChordSequencerInputs { clock, reset };
+            let params = ChordSequencerParams {
+                enabled: state.enabled.slice(frames),
+                tempo: state.tempo.slice(frames),
+                rate: state.rate.slice(frames),
+                gate_length: state.gate_length.slice(frames),
+                swing: state.swing.slice(frames),
+                length: state.length.slice(frames),
+                strum_speed: state.strum_speed.slice(frames),
+                strum_direction: state.strum_direction.slice(frames),
+                voicing: state.voicing.slice(frames),
+            };
+            let seq_outputs = ChordSequencerOutputs {
+                cv_1: o0[0].channel_mut(0),
+                gate_1: o1[0].channel_mut(0),
+                cv_2: o2[0].channel_mut(0),
+                gate_2: o3[0].channel_mut(0),
+                cv_3: o4[0].channel_mut(0),
+                gate_3: o5[0].channel_mut(0),
+                cv_4: o6[0].channel_mut(0),
+                gate_4: o7[0].channel_mut(0),
+                step_out: o8[0].channel_mut(0),
+                root_cv: o9[0].channel_mut(0),
+            };
+            state.seq.process_block(seq_outputs, seq_inputs, params);
+        }
+        ModuleState::PolyrhythmSequencer(state) => {
+            let clock = if connections[0].is_empty() { None } else { Some(inputs[0].channel(0)) };
+            let reset = if connections[1].is_empty() { None } else { Some(inputs[1].channel(0)) };
+            // 9 outputs: cv1,gate1,cv2,gate2,cv3,gate3,cv4,gate4,step
+            let (o0, rest) = outputs.split_at_mut(1);
+            let (o1, rest) = rest.split_at_mut(1);
+            let (o2, rest) = rest.split_at_mut(1);
+            let (o3, rest) = rest.split_at_mut(1);
+            let (o4, rest) = rest.split_at_mut(1);
+            let (o5, rest) = rest.split_at_mut(1);
+            let (o6, rest) = rest.split_at_mut(1);
+            let (o7, o8) = rest.split_at_mut(1);
+            let poly_inputs = PolyrhythmInputs { clock, reset };
+            let params = PolyrhythmParams {
+                enabled: state.enabled.slice(frames),
+                tempo: state.tempo.slice(frames),
+                rate: state.rate.slice(frames),
+                gate_length: state.gate_length.slice(frames),
+                swing: state.swing.slice(frames),
+                track1_length: state.track1_length.slice(frames),
+                track2_length: state.track2_length.slice(frames),
+                track3_length: state.track3_length.slice(frames),
+                track4_length: state.track4_length.slice(frames),
+                track1_mute: state.track1_mute.slice(frames),
+                track2_mute: state.track2_mute.slice(frames),
+                track3_mute: state.track3_mute.slice(frames),
+                track4_mute: state.track4_mute.slice(frames),
+            };
+            let poly_outputs = PolyrhythmOutputs {
+                cv_1: o0[0].channel_mut(0),
+                gate_1: o1[0].channel_mut(0),
+                cv_2: o2[0].channel_mut(0),
+                gate_2: o3[0].channel_mut(0),
+                cv_3: o4[0].channel_mut(0),
+                gate_3: o5[0].channel_mut(0),
+                cv_4: o6[0].channel_mut(0),
+                gate_4: o7[0].channel_mut(0),
+                step_out: o8[0].channel_mut(0),
+            };
+            state.seq.process_block(poly_outputs, poly_inputs, params);
         }
         ModuleState::Notes => {
             // UI-only module, no audio processing

@@ -8,7 +8,6 @@
 import type { ControlProps } from '../types'
 import { RotaryKnob } from '../../RotaryKnob'
 import { ControlBox, ControlBoxRow } from '../../ControlBox'
-import { ControlButtons } from '../../ControlButtons'
 import { WaveformButtons, WAVE_OPTIONS_STANDARD } from '../../WaveformSelector'
 import { ToggleButton } from '../../ToggleButton'
 import { formatInt, formatPercent, formatDecimal1, formatDecimal2 } from '../../formatters'

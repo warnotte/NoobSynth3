@@ -3,10 +3,10 @@
 use std::collections::HashMap;
 
 use dsp_core::{
-  Adsr, Arpeggiator, AyPlayer, Chaos, Choir, Chorus, Clap808, Clap909, Compressor, Cowbell808, Delay, DrumSequencer, Ensemble,
+  Adsr, Arpeggiator, AyPlayer, Chaos, ChordSequencer, Choir, Chorus, Clap808, Clap909, Compressor, Cowbell808, Delay, DrumSequencer, Ensemble,
   EuclideanSequencer, FmMatrix, FmOperator, Granular, GranularDelay, HiHat808, HiHat909, Hpf, KarplusStrong,
   Kick808, Kick909, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, ParticleCloud, Phaser, PipeOrgan, PitchShifter,
-  Resonator, Reverb, Rimshot909, SampleHold, Shepard, SidPlayer, SlewLimiter, Snare808, Snare909, SnesOsc, SpectralSwarm, SpeechSynth,
+  PolyrhythmSequencer, Resonator, Reverb, Rimshot909, SampleHold, Shepard, SidPlayer, SlewLimiter, Snare808, Snare909, SnesOsc, SpectralSwarm, SpeechSynth,
   SpringReverb, StepSequencer, Supersaw, TapeDelay, Tb303, Tom808, Tom909, TuringMachine, Vcf, Vco, Vocoder, Wavetable,
 };
 
@@ -694,6 +694,50 @@ pub(crate) fn create_state(
       playing: ParamBuffer::new(param_number(params, "playing", 0.0)),
       loop_enabled: ParamBuffer::new(param_number(params, "loop", 1.0)),
     }),
+    ModuleType::ChordSequencer => {
+      let mut seq = ChordSequencer::new(sample_rate);
+      if let Some(step_data) = params.get("stepData") {
+        if let Some(s) = step_data.as_str() {
+          seq.parse_step_data(s);
+        }
+      }
+      ModuleState::ChordSequencer(ChordSequencerState {
+        seq,
+        enabled: ParamBuffer::new(param_number(params, "enabled", 1.0)),
+        tempo: ParamBuffer::new(param_number(params, "tempo", 120.0)),
+        rate: ParamBuffer::new(param_number(params, "rate", 2.0)),
+        gate_length: ParamBuffer::new(param_number(params, "gateLength", 50.0)),
+        swing: ParamBuffer::new(param_number(params, "swing", 0.0)),
+        length: ParamBuffer::new(param_number(params, "length", 4.0)),
+        strum_speed: ParamBuffer::new(param_number(params, "strumSpeed", 0.0)),
+        strum_direction: ParamBuffer::new(param_number(params, "strumDirection", 0.0)),
+        voicing: ParamBuffer::new(param_number(params, "voicing", 0.0)),
+      })
+    }
+    ModuleType::PolyrhythmSequencer => {
+      let mut seq = PolyrhythmSequencer::new(sample_rate);
+      if let Some(step_data) = params.get("stepData") {
+        if let Some(s) = step_data.as_str() {
+          seq.parse_step_data(s);
+        }
+      }
+      ModuleState::PolyrhythmSequencer(PolyrhythmSequencerState {
+        seq,
+        enabled: ParamBuffer::new(param_number(params, "enabled", 1.0)),
+        tempo: ParamBuffer::new(param_number(params, "tempo", 120.0)),
+        rate: ParamBuffer::new(param_number(params, "rate", 3.0)),
+        gate_length: ParamBuffer::new(param_number(params, "gateLength", 50.0)),
+        swing: ParamBuffer::new(param_number(params, "swing", 0.0)),
+        track1_length: ParamBuffer::new(param_number(params, "track1Length", 8.0)),
+        track2_length: ParamBuffer::new(param_number(params, "track2Length", 12.0)),
+        track3_length: ParamBuffer::new(param_number(params, "track3Length", 16.0)),
+        track4_length: ParamBuffer::new(param_number(params, "track4Length", 7.0)),
+        track1_mute: ParamBuffer::new(param_number(params, "track1Mute", 0.0)),
+        track2_mute: ParamBuffer::new(param_number(params, "track2Mute", 0.0)),
+        track3_mute: ParamBuffer::new(param_number(params, "track3Mute", 0.0)),
+        track4_mute: ParamBuffer::new(param_number(params, "track4Mute", 0.0)),
+      })
+    }
     ModuleType::Compressor => ModuleState::Compressor(CompressorState {
       compressor: Compressor::new(sample_rate),
       threshold: ParamBuffer::new(param_number(params, "threshold", -20.0)),
@@ -1377,6 +1421,34 @@ pub(crate) fn apply_param(state: &mut ModuleState, param: &str, value: f32) {
       "mix" => state.mix.set(value),
       _ => {}
     },
+    ModuleState::ChordSequencer(state) => match param {
+      "enabled" => state.enabled.set(value),
+      "tempo" => state.tempo.set(value),
+      "rate" => state.rate.set(value),
+      "gateLength" => state.gate_length.set(value),
+      "swing" => state.swing.set(value),
+      "length" => state.length.set(value),
+      "strumSpeed" => state.strum_speed.set(value),
+      "strumDirection" => state.strum_direction.set(value),
+      "voicing" => state.voicing.set(value),
+      _ => {}
+    },
+    ModuleState::PolyrhythmSequencer(state) => match param {
+      "enabled" => state.enabled.set(value),
+      "tempo" => state.tempo.set(value),
+      "rate" => state.rate.set(value),
+      "gateLength" => state.gate_length.set(value),
+      "swing" => state.swing.set(value),
+      "track1Length" => state.track1_length.set(value),
+      "track2Length" => state.track2_length.set(value),
+      "track3Length" => state.track3_length.set(value),
+      "track4Length" => state.track4_length.set(value),
+      "track1Mute" => state.track1_mute.set(value),
+      "track2Mute" => state.track2_mute.set(value),
+      "track3Mute" => state.track3_mute.set(value),
+      "track4Mute" => state.track4_mute.set(value),
+      _ => {}
+    },
     _ => {}
   }
 }
@@ -1402,6 +1474,16 @@ pub(crate) fn apply_param_str(state: &mut ModuleState, param: &str, value: &str)
     ModuleState::SpeechSynth(state) => {
       if param == "speechText" {
         state.synth.set_text(value);
+      }
+    }
+    ModuleState::ChordSequencer(state) => {
+      if param == "stepData" {
+        state.seq.parse_step_data(value);
+      }
+    }
+    ModuleState::PolyrhythmSequencer(state) => {
+      if param == "stepData" {
+        state.seq.parse_step_data(value);
       }
     }
     _ => {}

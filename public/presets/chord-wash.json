@@ -1,0 +1,142 @@
+{
+  "version": 1,
+  "id": "chord-wash",
+  "name": "Chord Wash",
+  "description": "Lush ambient pad with SuperSaw chords, sweeping filter, and ensemble.",
+  "graph": {
+    "modules": [
+      {
+        "id": "chordseq-1",
+        "type": "chord-sequencer",
+        "name": "Chord Seq",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "enabled": 1,
+          "tempo": 72,
+          "rate": 0,
+          "gateLength": 95,
+          "swing": 0,
+          "length": 4,
+          "strumSpeed": 0,
+          "strumDirection": 0,
+          "voicing": 1,
+          "stepData": "[{\"root\":60,\"chordType\":4,\"inversion\":0,\"gate\":true},{\"root\":64,\"chordType\":3,\"inversion\":1,\"gate\":true},{\"root\":65,\"chordType\":4,\"inversion\":0,\"gate\":true},{\"root\":62,\"chordType\":3,\"inversion\":0,\"gate\":true},{\"root\":60,\"chordType\":0,\"inversion\":0,\"gate\":false},{\"root\":60,\"chordType\":0,\"inversion\":0,\"gate\":false},{\"root\":60,\"chordType\":0,\"inversion\":0,\"gate\":false},{\"root\":60,\"chordType\":0,\"inversion\":0,\"gate\":false}]"
+        }
+      },
+      {
+        "id": "saw-1",
+        "type": "supersaw",
+        "name": "Pad 1",
+        "position": { "x": 5, "y": 0 },
+        "params": { "frequency": 220, "detune": 18, "mix": 0.75 }
+      },
+      {
+        "id": "saw-2",
+        "type": "supersaw",
+        "name": "Pad 2",
+        "position": { "x": 5, "y": 2 },
+        "params": { "frequency": 220, "detune": 28, "mix": 0.8 }
+      },
+      {
+        "id": "saw-3",
+        "type": "supersaw",
+        "name": "Pad 3",
+        "position": { "x": 5, "y": 4 },
+        "params": { "frequency": 220, "detune": 22, "mix": 0.75 }
+      },
+      {
+        "id": "saw-4",
+        "type": "supersaw",
+        "name": "Pad 4",
+        "position": { "x": 5, "y": 6 },
+        "params": { "frequency": 220, "detune": 32, "mix": 0.85 }
+      },
+      {
+        "id": "adsr-1",
+        "type": "adsr",
+        "name": "Pad Env",
+        "position": { "x": 8, "y": 5 },
+        "params": { "attack": 1.2, "decay": 0.8, "sustain": 0.65, "release": 2.0 }
+      },
+      {
+        "id": "mixer-pad",
+        "type": "mixer-8",
+        "name": "Pad Mix",
+        "position": { "x": 9, "y": 0 },
+        "params": {
+          "level1": 0.25, "level2": 0.25, "level3": 0.25, "level4": 0.25,
+          "level5": 0, "level6": 0, "level7": 0, "level8": 0
+        }
+      },
+      {
+        "id": "gain-pad",
+        "type": "gain",
+        "name": "Pad VCA",
+        "position": { "x": 12, "y": 0 },
+        "params": { "gain": 0.3 }
+      },
+      {
+        "id": "vcf-1",
+        "type": "vcf",
+        "name": "VCF",
+        "position": { "x": 15, "y": 0 },
+        "params": { "cutoff": 900, "resonance": 0.25, "model": "svf", "mode": "lp", "slope": 24 }
+      },
+      {
+        "id": "lfo-1",
+        "type": "lfo",
+        "name": "Filt LFO",
+        "position": { "x": 12, "y": 4 },
+        "params": { "rate": 0.08, "depth": 0.4, "offset": 0, "shape": "sine", "bipolar": true }
+      },
+      {
+        "id": "ensemble-1",
+        "type": "ensemble",
+        "name": "Ensemble",
+        "position": { "x": 18, "y": 0 },
+        "params": { "rate": 0.18, "depth": 11, "delay": 15, "mix": 0.55, "spread": 0.85 }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "x": 21, "y": 0 },
+        "params": { "mix": 0.45, "decay": 3.5, "damping": 0.35 }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Output",
+        "position": { "x": 24, "y": 0 },
+        "params": { "level": 1 }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 0, "y": 8 },
+        "params": {
+          "text": "CHORD WASH\n\nAmbient pad with slow chord changes.\n\n4 SuperSaws (spread voicing)\n→ VCA (slow 1.2s ADSR) → LP Filter\n→ Ensemble → Reverb\n\nLFO slowly sweeps the filter.\nCMaj7 - Em7 - FMaj7 - Dm7\n\nTry: voicing, filter cutoff,\nLFO rate, reverb decay."
+        }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "chordseq-1", "portId": "cv-1" }, "to": { "moduleId": "saw-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "chordseq-1", "portId": "cv-2" }, "to": { "moduleId": "saw-2", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "chordseq-1", "portId": "cv-3" }, "to": { "moduleId": "saw-3", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "chordseq-1", "portId": "cv-4" }, "to": { "moduleId": "saw-4", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "chordseq-1", "portId": "gate-1" }, "to": { "moduleId": "adsr-1", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "saw-1", "portId": "out" }, "to": { "moduleId": "mixer-pad", "portId": "in-1" }, "kind": "audio" },
+      { "from": { "moduleId": "saw-2", "portId": "out" }, "to": { "moduleId": "mixer-pad", "portId": "in-2" }, "kind": "audio" },
+      { "from": { "moduleId": "saw-3", "portId": "out" }, "to": { "moduleId": "mixer-pad", "portId": "in-3" }, "kind": "audio" },
+      { "from": { "moduleId": "saw-4", "portId": "out" }, "to": { "moduleId": "mixer-pad", "portId": "in-4" }, "kind": "audio" },
+      { "from": { "moduleId": "mixer-pad", "portId": "out" }, "to": { "moduleId": "gain-pad", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-1", "portId": "env" }, "to": { "moduleId": "gain-pad", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "gain-pad", "portId": "out" }, "to": { "moduleId": "vcf-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "lfo-1", "portId": "cv-out" }, "to": { "moduleId": "vcf-1", "portId": "mod" }, "kind": "cv" },
+      { "from": { "moduleId": "vcf-1", "portId": "out" }, "to": { "moduleId": "ensemble-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "ensemble-1", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}

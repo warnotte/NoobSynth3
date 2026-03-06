@@ -109,6 +109,16 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // reset
       PortInfo { channels: 1 },  // cv-offset
     ],
+    // Chord Sequencer - 2 inputs (clock, reset)
+    ModuleType::ChordSequencer => vec![
+      PortInfo { channels: 1 },  // clock
+      PortInfo { channels: 1 },  // reset
+    ],
+    // Polyrhythm Sequencer - 2 inputs (clock, reset)
+    ModuleType::PolyrhythmSequencer => vec![
+      PortInfo { channels: 1 },  // clock
+      PortInfo { channels: 1 },  // reset
+    ],
     ModuleType::Tb303 => vec![
       PortInfo { channels: 1 },  // pitch
       PortInfo { channels: 1 },  // gate
@@ -318,6 +328,31 @@ pub fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // cv-out
       PortInfo { channels: 1 },  // gate-out
       PortInfo { channels: 1 },  // velocity-out
+      PortInfo { channels: 1 },  // step-out
+    ],
+    // Chord Sequencer - 10 outputs (4×CV + 4×Gate + step + root-cv)
+    ModuleType::ChordSequencer => vec![
+      PortInfo { channels: 1 },  // cv-1
+      PortInfo { channels: 1 },  // gate-1
+      PortInfo { channels: 1 },  // cv-2
+      PortInfo { channels: 1 },  // gate-2
+      PortInfo { channels: 1 },  // cv-3
+      PortInfo { channels: 1 },  // gate-3
+      PortInfo { channels: 1 },  // cv-4
+      PortInfo { channels: 1 },  // gate-4
+      PortInfo { channels: 1 },  // step-out
+      PortInfo { channels: 1 },  // root-cv
+    ],
+    // Polyrhythm Sequencer - 9 outputs (4×CV + 4×Gate + step)
+    ModuleType::PolyrhythmSequencer => vec![
+      PortInfo { channels: 1 },  // cv-1
+      PortInfo { channels: 1 },  // gate-1
+      PortInfo { channels: 1 },  // cv-2
+      PortInfo { channels: 1 },  // gate-2
+      PortInfo { channels: 1 },  // cv-3
+      PortInfo { channels: 1 },  // gate-3
+      PortInfo { channels: 1 },  // cv-4
+      PortInfo { channels: 1 },  // gate-4
       PortInfo { channels: 1 },  // step-out
     ],
     ModuleType::Tb303 => vec![
@@ -653,6 +688,11 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
       "cv-offset" => Some(2),
       _ => None,
     },
+    ModuleType::ChordSequencer | ModuleType::PolyrhythmSequencer => match port_id {
+      "clock" | "clk" => Some(0),
+      "reset" | "rst" => Some(1),
+      _ => None,
+    },
     ModuleType::Tb303 => match port_id {
       "pitch" => Some(0),
       "gate" => Some(1),
@@ -975,6 +1015,31 @@ pub fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize
       "gate-out" => Some(1),
       "velocity-out" => Some(2),
       "step-out" => Some(3),
+      _ => None,
+    },
+    ModuleType::ChordSequencer => match port_id {
+      "cv-1" => Some(0),
+      "gate-1" => Some(1),
+      "cv-2" => Some(2),
+      "gate-2" => Some(3),
+      "cv-3" => Some(4),
+      "gate-3" => Some(5),
+      "cv-4" => Some(6),
+      "gate-4" => Some(7),
+      "step-out" => Some(8),
+      "root-cv" => Some(9),
+      _ => None,
+    },
+    ModuleType::PolyrhythmSequencer => match port_id {
+      "cv-1" => Some(0),
+      "gate-1" => Some(1),
+      "cv-2" => Some(2),
+      "gate-2" => Some(3),
+      "cv-3" => Some(4),
+      "gate-3" => Some(5),
+      "cv-4" => Some(6),
+      "gate-4" => Some(7),
+      "step-out" => Some(8),
       _ => None,
     },
     ModuleType::Tb303 => match port_id {

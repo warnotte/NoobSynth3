@@ -88,6 +88,10 @@ export const moduleSizes: Record<ModuleType, string> = {
   'sid-player': '3x5',
   // AY Player
   'ay-player': '3x5',
+  // Chord Sequencer
+  'chord-sequencer': '3x5',
+  // Polyrhythm Sequencer
+  'polyrhythm-sequencer': '3x5',
 }
 
 export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>> = {
@@ -150,6 +154,8 @@ export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>>
   // SID Player
   'sid-player': 'strip',
   'ay-player': 'strip',
+  'chord-sequencer': 'strip',
+  'polyrhythm-sequencer': 'strip',
 }
 
 export type ModuleCategory =
@@ -247,6 +253,8 @@ export const moduleCatalog: { type: ModuleType; label: string; category: ModuleC
   { type: 'turing-machine', label: 'Turing Machine', category: 'sequencers' },
   { type: 'sid-player', label: 'SID Player', category: 'sequencers' },
   { type: 'ay-player', label: 'AY Player', category: 'sequencers' },
+  { type: 'chord-sequencer', label: 'Chord Seq', category: 'sequencers' },
+  { type: 'polyrhythm-sequencer', label: 'Polyrhythm', category: 'sequencers' },
   { type: 'mario', label: 'Mario IO', category: 'sequencers' },
   // TR-909 Drums
   { type: '909-kick', label: '909 Kick', category: 'drums' },
@@ -356,6 +364,8 @@ export const modulePrefixes: Record<ModuleType, string> = {
   'turing-machine': 'turing',
   'sid-player': 'sid',
   'ay-player': 'ay',
+  'chord-sequencer': 'chordseq',
+  'polyrhythm-sequencer': 'polyseq',
 }
 
 export const moduleLabels: Record<ModuleType, string> = {
@@ -443,6 +453,8 @@ export const moduleLabels: Record<ModuleType, string> = {
   'turing-machine': 'Turing Machine',
   'sid-player': 'SID Player',
   'ay-player': 'AY Player',
+  'chord-sequencer': 'Chord Seq',
+  'polyrhythm-sequencer': 'Polyrhythm',
 }
 
 export const moduleDefaults: Record<ModuleType, Record<string, number | string | boolean>> = {
@@ -975,6 +987,53 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
   'ay-player': {
     playing: 0,         // 0=stopped, 1=playing
     loop: 1,            // 1=loop enabled
+  },
+  'chord-sequencer': {
+    enabled: true,
+    tempo: 120,
+    rate: 2,            // 1/4 note
+    gateLength: 50,
+    swing: 0,
+    length: 4,
+    strumSpeed: 0,
+    strumDirection: 0,  // 0=down, 1=up, 2=alt
+    voicing: 0,         // 0=close, 1=spread
+    stepData: JSON.stringify([
+      { root: 60, chordType: 0, inversion: 0, gate: true },
+      { root: 57, chordType: 1, inversion: 0, gate: true },
+      { root: 65, chordType: 0, inversion: 0, gate: true },
+      { root: 67, chordType: 0, inversion: 0, gate: true },
+      { root: 60, chordType: 0, inversion: 0, gate: false },
+      { root: 60, chordType: 0, inversion: 0, gate: false },
+      { root: 60, chordType: 0, inversion: 0, gate: false },
+      { root: 60, chordType: 0, inversion: 0, gate: false },
+    ]),
+  },
+  'polyrhythm-sequencer': {
+    enabled: true,
+    tempo: 120,
+    rate: 3,            // 1/8 note
+    gateLength: 50,
+    swing: 0,
+    track1Length: 8,
+    track2Length: 12,
+    track3Length: 16,
+    track4Length: 7,
+    track1Mute: false,
+    track2Mute: false,
+    track3Mute: false,
+    track4Mute: false,
+    stepData: JSON.stringify(
+      Array.from({ length: 4 }, (_, t) => {
+        const len = [8, 12, 16, 7][t]
+        return Array.from({ length: len }, (__, s) => ({
+          track: t, step: s,
+          pitch: Math.floor(Math.random() * 13) - 6,
+          gate: Math.random() > 0.2,
+          velocity: 80 + Math.floor(Math.random() * 20),
+        }))
+      }).flat()
+    ),
   },
 }
 

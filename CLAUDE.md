@@ -152,7 +152,7 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 
 ### Documentation (obligatoire)
 - [ ] `docs/MODULES.md` - Documentation complète du module
-- [ ] `README.md` - Mettre à jour le compte de modules (actuellement 75)
+- [ ] `README.md` - Mettre à jour le compte de modules (actuellement 77)
 - [ ] `CLAUDE.md` - Ajouter à la liste "Module Types" si pertinent
 
 ### Optionnel
@@ -198,7 +198,7 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 
 **⚠️ RÈGLE:** Toute nouvelle feature UI↔Audio DOIT être implémentée pour Tauri en même temps que Web. Ne jamais merger une feature Web-only.
 
-## Module Types (75 total)
+## Module Types (77 total)
 
 ### Sources (17)
 oscillator, supersaw, karplus, fm-op, fm-matrix, nes-osc, snes-osc, noise, tb-303, shepard, pipe-organ, spectral-swarm, resonator, wavetable, granular, particle-cloud, speech-synth
@@ -215,8 +215,8 @@ chorus, ensemble, choir, vocoder, delay, granular-delay, tape-delay, spring-reve
 ### Modulators (7)
 adsr, lfo, mod-router, sample-hold, slew, quantizer, chaos
 
-### Sequencers (10)
-clock, arpeggiator, step-sequencer, euclidean, drum-sequencer, midi-file-sequencer, turing-machine, mario, sid-player, ay-player
+### Sequencers (12)
+clock, arpeggiator, step-sequencer, euclidean, drum-sequencer, midi-file-sequencer, turing-machine, mario, sid-player, ay-player, chord-sequencer, polyrhythm-sequencer
 
 ### TR-909 Drums (6)
 909-kick, 909-snare, 909-hihat, 909-clap, 909-tom, 909-rimshot
@@ -536,6 +536,26 @@ Ces paramètres utilisent des **valeurs numériques** :
 ```
 
 **Output Level :** Mettre `"level": 1` pour volume maximum par défaut
+
+### Port ID Reference (IMPORTANT — check portCatalog.ts when in doubt)
+
+Les port IDs dans les presets doivent correspondre **exactement** à ceux définis dans `src/ui/portCatalog.ts`. Erreurs fréquentes :
+
+| Module | Port | ID correct | Erreur fréquente |
+|--------|------|------------|------------------|
+| **adsr** | output | `env` | ~~`out`~~ |
+| **mixer-8** | inputs | `in-1`, `in-2`, ..., `in-8` | ~~`in1`, `in2`~~ |
+| **mixer** (6ch) | inputs | `in-1`, `in-2`, ..., `in-6` | ~~`in1`, `in2`~~ |
+| **oscillator** | pitch input | `pitch` | ~~`freq`~~ |
+| **oscillator** | output | `out` | — |
+| **gain** | audio input | `in` | — |
+| **gain** | CV input | `cv` | — |
+| **vcf** | modulation | `mod` | ~~`cv`~~ |
+| **vcf** | envelope | `env` | — |
+| **output** | input | `in` | — |
+| **reverb/delay** | input/output | `in` / `out` | — |
+
+**Règle :** En cas de doute, toujours vérifier `src/ui/portCatalog.ts` pour le module concerné.
 
 ---
 

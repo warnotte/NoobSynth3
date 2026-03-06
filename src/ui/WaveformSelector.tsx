@@ -78,7 +78,7 @@ type WaveformOption<T> = {
 }
 
 type WaveformButtonsProps<T extends string | number> = {
-  options: WaveformOption<T>[]
+  options: readonly WaveformOption<T>[]
   value: T
   onChange: (value: T) => void
 }

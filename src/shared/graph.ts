@@ -89,6 +89,10 @@ export type ModuleType =
   | 'ay-player'
   // Speech Synth (robotic voice)
   | 'speech-synth'
+  // Chord Sequencer
+  | 'chord-sequencer'
+  // Polyrhythm Sequencer
+  | 'polyrhythm-sequencer'
 
 export interface ModuleSpec {
   id: string

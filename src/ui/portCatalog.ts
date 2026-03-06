@@ -306,6 +306,41 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
       { id: 'step-out', label: 'Step', kind: 'cv', direction: 'out' },
     ],
   },
+  'chord-sequencer': {
+    inputs: [
+      { id: 'clock', label: 'Clk', kind: 'sync', direction: 'in' },
+      { id: 'reset', label: 'Rst', kind: 'sync', direction: 'in' },
+    ],
+    outputs: [
+      { id: 'cv-1', label: 'CV1', kind: 'cv', direction: 'out' },
+      { id: 'gate-1', label: 'G1', kind: 'gate', direction: 'out' },
+      { id: 'cv-2', label: 'CV2', kind: 'cv', direction: 'out' },
+      { id: 'gate-2', label: 'G2', kind: 'gate', direction: 'out' },
+      { id: 'cv-3', label: 'CV3', kind: 'cv', direction: 'out' },
+      { id: 'gate-3', label: 'G3', kind: 'gate', direction: 'out' },
+      { id: 'cv-4', label: 'CV4', kind: 'cv', direction: 'out' },
+      { id: 'gate-4', label: 'G4', kind: 'gate', direction: 'out' },
+      { id: 'step-out', label: 'Step', kind: 'cv', direction: 'out' },
+      { id: 'root-cv', label: 'Root', kind: 'cv', direction: 'out' },
+    ],
+  },
+  'polyrhythm-sequencer': {
+    inputs: [
+      { id: 'clock', label: 'Clk', kind: 'sync', direction: 'in' },
+      { id: 'reset', label: 'Rst', kind: 'sync', direction: 'in' },
+    ],
+    outputs: [
+      { id: 'cv-1', label: 'CV1', kind: 'cv', direction: 'out' },
+      { id: 'gate-1', label: 'G1', kind: 'gate', direction: 'out' },
+      { id: 'cv-2', label: 'CV2', kind: 'cv', direction: 'out' },
+      { id: 'gate-2', label: 'G2', kind: 'gate', direction: 'out' },
+      { id: 'cv-3', label: 'CV3', kind: 'cv', direction: 'out' },
+      { id: 'gate-3', label: 'G3', kind: 'gate', direction: 'out' },
+      { id: 'cv-4', label: 'CV4', kind: 'cv', direction: 'out' },
+      { id: 'gate-4', label: 'G4', kind: 'gate', direction: 'out' },
+      { id: 'step-out', label: 'Step', kind: 'cv', direction: 'out' },
+    ],
+  },
   'tb-303': {
     inputs: [
       { id: 'pitch', label: 'Pitch', kind: 'cv', direction: 'in' },
