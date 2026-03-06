@@ -390,7 +390,7 @@ Presets stockés dans `public/presets/` avec structure:
 }
 ```
 
-Groupes existants: Basics, Leads, Bass, Pads, FX, Drums, 8-Bit, Experimental, Shepard, Drones, Wavetable, Vocal Synthesis
+Groupes existants: Basics, Leads, Bass, Pads, FX, Drums, 8-Bit, Experimental, Shepard, Drones, Wavetable, Vocal Synthesis, Chord Sequencer, Polyrhythm
 
 ### Connection Format (IMPORTANT)
 

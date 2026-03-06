@@ -1,0 +1,313 @@
+{
+  "version": 1,
+  "id": "polyrhythm-generative",
+  "name": "Generative Polyrhythm",
+  "description": "Polyrhythm + Turing Machine + Euclidean + Chaos Engine + S&H — fully generative evolving patch.",
+  "graph": {
+    "modules": [
+      {
+        "id": "clock-1",
+        "type": "clock",
+        "name": "Clock",
+        "position": { "x": 0, "y": 0 },
+        "params": { "running": true, "tempo": 125, "rate": 4, "swing": 5 }
+      },
+      {
+        "id": "polyseq-1",
+        "type": "polyrhythm-sequencer",
+        "name": "Polyrhythm",
+        "position": { "x": 2, "y": 0 },
+        "params": {
+          "enabled": true,
+          "tempo": 125,
+          "rate": 3,
+          "gateLength": 50,
+          "swing": 5,
+          "track1Length": 7,
+          "track2Length": 12,
+          "track3Length": 5,
+          "track4Length": 4,
+          "track1Mute": false,
+          "track2Mute": false,
+          "track3Mute": false,
+          "track4Mute": false,
+          "stepData": "[{\"track\":0,\"step\":0,\"pitch\":0,\"gate\":true,\"velocity\":100},{\"track\":0,\"step\":1,\"pitch\":7,\"gate\":true,\"velocity\":80},{\"track\":0,\"step\":2,\"pitch\":5,\"gate\":true,\"velocity\":90},{\"track\":0,\"step\":3,\"pitch\":3,\"gate\":false,\"velocity\":0},{\"track\":0,\"step\":4,\"pitch\":10,\"gate\":true,\"velocity\":85},{\"track\":0,\"step\":5,\"pitch\":7,\"gate\":true,\"velocity\":70},{\"track\":0,\"step\":6,\"pitch\":12,\"gate\":true,\"velocity\":80},{\"track\":1,\"step\":0,\"pitch\":12,\"gate\":true,\"velocity\":100},{\"track\":1,\"step\":1,\"pitch\":15,\"gate\":true,\"velocity\":80},{\"track\":1,\"step\":2,\"pitch\":19,\"gate\":true,\"velocity\":90},{\"track\":1,\"step\":3,\"pitch\":12,\"gate\":false,\"velocity\":0},{\"track\":1,\"step\":4,\"pitch\":17,\"gate\":true,\"velocity\":75},{\"track\":1,\"step\":5,\"pitch\":15,\"gate\":true,\"velocity\":85},{\"track\":1,\"step\":6,\"pitch\":10,\"gate\":false,\"velocity\":0},{\"track\":1,\"step\":7,\"pitch\":19,\"gate\":true,\"velocity\":80},{\"track\":1,\"step\":8,\"pitch\":14,\"gate\":true,\"velocity\":90},{\"track\":1,\"step\":9,\"pitch\":12,\"gate\":true,\"velocity\":70},{\"track\":1,\"step\":10,\"pitch\":17,\"gate\":false,\"velocity\":0},{\"track\":1,\"step\":11,\"pitch\":7,\"gate\":true,\"velocity\":80},{\"track\":2,\"step\":0,\"pitch\":-12,\"gate\":true,\"velocity\":100},{\"track\":2,\"step\":1,\"pitch\":-12,\"gate\":false,\"velocity\":0},{\"track\":2,\"step\":2,\"pitch\":-5,\"gate\":true,\"velocity\":85},{\"track\":2,\"step\":3,\"pitch\":-7,\"gate\":true,\"velocity\":80},{\"track\":2,\"step\":4,\"pitch\":-12,\"gate\":true,\"velocity\":90},{\"track\":3,\"step\":0,\"pitch\":0,\"gate\":true,\"velocity\":100},{\"track\":3,\"step\":1,\"pitch\":0,\"gate\":true,\"velocity\":60},{\"track\":3,\"step\":2,\"pitch\":0,\"gate\":false,\"velocity\":0},{\"track\":3,\"step\":3,\"pitch\":0,\"gate\":true,\"velocity\":80}]"
+        }
+      },
+      {
+        "id": "turing-1",
+        "type": "turing-machine",
+        "name": "Turing",
+        "position": { "x": 2, "y": 5 },
+        "params": { "probability": 0.4, "length": 12, "range": 2, "scale": 3, "root": 0 }
+      },
+      {
+        "id": "euclid-1",
+        "type": "euclidean",
+        "name": "Euclidean",
+        "position": { "x": 2, "y": 10 },
+        "params": { "enabled": true, "tempo": 125, "rate": 3, "steps": 8, "pulses": 5, "rotation": 2, "gateLength": 50, "swing": 0 }
+      },
+      {
+        "id": "chaos-1",
+        "type": "chaos",
+        "name": "Chaos",
+        "position": { "x": 0, "y": 14 },
+        "params": { "speed": 0.5, "rho": 30, "sigma": 12, "beta": 2.66, "scale": 0, "root": 0 }
+      },
+      {
+        "id": "lfo-1",
+        "type": "lfo",
+        "name": "Slow LFO",
+        "position": { "x": 3, "y": 14 },
+        "params": { "rate": 0.08, "depth": 0.6, "offset": 0, "shape": "sine", "bipolar": true }
+      },
+      {
+        "id": "lfo-2",
+        "type": "lfo",
+        "name": "Fast LFO",
+        "position": { "x": 6, "y": 14 },
+        "params": { "rate": 4.0, "depth": 0.3, "offset": 0, "shape": "square", "bipolar": true }
+      },
+      {
+        "id": "sh-1",
+        "type": "sample-hold",
+        "name": "S&H",
+        "position": { "x": 9, "y": 14 },
+        "params": { "mode": 0 }
+      },
+      {
+        "id": "slew-1",
+        "type": "slew",
+        "name": "Slew",
+        "position": { "x": 12, "y": 14 },
+        "params": { "rise": 0.15, "fall": 0.2 }
+      },
+      {
+        "id": "quant-1",
+        "type": "quantizer",
+        "name": "Quantizer",
+        "position": { "x": 5, "y": 5 },
+        "params": { "root": 0, "scale": 3 }
+      },
+      {
+        "id": "osc-1",
+        "type": "wavetable",
+        "name": "Melody",
+        "position": { "x": 6, "y": 0 },
+        "params": { "frequency": 220, "bank": 0, "position": 0.5, "detune": 6, "voices": 2 }
+      },
+      {
+        "id": "osc-2",
+        "type": "oscillator",
+        "name": "Arp Saw",
+        "position": { "x": 6, "y": 3 },
+        "params": { "frequency": 440, "type": "sawtooth" }
+      },
+      {
+        "id": "osc-3",
+        "type": "oscillator",
+        "name": "Bass",
+        "position": { "x": 6, "y": 5 },
+        "params": { "frequency": 110, "type": "triangle" }
+      },
+      {
+        "id": "noise-1",
+        "type": "noise",
+        "name": "Perc Noise",
+        "position": { "x": 6, "y": 7 },
+        "params": { "type": "white" }
+      },
+      {
+        "id": "osc-5",
+        "type": "wavetable",
+        "name": "Turing Voice",
+        "position": { "x": 6, "y": 9 },
+        "params": { "frequency": 220, "bank": 2, "position": 0.6, "detune": 8, "voices": 2 }
+      },
+      {
+        "id": "adsr-1",
+        "type": "adsr",
+        "name": "Env 1",
+        "position": { "x": 9, "y": 0 },
+        "params": { "attack": 0.01, "decay": 0.3, "sustain": 0.4, "release": 0.2 }
+      },
+      {
+        "id": "adsr-2",
+        "type": "adsr",
+        "name": "Env 2",
+        "position": { "x": 9, "y": 2 },
+        "params": { "attack": 0.005, "decay": 0.1, "sustain": 0.3, "release": 0.08 }
+      },
+      {
+        "id": "adsr-3",
+        "type": "adsr",
+        "name": "Env 3",
+        "position": { "x": 9, "y": 4 },
+        "params": { "attack": 0.005, "decay": 0.4, "sustain": 0.5, "release": 0.3 }
+      },
+      {
+        "id": "adsr-4",
+        "type": "adsr",
+        "name": "Env 4",
+        "position": { "x": 9, "y": 6 },
+        "params": { "attack": 0.001, "decay": 0.05, "sustain": 0, "release": 0.03 }
+      },
+      {
+        "id": "adsr-5",
+        "type": "adsr",
+        "name": "Env Turing",
+        "position": { "x": 9, "y": 8 },
+        "params": { "attack": 0.01, "decay": 0.2, "sustain": 0.3, "release": 0.15 }
+      },
+      {
+        "id": "gain-1",
+        "type": "gain",
+        "name": "VCA 1",
+        "position": { "x": 12, "y": 0 },
+        "params": { "gain": 0.3 }
+      },
+      {
+        "id": "gain-2",
+        "type": "gain",
+        "name": "VCA 2",
+        "position": { "x": 12, "y": 2 },
+        "params": { "gain": 0.25 }
+      },
+      {
+        "id": "gain-3",
+        "type": "gain",
+        "name": "VCA 3",
+        "position": { "x": 12, "y": 4 },
+        "params": { "gain": 0.35 }
+      },
+      {
+        "id": "gain-4",
+        "type": "gain",
+        "name": "VCA 4",
+        "position": { "x": 12, "y": 6 },
+        "params": { "gain": 0.15 }
+      },
+      {
+        "id": "gain-5",
+        "type": "gain",
+        "name": "VCA Turing",
+        "position": { "x": 12, "y": 8 },
+        "params": { "gain": 0.25 }
+      },
+      {
+        "id": "wavefold-1",
+        "type": "wavefolder",
+        "name": "Fold",
+        "position": { "x": 12, "y": 10 },
+        "params": { "drive": 3.0, "symmetry": 0.4 }
+      },
+      {
+        "id": "mixer-1",
+        "type": "mixer-8",
+        "name": "Mixer",
+        "position": { "x": 15, "y": 0 },
+        "params": {
+          "level1": 0.35, "level2": 0.3, "level3": 0.4, "level4": 0.15,
+          "level5": 0.3, "level6": 0, "level7": 0, "level8": 0
+        }
+      },
+      {
+        "id": "vcf-1",
+        "type": "vcf",
+        "name": "Main Filter",
+        "position": { "x": 18, "y": 0 },
+        "params": { "cutoff": 2000, "resonance": 0.4, "drive": 0.15, "model": "svf", "mode": "lp", "slope": 24 }
+      },
+      {
+        "id": "phaser-1",
+        "type": "phaser",
+        "name": "Phaser",
+        "position": { "x": 21, "y": 0 },
+        "params": { "rate": 0.3, "depth": 0.6, "stages": 6, "mix": 0.3, "feedback": 0.4 }
+      },
+      {
+        "id": "delay-1",
+        "type": "delay",
+        "name": "Delay",
+        "position": { "x": 24, "y": 0 },
+        "params": { "time": 240, "feedback": 0.35, "mix": 0.25 }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "x": 24, "y": 2 },
+        "params": { "mix": 0.35, "decay": 2.5, "damping": 0.5 }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Output",
+        "position": { "x": 27, "y": 0 },
+        "params": { "level": 1 }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 0, "y": 17 },
+        "params": {
+          "text": "GENERATIVE POLYRHYTHM\n\n125 BPM — Fully generative patch\n\nPOLYRHYTHM (7, 12, 5, 4 steps):\n- T1: Wavetable melody (7)\n- T2: Saw arp (12)\n- T3: Triangle bass (5)\n- T4: Noise percussion (4)\n\nTURING MACHINE:\n- 12-bit register, probability 0.4\n- → Quantizer → Wavetable voice\n- Gated by Euclidean E(5,8)\n- Through Wavefolder for metallic tone\n\nCHAOS + MODULATION:\n- Chaos X → Slew → VCF mod\n- Chaos Y → S&H → melody pitch\n- Chaos Gate → S&H trigger\n- Slow LFO → extra VCF sweep\n- Fast LFO → turing pitch wobble\n\nFX: Phaser → Delay → Reverb\n\nTweak Turing probability for more/less\nrandomness (0=locked, 1=pure random)."
+        }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "polyseq-1", "portId": "clock" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "reset" }, "to": { "moduleId": "polyseq-1", "portId": "reset" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "turing-1", "portId": "clock" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "reset" }, "to": { "moduleId": "turing-1", "portId": "reset" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "euclid-1", "portId": "clock" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "reset" }, "to": { "moduleId": "euclid-1", "portId": "reset" }, "kind": "sync" },
+
+      { "from": { "moduleId": "polyseq-1", "portId": "cv-1" }, "to": { "moduleId": "osc-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "polyseq-1", "portId": "gate-1" }, "to": { "moduleId": "adsr-1", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "polyseq-1", "portId": "cv-2" }, "to": { "moduleId": "osc-2", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "polyseq-1", "portId": "gate-2" }, "to": { "moduleId": "adsr-2", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "polyseq-1", "portId": "cv-3" }, "to": { "moduleId": "osc-3", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "polyseq-1", "portId": "gate-3" }, "to": { "moduleId": "adsr-3", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "polyseq-1", "portId": "gate-4" }, "to": { "moduleId": "adsr-4", "portId": "gate" }, "kind": "gate" },
+
+      { "from": { "moduleId": "osc-1", "portId": "out" }, "to": { "moduleId": "gain-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-1", "portId": "env" }, "to": { "moduleId": "gain-1", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "osc-2", "portId": "out" }, "to": { "moduleId": "gain-2", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-2", "portId": "env" }, "to": { "moduleId": "gain-2", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "osc-3", "portId": "out" }, "to": { "moduleId": "gain-3", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-3", "portId": "env" }, "to": { "moduleId": "gain-3", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "noise-1", "portId": "out" }, "to": { "moduleId": "gain-4", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-4", "portId": "env" }, "to": { "moduleId": "gain-4", "portId": "cv" }, "kind": "cv" },
+
+      { "from": { "moduleId": "turing-1", "portId": "cv" }, "to": { "moduleId": "quant-1", "portId": "in" }, "kind": "cv" },
+      { "from": { "moduleId": "quant-1", "portId": "out" }, "to": { "moduleId": "osc-5", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "euclid-1", "portId": "gate" }, "to": { "moduleId": "adsr-5", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "osc-5", "portId": "out" }, "to": { "moduleId": "wavefold-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "wavefold-1", "portId": "out" }, "to": { "moduleId": "gain-5", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-5", "portId": "env" }, "to": { "moduleId": "gain-5", "portId": "cv" }, "kind": "cv" },
+
+      { "from": { "moduleId": "gain-1", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-1" }, "kind": "audio" },
+      { "from": { "moduleId": "gain-2", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-2" }, "kind": "audio" },
+      { "from": { "moduleId": "gain-3", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-3" }, "kind": "audio" },
+      { "from": { "moduleId": "gain-4", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-4" }, "kind": "audio" },
+      { "from": { "moduleId": "gain-5", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-5" }, "kind": "audio" },
+
+      { "from": { "moduleId": "mixer-1", "portId": "out" }, "to": { "moduleId": "vcf-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "vcf-1", "portId": "out" }, "to": { "moduleId": "phaser-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "phaser-1", "portId": "out" }, "to": { "moduleId": "delay-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "delay-1", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" },
+
+      { "from": { "moduleId": "chaos-1", "portId": "x" }, "to": { "moduleId": "slew-1", "portId": "in" }, "kind": "cv" },
+      { "from": { "moduleId": "slew-1", "portId": "out" }, "to": { "moduleId": "vcf-1", "portId": "mod" }, "kind": "cv" },
+      { "from": { "moduleId": "chaos-1", "portId": "gate" }, "to": { "moduleId": "sh-1", "portId": "trig" }, "kind": "sync" },
+      { "from": { "moduleId": "chaos-1", "portId": "y" }, "to": { "moduleId": "sh-1", "portId": "in" }, "kind": "cv" },
+      { "from": { "moduleId": "sh-1", "portId": "out" }, "to": { "moduleId": "osc-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "lfo-1", "portId": "cv-out" }, "to": { "moduleId": "vcf-1", "portId": "mod" }, "kind": "cv" },
+      { "from": { "moduleId": "lfo-2", "portId": "cv-out" }, "to": { "moduleId": "osc-5", "portId": "pitch" }, "kind": "cv" }
+    ]
+  }
+}

@@ -1,0 +1,264 @@
+{
+  "version": 1,
+  "id": "polyrhythm-chaos",
+  "name": "Polyrhythm Chaos",
+  "description": "Dark polyrhythm with Chaos Engine, S&H, LFOs, wavefolder, and chaotic filter modulation.",
+  "graph": {
+    "modules": [
+      {
+        "id": "clock-1",
+        "type": "clock",
+        "name": "Clock",
+        "position": { "x": 0, "y": 0 },
+        "params": { "running": true, "tempo": 90, "rate": 3, "swing": 0 }
+      },
+      {
+        "id": "polyseq-1",
+        "type": "polyrhythm-sequencer",
+        "name": "Polyrhythm",
+        "position": { "x": 2, "y": 0 },
+        "params": {
+          "enabled": true,
+          "tempo": 90,
+          "rate": 3,
+          "gateLength": 60,
+          "swing": 10,
+          "track1Length": 5,
+          "track2Length": 7,
+          "track3Length": 3,
+          "track4Length": 16,
+          "track1Mute": false,
+          "track2Mute": false,
+          "track3Mute": false,
+          "track4Mute": false,
+          "stepData": "[{\"track\":0,\"step\":0,\"pitch\":0,\"gate\":true,\"velocity\":100},{\"track\":0,\"step\":1,\"pitch\":3,\"gate\":true,\"velocity\":80},{\"track\":0,\"step\":2,\"pitch\":7,\"gate\":true,\"velocity\":90},{\"track\":0,\"step\":3,\"pitch\":10,\"gate\":true,\"velocity\":75},{\"track\":0,\"step\":4,\"pitch\":7,\"gate\":false,\"velocity\":0},{\"track\":1,\"step\":0,\"pitch\":12,\"gate\":true,\"velocity\":100},{\"track\":1,\"step\":1,\"pitch\":15,\"gate\":true,\"velocity\":80},{\"track\":1,\"step\":2,\"pitch\":14,\"gate\":false,\"velocity\":0},{\"track\":1,\"step\":3,\"pitch\":10,\"gate\":true,\"velocity\":85},{\"track\":1,\"step\":4,\"pitch\":17,\"gate\":true,\"velocity\":90},{\"track\":1,\"step\":5,\"pitch\":8,\"gate\":true,\"velocity\":70},{\"track\":1,\"step\":6,\"pitch\":14,\"gate\":false,\"velocity\":0},{\"track\":2,\"step\":0,\"pitch\":-24,\"gate\":true,\"velocity\":100},{\"track\":2,\"step\":1,\"pitch\":-17,\"gate\":true,\"velocity\":85},{\"track\":2,\"step\":2,\"pitch\":-19,\"gate\":true,\"velocity\":90},{\"track\":3,\"step\":0,\"pitch\":0,\"gate\":true,\"velocity\":100},{\"track\":3,\"step\":1,\"pitch\":5,\"gate\":true,\"velocity\":80},{\"track\":3,\"step\":2,\"pitch\":12,\"gate\":true,\"velocity\":90},{\"track\":3,\"step\":3,\"pitch\":3,\"gate\":false,\"velocity\":0},{\"track\":3,\"step\":4,\"pitch\":7,\"gate\":true,\"velocity\":75},{\"track\":3,\"step\":5,\"pitch\":-5,\"gate\":false,\"velocity\":0},{\"track\":3,\"step\":6,\"pitch\":10,\"gate\":true,\"velocity\":85},{\"track\":3,\"step\":7,\"pitch\":2,\"gate\":true,\"velocity\":70},{\"track\":3,\"step\":8,\"pitch\":8,\"gate\":true,\"velocity\":80},{\"track\":3,\"step\":9,\"pitch\":0,\"gate\":false,\"velocity\":0},{\"track\":3,\"step\":10,\"pitch\":3,\"gate\":true,\"velocity\":75},{\"track\":3,\"step\":11,\"pitch\":7,\"gate\":false,\"velocity\":0},{\"track\":3,\"step\":12,\"pitch\":-2,\"gate\":true,\"velocity\":85},{\"track\":3,\"step\":13,\"pitch\":5,\"gate\":true,\"velocity\":90},{\"track\":3,\"step\":14,\"pitch\":10,\"gate\":true,\"velocity\":70},{\"track\":3,\"step\":15,\"pitch\":0,\"gate\":false,\"velocity\":0}]"
+        }
+      },
+      {
+        "id": "chaos-1",
+        "type": "chaos",
+        "name": "Chaos",
+        "position": { "x": 0, "y": 5 },
+        "params": { "speed": 0.3, "rho": 28, "sigma": 10, "beta": 2.66, "scale": 0, "root": 0 }
+      },
+      {
+        "id": "lfo-1",
+        "type": "lfo",
+        "name": "Tremolo",
+        "position": { "x": 0, "y": 8 },
+        "params": { "rate": 0.12, "depth": 0.4, "offset": 0.6, "shape": "sine", "bipolar": false }
+      },
+      {
+        "id": "lfo-2",
+        "type": "lfo",
+        "name": "Vibrato",
+        "position": { "x": 0, "y": 11 },
+        "params": { "rate": 2.5, "depth": 0.15, "offset": 0, "shape": "triangle", "bipolar": true }
+      },
+      {
+        "id": "slew-1",
+        "type": "slew",
+        "name": "Slew",
+        "position": { "x": 3, "y": 5 },
+        "params": { "rise": 0.2, "fall": 0.3 }
+      },
+      {
+        "id": "sh-1",
+        "type": "sample-hold",
+        "name": "S&H",
+        "position": { "x": 3, "y": 8 },
+        "params": { "mode": 0 }
+      },
+      {
+        "id": "quant-1",
+        "type": "quantizer",
+        "name": "Quantizer",
+        "position": { "x": 3, "y": 10 },
+        "params": { "root": 0, "scale": 2 }
+      },
+      {
+        "id": "osc-1",
+        "type": "wavetable",
+        "name": "Dark Pad",
+        "position": { "x": 6, "y": 0 },
+        "params": { "frequency": 220, "bank": 1, "position": 0.4, "detune": 10, "voices": 3 }
+      },
+      {
+        "id": "osc-2",
+        "type": "oscillator",
+        "name": "Lead",
+        "position": { "x": 6, "y": 3 },
+        "params": { "frequency": 440, "type": "sawtooth" }
+      },
+      {
+        "id": "osc-3",
+        "type": "oscillator",
+        "name": "Sub Bass",
+        "position": { "x": 6, "y": 5 },
+        "params": { "frequency": 55, "type": "triangle" }
+      },
+      {
+        "id": "osc-4",
+        "type": "wavetable",
+        "name": "Chaos Stab",
+        "position": { "x": 6, "y": 7 },
+        "params": { "frequency": 220, "bank": 2, "position": 0.7, "detune": 5, "voices": 2 }
+      },
+      {
+        "id": "adsr-1",
+        "type": "adsr",
+        "name": "Env 1",
+        "position": { "x": 9, "y": 0 },
+        "params": { "attack": 0.2, "decay": 0.6, "sustain": 0.5, "release": 0.8 }
+      },
+      {
+        "id": "adsr-2",
+        "type": "adsr",
+        "name": "Env 2",
+        "position": { "x": 9, "y": 2 },
+        "params": { "attack": 0.005, "decay": 0.15, "sustain": 0.3, "release": 0.1 }
+      },
+      {
+        "id": "adsr-3",
+        "type": "adsr",
+        "name": "Env 3",
+        "position": { "x": 9, "y": 4 },
+        "params": { "attack": 0.005, "decay": 0.4, "sustain": 0.5, "release": 0.3 }
+      },
+      {
+        "id": "adsr-4",
+        "type": "adsr",
+        "name": "Env 4",
+        "position": { "x": 9, "y": 6 },
+        "params": { "attack": 0.01, "decay": 0.2, "sustain": 0.3, "release": 0.15 }
+      },
+      {
+        "id": "gain-1",
+        "type": "gain",
+        "name": "VCA 1",
+        "position": { "x": 12, "y": 0 },
+        "params": { "gain": 0.3 }
+      },
+      {
+        "id": "gain-2",
+        "type": "gain",
+        "name": "VCA 2",
+        "position": { "x": 12, "y": 2 },
+        "params": { "gain": 0.25 }
+      },
+      {
+        "id": "gain-3",
+        "type": "gain",
+        "name": "VCA 3",
+        "position": { "x": 12, "y": 4 },
+        "params": { "gain": 0.35 }
+      },
+      {
+        "id": "gain-4",
+        "type": "gain",
+        "name": "VCA 4",
+        "position": { "x": 12, "y": 6 },
+        "params": { "gain": 0.2 }
+      },
+      {
+        "id": "gain-5",
+        "type": "gain",
+        "name": "Master VCA",
+        "position": { "x": 15, "y": 0 },
+        "params": { "gain": 0.8 }
+      },
+      {
+        "id": "mixer-1",
+        "type": "mixer-8",
+        "name": "Mixer",
+        "position": { "x": 17, "y": 0 },
+        "params": {
+          "level1": 0.4, "level2": 0.3, "level3": 0.4, "level4": 0.25,
+          "level5": 0, "level6": 0, "level7": 0, "level8": 0
+        }
+      },
+      {
+        "id": "vcf-1",
+        "type": "vcf",
+        "name": "Chaos Filter",
+        "position": { "x": 20, "y": 0 },
+        "params": { "cutoff": 1200, "resonance": 0.5, "drive": 0.2, "model": "svf", "mode": "lp", "slope": 24 }
+      },
+      {
+        "id": "wavefold-1",
+        "type": "wavefolder",
+        "name": "Wavefolder",
+        "position": { "x": 23, "y": 0 },
+        "params": { "drive": 2.5, "symmetry": 0.5 }
+      },
+      {
+        "id": "delay-1",
+        "type": "delay",
+        "name": "Delay",
+        "position": { "x": 23, "y": 2 },
+        "params": { "time": 333, "feedback": 0.4, "mix": 0.3 }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "x": 26, "y": 0 },
+        "params": { "mix": 0.4, "decay": 3.0, "damping": 0.4 }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Output",
+        "position": { "x": 29, "y": 0 },
+        "params": { "level": 1 }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 0, "y": 14 },
+        "params": {
+          "text": "POLYRHYTHM CHAOS\n\n90 BPM — Dark chaotic polyrhythm\n\n4 tracks (5, 7, 3, 16 steps):\n- T1: Wavetable dark pad (5)\n- T2: Saw lead + LFO vibrato (7)\n- T3: Triangle sub bass (3)\n- T4: WT stab + S&H random pitch (16)\n\nMODULATION:\n- Chaos Engine → Slew → VCF cutoff\n- Chaos Y → S&H → Quantizer → T4 pitch\n- LFO 1: Slow tremolo on master\n- LFO 2: Vibrato on lead\n\nFX: Wavefolder → Delay → Reverb\nLCM = 1680 steps before repeat!"
+        }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "polyseq-1", "portId": "clock" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "reset" }, "to": { "moduleId": "polyseq-1", "portId": "reset" }, "kind": "sync" },
+      { "from": { "moduleId": "polyseq-1", "portId": "cv-1" }, "to": { "moduleId": "osc-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "polyseq-1", "portId": "gate-1" }, "to": { "moduleId": "adsr-1", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "polyseq-1", "portId": "cv-2" }, "to": { "moduleId": "osc-2", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "polyseq-1", "portId": "gate-2" }, "to": { "moduleId": "adsr-2", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "polyseq-1", "portId": "cv-3" }, "to": { "moduleId": "osc-3", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "polyseq-1", "portId": "gate-3" }, "to": { "moduleId": "adsr-3", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "polyseq-1", "portId": "cv-4" }, "to": { "moduleId": "osc-4", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "polyseq-1", "portId": "gate-4" }, "to": { "moduleId": "adsr-4", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "osc-1", "portId": "out" }, "to": { "moduleId": "gain-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-1", "portId": "env" }, "to": { "moduleId": "gain-1", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "osc-2", "portId": "out" }, "to": { "moduleId": "gain-2", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-2", "portId": "env" }, "to": { "moduleId": "gain-2", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "osc-3", "portId": "out" }, "to": { "moduleId": "gain-3", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-3", "portId": "env" }, "to": { "moduleId": "gain-3", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "osc-4", "portId": "out" }, "to": { "moduleId": "gain-4", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-4", "portId": "env" }, "to": { "moduleId": "gain-4", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "gain-1", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-1" }, "kind": "audio" },
+      { "from": { "moduleId": "gain-2", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-2" }, "kind": "audio" },
+      { "from": { "moduleId": "gain-3", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-3" }, "kind": "audio" },
+      { "from": { "moduleId": "gain-4", "portId": "out" }, "to": { "moduleId": "mixer-1", "portId": "in-4" }, "kind": "audio" },
+      { "from": { "moduleId": "mixer-1", "portId": "out" }, "to": { "moduleId": "gain-5", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "gain-5", "portId": "out" }, "to": { "moduleId": "vcf-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "vcf-1", "portId": "out" }, "to": { "moduleId": "wavefold-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "wavefold-1", "portId": "out" }, "to": { "moduleId": "delay-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "delay-1", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "chaos-1", "portId": "x" }, "to": { "moduleId": "slew-1", "portId": "in" }, "kind": "cv" },
+      { "from": { "moduleId": "slew-1", "portId": "out" }, "to": { "moduleId": "vcf-1", "portId": "mod" }, "kind": "cv" },
+      { "from": { "moduleId": "chaos-1", "portId": "gate" }, "to": { "moduleId": "sh-1", "portId": "trig" }, "kind": "sync" },
+      { "from": { "moduleId": "chaos-1", "portId": "y" }, "to": { "moduleId": "sh-1", "portId": "in" }, "kind": "cv" },
+      { "from": { "moduleId": "sh-1", "portId": "out" }, "to": { "moduleId": "quant-1", "portId": "in" }, "kind": "cv" },
+      { "from": { "moduleId": "quant-1", "portId": "out" }, "to": { "moduleId": "osc-4", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "lfo-1", "portId": "cv-out" }, "to": { "moduleId": "gain-5", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "lfo-2", "portId": "cv-out" }, "to": { "moduleId": "osc-2", "portId": "pitch" }, "kind": "cv" }
+    ]
+  }
+}

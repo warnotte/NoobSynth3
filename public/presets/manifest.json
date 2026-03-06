@@ -1388,6 +1388,20 @@
       "group": "Polyrhythm"
     },
     {
+      "id": "polyrhythm-chaos",
+      "name": "Polyrhythm Chaos",
+      "description": "Dark polyrhythm with Chaos Engine, S&H, LFOs, wavefolder, and chaotic filter modulation.",
+      "file": "polyrhythm-chaos.json",
+      "group": "Polyrhythm"
+    },
+    {
+      "id": "polyrhythm-generative",
+      "name": "Generative Polyrhythm",
+      "description": "Polyrhythm + Turing Machine + Euclidean + Chaos Engine + S&H — fully generative evolving patch.",
+      "file": "polyrhythm-generative.json",
+      "group": "Polyrhythm"
+    },
+    {
       "id": "plucked-chords",
       "name": "Plucked Chords",
       "description": "Strummed guitar-like chords using Karplus-Strong synthesis and spring reverb.",
