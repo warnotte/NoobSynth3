@@ -1442,6 +1442,41 @@
       "description": "5 layers: SuperSaw pad + strummed strings (spring reverb) + triangle melody + FM bass + gentle 909 beat.",
       "file": "cinematic-dreams.json",
       "group": "Chord Sequencer"
+    },
+    {
+      "id": "showcase-odyssey",
+      "name": "Showcase Odyssey",
+      "description": "MEGA preset: 52 modules — all sequencers, 9 sound sources, 909 drums, full effects chain. The ultimate system demo.",
+      "file": "showcase-odyssey.json",
+      "group": "Showcase"
+    },
+    {
+      "id": "showcase-cinematic",
+      "name": "Showcase Cinematic",
+      "description": "90 BPM cinematic: chord pads + supersaw lead + karplus strings + spring reverb + gentle 909 drums.",
+      "file": "showcase-cinematic.json",
+      "group": "Showcase"
+    },
+    {
+      "id": "showcase-ambient",
+      "name": "Showcase Ambient",
+      "description": "70 BPM generative ambient: Turing Machine + Spectral Swarm + Chaos Engine + slow evolving wavetable pads.",
+      "file": "showcase-ambient.json",
+      "group": "Showcase"
+    },
+    {
+      "id": "showcase-idm",
+      "name": "Showcase IDM",
+      "description": "110 BPM IDM: polyrhythm + dual FM + ring mod + turing machine + euclidean + phaser + tape delay.",
+      "file": "showcase-idm.json",
+      "group": "Showcase"
+    },
+    {
+      "id": "showcase-techno",
+      "name": "Showcase Techno",
+      "description": "130 BPM hard techno: TB-303 acid + full 909 drums + FM synthesis + euclidean patterns + compressor.",
+      "file": "showcase-techno.json",
+      "group": "Showcase"
     }
   ]
 }
