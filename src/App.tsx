@@ -18,7 +18,6 @@ import {
   isGraphState,
   cloneGraph,
   getVoiceCountFromGraph,
-  hasSameModuleShape,
   isRecord,
 } from './state/graphUtils'
 import { clampMidiNote, clampVoiceCount } from './state/midiUtils'
@@ -1558,17 +1557,6 @@ function App() {
     presetsReady: presetStatus === 'ready',
   })
 
-  const applyGraphParams = (nextGraph: GraphState) => {
-    if (statusRef.current !== 'running') {
-      return
-    }
-    nextGraph.modules.forEach((module) => {
-      Object.entries(module.params).forEach(([paramId, value]) => {
-        engine.setParam(module.id, paramId, value)
-      })
-    })
-  }
-
   const queueEngineRestart = (nextGraph: GraphState) => {
     if (statusRef.current !== 'running') {
       return
@@ -1625,14 +1613,11 @@ function App() {
       setCurrentPresetId(null)
       clearUrlShareParams()
     }
-    const shouldRestart =
-      statusRef.current === 'running' &&
-      (!hasSameModuleShape(graphRef.current, layouted) ||
-        getVoiceCountFromGraph(graphRef.current) !== getVoiceCountFromGraph(layouted))
-    if (shouldRestart) {
+    // Always do a full engine restart when switching presets to ensure
+    // all WASM module states are rebuilt from scratch (compressor envelopes,
+    // reverb tails, effect states, etc.) and avoid stale state leaking.
+    if (statusRef.current === 'running') {
       queueEngineRestart(layouted)
-    } else {
-      applyGraphParams(layouted)
     }
     if (isTauri && tauriNativeRunning) {
       scheduleNativeGraphSync(layouted, signature, { immediate: true })
