@@ -574,6 +574,9 @@ Les port IDs dans les presets doivent correspondre **exactement** à ceux défin
 | WASAPI buffer overflow | `&[0.0; 128][..frames]` trop petit pour WASAPI (480-4096 frames) | `const ZERO_BUFFER: [f32; 4096]` dans `process.rs` |
 | Octave ne change pas le pitch | CV calculé comme `(note - midiRoot) / 12` → toujours relatif | CV fixe: `(note - 60) / 12` (MIDI 60 = C4 = référence) |
 | Mixers perdent la stéréo | Mixers ne traitaient que `channel(0)` | Méthodes `process_block_stereo` + `channels_mut_2()` pour L/R |
+| Mixer gain staging trop faible | Mixer 2ch: toujours `÷2`. Multi-ch: `÷N`. Perte de volume excessive | Tous les mixers: `÷√N` (sommation de puissance, standard DAW) |
+| Reverb wet trop atténuée | `input_gain=0.35 × wet_scale=0.3 = ×0.105` | `input_gain=0.5 × wet_scale=0.5 = ×0.25` (2.4× plus fort) |
+| Presets Showcase/Chord trop faibles | Accumulation d'atténuations (gain×mixer×VCF×reverb) | Recalibrage gains, mixer levels, VCF cutoff sur Ambient et Odyssey |
 
 ---
 
@@ -621,7 +624,7 @@ Les port IDs dans les presets doivent correspondre **exactement** à ceux défin
 | VST UI | L'éditeur est un launcher; UI complète dans fenêtre Tauri externe |
 | VST Macros | Les édits UI ne modifient pas l'automation DAW |
 | WASM | `wasm-opt` désactivé (bulk memory mismatch); non optimisé |
-| **Mixers Division Volume** | Le mixer 2ch divise toujours par 2 (`*0.5`), même avec une seule entrée. Les mixers multi-canaux (6ch, 8ch) divisent par le nombre d'entrées *connectées*. Chaîner plusieurs mixers cause perte de volume. Workaround: ajouter un Gain en sortie. |
+| **Mixers Gain Staging** | Tous les mixers (2ch, 6ch, 8ch) divisent par `√N` (N = entrées connectées). Formule standard DAW (sommation de puissance). Ancien comportement: 2ch divisait toujours par 2, multi-ch par N. |
 | **RSID partiellement supporté** | Certains fichiers RSID (Great Giana Sisters, RoboCop) ne jouent pas correctement. L'émulation CPU 6502/CIA/VIC n'est pas assez précise pour les tunes RSID les plus exigeantes (timer modulation dynamique, échantillons digi). Les PSID fonctionnent tous. |
 
 ---

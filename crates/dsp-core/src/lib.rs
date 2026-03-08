@@ -186,12 +186,20 @@ impl Mixer {
             return;
         }
 
+        let active_count =
+            input_a.is_some() as u32 + input_b.is_some() as u32;
+        let scale = if active_count > 0 {
+            1.0 / (active_count as Sample).sqrt()
+        } else {
+            0.0
+        };
+
         for i in 0..output.len() {
             let level_a_value = sample_at(level_a, i, 0.6);
             let level_b_value = sample_at(level_b, i, 0.6);
             let a = input_at(input_a, i) * level_a_value;
             let b = input_at(input_b, i) * level_b_value;
-            output[i] = (a + b) * 0.5;
+            output[i] = (a + b) * scale;
         }
     }
 
@@ -214,7 +222,7 @@ impl Mixer {
             }
         }
         let scale = if active_count > 0 {
-            1.0 / active_count as Sample
+            1.0 / (active_count as Sample).sqrt()
         } else {
             0.0
         };
@@ -244,6 +252,14 @@ impl Mixer {
             return;
         }
 
+        let active_count =
+            input_a_l.is_some() as u32 + input_b_l.is_some() as u32;
+        let scale = if active_count > 0 {
+            1.0 / (active_count as Sample).sqrt()
+        } else {
+            0.0
+        };
+
         for i in 0..output_l.len() {
             let level_a_value = sample_at(level_a, i, 0.6);
             let level_b_value = sample_at(level_b, i, 0.6);
@@ -251,8 +267,8 @@ impl Mixer {
             let a_r = input_at(input_a_r, i) * level_a_value;
             let b_l = input_at(input_b_l, i) * level_b_value;
             let b_r = input_at(input_b_r, i) * level_b_value;
-            output_l[i] = (a_l + b_l) * 0.5;
-            output_r[i] = (a_r + b_r) * 0.5;
+            output_l[i] = (a_l + b_l) * scale;
+            output_r[i] = (a_r + b_r) * scale;
         }
     }
 
@@ -278,7 +294,7 @@ impl Mixer {
             }
         }
         let scale = if active_count > 0 {
-            1.0 / active_count as Sample
+            1.0 / (active_count as Sample).sqrt()
         } else {
             0.0
         };

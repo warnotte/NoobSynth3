@@ -248,7 +248,7 @@ impl Reverb {
             self.pre_buffer_r[self.pre_write_index] = in_r;
             self.pre_write_index = (self.pre_write_index + 1) % pre_buffer_size;
 
-            let input_gain = 0.35;
+            let input_gain = 0.5;
             let reverb_in_l = pre_l * input_gain;
             let reverb_in_r = pre_r * input_gain;
 
@@ -267,7 +267,7 @@ impl Reverb {
                 wet_r = allpass.process(wet_r);
             }
 
-            let wet_scale = 0.3;
+            let wet_scale = 0.5;
             wet_l *= wet_scale;
             wet_r *= wet_scale;
 
