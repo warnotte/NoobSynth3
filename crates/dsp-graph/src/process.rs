@@ -15,6 +15,7 @@ use dsp_core::{
     FrequencyShifterInputs, FrequencyShifterParams,
     GlitchInputs, GlitchParams,
     LeslieInputs, LeslieParams,
+    WahInputs, WahParams, TubeAmpInputs, TubeAmpParams,
     Cowbell808Inputs, Cowbell808Params,
     DelayInputs, DelayParams, Distortion, DistortionParams,
     DrumSequencerInputs, DrumSequencerOutputs, DrumSequencerParams,
@@ -1679,6 +1680,11 @@ pub(crate) fn process_module(
                 drawbar_1: state.drawbar_1.slice(frames),
                 voicing: state.voicing.slice(frames),
                 chiff: state.chiff.slice(frames),
+                percussion: state.percussion.slice(frames),
+                perc_harmonic: state.perc_harmonic.slice(frames),
+                perc_decay: state.perc_decay.slice(frames),
+                perc_volume: state.perc_volume.slice(frames),
+                chorus_vibrato: state.chorus_vibrato.slice(frames),
                 tremulant: state.tremulant.slice(frames),
                 trem_rate: state.trem_rate.slice(frames),
                 wind: state.wind.slice(frames),
@@ -2244,11 +2250,49 @@ pub(crate) fn process_module(
                 brake: state.brake.slice(frames),
                 drive: state.drive.slice(frames),
                 depth: state.depth.slice(frames),
+                horn_drum: state.horn_drum.slice(frames),
+                mic_dist: state.mic_dist.slice(frames),
+                ramp: state.ramp.slice(frames),
                 mix: state.mix.slice(frames),
             };
             let les_inputs = LeslieInputs { input_l, input_r };
             let (out_l, out_r) = outputs[0].channels_mut_2();
             state.leslie.process_block(out_l, out_r, les_inputs, params);
+        }
+        ModuleState::Wah(state) => {
+            let input = if !connections[0].is_empty() {
+                Some(inputs[0].channel(0))
+            } else {
+                None
+            };
+            let params = WahParams {
+                mode: state.mode.slice(frames),
+                freq: state.freq.slice(frames),
+                range: state.range.slice(frames),
+                resonance: state.resonance.slice(frames),
+                speed: state.speed.slice(frames),
+                sensitivity: state.sensitivity.slice(frames),
+                mix: state.mix.slice(frames),
+            };
+            let out = outputs[0].channel_mut(0);
+            state.wah.process_block(out, WahInputs { input }, params);
+        }
+        ModuleState::TubeAmp(state) => {
+            let input = if !connections[0].is_empty() {
+                Some(inputs[0].channel(0))
+            } else {
+                None
+            };
+            let params = TubeAmpParams {
+                gain: state.gain.slice(frames),
+                stages: state.stages.slice(frames),
+                tone: state.tone.slice(frames),
+                bias: state.bias.slice(frames),
+                sag: state.sag.slice(frames),
+                mix: state.mix.slice(frames),
+            };
+            let out = outputs[0].channel_mut(0);
+            state.tube_amp.process_block(out, TubeAmpInputs { input }, params);
         }
         ModuleState::ChordSequencer(state) => {
             let clock = if connections[0].is_empty() { None } else { Some(inputs[0].channel(0)) };

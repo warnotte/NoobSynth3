@@ -75,7 +75,9 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 2 }, // audio in (stereo)
       PortInfo { channels: 1 }, // vowel CV
     ],
-    ModuleType::Distortion => vec![PortInfo { channels: 1 }],
+    ModuleType::Distortion
+    | ModuleType::Wah
+    | ModuleType::TubeAmp => vec![PortInfo { channels: 1 }],
     ModuleType::Wavefolder => vec![PortInfo { channels: 1 }],
     ModuleType::Supersaw => vec![PortInfo { channels: 1 }],
     ModuleType::Karplus => vec![
@@ -327,7 +329,9 @@ pub fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
     | ModuleType::Phaser => {
       vec![PortInfo { channels: 2 }]
     },
-    ModuleType::Distortion => vec![PortInfo { channels: 1 }],
+    ModuleType::Distortion
+    | ModuleType::Wah
+    | ModuleType::TubeAmp => vec![PortInfo { channels: 1 }],
     ModuleType::Wavefolder => vec![PortInfo { channels: 1 }],
     ModuleType::Supersaw => vec![PortInfo { channels: 1 }],
     ModuleType::Karplus => vec![PortInfo { channels: 1 }],  // audio output
@@ -697,8 +701,10 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
       "vowel" | "cv" => Some(1),
       _ => None,
     },
-    ModuleType::Distortion => match port_id {
-      "in" => Some(0),
+    ModuleType::Distortion
+    | ModuleType::Wah
+    | ModuleType::TubeAmp => match port_id {
+      "in" | "input" | "audio" => Some(0),
       _ => None,
     },
     ModuleType::Wavefolder => match port_id {
@@ -1046,8 +1052,10 @@ pub fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize
       "out" => Some(0),
       _ => None,
     },
-    ModuleType::Distortion => match port_id {
-      "out" => Some(0),
+    ModuleType::Distortion
+    | ModuleType::Wah
+    | ModuleType::TubeAmp => match port_id {
+      "out" | "output" => Some(0),
       _ => None,
     },
     ModuleType::Wavefolder => match port_id {

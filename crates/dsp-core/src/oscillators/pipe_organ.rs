@@ -1,13 +1,19 @@
-//! Pipe Organ synthesizer module.
+//! Pipe Organ / Hammond B3 synthesizer module.
 //!
-//! Realistic pipe organ emulation using additive synthesis with:
+//! Realistic organ emulation using additive synthesis with:
 //! - 8 drawbars for different footages (16' to 1')
 //! - 3 voicing types (Diapason, Flute, String)
-//! - Chiff (initial air noise burst)
+//! - Hammond percussion (2nd/3rd harmonic, fast/slow decay)
+//! - Chiff / key click (initial transient)
+//! - Chorus/Vibrato scanner (V1-V3, C1-C3)
 //! - Tremulant (wind supply modulation)
 //! - Wind instability (natural fluctuation)
 
 use crate::common::{input_at, Sample};
+
+// Scanner vibrato constants (Hammond-style)
+const SCANNER_RATE: f32 = 7.0; // Hz, fixed scanner speed
+const SCANNER_BUF_MS: f32 = 3.0; // Max delay in ms
 
 /// Number of drawbars (organ stops)
 pub const ORGAN_DRAWBARS: usize = 8;
@@ -69,6 +75,15 @@ pub struct PipeOrgan {
     chiff_envelope: f32,
     noise_state: u32,
 
+    // Hammond percussion
+    perc_envelope: f32,
+    perc_last_gate: f32,
+
+    // Chorus/Vibrato scanner
+    scanner_phase: f32,
+    scanner_buf: Vec<f32>,
+    scanner_write_idx: usize,
+
     // Tremulant LFO
     tremulant_phase: f32,
 
@@ -108,6 +123,21 @@ pub struct PipeOrganParams<'a> {
     /// Chiff amount (0.0 to 1.0)
     pub chiff: &'a [Sample],
 
+    /// Hammond percussion on/off (0 or 1)
+    pub percussion: &'a [Sample],
+
+    /// Percussion harmonic: 0=2nd (4'), 1=3rd (2⅔')
+    pub perc_harmonic: &'a [Sample],
+
+    /// Percussion decay: 0=fast (~200ms), 1=slow (~500ms)
+    pub perc_decay: &'a [Sample],
+
+    /// Percussion volume (0.0 to 1.0)
+    pub perc_volume: &'a [Sample],
+
+    /// Chorus/Vibrato scanner: 0=off, 1=V1, 2=V2, 3=V3, 4=C1, 5=C2, 6=C3
+    pub chorus_vibrato: &'a [Sample],
+
     /// Tremulant depth (0.0 to 1.0)
     pub tremulant: &'a [Sample],
 
@@ -132,13 +162,20 @@ pub struct PipeOrganInputs<'a> {
 impl PipeOrgan {
     /// Create a new pipe organ at the given sample rate.
     pub fn new(sample_rate: f32) -> Self {
+        let sr = sample_rate.max(1.0);
+        let scanner_buf_size = ((SCANNER_BUF_MS * sr / 1000.0) as usize + 2).max(4);
         Self {
-            sample_rate: sample_rate.max(1.0),
-            inv_sample_rate: 1.0 / sample_rate.max(1.0),
+            sample_rate: sr,
+            inv_sample_rate: 1.0 / sr,
             phases: [0.0; ORGAN_DRAWBARS],
             chiff_phase: 0.0,
             chiff_envelope: 0.0,
             noise_state: 0x12345678,
+            perc_envelope: 0.0,
+            perc_last_gate: 0.0,
+            scanner_phase: 0.0,
+            scanner_buf: vec![0.0; scanner_buf_size],
+            scanner_write_idx: 0,
             tremulant_phase: 0.0,
             wind_phase: 0.0,
             wind_phase2: 0.0,
@@ -151,8 +188,26 @@ impl PipeOrgan {
 
     /// Update sample rate.
     pub fn set_sample_rate(&mut self, sample_rate: f32) {
-        self.sample_rate = sample_rate.max(1.0);
-        self.inv_sample_rate = 1.0 / self.sample_rate;
+        let sr = sample_rate.max(1.0);
+        if (sr - self.sample_rate).abs() > 1.0 {
+            self.sample_rate = sr;
+            self.inv_sample_rate = 1.0 / sr;
+            let scanner_buf_size = ((SCANNER_BUF_MS * sr / 1000.0) as usize + 2).max(4);
+            self.scanner_buf = vec![0.0; scanner_buf_size];
+            self.scanner_write_idx = 0;
+        }
+    }
+
+    /// Interpolated read from scanner delay buffer.
+    fn scanner_read(&self, delay_samples: f32) -> f32 {
+        let size = self.scanner_buf.len() as i32;
+        let read_pos = self.scanner_write_idx as f32 - delay_samples;
+        let base = read_pos.floor();
+        let mut ia = base as i32 % size;
+        if ia < 0 { ia += size; }
+        let ib = (ia + 1) % size;
+        let frac = read_pos - base;
+        self.scanner_buf[ia as usize] + (self.scanner_buf[ib as usize] - self.scanner_buf[ia as usize]) * frac
     }
 
     /// Generate white noise using xorshift.
@@ -257,6 +312,11 @@ impl PipeOrgan {
 
             let chiff_amount = params.chiff.get(i).copied()
                 .unwrap_or_else(|| params.chiff.last().copied().unwrap_or(0.3));
+            let percussion_on = params.percussion.get(i).copied().unwrap_or(0.0) >= 0.5;
+            let perc_harmonic = params.perc_harmonic.get(i).copied().unwrap_or(0.0);
+            let perc_decay_mode = params.perc_decay.get(i).copied().unwrap_or(0.0);
+            let perc_volume = params.perc_volume.get(i).copied().unwrap_or(0.8);
+            let cv_mode = params.chorus_vibrato.get(i).copied().unwrap_or(0.0) as u8;
             let tremulant_depth = params.tremulant.get(i).copied()
                 .unwrap_or_else(|| params.tremulant.last().copied().unwrap_or(0.0));
             let trem_rate = params.trem_rate.get(i).copied()
@@ -272,15 +332,34 @@ impl PipeOrgan {
             let env_speed = if gate_on { 0.005 } else { 0.001 }; // Fast attack, medium release
             self.envelope += env_speed * (env_target - self.envelope);
 
-            // === Chiff (initial noise burst) ===
+            // === Chiff / Key Click (improved Hammond-style) ===
             if gate_trigger {
                 self.chiff_envelope = 1.0;
             }
-            // Chiff decays over ~50-80ms
-            let chiff_decay = (-self.inv_sample_rate / 0.06).exp();
-            self.chiff_envelope *= chiff_decay;
+            // Key click: fast decay ~8ms for tonal click + 40ms noise tail
+            let click_decay = (-self.inv_sample_rate / 0.008).exp();
+            let noise_decay = (-self.inv_sample_rate / 0.04).exp();
+            self.chiff_envelope *= noise_decay;
+            // Tonal click component: broadband burst at contact
+            let tonal_click = if self.chiff_envelope > 0.5 {
+                (self.phases[1] * two_pi * 3.0).sin() * 0.4 // Based on 8' phase
+            } else {
+                0.0
+            };
+            let noise_click = self.chiff_noise(freq) * self.chiff_envelope;
+            let chiff_signal = (tonal_click + noise_click) * chiff_amount * 0.5;
 
-            let chiff_signal = self.chiff_noise(freq) * self.chiff_envelope * chiff_amount * 0.5;
+            // === Hammond Percussion ===
+            // Trigger on gate rising edge
+            let perc_trigger = gate > 0.5 && self.perc_last_gate <= 0.5;
+            self.perc_last_gate = gate;
+            if perc_trigger {
+                self.perc_envelope = 1.0;
+            }
+            // Decay: fast ~200ms, slow ~500ms
+            let perc_decay_time = if perc_decay_mode >= 0.5 { 0.5 } else { 0.2 };
+            let perc_coeff = (-self.inv_sample_rate * 6.9 / perc_decay_time).exp();
+            self.perc_envelope *= perc_coeff;
 
             // === Tremulant LFO ===
             self.tremulant_phase += trem_rate * self.inv_sample_rate;
@@ -342,10 +421,19 @@ impl PipeOrgan {
                 sum /= total_weight.max(1.0);
             }
 
+            // === Add Hammond Percussion ===
+            if percussion_on && self.perc_envelope > 0.001 {
+                // 2nd harmonic = 4' (index 2, ratio 2.0), 3rd harmonic = 2⅔' (index 3, ratio 3.0)
+                // 2nd harmonic = 4' (index 2, ratio 2.0), 3rd harmonic = 2⅔' (index 3, ratio 3.0)
+                let perc_phase_idx = if perc_harmonic >= 0.5 { 3 } else { 2 };
+                let perc_signal = (self.phases[perc_phase_idx] * two_pi).sin();
+                sum += perc_signal * self.perc_envelope * perc_volume * 0.6;
+            }
+
             // Apply tremulant modulation
             sum *= tremulant_mod;
 
-            // Add chiff
+            // Add chiff / key click
             sum += chiff_signal;
 
             // === Brightness filter (gentle low-pass) ===
@@ -360,6 +448,38 @@ impl PipeOrgan {
             let filtered_mix = 1.0 - brightness * 0.5;
             sum = sum * (1.0 - filtered_mix) + self.lp_state * filtered_mix;
 
+            // === Chorus/Vibrato Scanner ===
+            // 0=off, 1=V1, 2=V2, 3=V3, 4=C1, 5=C2, 6=C3
+            if cv_mode > 0 {
+                let buf_size = self.scanner_buf.len();
+                self.scanner_buf[self.scanner_write_idx] = sum;
+
+                // Scanner LFO
+                self.scanner_phase += SCANNER_RATE * self.inv_sample_rate;
+                if self.scanner_phase >= 1.0 { self.scanner_phase -= 1.0; }
+                let scanner_lfo = (self.scanner_phase * two_pi).sin();
+
+                // Depth in ms: V1/C1=0.3, V2/C2=0.7, V3/C3=1.2
+                let depth_ms = match cv_mode {
+                    1 | 4 => 0.3,
+                    2 | 5 => 0.7,
+                    _ => 1.2, // 3 | 6
+                };
+                let center_delay = depth_ms * self.sample_rate / 1000.0;
+                let mod_range = center_delay * 0.5;
+                let delay_samples = center_delay + scanner_lfo * mod_range;
+                let wet = self.scanner_read(delay_samples.max(0.5));
+
+                // V modes = wet only, C modes = 50/50 dry+wet
+                sum = if cv_mode <= 3 {
+                    wet // Vibrato: wet only
+                } else {
+                    sum * 0.5 + wet * 0.5 // Chorus: mix
+                };
+
+                self.scanner_write_idx = (self.scanner_write_idx + 1) % buf_size;
+            }
+
             // Apply envelope
             sum *= self.envelope;
 
@@ -372,6 +492,11 @@ impl PipeOrgan {
         self.phases = [0.0; ORGAN_DRAWBARS];
         self.chiff_phase = 0.0;
         self.chiff_envelope = 0.0;
+        self.perc_envelope = 0.0;
+        self.perc_last_gate = 0.0;
+        self.scanner_phase = 0.0;
+        for s in self.scanner_buf.iter_mut() { *s = 0.0; }
+        self.scanner_write_idx = 0;
         self.tremulant_phase = 0.0;
         self.wind_phase = 0.0;
         self.wind_phase2 = 0.0;

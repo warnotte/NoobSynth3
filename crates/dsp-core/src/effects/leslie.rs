@@ -53,6 +53,9 @@ pub struct LeslieParams<'a> {
     pub brake: &'a [Sample],    // 1 = stop rotors
     pub drive: &'a [Sample],    // 0..1 overdrive
     pub depth: &'a [Sample],    // 0..1 modulation depth
+    pub horn_drum: &'a [Sample],// 0..1 horn/drum balance (0.5=balanced)
+    pub mic_dist: &'a [Sample], // 0..1 mic distance (0=close, 1=far)
+    pub ramp: &'a [Sample],     // 0..1 ramp speed (0=slow, 1=fast)
     pub mix: &'a [Sample],      // 0..1 dry/wet
 }
 
@@ -128,6 +131,9 @@ impl Leslie {
             let brake = sample_at(params.brake, i, 0.0) >= 0.5;
             let drive = sample_at(params.drive, i, 0.0).clamp(0.0, 1.0);
             let depth = sample_at(params.depth, i, 0.7).clamp(0.0, 1.0);
+            let horn_drum = sample_at(params.horn_drum, i, 0.5).clamp(0.0, 1.0);
+            let mic_dist = sample_at(params.mic_dist, i, 0.0).clamp(0.0, 1.0);
+            let ramp_speed = sample_at(params.ramp, i, 0.5).clamp(0.0, 1.0);
             let mix = sample_at(params.mix, i, 1.0).clamp(0.0, 1.0);
 
             // Target rates
@@ -139,11 +145,14 @@ impl Leslie {
                 (HORN_SLOW, DRUM_SLOW)
             };
 
-            // Smooth ramp toward target
+            // Smooth ramp toward target (ramp_speed: 0=slow, 1=fast)
+            let ramp_mult = 0.5 + ramp_speed * 3.0; // 0.5x to 3.5x
+            let horn_accel = HORN_ACCEL * ramp_mult;
+            let drum_accel = DRUM_ACCEL * ramp_mult;
             let horn_diff = horn_target - self.horn_rate;
             let drum_diff = drum_target - self.drum_rate;
-            self.horn_rate += horn_diff.signum() * (HORN_ACCEL * inv_sr).min(horn_diff.abs());
-            self.drum_rate += drum_diff.signum() * (DRUM_ACCEL * inv_sr).min(drum_diff.abs());
+            self.horn_rate += horn_diff.signum() * (horn_accel * inv_sr).min(horn_diff.abs());
+            self.drum_rate += drum_diff.signum() * (drum_accel * inv_sr).min(drum_diff.abs());
 
             // Input
             let dry_l = input_at(inputs.input_l, i);
@@ -200,13 +209,26 @@ impl Leslie {
             let drum_l = Self::read_interp(&self.drum_buf_l, self.write_idx, drum_del_l) * drum_am_l;
             let drum_r = Self::read_interp(&self.drum_buf_r, self.write_idx, drum_del_r) * drum_am_r;
 
-            // Combine
-            let wet_l = horn_l + drum_l;
-            let wet_r = horn_r + drum_r;
+            // Combine with horn/drum balance
+            // horn_drum: 0=all drum, 0.5=balanced, 1=all horn
+            let horn_level = horn_drum.min(1.0) * 2.0; // 0..1 -> 0..2
+            let drum_level = (1.0 - horn_drum).min(1.0) * 2.0;
+            let horn_gain = horn_level.min(1.0);
+            let drum_gain = drum_level.min(1.0);
+
+            let wet_l = horn_l * horn_gain + drum_l * drum_gain;
+            let wet_r = horn_r * horn_gain + drum_r * drum_gain;
+
+            // Mic distance: close=dry/direct, far=more blended/diffuse
+            // Simulates mic placement: close mic = more stereo separation, far = more mono/room
+            let stereo_narrow = mic_dist * 0.6; // 0=full stereo, 0.6=mostly mono
+            let mid = (wet_l + wet_r) * 0.5;
+            let final_wet_l = wet_l + (mid - wet_l) * stereo_narrow;
+            let final_wet_r = wet_r + (mid - wet_r) * stereo_narrow;
 
             let dry_mix = 1.0 - mix;
-            out_l[i] = dry_l * dry_mix + wet_l * mix;
-            out_r[i] = dry_r * dry_mix + wet_r * mix;
+            out_l[i] = dry_l * dry_mix + final_wet_l * mix;
+            out_r[i] = dry_r * dry_mix + final_wet_r * mix;
 
             // Advance phases
             self.horn_phase += tau * self.horn_rate * inv_sr;

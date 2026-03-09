@@ -85,6 +85,8 @@ pub use effects::{
     Eq3, Eq3Params, Eq3Inputs,
     Glitch, GlitchParams, GlitchInputs,
     Leslie, LeslieParams, LeslieInputs,
+    Wah, WahParams, WahInputs,
+    TubeAmp, TubeAmpParams, TubeAmpInputs,
 };
 
 // Re-export modulators

@@ -209,6 +209,8 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
     outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
   },
   leslie: simpleAudioEffect(),
+  wah: simpleAudioEffect(),
+  'tube-amp': simpleAudioEffect(),
   'envelope-follower': {
     inputs: [{ id: 'in', label: 'In', kind: 'audio', direction: 'in' }],
     outputs: [{ id: 'out', label: 'CV', kind: 'cv', direction: 'out' }],

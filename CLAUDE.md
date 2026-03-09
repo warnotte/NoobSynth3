@@ -214,7 +214,7 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 
 **⚠️ RÈGLE:** Toute nouvelle feature UI↔Audio DOIT être implémentée pour Tauri en même temps que Web. Ne jamais merger une feature Web-only.
 
-## Module Types (85 total)
+## Module Types (87 total)
 
 ### Sources (17)
 oscillator, supersaw, karplus, fm-op, fm-matrix, nes-osc, snes-osc, noise, tb-303, shepard, pipe-organ, spectral-swarm, resonator, wavetable, granular, particle-cloud, speech-synth
@@ -225,8 +225,8 @@ vcf, hpf
 ### Amplifiers (6)
 gain, cv-vca, mixer, mixer-1x2, mixer-8, crossfader
 
-### Effects (21)
-chorus, ensemble, choir, vocoder, delay, granular-delay, tape-delay, spring-reverb, reverb, phaser, distortion, wavefolder, ring-mod, pitch-shifter, compressor, bit-crusher, flanger, freq-shifter, eq3, glitch, leslie
+### Effects (23)
+chorus, ensemble, choir, vocoder, delay, granular-delay, tape-delay, spring-reverb, reverb, phaser, distortion, wavefolder, ring-mod, pitch-shifter, compressor, bit-crusher, flanger, freq-shifter, eq3, glitch, leslie, wah, tube-amp
 
 ### Modulators (8)
 adsr, lfo, mod-router, sample-hold, slew, quantizer, chaos, envelope-follower
@@ -370,7 +370,19 @@ Trois biquad en série (low shelf, mid peak, high shelf). Coefficients Audio EQ 
 Effet de glitch déclenché par clock. Capture des slices audio et les répète avec reverse/pitch aléatoire. Params: probability, sliceMs, repeats, reverseChance, pitchRange, mix. Port d'entrée clock obligatoire.
 
 ### Leslie Rotary Speaker
-Simulation de cabine Leslie 122/147. Crossover 1-pole à 800Hz sépare basses (drum rotor) et aigus (horn rotor). Chaque rotor : AM + Doppler (delay modulé). Vitesse lente/rapide avec rampe d'accélération (horn 3 Hz/s, drum 1.5 Hz/s). Overdrive doux (tanh). Sortie stéréo. Params: speed (0=slow, 1=fast), brake, drive, depth, mix.
+Simulation de cabine Leslie 122/147. Crossover 1-pole à 800Hz sépare basses (drum rotor) et aigus (horn rotor). Chaque rotor : AM + Doppler (delay modulé). Vitesse lente/rapide avec rampe d'accélération configurable. Overdrive doux (tanh). Sortie stéréo. Params: speed (0=slow, 1=fast), brake, drive, depth, hornDrum (balance horn/drum), micDist (distance micro), ramp (vitesse accélération), mix.
+
+### Pipe Organ — Hammond B3 Features
+Le Pipe Organ module inclut des features Hammond B3 authentiques :
+- **Percussion** : 2nd ou 3rd harmonique avec decay rapide (~200ms) ou lent (~500ms). Params: percussion (on/off), percHarmonic (0=2nd, 1=3rd), percDecay (0=fast, 1=slow), percVolume.
+- **Key Click** : Transitoire amélioré avec composante tonale + bruit (chiff param).
+- **Chorus/Vibrato Scanner** : 6 modes Hammond (V1/V2/V3 vibrato, C1/C2/C3 chorus). Delay modulé à 7Hz. Param: chorusVibrato (0-6).
+
+### Wah-Wah
+Auto-wah avec filtre bandpass résonant (SVF 2-pole). Deux modes : Envelope follower (auto-wah, suit la dynamique) et LFO (sweep périodique). Params: mode (0=env, 1=LFO), freq (200-2000 Hz base), range (sweep depth), resonance (Q), speed (LFO Hz), sensitivity (env mode), mix.
+
+### Tube Amp
+Amplificateur à tubes multi-étages avec saturation asymétrique (caractéristique triode). Tone stack Baxandall (dark/bright). Power supply sag (compression dynamique). DC blocker intégré. Params: gain (drive 1x-20x), stages (1-4 étages), tone, bias (asymétrie), sag, mix.
 
 ### Unified Rate Divisions
 Tous les séquenceurs et le Delay (mode sync) utilisent un système de rate divisions unifié défini dans:

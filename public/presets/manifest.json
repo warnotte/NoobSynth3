@@ -1575,6 +1575,20 @@
       "description": "Full 8-track MIDI through Hammond organs with Leslie rotary speaker.",
       "file": "midi-leslie-organ-8trk.json",
       "group": "Leslie"
+    },
+    {
+      "id": "organ-wah",
+      "name": "Funky Organ + Wah",
+      "description": "Hammond B3 through auto-wah and Leslie for funky organ tones.",
+      "file": "organ-wah.json",
+      "group": "Leslie"
+    },
+    {
+      "id": "organ-tube-rock",
+      "name": "Rock Organ + Tube Amp",
+      "description": "Hammond B3 through tube amplifier and Leslie for classic rock/blues organ.",
+      "file": "organ-tube-rock.json",
+      "group": "Leslie"
     }
   ]
 }

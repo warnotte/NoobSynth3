@@ -68,6 +68,8 @@ pub enum ModuleType {
     Eq3,
     Glitch,
     Leslie,
+    Wah,
+    TubeAmp,
 
     // Sequencers
     Clock,

@@ -1,15 +1,26 @@
 /**
- * Pipe Organ Module Controls
+ * Pipe Organ / Hammond B3 Module Controls
  *
- * Classic pipe organ with drawbars and voicing.
- * Parameters: frequency, drawbars (8), voicing, chiff, tremulant, tremRate, wind, brightness
+ * Parameters: frequency, drawbars (8), voicing, chiff, percussion, chorusVibrato,
+ * tremulant, tremRate, wind, brightness
  */
 
 import type { ControlProps } from '../types'
 import { RotaryKnob } from '../../RotaryKnob'
 import { ControlBox, ControlBoxRow } from '../../ControlBox'
 import { ControlButtons } from '../../ControlButtons'
+import { ToggleButton } from '../../ToggleButton'
 import { formatInt, formatPercent, formatDecimal1 } from '../../formatters'
+
+const CV_LABELS = [
+  { id: 0, label: 'OFF' },
+  { id: 1, label: 'V1' },
+  { id: 2, label: 'V2' },
+  { id: 3, label: 'V3' },
+  { id: 4, label: 'C1' },
+  { id: 5, label: 'C2' },
+  { id: 6, label: 'C3' },
+]
 
 export function PipeOrganControls({ module, updateParam }: ControlProps) {
   const frequency = Number(module.params.frequency ?? 220)
@@ -23,6 +34,11 @@ export function PipeOrganControls({ module, updateParam }: ControlProps) {
   const drawbar1 = Number(module.params.drawbar1 ?? 0.2)
   const voicing = Number(module.params.voicing ?? 0)
   const chiff = Number(module.params.chiff ?? 0.3)
+  const percussion = Boolean(module.params.percussion)
+  const percHarmonic = Number(module.params.percHarmonic ?? 0)
+  const percDecay = Number(module.params.percDecay ?? 0)
+  const percVolume = Number(module.params.percVolume ?? 0.8)
+  const chorusVibrato = Number(module.params.chorusVibrato ?? 0)
   const tremulant = Number(module.params.tremulant ?? 0.0)
   const tremRate = Number(module.params.tremRate ?? 6.0)
   const wind = Number(module.params.wind ?? 0.1)
@@ -128,8 +144,50 @@ export function PipeOrganControls({ module, updateParam }: ControlProps) {
           onChange={(value) => updateParam(module.id, 'voicing', value)}
         />
       </ControlBox>
+      {/* Hammond Percussion */}
+      <ControlBox label="Percussion" compact>
+        <ToggleButton
+          label={percussion ? 'ON' : 'OFF'}
+          value={percussion}
+          onChange={(value) => updateParam(module.id, 'percussion', value)}
+        />
+        <ControlButtons
+          options={[
+            { id: 0, label: '2nd' },
+            { id: 1, label: '3rd' },
+          ]}
+          value={percHarmonic}
+          onChange={(value) => updateParam(module.id, 'percHarmonic', value)}
+        />
+        <ControlButtons
+          options={[
+            { id: 0, label: 'FAST' },
+            { id: 1, label: 'SLOW' },
+          ]}
+          value={percDecay}
+          onChange={(value) => updateParam(module.id, 'percDecay', value)}
+        />
+      </ControlBox>
       <RotaryKnob
-        label="Chiff"
+        label="P.Vol"
+        min={0}
+        max={1}
+        step={0.01}
+        value={percVolume}
+        onChange={(value) => updateParam(module.id, 'percVolume', value)}
+        format={formatPercent}
+      />
+      {/* Chorus/Vibrato Scanner */}
+      <ControlBox label="C/V Scanner" compact>
+        <ControlButtons
+          options={CV_LABELS}
+          value={chorusVibrato}
+          onChange={(value) => updateParam(module.id, 'chorusVibrato', value)}
+          columns={4}
+        />
+      </ControlBox>
+      <RotaryKnob
+        label="Click"
         min={0}
         max={1}
         step={0.01}

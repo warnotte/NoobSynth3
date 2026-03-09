@@ -5,7 +5,7 @@ use dsp_core::{
     EnvelopeFollower, Eq3, EuclideanSequencer, Flanger, FmMatrix, FmOperator, FrequencyShifter, Glitch, Granular, GranularDelay, HiHat808, HiHat909, Hpf, KarplusStrong, Leslie,
     Kick808, Kick909, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, ParticleCloud, Phaser, PipeOrgan, PitchShifter,
     PolyrhythmSequencer, Resonator, Reverb, Rimshot909, SampleHold, Shepard, SidPlayer, SlewLimiter, Snare808, Snare909, SnesOsc, SpectralSwarm, SpeechSynth,
-    SpringReverb, StepSequencer, Supersaw, TapeDelay, Tb303, Tom808, Tom909, TuringMachine, Vcf, Vco, Vocoder, Wavetable,
+    SpringReverb, StepSequencer, Supersaw, TapeDelay, Tb303, Tom808, Tom909, TubeAmp, TuringMachine, Vcf, Vco, Vocoder, Wah, Wavetable,
 };
 
 use crate::types::ParamBuffer;
@@ -170,6 +170,11 @@ pub struct PipeOrganState {
     pub drawbar_1: ParamBuffer,
     pub voicing: ParamBuffer,
     pub chiff: ParamBuffer,
+    pub percussion: ParamBuffer,
+    pub perc_harmonic: ParamBuffer,
+    pub perc_decay: ParamBuffer,
+    pub perc_volume: ParamBuffer,
+    pub chorus_vibrato: ParamBuffer,
     pub tremulant: ParamBuffer,
     pub trem_rate: ParamBuffer,
     pub wind: ParamBuffer,
@@ -575,6 +580,30 @@ pub struct LeslieState {
     pub brake: ParamBuffer,
     pub drive: ParamBuffer,
     pub depth: ParamBuffer,
+    pub horn_drum: ParamBuffer,
+    pub mic_dist: ParamBuffer,
+    pub ramp: ParamBuffer,
+    pub mix: ParamBuffer,
+}
+
+pub struct WahState {
+    pub wah: Wah,
+    pub mode: ParamBuffer,
+    pub freq: ParamBuffer,
+    pub range: ParamBuffer,
+    pub resonance: ParamBuffer,
+    pub speed: ParamBuffer,
+    pub sensitivity: ParamBuffer,
+    pub mix: ParamBuffer,
+}
+
+pub struct TubeAmpState {
+    pub tube_amp: TubeAmp,
+    pub gain: ParamBuffer,
+    pub stages: ParamBuffer,
+    pub tone: ParamBuffer,
+    pub bias: ParamBuffer,
+    pub sag: ParamBuffer,
     pub mix: ParamBuffer,
 }
 
@@ -922,6 +951,8 @@ pub enum ModuleState {
     Eq3(Eq3State),
     Glitch(GlitchState),
     Leslie(LeslieState),
+    Wah(WahState),
+    TubeAmp(TubeAmpState),
 
     // Sequencers
     Clock(ClockState),

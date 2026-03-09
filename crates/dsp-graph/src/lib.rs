@@ -837,6 +837,8 @@ fn normalize_module_type(raw: &str) -> ModuleType {
     "eq3" | "eq-3" => ModuleType::Eq3,
     "glitch" => ModuleType::Glitch,
     "leslie" | "rotary" => ModuleType::Leslie,
+    "wah" | "wah-wah" | "auto-wah" => ModuleType::Wah,
+    "tube-amp" | "tube" => ModuleType::TubeAmp,
     "control" => ModuleType::Control,
     "scope" => ModuleType::Scope,
     "meter" => ModuleType::Meter,

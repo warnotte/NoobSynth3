@@ -8,7 +8,7 @@ export const moduleSizes: Record<ModuleType, string> = {
   'snes-osc': '2x2',
   noise: '2x2',
   shepard: '2x3',
-  'pipe-organ': '2x3',
+  'pipe-organ': '3x4',
   'spectral-swarm': '2x3',
   'resonator': '2x3',
   'wavetable': '2x3',
@@ -102,7 +102,9 @@ export const moduleSizes: Record<ModuleType, string> = {
   'freq-shifter': '2x2',
   'eq3': '3x2',
   'glitch': '2x3',
-  'leslie': '2x2',
+  'leslie': '2x3',
+  'wah': '2x2',
+  'tube-amp': '2x2',
 }
 
 export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>> = {
@@ -174,6 +176,8 @@ export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>>
   'eq3': 'strip',
   'glitch': 'strip',
   'leslie': 'strip',
+  'wah': 'strip',
+  'tube-amp': 'strip',
 }
 
 export type ModuleCategory =
@@ -259,6 +263,8 @@ export const moduleCatalog: { type: ModuleType; label: string; category: ModuleC
   { type: 'eq3', label: 'EQ 3-Band', category: 'effects' },
   { type: 'glitch', label: 'Glitch', category: 'effects' },
   { type: 'leslie', label: 'Leslie', category: 'effects' },
+  { type: 'wah', label: 'Wah-Wah', category: 'effects' },
+  { type: 'tube-amp', label: 'Tube Amp', category: 'effects' },
   // Modulators
   { type: 'adsr', label: 'ADSR', category: 'modulators' },
   { type: 'lfo', label: 'LFO', category: 'modulators' },
@@ -400,6 +406,8 @@ export const modulePrefixes: Record<ModuleType, string> = {
   'eq3': 'eq',
   'glitch': 'gltch',
   'leslie': 'les',
+  'wah': 'wah',
+  'tube-amp': 'tube',
 }
 
 export const moduleLabels: Record<ModuleType, string> = {
@@ -497,6 +505,8 @@ export const moduleLabels: Record<ModuleType, string> = {
   'eq3': 'EQ 3-Band',
   'glitch': 'Glitch',
   'leslie': 'Leslie',
+  'wah': 'Wah-Wah',
+  'tube-amp': 'Tube Amp',
 }
 
 export const moduleDefaults: Record<ModuleType, Record<string, number | string | boolean>> = {
@@ -531,21 +541,26 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     shimmer: 0,       // Random amplitude shimmer (0-1)
   },
   'pipe-organ': {
-    frequency: 220,   // Base frequency Hz
-    drawbar16: 0.5,   // 16' (sub bass)
-    drawbar8: 0.8,    // 8' (unison/fundamental)
-    drawbar4: 0.6,    // 4' (octave)
-    drawbar223: 0.0,  // 2⅔' (twelfth/quint)
-    drawbar2: 0.4,    // 2' (fifteenth)
-    drawbar135: 0.0,  // 1⅗' (seventeenth/tierce)
-    drawbar113: 0.0,  // 1⅓' (nineteenth)
-    drawbar1: 0.2,    // 1' (twenty-second)
-    voicing: 0,       // 0=Diapason, 1=Flute, 2=String
-    chiff: 0.3,       // Initial air noise (0-1)
-    tremulant: 0.0,   // Tremulant depth (0-1)
-    tremRate: 6.0,    // Tremulant rate Hz (4-8)
-    wind: 0.1,        // Wind instability (0-1)
-    brightness: 0.7,  // Brightness/filter (0-1)
+    frequency: 220,       // Base frequency Hz
+    drawbar16: 0.5,       // 16' (sub bass)
+    drawbar8: 0.8,        // 8' (unison/fundamental)
+    drawbar4: 0.6,        // 4' (octave)
+    drawbar223: 0.0,      // 2⅔' (twelfth/quint)
+    drawbar2: 0.4,        // 2' (fifteenth)
+    drawbar135: 0.0,      // 1⅗' (seventeenth/tierce)
+    drawbar113: 0.0,      // 1⅓' (nineteenth)
+    drawbar1: 0.2,        // 1' (twenty-second)
+    voicing: 0,           // 0=Diapason, 1=Flute, 2=String
+    chiff: 0.3,           // Key click amount (0-1)
+    percussion: 0,        // Hammond percussion on/off
+    percHarmonic: 0,      // 0=2nd (4'), 1=3rd (2⅔')
+    percDecay: 0,         // 0=fast (~200ms), 1=slow (~500ms)
+    percVolume: 0.8,      // Percussion volume (0-1)
+    chorusVibrato: 0,     // 0=off, 1=V1, 2=V2, 3=V3, 4=C1, 5=C2, 6=C3
+    tremulant: 0.0,       // Tremulant depth (0-1)
+    tremRate: 6.0,        // Tremulant rate Hz (4-8)
+    wind: 0.1,            // Wind instability (0-1)
+    brightness: 0.7,      // Brightness/filter (0-1)
   },
   'spectral-swarm': {
     frequency: 110,       // Base frequency Hz
@@ -1094,6 +1109,26 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     brake: 0,
     drive: 0,
     depth: 0.7,
+    hornDrum: 0.5,    // Horn/drum balance (0=drum, 0.5=balanced, 1=horn)
+    micDist: 0.0,     // Mic distance (0=close, 1=far)
+    ramp: 0.5,        // Ramp speed (0=slow, 1=fast)
+    mix: 1.0,
+  },
+  'wah': {
+    mode: 0,              // 0=envelope, 1=LFO
+    freq: 800,            // Base frequency Hz
+    range: 0.7,           // Sweep range 0-1
+    resonance: 0.5,       // Filter Q 0-1
+    speed: 2.0,           // LFO rate Hz (LFO mode)
+    sensitivity: 0.7,     // Envelope sensitivity (env mode)
+    mix: 1.0,
+  },
+  'tube-amp': {
+    gain: 0.5,            // Input drive 0-1
+    stages: 2,            // Tube stages 1-4
+    tone: 0.5,            // Tone (dark-bright)
+    bias: 0.3,            // Tube bias asymmetry
+    sag: 0.0,             // Power supply sag
     mix: 1.0,
   },
   'polyrhythm-sequencer': {

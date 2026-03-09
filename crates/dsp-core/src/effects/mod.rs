@@ -53,6 +53,8 @@ pub mod frequency_shifter;
 pub mod eq3;
 pub mod glitch;
 pub mod leslie;
+pub mod wah;
+pub mod tube_amp;
 
 // Re-export all public types
 pub use delay::{Delay, DelayInputs, DelayParams};
@@ -76,3 +78,5 @@ pub use frequency_shifter::{FrequencyShifter, FrequencyShifterParams, FrequencyS
 pub use eq3::{Eq3, Eq3Params, Eq3Inputs};
 pub use glitch::{Glitch, GlitchParams, GlitchInputs};
 pub use leslie::{Leslie, LeslieParams, LeslieInputs};
+pub use wah::{Wah, WahParams, WahInputs};
+pub use tube_amp::{TubeAmp, TubeAmpParams, TubeAmpInputs};

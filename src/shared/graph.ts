@@ -103,6 +103,8 @@ export type ModuleType =
   | 'eq3'
   | 'glitch'
   | 'leslie'
+  | 'wah'
+  | 'tube-amp'
 
 export interface ModuleSpec {
   id: string

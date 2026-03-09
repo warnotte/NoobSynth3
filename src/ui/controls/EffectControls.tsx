@@ -1145,6 +1145,171 @@ export function renderEffectControls(props: ControlProps): React.ReactElement | 
           format={formatPercent}
         />
         <RotaryKnob
+          label="H/D Bal"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.hornDrum ?? 0.5)}
+          onChange={(value) => updateParam(module.id, 'hornDrum', value)}
+          format={formatPercent}
+        />
+        <RotaryKnob
+          label="Mic Dist"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.micDist ?? 0)}
+          onChange={(value) => updateParam(module.id, 'micDist', value)}
+          format={formatPercent}
+        />
+        <RotaryKnob
+          label="Ramp"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.ramp ?? 0.5)}
+          onChange={(value) => updateParam(module.id, 'ramp', value)}
+          format={formatPercent}
+        />
+        <RotaryKnob
+          label="Mix"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.mix ?? 1)}
+          onChange={(value) => updateParam(module.id, 'mix', value)}
+          format={formatPercent}
+        />
+      </>
+    )
+  }
+
+  if (module.type === 'wah') {
+    const mode = Number(module.params.mode ?? 0)
+    return (
+      <>
+        <ControlBox label="Mode" compact>
+          <ControlButtons
+            options={[
+              { id: 0, label: 'ENV' },
+              { id: 1, label: 'LFO' },
+            ]}
+            value={mode}
+            onChange={(value) => updateParam(module.id, 'mode', value)}
+          />
+        </ControlBox>
+        <RotaryKnob
+          label="Freq"
+          min={200}
+          max={2000}
+          step={10}
+          unit="Hz"
+          value={Number(module.params.freq ?? 800)}
+          onChange={(value) => updateParam(module.id, 'freq', value)}
+          format={formatInt}
+        />
+        <RotaryKnob
+          label="Range"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.range ?? 0.7)}
+          onChange={(value) => updateParam(module.id, 'range', value)}
+          format={formatPercent}
+        />
+        <RotaryKnob
+          label="Reso"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.resonance ?? 0.5)}
+          onChange={(value) => updateParam(module.id, 'resonance', value)}
+          format={formatPercent}
+        />
+        <RotaryKnob
+          label="Speed"
+          min={0.1}
+          max={10}
+          step={0.1}
+          unit="Hz"
+          value={Number(module.params.speed ?? 2)}
+          onChange={(value) => updateParam(module.id, 'speed', value)}
+          format={formatDecimal1}
+        />
+        <RotaryKnob
+          label="Sens"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.sensitivity ?? 0.7)}
+          onChange={(value) => updateParam(module.id, 'sensitivity', value)}
+          format={formatPercent}
+        />
+        <RotaryKnob
+          label="Mix"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.mix ?? 1)}
+          onChange={(value) => updateParam(module.id, 'mix', value)}
+          format={formatPercent}
+        />
+      </>
+    )
+  }
+
+  if (module.type === 'tube-amp') {
+    return (
+      <>
+        <RotaryKnob
+          label="Gain"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.gain ?? 0.5)}
+          onChange={(value) => updateParam(module.id, 'gain', value)}
+          format={formatPercent}
+        />
+        <ControlBox label="Stages" compact>
+          <ControlButtons
+            options={[
+              { id: 1, label: '1' },
+              { id: 2, label: '2' },
+              { id: 3, label: '3' },
+              { id: 4, label: '4' },
+            ]}
+            value={Number(module.params.stages ?? 2)}
+            onChange={(value) => updateParam(module.id, 'stages', value)}
+          />
+        </ControlBox>
+        <RotaryKnob
+          label="Tone"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.tone ?? 0.5)}
+          onChange={(value) => updateParam(module.id, 'tone', value)}
+          format={formatPercent}
+        />
+        <RotaryKnob
+          label="Bias"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.bias ?? 0.3)}
+          onChange={(value) => updateParam(module.id, 'bias', value)}
+          format={formatPercent}
+        />
+        <RotaryKnob
+          label="Sag"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.sag ?? 0)}
+          onChange={(value) => updateParam(module.id, 'sag', value)}
+          format={formatPercent}
+        />
+        <RotaryKnob
           label="Mix"
           min={0}
           max={1}

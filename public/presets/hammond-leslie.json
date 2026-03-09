@@ -37,6 +37,11 @@
           "drawbar1": 0.15,
           "voicing": 0,
           "chiff": 0.25,
+          "percussion": 1,
+          "percHarmonic": 1,
+          "percDecay": 0,
+          "percVolume": 0.8,
+          "chorusVibrato": 5,
           "tremulant": 0.0,
           "tremRate": 6,
           "wind": 0.05,
@@ -104,7 +109,7 @@
         "name": "Info",
         "position": { "x": 720, "y": 320 },
         "params": {
-          "text": "HAMMOND B3 + LESLIE 122\n\nClassic rock/jazz organ sound.\n\nSignal: Keyboard -> Pipe Organ (all drawbars) -> VCA -> Leslie -> Reverb -> Out\n\nDrawbar settings (Hammond-style):\n- 16' 8' 4' 2⅔' 2' 1⅗' 1⅓' 1'\n- 8  8  7  5   6  3   2   1.5\n\nLeslie cabinet:\n- SLOW/FAST toggle switches rotor speed\n- Drive 25% = gentle tube warmth\n- Depth 75% = strong rotary effect\n\nTry:\n- Toggle SLOW/FAST while playing!\n- Drive 0.5+ = gritty rock organ\n- Brake = stop rotors for static sound\n- Change drawbars for different tones\n- Voices 1 = mono organ lead"
+          "text": "HAMMOND B3 + LESLIE 122\n\nClassic rock/jazz organ sound.\nPercussion ON (3rd harmonic, fast decay).\nChorus/Vibrato: C2 scanner.\n\nSignal: Keyboard -> Pipe Organ -> VCA -> Leslie -> Reverb -> Out\n\nLeslie cabinet:\n- SLOW/FAST toggle = rotor speed\n- H/D Bal = horn vs drum balance\n- Mic Dist = close vs far mic\n- Ramp = spin-up speed\n\nTry:\n- Toggle SLOW/FAST while playing!\n- Percussion 2nd vs 3rd harmonic\n- Scanner V1-V3 (vibrato) / C1-C3 (chorus)\n- Drive 0.5+ = gritty rock organ"
         }
       }
     ],

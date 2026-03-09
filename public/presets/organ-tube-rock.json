@@ -1,0 +1,104 @@
+{
+  "version": 1,
+  "id": "organ-tube-rock",
+  "name": "Rock Organ + Tube Amp",
+  "description": "Hammond B3 through tube amplifier and Leslie for classic rock/blues organ.",
+  "graph": {
+    "modules": [
+      {
+        "id": "ctrl-1",
+        "type": "control",
+        "name": "Keyboard",
+        "position": { "x": 0, "y": 2 },
+        "params": {
+          "cv": 0, "cvMode": "unipolar", "velocity": 1,
+          "midiVelocity": true, "gate": 0, "glide": 0.01, "voices": 8
+        }
+      },
+      {
+        "id": "organ-1",
+        "type": "pipe-organ",
+        "name": "Hammond B3",
+        "position": { "x": 3, "y": 2 },
+        "params": {
+          "frequency": 220,
+          "drawbar16": 1.0, "drawbar8": 1.0, "drawbar4": 0.9,
+          "drawbar223": 0.7, "drawbar2": 0.8, "drawbar135": 0.5,
+          "drawbar113": 0.4, "drawbar1": 0.3,
+          "voicing": 0, "chiff": 0.3,
+          "percussion": 1, "percHarmonic": 1, "percDecay": 0, "percVolume": 0.9,
+          "chorusVibrato": 6,
+          "tremulant": 0.0, "tremRate": 6, "wind": 0.05, "brightness": 0.85
+        }
+      },
+      {
+        "id": "adsr-1",
+        "type": "adsr",
+        "name": "ADSR",
+        "position": { "x": 6, "y": 4 },
+        "params": { "attack": 0.003, "decay": 0.05, "sustain": 0.95, "release": 0.1 }
+      },
+      {
+        "id": "vca-1",
+        "type": "gain",
+        "name": "VCA",
+        "position": { "x": 6, "y": 2 },
+        "params": { "gain": 0.85 }
+      },
+      {
+        "id": "tube-1",
+        "type": "tube-amp",
+        "name": "Tube Amp",
+        "position": { "x": 8, "y": 2 },
+        "params": {
+          "gain": 0.6, "stages": 2, "tone": 0.6,
+          "bias": 0.35, "sag": 0.15, "mix": 0.8
+        }
+      },
+      {
+        "id": "les-1",
+        "type": "leslie",
+        "name": "Leslie 122",
+        "position": { "x": 10, "y": 2 },
+        "params": {
+          "speed": 1, "brake": 0, "drive": 0.35,
+          "depth": 0.8, "hornDrum": 0.55, "micDist": 0.1, "ramp": 0.6, "mix": 1.0
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "spring-reverb",
+        "name": "Spring",
+        "position": { "x": 12, "y": 2 },
+        "params": { "decay": 0.5, "tone": 0.6, "drive": 0.15, "mix": 0.2 }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Main Out",
+        "position": { "x": 14, "y": 2 },
+        "params": { "level": 1 }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 10, "y": 5 },
+        "params": {
+          "text": "ROCK ORGAN + TUBE AMP\n\nHammond B3 full drawbars through tube\namp saturation and Leslie cabinet.\nSpring reverb for vintage character.\n\nSignal:\nKeyboard -> Organ -> VCA -> Tube Amp -> Leslie -> Spring Reverb -> Out\n\nTube Amp settings:\n- Gain = drive amount (crank for distortion!)\n- Stages = more stages = more saturation\n- Tone = dark to bright\n- Bias = tube asymmetry (adds harmonics)\n- Sag = power supply compression\n\nTips:\n- Gain 0.8+ = heavy rock distortion\n- 3-4 stages = crushing overdrive\n- Toggle Leslie SLOW/FAST!\n- Scanner C3 for maximum chorus width"
+        }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "ctrl-1", "portId": "cv-out" }, "to": { "moduleId": "organ-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "ctrl-1", "portId": "gate-out" }, "to": { "moduleId": "organ-1", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "ctrl-1", "portId": "gate-out" }, "to": { "moduleId": "adsr-1", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "organ-1", "portId": "out" }, "to": { "moduleId": "vca-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-1", "portId": "env" }, "to": { "moduleId": "vca-1", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "vca-1", "portId": "out" }, "to": { "moduleId": "tube-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "tube-1", "portId": "out" }, "to": { "moduleId": "les-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "les-1", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}
