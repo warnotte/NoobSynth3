@@ -1,0 +1,166 @@
+{
+  "version": 1,
+  "id": "flanger-test",
+  "name": "Flanger Test",
+  "description": "Oscillator through VCF and Flanger with LFO modulation.",
+  "graph": {
+    "modules": [
+      {
+        "id": "ctrl-1",
+        "type": "control",
+        "name": "Keyboard",
+        "position": { "x": 120, "y": 120 },
+        "params": {
+          "cv": 0,
+          "cvMode": "unipolar",
+          "velocity": 1,
+          "midiVelocity": true,
+          "gate": 0,
+          "glide": 0.02,
+          "voices": 4
+        }
+      },
+      {
+        "id": "osc-1",
+        "type": "oscillator",
+        "name": "VCO",
+        "position": { "x": 520, "y": 120 },
+        "params": {
+          "frequency": 220,
+          "type": "sawtooth",
+          "pwm": 0.5,
+          "unison": 1,
+          "detune": 0
+        }
+      },
+      {
+        "id": "adsr-1",
+        "type": "adsr",
+        "name": "ADSR",
+        "position": { "x": 520, "y": 320 },
+        "params": {
+          "attack": 0.01,
+          "decay": 0.3,
+          "sustain": 0.7,
+          "release": 0.4
+        }
+      },
+      {
+        "id": "vcf-1",
+        "type": "vcf",
+        "name": "VCF",
+        "position": { "x": 720, "y": 120 },
+        "params": {
+          "cutoff": 2500,
+          "resonance": 0.25,
+          "drive": 0.1,
+          "envAmount": 0.4,
+          "modAmount": 0,
+          "keyTrack": 0.5,
+          "model": "svf",
+          "mode": "lp",
+          "slope": 12
+        }
+      },
+      {
+        "id": "lfo-1",
+        "type": "lfo",
+        "name": "LFO",
+        "position": { "x": 720, "y": 320 },
+        "params": {
+          "rate": 0.2,
+          "depth": 0.8,
+          "offset": 0,
+          "shape": "sine",
+          "bipolar": true
+        }
+      },
+      {
+        "id": "gain-1",
+        "type": "gain",
+        "name": "VCA",
+        "position": { "x": 920, "y": 120 },
+        "params": {
+          "gain": 0.8
+        }
+      },
+      {
+        "id": "flng-1",
+        "type": "flanger",
+        "name": "Flanger",
+        "position": { "x": 1120, "y": 120 },
+        "params": {
+          "rate": 0.25,
+          "depth": 3.0,
+          "feedback": 0.6,
+          "mix": 0.5
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Main Out",
+        "position": { "x": 1320, "y": 120 },
+        "params": {
+          "level": 1
+        }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 1120, "y": 320 },
+        "params": {
+          "text": "FLANGER TEST\n\nSawtooth oscillator through VCF and Flanger.\n\n- Control keyboard -> VCO pitch + ADSR gate\n- VCO -> VCF (lowpass) -> VCA -> Flanger -> Output\n- LFO modulates VCF cutoff for slow movement\n- ADSR controls VCA amplitude\n\nFlanger settings:\n- Rate: 0.25 Hz (slow sweep)\n- Depth: 3.0 ms\n- Feedback: 0.6 (strong flanging)\n- Mix: 50%\n\nTry: increase feedback for jet-plane effect, or speed up rate for chorus-like tones."
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "cv-out" },
+        "to": { "moduleId": "osc-1", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "gate-out" },
+        "to": { "moduleId": "adsr-1", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "osc-1", "portId": "out" },
+        "to": { "moduleId": "vcf-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "adsr-1", "portId": "env" },
+        "to": { "moduleId": "vcf-1", "portId": "env" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "lfo-1", "portId": "cv-out" },
+        "to": { "moduleId": "vcf-1", "portId": "mod" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "adsr-1", "portId": "env" },
+        "to": { "moduleId": "gain-1", "portId": "cv" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "vcf-1", "portId": "out" },
+        "to": { "moduleId": "gain-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "gain-1", "portId": "out" },
+        "to": { "moduleId": "flng-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "flng-1", "portId": "out" },
+        "to": { "moduleId": "out-1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

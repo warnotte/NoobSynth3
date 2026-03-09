@@ -98,6 +98,10 @@ export type ModuleType =
   | 'envelope-follower'
   // Bit Crusher (lo-fi effect)
   | 'bit-crusher'
+  | 'flanger'
+  | 'freq-shifter'
+  | 'eq3'
+  | 'glitch'
 
 export interface ModuleSpec {
   id: string

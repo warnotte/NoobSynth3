@@ -214,7 +214,7 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 
 **⚠️ RÈGLE:** Toute nouvelle feature UI↔Audio DOIT être implémentée pour Tauri en même temps que Web. Ne jamais merger une feature Web-only.
 
-## Module Types (80 total)
+## Module Types (84 total)
 
 ### Sources (17)
 oscillator, supersaw, karplus, fm-op, fm-matrix, nes-osc, snes-osc, noise, tb-303, shepard, pipe-organ, spectral-swarm, resonator, wavetable, granular, particle-cloud, speech-synth
@@ -225,8 +225,8 @@ vcf, hpf
 ### Amplifiers (6)
 gain, cv-vca, mixer, mixer-1x2, mixer-8, crossfader
 
-### Effects (16)
-chorus, ensemble, choir, vocoder, delay, granular-delay, tape-delay, spring-reverb, reverb, phaser, distortion, wavefolder, ring-mod, pitch-shifter, compressor, bit-crusher
+### Effects (20)
+chorus, ensemble, choir, vocoder, delay, granular-delay, tape-delay, spring-reverb, reverb, phaser, distortion, wavefolder, ring-mod, pitch-shifter, compressor, bit-crusher, flanger, freq-shifter, eq3, glitch
 
 ### Modulators (8)
 adsr, lfo, mod-router, sample-hold, slew, quantizer, chaos, envelope-follower
@@ -347,8 +347,30 @@ Le mode Tauri utilise `cpal` (WASAPI/CoreAudio/ALSA) au lieu de Web Audio. Les f
 - `src/App.tsx` - Création des bridges (`useMemo`)
 - `src/ui/controls/*.tsx` - Detection `isNativeMode` + polling
 
+### Delay Tempo Sync
+Le Delay supporte la synchronisation au tempo via les paramètres:
+- `tempoSync` (0/1): Active/désactive la sync
+- `syncRate` (0-15): Index dans RATE_DIVISIONS
+- `tempo` (BPM): Tempo de référence
+Quand activé, le temps de delay est calculé: `rate_beats * 60 / tempo * 1000` ms
+
+### Compressor Sidechain
+Le Compressor a un port d'entrée `sidechain` (index 1). Quand connecté, la détection de niveau utilise le signal sidechain au lieu de l'entrée principale (ducking/pumping).
+
+### Flanger
+Effet de flanging stéréo avec delay modulé par LFO et feedback (tanh-borné pour stabilité). Params: rate, depth (ms), feedback (-0.95 à 0.95), mix.
+
+### Frequency Shifter (Bode)
+Déplacement de fréquence constant via transformée de Hilbert (SSB). Params: shift (-500 à +500 Hz), mix.
+
+### EQ 3-Band
+Trois biquad en série (low shelf, mid peak, high shelf). Coefficients Audio EQ Cookbook. Params: lowGain, midGain, highGain, lowFreq, midFreq, highFreq, midQ.
+
+### Glitch/Stutter
+Effet de glitch déclenché par clock. Capture des slices audio et les répète avec reverse/pitch aléatoire. Params: probability, sliceMs, repeats, reverseChance, pitchRange, mix. Port d'entrée clock obligatoire.
+
 ### Unified Rate Divisions
-Tous les séquenceurs utilisent un système de rate divisions unifié défini dans:
+Tous les séquenceurs et le Delay (mode sync) utilisent un système de rate divisions unifié défini dans:
 - **Rust:** `crates/dsp-core/src/sequencers/mod.rs` → `RATE_DIVISIONS[16]`
 - **TypeScript:** `src/shared/rates.ts` → `RATE_DIVISIONS`, `RATE_PRESETS`, `DEFAULT_RATES`
 

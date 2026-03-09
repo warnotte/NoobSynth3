@@ -80,6 +80,10 @@ pub use effects::{
     PitchShifter, PitchShifterParams, PitchShifterInputs,
     Compressor, CompressorParams,
     BitCrusher, BitCrusherParams, BitCrusherInputs,
+    Flanger, FlangerParams, FlangerInputs,
+    FrequencyShifter, FrequencyShifterParams, FrequencyShifterInputs,
+    Eq3, Eq3Params, Eq3Inputs,
+    Glitch, GlitchParams, GlitchInputs,
 };
 
 // Re-export modulators

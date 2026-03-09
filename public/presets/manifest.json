@@ -1491,6 +1491,69 @@
       "description": "Lo-fi bit crushing with sample rate decimation and delay.",
       "file": "bit-crusher-test.json",
       "group": "Module Tests"
+    },
+    {
+      "id": "flanger-test",
+      "name": "Flanger Test",
+      "description": "Oscillator through VCF and Flanger with LFO modulation.",
+      "file": "flanger-test.json",
+      "group": "Module Tests"
+    },
+    {
+      "id": "freq-shifter-test",
+      "name": "Freq Shifter Test",
+      "description": "Supersaw pad through Frequency Shifter with LFO and reverb.",
+      "file": "freq-shifter-test.json",
+      "group": "Module Tests"
+    },
+    {
+      "id": "eq3-test",
+      "name": "EQ3 Test",
+      "description": "Full signal chain with 3-band EQ shaping.",
+      "file": "eq3-test.json",
+      "group": "Module Tests"
+    },
+    {
+      "id": "sidechain-test",
+      "name": "Sidechain Pump",
+      "description": "Classic EDM sidechain pumping: pad ducked by 4-on-the-floor kick.",
+      "file": "sidechain-test.json",
+      "group": "Module Tests"
+    },
+    {
+      "id": "delay-sync-test",
+      "name": "Delay Sync Test",
+      "description": "Tempo-synced delay with step sequencer melody.",
+      "file": "delay-sync-test.json",
+      "group": "Module Tests"
+    },
+    {
+      "id": "glitch-test",
+      "name": "Glitch Drums",
+      "description": "Clock-triggered glitch effect on a drum beat.",
+      "file": "glitch-test.json",
+      "group": "Glitch"
+    },
+    {
+      "id": "glitch-vocal",
+      "name": "Glitch Vocal Chop",
+      "description": "Speech synth through aggressive glitch for vocal chop effect.",
+      "file": "glitch-vocal.json",
+      "group": "Glitch"
+    },
+    {
+      "id": "glitch-pad",
+      "name": "Glitch Ambient Pad",
+      "description": "Evolving pad with subtle glitch textures and reverb wash.",
+      "file": "glitch-pad.json",
+      "group": "Glitch"
+    },
+    {
+      "id": "glitch-breakbeat",
+      "name": "Glitch Breakbeat",
+      "description": "808 breakbeat with fast glitch stutters and distortion.",
+      "file": "glitch-breakbeat.json",
+      "group": "Glitch"
     }
   ]
 }

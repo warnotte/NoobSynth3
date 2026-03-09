@@ -1,0 +1,195 @@
+{
+  "version": 1,
+  "id": "sidechain-test",
+  "name": "Sidechain Pump",
+  "description": "Classic EDM sidechain pumping: pad ducked by 4-on-the-floor kick.",
+  "graph": {
+    "modules": [
+      {
+        "id": "clock-1",
+        "type": "clock",
+        "name": "Clock",
+        "position": { "x": 120, "y": 120 },
+        "params": {
+          "running": true,
+          "tempo": 128,
+          "rate": 2,
+          "swing": 0
+        }
+      },
+      {
+        "id": "drumseq-1",
+        "type": "drum-sequencer",
+        "name": "Drum Seq",
+        "position": { "x": 320, "y": 120 },
+        "params": {
+          "enabled": true,
+          "tempo": 128,
+          "rate": 2,
+          "gateLength": 50,
+          "swing": 0,
+          "length": 4,
+          "drumData": "{\"tracks\":[[{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}]]}"
+        }
+      },
+      {
+        "id": "kick-1",
+        "type": "909-kick",
+        "name": "909 Kick",
+        "position": { "x": 720, "y": 120 },
+        "params": {
+          "tune": 50,
+          "attack": 0.5,
+          "decay": 0.55,
+          "drive": 0.35
+        }
+      },
+      {
+        "id": "osc-1",
+        "type": "supersaw",
+        "name": "Pad Supersaw",
+        "position": { "x": 120, "y": 320 },
+        "params": {
+          "frequency": 165,
+          "detune": 20,
+          "mix": 0.7
+        }
+      },
+      {
+        "id": "vcf-1",
+        "type": "vcf",
+        "name": "Pad Filter",
+        "position": { "x": 320, "y": 320 },
+        "params": {
+          "cutoff": 1800,
+          "resonance": 0.15,
+          "drive": 0.05,
+          "model": "svf",
+          "mode": "lp",
+          "slope": 24
+        }
+      },
+      {
+        "id": "gain-1",
+        "type": "gain",
+        "name": "Pad Level",
+        "position": { "x": 520, "y": 320 },
+        "params": {
+          "gain": 0.7
+        }
+      },
+      {
+        "id": "comp-1",
+        "type": "compressor",
+        "name": "Sidechain",
+        "position": { "x": 720, "y": 320 },
+        "params": {
+          "threshold": -35,
+          "ratio": 16,
+          "attack": 0.5,
+          "release": 180,
+          "makeup": 3,
+          "mix": 1.0
+        }
+      },
+      {
+        "id": "mix8-1",
+        "type": "mixer-8",
+        "name": "Mix",
+        "position": { "x": 920, "y": 120 },
+        "params": {
+          "level1": 0.7,
+          "level2": 0.9,
+          "level3": 0,
+          "level4": 0,
+          "level5": 0,
+          "level6": 0,
+          "level7": 0,
+          "level8": 0
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "x": 1120, "y": 120 },
+        "params": {
+          "time": 0.55,
+          "damp": 0.5,
+          "preDelay": 15,
+          "mix": 0.15
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Main Out",
+        "position": { "x": 1320, "y": 120 },
+        "params": {
+          "level": 1
+        }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 920, "y": 320 },
+        "params": {
+          "text": "SIDECHAIN PUMP\n\nClassic EDM sidechain compression.\n\nSignal flow:\n- Clock -> Drum Seq (4-on-the-floor kick)\n- Drum Seq gate-kick -> 909 Kick trigger\n- Supersaw pad -> VCF -> Gain -> Compressor main input\n- Kick audio -> Compressor SIDECHAIN input\n- Kick + compressed pad -> Mixer-8 -> Reverb -> Out\n\nThe pumping effect:\n- Threshold -35dB = very sensitive to kick\n- Ratio 16:1 = heavy ducking\n- Attack 0.5ms = instant duck\n- Release 180ms = smooth rhythmic pump\n\nTry tweaking:\n- Release 80ms = tight pump\n- Release 350ms = deep, slow pump\n- Ratio 4:1 = subtle ducking\n- Ratio 20:1 = extreme ducking"
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "clock-1", "portId": "clock" },
+        "to": { "moduleId": "drumseq-1", "portId": "clock" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "drumseq-1", "portId": "gate-kick" },
+        "to": { "moduleId": "kick-1", "portId": "trigger" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "osc-1", "portId": "out" },
+        "to": { "moduleId": "vcf-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "vcf-1", "portId": "out" },
+        "to": { "moduleId": "gain-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "gain-1", "portId": "out" },
+        "to": { "moduleId": "comp-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "kick-1", "portId": "out" },
+        "to": { "moduleId": "comp-1", "portId": "sidechain" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "kick-1", "portId": "out" },
+        "to": { "moduleId": "mix8-1", "portId": "in-1" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "comp-1", "portId": "out" },
+        "to": { "moduleId": "mix8-1", "portId": "in-2" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "mix8-1", "portId": "out" },
+        "to": { "moduleId": "reverb-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb-1", "portId": "out" },
+        "to": { "moduleId": "out-1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

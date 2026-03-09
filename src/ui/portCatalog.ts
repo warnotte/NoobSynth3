@@ -190,8 +190,24 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
   phaser: simpleAudioEffect(),
   distortion: simpleAudioEffect(),
   wavefolder: simpleAudioEffect(),
-  compressor: simpleAudioEffect(),
+  compressor: {
+    inputs: [
+      { id: 'in', label: 'In', kind: 'audio', direction: 'in' },
+      { id: 'sidechain', label: 'SC', kind: 'audio', direction: 'in' },
+    ],
+    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
+  },
   'bit-crusher': simpleAudioEffect(),
+  flanger: simpleAudioEffect(),
+  'freq-shifter': simpleAudioEffect(),
+  eq3: simpleAudioEffect(),
+  glitch: {
+    inputs: [
+      { id: 'in', label: 'In', kind: 'audio', direction: 'in' },
+      { id: 'clock', label: 'Clk', kind: 'sync', direction: 'in' },
+    ],
+    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
+  },
   'envelope-follower': {
     inputs: [{ id: 'in', label: 'In', kind: 'audio', direction: 'in' }],
     outputs: [{ id: 'out', label: 'CV', kind: 'cv', direction: 'out' }],

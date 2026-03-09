@@ -63,6 +63,10 @@ pub enum ModuleType {
     PitchShifter,
     Compressor,
     BitCrusher,
+    Flanger,
+    FreqShifter,
+    Eq3,
+    Glitch,
 
     // Sequencers
     Clock,

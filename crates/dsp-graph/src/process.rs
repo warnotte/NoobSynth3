@@ -10,6 +10,10 @@ use dsp_core::{
     Clap808Inputs, Clap808Params, Clap909Inputs, Clap909Params,
     BitCrusherInputs, BitCrusherParams,
     CompressorParams,
+    Eq3Inputs, Eq3Params,
+    FlangerInputs, FlangerParams,
+    FrequencyShifterInputs, FrequencyShifterParams,
+    GlitchInputs, GlitchParams,
     Cowbell808Inputs, Cowbell808Params,
     DelayInputs, DelayParams, Distortion, DistortionParams,
     DrumSequencerInputs, DrumSequencerOutputs, DrumSequencerParams,
@@ -53,6 +57,7 @@ use dsp_core::{
     VocoderInputs, VocoderParams, Wavefolder, WavefolderParams,
     WavetableInputs, WavetableParams,
     MARIO_CHANNELS,
+    sequencers::RATE_DIVISIONS,
 };
 
 use crate::buffer::{mix_buffers, Buffer};
@@ -673,8 +678,21 @@ pub(crate) fn process_module(
             } else {
                 None
             };
+            // Compute delay time: if tempo sync is on, derive from tempo + rate
+            let tempo_sync = state.tempo_sync.slice(frames)[0] >= 0.5;
+            let time_ms_buf;
+            let time_ms_slice = if tempo_sync {
+                let tempo = state.tempo.slice(frames)[0].max(20.0);
+                let rate_idx = state.sync_rate.slice(frames)[0] as usize;
+                let rate_beats = RATE_DIVISIONS.get(rate_idx).copied().unwrap_or(1.0);
+                let synced_ms = (rate_beats * 60.0 / tempo as f64 * 1000.0) as f32;
+                time_ms_buf = vec![synced_ms; frames];
+                &time_ms_buf[..]
+            } else {
+                state.time.slice(frames)
+            };
             let params = DelayParams {
-                time_ms: state.time.slice(frames),
+                time_ms: time_ms_slice,
                 feedback: state.feedback.slice(frames),
                 mix: state.mix.slice(frames),
                 tone: state.tone.slice(frames),
@@ -2097,6 +2115,13 @@ pub(crate) fn process_module(
             } else {
                 None
             };
+            let sc_connected = connections.len() > 1 && !connections[1].is_empty();
+            let sc_l = if sc_connected { Some(inputs[1].channel(0)) } else { None };
+            let sc_r = if sc_connected {
+                Some(if inputs[1].channel_count() == 1 { inputs[1].channel(0) } else { inputs[1].channel(1) })
+            } else {
+                None
+            };
             let params = CompressorParams {
                 threshold: state.threshold.slice(frames),
                 ratio: state.ratio.slice(frames),
@@ -2106,7 +2131,7 @@ pub(crate) fn process_module(
                 mix: state.mix.slice(frames),
             };
             let (out_l, out_r) = outputs[0].channels_mut_2();
-            state.compressor.process_block_stereo(out_l, out_r, input_l, input_r, params);
+            state.compressor.process_block_stereo(out_l, out_r, input_l, input_r, params, sc_l, sc_r);
         }
         ModuleState::BitCrusher(state) => {
             let input_connected = !connections[0].is_empty();
@@ -2124,6 +2149,86 @@ pub(crate) fn process_module(
             let bc_inputs = BitCrusherInputs { input_l, input_r };
             let (out_l, out_r) = outputs[0].channels_mut_2();
             state.crusher.process_block(out_l, out_r, bc_inputs, params);
+        }
+        ModuleState::Flanger(state) => {
+            let input_connected = !connections[0].is_empty();
+            let input_l = if input_connected { Some(inputs[0].channel(0)) } else { None };
+            let input_r = if input_connected {
+                Some(if inputs[0].channel_count() == 1 { inputs[0].channel(0) } else { inputs[0].channel(1) })
+            } else {
+                None
+            };
+            let params = FlangerParams {
+                rate: state.rate.slice(frames),
+                depth_ms: state.depth.slice(frames),
+                feedback: state.feedback.slice(frames),
+                mix: state.mix.slice(frames),
+            };
+            let fl_inputs = FlangerInputs { input_l, input_r };
+            let (out_l, out_r) = outputs[0].channels_mut_2();
+            state.flanger.process_block(out_l, out_r, fl_inputs, params);
+        }
+        ModuleState::FreqShifter(state) => {
+            let input_connected = !connections[0].is_empty();
+            let input_l = if input_connected { Some(inputs[0].channel(0)) } else { None };
+            let input_r = if input_connected {
+                Some(if inputs[0].channel_count() == 1 { inputs[0].channel(0) } else { inputs[0].channel(1) })
+            } else {
+                None
+            };
+            let params = FrequencyShifterParams {
+                shift: state.shift.slice(frames),
+                mix: state.mix.slice(frames),
+            };
+            let fs_inputs = FrequencyShifterInputs { input_l, input_r };
+            let (out_l, out_r) = outputs[0].channels_mut_2();
+            state.shifter.process_block(out_l, out_r, fs_inputs, params);
+        }
+        ModuleState::Eq3(state) => {
+            let input_connected = !connections[0].is_empty();
+            let input_l = if input_connected { Some(inputs[0].channel(0)) } else { None };
+            let input_r = if input_connected {
+                Some(if inputs[0].channel_count() == 1 { inputs[0].channel(0) } else { inputs[0].channel(1) })
+            } else {
+                None
+            };
+            let params = Eq3Params {
+                low_gain: state.low_gain.slice(frames),
+                mid_gain: state.mid_gain.slice(frames),
+                high_gain: state.high_gain.slice(frames),
+                low_freq: state.low_freq.slice(frames),
+                mid_freq: state.mid_freq.slice(frames),
+                high_freq: state.high_freq.slice(frames),
+                mid_q: state.mid_q.slice(frames),
+            };
+            let eq_inputs = Eq3Inputs { input_l, input_r };
+            let (out_l, out_r) = outputs[0].channels_mut_2();
+            state.eq.process_block(out_l, out_r, eq_inputs, params);
+        }
+        ModuleState::Glitch(state) => {
+            let input_connected = !connections[0].is_empty();
+            let input_l = if input_connected { Some(inputs[0].channel(0)) } else { None };
+            let input_r = if input_connected {
+                Some(if inputs[0].channel_count() == 1 { inputs[0].channel(0) } else { inputs[0].channel(1) })
+            } else {
+                None
+            };
+            let clock = if connections.len() > 1 && !connections[1].is_empty() {
+                Some(inputs[1].channel(0))
+            } else {
+                None
+            };
+            let params = GlitchParams {
+                probability: state.probability.slice(frames),
+                slice_ms: state.slice_ms.slice(frames),
+                repeats: state.repeats.slice(frames),
+                reverse_chance: state.reverse_chance.slice(frames),
+                pitch_range: state.pitch_range.slice(frames),
+                mix: state.mix.slice(frames),
+            };
+            let gl_inputs = GlitchInputs { input_l, input_r, clock };
+            let (out_l, out_r) = outputs[0].channels_mut_2();
+            state.glitch.process_block(out_l, out_r, gl_inputs, params);
         }
         ModuleState::ChordSequencer(state) => {
             let clock = if connections[0].is_empty() { None } else { Some(inputs[0].channel(0)) };

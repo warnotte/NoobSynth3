@@ -1,0 +1,189 @@
+{
+  "version": 1,
+  "id": "glitch-breakbeat",
+  "name": "Glitch Breakbeat",
+  "description": "Fast glitch stutters on a breakbeat drum pattern.",
+  "graph": {
+    "modules": [
+      {
+        "id": "clock-1",
+        "type": "clock",
+        "name": "Clock",
+        "position": { "x": 120, "y": 120 },
+        "params": {
+          "running": true,
+          "tempo": 140,
+          "rate": 4,
+          "swing": 15
+        }
+      },
+      {
+        "id": "drumseq-1",
+        "type": "drum-sequencer",
+        "name": "Drum Seq",
+        "position": { "x": 320, "y": 120 },
+        "params": {
+          "enabled": true,
+          "tempo": 140,
+          "rate": 4,
+          "gateLength": 50,
+          "swing": 15,
+          "length": 16,
+          "drumData": "{\"tracks\":[[{\"g\":1,\"a\":1},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":1},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":1},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":1},{\"g\":0,\"a\":0}],[{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":1,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":1,\"a\":0},{\"g\":1,\"a\":0},{\"g\":1,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":1,\"a\":0},{\"g\":1,\"a\":0},{\"g\":1,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}]]}"
+        }
+      },
+      {
+        "id": "kick-1",
+        "type": "808-kick",
+        "name": "808 Kick",
+        "position": { "x": 720, "y": 120 },
+        "params": {
+          "tune": 45,
+          "decay": 0.6,
+          "tone": 0.5,
+          "drive": 0.4
+        }
+      },
+      {
+        "id": "snare-1",
+        "type": "808-snare",
+        "name": "808 Snare",
+        "position": { "x": 720, "y": 320 },
+        "params": {
+          "tune": 180,
+          "tone": 0.5,
+          "snappy": 0.7,
+          "decay": 0.35
+        }
+      },
+      {
+        "id": "hh-1",
+        "type": "808-hihat",
+        "name": "808 HH",
+        "position": { "x": 720, "y": 520 },
+        "params": {
+          "openDecay": 0.3,
+          "closedDecay": 0.08,
+          "tone": 0.7
+        }
+      },
+      {
+        "id": "mix8-1",
+        "type": "mixer-8",
+        "name": "Drum Mix",
+        "position": { "x": 920, "y": 120 },
+        "params": {
+          "level1": 1.0,
+          "level2": 0.8,
+          "level3": 0.5,
+          "level4": 0,
+          "level5": 0,
+          "level6": 0,
+          "level7": 0,
+          "level8": 0
+        }
+      },
+      {
+        "id": "gltch-1",
+        "type": "glitch",
+        "name": "Glitch",
+        "position": { "x": 1120, "y": 120 },
+        "params": {
+          "probability": 0.55,
+          "sliceMs": 40,
+          "repeats": 5,
+          "reverseChance": 0.35,
+          "pitchRange": 2,
+          "mix": 0.75
+        }
+      },
+      {
+        "id": "dist-1",
+        "type": "distortion",
+        "name": "Distortion",
+        "position": { "x": 1120, "y": 320 },
+        "params": {
+          "drive": 0.25,
+          "tone": 0.6,
+          "mix": 0.3,
+          "mode": "hard"
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Main Out",
+        "position": { "x": 1320, "y": 120 },
+        "params": {
+          "level": 1
+        }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 1320, "y": 320 },
+        "params": {
+          "text": "GLITCH BREAKBEAT\n\n808 breakbeat pattern with fast glitch stutters.\n\n- 140 BPM with swing for groove\n- Syncopated kick/snare + busy HH\n- Drums mixed -> Glitch -> Distortion -> Out\n\nGlitch settings:\n- Prob 55% = over half the beats glitch\n- Slice 40ms = fast micro-stutters\n- Repeats 5 = machine gun fills\n- Reverse 35% = occasional reverse hits\n- Pitch 2st = subtle pitch warping\n\nThe distortion adds grit to the glitched beats.\n\nTry:\n- Tempo 160 = DnB speed\n- Prob 1.0 + Repeats 8 = total chaos\n- Remove distortion for cleaner sound\n- SliceMs 15 = granular texture"
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "clock-1", "portId": "clock" },
+        "to": { "moduleId": "drumseq-1", "portId": "clock" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "clock-1", "portId": "clock" },
+        "to": { "moduleId": "gltch-1", "portId": "clock" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "drumseq-1", "portId": "gate-kick" },
+        "to": { "moduleId": "kick-1", "portId": "trigger" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "drumseq-1", "portId": "gate-snare" },
+        "to": { "moduleId": "snare-1", "portId": "trigger" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "drumseq-1", "portId": "gate-hhc" },
+        "to": { "moduleId": "hh-1", "portId": "trigger" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "kick-1", "portId": "out" },
+        "to": { "moduleId": "mix8-1", "portId": "in-1" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "snare-1", "portId": "out" },
+        "to": { "moduleId": "mix8-1", "portId": "in-2" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "hh-1", "portId": "out" },
+        "to": { "moduleId": "mix8-1", "portId": "in-3" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "mix8-1", "portId": "out" },
+        "to": { "moduleId": "gltch-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "gltch-1", "portId": "out" },
+        "to": { "moduleId": "dist-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "dist-1", "portId": "out" },
+        "to": { "moduleId": "out-1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

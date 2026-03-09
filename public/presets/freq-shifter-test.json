@@ -1,0 +1,134 @@
+{
+  "version": 1,
+  "id": "freq-shifter-test",
+  "name": "Freq Shifter Test",
+  "description": "Supersaw pad through Frequency Shifter with LFO modulation.",
+  "graph": {
+    "modules": [
+      {
+        "id": "ctrl-1",
+        "type": "control",
+        "name": "Keyboard",
+        "position": { "x": 120, "y": 120 },
+        "params": {
+          "cv": 0,
+          "cvMode": "unipolar",
+          "velocity": 1,
+          "midiVelocity": true,
+          "gate": 0,
+          "glide": 0.05,
+          "voices": 4
+        }
+      },
+      {
+        "id": "ssaw-1",
+        "type": "supersaw",
+        "name": "Supersaw",
+        "position": { "x": 520, "y": 120 },
+        "params": {
+          "frequency": 220,
+          "detune": 30,
+          "mix": 1.0
+        }
+      },
+      {
+        "id": "adsr-1",
+        "type": "adsr",
+        "name": "ADSR",
+        "position": { "x": 520, "y": 320 },
+        "params": {
+          "attack": 0.3,
+          "decay": 0.5,
+          "sustain": 0.8,
+          "release": 1.0
+        }
+      },
+      {
+        "id": "gain-1",
+        "type": "gain",
+        "name": "VCA",
+        "position": { "x": 720, "y": 120 },
+        "params": {
+          "gain": 0.7
+        }
+      },
+      {
+        "id": "fshft-1",
+        "type": "freq-shifter",
+        "name": "Freq Shifter",
+        "position": { "x": 920, "y": 120 },
+        "params": {
+          "shift": 5.0,
+          "mix": 0.7
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "x": 1120, "y": 120 },
+        "params": {
+          "time": 0.75,
+          "damp": 0.3,
+          "preDelay": 25,
+          "mix": 0.35
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Main Out",
+        "position": { "x": 1320, "y": 120 },
+        "params": {
+          "level": 1
+        }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 920, "y": 320 },
+        "params": {
+          "text": "FREQ SHIFTER TEST\n\nRich Supersaw pad through Frequency Shifter and Reverb.\n\n- Control -> Supersaw (detuned pad sound)\n- ADSR (slow attack) -> VCA for pad envelope\n- VCA -> Freq Shifter -> Reverb -> Output\n\nFreq Shifter: +5 Hz shift creates metallic, swirling quality.\n\nTry:\n- Shift 0-2 Hz = subtle beating\n- Shift 10-50 Hz = robotic/alien\n- Shift 100+ Hz = bells/inharmonic\n- Negative shift = downward shift"
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "cv-out" },
+        "to": { "moduleId": "ssaw-1", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "gate-out" },
+        "to": { "moduleId": "adsr-1", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "ssaw-1", "portId": "out" },
+        "to": { "moduleId": "gain-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "adsr-1", "portId": "env" },
+        "to": { "moduleId": "gain-1", "portId": "cv" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "gain-1", "portId": "out" },
+        "to": { "moduleId": "fshft-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "fshft-1", "portId": "out" },
+        "to": { "moduleId": "reverb-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb-1", "portId": "out" },
+        "to": { "moduleId": "out-1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

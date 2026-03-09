@@ -248,10 +248,28 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
     // Compressor - 1 stereo input
     ModuleType::Compressor => vec![
       PortInfo { channels: 2 },  // audio in (stereo)
+      PortInfo { channels: 2 },  // sidechain in (stereo)
     ],
     // BitCrusher - 1 stereo input
     ModuleType::BitCrusher => vec![
       PortInfo { channels: 2 },  // audio in (stereo)
+    ],
+    // Flanger - 1 stereo input
+    ModuleType::Flanger => vec![
+      PortInfo { channels: 2 },  // audio in (stereo)
+    ],
+    // FreqShifter - 1 stereo input
+    ModuleType::FreqShifter => vec![
+      PortInfo { channels: 2 },  // audio in (stereo)
+    ],
+    // Eq3 - 1 stereo input
+    ModuleType::Eq3 => vec![
+      PortInfo { channels: 2 },  // audio in (stereo)
+    ],
+    // Glitch - 1 stereo input + clock
+    ModuleType::Glitch => vec![
+      PortInfo { channels: 2 },  // audio in (stereo)
+      PortInfo { channels: 1 },  // clock trigger
     ],
     // SpeechSynth - 3 inputs (pitch CV, gate, clock)
     ModuleType::SpeechSynth => vec![
@@ -522,6 +540,22 @@ pub fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
     ],
     // BitCrusher - 1 stereo output
     ModuleType::BitCrusher => vec![
+      PortInfo { channels: 2 },  // stereo audio out
+    ],
+    // Flanger - 1 stereo output
+    ModuleType::Flanger => vec![
+      PortInfo { channels: 2 },  // stereo audio out
+    ],
+    // FreqShifter - 1 stereo output
+    ModuleType::FreqShifter => vec![
+      PortInfo { channels: 2 },  // stereo audio out
+    ],
+    // Eq3 - 1 stereo output
+    ModuleType::Eq3 => vec![
+      PortInfo { channels: 2 },  // stereo audio out
+    ],
+    // Glitch - 1 stereo output
+    ModuleType::Glitch => vec![
       PortInfo { channels: 2 },  // stereo audio out
     ],
     // SpeechSynth - 1 mono output
@@ -856,14 +890,36 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
       "reset" | "rst" => Some(0),
       _ => None,
     },
-    // Compressor - 1 input
+    // Compressor - 2 inputs (audio + sidechain)
     ModuleType::Compressor => match port_id {
       "in" | "input" | "audio" => Some(0),
+      "sidechain" | "sc" => Some(1),
       _ => None,
     },
     // BitCrusher - 1 input
     ModuleType::BitCrusher => match port_id {
       "in" | "input" | "audio" => Some(0),
+      _ => None,
+    },
+    // Flanger - 1 input
+    ModuleType::Flanger => match port_id {
+      "in" | "input" | "audio" => Some(0),
+      _ => None,
+    },
+    // FreqShifter - 1 input
+    ModuleType::FreqShifter => match port_id {
+      "in" | "input" | "audio" => Some(0),
+      _ => None,
+    },
+    // Eq3 - 1 input
+    ModuleType::Eq3 => match port_id {
+      "in" | "input" | "audio" => Some(0),
+      _ => None,
+    },
+    // Glitch - 2 inputs (audio + clock)
+    ModuleType::Glitch => match port_id {
+      "in" | "input" | "audio" => Some(0),
+      "clock" | "clk" | "trig" => Some(1),
       _ => None,
     },
     // SpeechSynth - 3 inputs
@@ -1255,6 +1311,26 @@ pub fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize
     },
     // BitCrusher - 1 output
     ModuleType::BitCrusher => match port_id {
+      "out" | "output" => Some(0),
+      _ => None,
+    },
+    // Flanger - 1 output
+    ModuleType::Flanger => match port_id {
+      "out" | "output" => Some(0),
+      _ => None,
+    },
+    // FreqShifter - 1 output
+    ModuleType::FreqShifter => match port_id {
+      "out" | "output" => Some(0),
+      _ => None,
+    },
+    // Eq3 - 1 output
+    ModuleType::Eq3 => match port_id {
+      "out" | "output" => Some(0),
+      _ => None,
+    },
+    // Glitch - 1 output
+    ModuleType::Glitch => match port_id {
       "out" | "output" => Some(0),
       _ => None,
     },

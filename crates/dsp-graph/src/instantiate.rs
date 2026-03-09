@@ -4,7 +4,7 @@ use std::collections::HashMap;
 
 use dsp_core::{
   Adsr, Arpeggiator, AyPlayer, BitCrusher, Chaos, ChordSequencer, Choir, Chorus, Clap808, Clap909, Compressor, Cowbell808, Delay, DrumSequencer, Ensemble,
-  EnvelopeFollower, EuclideanSequencer, FmMatrix, FmOperator, Granular, GranularDelay, HiHat808, HiHat909, Hpf, KarplusStrong,
+  EnvelopeFollower, Eq3, EuclideanSequencer, Flanger, FmMatrix, FmOperator, FrequencyShifter, Glitch, Granular, GranularDelay, HiHat808, HiHat909, Hpf, KarplusStrong,
   Kick808, Kick909, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, ParticleCloud, Phaser, PipeOrgan, PitchShifter,
   PolyrhythmSequencer, Resonator, Reverb, Rimshot909, SampleHold, Shepard, SidPlayer, SlewLimiter, Snare808, Snare909, SnesOsc, SpectralSwarm, SpeechSynth,
   SpringReverb, StepSequencer, Supersaw, TapeDelay, Tb303, Tom808, Tom909, TuringMachine, Vcf, Vco, Vocoder, Wavetable,
@@ -194,6 +194,9 @@ pub(crate) fn create_state(
       mix: ParamBuffer::new(param_number(params, "mix", 0.25)),
       tone: ParamBuffer::new(param_number(params, "tone", 0.55)),
       ping_pong: ParamBuffer::new(param_number(params, "pingPong", 0.0)),
+      tempo_sync: ParamBuffer::new(param_number(params, "tempoSync", 0.0)),
+      sync_rate: ParamBuffer::new(param_number(params, "syncRate", 3.0)),
+      tempo: ParamBuffer::new(param_number(params, "tempo", 120.0)),
     }),
     ModuleType::GranularDelay => ModuleState::GranularDelay(GranularDelayState {
       delay: GranularDelay::new(sample_rate),
@@ -760,6 +763,37 @@ pub(crate) fn create_state(
       downsample: ParamBuffer::new(param_number(params, "downsample", 1.0)),
       mix: ParamBuffer::new(param_number(params, "mix", 1.0)),
     }),
+    ModuleType::Flanger => ModuleState::Flanger(FlangerState {
+      flanger: Flanger::new(sample_rate),
+      rate: ParamBuffer::new(param_number(params, "rate", 0.3)),
+      depth: ParamBuffer::new(param_number(params, "depth", 2.0)),
+      feedback: ParamBuffer::new(param_number(params, "feedback", 0.5)),
+      mix: ParamBuffer::new(param_number(params, "mix", 0.5)),
+    }),
+    ModuleType::FreqShifter => ModuleState::FreqShifter(FreqShifterState {
+      shifter: FrequencyShifter::new(sample_rate),
+      shift: ParamBuffer::new(param_number(params, "shift", 0.0)),
+      mix: ParamBuffer::new(param_number(params, "mix", 1.0)),
+    }),
+    ModuleType::Eq3 => ModuleState::Eq3(Eq3State {
+      eq: Eq3::new(sample_rate),
+      low_gain: ParamBuffer::new(param_number(params, "lowGain", 0.0)),
+      mid_gain: ParamBuffer::new(param_number(params, "midGain", 0.0)),
+      high_gain: ParamBuffer::new(param_number(params, "highGain", 0.0)),
+      low_freq: ParamBuffer::new(param_number(params, "lowFreq", 200.0)),
+      mid_freq: ParamBuffer::new(param_number(params, "midFreq", 1000.0)),
+      high_freq: ParamBuffer::new(param_number(params, "highFreq", 5000.0)),
+      mid_q: ParamBuffer::new(param_number(params, "midQ", 1.0)),
+    }),
+    ModuleType::Glitch => ModuleState::Glitch(GlitchState {
+      glitch: Glitch::new(sample_rate),
+      probability: ParamBuffer::new(param_number(params, "probability", 0.5)),
+      slice_ms: ParamBuffer::new(param_number(params, "sliceMs", 100.0)),
+      repeats: ParamBuffer::new(param_number(params, "repeats", 2.0)),
+      reverse_chance: ParamBuffer::new(param_number(params, "reverseChance", 0.3)),
+      pitch_range: ParamBuffer::new(param_number(params, "pitchRange", 0.0)),
+      mix: ParamBuffer::new(param_number(params, "mix", 0.5)),
+    }),
   }
 }
 
@@ -952,6 +986,9 @@ pub(crate) fn apply_param(state: &mut ModuleState, param: &str, value: f32) {
       "mix" => state.mix.set(value),
       "tone" => state.tone.set(value),
       "pingPong" => state.ping_pong.set(value),
+      "tempoSync" => state.tempo_sync.set(value),
+      "syncRate" => state.sync_rate.set(value),
+      "tempo" => state.tempo.set(value),
       _ => {}
     },
     ModuleState::GranularDelay(state) => match param {
@@ -1443,6 +1480,37 @@ pub(crate) fn apply_param(state: &mut ModuleState, param: &str, value: f32) {
     ModuleState::BitCrusher(state) => match param {
       "bits" => state.bits.set(value),
       "downsample" => state.downsample.set(value),
+      "mix" => state.mix.set(value),
+      _ => {}
+    },
+    ModuleState::Flanger(state) => match param {
+      "rate" => state.rate.set(value),
+      "depth" => state.depth.set(value),
+      "feedback" => state.feedback.set(value),
+      "mix" => state.mix.set(value),
+      _ => {}
+    },
+    ModuleState::FreqShifter(state) => match param {
+      "shift" => state.shift.set(value),
+      "mix" => state.mix.set(value),
+      _ => {}
+    },
+    ModuleState::Eq3(state) => match param {
+      "lowGain" => state.low_gain.set(value),
+      "midGain" => state.mid_gain.set(value),
+      "highGain" => state.high_gain.set(value),
+      "lowFreq" => state.low_freq.set(value),
+      "midFreq" => state.mid_freq.set(value),
+      "highFreq" => state.high_freq.set(value),
+      "midQ" => state.mid_q.set(value),
+      _ => {}
+    },
+    ModuleState::Glitch(state) => match param {
+      "probability" => state.probability.set(value),
+      "sliceMs" => state.slice_ms.set(value),
+      "repeats" => state.repeats.set(value),
+      "reverseChance" => state.reverse_chance.set(value),
+      "pitchRange" => state.pitch_range.set(value),
       "mix" => state.mix.set(value),
       _ => {}
     },

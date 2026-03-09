@@ -1,0 +1,136 @@
+{
+  "version": 1,
+  "id": "glitch-pad",
+  "name": "Glitch Ambient Pad",
+  "description": "Evolving pad with subtle glitch textures and reverb wash.",
+  "graph": {
+    "modules": [
+      {
+        "id": "clock-1",
+        "type": "clock",
+        "name": "Clock",
+        "position": { "x": 120, "y": 120 },
+        "params": {
+          "running": true,
+          "tempo": 60,
+          "rate": 3,
+          "swing": 0
+        }
+      },
+      {
+        "id": "osc-1",
+        "type": "supersaw",
+        "name": "Supersaw",
+        "position": { "x": 120, "y": 320 },
+        "params": {
+          "frequency": 110,
+          "detune": 25,
+          "mix": 0.6
+        }
+      },
+      {
+        "id": "vcf-1",
+        "type": "vcf",
+        "name": "VCF",
+        "position": { "x": 320, "y": 320 },
+        "params": {
+          "cutoff": 1200,
+          "resonance": 0.25,
+          "drive": 0.05,
+          "model": "svf",
+          "mode": "lp",
+          "slope": 24
+        }
+      },
+      {
+        "id": "lfo-1",
+        "type": "lfo",
+        "name": "LFO",
+        "position": { "x": 120, "y": 520 },
+        "params": {
+          "rate": 0.08,
+          "shape": "sine",
+          "depth": 1,
+          "offset": 0,
+          "bipolar": true
+        }
+      },
+      {
+        "id": "gltch-1",
+        "type": "glitch",
+        "name": "Glitch",
+        "position": { "x": 520, "y": 120 },
+        "params": {
+          "probability": 0.25,
+          "sliceMs": 200,
+          "repeats": 2,
+          "reverseChance": 0.6,
+          "pitchRange": 3,
+          "mix": 0.4
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "x": 720, "y": 120 },
+        "params": {
+          "time": 0.85,
+          "damp": 0.35,
+          "preDelay": 30,
+          "mix": 0.45
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Main Out",
+        "position": { "x": 920, "y": 120 },
+        "params": {
+          "level": 1
+        }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 520, "y": 320 },
+        "params": {
+          "text": "GLITCH AMBIENT PAD\n\nSubtle glitch textures on a dark pad.\n\n- Supersaw (A2) -> VCF (LP 24dB) -> Glitch -> Reverb -> Out\n- LFO slowly modulates VCF cutoff\n- Clock at 60 BPM triggers glitch at 1/8 rate\n\nGlitch is set gentle:\n- Prob 25% = occasional glitches\n- Slice 200ms = long fragments\n- Repeats 2 = gentle stutter\n- Reverse 60% = many reversed grains\n- Pitch 3st = subtle pitch shift\n- Mix 40% = blended with dry\n\nThe reverb washes over the glitches\ncreating an ambient, evolving texture.\n\nTry:\n- Prob 0.5 + SliceMs 100 = more active\n- Reverb Mix 0.7 = deep wash\n- VCF cutoff 600 = darker, muffled"
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "clock-1", "portId": "clock" },
+        "to": { "moduleId": "gltch-1", "portId": "clock" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "osc-1", "portId": "out" },
+        "to": { "moduleId": "vcf-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "lfo-1", "portId": "cv-out" },
+        "to": { "moduleId": "vcf-1", "portId": "mod" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "vcf-1", "portId": "out" },
+        "to": { "moduleId": "gltch-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "gltch-1", "portId": "out" },
+        "to": { "moduleId": "reverb-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb-1", "portId": "out" },
+        "to": { "moduleId": "out-1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

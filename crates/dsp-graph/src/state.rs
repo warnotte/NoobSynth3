@@ -2,7 +2,7 @@
 
 use dsp_core::{
     Adsr, Arpeggiator, AyPlayer, BitCrusher, Chaos, ChordSequencer, Choir, Chorus, Clap808, Clap909, Compressor, Cowbell808, Delay, DrumSequencer, Ensemble,
-    EnvelopeFollower, EuclideanSequencer, FmMatrix, FmOperator, Granular, GranularDelay, HiHat808, HiHat909, Hpf, KarplusStrong,
+    EnvelopeFollower, Eq3, EuclideanSequencer, Flanger, FmMatrix, FmOperator, FrequencyShifter, Glitch, Granular, GranularDelay, HiHat808, HiHat909, Hpf, KarplusStrong,
     Kick808, Kick909, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, ParticleCloud, Phaser, PipeOrgan, PitchShifter,
     PolyrhythmSequencer, Resonator, Reverb, Rimshot909, SampleHold, Shepard, SidPlayer, SlewLimiter, Snare808, Snare909, SnesOsc, SpectralSwarm, SpeechSynth,
     SpringReverb, StepSequencer, Supersaw, TapeDelay, Tb303, Tom808, Tom909, TuringMachine, Vcf, Vco, Vocoder, Wavetable,
@@ -445,6 +445,9 @@ pub struct DelayState {
     pub mix: ParamBuffer,
     pub tone: ParamBuffer,
     pub ping_pong: ParamBuffer,
+    pub tempo_sync: ParamBuffer,
+    pub sync_rate: ParamBuffer,
+    pub tempo: ParamBuffer,
 }
 
 pub struct GranularDelayState {
@@ -528,6 +531,41 @@ pub struct BitCrusherState {
     pub crusher: BitCrusher,
     pub bits: ParamBuffer,
     pub downsample: ParamBuffer,
+    pub mix: ParamBuffer,
+}
+
+pub struct FlangerState {
+    pub flanger: Flanger,
+    pub rate: ParamBuffer,
+    pub depth: ParamBuffer,
+    pub feedback: ParamBuffer,
+    pub mix: ParamBuffer,
+}
+
+pub struct FreqShifterState {
+    pub shifter: FrequencyShifter,
+    pub shift: ParamBuffer,
+    pub mix: ParamBuffer,
+}
+
+pub struct Eq3State {
+    pub eq: Eq3,
+    pub low_gain: ParamBuffer,
+    pub mid_gain: ParamBuffer,
+    pub high_gain: ParamBuffer,
+    pub low_freq: ParamBuffer,
+    pub mid_freq: ParamBuffer,
+    pub high_freq: ParamBuffer,
+    pub mid_q: ParamBuffer,
+}
+
+pub struct GlitchState {
+    pub glitch: Glitch,
+    pub probability: ParamBuffer,
+    pub slice_ms: ParamBuffer,
+    pub repeats: ParamBuffer,
+    pub reverse_chance: ParamBuffer,
+    pub pitch_range: ParamBuffer,
     pub mix: ParamBuffer,
 }
 
@@ -870,6 +908,10 @@ pub enum ModuleState {
     PitchShifter(PitchShifterState),
     Compressor(CompressorState),
     BitCrusher(BitCrusherState),
+    Flanger(FlangerState),
+    FreqShifter(FreqShifterState),
+    Eq3(Eq3State),
+    Glitch(GlitchState),
 
     // Sequencers
     Clock(ClockState),

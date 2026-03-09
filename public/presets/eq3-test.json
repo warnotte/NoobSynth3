@@ -1,0 +1,151 @@
+{
+  "version": 1,
+  "id": "eq3-test",
+  "name": "EQ3 Test",
+  "description": "Full signal chain with 3-band EQ shaping.",
+  "graph": {
+    "modules": [
+      {
+        "id": "ctrl-1",
+        "type": "control",
+        "name": "Keyboard",
+        "position": { "x": 120, "y": 120 },
+        "params": {
+          "cv": 0,
+          "cvMode": "unipolar",
+          "velocity": 1,
+          "midiVelocity": true,
+          "gate": 0,
+          "glide": 0.02,
+          "voices": 4
+        }
+      },
+      {
+        "id": "osc-1",
+        "type": "oscillator",
+        "name": "VCO",
+        "position": { "x": 520, "y": 120 },
+        "params": {
+          "frequency": 220,
+          "type": "sawtooth",
+          "pwm": 0.5,
+          "unison": 3,
+          "detune": 10
+        }
+      },
+      {
+        "id": "adsr-1",
+        "type": "adsr",
+        "name": "ADSR",
+        "position": { "x": 520, "y": 320 },
+        "params": {
+          "attack": 0.01,
+          "decay": 0.25,
+          "sustain": 0.6,
+          "release": 0.3
+        }
+      },
+      {
+        "id": "vcf-1",
+        "type": "vcf",
+        "name": "VCF",
+        "position": { "x": 720, "y": 120 },
+        "params": {
+          "cutoff": 3000,
+          "resonance": 0.15,
+          "drive": 0.1,
+          "envAmount": 0.3,
+          "modAmount": 0,
+          "keyTrack": 0.5,
+          "model": "svf",
+          "mode": "lp",
+          "slope": 12
+        }
+      },
+      {
+        "id": "gain-1",
+        "type": "gain",
+        "name": "VCA",
+        "position": { "x": 920, "y": 120 },
+        "params": {
+          "gain": 0.8
+        }
+      },
+      {
+        "id": "eq-1",
+        "type": "eq3",
+        "name": "EQ 3-Band",
+        "position": { "x": 1120, "y": 120 },
+        "params": {
+          "lowGain": 3.0,
+          "midGain": -2.0,
+          "highGain": 4.0,
+          "lowFreq": 200,
+          "midFreq": 1000,
+          "highFreq": 5000,
+          "midQ": 1.0
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Main Out",
+        "position": { "x": 1320, "y": 120 },
+        "params": {
+          "level": 1
+        }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 1120, "y": 420 },
+        "params": {
+          "text": "EQ 3-BAND TEST\n\nSawtooth (3-voice unison) through VCF and EQ3.\n\n- Control -> VCO (unison 3, detuned) -> VCF -> VCA -> EQ3 -> Output\n- ADSR controls VCF envelope and VCA amplitude\n\nEQ settings:\n- Low +3 dB at 200 Hz (bass boost)\n- Mid -2 dB at 1 kHz (scoop)\n- High +4 dB at 5 kHz (presence/air)\n\nTry:\n- Boost mid for nasal lead tone\n- Cut high for dark, muffled sound\n- Sweep midFreq to find resonant sweet spots\n- Increase midQ for surgical cuts/boosts"
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "cv-out" },
+        "to": { "moduleId": "osc-1", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "gate-out" },
+        "to": { "moduleId": "adsr-1", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "osc-1", "portId": "out" },
+        "to": { "moduleId": "vcf-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "adsr-1", "portId": "env" },
+        "to": { "moduleId": "vcf-1", "portId": "env" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "adsr-1", "portId": "env" },
+        "to": { "moduleId": "gain-1", "portId": "cv" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "vcf-1", "portId": "out" },
+        "to": { "moduleId": "gain-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "gain-1", "portId": "out" },
+        "to": { "moduleId": "eq-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "eq-1", "portId": "out" },
+        "to": { "moduleId": "out-1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

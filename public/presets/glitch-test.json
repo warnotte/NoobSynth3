@@ -1,0 +1,173 @@
+{
+  "version": 1,
+  "id": "glitch-test",
+  "name": "Glitch Test",
+  "description": "Clock-triggered glitch effect on a drum beat.",
+  "graph": {
+    "modules": [
+      {
+        "id": "clock-1",
+        "type": "clock",
+        "name": "Clock",
+        "position": { "x": 120, "y": 120 },
+        "params": {
+          "running": true,
+          "tempo": 130,
+          "rate": 4,
+          "swing": 0
+        }
+      },
+      {
+        "id": "drumseq-1",
+        "type": "drum-sequencer",
+        "name": "Drum Seq",
+        "position": { "x": 320, "y": 120 },
+        "params": {
+          "enabled": true,
+          "tempo": 130,
+          "rate": 4,
+          "gateLength": 50,
+          "swing": 0,
+          "length": 16,
+          "drumData": "{\"tracks\":[[{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}]]}"
+        }
+      },
+      {
+        "id": "kick-1",
+        "type": "909-kick",
+        "name": "909 Kick",
+        "position": { "x": 720, "y": 120 },
+        "params": {
+          "tune": 55,
+          "attack": 0.4,
+          "decay": 0.5,
+          "drive": 0.3
+        }
+      },
+      {
+        "id": "snare-1",
+        "type": "909-snare",
+        "name": "909 Snare",
+        "position": { "x": 720, "y": 320 },
+        "params": {
+          "tune": 200,
+          "tone": 0.5,
+          "snappy": 0.6,
+          "decay": 0.3
+        }
+      },
+      {
+        "id": "hh-1",
+        "type": "909-hihat",
+        "name": "909 HiHat",
+        "position": { "x": 720, "y": 520 },
+        "params": {
+          "openDecay": 0.4,
+          "closedDecay": 0.1,
+          "tone": 0.6,
+          "mix": 0.5
+        }
+      },
+      {
+        "id": "mix8-1",
+        "type": "mixer-8",
+        "name": "Drum Mix",
+        "position": { "x": 920, "y": 120 },
+        "params": {
+          "level1": 1.0,
+          "level2": 0.8,
+          "level3": 0.5,
+          "level4": 0,
+          "level5": 0,
+          "level6": 0,
+          "level7": 0,
+          "level8": 0
+        }
+      },
+      {
+        "id": "gltch-1",
+        "type": "glitch",
+        "name": "Glitch",
+        "position": { "x": 1120, "y": 120 },
+        "params": {
+          "probability": 0.4,
+          "sliceMs": 80,
+          "repeats": 3,
+          "reverseChance": 0.3,
+          "pitchRange": 0.2,
+          "mix": 0.6
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Main Out",
+        "position": { "x": 1320, "y": 120 },
+        "params": {
+          "level": 1
+        }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 1120, "y": 420 },
+        "params": {
+          "text": "GLITCH TEST\n\nDrum beat through clock-triggered Glitch processor.\n\n- Clock (130 BPM) -> Drum Sequencer + Glitch clock\n- Kick (1,5,9,12,13) + Snare (5,13) + HH (8th notes)\n- Drums -> Mixer-8 -> Glitch -> Output\n\nGlitch settings:\n- Probability: 40% (not every beat glitches)\n- Slice: 80 ms\n- Repeats: 3 (stutter count)\n- Reverse: 30% chance\n- Pitch Range: 0.2 (subtle pitch shifts)\n- Mix: 60%\n\nTry:\n- Probability 1.0 = constant glitch madness\n- SliceMs 20 = micro-stutters\n- Repeats 8 = machine-gun effect\n- PitchRange 1.0 = extreme pitch warping"
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "clock-1", "portId": "clock" },
+        "to": { "moduleId": "drumseq-1", "portId": "clock" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "clock-1", "portId": "clock" },
+        "to": { "moduleId": "gltch-1", "portId": "clock" },
+        "kind": "sync"
+      },
+      {
+        "from": { "moduleId": "drumseq-1", "portId": "gate-kick" },
+        "to": { "moduleId": "kick-1", "portId": "trigger" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "drumseq-1", "portId": "gate-snare" },
+        "to": { "moduleId": "snare-1", "portId": "trigger" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "drumseq-1", "portId": "gate-hhc" },
+        "to": { "moduleId": "hh-1", "portId": "trigger" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "kick-1", "portId": "out" },
+        "to": { "moduleId": "mix8-1", "portId": "in-1" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "snare-1", "portId": "out" },
+        "to": { "moduleId": "mix8-1", "portId": "in-2" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "hh-1", "portId": "out" },
+        "to": { "moduleId": "mix8-1", "portId": "in-3" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "mix8-1", "portId": "out" },
+        "to": { "moduleId": "gltch-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "gltch-1", "portId": "out" },
+        "to": { "moduleId": "out-1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

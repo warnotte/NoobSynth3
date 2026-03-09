@@ -48,6 +48,10 @@ pub mod vocoder;
 pub mod pitch_shifter;
 pub mod compressor;
 pub mod bit_crusher;
+pub mod flanger;
+pub mod frequency_shifter;
+pub mod eq3;
+pub mod glitch;
 
 // Re-export all public types
 pub use delay::{Delay, DelayInputs, DelayParams};
@@ -66,3 +70,7 @@ pub use vocoder::{Vocoder, VocoderInputs, VocoderParams};
 pub use pitch_shifter::{PitchShifter, PitchShifterInputs, PitchShifterParams};
 pub use compressor::{Compressor, CompressorParams};
 pub use bit_crusher::{BitCrusher, BitCrusherInputs, BitCrusherParams};
+pub use flanger::{Flanger, FlangerParams, FlangerInputs};
+pub use frequency_shifter::{FrequencyShifter, FrequencyShifterParams, FrequencyShifterInputs};
+pub use eq3::{Eq3, Eq3Params, Eq3Inputs};
+pub use glitch::{Glitch, GlitchParams, GlitchInputs};

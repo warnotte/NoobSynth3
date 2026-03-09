@@ -41,6 +41,9 @@ pub struct CompressorParams<'a> {
 impl Compressor {
     /// Process a stereo block of audio through the compressor.
     /// Uses linked detection (max of both channels) to preserve stereo image.
+    /// Process a stereo block with optional external sidechain.
+    /// When sidechain inputs are provided, level detection uses the sidechain
+    /// signal instead of the main input (for ducking/pumping effects).
     pub fn process_block_stereo(
         &mut self,
         out_l: &mut [Sample],
@@ -48,6 +51,8 @@ impl Compressor {
         in_l: Option<&[Sample]>,
         in_r: Option<&[Sample]>,
         params: CompressorParams<'_>,
+        sidechain_l: Option<&[Sample]>,
+        sidechain_r: Option<&[Sample]>,
     ) {
         let frames = out_l.len().min(out_r.len());
         if frames == 0 {
@@ -73,8 +78,14 @@ impl Compressor {
             let attack_coeff = (-2.0 * std::f32::consts::PI * 1000.0 / (attack_ms * self.sample_rate)).exp();
             let release_coeff = (-2.0 * std::f32::consts::PI * 1000.0 / (release_ms * self.sample_rate)).exp();
 
-            // Linked stereo detection - use max of both channels
-            let input_peak = sample_l.abs().max(sample_r.abs());
+            // Level detection: use sidechain if connected, otherwise main input
+            let input_peak = if sidechain_l.is_some() || sidechain_r.is_some() {
+                let sc_l = input_at(sidechain_l, i);
+                let sc_r = input_at(sidechain_r, i);
+                sc_l.abs().max(sc_r.abs())
+            } else {
+                sample_l.abs().max(sample_r.abs())
+            };
 
             // Envelope follower (peak detection)
             if input_peak > self.envelope {

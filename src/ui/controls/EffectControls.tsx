@@ -8,10 +8,11 @@
 import type React from 'react'
 import type { ControlProps } from './types'
 import { RotaryKnob } from '../RotaryKnob'
-import { ControlBox } from '../ControlBox'
+import { ControlBox, ControlBoxRow } from '../ControlBox'
 import { ControlButtons } from '../ControlButtons'
 import { ToggleButton, ToggleGroup } from '../ToggleButton'
 import { formatDecimal1, formatDecimal2, formatInt, formatPercent } from '../formatters'
+import { RATE_DIVISIONS } from '../../shared/rates'
 
 export function renderEffectControls(props: ControlProps): React.ReactElement | null {
   const { module, updateParam } = props
@@ -296,18 +297,35 @@ export function renderEffectControls(props: ControlProps): React.ReactElement | 
 
   if (module.type === 'delay') {
     const pingPong = Boolean(module.params.pingPong)
+    const tempoSync = Boolean(module.params.tempoSync)
+    const syncRate = Number(module.params.syncRate ?? 3)
+    const tempo = Number(module.params.tempo ?? 120)
     return (
       <>
-        <RotaryKnob
-          label="Time"
-          min={20}
-          max={1200}
-          step={1}
-          unit="ms"
-          value={Number(module.params.time ?? 360)}
-          onChange={(value) => updateParam(module.id, 'time', value)}
-          format={formatInt}
-        />
+        {!tempoSync && (
+          <RotaryKnob
+            label="Time"
+            min={20}
+            max={1200}
+            step={1}
+            unit="ms"
+            value={Number(module.params.time ?? 360)}
+            onChange={(value) => updateParam(module.id, 'time', value)}
+            format={formatInt}
+          />
+        )}
+        {tempoSync && (
+          <RotaryKnob
+            label="Tempo"
+            min={20}
+            max={300}
+            step={1}
+            unit="BPM"
+            value={tempo}
+            onChange={(value) => updateParam(module.id, 'tempo', value)}
+            format={formatInt}
+          />
+        )}
         <RotaryKnob
           label="Feedback"
           min={0}
@@ -335,7 +353,22 @@ export function renderEffectControls(props: ControlProps): React.ReactElement | 
           onChange={(value) => updateParam(module.id, 'tone', value)}
           format={(value) => `${Math.round(value * 100)}%`}
         />
+        {tempoSync && (
+          <ControlBox label="Rate" compact>
+            <ControlButtons
+              columns={3}
+              options={RATE_DIVISIONS.slice(0, 6).map(r => ({ id: r.id, label: r.label }))}
+              value={syncRate}
+              onChange={(value) => updateParam(module.id, 'syncRate', value)}
+            />
+          </ControlBox>
+        )}
         <ToggleGroup>
+          <ToggleButton
+            label="Sync"
+            value={tempoSync}
+            onChange={(value) => updateParam(module.id, 'tempoSync', value)}
+          />
           <ToggleButton
             label="Ping Pong"
             value={pingPong}
@@ -849,6 +882,226 @@ export function renderEffectControls(props: ControlProps): React.ReactElement | 
           max={1}
           step={0.01}
           value={Number(module.params.mix ?? 1)}
+          onChange={(value) => updateParam(module.id, 'mix', value)}
+          format={formatPercent}
+        />
+      </>
+    )
+  }
+
+  if (module.type === 'flanger') {
+    return (
+      <>
+        <RotaryKnob
+          label="Rate"
+          min={0.01}
+          max={5}
+          step={0.01}
+          unit="Hz"
+          value={Number(module.params.rate ?? 0.3)}
+          onChange={(value) => updateParam(module.id, 'rate', value)}
+          format={formatDecimal2}
+        />
+        <RotaryKnob
+          label="Depth"
+          min={0}
+          max={5}
+          step={0.1}
+          unit="ms"
+          value={Number(module.params.depth ?? 2)}
+          onChange={(value) => updateParam(module.id, 'depth', value)}
+          format={formatDecimal1}
+        />
+        <RotaryKnob
+          label="Feedback"
+          min={-0.95}
+          max={0.95}
+          step={0.01}
+          value={Number(module.params.feedback ?? 0.5)}
+          onChange={(value) => updateParam(module.id, 'feedback', value)}
+          format={formatDecimal2}
+        />
+        <RotaryKnob
+          label="Mix"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.mix ?? 0.5)}
+          onChange={(value) => updateParam(module.id, 'mix', value)}
+          format={formatPercent}
+        />
+      </>
+    )
+  }
+
+  if (module.type === 'freq-shifter') {
+    return (
+      <>
+        <RotaryKnob
+          label="Shift"
+          min={-500}
+          max={500}
+          step={0.5}
+          unit="Hz"
+          value={Number(module.params.shift ?? 0)}
+          onChange={(value) => updateParam(module.id, 'shift', value)}
+          format={(v) => {
+            const s = v.toFixed(1)
+            return v > 0 ? `+${s}` : s
+          }}
+        />
+        <RotaryKnob
+          label="Mix"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.mix ?? 1)}
+          onChange={(value) => updateParam(module.id, 'mix', value)}
+          format={formatPercent}
+        />
+      </>
+    )
+  }
+
+  if (module.type === 'eq3') {
+    const fmtGain = (v: number) => { const s = v.toFixed(1); return v > 0 ? `+${s}` : s }
+    return (
+      <ControlBoxRow>
+        <ControlBox label="Low">
+          <RotaryKnob
+            label="Gain"
+            min={-12}
+            max={12}
+            step={0.5}
+            unit="dB"
+            value={Number(module.params.lowGain ?? 0)}
+            onChange={(value) => updateParam(module.id, 'lowGain', value)}
+            format={fmtGain}
+          />
+          <RotaryKnob
+            label="Freq"
+            min={20}
+            max={2000}
+            step={5}
+            unit="Hz"
+            value={Number(module.params.lowFreq ?? 200)}
+            onChange={(value) => updateParam(module.id, 'lowFreq', value)}
+            format={formatInt}
+          />
+        </ControlBox>
+        <ControlBox label="Mid">
+          <RotaryKnob
+            label="Gain"
+            min={-12}
+            max={12}
+            step={0.5}
+            unit="dB"
+            value={Number(module.params.midGain ?? 0)}
+            onChange={(value) => updateParam(module.id, 'midGain', value)}
+            format={fmtGain}
+          />
+          <RotaryKnob
+            label="Freq"
+            min={200}
+            max={8000}
+            step={10}
+            unit="Hz"
+            value={Number(module.params.midFreq ?? 1000)}
+            onChange={(value) => updateParam(module.id, 'midFreq', value)}
+            format={formatInt}
+          />
+          <RotaryKnob
+            label="Q"
+            min={0.1}
+            max={10}
+            step={0.1}
+            value={Number(module.params.midQ ?? 1)}
+            onChange={(value) => updateParam(module.id, 'midQ', value)}
+            format={formatDecimal1}
+          />
+        </ControlBox>
+        <ControlBox label="High">
+          <RotaryKnob
+            label="Gain"
+            min={-12}
+            max={12}
+            step={0.5}
+            unit="dB"
+            value={Number(module.params.highGain ?? 0)}
+            onChange={(value) => updateParam(module.id, 'highGain', value)}
+            format={fmtGain}
+          />
+          <RotaryKnob
+            label="Freq"
+            min={2000}
+            max={20000}
+            step={50}
+            unit="Hz"
+            value={Number(module.params.highFreq ?? 5000)}
+            onChange={(value) => updateParam(module.id, 'highFreq', value)}
+            format={formatInt}
+          />
+        </ControlBox>
+      </ControlBoxRow>
+    )
+  }
+
+  if (module.type === 'glitch') {
+    return (
+      <>
+        <RotaryKnob
+          label="Prob"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.probability ?? 0.5)}
+          onChange={(value) => updateParam(module.id, 'probability', value)}
+          format={formatPercent}
+        />
+        <RotaryKnob
+          label="Slice"
+          min={10}
+          max={500}
+          step={1}
+          unit="ms"
+          value={Number(module.params.sliceMs ?? 100)}
+          onChange={(value) => updateParam(module.id, 'sliceMs', value)}
+          format={formatInt}
+        />
+        <RotaryKnob
+          label="Repeats"
+          min={1}
+          max={8}
+          step={1}
+          value={Number(module.params.repeats ?? 2)}
+          onChange={(value) => updateParam(module.id, 'repeats', value)}
+          format={formatInt}
+        />
+        <RotaryKnob
+          label="Reverse"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.reverseChance ?? 0.3)}
+          onChange={(value) => updateParam(module.id, 'reverseChance', value)}
+          format={formatPercent}
+        />
+        <RotaryKnob
+          label="Pitch"
+          min={0}
+          max={12}
+          step={0.5}
+          unit="st"
+          value={Number(module.params.pitchRange ?? 0)}
+          onChange={(value) => updateParam(module.id, 'pitchRange', value)}
+          format={formatDecimal1}
+        />
+        <RotaryKnob
+          label="Mix"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.mix ?? 0.5)}
           onChange={(value) => updateParam(module.id, 'mix', value)}
           format={formatPercent}
         />

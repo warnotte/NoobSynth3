@@ -97,6 +97,11 @@ export const moduleSizes: Record<ModuleType, string> = {
   'envelope-follower': '1x2',
   // Bit Crusher
   'bit-crusher': '2x2',
+  // New effects
+  'flanger': '2x2',
+  'freq-shifter': '2x2',
+  'eq3': '3x2',
+  'glitch': '2x3',
 }
 
 export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>> = {
@@ -163,6 +168,10 @@ export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>>
   'polyrhythm-sequencer': 'strip',
   'envelope-follower': 'strip',
   'bit-crusher': 'strip',
+  'flanger': 'strip',
+  'freq-shifter': 'strip',
+  'eq3': 'strip',
+  'glitch': 'strip',
 }
 
 export type ModuleCategory =
@@ -243,6 +252,10 @@ export const moduleCatalog: { type: ModuleType; label: string; category: ModuleC
   { type: 'pitch-shifter', label: 'Pitch Shifter', category: 'effects' },
   { type: 'compressor', label: 'Compressor', category: 'effects' },
   { type: 'bit-crusher', label: 'Bit Crusher', category: 'effects' },
+  { type: 'flanger', label: 'Flanger', category: 'effects' },
+  { type: 'freq-shifter', label: 'Freq Shift', category: 'effects' },
+  { type: 'eq3', label: 'EQ 3-Band', category: 'effects' },
+  { type: 'glitch', label: 'Glitch', category: 'effects' },
   // Modulators
   { type: 'adsr', label: 'ADSR', category: 'modulators' },
   { type: 'lfo', label: 'LFO', category: 'modulators' },
@@ -379,6 +392,10 @@ export const modulePrefixes: Record<ModuleType, string> = {
   'polyrhythm-sequencer': 'polyseq',
   'envelope-follower': 'envf',
   'bit-crusher': 'crush',
+  'flanger': 'flng',
+  'freq-shifter': 'fshft',
+  'eq3': 'eq',
+  'glitch': 'gltch',
 }
 
 export const moduleLabels: Record<ModuleType, string> = {
@@ -471,6 +488,10 @@ export const moduleLabels: Record<ModuleType, string> = {
   'polyrhythm-sequencer': 'Polyrhythm',
   'envelope-follower': 'Env Follower',
   'bit-crusher': 'Bit Crusher',
+  'flanger': 'Flanger',
+  'freq-shifter': 'Freq Shifter',
+  'eq3': 'EQ 3-Band',
+  'glitch': 'Glitch',
 }
 
 export const moduleDefaults: Record<ModuleType, Record<string, number | string | boolean>> = {
@@ -1035,6 +1056,33 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     bits: 8.0,
     downsample: 1.0,
     mix: 1.0,
+  },
+  'flanger': {
+    rate: 0.3,
+    depth: 2.0,
+    feedback: 0.5,
+    mix: 0.5,
+  },
+  'freq-shifter': {
+    shift: 0.0,
+    mix: 1.0,
+  },
+  'eq3': {
+    lowGain: 0.0,
+    midGain: 0.0,
+    highGain: 0.0,
+    lowFreq: 200,
+    midFreq: 1000,
+    highFreq: 5000,
+    midQ: 1.0,
+  },
+  'glitch': {
+    probability: 0.5,
+    sliceMs: 100,
+    repeats: 2,
+    reverseChance: 0.3,
+    pitchRange: 0.0,
+    mix: 0.5,
   },
   'polyrhythm-sequencer': {
     enabled: true,
