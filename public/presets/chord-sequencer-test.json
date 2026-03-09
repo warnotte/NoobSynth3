@@ -84,28 +84,28 @@
         "type": "gain",
         "name": "VCA 1",
         "position": { "x": 11, "y": 0 },
-        "params": { "gain": 0.3 }
+        "params": { "gain": 0.9 }
       },
       {
         "id": "gain-2",
         "type": "gain",
         "name": "VCA 2",
         "position": { "x": 11, "y": 3 },
-        "params": { "gain": 0.3 }
+        "params": { "gain": 0.9 }
       },
       {
         "id": "gain-3",
         "type": "gain",
         "name": "VCA 3",
         "position": { "x": 11, "y": 6 },
-        "params": { "gain": 0.3 }
+        "params": { "gain": 0.9 }
       },
       {
         "id": "gain-4",
         "type": "gain",
         "name": "VCA 4",
         "position": { "x": 11, "y": 9 },
-        "params": { "gain": 0.3 }
+        "params": { "gain": 0.9 }
       },
       {
         "id": "mixer-1",
@@ -113,7 +113,7 @@
         "name": "Mixer",
         "position": { "x": 14, "y": 0 },
         "params": {
-          "level1": 0.25, "level2": 0.25, "level3": 0.25, "level4": 0.25,
+          "level1": 0.7, "level2": 0.7, "level3": 0.7, "level4": 0.7,
           "level5": 0, "level6": 0, "level7": 0, "level8": 0
         }
       },
@@ -122,7 +122,7 @@
         "type": "vcf",
         "name": "VCF",
         "position": { "x": 17, "y": 0 },
-        "params": { "cutoff": 3000, "resonance": 0.2, "model": "svf", "mode": "lp", "slope": 24 }
+        "params": { "cutoff": 4500, "resonance": 0.2, "model": "svf", "mode": "lp", "slope": 12 }
       },
       {
         "id": "reverb-1",

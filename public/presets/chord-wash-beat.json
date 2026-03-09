@@ -64,7 +64,7 @@
         "name": "Pad Mix",
         "position": { "x": 9, "y": 0 },
         "params": {
-          "level1": 0.25, "level2": 0.25, "level3": 0.25, "level4": 0.25,
+          "level1": 0.7, "level2": 0.7, "level3": 0.7, "level4": 0.7,
           "level5": 0, "level6": 0, "level7": 0, "level8": 0
         }
       },
@@ -73,14 +73,14 @@
         "type": "gain",
         "name": "Pad VCA",
         "position": { "x": 12, "y": 0 },
-        "params": { "gain": 0.3 }
+        "params": { "gain": 0.9 }
       },
       {
         "id": "vcf-1",
         "type": "vcf",
         "name": "VCF",
         "position": { "x": 15, "y": 0 },
-        "params": { "cutoff": 900, "resonance": 0.25, "model": "svf", "mode": "lp", "slope": 24 }
+        "params": { "cutoff": 1350, "resonance": 0.25, "model": "svf", "mode": "lp", "slope": 12 }
       },
       {
         "id": "lfo-1",
@@ -137,7 +137,7 @@
         "type": "mixer-1x2",
         "name": "Drum Mix",
         "position": { "x": 11, "y": 8 },
-        "params": { "levelA": 0.35, "levelB": 0.12, "levelC": 0.15, "levelD": 0.6, "levelE": 0.6, "levelF": 0.6 }
+        "params": { "levelA": 0.7, "levelB": 0.25, "levelC": 0.3, "levelD": 0.6, "levelE": 0.6, "levelF": 0.6 }
       },
       {
         "id": "delay-1",
@@ -152,7 +152,7 @@
         "name": "Main Mix",
         "position": { "x": 21, "y": 0 },
         "params": {
-          "level1": 0.9, "level2": 0.12,
+          "level1": 1.0, "level2": 0.35,
           "level3": 0, "level4": 0, "level5": 0, "level6": 0, "level7": 0, "level8": 0
         }
       },

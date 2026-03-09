@@ -95,28 +95,28 @@
         "type": "gain",
         "name": "VCA 1",
         "position": { "x": 14, "y": 0 },
-        "params": { "gain": 0.3 }
+        "params": { "gain": 0.9 }
       },
       {
         "id": "gain-2",
         "type": "gain",
         "name": "VCA 2",
         "position": { "x": 14, "y": 3 },
-        "params": { "gain": 0.25 }
+        "params": { "gain": 0.8 }
       },
       {
         "id": "gain-3",
         "type": "gain",
         "name": "VCA 3",
         "position": { "x": 14, "y": 6 },
-        "params": { "gain": 0.35 }
+        "params": { "gain": 1.0 }
       },
       {
         "id": "gain-4",
         "type": "gain",
         "name": "VCA 4",
         "position": { "x": 14, "y": 9 },
-        "params": { "gain": 0.2 }
+        "params": { "gain": 0.7 }
       },
       {
         "id": "mixer-1",
@@ -124,7 +124,7 @@
         "name": "Mixer",
         "position": { "x": 17, "y": 0 },
         "params": {
-          "level1": 0.4, "level2": 0.35, "level3": 0.4, "level4": 0.3,
+          "level1": 1.0, "level2": 0.9, "level3": 1.0, "level4": 0.8,
           "level5": 0, "level6": 0, "level7": 0, "level8": 0
         }
       },
@@ -140,7 +140,7 @@
         "type": "reverb",
         "name": "Reverb",
         "position": { "x": 23, "y": 0 },
-        "params": { "mix": 0.5, "decay": 4.0, "damping": 0.3 }
+        "params": { "mix": 0.35, "decay": 4.0, "damping": 0.3 }
       },
       {
         "id": "out-1",

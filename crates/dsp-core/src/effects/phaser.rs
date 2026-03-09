@@ -104,9 +104,11 @@ impl Phaser {
                 None => in_l,
             };
 
-            // Process allpass chain
-            let mut proc_l = in_l + self.allpass_l[3] * feedback;
-            let mut proc_r = in_r + self.allpass_r[3] * feedback;
+            // Process allpass chain (soft-clip feedback to prevent runaway)
+            let fb_l = (self.allpass_l[3] * feedback).clamp(-1.0, 1.0);
+            let fb_r = (self.allpass_r[3] * feedback).clamp(-1.0, 1.0);
+            let mut proc_l = in_l + fb_l;
+            let mut proc_r = in_r + fb_r;
 
             for stage in 0..4 {
                 let freq = base_freqs[stage] * mod_amount;
@@ -116,8 +118,8 @@ impl Phaser {
             }
 
             let dry = 1.0 - mix;
-            out_l[i] = in_l * dry + proc_l * mix;
-            out_r[i] = in_r * dry + proc_r * mix;
+            out_l[i] = in_l * dry + proc_l.tanh() * mix;
+            out_r[i] = in_r * dry + proc_r.tanh() * mix;
         }
     }
 }

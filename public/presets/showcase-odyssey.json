@@ -109,13 +109,13 @@
       { "from": { "moduleId": "polyseq-1", "portId": "gate-4" }, "to": { "moduleId": "bass-1", "portId": "gate" }, "kind": "gate" },
 
       { "from": { "moduleId": "drumseq-1", "portId": "gate-kick" }, "to": { "moduleId": "kick-1", "portId": "trigger" }, "kind": "gate" },
-      { "from": { "moduleId": "drumseq-1", "portId": "accent-kick" }, "to": { "moduleId": "kick-1", "portId": "accent" }, "kind": "cv" },
+      { "from": { "moduleId": "drumseq-1", "portId": "acc-kick" }, "to": { "moduleId": "kick-1", "portId": "accent" }, "kind": "cv" },
       { "from": { "moduleId": "drumseq-1", "portId": "gate-snare" }, "to": { "moduleId": "snare-1", "portId": "trigger" }, "kind": "gate" },
-      { "from": { "moduleId": "drumseq-1", "portId": "accent-snare" }, "to": { "moduleId": "snare-1", "portId": "accent" }, "kind": "cv" },
+      { "from": { "moduleId": "drumseq-1", "portId": "acc-snare" }, "to": { "moduleId": "snare-1", "portId": "accent" }, "kind": "cv" },
       { "from": { "moduleId": "drumseq-1", "portId": "gate-hhc" }, "to": { "moduleId": "hihat-1", "portId": "trigger" }, "kind": "gate" },
       { "from": { "moduleId": "drumseq-1", "portId": "accent-hhc" }, "to": { "moduleId": "hihat-1", "portId": "accent" }, "kind": "cv" },
       { "from": { "moduleId": "drumseq-1", "portId": "gate-clap" }, "to": { "moduleId": "clap-1", "portId": "trigger" }, "kind": "gate" },
-      { "from": { "moduleId": "drumseq-1", "portId": "accent-clap" }, "to": { "moduleId": "clap-1", "portId": "accent" }, "kind": "cv" },
+      { "from": { "moduleId": "drumseq-1", "portId": "acc-clap" }, "to": { "moduleId": "clap-1", "portId": "accent" }, "kind": "cv" },
 
       { "from": { "moduleId": "turing-1", "portId": "cv" }, "to": { "moduleId": "quant-1", "portId": "in" }, "kind": "cv" },
       { "from": { "moduleId": "quant-1", "portId": "out" }, "to": { "moduleId": "swarm-1", "portId": "pitch" }, "kind": "cv" },

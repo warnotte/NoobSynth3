@@ -64,7 +64,7 @@
         "name": "Pad Mix",
         "position": { "x": 9, "y": 0 },
         "params": {
-          "level1": 0.25, "level2": 0.25, "level3": 0.25, "level4": 0.25,
+          "level1": 0.7, "level2": 0.7, "level3": 0.7, "level4": 0.7,
           "level5": 0, "level6": 0, "level7": 0, "level8": 0
         }
       },
@@ -73,14 +73,14 @@
         "type": "gain",
         "name": "Pad VCA",
         "position": { "x": 12, "y": 0 },
-        "params": { "gain": 0.3 }
+        "params": { "gain": 0.9 }
       },
       {
         "id": "vcf-1",
         "type": "vcf",
         "name": "VCF",
         "position": { "x": 15, "y": 0 },
-        "params": { "cutoff": 900, "resonance": 0.25, "model": "svf", "mode": "lp", "slope": 24 }
+        "params": { "cutoff": 1350, "resonance": 0.25, "model": "svf", "mode": "lp", "slope": 12 }
       },
       {
         "id": "lfo-1",
@@ -101,7 +101,7 @@
         "type": "reverb",
         "name": "Reverb",
         "position": { "x": 21, "y": 0 },
-        "params": { "mix": 0.45, "decay": 3.5, "damping": 0.35 }
+        "params": { "mix": 0.35, "decay": 3.5, "damping": 0.35 }
       },
       {
         "id": "out-1",

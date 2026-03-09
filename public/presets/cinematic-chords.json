@@ -64,7 +64,7 @@
         "name": "Pad Mix",
         "position": { "x": 9, "y": 0 },
         "params": {
-          "level1": 0.2, "level2": 0.2, "level3": 0.2, "level4": 0.2,
+          "level1": 0.6, "level2": 0.6, "level3": 0.6, "level4": 0.6,
           "level5": 0, "level6": 0, "level7": 0, "level8": 0
         }
       },
@@ -73,14 +73,14 @@
         "type": "gain",
         "name": "Pad VCA",
         "position": { "x": 12, "y": 0 },
-        "params": { "gain": 0.25 }
+        "params": { "gain": 0.8 }
       },
       {
         "id": "vcf-pad",
         "type": "vcf",
         "name": "Pad Filter",
         "position": { "x": 15, "y": 0 },
-        "params": { "cutoff": 700, "resonance": 0.2, "model": "svf", "mode": "lp", "slope": 24 }
+        "params": { "cutoff": 1050, "resonance": 0.2, "model": "svf", "mode": "lp", "slope": 12 }
       },
       {
         "id": "lfo-filt",
@@ -149,7 +149,7 @@
         "name": "String Mix",
         "position": { "x": 9, "y": 8 },
         "params": {
-          "level1": 0.3, "level2": 0.3, "level3": 0.3, "level4": 0.3,
+          "level1": 0.8, "level2": 0.8, "level3": 0.8, "level4": 0.8,
           "level5": 0, "level6": 0, "level7": 0, "level8": 0
         }
       },
@@ -180,14 +180,14 @@
         "type": "vcf",
         "name": "Bass Filter",
         "position": { "x": 9, "y": 16 },
-        "params": { "cutoff": 400, "resonance": 0.3, "model": "svf", "mode": "lp", "slope": 24 }
+        "params": { "cutoff": 600, "resonance": 0.3, "model": "svf", "mode": "lp", "slope": 12 }
       },
       {
         "id": "gain-bass",
         "type": "gain",
         "name": "Bass Vol",
         "position": { "x": 12, "y": 16 },
-        "params": { "gain": 0.3 }
+        "params": { "gain": 0.9 }
       },
 
       {
@@ -196,7 +196,7 @@
         "name": "Main Mix",
         "position": { "x": 21, "y": 0 },
         "params": {
-          "level1": 0.7, "level2": 0.45, "level3": 0.35,
+          "level1": 1.0, "level2": 1.0, "level3": 0.9,
           "level4": 0, "level5": 0, "level6": 0, "level7": 0, "level8": 0
         }
       },
@@ -205,7 +205,7 @@
         "type": "reverb",
         "name": "Reverb",
         "position": { "x": 24, "y": 0 },
-        "params": { "mix": 0.45, "decay": 4.0, "damping": 0.3 }
+        "params": { "mix": 0.35, "decay": 4.0, "damping": 0.3 }
       },
       {
         "id": "out-1",

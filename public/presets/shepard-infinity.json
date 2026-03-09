@@ -300,11 +300,11 @@
         "id": "mix1",
         "type": "mixer-1x2",
         "params": {
-          "levelA": 0.35,
-          "levelB": 0.3,
-          "levelC": 0.28,
-          "levelD": 0.22,
-          "levelE": 0.15,
+          "levelA": 0.7,
+          "levelB": 0.6,
+          "levelC": 0.56,
+          "levelD": 0.44,
+          "levelE": 0.3,
           "levelF": 0.3
         },
         "position": {
@@ -317,7 +317,7 @@
         "id": "vcf1",
         "type": "vcf",
         "params": {
-          "cutoff": 2000,
+          "cutoff": 3000,
           "resonance": 0.35,
           "drive": 0.15,
           "envAmount": 0,
@@ -325,7 +325,7 @@
           "keyTrack": 0,
           "model": "svf",
           "mode": "lp",
-          "slope": 24
+          "slope": 12
         },
         "position": {
           "col": 9,
@@ -374,7 +374,7 @@
           "time": 12,
           "damp": 0.25,
           "preDelay": 0.1,
-          "mix": 0.6
+          "mix": 0.35
         },
         "position": {
           "col": 15,

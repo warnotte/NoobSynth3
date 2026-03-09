@@ -67,28 +67,28 @@
         "type": "gain",
         "name": "Lead Vol",
         "position": { "x": 11, "y": 0 },
-        "params": { "gain": 0.25 }
+        "params": { "gain": 0.8 }
       },
       {
         "id": "gain-bass",
         "type": "gain",
         "name": "Bass Vol",
         "position": { "x": 11, "y": 3 },
-        "params": { "gain": 0.35 }
+        "params": { "gain": 1.0 }
       },
       {
         "id": "gain-high",
         "type": "gain",
         "name": "High Vol",
         "position": { "x": 11, "y": 6 },
-        "params": { "gain": 0.15 }
+        "params": { "gain": 0.5 }
       },
       {
         "id": "gain-perc",
         "type": "gain",
         "name": "Perc Vol",
         "position": { "x": 11, "y": 9 },
-        "params": { "gain": 0.2 }
+        "params": { "gain": 0.7 }
       },
       {
         "id": "drumseq-1",
@@ -145,7 +145,7 @@
         "type": "mixer-1x2",
         "name": "Drum Mix",
         "position": { "x": 18, "y": 12 },
-        "params": { "levelA": 0.5, "levelB": 0.35, "levelC": 0.2, "levelD": 0.3, "levelE": 0.25, "levelF": 0.6 }
+        "params": { "levelA": 1.0, "levelB": 0.7, "levelC": 0.4, "levelD": 0.6, "levelE": 0.5, "levelF": 0.6 }
       },
       {
         "id": "mixer-main",
@@ -153,7 +153,7 @@
         "name": "Main Mix",
         "position": { "x": 15, "y": 0 },
         "params": {
-          "level1": 0.4, "level2": 0.5, "level3": 0.2, "level4": 0.2, "level5": 0.35,
+          "level1": 1.0, "level2": 1.0, "level3": 0.6, "level4": 0.6, "level5": 0.9,
           "level6": 0, "level7": 0, "level8": 0
         }
       },
