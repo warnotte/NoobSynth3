@@ -886,4 +886,7 @@ pub enum ModuleState {
     Control(ControlState),
     Scope,
     Notes,
+
+    /// Placeholder used during state transfer (never used in processing)
+    Empty,
 }

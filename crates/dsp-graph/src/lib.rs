@@ -106,6 +106,14 @@ impl GraphEngine {
     Ok(())
   }
 
+  /// Set graph with fresh state (no preservation). Used for preset switches.
+  pub fn set_graph_json_fresh(&mut self, payload: &str) -> Result<(), String> {
+    let graph: GraphPayload =
+      serde_json::from_str(payload).map_err(|err| format!("Invalid graph JSON: {err}"))?;
+    self.set_graph_fresh(graph);
+    Ok(())
+  }
+
   pub fn set_param(&mut self, module_id: &str, param: &str, value: f32) {
     if let Some(indices) = self.module_map.get(module_id) {
       for &index in indices {
@@ -551,17 +559,31 @@ impl GraphEngine {
   }
 
   fn set_graph(&mut self, graph: GraphPayload) {
+    self.set_graph_inner(graph, true);
+  }
+
+  fn set_graph_fresh(&mut self, graph: GraphPayload) {
+    self.set_graph_inner(graph, false);
+  }
+
+  fn set_graph_inner(&mut self, graph: GraphPayload, preserve_state: bool) {
     let voice_count = resolve_voice_count(&graph.modules);
     self.voice_count = voice_count;
 
-    // Preserve sequencer state before clearing (keyed by module_id + voice_index)
-    let mut saved_sequencer_ticks: HashMap<(String, Option<usize>), f64> = HashMap::new();
-    for (module_id, indices) in &self.module_map {
-      for &idx in indices {
-        if let ModuleState::MidiFileSequencer(ref state) = self.modules[idx].state {
-          let voice = self.modules[idx].voice_index;
-          let tick = state.seq.current_tick_precise();
-          saved_sequencer_ticks.insert((module_id.clone(), voice), tick);
+    // Save all module states keyed by (module_id, voice_index, module_type)
+    let mut saved_states: HashMap<(String, Option<usize>), (ModuleType, ModuleState)> = HashMap::new();
+    if preserve_state {
+      for (module_id, indices) in &self.module_map {
+        for &idx in indices {
+          let node = &self.modules[idx];
+          // Use std::mem::replace to take ownership without Clone
+          saved_states.insert(
+            (module_id.clone(), node.voice_index),
+            (node.module_type, std::mem::replace(
+              &mut self.modules[idx].state,
+              ModuleState::Empty,
+            )),
+          );
         }
       }
     }
@@ -581,18 +603,18 @@ impl GraphEngine {
       let is_poly = is_poly_type(module_type);
       let instance_count = if is_poly { voice_count } else { 1 };
       for voice_index in 0..instance_count {
+        let voice = if is_poly { Some(voice_index) } else { None };
         let mut node = ModuleNode::new(
           module_type,
-          if is_poly { Some(voice_index) } else { None },
+          voice,
           &params,
           self.sample_rate,
         );
 
-        // Restore sequencer state if we have saved state for this module
-        if let ModuleState::MidiFileSequencer(ref mut state) = node.state {
-          let voice = if is_poly { Some(voice_index) } else { None };
-          if let Some(&tick) = saved_sequencer_ticks.get(&(module.id.clone(), voice)) {
-            state.seq.set_current_tick_precise(tick);
+        // Restore state if same module id + same type still exists
+        if let Some((saved_type, saved_state)) = saved_states.remove(&(module.id.clone(), voice)) {
+          if saved_type == module_type {
+            node.state = saved_state;
           }
         }
 

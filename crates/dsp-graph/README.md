@@ -83,8 +83,11 @@ use dsp_graph::GraphEngine;
 
 let mut engine = GraphEngine::new(44100.0);
 
-// Charger le graphe
+// Charger le graphe (préserve l'état des modules existants)
 engine.set_graph_json(json_string)?;
+
+// Charger le graphe (état frais, pour changement de preset)
+engine.set_graph_json_fresh(json_string)?;
 
 // Modifier un paramètre
 engine.set_param("vco-1", "frequency", 880.0);

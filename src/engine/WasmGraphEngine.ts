@@ -34,7 +34,7 @@ export class AudioEngine {
 
   async start(graph: GraphState): Promise<void> {
     await this.init()
-    this.loadGraph(graph)
+    this.loadGraph(graph, true)
     await this.context?.resume()
   }
 
@@ -149,6 +149,11 @@ export class AudioEngine {
     }
     this.currentGraph = { ...this.currentGraph, connections }
     this.sendGraph()
+  }
+
+  /** Update graph while preserving existing module states (for add/remove module). */
+  updateGraph(graph: GraphState): void {
+    this.loadGraph(graph)
   }
 
   setParam(moduleId: string, paramId: string, value: number | string | boolean): void {
@@ -467,7 +472,7 @@ export class AudioEngine {
     this.workletsLoaded = true
   }
 
-  private loadGraph(graph: GraphState): void {
+  private loadGraph(graph: GraphState, fresh = false): void {
     this.currentGraph = graph
     const tapOutputs = this.buildTapOutputs(graph.modules)
     const needsReset =
@@ -483,7 +488,7 @@ export class AudioEngine {
       this.createGraphNode()
     }
 
-    this.sendGraph()
+    this.sendGraph(fresh)
   }
 
   private createGraphNode(): void {
@@ -672,7 +677,7 @@ export class AudioEngine {
     return true
   }
 
-  private sendGraph(): void {
+  private sendGraph(fresh = false): void {
     if (!this.graphNode || !this.currentGraph) {
       return
     }
@@ -682,7 +687,7 @@ export class AudioEngine {
       taps: this.tapOutputs,
     }
     this.graphNode.port.postMessage({
-      type: 'setGraph',
+      type: fresh ? 'setGraphFresh' : 'setGraph',
       graphJson: JSON.stringify(payload),
     })
   }

@@ -2171,8 +2171,8 @@ pub(crate) fn process_module(
             };
             state.seq.process_block(poly_outputs, poly_inputs, params);
         }
-        ModuleState::Notes => {
-            // UI-only module, no audio processing
+        ModuleState::Notes | ModuleState::Empty => {
+            // UI-only module / placeholder, no audio processing
         }
     }
 }

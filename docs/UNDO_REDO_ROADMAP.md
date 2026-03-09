@@ -161,7 +161,7 @@ const { undo, redo } = useUndoableState(graph, {
 
 ### 3.4 Changements structurels vs paramètres
 
-**Problème** : Ajouter/supprimer un module nécessite un restart de l'engine, pas juste un setParam.
+**Note** : Depuis le refactor graph update, ajouter/supprimer un module utilise `engine.updateGraph()` (mise à jour incrémentale, préserve les états des modules existants). Seul le changement de preset fait un full restart via `queueEngineRestart()`.
 
 **Solution** : Détecter le type de changement dans `onHistoryChange`
 ```typescript
@@ -170,8 +170,8 @@ onHistoryChange: (newGraph, prevGraph) => {
     // Juste des params → syncEngineParams()
     syncEngineParams(newGraph)
   } else {
-    // Structure changée → queueEngineRestart()
-    queueEngineRestart(newGraph)
+    // Structure changée → engine.updateGraph() (préserve état)
+    engine.updateGraph(newGraph)
   }
 }
 ```

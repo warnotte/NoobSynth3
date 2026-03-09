@@ -22,6 +22,12 @@ impl WasmGraphEngine {
       .map_err(|err| JsValue::from_str(&err))
   }
 
+  pub fn set_graph_fresh(&mut self, graph_json: &str) -> Result<(), JsValue> {
+    self.engine
+      .set_graph_json_fresh(graph_json)
+      .map_err(|err| JsValue::from_str(&err))
+  }
+
   pub fn set_param(&mut self, module_id: &str, param_id: &str, value: f32) {
     self.engine.set_param(module_id, param_id, value);
   }

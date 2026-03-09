@@ -2066,7 +2066,11 @@ function App() {
     resetPatching()
     graphRef.current = nextGraph
     setGraph(nextGraph)
-    queueEngineRestart(nextGraph)
+    // Incremental update: preserve existing module states
+    if (statusRef.current === 'running') {
+      engine.updateGraph(nextGraph)
+      activeVoiceCountRef.current = getVoiceCountFromGraph(nextGraph)
+    }
     // Clear preset tracking when graph is modified
     if (currentPresetId) {
       setCurrentPresetId(null)

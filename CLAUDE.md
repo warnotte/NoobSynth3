@@ -277,6 +277,25 @@ Les drums 909 utilisent un mécanisme de "latching" pour l'accent:
 - Stocké dans `latched_accent` et utilisé pendant toute la durée du son
 - Évite les glitches si l'accent CV change pendant que le son joue
 
+### Graph Update Modes (IMPORTANT)
+
+Le graph engine supporte deux modes de mise à jour :
+
+| Mode | Rust | JS | Quand |
+|------|------|----|-------|
+| **Preserve** | `set_graph()` | `engine.updateGraph()` | Ajout/suppression de module, connexions, layout |
+| **Fresh** | `set_graph_fresh()` | `engine.start()` via `queueEngineRestart()` | Changement de preset |
+
+**Preserve** : Sauvegarde les états de tous les modules existants (par `module_id` + `voice_index`). Si un module existe encore avec le même type, son état DSP est restauré (séquenceurs gardent leur position, effets gardent leurs tails, etc.). Les nouveaux modules sont créés fresh.
+
+**Fresh** : Détruit tout et recrée from scratch. Utilisé uniquement pour les presets afin d'éviter les fuites d'état (reverb tails, compressor envelopes d'un ancien preset).
+
+**Fichiers clés :**
+- `crates/dsp-graph/src/lib.rs` : `set_graph_inner(graph, preserve_state)`
+- `src/App.tsx` : `applyGraphUpdate()` (preserve) vs `applyPreset()` → `queueEngineRestart()` (fresh)
+- `src/engine/WasmGraphEngine.ts` : `updateGraph()` (preserve) vs `start()` (fresh)
+- `src/engine/worklets/wasm-graph-processor.ts` : messages `setGraph` vs `setGraphFresh`
+
 ### Sequencer Playhead Sync
 - Les séquenceurs (Step, Drum) exposent `current_step()` côté Rust
 - L'AudioWorklet poll `get_sequencer_step()` toutes les ~20ms
@@ -576,7 +595,9 @@ Les port IDs dans les presets doivent correspondre **exactement** à ceux défin
 | Mixers perdent la stéréo | Mixers ne traitaient que `channel(0)` | Méthodes `process_block_stereo` + `channels_mut_2()` pour L/R |
 | Mixer gain staging trop faible | Mixer 2ch: toujours `÷2`. Multi-ch: `÷N`. Perte de volume excessive | Tous les mixers: `÷√N` (sommation de puissance, standard DAW) |
 | Reverb wet trop atténuée | `input_gain=0.35 × wet_scale=0.3 = ×0.105` | `input_gain=0.5 × wet_scale=0.5 = ×0.25` (2.4× plus fort) |
-| Presets Showcase/Chord trop faibles | Accumulation d'atténuations (gain×mixer×VCF×reverb) | Recalibrage gains, mixer levels, VCF cutoff sur Ambient et Odyssey |
+| Presets Showcase/Chord trop faibles | Accumulation d'atténuations (gain×mixer×VCF×reverb) | Recalibrage gains, mixer levels, VCF cutoff sur 15 presets |
+| Phaser feedback runaway | Feedback pris depuis l'état interne allpass (croissance infinie) | Feedback via sortie bornée par `tanh()` avant réinjection |
+| Ajout module = full restart | `applyGraphUpdate()` appelait `queueEngineRestart()` pour tout changement | Update incrémental (`set_graph` preserve state), full restart uniquement pour presets (`set_graph_fresh`) |
 
 ---
 

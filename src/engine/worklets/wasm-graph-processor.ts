@@ -42,6 +42,7 @@ const decodeWasmDataUrl = (dataUrl: string) => {
 
 type GraphMessage =
   | { type: 'setGraph'; graphJson: string }
+  | { type: 'setGraphFresh'; graphJson: string }
   | { type: 'setParam'; moduleId: string; paramId: string; value: number }
   | { type: 'setParamString'; moduleId: string; paramId: string; value: string }
   | { type: 'controlVoiceCv'; moduleId: string; voice: number; value: number }
@@ -94,10 +95,14 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
 
   private queueMessage(message: GraphMessage) {
     // setGraph is handled immediately (before engine is used in process)
-    if (message.type === 'setGraph') {
+    if (message.type === 'setGraph' || message.type === 'setGraphFresh') {
       if (this.ready && this.engine) {
         try {
-          this.engine.set_graph(message.graphJson)
+          if (message.type === 'setGraphFresh') {
+            this.engine.set_graph_fresh(message.graphJson)
+          } else {
+            this.engine.set_graph(message.graphJson)
+          }
         } catch (error) {
           console.error('WASM set_graph error:', error)
         }
