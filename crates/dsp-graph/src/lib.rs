@@ -254,6 +254,21 @@ impl GraphEngine {
     -1
   }
 
+  /// Get meter peak levels as [peak_l, peak_r] encoded in a single u32.
+  /// High 16 bits = left (0..10000 = 0.0..1.0), low 16 bits = right.
+  pub fn get_meter_level(&self, module_id: &str) -> u32 {
+    if let Some(index) = self.module_map.get(module_id).and_then(|list| list.first()) {
+      if let Some(module) = self.modules.get(*index) {
+        if let ModuleState::Meter(state) = &module.state {
+          let l = (state.peak_l.clamp(0.0, 2.0) * 10000.0) as u32;
+          let r = (state.peak_r.clamp(0.0, 2.0) * 10000.0) as u32;
+          return (l << 16) | r;
+        }
+      }
+    }
+    0
+  }
+
   /// Get total ticks for a MIDI file sequencer module
   /// Returns 0 if module not found or not a MIDI file sequencer
   pub fn get_midi_total_ticks(&self, module_id: &str) -> i32 {
@@ -818,6 +833,7 @@ fn normalize_module_type(raw: &str) -> ModuleType {
     "compressor" => ModuleType::Compressor,
     "control" => ModuleType::Control,
     "scope" => ModuleType::Scope,
+    "meter" => ModuleType::Meter,
     "mario" => ModuleType::Mario,
     "arpeggiator" => ModuleType::Arpeggiator,
     "step-sequencer" => ModuleType::StepSequencer,

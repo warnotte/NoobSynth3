@@ -2171,6 +2171,21 @@ pub(crate) fn process_module(
             };
             state.seq.process_block(poly_outputs, poly_inputs, params);
         }
+        ModuleState::Meter(state) => {
+            // Track peak amplitude from stereo input
+            let left = inputs[0].channel(0);
+            let right = inputs[0].channel(1);
+            let mut peak_l = 0.0_f32;
+            let mut peak_r = 0.0_f32;
+            for i in 0..left.len() {
+                peak_l = peak_l.max(left[i].abs());
+                peak_r = peak_r.max(right[i].abs());
+            }
+            // Smooth decay (~20dB/s at 44100 Hz / 128 block)
+            let decay = 0.95_f32;
+            state.peak_l = (state.peak_l * decay).max(peak_l);
+            state.peak_r = (state.peak_r * decay).max(peak_r);
+        }
         ModuleState::Notes | ModuleState::Empty => {
             // UI-only module / placeholder, no audio processing
         }

@@ -98,6 +98,7 @@ pub enum ModuleType {
     Lab,
     AudioIn,
     Scope,
+    Meter,
     Notes,
 }
 

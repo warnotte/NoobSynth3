@@ -853,7 +853,7 @@ Multiplication de deux signaux audio.
 **Entrées** : in-a (audio), in-b (audio)  
 **Sorties** : out (audio)
 
-### Mixer 1x1
+### Mixer 2ch (mixer)
 
 Mixe deux sources avec niveaux réglables.
 
@@ -862,10 +862,10 @@ Mixe deux sources avec niveaux réglables.
 | `levelA` | 0-1 | Niveau entrée A |
 | `levelB` | 0-1 | Niveau entrée B |
 
-**Entrées** : in-a (audio), in-b (audio)  
+**Entrées** : in-a (audio), in-b (audio)
 **Sorties** : out (audio)
 
-### Mixer 1x2
+### Mixer 6ch (mixer-1x2)
 
 Mixe jusqu'à 6 sources.
 
@@ -873,8 +873,30 @@ Mixe jusqu'à 6 sources.
 |-----------|-------|-------------|
 | `levelA-F` | 0-1 | Niveau pour chaque entrée |
 
-**Entrées** : in-a, in-b, in-c, in-d, in-e, in-f (audio)  
+**Entrées** : in-a, in-b, in-c, in-d, in-e, in-f (audio)
 **Sorties** : out (audio)
+
+### Mixer 8ch (mixer-8)
+
+Mixe jusqu'à 8 sources.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `level1-8` | 0-1 | Niveau pour chaque entrée |
+
+**Entrées** : in-1, in-2, ..., in-8 (audio)
+**Sorties** : out (audio)
+
+### Gain Staging des Mixeurs
+
+Tous les mixeurs utilisent une **sommation de puissance** : la sortie est divisée par `√N` (N = nombre d'entrées connectées). Cette formule est le standard DAW et préserve mieux le volume perçu que la division linéaire `1/N`.
+
+| Entrées connectées | Atténuation |
+|--------------------|-------------|
+| 1 | ×1.0 (0 dB) |
+| 2 | ×0.71 (-3 dB) |
+| 4 | ×0.5 (-6 dB) |
+| 8 | ×0.35 (-9 dB) |
 
 ### Scope
 

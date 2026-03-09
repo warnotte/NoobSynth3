@@ -13,6 +13,7 @@ import { ControlModuleControls } from './ControlModuleControls'
 import { ScopeControls } from './ScopeControls'
 import { LabControls } from './LabControls'
 import { NotesControls } from './NotesControls'
+import { MeterControls } from './MeterControls'
 
 export function renderIOControls(props: ControlProps): React.ReactElement | null {
   const { module } = props
@@ -30,6 +31,8 @@ export function renderIOControls(props: ControlProps): React.ReactElement | null
       return <LabControls {...props} />
     case 'notes':
       return <NotesControls {...props} />
+    case 'meter':
+      return <MeterControls {...props} />
     default:
       return null
   }

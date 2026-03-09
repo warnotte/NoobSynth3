@@ -28,6 +28,7 @@ export type ModuleType =
   | 'control'
   | 'adsr'
   | 'scope'
+  | 'meter'
   | 'vcf'
   | 'hpf'
   | 'mixer'

@@ -90,6 +90,11 @@ impl WasmGraphEngine {
     self.engine.get_sequencer_step(module_id)
   }
 
+  /// Get meter peak levels packed as u32 (high16=left, low16=right)
+  pub fn get_meter_level(&self, module_id: &str) -> u32 {
+    self.engine.get_meter_level(module_id)
+  }
+
   /// Get total ticks for a MIDI file sequencer module
   /// Returns 0 if module not found or not a MIDI file sequencer
   pub fn get_midi_total_ticks(&self, module_id: &str) -> i32 {

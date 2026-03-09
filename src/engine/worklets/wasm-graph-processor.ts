@@ -69,6 +69,7 @@ type GraphMessage =
   | { type: 'watchAyVoices'; moduleIds: string[] }
   | { type: 'watchParticles'; moduleIds: string[] }
   | { type: 'loadParticleBuffer'; moduleId: string; data: number[] }
+  | { type: 'watchMeters'; moduleIds: string[] }
 
 class WasmGraphProcessor extends AudioWorkletProcessor {
   private engine: InstanceType<NonNullable<typeof WasmGraphEngine>> | null = null
@@ -84,6 +85,7 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
   private watchedSids: string[] = []
   private watchedAys: string[] = []
   private watchedParticles: string[] = []
+  private watchedMeters: string[] = []
   private debugCounter = 0
   private messageQueue: GraphMessage[] = []
 
@@ -136,6 +138,10 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
     }
     if (message.type === 'watchParticles') {
       this.watchedParticles = message.moduleIds
+      return
+    }
+    if (message.type === 'watchMeters') {
+      this.watchedMeters = message.moduleIds
       return
     }
     // Queue other messages to be processed in process() before render()
@@ -389,6 +395,18 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
             positions: Array.from(positions),
           })
         }
+      }
+    }
+
+    if (shouldPoll && this.watchedMeters.length > 0) {
+      for (const moduleId of this.watchedMeters) {
+        const packed = this.engine.get_meter_level(moduleId)
+        this.port.postMessage({
+          type: 'meterLevel',
+          moduleId,
+          peakL: ((packed >>> 16) & 0xffff) / 10000,
+          peakR: (packed & 0xffff) / 10000,
+        })
       }
     }
 

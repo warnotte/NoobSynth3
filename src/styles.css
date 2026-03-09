@@ -4506,3 +4506,90 @@ textarea:focus-visible,
   font-size: 9px;
   opacity: 0.5;
 }
+
+/* ── Meter ─────────────────────────────────────────────────────── */
+.meter-controls {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 2px;
+}
+.meter-display {
+  display: flex;
+  gap: 2px;
+  height: 120px;
+}
+.meter-ticks {
+  position: relative;
+  width: 22px;
+  font-size: 7px;
+  color: #555;
+  flex-shrink: 0;
+}
+.meter-tick {
+  position: absolute;
+  right: 3px;
+  transform: translateY(50%);
+  line-height: 1;
+  white-space: nowrap;
+}
+.meter-tick-zero {
+  color: #999;
+  font-weight: bold;
+}
+.meter-bars {
+  flex: 1;
+  display: flex;
+  gap: 3px;
+  max-width: 60px;
+}
+.meter-channel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.meter-bar-bg {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  background: #0a0a0a;
+  border: 1px solid #2a2a2a;
+  border-radius: 2px;
+  position: relative;
+  overflow: hidden;
+}
+.meter-bar-segment {
+  position: absolute;
+  left: 1px;
+  right: 1px;
+  opacity: 0.9;
+}
+.meter-zero-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #666;
+  pointer-events: none;
+}
+.meter-label {
+  font-size: 8px;
+  color: #777;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+.meter-readout {
+  display: flex;
+  justify-content: space-around;
+  font-size: 9px;
+  font-family: monospace;
+  color: #aaa;
+  text-align: center;
+}
+.meter-clip {
+  color: #f44;
+  font-weight: bold;
+}

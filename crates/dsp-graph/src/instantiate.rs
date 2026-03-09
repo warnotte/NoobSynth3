@@ -291,6 +291,7 @@ pub(crate) fn create_state(
       sample_rate,
     }),
     ModuleType::Scope => ModuleState::Scope,
+    ModuleType::Meter => ModuleState::Meter(MeterState { peak_l: 0.0, peak_r: 0.0 }),
     ModuleType::Mario => ModuleState::Mario(MarioState {
       mario: Mario::new(),
     }),

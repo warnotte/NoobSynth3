@@ -245,6 +245,12 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
       { id: 'out-b', label: 'B', kind: 'audio', direction: 'out' },
     ],
   },
+  meter: {
+    inputs: [
+      { id: 'in', label: 'In', kind: 'audio', direction: 'in' },
+    ],
+    outputs: [],
+  },
   lab: {
     inputs: [
       { id: 'in-a', label: 'In A', kind: 'audio', direction: 'in' },

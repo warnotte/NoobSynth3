@@ -31,6 +31,8 @@ export class AudioEngine {
   private watchedAys: Set<string> = new Set()
   private particlePositionCallbacks: Map<string, (positions: Float32Array, activeCount: number) => void> = new Map()
   private watchedParticles: Set<string> = new Set()
+  private meterCallbacks: Map<string, (peakL: number, peakR: number) => void> = new Map()
+  private watchedMeters: Set<string> = new Set()
 
   async start(graph: GraphState): Promise<void> {
     await this.init()
@@ -342,6 +344,28 @@ export class AudioEngine {
     })
   }
 
+  watchMeter(
+    moduleId: string,
+    callback: (peakL: number, peakR: number) => void,
+  ): () => void {
+    this.meterCallbacks.set(moduleId, callback)
+    this.watchedMeters.add(moduleId)
+    this.syncWatchedMeters()
+
+    return () => {
+      this.meterCallbacks.delete(moduleId)
+      this.watchedMeters.delete(moduleId)
+      this.syncWatchedMeters()
+    }
+  }
+
+  private syncWatchedMeters(): void {
+    this.graphNode?.port.postMessage({
+      type: 'watchMeters',
+      moduleIds: Array.from(this.watchedMeters),
+    })
+  }
+
   loadParticleBuffer(moduleId: string, data: Float32Array): Promise<number> {
     return new Promise((resolve) => {
       this.graphNode?.port.postMessage({
@@ -517,7 +541,7 @@ export class AudioEngine {
 
     // Listen for messages from the worklet
     this.graphNode.port.onmessage = (event) => {
-      const data = event.data as { type: string; steps?: Record<string, number>; positions?: Record<string, number> | number[]; data?: number[]; voices?: Record<string, number[]>; elapsed?: Record<string, number>; moduleId?: string }
+      const data = event.data as { type: string; steps?: Record<string, number>; positions?: Record<string, number> | number[]; data?: number[]; voices?: Record<string, number[]>; elapsed?: Record<string, number>; moduleId?: string; peakL?: number; peakR?: number }
       if (data.type === 'sequencerSteps' && data.steps) {
         // Debug: log incoming step updates (throttled)
         const stepEntries = Object.entries(data.steps)
@@ -565,11 +589,15 @@ export class AudioEngine {
       } else if (data.type === 'particlePositions' && data.moduleId) {
         const callback = this.particlePositionCallbacks.get(data.moduleId)
         if (callback && data.positions) {
-          // Positions is [x0, y0, x1, y1, ..., x31, y31, activeCount]
           const posArr = data.positions as number[]
           const positions = new Float32Array(posArr.slice(0, 64))
           const activeCount = posArr[64] ?? 0
           callback(positions, activeCount)
+        }
+      } else if (data.type === 'meterLevel' && data.moduleId) {
+        const callback = this.meterCallbacks.get(data.moduleId)
+        if (callback) {
+          callback(data.peakL as number, data.peakR as number)
         }
       } else if (data.type === 'sidVoiceStates' && data.voices) {
         const elapsedMap = (data.elapsed || {}) as Record<string, number>

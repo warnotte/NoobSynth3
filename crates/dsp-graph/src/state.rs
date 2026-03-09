@@ -786,6 +786,12 @@ pub struct ControlState {
     pub sample_rate: f32,
 }
 
+// -- Meter -------------------------------------------------------------------
+pub struct MeterState {
+    pub peak_l: f32,
+    pub peak_r: f32,
+}
+
 // =============================================================================
 // Module State Enum
 // =============================================================================
@@ -885,6 +891,7 @@ pub enum ModuleState {
     AudioIn(AudioInState),
     Control(ControlState),
     Scope,
+    Meter(MeterState),
     Notes,
 
     /// Placeholder used during state transfer (never used in processing)

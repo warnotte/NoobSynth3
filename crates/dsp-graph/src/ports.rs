@@ -98,6 +98,9 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },
       PortInfo { channels: 1 },
     ],
+    ModuleType::Meter => vec![
+      PortInfo { channels: 2 },  // stereo audio input
+    ],
     ModuleType::Mario => vec![],
     ModuleType::Arpeggiator => vec![
       PortInfo { channels: 1 },  // cv-in
@@ -311,6 +314,7 @@ pub fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },
     ],
     ModuleType::Scope => vec![PortInfo { channels: 2 }, PortInfo { channels: 2 }],
+    ModuleType::Meter => vec![],
     ModuleType::Mario => {
       let mut outputs = Vec::new();
       for _ in 0..5 {
@@ -676,6 +680,10 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
       "in-d" => Some(3),
       _ => None,
     },
+    ModuleType::Meter => match port_id {
+      "in" => Some(0),
+      _ => None,
+    },
     ModuleType::Arpeggiator => match port_id {
       "cv-in" => Some(0),
       "gate-in" => Some(1),
@@ -989,6 +997,9 @@ pub fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize
     ModuleType::Scope => match port_id {
       "out-a" => Some(0),
       "out-b" => Some(1),
+      _ => None,
+    },
+    ModuleType::Meter => match port_id {
       _ => None,
     },
     ModuleType::Mario => match port_id {
