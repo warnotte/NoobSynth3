@@ -26,6 +26,8 @@ pub struct Phaser {
     allpass_l: [f32; 4],
     allpass_r: [f32; 4],
     lfo_phase: f32,
+    feedback_l: f32,
+    feedback_r: f32,
 }
 
 /// Input signals for Phaser.
@@ -56,6 +58,8 @@ impl Phaser {
             allpass_l: [0.0; 4],
             allpass_r: [0.0; 4],
             lfo_phase: 0.0,
+            feedback_l: 0.0,
+            feedback_r: 0.0,
         }
     }
 
@@ -104,11 +108,9 @@ impl Phaser {
                 None => in_l,
             };
 
-            // Process allpass chain (soft-clip feedback to prevent runaway)
-            let fb_l = (self.allpass_l[3] * feedback).clamp(-1.0, 1.0);
-            let fb_r = (self.allpass_r[3] * feedback).clamp(-1.0, 1.0);
-            let mut proc_l = in_l + fb_l;
-            let mut proc_r = in_r + fb_r;
+            // Feedback from previous sample's allpass output (not internal state)
+            let mut proc_l = in_l + self.feedback_l * feedback;
+            let mut proc_r = in_r + self.feedback_r * feedback;
 
             for stage in 0..4 {
                 let freq = base_freqs[stage] * mod_amount;
@@ -117,9 +119,13 @@ impl Phaser {
                 proc_r = Self::allpass(proc_r, coeff, &mut self.allpass_r[stage]);
             }
 
+            // Store bounded output for next sample's feedback
+            self.feedback_l = proc_l.tanh();
+            self.feedback_r = proc_r.tanh();
+
             let dry = 1.0 - mix;
-            out_l[i] = in_l * dry + proc_l.tanh() * mix;
-            out_r[i] = in_r * dry + proc_r.tanh() * mix;
+            out_l[i] = in_l * dry + self.feedback_l * mix;
+            out_r[i] = in_r * dry + self.feedback_r * mix;
         }
     }
 }
