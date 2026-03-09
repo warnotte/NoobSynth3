@@ -65,6 +65,22 @@ Shared UI components:
 └── KeyboardPopup.tsx            # 61-key expanded keyboard modal (React Portal)
 ```
 
+## Cable & Port Colors
+
+Câbles et jacks sont colorés par type de signal :
+
+| Type | Jack (CSS var) | Couleur | Gradient câble |
+|------|---------------|---------|----------------|
+| Audio | `--accent-cool` | `#5bb6ff` bleu | `#2f7fbe` → `#9cd6ff` |
+| CV | `--accent-mint` | `#42e2b1` menthe/vert | `#1f9c78` → `#7af2c8` |
+| Gate | `--accent-warm` | `#f0b06b` orange | `#c9793a` → `#ffd2a4` |
+| Sync | `--accent-rose` | `#ff6fae` rose | `#ce5b93` → `#ffb7d4` |
+
+**Fichiers clés :**
+- `src/index.css` — variables CSS (`--accent-cool`, `--jack-audio`, etc.)
+- `src/styles.css` — classes `.jack.kind-audio/cv/gate/sync`
+- `src/ui/PatchLayer.tsx` — gradients SVG `cable-audio/cv/gate/sync`
+
 ## UI Dev Tools
 
 - Dev Resize toggle lives in `src/ui/TopBar.tsx` (dev builds only). It enables the resize handle on `ModuleCard` and the resize preview ghost in `RackView`.
