@@ -1477,6 +1477,20 @@
       "description": "130 BPM hard techno: TB-303 acid + full 909 drums + FM synthesis + euclidean patterns + compressor.",
       "file": "showcase-techno.json",
       "group": "Showcase"
+    },
+    {
+      "id": "envelope-follower-test",
+      "name": "Envelope Follower",
+      "description": "Audio envelope controls VCF cutoff via Envelope Follower module.",
+      "file": "envelope-follower-test.json",
+      "group": "Module Tests"
+    },
+    {
+      "id": "bit-crusher-test",
+      "name": "Bit Crusher",
+      "description": "Lo-fi bit crushing with sample rate decimation and delay.",
+      "file": "bit-crusher-test.json",
+      "group": "Module Tests"
     }
   ]
 }

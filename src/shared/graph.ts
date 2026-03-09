@@ -94,6 +94,10 @@ export type ModuleType =
   | 'chord-sequencer'
   // Polyrhythm Sequencer
   | 'polyrhythm-sequencer'
+  // Envelope Follower (audio → CV)
+  | 'envelope-follower'
+  // Bit Crusher (lo-fi effect)
+  | 'bit-crusher'
 
 export interface ModuleSpec {
   id: string

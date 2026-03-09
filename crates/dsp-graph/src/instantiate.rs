@@ -3,8 +3,8 @@
 use std::collections::HashMap;
 
 use dsp_core::{
-  Adsr, Arpeggiator, AyPlayer, Chaos, ChordSequencer, Choir, Chorus, Clap808, Clap909, Compressor, Cowbell808, Delay, DrumSequencer, Ensemble,
-  EuclideanSequencer, FmMatrix, FmOperator, Granular, GranularDelay, HiHat808, HiHat909, Hpf, KarplusStrong,
+  Adsr, Arpeggiator, AyPlayer, BitCrusher, Chaos, ChordSequencer, Choir, Chorus, Clap808, Clap909, Compressor, Cowbell808, Delay, DrumSequencer, Ensemble,
+  EnvelopeFollower, EuclideanSequencer, FmMatrix, FmOperator, Granular, GranularDelay, HiHat808, HiHat909, Hpf, KarplusStrong,
   Kick808, Kick909, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, ParticleCloud, Phaser, PipeOrgan, PitchShifter,
   PolyrhythmSequencer, Resonator, Reverb, Rimshot909, SampleHold, Shepard, SidPlayer, SlewLimiter, Snare808, Snare909, SnesOsc, SpectralSwarm, SpeechSynth,
   SpringReverb, StepSequencer, Supersaw, TapeDelay, Tb303, Tom808, Tom909, TuringMachine, Vcf, Vco, Vocoder, Wavetable,
@@ -55,6 +55,12 @@ pub(crate) fn create_state(
       slew: SlewLimiter::new(sample_rate),
       rise: ParamBuffer::new(param_number(params, "rise", 0.05)),
       fall: ParamBuffer::new(param_number(params, "fall", 0.05)),
+    }),
+    ModuleType::EnvelopeFollower => ModuleState::EnvelopeFollower(EnvelopeFollowerState {
+      envelope_follower: EnvelopeFollower::new(sample_rate),
+      attack: ParamBuffer::new(param_number(params, "attack", 0.01)),
+      release: ParamBuffer::new(param_number(params, "release", 0.1)),
+      gain: ParamBuffer::new(param_number(params, "gain", 1.0)),
     }),
     ModuleType::Quantizer => ModuleState::Quantizer(QuantizerState {
       root: ParamBuffer::new(param_number(params, "root", 0.0)),
@@ -748,6 +754,12 @@ pub(crate) fn create_state(
       makeup: ParamBuffer::new(param_number(params, "makeup", 0.0)),
       mix: ParamBuffer::new(param_number(params, "mix", 1.0)),
     }),
+    ModuleType::BitCrusher => ModuleState::BitCrusher(BitCrusherState {
+      crusher: BitCrusher::new(),
+      bits: ParamBuffer::new(param_number(params, "bits", 8.0)),
+      downsample: ParamBuffer::new(param_number(params, "downsample", 1.0)),
+      mix: ParamBuffer::new(param_number(params, "mix", 1.0)),
+    }),
   }
 }
 
@@ -788,6 +800,12 @@ pub(crate) fn apply_param(state: &mut ModuleState, param: &str, value: f32) {
     ModuleState::Slew(state) => match param {
       "rise" => state.rise.set(value),
       "fall" => state.fall.set(value),
+      _ => {}
+    },
+    ModuleState::EnvelopeFollower(state) => match param {
+      "attack" => state.attack.set(value),
+      "release" => state.release.set(value),
+      "gain" => state.gain.set(value),
       _ => {}
     },
     ModuleState::Quantizer(state) => match param {
@@ -1419,6 +1437,12 @@ pub(crate) fn apply_param(state: &mut ModuleState, param: &str, value: f32) {
       "attack" => state.attack.set(value),
       "release" => state.release.set(value),
       "makeup" => state.makeup.set(value),
+      "mix" => state.mix.set(value),
+      _ => {}
+    },
+    ModuleState::BitCrusher(state) => match param {
+      "bits" => state.bits.set(value),
+      "downsample" => state.downsample.set(value),
       "mix" => state.mix.set(value),
       _ => {}
     },

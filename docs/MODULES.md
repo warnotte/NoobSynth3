@@ -577,8 +577,26 @@ Multiplie deux signaux CV ensemble.
 |-----------|-------|-------------|
 | `gain` | 0-1 | Profondeur |
 
-**Entrées** : in (CV), cv (CV)  
+**Entrées** : in (CV), cv (CV)
 **Sorties** : out (CV)
+
+### Envelope Follower
+
+Convertit l'amplitude d'un signal audio en CV. Utile pour le ducking, l'auto-wah, ou la modulation dynamique.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `attack` | 0.001-0.5s | Temps de montée de l'enveloppe |
+| `release` | 0.001-2s | Temps de descente |
+| `gain` | 0-10 | Amplification du CV de sortie |
+
+**Entrées** : in (audio)
+**Sorties** : out (CV)
+
+Notes :
+- Détection d'enveloppe par lissage exponentiel (coefficients séparés attack/release)
+- CV de sortie clampé à [0, 1] (avant gain)
+- Gain élevé (>2) utile pour les signaux faibles (percussions, chuchotements)
 
 ---
 
@@ -812,6 +830,25 @@ Compresseur de dynamique stéréo avec détection liée.
 - Mix à 50% = compression parallèle (NY compression)
 - Ratio élevé (10:1+) = effet de limiting
 
+### Bit Crusher
+
+Effet lo-fi : réduction de la profondeur de bits et du taux d'échantillonnage.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `bits` | 1-16 | Profondeur de bits (16 = transparent) |
+| `downsample` | 1-64 | Facteur de décimation (1 = pas de réduction) |
+| `mix` | 0-1 | Dry/wet |
+
+**Entrées** : in (audio stéréo)
+**Sorties** : out (audio stéréo)
+
+Notes :
+- Bits < 8 = quantification audible (staircase waveform)
+- Downsample > 4 = aliasing rétro style 8-bit / lo-fi
+- Mix permet le blend parallèle avec le signal propre
+- Combiné avec un VCF en sortie pour adoucir les artefacts
+
 ---
 
 ## Utilitaires
@@ -910,8 +947,22 @@ Visualisation multi-mode style DATA.
 | `freeze` | true/false | Geler l'affichage |
 | `chA-D` | true/false | Activer les canaux |
 
-**Entrées** : in-a (audio), in-b (audio), in-c (CV), in-d (CV)  
+**Entrées** : in-a (audio), in-b (audio), in-c (CV), in-d (CV)
 **Sorties** : out-a (audio), out-b (audio)
+
+### Meter
+
+VU-mètre stéréo avec barres segmentées colorées et indicateur de clip.
+
+**Entrées** : in (audio stéréo)
+**Sorties** : aucune (monitoring uniquement)
+
+Notes :
+- Barres segmentées : vert (-60→-12 dB), jaune (-12→-6), orange (-6→0), rouge (0→+6)
+- Ligne de référence 0 dB
+- Indicateur de clip (rouge) quand le signal dépasse 0 dB
+- Peak decay à 0.95 pour un affichage fluide
+- Polling WASM ~20ms via `get_meter_level()`
 
 ### Lab Panel
 

@@ -831,6 +831,7 @@ fn normalize_module_type(raw: &str) -> ModuleType {
     "distortion" => ModuleType::Distortion,
     "wavefolder" => ModuleType::Wavefolder,
     "compressor" => ModuleType::Compressor,
+    "bit-crusher" => ModuleType::BitCrusher,
     "control" => ModuleType::Control,
     "scope" => ModuleType::Scope,
     "meter" => ModuleType::Meter,
@@ -873,6 +874,7 @@ fn normalize_module_type(raw: &str) -> ModuleType {
     "pitch-shifter" => ModuleType::PitchShifter,
     "clock" => ModuleType::Clock,
     "chaos" => ModuleType::Chaos,
+    "envelope-follower" => ModuleType::EnvelopeFollower,
     "turing-machine" | "turing" => ModuleType::TuringMachine,
     // SID Player
     "sid-player" => ModuleType::SidPlayer,

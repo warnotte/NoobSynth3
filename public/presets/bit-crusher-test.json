@@ -1,0 +1,127 @@
+{
+  "id": "bit-crusher-test",
+  "name": "Bit Crusher Test",
+  "description": "Lo-fi bit crushing with LFO-modulated downsample rate.",
+  "group": "Module Tests",
+  "graph": {
+    "modules": [
+      {
+        "id": "ctrl-1",
+        "type": "control",
+        "name": "Control",
+        "position": { "col": 1, "row": 1 },
+        "params": {
+          "cv": 0,
+          "cvMode": "unipolar",
+          "velocity": 1,
+          "midiVelocity": true,
+          "gate": 0,
+          "glide": 0.02,
+          "voices": 4
+        }
+      },
+      {
+        "id": "osc-1",
+        "type": "oscillator",
+        "name": "VCO",
+        "position": { "col": 4, "row": 1 },
+        "params": {
+          "frequency": 220,
+          "type": "sawtooth",
+          "pwm": 0.5
+        }
+      },
+      {
+        "id": "adsr-1",
+        "type": "adsr",
+        "name": "ADSR",
+        "position": { "col": 6, "row": 1 },
+        "params": {
+          "attack": 0.01,
+          "decay": 0.2,
+          "sustain": 0.7,
+          "release": 0.5
+        }
+      },
+      {
+        "id": "gain-1",
+        "type": "gain",
+        "name": "VCA",
+        "position": { "col": 7, "row": 1 },
+        "params": { "gain": 0.8 }
+      },
+      {
+        "id": "crush-1",
+        "type": "bit-crusher",
+        "name": "Bit Crusher",
+        "position": { "col": 8, "row": 1 },
+        "params": {
+          "bits": 6.0,
+          "downsample": 8.0,
+          "mix": 1.0
+        }
+      },
+      {
+        "id": "vcf-1",
+        "type": "vcf",
+        "name": "VCF",
+        "position": { "col": 10, "row": 1 },
+        "params": {
+          "cutoff": 3000,
+          "resonance": 0.2,
+          "drive": 0.1,
+          "model": "svf",
+          "mode": "lp",
+          "slope": 12
+        }
+      },
+      {
+        "id": "delay-1",
+        "type": "delay",
+        "name": "Delay",
+        "position": { "col": 12, "row": 1 },
+        "params": {
+          "time": 320,
+          "feedback": 0.3,
+          "mix": 0.25,
+          "tone": 0.5,
+          "pingPong": true
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Main Out",
+        "position": { "col": 14, "row": 1 },
+        "params": { "level": 1.0 }
+      },
+      {
+        "id": "meter-1",
+        "type": "meter",
+        "name": "Meter",
+        "position": { "col": 14, "row": 2 },
+        "params": {}
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "col": 1, "row": 5 },
+        "params": {
+          "text": "BIT CRUSHER TEST\n\nLo-fi bit depth reduction + sample rate decimation.\n\n- Bits: 6 (aggressive quantization)\n- Downsample: 8x (retro aliasing)\n- VCF tames harsh aliasing\n\nTry adjusting:\n- Bits (1-16): lower = more distortion\n- Rate (1-64): higher = more aliasing\n- Mix for parallel blend with clean signal\n- VCF cutoff to shape the crushed tone"
+        }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "ctrl-1", "portId": "cv-out" }, "to": { "moduleId": "osc-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "ctrl-1", "portId": "gate-out" }, "to": { "moduleId": "adsr-1", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "osc-1", "portId": "out" }, "to": { "moduleId": "gain-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-1", "portId": "env" }, "to": { "moduleId": "gain-1", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "gain-1", "portId": "out" }, "to": { "moduleId": "crush-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "crush-1", "portId": "out" }, "to": { "moduleId": "vcf-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "vcf-1", "portId": "out" }, "to": { "moduleId": "delay-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "delay-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "delay-1", "portId": "out" }, "to": { "moduleId": "meter-1", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}

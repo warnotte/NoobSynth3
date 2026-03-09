@@ -1,8 +1,8 @@
 //! Module state definitions for all DSP modules.
 
 use dsp_core::{
-    Adsr, Arpeggiator, AyPlayer, Chaos, ChordSequencer, Choir, Chorus, Clap808, Clap909, Compressor, Cowbell808, Delay, DrumSequencer, Ensemble,
-    EuclideanSequencer, FmMatrix, FmOperator, Granular, GranularDelay, HiHat808, HiHat909, Hpf, KarplusStrong,
+    Adsr, Arpeggiator, AyPlayer, BitCrusher, Chaos, ChordSequencer, Choir, Chorus, Clap808, Clap909, Compressor, Cowbell808, Delay, DrumSequencer, Ensemble,
+    EnvelopeFollower, EuclideanSequencer, FmMatrix, FmOperator, Granular, GranularDelay, HiHat808, HiHat909, Hpf, KarplusStrong,
     Kick808, Kick909, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, ParticleCloud, Phaser, PipeOrgan, PitchShifter,
     PolyrhythmSequencer, Resonator, Reverb, Rimshot909, SampleHold, Shepard, SidPlayer, SlewLimiter, Snare808, Snare909, SnesOsc, SpectralSwarm, SpeechSynth,
     SpringReverb, StepSequencer, Supersaw, TapeDelay, Tb303, Tom808, Tom909, TuringMachine, Vcf, Vco, Vocoder, Wavetable,
@@ -385,6 +385,13 @@ pub struct ChaosState {
     pub root: ParamBuffer,
 }
 
+pub struct EnvelopeFollowerState {
+    pub envelope_follower: EnvelopeFollower,
+    pub attack: ParamBuffer,
+    pub release: ParamBuffer,
+    pub gain: ParamBuffer,
+}
+
 // =============================================================================
 // Effect States
 // =============================================================================
@@ -514,6 +521,13 @@ pub struct CompressorState {
     pub attack: ParamBuffer,
     pub release: ParamBuffer,
     pub makeup: ParamBuffer,
+    pub mix: ParamBuffer,
+}
+
+pub struct BitCrusherState {
+    pub crusher: BitCrusher,
+    pub bits: ParamBuffer,
+    pub downsample: ParamBuffer,
     pub mix: ParamBuffer,
 }
 
@@ -838,6 +852,7 @@ pub enum ModuleState {
     Slew(SlewState),
     Quantizer(QuantizerState),
     Chaos(ChaosState),
+    EnvelopeFollower(EnvelopeFollowerState),
 
     // Effects
     Chorus(ChorusState),
@@ -854,6 +869,7 @@ pub enum ModuleState {
     Wavefolder(WavefolderState),
     PitchShifter(PitchShifterState),
     Compressor(CompressorState),
+    BitCrusher(BitCrusherState),
 
     // Sequencers
     Clock(ClockState),

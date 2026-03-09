@@ -93,6 +93,10 @@ export const moduleSizes: Record<ModuleType, string> = {
   'chord-sequencer': '3x5',
   // Polyrhythm Sequencer
   'polyrhythm-sequencer': '3x5',
+  // Envelope Follower
+  'envelope-follower': '1x2',
+  // Bit Crusher
+  'bit-crusher': '2x2',
 }
 
 export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>> = {
@@ -157,6 +161,8 @@ export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>>
   'ay-player': 'strip',
   'chord-sequencer': 'strip',
   'polyrhythm-sequencer': 'strip',
+  'envelope-follower': 'strip',
+  'bit-crusher': 'strip',
 }
 
 export type ModuleCategory =
@@ -236,6 +242,7 @@ export const moduleCatalog: { type: ModuleType; label: string; category: ModuleC
   { type: 'ring-mod', label: 'Ring Mod', category: 'effects' },
   { type: 'pitch-shifter', label: 'Pitch Shifter', category: 'effects' },
   { type: 'compressor', label: 'Compressor', category: 'effects' },
+  { type: 'bit-crusher', label: 'Bit Crusher', category: 'effects' },
   // Modulators
   { type: 'adsr', label: 'ADSR', category: 'modulators' },
   { type: 'lfo', label: 'LFO', category: 'modulators' },
@@ -244,6 +251,7 @@ export const moduleCatalog: { type: ModuleType; label: string; category: ModuleC
   { type: 'slew', label: 'Slew', category: 'modulators' },
   { type: 'quantizer', label: 'Quantizer', category: 'modulators' },
   { type: 'chaos', label: 'Chaos Engine', category: 'modulators' },
+  { type: 'envelope-follower', label: 'Env Follow', category: 'modulators' },
   // Sequencers
   { type: 'clock', label: 'Clock', category: 'sequencers' },
   { type: 'arpeggiator', label: 'Arpeggiator', category: 'sequencers' },
@@ -369,6 +377,8 @@ export const modulePrefixes: Record<ModuleType, string> = {
   'ay-player': 'ay',
   'chord-sequencer': 'chordseq',
   'polyrhythm-sequencer': 'polyseq',
+  'envelope-follower': 'envf',
+  'bit-crusher': 'crush',
 }
 
 export const moduleLabels: Record<ModuleType, string> = {
@@ -459,6 +469,8 @@ export const moduleLabels: Record<ModuleType, string> = {
   'ay-player': 'AY Player',
   'chord-sequencer': 'Chord Seq',
   'polyrhythm-sequencer': 'Polyrhythm',
+  'envelope-follower': 'Env Follower',
+  'bit-crusher': 'Bit Crusher',
 }
 
 export const moduleDefaults: Record<ModuleType, Record<string, number | string | boolean>> = {
@@ -1013,6 +1025,16 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
       { root: 60, chordType: 0, inversion: 0, gate: false },
       { root: 60, chordType: 0, inversion: 0, gate: false },
     ]),
+  },
+  'envelope-follower': {
+    attack: 0.01,
+    release: 0.1,
+    gain: 1.0,
+  },
+  'bit-crusher': {
+    bits: 8.0,
+    downsample: 1.0,
+    mix: 1.0,
   },
   'polyrhythm-sequencer': {
     enabled: true,

@@ -232,6 +232,42 @@ export function renderModulatorControls(props: ControlProps): React.ReactElement
     )
   }
 
+  if (module.type === 'envelope-follower') {
+    return (
+      <>
+        <RotaryKnob
+          label="Attack"
+          min={0.001}
+          max={0.5}
+          step={0.001}
+          unit="s"
+          value={Number(module.params.attack ?? 0.01)}
+          onChange={(value) => updateParam(module.id, 'attack', value)}
+          format={formatDecimal2}
+        />
+        <RotaryKnob
+          label="Release"
+          min={0.001}
+          max={2}
+          step={0.001}
+          unit="s"
+          value={Number(module.params.release ?? 0.1)}
+          onChange={(value) => updateParam(module.id, 'release', value)}
+          format={formatDecimal2}
+        />
+        <RotaryKnob
+          label="Gain"
+          min={0}
+          max={10}
+          step={0.1}
+          value={Number(module.params.gain ?? 1)}
+          onChange={(value) => updateParam(module.id, 'gain', value)}
+          format={formatDecimal2}
+        />
+      </>
+    )
+  }
+
   if (module.type === 'chaos') {
     const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
     return (

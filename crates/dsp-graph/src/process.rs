@@ -8,6 +8,7 @@ use dsp_core::{
     ChaosInputs, ChaosParams,
     ChoirInputs, ChoirParams, ChorusInputs, ChorusParams,
     Clap808Inputs, Clap808Params, Clap909Inputs, Clap909Params,
+    BitCrusherInputs, BitCrusherParams,
     CompressorParams,
     Cowbell808Inputs, Cowbell808Params,
     DelayInputs, DelayParams, Distortion, DistortionParams,
@@ -38,6 +39,7 @@ use dsp_core::{
     ChordSequencerInputs, ChordSequencerOutputs, ChordSequencerParams,
     PolyrhythmInputs, PolyrhythmOutputs, PolyrhythmParams,
     SlewInputs, SlewParams,
+    EnvelopeFollowerInputs, EnvelopeFollowerParams,
     Snare808Inputs, Snare808Params,
     Snare909Inputs, Snare909Params, SnesOscInputs, SnesOscParams, SpectralSwarmInputs, SpectralSwarmParams,
     SpringReverbInputs, SpringReverbParams,
@@ -180,6 +182,21 @@ pub(crate) fn process_module(
             let slew_inputs = SlewInputs { input };
             let output = outputs[0].channel_mut(0);
             state.slew.process_block(output, slew_inputs, params);
+        }
+        ModuleState::EnvelopeFollower(state) => {
+            let input = if connections[0].is_empty() {
+                None
+            } else {
+                Some(inputs[0].channel(0))
+            };
+            let params = EnvelopeFollowerParams {
+                attack: state.attack.slice(frames),
+                release: state.release.slice(frames),
+                gain: state.gain.slice(frames),
+            };
+            let ef_inputs = EnvelopeFollowerInputs { input };
+            let output = outputs[0].channel_mut(0);
+            state.envelope_follower.process_block(output, ef_inputs, params);
         }
         ModuleState::Quantizer(state) => {
             let input = if connections[0].is_empty() {
@@ -2090,6 +2107,23 @@ pub(crate) fn process_module(
             };
             let (out_l, out_r) = outputs[0].channels_mut_2();
             state.compressor.process_block_stereo(out_l, out_r, input_l, input_r, params);
+        }
+        ModuleState::BitCrusher(state) => {
+            let input_connected = !connections[0].is_empty();
+            let input_l = if input_connected { Some(inputs[0].channel(0)) } else { None };
+            let input_r = if input_connected {
+                Some(if inputs[0].channel_count() == 1 { inputs[0].channel(0) } else { inputs[0].channel(1) })
+            } else {
+                None
+            };
+            let params = BitCrusherParams {
+                bits: state.bits.slice(frames),
+                downsample: state.downsample.slice(frames),
+                mix: state.mix.slice(frames),
+            };
+            let bc_inputs = BitCrusherInputs { input_l, input_r };
+            let (out_l, out_r) = outputs[0].channels_mut_2();
+            state.crusher.process_block(out_l, out_r, bc_inputs, params);
         }
         ModuleState::ChordSequencer(state) => {
             let clock = if connections[0].is_empty() { None } else { Some(inputs[0].channel(0)) };

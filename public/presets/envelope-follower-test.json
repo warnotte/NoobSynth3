@@ -1,0 +1,129 @@
+{
+  "id": "envelope-follower-test",
+  "name": "Envelope Follower Test",
+  "description": "Audio envelope controls VCF cutoff via Envelope Follower module.",
+  "group": "Module Tests",
+  "graph": {
+    "modules": [
+      {
+        "id": "ctrl-1",
+        "type": "control",
+        "name": "Control",
+        "position": { "col": 1, "row": 1 },
+        "params": {
+          "cv": 0,
+          "cvMode": "unipolar",
+          "velocity": 1,
+          "midiVelocity": true,
+          "gate": 0,
+          "glide": 0.02,
+          "voices": 4
+        }
+      },
+      {
+        "id": "osc-1",
+        "type": "oscillator",
+        "name": "VCO",
+        "position": { "col": 4, "row": 1 },
+        "params": {
+          "frequency": 220,
+          "type": "sawtooth",
+          "pwm": 0.5
+        }
+      },
+      {
+        "id": "adsr-1",
+        "type": "adsr",
+        "name": "ADSR",
+        "position": { "col": 6, "row": 1 },
+        "params": {
+          "attack": 0.01,
+          "decay": 0.3,
+          "sustain": 0.6,
+          "release": 0.4
+        }
+      },
+      {
+        "id": "gain-1",
+        "type": "gain",
+        "name": "VCA",
+        "position": { "col": 7, "row": 1 },
+        "params": { "gain": 0.8 }
+      },
+      {
+        "id": "envf-1",
+        "type": "envelope-follower",
+        "name": "Env Follow",
+        "position": { "col": 8, "row": 1 },
+        "params": {
+          "attack": 0.005,
+          "release": 0.15,
+          "gain": 2.0
+        }
+      },
+      {
+        "id": "vcf-1",
+        "type": "vcf",
+        "name": "VCF",
+        "position": { "col": 9, "row": 1 },
+        "params": {
+          "cutoff": 400,
+          "resonance": 0.4,
+          "drive": 0.1,
+          "envAmount": 0,
+          "modAmount": 0.6,
+          "model": "svf",
+          "mode": "lp",
+          "slope": 24
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "col": 11, "row": 1 },
+        "params": {
+          "time": 0.6,
+          "damp": 0.4,
+          "preDelay": 18,
+          "mix": 0.2
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Main Out",
+        "position": { "col": 13, "row": 1 },
+        "params": { "level": 1.0 }
+      },
+      {
+        "id": "meter-1",
+        "type": "meter",
+        "name": "Meter",
+        "position": { "col": 13, "row": 2 },
+        "params": {}
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "col": 1, "row": 5 },
+        "params": {
+          "text": "ENVELOPE FOLLOWER TEST\n\nThe Envelope Follower converts audio amplitude to CV.\n\n- VCO -> VCA (with ADSR) -> Env Follower\n- Env Follower CV output -> VCF mod input\n- Louder playing = brighter filter\n\nTry adjusting:\n- Attack/Release on Env Follower for responsiveness\n- Gain to amplify the CV output\n- VCF resonance for more dramatic effect"
+        }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "ctrl-1", "portId": "cv-out" }, "to": { "moduleId": "osc-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "ctrl-1", "portId": "gate-out" }, "to": { "moduleId": "adsr-1", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "osc-1", "portId": "out" }, "to": { "moduleId": "gain-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-1", "portId": "env" }, "to": { "moduleId": "gain-1", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "gain-1", "portId": "out" }, "to": { "moduleId": "envf-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "gain-1", "portId": "out" }, "to": { "moduleId": "vcf-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "envf-1", "portId": "out" }, "to": { "moduleId": "vcf-1", "portId": "mod" }, "kind": "cv" },
+      { "from": { "moduleId": "vcf-1", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "meter-1", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}

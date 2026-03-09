@@ -79,6 +79,7 @@ pub use effects::{
     Vocoder, VocoderParams, VocoderInputs,
     PitchShifter, PitchShifterParams, PitchShifterInputs,
     Compressor, CompressorParams,
+    BitCrusher, BitCrusherParams, BitCrusherInputs,
 };
 
 // Re-export modulators
@@ -89,6 +90,7 @@ pub use modulators::{
     SlewLimiter, SlewParams, SlewInputs,
     Quantizer, QuantizerParams, QuantizerInputs,
     Chaos, ChaosParams, ChaosInputs,
+    EnvelopeFollower, EnvelopeFollowerParams, EnvelopeFollowerInputs,
 };
 
 // Re-export sequencers

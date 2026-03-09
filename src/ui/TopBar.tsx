@@ -20,6 +20,8 @@ type TopBarProps = {
   shareUrl: string | null
   /** Error message if share URL can't be generated */
   shareError?: string | null
+  isRecording?: boolean
+  onToggleRecording?: () => void
 }
 
 // Icons
@@ -44,6 +46,11 @@ const CableIcon = () => (
     <path d="M6 9c0 6 12 6 12 12"/>
   </svg>
 )
+const RecordIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+    <circle cx="12" cy="12" r="8"/>
+  </svg>
+)
 const ResizeIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
     <path d="M21 21l-6-6m6 6v-6m0 6h-6M3 3l6 6M3 3v6m0-6h6"/>
@@ -66,6 +73,8 @@ export const TopBar = ({
   onToggleDevResize = () => {},
   shareUrl,
   shareError,
+  isRecording = false,
+  onToggleRecording = () => {},
 }: TopBarProps) => {
   const [shareStatus, setShareStatus] = useState<ShareStatus>('idle')
 
@@ -114,26 +123,37 @@ export const TopBar = ({
         <div className="topbar-zone">
           <div className="transport-block">
             <span className="action-label">Transport</span>
-            <div className="power-toggle" aria-label="Power">
+            <div className="transport-row">
+              <div className="power-toggle" aria-label="Power">
+                <button
+                  className={`button power-toggle-btn ${
+                    isRunning || isBooting ? 'active' : ''
+                  }`}
+                  onClick={onStart}
+                  disabled={isBooting || isRunning}
+                  title={isBooting ? 'Booting...' : 'Start engine'}
+                >
+                  <PlayIcon />
+                </button>
+                <button
+                  className={`button power-toggle-btn ${
+                    !isRunning && !isBooting ? 'active' : ''
+                  }`}
+                  onClick={onStop}
+                  disabled={!isRunning}
+                  title="Stop engine"
+                >
+                  <StopIcon />
+                </button>
+              </div>
               <button
-                className={`button power-toggle-btn ${
-                  isRunning || isBooting ? 'active' : ''
-                }`}
-                onClick={onStart}
-                disabled={isBooting || isRunning}
-                title={isBooting ? 'Booting...' : 'Start engine'}
-              >
-                <PlayIcon />
-              </button>
-              <button
-                className={`button power-toggle-btn ${
-                  !isRunning && !isBooting ? 'active' : ''
-                }`}
-                onClick={onStop}
+                type="button"
+                className={`button top-bar-record ${isRecording ? 'recording' : ''}`}
+                onClick={onToggleRecording}
                 disabled={!isRunning}
-                title="Stop engine"
+                title={isRecording ? 'Stop recording & download' : 'Start recording'}
               >
-                <StopIcon />
+                <RecordIcon />
               </button>
             </div>
           </div>

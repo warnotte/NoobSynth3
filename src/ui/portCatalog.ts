@@ -191,6 +191,11 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
   distortion: simpleAudioEffect(),
   wavefolder: simpleAudioEffect(),
   compressor: simpleAudioEffect(),
+  'bit-crusher': simpleAudioEffect(),
+  'envelope-follower': {
+    inputs: [{ id: 'in', label: 'In', kind: 'audio', direction: 'in' }],
+    outputs: [{ id: 'out', label: 'CV', kind: 'cv', direction: 'out' }],
+  },
   supersaw: pitchToAudio(),
   karplus: {
     inputs: [

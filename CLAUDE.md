@@ -152,7 +152,7 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 
 ### Documentation (obligatoire)
 - [ ] `docs/MODULES.md` - Documentation complète du module
-- [ ] `README.md` - Mettre à jour le compte de modules (actuellement 77)
+- [ ] `README.md` - Mettre à jour le compte de modules (actuellement 80)
 - [ ] `CLAUDE.md` - Ajouter à la liste "Module Types" si pertinent
 
 ### Optionnel
@@ -198,7 +198,7 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 
 **⚠️ RÈGLE:** Toute nouvelle feature UI↔Audio DOIT être implémentée pour Tauri en même temps que Web. Ne jamais merger une feature Web-only.
 
-## Module Types (77 total)
+## Module Types (80 total)
 
 ### Sources (17)
 oscillator, supersaw, karplus, fm-op, fm-matrix, nes-osc, snes-osc, noise, tb-303, shepard, pipe-organ, spectral-swarm, resonator, wavetable, granular, particle-cloud, speech-synth
@@ -209,11 +209,11 @@ vcf, hpf
 ### Amplifiers (6)
 gain, cv-vca, mixer, mixer-1x2, mixer-8, crossfader
 
-### Effects (15)
-chorus, ensemble, choir, vocoder, delay, granular-delay, tape-delay, spring-reverb, reverb, phaser, distortion, wavefolder, ring-mod, pitch-shifter, compressor
+### Effects (16)
+chorus, ensemble, choir, vocoder, delay, granular-delay, tape-delay, spring-reverb, reverb, phaser, distortion, wavefolder, ring-mod, pitch-shifter, compressor, bit-crusher
 
-### Modulators (7)
-adsr, lfo, mod-router, sample-hold, slew, quantizer, chaos
+### Modulators (8)
+adsr, lfo, mod-router, sample-hold, slew, quantizer, chaos, envelope-follower
 
 ### Sequencers (12)
 clock, arpeggiator, step-sequencer, euclidean, drum-sequencer, midi-file-sequencer, turing-machine, mario, sid-player, ay-player, chord-sequencer, polyrhythm-sequencer
@@ -224,12 +224,20 @@ clock, arpeggiator, step-sequencer, euclidean, drum-sequencer, midi-file-sequenc
 ### TR-808 Drums (6)
 808-kick, 808-snare, 808-hihat, 808-cowbell, 808-clap, 808-tom
 
-### I/O & Utilities (6)
-control, output, audio-in, scope, lab, notes
+### I/O & Utilities (7)
+control, output, audio-in, scope, meter, lab, notes
 
 ---
 
 ## Features Implementation Notes
+
+### Recording (WAV Export)
+Le bouton Record dans la TopBar capture l'audio en WAV 16-bit PCM stéréo :
+- **Capture** : `ScriptProcessorNode` connecté à `MediaStreamAudioDestinationNode` accumule les samples Float32
+- **Encodage** : Header RIFF/WAVE complet avec durée exacte → seek fonctionnel partout
+- **Format** : `.wav` (PCM 16-bit, stéréo, sample rate du AudioContext)
+- **Fichiers clés** : `src/App.tsx` (`handleToggleRecording`), `src/ui/TopBar.tsx` (bouton)
+- Le batch export (`runPresetBatchExport`) utilise le même encodage WAV
 
 ### Drum Sequencer
 - 8 tracks (Kick, Snare, HH-C, HH-O, Clap, Tom, Rim, Aux)

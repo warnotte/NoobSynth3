@@ -351,6 +351,7 @@ function App() {
   const [gridMetrics, setGridMetrics] = useState<GridMetrics>(DEFAULT_GRID_METRICS)
   const [devResizeEnabled, setDevResizeEnabled] = useState(() => isDev)
   const [cablesVisible, setCablesVisible] = useState(true)
+  const [isRecording, setIsRecording] = useState(false)
   const [moduleSizeOverrides, setModuleSizeOverrides] = useState<Record<string, string>>({})
   const [moduleResizePreview, setModuleResizePreview] = useState<ModuleResizePreview | null>(null)
   const [contextMenu, setContextMenu] = useState<{
@@ -361,6 +362,8 @@ function App() {
   const rackRef = useRef<HTMLDivElement | null>(null)
   const modulesRef = useRef<HTMLDivElement | null>(null)
   const presetFileRef = useRef<HTMLInputElement | null>(null)
+  const wavRecorderNodeRef = useRef<ScriptProcessorNode | null>(null)
+  const wavChunksRef = useRef<Float32Array[][]>([[], []]) // [L chunks, R chunks]
   const activeVoiceCountRef = useRef<number | null>(null)
   const graphRef = useRef(graph)
   const statusRef = useRef(status)
@@ -1883,29 +1886,184 @@ function App() {
       if (!destination) {
         throw new Error('Audio output is not ready.')
       }
-      if (typeof MediaRecorder === 'undefined') {
-        throw new Error('MediaRecorder unavailable in this browser.')
-      }
-      const chunks: Blob[] = []
-      return await new Promise<Blob>((resolve, reject) => {
-        const recorder = new MediaRecorder(destination.stream, { mimeType: 'audio/webm' })
-        recorder.ondataavailable = (event) => {
-          if (event.data && event.data.size > 0) {
-            chunks.push(event.data)
+      const ctx = destination.context as AudioContext
+      const sampleRate = ctx.sampleRate
+      const chunksL: Float32Array[] = []
+      const chunksR: Float32Array[] = []
+
+      return await new Promise<Blob>((resolve) => {
+        const scriptNode = ctx.createScriptProcessor(4096, 2, 2)
+        scriptNode.onaudioprocess = (e) => {
+          chunksL.push(new Float32Array(e.inputBuffer.getChannelData(0)))
+          chunksR.push(new Float32Array(e.inputBuffer.getChannelData(1)))
+        }
+        const source = ctx.createMediaStreamSource(destination.stream)
+        const muteGain = ctx.createGain()
+        muteGain.gain.value = 0
+        source.connect(scriptNode)
+        scriptNode.connect(muteGain)
+        muteGain.connect(ctx.destination)
+
+        setTimeout(() => {
+          scriptNode.disconnect()
+          source.disconnect()
+          muteGain.disconnect()
+
+          const totalSamples = chunksL.reduce((n, c) => n + c.length, 0)
+          const interleaved = new Float32Array(totalSamples * 2)
+          let offset = 0
+          for (let c = 0; c < chunksL.length; c++) {
+            const L = chunksL[c]
+            const R = chunksR[c]
+            for (let i = 0; i < L.length; i++) {
+              interleaved[offset++] = L[i]
+              interleaved[offset++] = R[i]
+            }
           }
-        }
-        recorder.onerror = () => {
-          reject(new Error('Recording failed.'))
-        }
-        recorder.onstop = () => {
-          resolve(new Blob(chunks, { type: 'audio/webm' }))
-        }
-        recorder.start()
-        setTimeout(() => recorder.stop(), durationMs)
+
+          const numChannels = 2
+          const bitsPerSample = 16
+          const byteRate = sampleRate * numChannels * (bitsPerSample / 8)
+          const blockAlign = numChannels * (bitsPerSample / 8)
+          const dataSize = interleaved.length * (bitsPerSample / 8)
+          const buffer = new ArrayBuffer(44 + dataSize)
+          const view = new DataView(buffer)
+          const writeStr = (off: number, str: string) => {
+            for (let i = 0; i < str.length; i++) view.setUint8(off + i, str.charCodeAt(i))
+          }
+          writeStr(0, 'RIFF')
+          view.setUint32(4, 36 + dataSize, true)
+          writeStr(8, 'WAVE')
+          writeStr(12, 'fmt ')
+          view.setUint32(16, 16, true)
+          view.setUint16(20, 1, true)
+          view.setUint16(22, numChannels, true)
+          view.setUint32(24, sampleRate, true)
+          view.setUint32(28, byteRate, true)
+          view.setUint16(32, blockAlign, true)
+          view.setUint16(34, bitsPerSample, true)
+          writeStr(36, 'data')
+          view.setUint32(40, dataSize, true)
+
+          let pos = 44
+          for (let i = 0; i < interleaved.length; i++) {
+            const s = Math.max(-1, Math.min(1, interleaved[i]))
+            view.setInt16(pos, s < 0 ? s * 0x8000 : s * 0x7FFF, true)
+            pos += 2
+          }
+
+          resolve(new Blob([buffer], { type: 'audio/wav' }))
+        }, durationMs)
       })
     },
     [engine],
   )
+
+  const handleToggleRecording = useCallback(() => {
+    if (isRecording) {
+      // Stop recording — build WAV and download
+      const node = wavRecorderNodeRef.current
+      if (node) {
+        node.disconnect()
+        wavRecorderNodeRef.current = null
+      }
+      setIsRecording(false)
+
+      const chunksL = wavChunksRef.current[0]
+      const chunksR = wavChunksRef.current[1]
+      const totalSamples = chunksL.reduce((n, c) => n + c.length, 0)
+      if (totalSamples === 0) return
+
+      // Interleave L/R into a single Float32Array
+      const interleaved = new Float32Array(totalSamples * 2)
+      let offset = 0
+      for (let c = 0; c < chunksL.length; c++) {
+        const L = chunksL[c]
+        const R = chunksR[c]
+        for (let i = 0; i < L.length; i++) {
+          interleaved[offset++] = L[i]
+          interleaved[offset++] = R[i]
+        }
+      }
+      wavChunksRef.current = [[], []]
+
+      // Encode WAV (16-bit PCM stereo)
+      const sampleRate = engine.getRecordingDestination()?.context.sampleRate ?? 48000
+      const numChannels = 2
+      const bitsPerSample = 16
+      const byteRate = sampleRate * numChannels * (bitsPerSample / 8)
+      const blockAlign = numChannels * (bitsPerSample / 8)
+      const dataSize = interleaved.length * (bitsPerSample / 8)
+      const buffer = new ArrayBuffer(44 + dataSize)
+      const view = new DataView(buffer)
+
+      // RIFF header
+      const writeStr = (off: number, str: string) => {
+        for (let i = 0; i < str.length; i++) view.setUint8(off + i, str.charCodeAt(i))
+      }
+      writeStr(0, 'RIFF')
+      view.setUint32(4, 36 + dataSize, true)
+      writeStr(8, 'WAVE')
+      writeStr(12, 'fmt ')
+      view.setUint32(16, 16, true) // fmt chunk size
+      view.setUint16(20, 1, true)  // PCM format
+      view.setUint16(22, numChannels, true)
+      view.setUint32(24, sampleRate, true)
+      view.setUint32(28, byteRate, true)
+      view.setUint16(32, blockAlign, true)
+      view.setUint16(34, bitsPerSample, true)
+      writeStr(36, 'data')
+      view.setUint32(40, dataSize, true)
+
+      // Convert float samples to 16-bit PCM
+      let pos = 44
+      for (let i = 0; i < interleaved.length; i++) {
+        const s = Math.max(-1, Math.min(1, interleaved[i]))
+        view.setInt16(pos, s < 0 ? s * 0x8000 : s * 0x7FFF, true)
+        pos += 2
+      }
+
+      const blob = new Blob([buffer], { type: 'audio/wav' })
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
+      const filename = `noobsynth3-${timestamp}.wav`
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = filename
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      URL.revokeObjectURL(url)
+      return
+    }
+
+    // Start recording — capture raw PCM via ScriptProcessorNode
+    const destination = engine.getRecordingDestination()
+    if (!destination) {
+      console.error('Recording destination not available — engine not running?')
+      return
+    }
+    const ctx = destination.context as AudioContext
+    wavChunksRef.current = [[], []]
+    // ScriptProcessorNode: 4096 buffer, 2 inputs, 0 outputs (sink)
+    const scriptNode = ctx.createScriptProcessor(4096, 2, 2)
+    scriptNode.onaudioprocess = (e) => {
+      // Copy input buffers (they get reused)
+      wavChunksRef.current[0].push(new Float32Array(e.inputBuffer.getChannelData(0)))
+      wavChunksRef.current[1].push(new Float32Array(e.inputBuffer.getChannelData(1)))
+    }
+    // Tap audio from the recording destination's stream
+    const source = ctx.createMediaStreamSource(destination.stream)
+    // ScriptProcessor needs a connected output to fire events — route through muted gain
+    const muteGain = ctx.createGain()
+    muteGain.gain.value = 0
+    source.connect(scriptNode)
+    scriptNode.connect(muteGain)
+    muteGain.connect(ctx.destination)
+
+    wavRecorderNodeRef.current = scriptNode
+    setIsRecording(true)
+  }, [engine, isRecording])
 
   const runPresetBatchExport = useCallback(
     async (options?: { durationMs?: number; settleMs?: number; prefix?: string }) => {
@@ -1922,7 +2080,7 @@ function App() {
         await wait(settleMs)
         const blob = await recordOutput(durationMs)
         const safeId = preset.id.replace(/[^a-z0-9_-]+/gi, '-')
-        const filename = `${prefix}-${safeId}-${session}.webm`
+        const filename = `${prefix}-${safeId}-${session}.wav`
         const url = URL.createObjectURL(blob)
         const link = document.createElement('a')
         link.href = url
@@ -2028,6 +2186,10 @@ function App() {
   }
 
   const handleUnifiedStop = async () => {
+    // Stop any active recording before stopping the engine
+    if (wavRecorderNodeRef.current) {
+      handleToggleRecording() // triggers stop + WAV download
+    }
     if (audioMode === 'vst') {
       // In VST mode, can't stop audio from here - it's controlled by DAW
       return
@@ -2239,6 +2401,8 @@ function App() {
           onToggleDevResize={() => setDevResizeEnabled((prev) => !prev)}
           shareUrl={shareUrl}
           shareError={shareError}
+          isRecording={isRecording}
+          onToggleRecording={handleToggleRecording}
         />
       <main className="workbench">
         <RackView

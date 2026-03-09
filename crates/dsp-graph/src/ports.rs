@@ -20,6 +20,7 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
     ModuleType::ModRouter => vec![PortInfo { channels: 1 }],
     ModuleType::SampleHold => vec![PortInfo { channels: 1 }, PortInfo { channels: 1 }],
     ModuleType::Slew => vec![PortInfo { channels: 1 }],
+    ModuleType::EnvelopeFollower => vec![PortInfo { channels: 1 }],
     ModuleType::Quantizer => vec![PortInfo { channels: 1 }],
     ModuleType::RingMod => vec![PortInfo { channels: 1 }, PortInfo { channels: 1 }],
     ModuleType::Gain => vec![PortInfo { channels: 2 }, PortInfo { channels: 1 }],
@@ -248,6 +249,10 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
     ModuleType::Compressor => vec![
       PortInfo { channels: 2 },  // audio in (stereo)
     ],
+    // BitCrusher - 1 stereo input
+    ModuleType::BitCrusher => vec![
+      PortInfo { channels: 2 },  // audio in (stereo)
+    ],
     // SpeechSynth - 3 inputs (pitch CV, gate, clock)
     ModuleType::SpeechSynth => vec![
       PortInfo { channels: 1 },  // pitch CV
@@ -274,6 +279,7 @@ pub fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
     ],
     ModuleType::SampleHold => vec![PortInfo { channels: 1 }],
     ModuleType::Slew => vec![PortInfo { channels: 1 }],
+    ModuleType::EnvelopeFollower => vec![PortInfo { channels: 1 }],
     ModuleType::Quantizer => vec![PortInfo { channels: 1 }],
     ModuleType::RingMod => vec![PortInfo { channels: 1 }],
     ModuleType::Gain => vec![PortInfo { channels: 2 }],
@@ -514,6 +520,10 @@ pub fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
     ModuleType::Compressor => vec![
       PortInfo { channels: 2 },  // stereo audio out
     ],
+    // BitCrusher - 1 stereo output
+    ModuleType::BitCrusher => vec![
+      PortInfo { channels: 2 },  // stereo audio out
+    ],
     // SpeechSynth - 1 mono output
     ModuleType::SpeechSynth => vec![
       PortInfo { channels: 1 },  // audio out
@@ -543,6 +553,10 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
       _ => None,
     },
     ModuleType::Slew => match port_id {
+      "in" => Some(0),
+      _ => None,
+    },
+    ModuleType::EnvelopeFollower => match port_id {
       "in" => Some(0),
       _ => None,
     },
@@ -847,6 +861,11 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
       "in" | "input" | "audio" => Some(0),
       _ => None,
     },
+    // BitCrusher - 1 input
+    ModuleType::BitCrusher => match port_id {
+      "in" | "input" | "audio" => Some(0),
+      _ => None,
+    },
     // SpeechSynth - 3 inputs
     ModuleType::SpeechSynth => match port_id {
       "pitch" | "pitch-cv" | "1volt" => Some(0),
@@ -884,6 +903,10 @@ pub fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize
     },
     ModuleType::Slew => match port_id {
       "out" => Some(0),
+      _ => None,
+    },
+    ModuleType::EnvelopeFollower => match port_id {
+      "out" | "cv-out" => Some(0),
       _ => None,
     },
     ModuleType::Quantizer => match port_id {
@@ -1227,6 +1250,11 @@ pub fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize
     },
     // Compressor - 1 output
     ModuleType::Compressor => match port_id {
+      "out" | "output" => Some(0),
+      _ => None,
+    },
+    // BitCrusher - 1 output
+    ModuleType::BitCrusher => match port_id {
       "out" | "output" => Some(0),
       _ => None,
     },

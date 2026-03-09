@@ -47,6 +47,7 @@ pub mod choir;
 pub mod vocoder;
 pub mod pitch_shifter;
 pub mod compressor;
+pub mod bit_crusher;
 
 // Re-export all public types
 pub use delay::{Delay, DelayInputs, DelayParams};
@@ -64,3 +65,4 @@ pub use choir::{Choir, ChoirInputs, ChoirParams, FormantFilter};
 pub use vocoder::{Vocoder, VocoderInputs, VocoderParams};
 pub use pitch_shifter::{PitchShifter, PitchShifterInputs, PitchShifterParams};
 pub use compressor::{Compressor, CompressorParams};
+pub use bit_crusher::{BitCrusher, BitCrusherInputs, BitCrusherParams};

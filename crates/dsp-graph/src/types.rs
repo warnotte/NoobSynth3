@@ -45,6 +45,7 @@ pub enum ModuleType {
     Slew,
     Quantizer,
     Chaos,
+    EnvelopeFollower,
 
     // Effects
     Chorus,
@@ -61,6 +62,7 @@ pub enum ModuleType {
     Wavefolder,
     PitchShifter,
     Compressor,
+    BitCrusher,
 
     // Sequencers
     Clock,
