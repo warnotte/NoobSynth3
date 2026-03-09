@@ -14,6 +14,7 @@ use dsp_core::{
     FlangerInputs, FlangerParams,
     FrequencyShifterInputs, FrequencyShifterParams,
     GlitchInputs, GlitchParams,
+    LeslieInputs, LeslieParams,
     Cowbell808Inputs, Cowbell808Params,
     DelayInputs, DelayParams, Distortion, DistortionParams,
     DrumSequencerInputs, DrumSequencerOutputs, DrumSequencerParams,
@@ -2229,6 +2230,25 @@ pub(crate) fn process_module(
             let gl_inputs = GlitchInputs { input_l, input_r, clock };
             let (out_l, out_r) = outputs[0].channels_mut_2();
             state.glitch.process_block(out_l, out_r, gl_inputs, params);
+        }
+        ModuleState::Leslie(state) => {
+            let input_connected = !connections[0].is_empty();
+            let input_l = if input_connected { Some(inputs[0].channel(0)) } else { None };
+            let input_r = if input_connected {
+                Some(if inputs[0].channel_count() == 1 { inputs[0].channel(0) } else { inputs[0].channel(1) })
+            } else {
+                None
+            };
+            let params = LeslieParams {
+                speed: state.speed.slice(frames),
+                brake: state.brake.slice(frames),
+                drive: state.drive.slice(frames),
+                depth: state.depth.slice(frames),
+                mix: state.mix.slice(frames),
+            };
+            let les_inputs = LeslieInputs { input_l, input_r };
+            let (out_l, out_r) = outputs[0].channels_mut_2();
+            state.leslie.process_block(out_l, out_r, les_inputs, params);
         }
         ModuleState::ChordSequencer(state) => {
             let clock = if connections[0].is_empty() { None } else { Some(inputs[0].channel(0)) };

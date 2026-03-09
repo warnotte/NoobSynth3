@@ -52,6 +52,7 @@ pub mod flanger;
 pub mod frequency_shifter;
 pub mod eq3;
 pub mod glitch;
+pub mod leslie;
 
 // Re-export all public types
 pub use delay::{Delay, DelayInputs, DelayParams};
@@ -74,3 +75,4 @@ pub use flanger::{Flanger, FlangerParams, FlangerInputs};
 pub use frequency_shifter::{FrequencyShifter, FrequencyShifterParams, FrequencyShifterInputs};
 pub use eq3::{Eq3, Eq3Params, Eq3Inputs};
 pub use glitch::{Glitch, GlitchParams, GlitchInputs};
+pub use leslie::{Leslie, LeslieParams, LeslieInputs};

@@ -214,7 +214,7 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 
 **⚠️ RÈGLE:** Toute nouvelle feature UI↔Audio DOIT être implémentée pour Tauri en même temps que Web. Ne jamais merger une feature Web-only.
 
-## Module Types (84 total)
+## Module Types (85 total)
 
 ### Sources (17)
 oscillator, supersaw, karplus, fm-op, fm-matrix, nes-osc, snes-osc, noise, tb-303, shepard, pipe-organ, spectral-swarm, resonator, wavetable, granular, particle-cloud, speech-synth
@@ -225,8 +225,8 @@ vcf, hpf
 ### Amplifiers (6)
 gain, cv-vca, mixer, mixer-1x2, mixer-8, crossfader
 
-### Effects (20)
-chorus, ensemble, choir, vocoder, delay, granular-delay, tape-delay, spring-reverb, reverb, phaser, distortion, wavefolder, ring-mod, pitch-shifter, compressor, bit-crusher, flanger, freq-shifter, eq3, glitch
+### Effects (21)
+chorus, ensemble, choir, vocoder, delay, granular-delay, tape-delay, spring-reverb, reverb, phaser, distortion, wavefolder, ring-mod, pitch-shifter, compressor, bit-crusher, flanger, freq-shifter, eq3, glitch, leslie
 
 ### Modulators (8)
 adsr, lfo, mod-router, sample-hold, slew, quantizer, chaos, envelope-follower
@@ -369,6 +369,9 @@ Trois biquad en série (low shelf, mid peak, high shelf). Coefficients Audio EQ 
 ### Glitch/Stutter
 Effet de glitch déclenché par clock. Capture des slices audio et les répète avec reverse/pitch aléatoire. Params: probability, sliceMs, repeats, reverseChance, pitchRange, mix. Port d'entrée clock obligatoire.
 
+### Leslie Rotary Speaker
+Simulation de cabine Leslie 122/147. Crossover 1-pole à 800Hz sépare basses (drum rotor) et aigus (horn rotor). Chaque rotor : AM + Doppler (delay modulé). Vitesse lente/rapide avec rampe d'accélération (horn 3 Hz/s, drum 1.5 Hz/s). Overdrive doux (tanh). Sortie stéréo. Params: speed (0=slow, 1=fast), brake, drive, depth, mix.
+
 ### Unified Rate Divisions
 Tous les séquenceurs et le Delay (mode sync) utilisent un système de rate divisions unifié défini dans:
 - **Rust:** `crates/dsp-core/src/sequencers/mod.rs` → `RATE_DIVISIONS[16]`
@@ -439,6 +442,25 @@ Ces features ont les structures de données en place mais la logique n'est pas c
 
 ---
 
+## Design Philosophy — Pipe Organ as Foundation
+
+Le Pipe Organ est le module de référence du synthétiseur. L'orgue est historiquement le premier synthétiseur : synthèse additive via les drawbars (8 harmoniques indépendantes), c'est exactement le principe fondamental sur lequel repose toute la synthèse sonore.
+
+**Pourquoi l'orgue est la meilleure base de test :**
+- **Polyphonie exigeante** : accords riches qui révèlent les problèmes de voice stealing
+- **Sustain long** : expose les artefacts du DSP (clicks, aliasing, dérive)
+- **Harmoniques riches** : 8 drawbars = spectre complexe qui traverse tout le signal path
+- **Module complet** : 8 drawbars, 3 voicings (Diapason/Flute/String), chiff, tremulant, wind, brightness
+
+**Combinaison Pipe Organ + Leslie** = le test ultime du signal path : si ça sonne bien sur un orgue à travers un Leslie, ça sonnera bien partout.
+
+**Presets de référence (groupe Leslie) :**
+- `hammond-leslie.json` — Clavier 8 voix, son classique rock/jazz
+- `midi-leslie-organ.json` — MIDI 4 pistes, registrations variées
+- `midi-leslie-organ-8trk.json` — MIDI 8 pistes complet, le test le plus exigeant
+
+---
+
 ## Preset System
 
 Presets stockés dans `public/presets/` avec structure:
@@ -455,7 +477,7 @@ Presets stockés dans `public/presets/` avec structure:
 }
 ```
 
-Groupes existants: Basics, Leads, Bass, Pads, FX, Drums, 8-Bit, Experimental, Shepard, Drones, Wavetable, Vocal Synthesis, Chord Sequencer, Polyrhythm, Showcase
+Groupes existants: Basics, Leads, Bass, Pads, FX, Drums, 8-Bit, Experimental, Shepard, Drones, Wavetable, Vocal Synthesis, Chord Sequencer, Polyrhythm, Showcase, Glitch, Leslie
 
 ### Connection Format (IMPORTANT)
 

@@ -1,0 +1,154 @@
+{
+  "version": 1,
+  "id": "hammond-leslie",
+  "name": "Hammond B3 + Leslie",
+  "description": "Classic Hammond B3 organ through a Leslie rotary speaker cabinet.",
+  "graph": {
+    "modules": [
+      {
+        "id": "ctrl-1",
+        "type": "control",
+        "name": "Keyboard",
+        "position": { "x": 120, "y": 120 },
+        "params": {
+          "cv": 0,
+          "cvMode": "unipolar",
+          "velocity": 1,
+          "midiVelocity": true,
+          "gate": 0,
+          "glide": 0.01,
+          "voices": 8
+        }
+      },
+      {
+        "id": "organ-1",
+        "type": "pipe-organ",
+        "name": "Hammond B3",
+        "position": { "x": 320, "y": 120 },
+        "params": {
+          "frequency": 220,
+          "drawbar16": 0.8,
+          "drawbar8": 1.0,
+          "drawbar4": 0.7,
+          "drawbar223": 0.5,
+          "drawbar2": 0.6,
+          "drawbar135": 0.3,
+          "drawbar113": 0.2,
+          "drawbar1": 0.15,
+          "voicing": 0,
+          "chiff": 0.25,
+          "tremulant": 0.0,
+          "tremRate": 6,
+          "wind": 0.05,
+          "brightness": 0.75
+        }
+      },
+      {
+        "id": "adsr-1",
+        "type": "adsr",
+        "name": "ADSR",
+        "position": { "x": 520, "y": 320 },
+        "params": {
+          "attack": 0.005,
+          "decay": 0.1,
+          "sustain": 0.9,
+          "release": 0.15
+        }
+      },
+      {
+        "id": "gain-1",
+        "type": "gain",
+        "name": "VCA",
+        "position": { "x": 520, "y": 120 },
+        "params": {
+          "gain": 0.8
+        }
+      },
+      {
+        "id": "les-1",
+        "type": "leslie",
+        "name": "Leslie 122",
+        "position": { "x": 720, "y": 120 },
+        "params": {
+          "speed": 0,
+          "brake": 0,
+          "drive": 0.25,
+          "depth": 0.75,
+          "mix": 1.0
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Room",
+        "position": { "x": 920, "y": 120 },
+        "params": {
+          "time": 0.45,
+          "damp": 0.5,
+          "preDelay": 10,
+          "mix": 0.15
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Main Out",
+        "position": { "x": 1120, "y": 120 },
+        "params": {
+          "level": 1
+        }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 720, "y": 320 },
+        "params": {
+          "text": "HAMMOND B3 + LESLIE 122\n\nClassic rock/jazz organ sound.\n\nSignal: Keyboard -> Pipe Organ (all drawbars) -> VCA -> Leslie -> Reverb -> Out\n\nDrawbar settings (Hammond-style):\n- 16' 8' 4' 2⅔' 2' 1⅗' 1⅓' 1'\n- 8  8  7  5   6  3   2   1.5\n\nLeslie cabinet:\n- SLOW/FAST toggle switches rotor speed\n- Drive 25% = gentle tube warmth\n- Depth 75% = strong rotary effect\n\nTry:\n- Toggle SLOW/FAST while playing!\n- Drive 0.5+ = gritty rock organ\n- Brake = stop rotors for static sound\n- Change drawbars for different tones\n- Voices 1 = mono organ lead"
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "cv-out" },
+        "to": { "moduleId": "organ-1", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "gate-out" },
+        "to": { "moduleId": "organ-1", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "gate-out" },
+        "to": { "moduleId": "adsr-1", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "organ-1", "portId": "out" },
+        "to": { "moduleId": "gain-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "adsr-1", "portId": "env" },
+        "to": { "moduleId": "gain-1", "portId": "cv" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "gain-1", "portId": "out" },
+        "to": { "moduleId": "les-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "les-1", "portId": "out" },
+        "to": { "moduleId": "reverb-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb-1", "portId": "out" },
+        "to": { "moduleId": "out-1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

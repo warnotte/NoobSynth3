@@ -102,6 +102,7 @@ export type ModuleType =
   | 'freq-shifter'
   | 'eq3'
   | 'glitch'
+  | 'leslie'
 
 export interface ModuleSpec {
   id: string

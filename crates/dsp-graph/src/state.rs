@@ -2,7 +2,7 @@
 
 use dsp_core::{
     Adsr, Arpeggiator, AyPlayer, BitCrusher, Chaos, ChordSequencer, Choir, Chorus, Clap808, Clap909, Compressor, Cowbell808, Delay, DrumSequencer, Ensemble,
-    EnvelopeFollower, Eq3, EuclideanSequencer, Flanger, FmMatrix, FmOperator, FrequencyShifter, Glitch, Granular, GranularDelay, HiHat808, HiHat909, Hpf, KarplusStrong,
+    EnvelopeFollower, Eq3, EuclideanSequencer, Flanger, FmMatrix, FmOperator, FrequencyShifter, Glitch, Granular, GranularDelay, HiHat808, HiHat909, Hpf, KarplusStrong, Leslie,
     Kick808, Kick909, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, ParticleCloud, Phaser, PipeOrgan, PitchShifter,
     PolyrhythmSequencer, Resonator, Reverb, Rimshot909, SampleHold, Shepard, SidPlayer, SlewLimiter, Snare808, Snare909, SnesOsc, SpectralSwarm, SpeechSynth,
     SpringReverb, StepSequencer, Supersaw, TapeDelay, Tb303, Tom808, Tom909, TuringMachine, Vcf, Vco, Vocoder, Wavetable,
@@ -569,6 +569,15 @@ pub struct GlitchState {
     pub mix: ParamBuffer,
 }
 
+pub struct LeslieState {
+    pub leslie: Leslie,
+    pub speed: ParamBuffer,
+    pub brake: ParamBuffer,
+    pub drive: ParamBuffer,
+    pub depth: ParamBuffer,
+    pub mix: ParamBuffer,
+}
+
 // =============================================================================
 // Sequencer States
 // =============================================================================
@@ -912,6 +921,7 @@ pub enum ModuleState {
     FreqShifter(FreqShifterState),
     Eq3(Eq3State),
     Glitch(GlitchState),
+    Leslie(LeslieState),
 
     // Sequencers
     Clock(ClockState),

@@ -102,6 +102,7 @@ export const moduleSizes: Record<ModuleType, string> = {
   'freq-shifter': '2x2',
   'eq3': '3x2',
   'glitch': '2x3',
+  'leslie': '2x2',
 }
 
 export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>> = {
@@ -172,6 +173,7 @@ export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>>
   'freq-shifter': 'strip',
   'eq3': 'strip',
   'glitch': 'strip',
+  'leslie': 'strip',
 }
 
 export type ModuleCategory =
@@ -256,6 +258,7 @@ export const moduleCatalog: { type: ModuleType; label: string; category: ModuleC
   { type: 'freq-shifter', label: 'Freq Shift', category: 'effects' },
   { type: 'eq3', label: 'EQ 3-Band', category: 'effects' },
   { type: 'glitch', label: 'Glitch', category: 'effects' },
+  { type: 'leslie', label: 'Leslie', category: 'effects' },
   // Modulators
   { type: 'adsr', label: 'ADSR', category: 'modulators' },
   { type: 'lfo', label: 'LFO', category: 'modulators' },
@@ -396,6 +399,7 @@ export const modulePrefixes: Record<ModuleType, string> = {
   'freq-shifter': 'fshft',
   'eq3': 'eq',
   'glitch': 'gltch',
+  'leslie': 'les',
 }
 
 export const moduleLabels: Record<ModuleType, string> = {
@@ -492,6 +496,7 @@ export const moduleLabels: Record<ModuleType, string> = {
   'freq-shifter': 'Freq Shifter',
   'eq3': 'EQ 3-Band',
   'glitch': 'Glitch',
+  'leslie': 'Leslie',
 }
 
 export const moduleDefaults: Record<ModuleType, Record<string, number | string | boolean>> = {
@@ -1083,6 +1088,13 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     reverseChance: 0.3,
     pitchRange: 0.0,
     mix: 0.5,
+  },
+  'leslie': {
+    speed: 0,
+    brake: 0,
+    drive: 0,
+    depth: 0.7,
+    mix: 1.0,
   },
   'polyrhythm-sequencer': {
     enabled: true,

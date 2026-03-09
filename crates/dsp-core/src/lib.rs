@@ -84,6 +84,7 @@ pub use effects::{
     FrequencyShifter, FrequencyShifterParams, FrequencyShifterInputs,
     Eq3, Eq3Params, Eq3Inputs,
     Glitch, GlitchParams, GlitchInputs,
+    Leslie, LeslieParams, LeslieInputs,
 };
 
 // Re-export modulators

@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use dsp_core::{
   Adsr, Arpeggiator, AyPlayer, BitCrusher, Chaos, ChordSequencer, Choir, Chorus, Clap808, Clap909, Compressor, Cowbell808, Delay, DrumSequencer, Ensemble,
   EnvelopeFollower, Eq3, EuclideanSequencer, Flanger, FmMatrix, FmOperator, FrequencyShifter, Glitch, Granular, GranularDelay, HiHat808, HiHat909, Hpf, KarplusStrong,
-  Kick808, Kick909, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, ParticleCloud, Phaser, PipeOrgan, PitchShifter,
+  Kick808, Kick909, Leslie, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, ParticleCloud, Phaser, PipeOrgan, PitchShifter,
   PolyrhythmSequencer, Resonator, Reverb, Rimshot909, SampleHold, Shepard, SidPlayer, SlewLimiter, Snare808, Snare909, SnesOsc, SpectralSwarm, SpeechSynth,
   SpringReverb, StepSequencer, Supersaw, TapeDelay, Tb303, Tom808, Tom909, TuringMachine, Vcf, Vco, Vocoder, Wavetable,
 };
@@ -794,6 +794,14 @@ pub(crate) fn create_state(
       pitch_range: ParamBuffer::new(param_number(params, "pitchRange", 0.0)),
       mix: ParamBuffer::new(param_number(params, "mix", 0.5)),
     }),
+    ModuleType::Leslie => ModuleState::Leslie(LeslieState {
+      leslie: Leslie::new(sample_rate),
+      speed: ParamBuffer::new(param_number(params, "speed", 0.0)),
+      brake: ParamBuffer::new(param_number(params, "brake", 0.0)),
+      drive: ParamBuffer::new(param_number(params, "drive", 0.0)),
+      depth: ParamBuffer::new(param_number(params, "depth", 0.7)),
+      mix: ParamBuffer::new(param_number(params, "mix", 1.0)),
+    }),
   }
 }
 
@@ -1511,6 +1519,14 @@ pub(crate) fn apply_param(state: &mut ModuleState, param: &str, value: f32) {
       "repeats" => state.repeats.set(value),
       "reverseChance" => state.reverse_chance.set(value),
       "pitchRange" => state.pitch_range.set(value),
+      "mix" => state.mix.set(value),
+      _ => {}
+    },
+    ModuleState::Leslie(state) => match param {
+      "speed" => state.speed.set(value),
+      "brake" => state.brake.set(value),
+      "drive" => state.drive.set(value),
+      "depth" => state.depth.set(value),
       "mix" => state.mix.set(value),
       _ => {}
     },

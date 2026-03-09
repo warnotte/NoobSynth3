@@ -1554,6 +1554,27 @@
       "description": "808 breakbeat with fast glitch stutters and distortion.",
       "file": "glitch-breakbeat.json",
       "group": "Glitch"
+    },
+    {
+      "id": "hammond-leslie",
+      "name": "Hammond B3 + Leslie",
+      "description": "Classic Hammond B3 organ through a Leslie rotary speaker cabinet.",
+      "file": "hammond-leslie.json",
+      "group": "Leslie"
+    },
+    {
+      "id": "midi-leslie-organ",
+      "name": "MIDI Hammond + Leslie (4 tracks)",
+      "description": "4-track MIDI through Hammond organs with Leslie rotary speaker.",
+      "file": "midi-leslie-organ.json",
+      "group": "Leslie"
+    },
+    {
+      "id": "midi-leslie-organ-8trk",
+      "name": "MIDI Hammond + Leslie (8 tracks)",
+      "description": "Full 8-track MIDI through Hammond organs with Leslie rotary speaker.",
+      "file": "midi-leslie-organ-8trk.json",
+      "group": "Leslie"
     }
   ]
 }

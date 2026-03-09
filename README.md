@@ -9,7 +9,7 @@ Synthétiseur modulaire inspiré de VCV Rack, construit avec React + Rust/WASM.
 ## Caractéristiques
 
 - **Interface Eurorack** : Rails, panneaux métal brossé, câbles patchables
-- **84 modules** : VCO, Supersaw, Karplus-Strong, NES/SNES Osc, TB-303, FM Op, FM Matrix (4-op), Shepard Tone, Pipe Organ, Spectral Swarm, Resonator, Wavetable, Granular Sampler, Particle Cloud, Speech Synth, SID Player (C64), AY Player (Spectrum/CPC), TR-909/808 Drums, Drum Sequencer (8-track), Euclidean Sequencer, MIDI File Sequencer, Turing Machine, Chord Sequencer, Polyrhythm Sequencer, Noise, Audio In, Sample & Hold, Slew, Quantizer, Chaos Engine, VCF (SVF/Ladder), LFO, ADSR, Step Sequencer, Arpeggiator, Ensemble/Choir, Delay/Tape/Granular, Spring/Reverb, Pitch Shifter, Wavefolder, Compressor, Flanger, Freq Shifter, EQ 3-Band, Glitch/Stutter...
+- **85 modules** : VCO, Supersaw, Karplus-Strong, NES/SNES Osc, TB-303, FM Op, FM Matrix (4-op), Shepard Tone, Pipe Organ, Spectral Swarm, Resonator, Wavetable, Granular Sampler, Particle Cloud, Speech Synth, SID Player (C64), AY Player (Spectrum/CPC), TR-909/808 Drums, Drum Sequencer (8-track), Euclidean Sequencer, MIDI File Sequencer, Turing Machine, Chord Sequencer, Polyrhythm Sequencer, Noise, Audio In, Sample & Hold, Slew, Quantizer, Chaos Engine, VCF (SVF/Ladder), LFO, ADSR, Step Sequencer, Arpeggiator, Ensemble/Choir, Delay/Tape/Granular, Spring/Reverb, Pitch Shifter, Wavefolder, Compressor, Flanger, Freq Shifter, EQ 3-Band, Glitch/Stutter, Leslie Rotary Speaker...
 - **Polyphonie** : 1/2/4/8 voix avec voice stealing
 - **MIDI** : Entrée Web MIDI avec vélocité
 - **Presets** : 190+ patches inclus (Jupiter, Juno, Moog, Prophet, Jarre, Acid, Moroder, 909, Shepard, MIDI Organ, Vocal Synthesis...)

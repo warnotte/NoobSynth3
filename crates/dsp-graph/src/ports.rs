@@ -271,6 +271,10 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 2 },  // audio in (stereo)
       PortInfo { channels: 1 },  // clock trigger
     ],
+    // Leslie - 1 stereo input
+    ModuleType::Leslie => vec![
+      PortInfo { channels: 2 },
+    ],
     // SpeechSynth - 3 inputs (pitch CV, gate, clock)
     ModuleType::SpeechSynth => vec![
       PortInfo { channels: 1 },  // pitch CV
@@ -557,6 +561,10 @@ pub fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
     // Glitch - 1 stereo output
     ModuleType::Glitch => vec![
       PortInfo { channels: 2 },  // stereo audio out
+    ],
+    // Leslie - 1 stereo output
+    ModuleType::Leslie => vec![
+      PortInfo { channels: 2 },
     ],
     // SpeechSynth - 1 mono output
     ModuleType::SpeechSynth => vec![
@@ -920,6 +928,10 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
     ModuleType::Glitch => match port_id {
       "in" | "input" | "audio" => Some(0),
       "clock" | "clk" | "trig" => Some(1),
+      _ => None,
+    },
+    ModuleType::Leslie => match port_id {
+      "in" | "input" | "audio" => Some(0),
       _ => None,
     },
     // SpeechSynth - 3 inputs
@@ -1331,6 +1343,10 @@ pub fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize
     },
     // Glitch - 1 output
     ModuleType::Glitch => match port_id {
+      "out" | "output" => Some(0),
+      _ => None,
+    },
+    ModuleType::Leslie => match port_id {
       "out" | "output" => Some(0),
       _ => None,
     },

@@ -1,0 +1,242 @@
+{
+  "version": 1,
+  "id": "midi-leslie-organ-8trk",
+  "name": "MIDI Hammond 8-Track + Leslie",
+  "description": "Full 8-track MIDI through Hammond organs and Leslie rotary speaker.",
+  "graph": {
+    "modules": [
+      {
+        "id": "midiseq-1",
+        "type": "midi-file-sequencer",
+        "name": "MIDI File",
+        "position": { "x": 0, "y": 3 },
+        "params": {
+          "enabled": true,
+          "tempo": 120,
+          "gateLength": 92,
+          "loop": true,
+          "voices": 6,
+          "midiData": "",
+          "selectedFile": ""
+        }
+      },
+      {
+        "id": "organ-1",
+        "type": "pipe-organ",
+        "name": "Track 1",
+        "position": { "x": 4, "y": 0 },
+        "params": {
+          "frequency": 220,
+          "drawbar16": 0.8, "drawbar8": 1.0, "drawbar4": 0.7,
+          "drawbar223": 0.5, "drawbar2": 0.6, "drawbar135": 0.3,
+          "drawbar113": 0.2, "drawbar1": 0.15,
+          "voicing": 0, "chiff": 0.3, "tremulant": 0.0, "tremRate": 6,
+          "wind": 0.05, "brightness": 0.8
+        }
+      },
+      {
+        "id": "organ-2",
+        "type": "pipe-organ",
+        "name": "Track 2",
+        "position": { "x": 4, "y": 1 },
+        "params": {
+          "frequency": 220,
+          "drawbar16": 0.6, "drawbar8": 0.9, "drawbar4": 0.5,
+          "drawbar223": 0.3, "drawbar2": 0.4, "drawbar135": 0.15,
+          "drawbar113": 0.1, "drawbar1": 0.1,
+          "voicing": 1, "chiff": 0.2, "tremulant": 0.0, "tremRate": 5.5,
+          "wind": 0.06, "brightness": 0.7
+        }
+      },
+      {
+        "id": "organ-3",
+        "type": "pipe-organ",
+        "name": "Track 3",
+        "position": { "x": 4, "y": 2 },
+        "params": {
+          "frequency": 220,
+          "drawbar16": 0.5, "drawbar8": 0.85, "drawbar4": 0.45,
+          "drawbar223": 0.25, "drawbar2": 0.35, "drawbar135": 0.1,
+          "drawbar113": 0.08, "drawbar1": 0.1,
+          "voicing": 0, "chiff": 0.15, "tremulant": 0.0, "tremRate": 6,
+          "wind": 0.04, "brightness": 0.65
+        }
+      },
+      {
+        "id": "organ-4",
+        "type": "pipe-organ",
+        "name": "Track 4",
+        "position": { "x": 4, "y": 3 },
+        "params": {
+          "frequency": 220,
+          "drawbar16": 0.7, "drawbar8": 0.8, "drawbar4": 0.4,
+          "drawbar223": 0.15, "drawbar2": 0.25, "drawbar135": 0.05,
+          "drawbar113": 0.0, "drawbar1": 0.05,
+          "voicing": 0, "chiff": 0.1, "tremulant": 0.0, "tremRate": 6,
+          "wind": 0.04, "brightness": 0.6
+        }
+      },
+      {
+        "id": "organ-5",
+        "type": "pipe-organ",
+        "name": "Track 5",
+        "position": { "x": 4, "y": 4 },
+        "params": {
+          "frequency": 220,
+          "drawbar16": 0.55, "drawbar8": 0.9, "drawbar4": 0.5,
+          "drawbar223": 0.2, "drawbar2": 0.3, "drawbar135": 0.1,
+          "drawbar113": 0.05, "drawbar1": 0.1,
+          "voicing": 1, "chiff": 0.12, "tremulant": 0.0, "tremRate": 5.8,
+          "wind": 0.05, "brightness": 0.65
+        }
+      },
+      {
+        "id": "organ-6",
+        "type": "pipe-organ",
+        "name": "Track 6",
+        "position": { "x": 4, "y": 5 },
+        "params": {
+          "frequency": 220,
+          "drawbar16": 0.45, "drawbar8": 0.85, "drawbar4": 0.4,
+          "drawbar223": 0.1, "drawbar2": 0.2, "drawbar135": 0.05,
+          "drawbar113": 0.0, "drawbar1": 0.08,
+          "voicing": 0, "chiff": 0.1, "tremulant": 0.0, "tremRate": 6,
+          "wind": 0.04, "brightness": 0.58
+        }
+      },
+      {
+        "id": "organ-7",
+        "type": "pipe-organ",
+        "name": "Track 7",
+        "position": { "x": 4, "y": 6 },
+        "params": {
+          "frequency": 220,
+          "drawbar16": 0.6, "drawbar8": 0.75, "drawbar4": 0.35,
+          "drawbar223": 0.1, "drawbar2": 0.2, "drawbar135": 0.0,
+          "drawbar113": 0.0, "drawbar1": 0.05,
+          "voicing": 0, "chiff": 0.08, "tremulant": 0.0, "tremRate": 6,
+          "wind": 0.03, "brightness": 0.55
+        }
+      },
+      {
+        "id": "organ-8",
+        "type": "pipe-organ",
+        "name": "Track 8 - Bass",
+        "position": { "x": 4, "y": 7 },
+        "params": {
+          "frequency": 220,
+          "drawbar16": 1.0, "drawbar8": 0.8, "drawbar4": 0.25,
+          "drawbar223": 0.0, "drawbar2": 0.1, "drawbar135": 0.0,
+          "drawbar113": 0.0, "drawbar1": 0.0,
+          "voicing": 0, "chiff": 0.05, "tremulant": 0.0, "tremRate": 6,
+          "wind": 0.03, "brightness": 0.5
+        }
+      },
+      {
+        "id": "mixer-hi",
+        "type": "mixer-1x2",
+        "name": "Mix 1-4",
+        "position": { "x": 7, "y": 1 },
+        "params": {
+          "ch1": 0.8, "ch2": 0.7, "ch3": 0.6, "ch4": 0.65,
+          "ch5": 0, "ch6": 0, "master": 0.75
+        }
+      },
+      {
+        "id": "mixer-lo",
+        "type": "mixer-1x2",
+        "name": "Mix 5-8",
+        "position": { "x": 7, "y": 5 },
+        "params": {
+          "ch1": 0.65, "ch2": 0.6, "ch3": 0.55, "ch4": 0.7,
+          "ch5": 0, "ch6": 0, "master": 0.75
+        }
+      },
+      {
+        "id": "mixer-main",
+        "type": "mixer",
+        "name": "Main Mix",
+        "position": { "x": 9, "y": 3 },
+        "params": {
+          "ch1": 0.8, "ch2": 0.8, "master": 0.8
+        }
+      },
+      {
+        "id": "les-1",
+        "type": "leslie",
+        "name": "Leslie 122",
+        "position": { "x": 11, "y": 3 },
+        "params": {
+          "speed": 0,
+          "brake": 0,
+          "drive": 0.3,
+          "depth": 0.8,
+          "mix": 1.0
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Hall",
+        "position": { "x": 13, "y": 3 },
+        "params": {
+          "time": 1.5,
+          "damp": 0.4,
+          "preDelay": 18,
+          "mix": 0.25
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Main Out",
+        "position": { "x": 15, "y": 3 },
+        "params": { "level": 1 }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 11, "y": 7 },
+        "params": {
+          "text": "MIDI HAMMOND 8-TRACK + LESLIE\n\nFull 8-track MIDI organ setup.\nEach track has its own Pipe Organ\nwith unique drawbar registration.\n\nRouting:\nMIDI (8 tracks) -> 8 Organs\n  -> Mix 1-4 + Mix 5-8\n  -> Main Mix -> Leslie -> Reverb -> Out\n\nTrack 1-4: Upper manual voices\nTrack 5-7: Lower manual voices\nTrack 8: Bass pedals (16'+8')\n\n6 polyphonic voices per track.\n\nTips:\n- Toggle Leslie SLOW/FAST!\n- Drive up for rock organ\n- Load Bach, jazz, gospel MIDI"
+        }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "midiseq-1", "portId": "cv-1" }, "to": { "moduleId": "organ-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "midiseq-1", "portId": "gate-1" }, "to": { "moduleId": "organ-1", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "midiseq-1", "portId": "cv-2" }, "to": { "moduleId": "organ-2", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "midiseq-1", "portId": "gate-2" }, "to": { "moduleId": "organ-2", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "midiseq-1", "portId": "cv-3" }, "to": { "moduleId": "organ-3", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "midiseq-1", "portId": "gate-3" }, "to": { "moduleId": "organ-3", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "midiseq-1", "portId": "cv-4" }, "to": { "moduleId": "organ-4", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "midiseq-1", "portId": "gate-4" }, "to": { "moduleId": "organ-4", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "midiseq-1", "portId": "cv-5" }, "to": { "moduleId": "organ-5", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "midiseq-1", "portId": "gate-5" }, "to": { "moduleId": "organ-5", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "midiseq-1", "portId": "cv-6" }, "to": { "moduleId": "organ-6", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "midiseq-1", "portId": "gate-6" }, "to": { "moduleId": "organ-6", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "midiseq-1", "portId": "cv-7" }, "to": { "moduleId": "organ-7", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "midiseq-1", "portId": "gate-7" }, "to": { "moduleId": "organ-7", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "midiseq-1", "portId": "cv-8" }, "to": { "moduleId": "organ-8", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "midiseq-1", "portId": "gate-8" }, "to": { "moduleId": "organ-8", "portId": "gate" }, "kind": "gate" },
+
+      { "from": { "moduleId": "organ-1", "portId": "out" }, "to": { "moduleId": "mixer-hi", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "organ-2", "portId": "out" }, "to": { "moduleId": "mixer-hi", "portId": "in-b" }, "kind": "audio" },
+      { "from": { "moduleId": "organ-3", "portId": "out" }, "to": { "moduleId": "mixer-hi", "portId": "in-c" }, "kind": "audio" },
+      { "from": { "moduleId": "organ-4", "portId": "out" }, "to": { "moduleId": "mixer-hi", "portId": "in-d" }, "kind": "audio" },
+
+      { "from": { "moduleId": "organ-5", "portId": "out" }, "to": { "moduleId": "mixer-lo", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "organ-6", "portId": "out" }, "to": { "moduleId": "mixer-lo", "portId": "in-b" }, "kind": "audio" },
+      { "from": { "moduleId": "organ-7", "portId": "out" }, "to": { "moduleId": "mixer-lo", "portId": "in-c" }, "kind": "audio" },
+      { "from": { "moduleId": "organ-8", "portId": "out" }, "to": { "moduleId": "mixer-lo", "portId": "in-d" }, "kind": "audio" },
+
+      { "from": { "moduleId": "mixer-hi", "portId": "out" }, "to": { "moduleId": "mixer-main", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "mixer-lo", "portId": "out" }, "to": { "moduleId": "mixer-main", "portId": "in-b" }, "kind": "audio" },
+
+      { "from": { "moduleId": "mixer-main", "portId": "out" }, "to": { "moduleId": "les-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "les-1", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}

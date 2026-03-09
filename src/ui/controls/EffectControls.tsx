@@ -1109,5 +1109,53 @@ export function renderEffectControls(props: ControlProps): React.ReactElement | 
     )
   }
 
+  if (module.type === 'leslie') {
+    const speed = Boolean(module.params.speed)
+    const brake = Boolean(module.params.brake)
+    return (
+      <>
+        <ToggleGroup>
+          <ToggleButton
+            label={speed ? 'FAST' : 'SLOW'}
+            value={speed}
+            onChange={(value) => updateParam(module.id, 'speed', value)}
+          />
+          <ToggleButton
+            label="Brake"
+            value={brake}
+            onChange={(value) => updateParam(module.id, 'brake', value)}
+          />
+        </ToggleGroup>
+        <RotaryKnob
+          label="Drive"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.drive ?? 0)}
+          onChange={(value) => updateParam(module.id, 'drive', value)}
+          format={formatPercent}
+        />
+        <RotaryKnob
+          label="Depth"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.depth ?? 0.7)}
+          onChange={(value) => updateParam(module.id, 'depth', value)}
+          format={formatPercent}
+        />
+        <RotaryKnob
+          label="Mix"
+          min={0}
+          max={1}
+          step={0.01}
+          value={Number(module.params.mix ?? 1)}
+          onChange={(value) => updateParam(module.id, 'mix', value)}
+          format={formatPercent}
+        />
+      </>
+    )
+  }
+
   return null
 }

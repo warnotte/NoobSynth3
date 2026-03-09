@@ -67,6 +67,7 @@ pub enum ModuleType {
     FreqShifter,
     Eq3,
     Glitch,
+    Leslie,
 
     // Sequencers
     Clock,

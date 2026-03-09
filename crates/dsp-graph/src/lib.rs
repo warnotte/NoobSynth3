@@ -836,6 +836,7 @@ fn normalize_module_type(raw: &str) -> ModuleType {
     "freq-shifter" | "frequency-shifter" => ModuleType::FreqShifter,
     "eq3" | "eq-3" => ModuleType::Eq3,
     "glitch" => ModuleType::Glitch,
+    "leslie" | "rotary" => ModuleType::Leslie,
     "control" => ModuleType::Control,
     "scope" => ModuleType::Scope,
     "meter" => ModuleType::Meter,
