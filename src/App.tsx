@@ -825,12 +825,24 @@ function App() {
     redo()
     pendingUndoSyncRef.current = true
   }, [redo])
+  const STRING_PARAMS = new Set(['stepData', 'drumData', 'midiData', 'speechText'])
   useEffect(() => {
     if (!pendingUndoSyncRef.current) return
     pendingUndoSyncRef.current = false
     if (statusRef.current === 'running') {
       engine.updateGraph(graph)
       activeVoiceCountRef.current = getVoiceCountFromGraph(graph)
+      // After updateGraph (preserve mode), the WASM engine restores old module
+      // states including old param values. Re-send all params to sync the sound.
+      for (const mod of graph.modules) {
+        for (const [paramId, value] of Object.entries(mod.params)) {
+          if (typeof value === 'string' && STRING_PARAMS.has(paramId)) {
+            engine.setParamString(mod.id, paramId, value)
+          } else {
+            engine.setParam(mod.id, paramId, value)
+          }
+        }
+      }
     }
   }, [graph, engine])
 
