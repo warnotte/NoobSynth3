@@ -31,9 +31,9 @@ public/midi-presets/    # MIDI files + manifest.json
 ## UI Component Structure
 
 ```
-App.tsx                          # Root component, state management
-├── TopBar.tsx                   # Header (power, presets, audio mode)
-├── SidePanel.tsx                # Left panel (module library) + Right panel (presets)
+App.tsx                          # Root component, state management, undo/redo
+├── TopBar.tsx                   # Header + sticky toolbar (transport, undo/redo, export/import, view)
+├── SidePanel.tsx                # Module library + Presets + Macros (drawer on mobile)
 ├── RackView.tsx                 # Main rack container
 │   ├── ModuleCard.tsx           # Single module frame (header, ports, body)
 │   │   └── controls/            # Module-specific controls
@@ -98,6 +98,8 @@ Câbles et jacks sont colorés par type de signal :
 
 | Hook | Rôle | Fichier |
 |------|------|---------|
+| `useUndoableState` | Undo/Redo avec historique (useReducer) | `hooks/useUndoableState.ts` |
+| `UndoContext` | Context pour transactions (begin/end/cancel) | `hooks/UndoContext.tsx` |
 | `usePatching` | Gestion des câbles (drag & drop) | `hooks/usePatching.tsx` |
 | `useModuleDrag` | Déplacement des modules | `hooks/useModuleDrag.ts` |
 | `useControlVoices` | Polyphonie, voice stealing, CV output (note 60 = CV 0) | `hooks/useControlVoices.ts` |
@@ -246,6 +248,23 @@ control, output, audio-in, scope, meter, lab, notes
 ---
 
 ## Features Implementation Notes
+
+### Undo/Redo System
+Implémenté via `useReducer` dans `src/hooks/useUndoableState.ts` :
+- **Historique** : Stack past/future avec max 50 entrées
+- **Transactions** : `beginTransaction()`→drag→`endTransaction()` = 1 undo step (knobs, modules)
+- **skipHistory** : Paramètres runtime (CV, gate, velocity, sync) ne polluent pas l'historique
+- **Sync audio** : Après undo/redo, `engine.updateGraph()` + re-send tous les params via `setParam()`/`setParamString()`
+- **Raccourcis** : Ctrl+Z (undo), Ctrl+Shift+Z / Ctrl+Y (redo), filtrés si input/textarea focus
+- **Reset** : `clearHistory()` appelé sur chargement preset et Clear rack
+- **Fichiers clés** : `src/hooks/useUndoableState.ts`, `src/hooks/UndoContext.tsx`, `src/App.tsx`
+
+### TopBar Layout
+La TopBar est divisée en deux éléments frères :
+- `<header className="topbar-head">` — Brand + subtitle, scroll normalement
+- `<div className="topbar-body">` — Toolbar sticky (z-index 1100, au-dessus des câbles)
+- **Zones** : Status | Transport (play/stop/record) | Patch (undo/redo/export/import) | View (cables toggle) | Dev (resize toggle)
+- **Mobile** : Header masqué, toolbar wrap horizontal, labels cachés, SidePanel en drawer slide-in
 
 ### Recording (WAV Export)
 Le bouton Record dans la TopBar capture l'audio en WAV 16-bit PCM stéréo :

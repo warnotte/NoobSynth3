@@ -9,13 +9,55 @@ Ils sont tous utilisés dans `App.tsx` et passent leurs callbacks/states aux com
 
 ```
 App.tsx
+├── useUndoableState()   → Undo/Redo avec historique (useReducer)
 ├── usePatching()        → Gestion des câbles (drag & drop)
 ├── useModuleDrag()      → Déplacement des modules dans le rack
 ├── useControlVoices()   → Polyphonie, voice stealing, séquenceur interne
 ├── useMidi()            → Web MIDI input
 ├── useMarioSequencer()  → Séquenceur dédié au module Mario
 └── useComputerKeyboard() → Clavier AZERTY/QWERTY comme input
+
+Context:
+└── UndoContext          → Partage begin/end/cancelTransaction aux composants
 ```
+
+---
+
+## useUndoableState
+
+**Fichier:** `useUndoableState.ts`
+
+**Rôle:** Gère l'historique undo/redo pour le graph state via useReducer.
+
+**Params:**
+```typescript
+useUndoableState<T>(initialState: T, config?: { maxHistory?: number })
+```
+
+**Retourne:**
+- `state` - État actuel
+- `setState(action, options?)` - Met à jour l'état (supporte `skipHistory: true`)
+- `undo()` / `redo()` - Navigation dans l'historique
+- `canUndo` / `canRedo` - Booléens
+- `undoCount` / `redoCount` - Compteurs pour affichage UI
+- `beginTransaction()` - Capture snapshot (début drag knob/module)
+- `endTransaction()` - Commit une entrée (snapshot→current)
+- `cancelTransaction()` - Restaure le snapshot (Escape pendant drag)
+- `clearHistory()` - Reset historique (changement de preset, clear rack)
+
+**Actions du reducer:** SET, SET_FN, UNDO, REDO, BEGIN_TRANSACTION, END_TRANSACTION, CANCEL_TRANSACTION, CLEAR_HISTORY
+
+---
+
+## UndoContext
+
+**Fichier:** `UndoContext.tsx`
+
+**Rôle:** React context qui partage les fonctions de transaction aux composants enfants.
+
+**Utilisé par:**
+- `RotaryKnob.tsx` — begin/endTransaction sur pointer drag
+- `useModuleDrag.ts` — begin/end/cancelTransaction sur module drag
 
 ---
 

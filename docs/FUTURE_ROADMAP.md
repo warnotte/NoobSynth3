@@ -476,53 +476,24 @@ export function MidiStatusPanel({
 
 ## 3. Fonctionnalités Manquantes
 
-### 3.1 Undo/Redo (Priorité: Haute)
+### 3.1 Undo/Redo ✅ FAIT
 
-**Statut:** Plan existant dans `docs/UNDO_REDO_ROADMAP.md`
+**Statut:** ✅ Implémenté en mars 2026 (branche `feat/ux-improvements`)
 
-**Résumé de l'approche:**
+**Approche retenue:** `useReducer` (v2) — voir `docs/UNDO_REDO_ROADMAP.md`
 
-```typescript
-type UndoableAction =
-  | { type: 'ADD_MODULE'; module: ModuleSpec }
-  | { type: 'REMOVE_MODULE'; moduleId: string; module: ModuleSpec }
-  | { type: 'MOVE_MODULE'; moduleId: string; from: Position; to: Position }
-  | { type: 'UPDATE_PARAM'; moduleId: string; paramId: string; from: any; to: any }
-  | { type: 'ADD_CONNECTION'; connection: Connection }
-  | { type: 'REMOVE_CONNECTION'; connection: Connection }
-  | { type: 'BATCH'; actions: UndoableAction[] }
+**Fichiers créés:**
+- `src/hooks/useUndoableState.ts` — Hook principal (useReducer-based)
+- `src/hooks/UndoContext.tsx` — React context pour transactions
 
-type HistoryState = {
-  past: UndoableAction[]
-  future: UndoableAction[]
-}
-
-// Hook
-function useUndoRedo(graph: Graph, setGraph: SetGraph) {
-  const [history, setHistory] = useState<HistoryState>({ past: [], future: [] })
-
-  const undo = useCallback(() => {
-    if (history.past.length === 0) return
-    const action = history.past[history.past.length - 1]
-    const reversed = reverseAction(action)
-    applyAction(reversed, graph, setGraph)
-    setHistory(h => ({
-      past: h.past.slice(0, -1),
-      future: [action, ...h.future]
-    }))
-  }, [history, graph, setGraph])
-
-  const redo = useCallback(() => {
-    // ... similar logic
-  }, [history, graph, setGraph])
-
-  return { undo, redo, canUndo: history.past.length > 0, canRedo: history.future.length > 0 }
-}
-```
-
-**Keyboard shortcuts:**
-- `Ctrl+Z` / `Cmd+Z` → Undo
-- `Ctrl+Shift+Z` / `Cmd+Shift+Z` → Redo
+**Fonctionnalités:**
+- Undo/Redo avec historique (max 50 entrées)
+- Transactions pour knob drags et module drags (1 undo = 1 drag complet)
+- `skipHistory` pour paramètres runtime (CV, gate, velocity, sync)
+- Sync audio après undo (re-send tous les params au moteur)
+- Boutons Undo/Redo dans TopBar avec compteurs
+- Raccourcis : `Ctrl+Z`, `Ctrl+Shift+Z`, `Ctrl+Y`
+- `clearHistory()` sur chargement de preset ou Clear rack
 
 ### 3.2 Arpeggiator - Modes Manquants (Priorité: Moyenne)
 
@@ -624,44 +595,15 @@ let scale = 1.0 / active_count as Sample;
 2. **Mode "Unity Gain"**: Option pour désactiver la division
 3. **Makeup Gain**: Knob de compensation sur chaque mixer
 
-### 3.4 Preset Export/Import (Priorité: Moyenne)
+### 3.4 Preset Export/Import ✅ FAIT
 
-**Actuellement:** Presets stockés dans `public/presets/`
+**Statut:** ✅ Implémenté en mars 2026
 
-**Fonctionnalité demandée:**
-- Export preset → fichier .json téléchargeable
-- Import preset → drag & drop ou file picker
-- Share preset → URL avec preset encodé (base64)
-
-```tsx
-// ExportPreset button
-const handleExport = () => {
-  const preset = {
-    id: `user-${Date.now()}`,
-    name: presetName,
-    description: '',
-    graph: graph,
-  }
-  const blob = new Blob([JSON.stringify(preset, null, 2)], { type: 'application/json' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = `${presetName}.json`
-  a.click()
-}
-
-// ImportPreset via drag & drop
-const handleDrop = async (event: DragEvent) => {
-  const file = event.dataTransfer?.files[0]
-  if (file?.name.endsWith('.json')) {
-    const text = await file.text()
-    const preset = JSON.parse(text)
-    if (validatePreset(preset)) {
-      setGraph(preset.graph)
-    }
-  }
-}
-```
+**Fonctionnalités:**
+- Export preset → télécharge fichier JSON du patch courant
+- Import preset → file picker (hidden input), charge un JSON
+- Boutons Export/Import dans TopBar et dans le SidePanel Presets
+- L'ancien bouton Share (URL encoding) a été supprimé (redondant et limité)
 
 ---
 
@@ -985,8 +927,8 @@ jobs:
 - [ ] Setup tests unitaires basiques
 
 ### Phase 2: Features Critiques (2-3 semaines)
-- [ ] Implement Undo/Redo
-- [ ] Stereo mixers
+- [x] Implement Undo/Redo ✅
+- [x] Stereo mixers ✅
 - [ ] Arpeggiator modes manquants
 
 ### Phase 3: Control Module v2 (1-2 semaines)
