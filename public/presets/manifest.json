@@ -1479,6 +1479,13 @@
       "group": "Showcase"
     },
     {
+      "id": "take-on-me",
+      "name": "Take On Me",
+      "description": "a-ha (1985) — Iconic synth riff + bass + 909 drums + supersaw pads. 169 BPM.",
+      "file": "take-on-me.json",
+      "group": "Showcase"
+    },
+    {
       "id": "envelope-follower-test",
       "name": "Envelope Follower",
       "description": "Audio envelope controls VCF cutoff via Envelope Follower module.",
