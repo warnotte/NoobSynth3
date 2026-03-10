@@ -8,7 +8,7 @@ export type SetStateOptions = {
   skipHistory?: boolean
 }
 
-export type UndoableStateConfig<T> = {
+export type UndoableStateConfig = {
   maxHistory?: number
 }
 
@@ -193,7 +193,7 @@ const DEFAULT_MAX_HISTORY = 50
 
 export function useUndoableState<T>(
   initialState: T | (() => T),
-  config?: UndoableStateConfig<T>,
+  config?: UndoableStateConfig,
 ): UndoableStateReturn<T> {
   const maxHistory = config?.maxHistory ?? DEFAULT_MAX_HISTORY
 

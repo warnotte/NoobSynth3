@@ -1,4 +1,3 @@
-import { useRef } from 'react'
 
 type TopBarProps = {
   status: 'idle' | 'running' | 'error'

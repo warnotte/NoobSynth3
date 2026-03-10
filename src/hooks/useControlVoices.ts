@@ -31,7 +31,7 @@ type UseControlVoicesParams = {
     moduleId: string,
     paramId: string,
     value: number | string | boolean,
-    options?: { skipEngine?: boolean },
+    options?: { skipEngine?: boolean; skipHistory?: boolean },
   ) => void
 }
 
