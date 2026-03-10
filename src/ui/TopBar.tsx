@@ -1,6 +1,4 @@
-import { useCallback, useState } from 'react'
-
-type ShareStatus = 'idle' | 'copied' | 'error'
+import { useRef } from 'react'
 
 type TopBarProps = {
   status: 'idle' | 'running' | 'error'
@@ -16,16 +14,14 @@ type TopBarProps = {
   showDevTools?: boolean
   devResizeEnabled?: boolean
   onToggleDevResize?: () => void
-  /** Current shareable URL (null if patch is too large) */
-  shareUrl: string | null
-  /** Error message if share URL can't be generated */
-  shareError?: string | null
   isRecording?: boolean
   onToggleRecording?: () => void
   undoCount?: number
   redoCount?: number
   onUndo?: () => void
   onRedo?: () => void
+  onExportPreset?: () => void
+  onImportPreset?: () => void
 }
 
 // Icons
@@ -37,11 +33,6 @@ const PlayIcon = () => (
 const StopIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
     <rect x="6" y="6" width="12" height="12"/>
-  </svg>
-)
-const ShareIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-    <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/>
   </svg>
 )
 const CableIcon = () => (
@@ -65,6 +56,16 @@ const RedoIcon = () => (
     <path d="M21 10H8a4 4 0 000 8h7M21 10l-4-4M21 10l-4 4"/>
   </svg>
 )
+const ExportIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+  </svg>
+)
+const ImportIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+  </svg>
+)
 const ResizeIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
     <path d="M21 21l-6-6m6 6v-6m0 6h-6M3 3l6 6M3 3v6m0-6h6"/>
@@ -85,35 +86,15 @@ export const TopBar = ({
   showDevTools = false,
   devResizeEnabled = false,
   onToggleDevResize = () => {},
-  shareUrl,
-  shareError,
   isRecording = false,
   onToggleRecording = () => {},
   undoCount = 0,
   redoCount = 0,
   onUndo = () => {},
   onRedo = () => {},
+  onExportPreset,
+  onImportPreset,
 }: TopBarProps) => {
-  const [shareStatus, setShareStatus] = useState<ShareStatus>('idle')
-
-  const handleShare = useCallback(async () => {
-    if (!shareUrl) {
-      setShareStatus('error')
-      setTimeout(() => setShareStatus('idle'), 2000)
-      return
-    }
-    try {
-      await navigator.clipboard.writeText(shareUrl)
-      setShareStatus('copied')
-      setTimeout(() => setShareStatus('idle'), 2000)
-    } catch {
-      setShareStatus('error')
-      setTimeout(() => setShareStatus('idle'), 2000)
-    }
-  }, [shareUrl])
-
-  const shareTitle = shareError || (shareUrl ? 'Copy shareable URL' : 'Patch too large to share')
-
   return (
     <header className="topbar">
       <div className="topbar-head">
@@ -169,7 +150,7 @@ export const TopBar = ({
                 className={`button top-bar-record ${isRecording ? 'recording' : ''}`}
                 onClick={onToggleRecording}
                 disabled={!isRunning}
-                title={isRecording ? 'Stop recording & download' : 'Start recording'}
+                title={isRecording ? 'Stop recording & download WAV' : 'Record audio to WAV file'}
               >
                 <RecordIcon />
               </button>
@@ -189,7 +170,7 @@ export const TopBar = ({
                 className={`button icon-btn ${undoCount > 0 ? '' : 'disabled'}`}
                 onClick={onUndo}
                 disabled={undoCount === 0}
-                title={`Undo (Ctrl+Z)${undoCount > 0 ? ` — ${undoCount}` : ''}`}
+                title={`Undo (Ctrl+Z)${undoCount > 0 ? ` — ${undoCount} step${undoCount > 1 ? 's' : ''}` : ''}`}
               >
                 <UndoIcon />
               </button>
@@ -198,18 +179,25 @@ export const TopBar = ({
                 className={`button icon-btn ${redoCount > 0 ? '' : 'disabled'}`}
                 onClick={onRedo}
                 disabled={redoCount === 0}
-                title={`Redo (Ctrl+Shift+Z)${redoCount > 0 ? ` — ${redoCount}` : ''}`}
+                title={`Redo (Ctrl+Shift+Z)${redoCount > 0 ? ` — ${redoCount} step${redoCount > 1 ? 's' : ''}` : ''}`}
               >
                 <RedoIcon />
               </button>
               <button
                 type="button"
-                className={`button icon-btn ${shareStatus !== 'idle' ? shareStatus : ''}`}
-                onClick={handleShare}
-                disabled={shareStatus === 'copied'}
-                title={shareTitle}
+                className="button icon-btn"
+                onClick={onExportPreset}
+                title="Export patch — Download current patch as JSON file"
               >
-                <ShareIcon />
+                <ExportIcon />
+              </button>
+              <button
+                type="button"
+                className="button icon-btn"
+                onClick={onImportPreset}
+                title="Import patch — Load a JSON patch file"
+              >
+                <ImportIcon />
               </button>
             </div>
           </div>

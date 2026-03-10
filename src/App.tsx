@@ -9,7 +9,6 @@ import { useUrlPreset } from './hooks/useUrlPreset'
 import { useUndoableState } from './hooks/useUndoableState'
 import { UndoProvider } from './hooks/UndoContext'
 import {
-  generatePresetUrl,
   setUrlPreset,
   clearUrlShareParams,
 } from './utils/urlSharing'
@@ -2225,10 +2224,6 @@ function App() {
   const modeLabel = audioMode === 'vst' ? 'VST Mode' : audioMode === 'native' ? 'Native Audio' : 'Web Audio'
   const unifiedBooting = audioMode === 'native' ? tauriNativeBooting : isBooting
 
-  // Compute share URL - only for loaded presets
-  const shareUrl = currentPresetId ? generatePresetUrl(currentPresetId) : null
-  const shareError = shareUrl === null ? 'Load a preset to share' : null
-
   const handleUnifiedStart = async () => {
     if (audioMode === 'vst') {
       // In VST mode, just sync the graph - audio is handled by DAW
@@ -2481,8 +2476,8 @@ function App() {
           redoCount={redoCount}
           onUndo={handleUndo}
           onRedo={handleRedo}
-          shareUrl={shareUrl}
-          shareError={shareError}
+          onExportPreset={handleExportPreset}
+          onImportPreset={handleImportPreset}
           isRecording={isRecording}
           onToggleRecording={handleToggleRecording}
         />
