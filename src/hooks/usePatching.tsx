@@ -163,7 +163,8 @@ export const usePatching = ({ graph, setGraph, rackRef, onGraphChange }: UsePatc
       if (!targets || targets.size === 0) {
         return null
       }
-      const snapRadius = 26
+      const isTouch = 'ontouchstart' in window
+      const snapRadius = isTouch ? 44 : 26
       let bestKey: string | null = null
       let bestDistance = Number.POSITIVE_INFINITY
       targets.forEach((key) => {
@@ -277,6 +278,7 @@ export const usePatching = ({ graph, setGraph, rackRef, onGraphChange }: UsePatc
       if (event.button !== 0) {
         return
       }
+      event.preventDefault()
       const current: PortHandle = { ...port, moduleId }
       const portKey = `${moduleId}:${port.id}`
       const start = portPositions[portKey] ?? getCenterFromElement(event.currentTarget)
