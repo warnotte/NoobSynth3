@@ -24,12 +24,6 @@
   flex-direction: row;
   align-items: baseline;
   gap: 12px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.1) 100%);
-  margin: -18px -22px 0;
-  padding: 18px 22px 12px;
-  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
 }
 
 .topbar-body {
@@ -37,6 +31,22 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 1100;
+  padding: 12px 22px;
+  background:
+    linear-gradient(135deg, rgba(45, 55, 72, 0.15) 0%, transparent 50%),
+    linear-gradient(180deg, #1c1c22 0%, #0f0f14 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-top-color: rgba(255, 255, 255, 0.18);
+  border-radius: var(--radius-xl);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+    0 4px 24px rgba(0, 0, 0, 0.55),
+    0 8px 40px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
 }
 
 /* Zone layout: left | center | right */
@@ -1992,30 +2002,8 @@
   gap: 16px;
 }
 
-.topbar {
-  display: grid;
-  grid-template-rows: auto auto;
-  gap: 16px;
-  padding: 18px 22px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  overflow: hidden;
-  background:
-    linear-gradient(135deg, rgba(45, 55, 72, 0.15) 0%, transparent 50%),
-    linear-gradient(180deg, #1c1c22 0%, #0f0f14 100%);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-top-color: rgba(255, 255, 255, 0.18);
-  border-radius: var(--radius-xl);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
-    0 4px 24px rgba(0, 0, 0, 0.55),
-    0 8px 40px rgba(0, 0, 0, 0.3);
-}
-
-/* Subtle shine overlay */
-.topbar::before {
+/* Subtle shine overlay on sticky bar */
+.topbar-body::before {
   content: '';
   position: absolute;
   top: 0;
@@ -4440,10 +4428,6 @@ textarea:focus-visible,
 }
 
 @media (max-width: 960px) {
-  .topbar {
-    gap: 12px;
-  }
-
   .topbar-body {
     flex-direction: column;
     align-items: flex-start;

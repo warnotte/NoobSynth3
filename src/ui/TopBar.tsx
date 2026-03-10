@@ -96,12 +96,12 @@ export const TopBar = ({
   onImportPreset,
 }: TopBarProps) => {
   return (
-    <header className="topbar">
-      <div className="topbar-head">
-        <div className="brand">NoobSynth Workbench</div>
-        <div className="subtitle">Modular audio engine prototype</div>
-      </div>
-      <div className="topbar-body">
+    <>
+    <header className="topbar-head">
+      <div className="brand">NoobSynth Workbench</div>
+      <div className="subtitle">Modular audio engine prototype</div>
+    </header>
+    <div className="topbar-body">
         {/* Left: Status */}
         <div className="topbar-zone topbar-zone--left">
           <div className="status-block">
@@ -245,6 +245,6 @@ export const TopBar = ({
           </>
         )}
       </div>
-    </header>
+    </>
   )
 }
