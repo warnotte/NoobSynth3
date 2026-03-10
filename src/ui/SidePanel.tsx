@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ChangeEvent, type RefObject } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { GraphState, MacroSpec, MacroTarget, ModuleSpec, ModuleType } from '../shared/graph'
 import type { PresetSpec } from '../state/presets'
 import {
@@ -19,8 +19,6 @@ type SidePanelProps = {
   onAddModule: (type: ModuleType) => void
   onExportPreset: () => void
   onImportPreset: () => void
-  presetFileRef: RefObject<HTMLInputElement | null>
-  onPresetFileChange: (event: ChangeEvent<HTMLInputElement>) => void
   presetError: string | null
   importError: string | null
   presetStatus: 'loading' | 'ready' | 'error'
@@ -71,8 +69,6 @@ export const SidePanel = ({
   onAddModule,
   onExportPreset,
   onImportPreset,
-  presetFileRef,
-  onPresetFileChange,
   presetError,
   importError,
   presetStatus,
@@ -335,13 +331,6 @@ export const SidePanel = ({
               >
                 Compact
               </button>
-              <input
-                ref={presetFileRef}
-                type="file"
-                accept="application/json"
-                className="preset-file"
-                onChange={onPresetFileChange}
-              />
             </div>
             {presetError && <div className="preset-error">{presetError}</div>}
             {importError && <div className="preset-error">{importError}</div>}

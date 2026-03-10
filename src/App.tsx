@@ -2514,8 +2514,6 @@ function App() {
           onAddModule={handleAddModule}
           onExportPreset={handleExportPreset}
           onImportPreset={handleImportPreset}
-          presetFileRef={presetFileRef}
-          onPresetFileChange={handlePresetFileChange}
           presetError={presetError}
           importError={importError}
           presetStatus={presetStatus}
@@ -2561,6 +2559,14 @@ function App() {
         connections={cablesVisible ? graph.connections : []}
         renderCable={renderCable}
         renderGhostCable={renderGhostCable}
+      />
+      <input
+        ref={presetFileRef}
+        type="file"
+        accept="application/json"
+        className="preset-file"
+        onChange={handlePresetFileChange}
+        style={{ display: 'none' }}
       />
       {contextMenu && (
         <ContextMenu
