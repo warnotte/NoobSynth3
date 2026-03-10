@@ -115,7 +115,6 @@ export const SidePanel = ({
   // All sections collapsed by default
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({
     library: true,
-    patching: true,
     presets: true,
     macros: true,
     tauri: true,
@@ -283,16 +282,6 @@ export const SidePanel = ({
                 )
               })}
             </div>
-      </PanelSection>
-      <PanelSection
-        title="Patching"
-        collapsed={collapsedSections.patching}
-        onToggle={() => toggleSection('patching')}
-      >
-        <p className="muted">
-          Drag from any jack to connect. Drag from a connected input to empty
-          space to unplug. Colors indicate signal type.
-        </p>
       </PanelSection>
       <PanelSection
         title="Presets"

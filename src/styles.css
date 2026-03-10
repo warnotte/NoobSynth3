@@ -4429,30 +4429,21 @@ textarea:focus-visible,
 
 @media (max-width: 960px) {
   .topbar-body {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-
-  .dev-tools {
-    align-items: flex-start;
-  }
-
-  .dev-toggles {
     flex-wrap: wrap;
+    gap: 8px 12px;
+    padding: 8px 14px;
   }
 
-  .view-tools {
-    align-items: flex-start;
+  .topbar-separator {
+    display: none;
   }
 
-  .view-toggles {
-    flex-wrap: wrap;
+  .topbar-zone {
+    gap: 8px;
   }
 
-  .power-toggle {
-    width: 100%;
-    max-width: 240px;
+  .action-label {
+    display: none;
   }
 
   .workbench {
