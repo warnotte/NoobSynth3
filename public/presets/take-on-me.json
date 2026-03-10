@@ -1,0 +1,413 @@
+{
+  "id": "take-on-me",
+  "name": "Take On Me",
+  "description": "a-ha (1985) — Iconic synth riff + bass + drums",
+  "group": "Showcase",
+  "graph": {
+    "modules": [
+      {
+        "id": "clock-1",
+        "type": "clock",
+        "name": "Clock",
+        "position": { "col": 1, "row": 1 },
+        "params": {
+          "tempo": 169,
+          "rate": 4,
+          "swing": 0,
+          "enabled": true
+        }
+      },
+      {
+        "id": "seq-riff",
+        "type": "step-sequencer",
+        "name": "Synth Riff",
+        "position": { "col": 3, "row": 1 },
+        "params": {
+          "enabled": true,
+          "tempo": 169,
+          "rate": 4,
+          "gateLength": 60,
+          "swing": 0,
+          "slideTime": 20,
+          "length": 16,
+          "direction": 0,
+          "stepData": "[{\"pitch\":6,\"gate\":true,\"velocity\":100,\"slide\":false},{\"pitch\":6,\"gate\":true,\"velocity\":90,\"slide\":false},{\"pitch\":2,\"gate\":true,\"velocity\":100,\"slide\":false},{\"pitch\":-1,\"gate\":true,\"velocity\":90,\"slide\":false},{\"pitch\":-1,\"gate\":false,\"velocity\":80,\"slide\":false},{\"pitch\":4,\"gate\":true,\"velocity\":100,\"slide\":false},{\"pitch\":4,\"gate\":true,\"velocity\":90,\"slide\":false},{\"pitch\":4,\"gate\":true,\"velocity\":80,\"slide\":false},{\"pitch\":8,\"gate\":true,\"velocity\":100,\"slide\":false},{\"pitch\":8,\"gate\":true,\"velocity\":90,\"slide\":false},{\"pitch\":9,\"gate\":true,\"velocity\":100,\"slide\":false},{\"pitch\":11,\"gate\":true,\"velocity\":100,\"slide\":true},{\"pitch\":11,\"gate\":true,\"velocity\":90,\"slide\":false},{\"pitch\":8,\"gate\":true,\"velocity\":80,\"slide\":false},{\"pitch\":6,\"gate\":true,\"velocity\":100,\"slide\":false},{\"pitch\":4,\"gate\":true,\"velocity\":90,\"slide\":false}]"
+        }
+      },
+      {
+        "id": "osc-riff",
+        "type": "oscillator",
+        "name": "Riff Osc",
+        "position": { "col": 6, "row": 1 },
+        "params": {
+          "frequency": 440,
+          "detune": 3.0,
+          "waveform": 1,
+          "pwm": 0.5,
+          "subMix": 0.0
+        }
+      },
+      {
+        "id": "adsr-riff",
+        "type": "adsr",
+        "name": "Riff Env",
+        "position": { "col": 8, "row": 1 },
+        "params": {
+          "attack": 0.002,
+          "decay": 0.15,
+          "sustain": 0.6,
+          "release": 0.08
+        }
+      },
+      {
+        "id": "vca-riff",
+        "type": "gain",
+        "name": "Riff VCA",
+        "position": { "col": 9, "row": 1 },
+        "params": {
+          "gain": 0.8
+        }
+      },
+      {
+        "id": "seq-bass",
+        "type": "step-sequencer",
+        "name": "Bass Line",
+        "position": { "col": 3, "row": 6 },
+        "params": {
+          "enabled": true,
+          "tempo": 169,
+          "rate": 3,
+          "gateLength": 70,
+          "swing": 0,
+          "slideTime": 30,
+          "length": 16,
+          "direction": 0,
+          "stepData": "[{\"pitch\":-13,\"gate\":true,\"velocity\":100,\"slide\":false},{\"pitch\":-13,\"gate\":false,\"velocity\":80,\"slide\":false},{\"pitch\":-13,\"gate\":true,\"velocity\":90,\"slide\":false},{\"pitch\":-13,\"gate\":false,\"velocity\":80,\"slide\":false},{\"pitch\":-8,\"gate\":true,\"velocity\":100,\"slide\":false},{\"pitch\":-8,\"gate\":false,\"velocity\":80,\"slide\":false},{\"pitch\":-8,\"gate\":true,\"velocity\":90,\"slide\":false},{\"pitch\":-8,\"gate\":false,\"velocity\":80,\"slide\":false},{\"pitch\":-3,\"gate\":true,\"velocity\":100,\"slide\":false},{\"pitch\":-3,\"gate\":false,\"velocity\":80,\"slide\":false},{\"pitch\":-3,\"gate\":true,\"velocity\":90,\"slide\":false},{\"pitch\":-3,\"gate\":false,\"velocity\":80,\"slide\":false},{\"pitch\":-6,\"gate\":true,\"velocity\":100,\"slide\":false},{\"pitch\":-6,\"gate\":false,\"velocity\":80,\"slide\":false},{\"pitch\":-6,\"gate\":true,\"velocity\":90,\"slide\":true},{\"pitch\":-8,\"gate\":true,\"velocity\":90,\"slide\":false}]"
+        }
+      },
+      {
+        "id": "osc-bass",
+        "type": "oscillator",
+        "name": "Bass Osc",
+        "position": { "col": 6, "row": 6 },
+        "params": {
+          "frequency": 220,
+          "detune": 0,
+          "waveform": 2,
+          "pwm": 0.5,
+          "subMix": 0.35
+        }
+      },
+      {
+        "id": "vcf-bass",
+        "type": "vcf",
+        "name": "Bass Filter",
+        "position": { "col": 8, "row": 6 },
+        "params": {
+          "cutoff": 600,
+          "resonance": 0.15,
+          "drive": 0.1,
+          "model": "ladder",
+          "mode": "lp",
+          "slope": 24
+        }
+      },
+      {
+        "id": "adsr-bass",
+        "type": "adsr",
+        "name": "Bass Env",
+        "position": { "col": 8, "row": 8 },
+        "params": {
+          "attack": 0.003,
+          "decay": 0.2,
+          "sustain": 0.5,
+          "release": 0.06
+        }
+      },
+      {
+        "id": "vca-bass",
+        "type": "gain",
+        "name": "Bass VCA",
+        "position": { "col": 10, "row": 6 },
+        "params": {
+          "gain": 0.65
+        }
+      },
+      {
+        "id": "drum-seq",
+        "type": "drum-sequencer",
+        "name": "Drums",
+        "position": { "col": 1, "row": 11 },
+        "params": {
+          "enabled": true,
+          "tempo": 169,
+          "rate": 4,
+          "swing": 0,
+          "drumData": "{\"tracks\":[[{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":1},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":1},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":1,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}]]}"
+        }
+      },
+      {
+        "id": "kick",
+        "type": "909-kick",
+        "name": "Kick",
+        "position": { "col": 5, "row": 11 },
+        "params": {
+          "tune": 50,
+          "attack": 0.6,
+          "decay": 0.5,
+          "drive": 0.25
+        }
+      },
+      {
+        "id": "snare",
+        "type": "909-snare",
+        "name": "Snare",
+        "position": { "col": 6, "row": 11 },
+        "params": {
+          "tune": 200,
+          "tone": 0.55,
+          "snappy": 0.6,
+          "decay": 0.25
+        }
+      },
+      {
+        "id": "hihat",
+        "type": "909-hihat",
+        "name": "HiHat",
+        "position": { "col": 7, "row": 11 },
+        "params": {
+          "openDecay": 0.3,
+          "closedDecay": 0.08,
+          "tone": 0.65,
+          "mix": 0.5
+        }
+      },
+      {
+        "id": "clap",
+        "type": "909-clap",
+        "name": "Clap",
+        "position": { "col": 8, "row": 11 },
+        "params": {
+          "tone": 0.5,
+          "decay": 0.3
+        }
+      },
+      {
+        "id": "chord-seq",
+        "type": "chord-sequencer",
+        "name": "Chords",
+        "position": { "col": 1, "row": 16 },
+        "params": {
+          "enabled": true,
+          "tempo": 169,
+          "rate": 0,
+          "gateLength": 90,
+          "swing": 0,
+          "length": 4,
+          "voicing": 0,
+          "stepData": "[{\"root\":71,\"chordType\":1,\"inversion\":0,\"gate\":true},{\"root\":64,\"chordType\":0,\"inversion\":0,\"gate\":true},{\"root\":69,\"chordType\":0,\"inversion\":0,\"gate\":true},{\"root\":66,\"chordType\":1,\"inversion\":0,\"gate\":true}]"
+        }
+      },
+      {
+        "id": "osc-pad",
+        "type": "supersaw",
+        "name": "Pad Synth",
+        "position": { "col": 4, "row": 16 },
+        "params": {
+          "frequency": 440,
+          "detune": 15,
+          "mix": 0.6,
+          "spread": 0.7
+        }
+      },
+      {
+        "id": "vcf-pad",
+        "type": "vcf",
+        "name": "Pad Filter",
+        "position": { "col": 6, "row": 16 },
+        "params": {
+          "cutoff": 1800,
+          "resonance": 0.1,
+          "drive": 0.0,
+          "model": "svf",
+          "mode": "lp",
+          "slope": 12
+        }
+      },
+      {
+        "id": "adsr-pad",
+        "type": "adsr",
+        "name": "Pad Env",
+        "position": { "col": 6, "row": 18 },
+        "params": {
+          "attack": 0.15,
+          "decay": 0.4,
+          "sustain": 0.7,
+          "release": 0.5
+        }
+      },
+      {
+        "id": "vca-pad",
+        "type": "gain",
+        "name": "Pad VCA",
+        "position": { "col": 8, "row": 16 },
+        "params": {
+          "gain": 0.35
+        }
+      },
+      {
+        "id": "chorus-1",
+        "type": "chorus",
+        "name": "Chorus",
+        "position": { "col": 10, "row": 1 },
+        "params": {
+          "rate": 1.2,
+          "depth": 0.4,
+          "mix": 0.3
+        }
+      },
+      {
+        "id": "delay-1",
+        "type": "delay",
+        "name": "Delay",
+        "position": { "col": 10, "row": 3 },
+        "params": {
+          "time": 177,
+          "feedback": 0.3,
+          "mix": 0.2,
+          "tone": 0.6,
+          "tempoSync": 0,
+          "pingPong": 1
+        }
+      },
+      {
+        "id": "mixer-main",
+        "type": "mixer",
+        "name": "Main Mix",
+        "position": { "col": 12, "row": 1 },
+        "params": {
+          "levelA": 0.85,
+          "levelB": 0.70
+        }
+      },
+      {
+        "id": "mixer-2",
+        "type": "mixer-1x2",
+        "name": "Mix Drums+Pad",
+        "position": { "col": 12, "row": 4 },
+        "params": {
+          "levelA": 0.75,
+          "levelB": 0.55
+        }
+      },
+      {
+        "id": "mixer-drums",
+        "type": "mixer-8",
+        "name": "Drum Mix",
+        "position": { "col": 9, "row": 11 },
+        "params": {
+          "level-1": 0.90,
+          "level-2": 0.75,
+          "level-3": 0.55,
+          "level-4": 0.40,
+          "level-5": 0.0,
+          "level-6": 0.0,
+          "level-7": 0.0,
+          "level-8": 0.0
+        }
+      },
+      {
+        "id": "mixer-final",
+        "type": "mixer-1x2",
+        "name": "Final Mix",
+        "position": { "col": 14, "row": 1 },
+        "params": {
+          "levelA": 0.85,
+          "levelB": 0.80
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "col": 14, "row": 4 },
+        "params": {
+          "decay": 1.8,
+          "damping": 0.5,
+          "mix": 0.2
+        }
+      },
+      {
+        "id": "output-1",
+        "type": "output",
+        "name": "Main Out",
+        "position": { "col": 16, "row": 1 },
+        "params": {
+          "level": 1
+        }
+      },
+      {
+        "id": "scope-1",
+        "type": "scope",
+        "name": "Scope",
+        "position": { "col": 16, "row": 3 },
+        "params": {}
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "col": 1, "row": 20 },
+        "params": {
+          "text": "TAKE ON ME — a-ha (1985)\n\nIconic synth-pop riff recreation.\n\n- Riff: Step sequencer → Square wave + chorus + delay\n- Bass: Step sequencer → Saw osc → Ladder filter (24dB)\n- Drums: 909 kit (kick, snare, hihat, clap)\n- Pads: Chord seq → Supersaw → LP filter\n\nTempo: 169 BPM\nKey: A major (Bm-E-A-F#m progression)\n\nAdjust chorus depth and delay feedback for different vibes."
+        }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "seq-riff", "portId": "clock" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "seq-bass", "portId": "clock" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "drum-seq", "portId": "clock" }, "kind": "sync" },
+      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "chord-seq", "portId": "clock" }, "kind": "sync" },
+
+      { "from": { "moduleId": "seq-riff", "portId": "cv-out" }, "to": { "moduleId": "osc-riff", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "seq-riff", "portId": "gate-out" }, "to": { "moduleId": "adsr-riff", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "osc-riff", "portId": "out" }, "to": { "moduleId": "vca-riff", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-riff", "portId": "env" }, "to": { "moduleId": "vca-riff", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "vca-riff", "portId": "out" }, "to": { "moduleId": "chorus-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "chorus-1", "portId": "out" }, "to": { "moduleId": "delay-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "delay-1", "portId": "out" }, "to": { "moduleId": "mixer-main", "portId": "in-a" }, "kind": "audio" },
+
+      { "from": { "moduleId": "seq-bass", "portId": "cv-out" }, "to": { "moduleId": "osc-bass", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "seq-bass", "portId": "gate-out" }, "to": { "moduleId": "adsr-bass", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "osc-bass", "portId": "out" }, "to": { "moduleId": "vcf-bass", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-bass", "portId": "env" }, "to": { "moduleId": "vcf-bass", "portId": "env" }, "kind": "cv" },
+      { "from": { "moduleId": "vcf-bass", "portId": "out" }, "to": { "moduleId": "vca-bass", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-bass", "portId": "env" }, "to": { "moduleId": "vca-bass", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "vca-bass", "portId": "out" }, "to": { "moduleId": "mixer-main", "portId": "in-b" }, "kind": "audio" },
+
+      { "from": { "moduleId": "drum-seq", "portId": "gate-kick" }, "to": { "moduleId": "kick", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "drum-seq", "portId": "gate-snare" }, "to": { "moduleId": "snare", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "drum-seq", "portId": "gate-hhc" }, "to": { "moduleId": "hihat", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "drum-seq", "portId": "gate-clap" }, "to": { "moduleId": "clap", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "kick", "portId": "out" }, "to": { "moduleId": "mixer-drums", "portId": "in-1" }, "kind": "audio" },
+      { "from": { "moduleId": "snare", "portId": "out" }, "to": { "moduleId": "mixer-drums", "portId": "in-2" }, "kind": "audio" },
+      { "from": { "moduleId": "hihat", "portId": "out" }, "to": { "moduleId": "mixer-drums", "portId": "in-3" }, "kind": "audio" },
+      { "from": { "moduleId": "clap", "portId": "out" }, "to": { "moduleId": "mixer-drums", "portId": "in-4" }, "kind": "audio" },
+      { "from": { "moduleId": "mixer-drums", "portId": "out" }, "to": { "moduleId": "mixer-2", "portId": "in-a" }, "kind": "audio" },
+
+      { "from": { "moduleId": "chord-seq", "portId": "cv-out" }, "to": { "moduleId": "osc-pad", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "chord-seq", "portId": "gate-out" }, "to": { "moduleId": "adsr-pad", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "osc-pad", "portId": "out" }, "to": { "moduleId": "vcf-pad", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-pad", "portId": "env" }, "to": { "moduleId": "vcf-pad", "portId": "env" }, "kind": "cv" },
+      { "from": { "moduleId": "vcf-pad", "portId": "out" }, "to": { "moduleId": "vca-pad", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-pad", "portId": "env" }, "to": { "moduleId": "vca-pad", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "vca-pad", "portId": "out" }, "to": { "moduleId": "mixer-2", "portId": "in-b" }, "kind": "audio" },
+
+      { "from": { "moduleId": "mixer-main", "portId": "out" }, "to": { "moduleId": "mixer-final", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "mixer-2", "portId": "out" }, "to": { "moduleId": "mixer-final", "portId": "in-b" }, "kind": "audio" },
+      { "from": { "moduleId": "mixer-final", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "output-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "scope-1", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}
