@@ -203,8 +203,30 @@ export const SidePanel = ({
 
   const isSearching = normalizedQuery.length > 0
 
+  const [mobileOpen, setMobileOpen] = useState(false)
+
   return (
-    <aside className="side-panel">
+    <>
+    <button
+      type="button"
+      className="side-panel-fab"
+      onClick={() => setMobileOpen(true)}
+      aria-label="Open panel"
+    >
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+    {mobileOpen && <div className="side-panel-backdrop" onClick={() => setMobileOpen(false)} />}
+    <aside className={`side-panel ${mobileOpen ? 'open' : ''}`}>
+      <button
+        type="button"
+        className="side-panel-close"
+        onClick={() => setMobileOpen(false)}
+        aria-label="Close panel"
+      >
+        &times;
+      </button>
       <PanelSection
         title="Module Library"
         collapsed={collapsedSections.library}
@@ -558,5 +580,6 @@ export const SidePanel = ({
             )}
       </PanelSection>
     </aside>
+    </>
   )
 }

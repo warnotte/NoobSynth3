@@ -2002,6 +2002,13 @@
   gap: 16px;
 }
 
+/* Mobile drawer elements — hidden on desktop */
+.side-panel-fab,
+.side-panel-close,
+.side-panel-backdrop {
+  display: none;
+}
+
 /* Subtle shine overlay on sticky bar */
 .topbar-body::before {
   content: '';
@@ -4428,6 +4435,7 @@ textarea:focus-visible,
 }
 
 @media (max-width: 960px) {
+  /* --- TopBar compact --- */
   .topbar-body {
     flex-wrap: wrap;
     gap: 8px 12px;
@@ -4446,8 +4454,82 @@ textarea:focus-visible,
     display: none;
   }
 
+  /* --- Hide header --- */
+  .topbar-head {
+    display: none;
+  }
+
+  /* --- SidePanel as slide-in drawer --- */
   .workbench {
     grid-template-columns: 1fr;
+  }
+
+  .side-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(320px, 85vw);
+    z-index: 2500;
+    background: linear-gradient(180deg, #14161c 0%, #0d0e12 100%);
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: -8px 0 32px rgba(0, 0, 0, 0.6);
+    padding: 48px 16px 24px;
+    overflow-y: auto;
+    transform: translateX(100%);
+    transition: transform 0.25s ease;
+  }
+
+  .side-panel.open {
+    transform: translateX(0);
+  }
+
+  .side-panel-fab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 2000;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: linear-gradient(135deg, #1c1c22 0%, #0f0f14 100%);
+    color: rgba(200, 215, 230, 0.85);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .side-panel-close {
+    display: block;
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    background: none;
+    border: none;
+    color: rgba(200, 215, 230, 0.7);
+    font-size: 1.6rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: 4px;
+  }
+
+  .side-panel-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 2400;
+    background: rgba(0, 0, 0, 0.5);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* --- Touch-friendly jacks --- */
+  .jack {
+    width: 22px;
+    height: 22px;
   }
 
   .modules {
@@ -4458,12 +4540,14 @@ textarea:focus-visible,
 
 @media (max-width: 720px) {
   .app {
-    gap: 20px;
-    padding: 20px 20px 28px;
+    gap: 12px;
+    padding: 8px 10px 20px;
   }
 
   .rack {
-    padding: 12px 16px;
+    padding: 8px 10px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .modules {
@@ -4471,16 +4555,25 @@ textarea:focus-visible,
     --rack-unit-y: 100px;
     --rack-gap: 3px;
   }
+
+  /* Compact knobs & labels on small screens */
+  .control-knob {
+    gap: 2px;
+  }
+
+  .control-label {
+    font-size: 0.6rem;
+  }
 }
 
 @media (max-width: 520px) {
   .app {
-    gap: 18px;
-    padding: 16px 14px 22px;
+    gap: 10px;
+    padding: 6px 6px 16px;
   }
 
   .rack {
-    padding: 10px 12px;
+    padding: 6px 8px;
   }
 
   .actions {
