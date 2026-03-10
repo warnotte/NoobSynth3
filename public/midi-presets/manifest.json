@@ -35,6 +35,51 @@
       "id": "zelda-dark-world",
       "name": "Zelda - Dark World",
       "file": "zelda-dark-world.mid"
+    },
+    {
+      "id": "vivaldi-grosso",
+      "name": "Vivaldi - Concerto Grosso Op.3 No.3",
+      "file": "grosso3.mid"
+    },
+    {
+      "id": "debussy-clairdelune",
+      "name": "Debussy - Clair de Lune",
+      "file": "clairdelune.mid"
+    },
+    {
+      "id": "grieg-mountain-king",
+      "name": "Grieg - In the Hall of the Mountain King",
+      "file": "4_mtking.mid"
+    },
+    {
+      "id": "saintsaens-cygne",
+      "name": "Saint-Saëns - Le Cygne (The Swan)",
+      "file": "cygne.mid"
+    },
+    {
+      "id": "purcell-trumpet",
+      "name": "Purcell - Trumpet Voluntary",
+      "file": "trumpet.mid"
+    },
+    {
+      "id": "autumn-leaves",
+      "name": "Jazz - Autumn Leaves",
+      "file": "autumn-leaves.mid"
+    },
+    {
+      "id": "watermelon-man",
+      "name": "Herbie Hancock - Watermelon Man",
+      "file": "watermelon-man.mid"
+    },
+    {
+      "id": "spain-corea",
+      "name": "Chick Corea - Spain",
+      "file": "spain-corea.mid"
+    },
+    {
+      "id": "all-blues",
+      "name": "Miles Davis - All Blues",
+      "file": "all-blues.mid"
     }
   ]
 }
