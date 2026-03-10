@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ChangeEvent, type RefObject } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { GraphState, MacroSpec, MacroTarget, ModuleSpec, ModuleType } from '../shared/graph'
 import type { PresetSpec } from '../state/presets'
 import {
@@ -19,8 +19,6 @@ type SidePanelProps = {
   onAddModule: (type: ModuleType) => void
   onExportPreset: () => void
   onImportPreset: () => void
-  presetFileRef: RefObject<HTMLInputElement | null>
-  onPresetFileChange: (event: ChangeEvent<HTMLInputElement>) => void
   presetError: string | null
   importError: string | null
   presetStatus: 'loading' | 'ready' | 'error'
@@ -71,8 +69,6 @@ export const SidePanel = ({
   onAddModule,
   onExportPreset,
   onImportPreset,
-  presetFileRef,
-  onPresetFileChange,
   presetError,
   importError,
   presetStatus,
@@ -119,7 +115,6 @@ export const SidePanel = ({
   // All sections collapsed by default
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({
     library: true,
-    patching: true,
     presets: true,
     macros: true,
     tauri: true,
@@ -208,8 +203,30 @@ export const SidePanel = ({
 
   const isSearching = normalizedQuery.length > 0
 
+  const [mobileOpen, setMobileOpen] = useState(false)
+
   return (
-    <aside className="side-panel">
+    <>
+    <button
+      type="button"
+      className="side-panel-fab"
+      onClick={() => setMobileOpen(true)}
+      aria-label="Open panel"
+    >
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+    {mobileOpen && <div className="side-panel-backdrop" onClick={() => setMobileOpen(false)} />}
+    <aside className={`side-panel ${mobileOpen ? 'open' : ''}`}>
+      <button
+        type="button"
+        className="side-panel-close"
+        onClick={() => setMobileOpen(false)}
+        aria-label="Close panel"
+      >
+        &times;
+      </button>
       <PanelSection
         title="Module Library"
         collapsed={collapsedSections.library}
@@ -289,16 +306,6 @@ export const SidePanel = ({
             </div>
       </PanelSection>
       <PanelSection
-        title="Patching"
-        collapsed={collapsedSections.patching}
-        onToggle={() => toggleSection('patching')}
-      >
-        <p className="muted">
-          Drag from any jack to connect. Drag from a connected input to empty
-          space to unplug. Colors indicate signal type.
-        </p>
-      </PanelSection>
-      <PanelSection
         title="Presets"
         collapsed={collapsedSections.presets}
         onToggle={() => toggleSection('presets')}
@@ -335,13 +342,6 @@ export const SidePanel = ({
               >
                 Compact
               </button>
-              <input
-                ref={presetFileRef}
-                type="file"
-                accept="application/json"
-                className="preset-file"
-                onChange={onPresetFileChange}
-              />
             </div>
             {presetError && <div className="preset-error">{presetError}</div>}
             {importError && <div className="preset-error">{importError}</div>}
@@ -580,5 +580,6 @@ export const SidePanel = ({
             )}
       </PanelSection>
     </aside>
+    </>
   )
 }

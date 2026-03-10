@@ -46,6 +46,9 @@ type UseModuleDragParams = {
   modulesRef: RefObject<HTMLDivElement | null>
   gridMetricsRef: MutableRefObject<GridMetrics>
   getModuleSize?: (module: GraphState['modules'][number]) => string | undefined
+  beginTransaction?: () => void
+  endTransaction?: () => void
+  cancelTransaction?: () => void
 }
 
 export const useModuleDrag = ({
@@ -54,6 +57,9 @@ export const useModuleDrag = ({
   modulesRef,
   gridMetricsRef,
   getModuleSize,
+  beginTransaction,
+  endTransaction,
+  cancelTransaction,
 }: UseModuleDragParams) => {
   const [moduleDragPreview, setModuleDragPreview] = useState<ModuleDragPreview | null>(null)
   const moduleDragRef = useRef<ModuleDragState | null>(null)
@@ -120,6 +126,7 @@ export const useModuleDrag = ({
       const origin = event.currentTarget
       origin.setPointerCapture(event.pointerId)
       setModuleDragPreview({ moduleId, col: startCol, row: startRow, span, valid: true })
+      beginTransaction?.()
 
       const handleMove = (moveEvent: PointerEvent) => {
         const state = moduleDragRef.current
@@ -202,6 +209,7 @@ export const useModuleDrag = ({
           window.cancelAnimationFrame(state.raf)
         }
         if (options?.restore) {
+          cancelTransaction?.()
           setGraph((prev) => ({
             ...prev,
             modules: prev.modules.map((entry) =>
@@ -210,6 +218,8 @@ export const useModuleDrag = ({
                 : entry,
             ),
           }))
+        } else {
+          endTransaction?.()
         }
         moduleDragRef.current = null
         setModuleDragPreview(null)
@@ -241,7 +251,7 @@ export const useModuleDrag = ({
       window.addEventListener('keydown', handleKeyDown)
       event.preventDefault()
     },
-    [getModuleSize, graphRef, gridMetricsRef, modulesRef, setGraph],
+    [getModuleSize, graphRef, gridMetricsRef, modulesRef, setGraph, beginTransaction, endTransaction, cancelTransaction],
   )
 
   return { handleModulePointerDown, moduleDragPreview }

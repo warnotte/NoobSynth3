@@ -1,6 +1,3 @@
-import { useCallback, useState } from 'react'
-
-type ShareStatus = 'idle' | 'copied' | 'error'
 
 type TopBarProps = {
   status: 'idle' | 'running' | 'error'
@@ -16,12 +13,14 @@ type TopBarProps = {
   showDevTools?: boolean
   devResizeEnabled?: boolean
   onToggleDevResize?: () => void
-  /** Current shareable URL (null if patch is too large) */
-  shareUrl: string | null
-  /** Error message if share URL can't be generated */
-  shareError?: string | null
   isRecording?: boolean
   onToggleRecording?: () => void
+  undoCount?: number
+  redoCount?: number
+  onUndo?: () => void
+  onRedo?: () => void
+  onExportPreset?: () => void
+  onImportPreset?: () => void
 }
 
 // Icons
@@ -35,11 +34,6 @@ const StopIcon = () => (
     <rect x="6" y="6" width="12" height="12"/>
   </svg>
 )
-const ShareIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-    <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/>
-  </svg>
-)
 const CableIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
     <circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/>
@@ -49,6 +43,26 @@ const CableIcon = () => (
 const RecordIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
     <circle cx="12" cy="12" r="8"/>
+  </svg>
+)
+const UndoIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+    <path d="M3 10h13a4 4 0 010 8H9M3 10l4-4M3 10l4 4"/>
+  </svg>
+)
+const RedoIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+    <path d="M21 10H8a4 4 0 000 8h7M21 10l-4-4M21 10l-4 4"/>
+  </svg>
+)
+const ExportIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+  </svg>
+)
+const ImportIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
   </svg>
 )
 const ResizeIcon = () => (
@@ -71,38 +85,22 @@ export const TopBar = ({
   showDevTools = false,
   devResizeEnabled = false,
   onToggleDevResize = () => {},
-  shareUrl,
-  shareError,
   isRecording = false,
   onToggleRecording = () => {},
+  undoCount = 0,
+  redoCount = 0,
+  onUndo = () => {},
+  onRedo = () => {},
+  onExportPreset,
+  onImportPreset,
 }: TopBarProps) => {
-  const [shareStatus, setShareStatus] = useState<ShareStatus>('idle')
-
-  const handleShare = useCallback(async () => {
-    if (!shareUrl) {
-      setShareStatus('error')
-      setTimeout(() => setShareStatus('idle'), 2000)
-      return
-    }
-    try {
-      await navigator.clipboard.writeText(shareUrl)
-      setShareStatus('copied')
-      setTimeout(() => setShareStatus('idle'), 2000)
-    } catch {
-      setShareStatus('error')
-      setTimeout(() => setShareStatus('idle'), 2000)
-    }
-  }, [shareUrl])
-
-  const shareTitle = shareError || (shareUrl ? 'Copy shareable URL' : 'Patch too large to share')
-
   return (
-    <header className="topbar">
-      <div className="topbar-head">
-        <div className="brand">NoobSynth Workbench</div>
-        <div className="subtitle">Modular audio engine prototype</div>
-      </div>
-      <div className="topbar-body">
+    <>
+    <header className="topbar-head">
+      <div className="brand">NoobSynth Workbench</div>
+      <div className="subtitle">Modular audio engine prototype</div>
+    </header>
+    <div className="topbar-body">
         {/* Left: Status */}
         <div className="topbar-zone topbar-zone--left">
           <div className="status-block">
@@ -151,7 +149,7 @@ export const TopBar = ({
                 className={`button top-bar-record ${isRecording ? 'recording' : ''}`}
                 onClick={onToggleRecording}
                 disabled={!isRunning}
-                title={isRecording ? 'Stop recording & download' : 'Start recording'}
+                title={isRecording ? 'Stop recording & download WAV' : 'Record audio to WAV file'}
               >
                 <RecordIcon />
               </button>
@@ -165,15 +163,42 @@ export const TopBar = ({
         <div className="topbar-zone">
           <div className="share-block">
             <span className="action-label">Patch</span>
-            <button
-              type="button"
-              className={`button icon-btn ${shareStatus !== 'idle' ? shareStatus : ''}`}
-              onClick={handleShare}
-              disabled={shareStatus === 'copied'}
-              title={shareTitle}
-            >
-              <ShareIcon />
-            </button>
+            <div className="patch-buttons-row">
+              <button
+                type="button"
+                className={`button icon-btn ${undoCount > 0 ? '' : 'disabled'}`}
+                onClick={onUndo}
+                disabled={undoCount === 0}
+                title={`Undo (Ctrl+Z)${undoCount > 0 ? ` — ${undoCount} step${undoCount > 1 ? 's' : ''}` : ''}`}
+              >
+                <UndoIcon />
+              </button>
+              <button
+                type="button"
+                className={`button icon-btn ${redoCount > 0 ? '' : 'disabled'}`}
+                onClick={onRedo}
+                disabled={redoCount === 0}
+                title={`Redo (Ctrl+Shift+Z)${redoCount > 0 ? ` — ${redoCount} step${redoCount > 1 ? 's' : ''}` : ''}`}
+              >
+                <RedoIcon />
+              </button>
+              <button
+                type="button"
+                className="button icon-btn"
+                onClick={onExportPreset}
+                title="Export patch — Download current patch as JSON file"
+              >
+                <ExportIcon />
+              </button>
+              <button
+                type="button"
+                className="button icon-btn"
+                onClick={onImportPreset}
+                title="Import patch — Load a JSON patch file"
+              >
+                <ImportIcon />
+              </button>
+            </div>
           </div>
         </div>
 
@@ -219,6 +244,6 @@ export const TopBar = ({
           </>
         )}
       </div>
-    </header>
+    </>
   )
 }

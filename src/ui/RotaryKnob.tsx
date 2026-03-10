@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useUndo } from '../hooks/UndoContext'
 
 type RotaryKnobProps = {
   label: string
@@ -40,6 +41,7 @@ export const RotaryKnob = ({
   const [isEditing, setIsEditing] = useState(false)
   const [draft, setDraft] = useState(value.toString())
   const dragRef = useRef<DragState | null>(null)
+  const { beginTransaction, endTransaction } = useUndo()
 
   useEffect(() => {
     if (!isEditing) {
@@ -74,6 +76,7 @@ export const RotaryKnob = ({
     event.currentTarget.setPointerCapture(event.pointerId)
     dragRef.current = { startY: event.clientY, startValue: value }
     setIsEditing(false)
+    beginTransaction()
   }
 
   const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
@@ -92,6 +95,7 @@ export const RotaryKnob = ({
     }
     dragRef.current = null
     event.currentTarget.releasePointerCapture(event.pointerId)
+    endTransaction()
   }
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {

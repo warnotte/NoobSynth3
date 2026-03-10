@@ -1,0 +1,104 @@
+{
+  "version": 1,
+  "id": "organ-funk-groove",
+  "name": "Funky Organ Groove",
+  "description": "Hammond B3 funk organ with envelope wah, Leslie and short reverb.",
+  "graph": {
+    "modules": [
+      {
+        "id": "ctrl-1",
+        "type": "control",
+        "name": "Keyboard",
+        "position": { "x": 0, "y": 2 },
+        "params": {
+          "cv": 0, "cvMode": "unipolar", "velocity": 1,
+          "midiVelocity": true, "gate": 0, "glide": 0.01, "voices": 8
+        }
+      },
+      {
+        "id": "organ-1",
+        "type": "pipe-organ",
+        "name": "Hammond B3",
+        "position": { "x": 3, "y": 2 },
+        "params": {
+          "frequency": 220,
+          "drawbar16": 0.5, "drawbar8": 1.0, "drawbar4": 0.85,
+          "drawbar223": 0.3, "drawbar2": 0.5, "drawbar135": 0.15,
+          "drawbar113": 0.1, "drawbar1": 0.05,
+          "voicing": 0, "chiff": 0.2,
+          "percussion": 1, "percHarmonic": 1, "percDecay": 0, "percVolume": 0.7,
+          "chorusVibrato": 4,
+          "tremulant": 0.0, "tremRate": 6, "wind": 0.04, "brightness": 0.8
+        }
+      },
+      {
+        "id": "adsr-1",
+        "type": "adsr",
+        "name": "ADSR",
+        "position": { "x": 6, "y": 4 },
+        "params": { "attack": 0.003, "decay": 0.06, "sustain": 0.9, "release": 0.1 }
+      },
+      {
+        "id": "vca-1",
+        "type": "gain",
+        "name": "VCA",
+        "position": { "x": 6, "y": 2 },
+        "params": { "gain": 0.8 }
+      },
+      {
+        "id": "wah-1",
+        "type": "wah",
+        "name": "Envelope Wah",
+        "position": { "x": 8, "y": 2 },
+        "params": {
+          "mode": 0, "freq": 500, "range": 0.9,
+          "resonance": 0.7, "speed": 3.0, "sensitivity": 0.9, "mix": 1.0
+        }
+      },
+      {
+        "id": "les-1",
+        "type": "leslie",
+        "name": "Leslie 122",
+        "position": { "x": 10, "y": 2 },
+        "params": {
+          "speed": 1, "brake": 0, "drive": 0.15,
+          "depth": 0.7, "hornDrum": 0.5, "micDist": 0.15, "ramp": 0.5, "mix": 1.0
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Room",
+        "position": { "x": 12, "y": 2 },
+        "params": { "time": 0.4, "damp": 0.6, "preDelay": 8, "mix": 0.15 }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Main Out",
+        "position": { "x": 14, "y": 2 },
+        "params": { "level": 1 }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 10, "y": 5 },
+        "params": {
+          "text": "FUNKY ORGAN GROOVE\n\nHammond B3 with envelope wah for\nclassic funk organ tones.\n\nSignal:\nKeyboard -> Organ -> VCA -> Wah -> Leslie -> Reverb -> Out\n\nThe secret: play STACCATO!\nShort choppy chords make the wah\nenvelope pop. Hold for sustained tones.\n\nTips:\n- Staccato playing = maximum wah effect\n- Increase Wah Sensitivity for more quack\n- Toggle Leslie SLOW/FAST for drama\n- Try Wah in LFO mode for auto-sweep"
+        }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "ctrl-1", "portId": "cv-out" }, "to": { "moduleId": "organ-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "ctrl-1", "portId": "gate-out" }, "to": { "moduleId": "organ-1", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "ctrl-1", "portId": "gate-out" }, "to": { "moduleId": "adsr-1", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "organ-1", "portId": "out" }, "to": { "moduleId": "vca-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-1", "portId": "env" }, "to": { "moduleId": "vca-1", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "vca-1", "portId": "out" }, "to": { "moduleId": "wah-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "wah-1", "portId": "out" }, "to": { "moduleId": "les-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "les-1", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}

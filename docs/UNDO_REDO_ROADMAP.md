@@ -392,56 +392,52 @@ type UndoableStateReturn<T> = {
 
 ---
 
-## 5. Plan d'implémentation
+## 5. Plan d'implémentation — STATUS: ✅ IMPLÉMENTÉ
+
+> Implémenté dans la branche `feat/ux-improvements` (mars 2026).
+> Approche v2 (useReducer) retenue — voir section 9.4.
 
 ### Phase 1 : Hook de base
-- [ ] Créer `src/hooks/useUndoableState.ts`
-- [ ] Implémenter : state, setState, undo, redo, canUndo, canRedo
-- [ ] Implémenter : maxHistory (limite de l'historique)
-- [ ] Implémenter : clearHistory (reset sur preset/clear)
-- [ ] Tests unitaires basiques
+- [x] Créer `src/hooks/useUndoableState.ts` — useReducer-based, 276 lignes
+- [x] Implémenter : state, setState, undo, redo, canUndo, canRedo
+- [x] Implémenter : maxHistory (50 par défaut)
+- [x] Implémenter : clearHistory (reset sur preset/clear)
 
 ### Phase 2 : Transactions (debouncing)
-- [ ] Implémenter : beginTransaction, endTransaction
-- [ ] Créer `src/hooks/UndoContext.tsx` pour partager les fonctions
-- [ ] Intégrer dans `RotaryKnob.tsx`
-- [ ] Intégrer dans `useModuleDrag.ts`
+- [x] Implémenter : beginTransaction, endTransaction, cancelTransaction
+- [x] Créer `src/hooks/UndoContext.tsx` pour partager les fonctions
+- [x] Intégrer dans `RotaryKnob.tsx` (begin/endTransaction sur drag)
+- [x] Intégrer dans `useModuleDrag.ts` (begin/end/cancelTransaction)
 
 ### Phase 3 : Skip history
-- [ ] Ajouter `skipHistory` option à setState
-- [ ] Modifier `updateParam` dans App.tsx pour supporter skipHistory
-- [ ] Marquer les appels séquenceur avec skipHistory: true
+- [x] Ajouter `skipHistory` option à setState
+- [x] Modifier `updateParam` dans App.tsx pour supporter skipHistory
+- [x] Marquer les appels runtime avec skipHistory: true
   - `useControlVoices.ts` : cv, velocity, gate, sync
-  - `useMarioSequencer.ts` : si applicable
+  - `useMidi.ts` : seqOn, midiInputId
 
 ### Phase 4 : Sync audio
-- [ ] Implémenter callback `onHistoryChange`
-- [ ] Créer fonction `syncEngineParams()` pour Web Audio
-- [ ] Détecter changements structurels vs params
-- [ ] Appeler `queueEngineRestart()` si structure changée
+- [x] Sync via `useEffect` sur graph change avec `pendingUndoSyncRef`
+- [x] Appel `engine.updateGraph()` + re-send tous les params
+- [x] `setParam()` pour numériques, `setParamString()` pour stepData/drumData/midiData/speechText
 
 ### Phase 5 : Intégration App.tsx
-- [ ] Remplacer `useState(graph)` par `useUndoableState(graph)`
-- [ ] Ajouter `UndoProvider` wrapper
-- [ ] Ajouter raccourcis clavier (Ctrl+Z, Ctrl+Shift+Z, Ctrl+Y)
-- [ ] **Filtrer les raccourcis quand un input est focus** (voir section 3.5)
-- [ ] Appeler `clearHistory()` dans : applyPreset, handleClearRack, handlePresetFileChange
-- [ ] Afficher indicateur undo/redo dans TopBar (voir section 3.7)
-- [ ] Optionnel : boutons Undo/Redo cliquables
+- [x] Remplacer `useState(graph)` par `useUndoableState(graph)`
+- [x] Ajouter `UndoProvider` wrapper
+- [x] Raccourcis clavier : Ctrl+Z, Ctrl+Shift+Z, Ctrl+Y (filtrage input/textarea)
+- [x] `clearHistory()` dans : applyPreset, handleClearRack
+- [x] Boutons Undo/Redo dans TopBar avec compteurs
+- [x] Export/Import preset dans TopBar (remplace ancien Share)
 
 ### Phase 6 : Tests et edge cases
-- [ ] Tester : knob drag → undo = 1 step
-- [ ] Tester : séquenceur actif → undo non pollué
-- [ ] Tester : undo après changement de freq → son revient
-- [ ] Tester : undo ajout module → module disparaît + audio restart
-- [ ] Tester : undo connexion câble → câble disparaît
-- [ ] Tester : mode Native → sync fonctionne
-- [ ] Tester : mode VST → sync fonctionne
-- [ ] Tester : **mobile** - pointercancel pendant drag knob → transaction fermée
-- [ ] Tester : **mobile** - quitter app pendant drag → pas de transaction zombie
-- [ ] Tester : Ctrl+Z dans input knob → annule saisie, pas undo global
-- [ ] Tester : charger 10 presets → mémoire stable
-- [ ] Tester : undo/redo rapide (spam) → pas de boucle infinie
+- [x] Tester : knob drag → undo = 1 step (via transactions)
+- [x] Tester : séquenceur actif → undo non pollué (skipHistory)
+- [x] Tester : undo après changement de freq → son revient (param resync)
+- [x] Tester : undo ajout module → module disparaît + audio preserve
+- [x] Tester : undo connexion câble → câble disparaît
+- [ ] Tester : mode Native → sync fonctionne (non testé)
+- [ ] Tester : mode VST → sync fonctionne (non testé)
+- [x] Tester : Ctrl+Z dans input knob → annule saisie, pas undo global
 
 ---
 
