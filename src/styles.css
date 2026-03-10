@@ -1997,7 +1997,9 @@
   grid-template-rows: auto auto;
   gap: 16px;
   padding: 18px 22px;
-  position: relative;
+  position: sticky;
+  top: 0;
+  z-index: 100;
   overflow: hidden;
   background:
     linear-gradient(135deg, rgba(45, 55, 72, 0.15) 0%, transparent 50%),
