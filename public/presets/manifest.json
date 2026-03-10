@@ -1584,10 +1584,31 @@
       "group": "Leslie"
     },
     {
+      "id": "organ-funk-groove",
+      "name": "Funky Organ Groove",
+      "description": "Hammond B3 funk organ with envelope wah, Leslie and short reverb.",
+      "file": "organ-funk-groove.json",
+      "group": "Leslie"
+    },
+    {
       "id": "organ-tube-rock",
       "name": "Rock Organ + Tube Amp",
       "description": "Hammond B3 through tube amplifier and Leslie for classic rock/blues organ.",
       "file": "organ-tube-rock.json",
+      "group": "Leslie"
+    },
+    {
+      "id": "organ-blues-tube",
+      "name": "Blues Organ + Tube Amp",
+      "description": "Warm Hammond B3 through gentle tube saturation and slow Leslie for smoky blues organ.",
+      "file": "organ-blues-tube.json",
+      "group": "Leslie"
+    },
+    {
+      "id": "organ-gospel",
+      "name": "Gospel Organ",
+      "description": "Full-throttle Hammond B3 with all drawbars cranked, fast Leslie and hall reverb.",
+      "file": "organ-gospel.json",
       "group": "Leslie"
     }
   ]

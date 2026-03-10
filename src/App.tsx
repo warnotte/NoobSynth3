@@ -6,6 +6,8 @@ import { useMarioSequencer } from './hooks/useMarioSequencer'
 import { useMidi } from './hooks/useMidi'
 import { usePatching } from './hooks/usePatching'
 import { useUrlPreset } from './hooks/useUrlPreset'
+import { useUndoableState } from './hooks/useUndoableState'
+import { UndoProvider } from './hooks/UndoContext'
 import {
   generatePresetUrl,
   setUrlPreset,
@@ -318,7 +320,20 @@ const isDev = import.meta.env.DEV
 
 function App() {
   const engine = useMemo(() => new AudioEngine(), [])
-  const [graph, setGraph] = useState<GraphState>(defaultGraph)
+  const {
+    state: graph,
+    setState: setGraph,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
+    undoCount,
+    redoCount,
+    beginTransaction,
+    endTransaction,
+    cancelTransaction,
+    clearHistory,
+  } = useUndoableState<GraphState>(defaultGraph)
   const [status, setStatus] = useState<'idle' | 'running' | 'error'>('idle')
   const [isBooting, setIsBooting] = useState(false)
   const [presets, setPresets] = useState<PresetSpec[]>([])
@@ -580,6 +595,9 @@ function App() {
     modulesRef,
     setGraph,
     getModuleSize,
+    beginTransaction,
+    endTransaction,
+    cancelTransaction,
   })
 
   const handleModuleResizePointerDown = useCallback(
@@ -797,6 +815,43 @@ function App() {
     graphRef.current = graph
   }, [graph])
 
+  // Undo/redo engine sync: when undo/redo fires, sync the audio engine
+  const pendingUndoSyncRef = useRef(false)
+  const handleUndo = useCallback(() => {
+    undo()
+    pendingUndoSyncRef.current = true
+  }, [undo])
+  const handleRedo = useCallback(() => {
+    redo()
+    pendingUndoSyncRef.current = true
+  }, [redo])
+  useEffect(() => {
+    if (!pendingUndoSyncRef.current) return
+    pendingUndoSyncRef.current = false
+    if (statusRef.current === 'running') {
+      engine.updateGraph(graph)
+      activeVoiceCountRef.current = getVoiceCountFromGraph(graph)
+    }
+  }, [graph, engine])
+
+  // Keyboard shortcuts: Ctrl+Z = undo, Ctrl+Shift+Z / Ctrl+Y = redo
+  useEffect(() => {
+    const handler = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return
+      if (!(event.ctrlKey || event.metaKey)) return
+      if (event.key === 'z' && !event.shiftKey) {
+        event.preventDefault()
+        handleUndo()
+      } else if ((event.key === 'z' && event.shiftKey) || event.key === 'y') {
+        event.preventDefault()
+        handleRedo()
+      }
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [handleUndo, handleRedo])
+
   useEffect(() => {
     moduleSizeOverridesRef.current = moduleSizeOverrides
   }, [moduleSizeOverrides])
@@ -907,7 +962,7 @@ function App() {
       moduleId: string,
       paramId: string,
       value: number | string | boolean,
-      options?: { skipEngine?: boolean },
+      options?: { skipEngine?: boolean; skipHistory?: boolean },
     ) => {
       setGraph((prev) => {
         const next = {
@@ -921,7 +976,7 @@ function App() {
         // Update ref synchronously to avoid race conditions when adding/removing modules
         graphRef.current = next
         return next
-      })
+      }, { skipHistory: options?.skipHistory })
       // Clear preset tracking when params change
       if (currentPresetId) {
         setCurrentPresetId(null)
@@ -1607,7 +1662,8 @@ function App() {
     }
     resetPatching()
     setGridError(null)
-    setGraph(layouted)
+    setGraph(layouted, { skipHistory: true })
+    clearHistory()
     // Update URL and track current preset
     if (options?.presetId) {
       setCurrentPresetId(options.presetId)
@@ -2221,13 +2277,13 @@ function App() {
       return
     }
     const normalized = layoutGraph(graphRef.current, moduleSizes, metrics, { getModuleSize })
-    applyGraphUpdate(normalized)
+    applyGraphUpdate(normalized, { skipHistory: true })
   }, [gridMetrics.columns])
 
-  const applyGraphUpdate = (nextGraph: GraphState) => {
+  const applyGraphUpdate = (nextGraph: GraphState, options?: { skipHistory?: boolean }) => {
     resetPatching()
     graphRef.current = nextGraph
-    setGraph(nextGraph)
+    setGraph(nextGraph, { skipHistory: options?.skipHistory })
     // Incremental update: preserve existing module states
     if (statusRef.current === 'running') {
       engine.updateGraph(nextGraph)
@@ -2343,6 +2399,7 @@ function App() {
   const handleClearRack = () => {
     setGridError(null)
     applyGraphUpdate({ modules: [], connections: [] })
+    clearHistory()
   }
 
   const handleAutoLayout = () => {
@@ -2384,6 +2441,15 @@ function App() {
   }
 
   return (
+    <UndoProvider
+      beginTransaction={beginTransaction}
+      endTransaction={endTransaction}
+      cancelTransaction={cancelTransaction}
+      undo={handleUndo}
+      redo={handleRedo}
+      canUndo={canUndo}
+      canRedo={canRedo}
+    >
     <div className="app">
         <TopBar
           status={audioStatus}
@@ -2399,6 +2465,10 @@ function App() {
           showDevTools={isDev}
           devResizeEnabled={devResizeEnabled}
           onToggleDevResize={() => setDevResizeEnabled((prev) => !prev)}
+          undoCount={undoCount}
+          redoCount={redoCount}
+          onUndo={handleUndo}
+          onRedo={handleRedo}
           shareUrl={shareUrl}
           shareError={shareError}
           isRecording={isRecording}
@@ -2495,6 +2565,7 @@ function App() {
         />
       )}
     </div>
+    </UndoProvider>
   )
 }
 

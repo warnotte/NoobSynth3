@@ -44,7 +44,7 @@ export const useMidi = ({
 
   useEffect(() => {
     if (midiEnabled && controlModuleId && seqOn) {
-      updateParam(controlModuleId, 'seqOn', false)
+      updateParam(controlModuleId, 'seqOn', false, { skipHistory: true })
     }
   }, [midiEnabled, controlModuleId, seqOn, updateParam])
 
@@ -58,7 +58,7 @@ export const useMidi = ({
       const hasSelected = inputs.some((input) => input.id === midiInputId)
       if (!hasSelected) {
         const nextId = inputs[0]?.id ?? ''
-        updateParam(controlModuleId, 'midiInputId', nextId)
+        updateParam(controlModuleId, 'midiInputId', nextId, { skipHistory: true })
       }
     },
     [controlModuleId, midiInputId, updateParam],

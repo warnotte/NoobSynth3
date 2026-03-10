@@ -1,0 +1,157 @@
+{
+  "id": "organ-gospel",
+  "name": "Gospel Organ",
+  "description": "Full-throttle Hammond B3 with fast Leslie and hall reverb.",
+  "group": "Showcase",
+  "graph": {
+    "modules": [
+      {
+        "id": "ctrl-1",
+        "type": "control",
+        "name": "Keyboard",
+        "position": { "x": 0, "y": 2 },
+        "params": {
+          "voices": 8,
+          "midiVelocity": true
+        }
+      },
+      {
+        "id": "organ-1",
+        "type": "pipe-organ",
+        "name": "Hammond B3",
+        "position": { "x": 3, "y": 2 },
+        "params": {
+          "frequency": 220,
+          "voicing": 0,
+          "drawbar16": 1.0,
+          "drawbar8": 1.0,
+          "drawbar4": 1.0,
+          "drawbar223": 0.8,
+          "drawbar2": 0.9,
+          "drawbar135": 0.7,
+          "drawbar113": 0.6,
+          "drawbar1": 0.5,
+          "chiff": 0.35,
+          "percussion": 1,
+          "percHarmonic": 1,
+          "percDecay": 0,
+          "percVolume": 0.9,
+          "chorusVibrato": 6,
+          "tremulant": 0.0,
+          "tremRate": 6,
+          "wind": 0.06,
+          "brightness": 0.9
+        }
+      },
+      {
+        "id": "adsr-1",
+        "type": "adsr",
+        "name": "ADSR",
+        "position": { "x": 6, "y": 4 },
+        "params": {
+          "attack": 0.003,
+          "decay": 0.05,
+          "sustain": 0.95,
+          "release": 0.1
+        }
+      },
+      {
+        "id": "vca-1",
+        "type": "gain",
+        "name": "VCA",
+        "position": { "x": 6, "y": 2 },
+        "params": {
+          "gain": 0.9
+        }
+      },
+      {
+        "id": "les-1",
+        "type": "leslie",
+        "name": "Leslie",
+        "position": { "x": 8, "y": 2 },
+        "params": {
+          "speed": 1,
+          "brake": 0,
+          "drive": 0.4,
+          "depth": 0.85,
+          "hornDrum": 0.55,
+          "micDist": 0.1,
+          "ramp": 0.7,
+          "mix": 1.0
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Hall Reverb",
+        "position": { "x": 10, "y": 2 },
+        "params": {
+          "time": 1.2,
+          "damp": 0.4,
+          "preDelay": 20,
+          "mix": 0.22
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Output",
+        "position": { "x": 12, "y": 2 },
+        "params": {
+          "level": 1
+        }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 8, "y": 5 },
+        "params": {
+          "text": "GOSPEL ORGAN\n\nFull-throttle Hammond B3 with ALL\ndrawbars pushed for maximum power.\nFast Leslie + hall reverb = church!\n\nSignal:\nKeyboard -> Organ -> VCA -> Leslie -> Reverb -> Out\n\nALL drawbars cranked = massive sound.\nScanner C3 = widest chorus.\nPercussion 3rd harmonic for bite.\n\nTips:\n- Play big chords for full effect\n- Leslie on FAST is essential\n- This is LOUD - adjust VCA if needed\n- Toggle Leslie SLOW for quiet passages"
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "cv-out" },
+        "to": { "moduleId": "organ-1", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "gate-out" },
+        "to": { "moduleId": "organ-1", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "ctrl-1", "portId": "gate-out" },
+        "to": { "moduleId": "adsr-1", "portId": "gate" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "organ-1", "portId": "out" },
+        "to": { "moduleId": "vca-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "adsr-1", "portId": "env" },
+        "to": { "moduleId": "vca-1", "portId": "cv" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "vca-1", "portId": "out" },
+        "to": { "moduleId": "les-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "les-1", "portId": "out" },
+        "to": { "moduleId": "reverb-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb-1", "portId": "out" },
+        "to": { "moduleId": "out-1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

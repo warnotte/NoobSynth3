@@ -147,9 +147,9 @@ export const useControlVoices = ({
       const voiceIndex = allocateVoice(note, clampedVelocity)
       // Use fixed reference (MIDI 60 = C4) so octave changes affect pitch
       const cv = (note - 60) / 12
-      updateParam(controlModuleId, 'cv', cv, { skipEngine: true })
+      updateParam(controlModuleId, 'cv', cv, { skipEngine: true, skipHistory: true })
       if (useVelocity) {
-        updateParam(controlModuleId, 'velocity', clampedVelocity, { skipEngine: true })
+        updateParam(controlModuleId, 'velocity', clampedVelocity, { skipEngine: true, skipHistory: true })
       }
       engine.setControlVoiceCv(controlModuleId, voiceIndex, cv)
       nativeControl?.setControlVoiceCv(controlModuleId, voiceIndex, cv)
@@ -207,7 +207,7 @@ export const useControlVoices = ({
 
   const setManualGate = useCallback(
     (moduleId: string, isOn: boolean) => {
-      updateParam(moduleId, 'gate', isOn ? 1 : 0, { skipEngine: true })
+      updateParam(moduleId, 'gate', isOn ? 1 : 0, { skipEngine: true, skipHistory: true })
       engine.setControlVoiceGate(moduleId, 0, isOn ? 1 : 0)
       nativeControl?.setControlVoiceGate(moduleId, 0, isOn ? 1 : 0)
     },
@@ -216,7 +216,7 @@ export const useControlVoices = ({
 
   const triggerManualSync = useCallback(
     (moduleId: string) => {
-      updateParam(moduleId, 'sync', 1, { skipEngine: true })
+      updateParam(moduleId, 'sync', 1, { skipEngine: true, skipHistory: true })
       engine.triggerControlVoiceSync(moduleId, 0)
       nativeControl?.triggerControlVoiceSync(moduleId, 0)
     },

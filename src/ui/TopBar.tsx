@@ -22,6 +22,10 @@ type TopBarProps = {
   shareError?: string | null
   isRecording?: boolean
   onToggleRecording?: () => void
+  undoCount?: number
+  redoCount?: number
+  onUndo?: () => void
+  onRedo?: () => void
 }
 
 // Icons
@@ -51,6 +55,16 @@ const RecordIcon = () => (
     <circle cx="12" cy="12" r="8"/>
   </svg>
 )
+const UndoIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+    <path d="M3 10h13a4 4 0 010 8H9M3 10l4-4M3 10l4 4"/>
+  </svg>
+)
+const RedoIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+    <path d="M21 10H8a4 4 0 000 8h7M21 10l-4-4M21 10l-4 4"/>
+  </svg>
+)
 const ResizeIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
     <path d="M21 21l-6-6m6 6v-6m0 6h-6M3 3l6 6M3 3v6m0-6h6"/>
@@ -75,6 +89,10 @@ export const TopBar = ({
   shareError,
   isRecording = false,
   onToggleRecording = () => {},
+  undoCount = 0,
+  redoCount = 0,
+  onUndo = () => {},
+  onRedo = () => {},
 }: TopBarProps) => {
   const [shareStatus, setShareStatus] = useState<ShareStatus>('idle')
 
@@ -165,15 +183,35 @@ export const TopBar = ({
         <div className="topbar-zone">
           <div className="share-block">
             <span className="action-label">Patch</span>
-            <button
-              type="button"
-              className={`button icon-btn ${shareStatus !== 'idle' ? shareStatus : ''}`}
-              onClick={handleShare}
-              disabled={shareStatus === 'copied'}
-              title={shareTitle}
-            >
-              <ShareIcon />
-            </button>
+            <div className="patch-buttons-row">
+              <button
+                type="button"
+                className={`button icon-btn ${undoCount > 0 ? '' : 'disabled'}`}
+                onClick={onUndo}
+                disabled={undoCount === 0}
+                title={`Undo (Ctrl+Z)${undoCount > 0 ? ` — ${undoCount}` : ''}`}
+              >
+                <UndoIcon />
+              </button>
+              <button
+                type="button"
+                className={`button icon-btn ${redoCount > 0 ? '' : 'disabled'}`}
+                onClick={onRedo}
+                disabled={redoCount === 0}
+                title={`Redo (Ctrl+Shift+Z)${redoCount > 0 ? ` — ${redoCount}` : ''}`}
+              >
+                <RedoIcon />
+              </button>
+              <button
+                type="button"
+                className={`button icon-btn ${shareStatus !== 'idle' ? shareStatus : ''}`}
+                onClick={handleShare}
+                disabled={shareStatus === 'copied'}
+                title={shareTitle}
+              >
+                <ShareIcon />
+              </button>
+            </div>
           </div>
         </div>
 

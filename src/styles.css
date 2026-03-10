@@ -164,6 +164,15 @@
   gap: 6px;
 }
 
+.patch-buttons-row {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.patch-buttons-row .button.disabled {
+  opacity: 0.3;
+}
+
 .dev-tools {
   display: flex;
   flex-direction: column;
