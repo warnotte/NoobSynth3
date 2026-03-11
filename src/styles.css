@@ -3491,6 +3491,38 @@
   border-color: rgba(100, 130, 170, 0.6);
 }
 
+/* Page navigation for 64-step sequencer */
+.seq-page-nav {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 4px;
+  padding: 4px 6px;
+}
+
+.seq-page-btn {
+  flex: 1;
+  padding: 4px 6px;
+  border: 1px solid rgba(80, 100, 130, 0.4);
+  border-radius: var(--radius-md);
+  background: var(--glass-4);
+  color: rgba(198, 212, 228, 0.7);
+  font-size: 9px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-normal);
+}
+
+.seq-page-btn.active {
+  background: rgba(0, 229, 255, 0.15);
+  border-color: rgba(0, 229, 255, 0.5);
+  color: #00e5ff;
+}
+
+.seq-page-btn:hover:not(.active) {
+  background: var(--glass-panel);
+  border-color: rgba(100, 130, 170, 0.6);
+}
+
 /* Step indicator LED */
 .seq-step.playing {
   background: rgba(66, 226, 177, 0.2);

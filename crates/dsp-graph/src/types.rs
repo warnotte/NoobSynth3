@@ -84,6 +84,7 @@ pub enum ModuleType {
     AyPlayer,
     ChordSequencer,
     PolyrhythmSequencer,
+    ClockDivider,
 
     // TR-909 Drums
     Kick909,

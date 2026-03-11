@@ -151,6 +151,12 @@ npm run dev           # Start dev server
 npm run build         # Production build
 ```
 
+## Scripts
+
+| Script | Usage | Description |
+|--------|-------|-------------|
+| `scripts/validate-preset-notes.mjs` | `node scripts/validate-preset-notes.mjs [preset-file]` | Valide les notes d'un preset. Lit le JSON, convertit les pitch des step sequencers en noms de notes réels (en tenant compte de la fréquence de base de l'oscillateur cible), et compare avec une mélodie de référence si disponible. Défaut : `public/presets/take-on-me.json`. |
+
 ## New Module Checklist
 
 Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :

@@ -6,7 +6,7 @@ use dsp_core::{
   Adsr, Arpeggiator, AyPlayer, BitCrusher, Chaos, ChordSequencer, Choir, Chorus, Clap808, Clap909, Compressor, Cowbell808, Delay, DrumSequencer, Ensemble,
   EnvelopeFollower, Eq3, EuclideanSequencer, Flanger, FmMatrix, FmOperator, FrequencyShifter, Glitch, Granular, GranularDelay, HiHat808, HiHat909, Hpf, KarplusStrong,
   Kick808, Kick909, Leslie, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, ParticleCloud, Phaser, PipeOrgan, PitchShifter,
-  PolyrhythmSequencer, Resonator, Reverb, Rimshot909, SampleHold, Shepard, SidPlayer, SlewLimiter, Snare808, Snare909, SnesOsc, SpectralSwarm, SpeechSynth,
+  ClockDivider, PolyrhythmSequencer, Resonator, Reverb, Rimshot909, SampleHold, Shepard, SidPlayer, SlewLimiter, Snare808, Snare909, SnesOsc, SpectralSwarm, SpeechSynth,
   SpringReverb, StepSequencer, Supersaw, TapeDelay, Tb303, Tom808, Tom909, TubeAmp, TuringMachine, Vcf, Vco, Vocoder, Wah, Wavetable,
 };
 
@@ -753,6 +753,9 @@ pub(crate) fn create_state(
         track4_mute: ParamBuffer::new(param_number(params, "track4Mute", 0.0)),
       })
     }
+    ModuleType::ClockDivider => ModuleState::ClockDivider(ClockDividerState {
+      divider: ClockDivider::new(sample_rate),
+    }),
     ModuleType::Compressor => ModuleState::Compressor(CompressorState {
       compressor: Compressor::new(sample_rate),
       threshold: ParamBuffer::new(param_number(params, "threshold", -20.0)),
@@ -1612,6 +1615,7 @@ pub(crate) fn apply_param(state: &mut ModuleState, param: &str, value: f32) {
       "track4Mute" => state.track4_mute.set(value),
       _ => {}
     },
+    ModuleState::ClockDivider(_) => {},
     _ => {}
   }
 }

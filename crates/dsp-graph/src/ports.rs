@@ -125,6 +125,11 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // clock
       PortInfo { channels: 1 },  // reset
     ],
+    // Clock Divider - 2 inputs (clock, reset)
+    ModuleType::ClockDivider => vec![
+      PortInfo { channels: 1 },  // clock
+      PortInfo { channels: 1 },  // reset
+    ],
     ModuleType::Tb303 => vec![
       PortInfo { channels: 1 },  // pitch
       PortInfo { channels: 1 },  // gate
@@ -390,6 +395,13 @@ pub fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // cv-4
       PortInfo { channels: 1 },  // gate-4
       PortInfo { channels: 1 },  // step-out
+    ],
+    // Clock Divider - 4 outputs (/2, /4, /8, /16)
+    ModuleType::ClockDivider => vec![
+      PortInfo { channels: 1 },  // div-2
+      PortInfo { channels: 1 },  // div-4
+      PortInfo { channels: 1 },  // div-8
+      PortInfo { channels: 1 },  // div-16
     ],
     ModuleType::Tb303 => vec![
       PortInfo { channels: 1 },  // out
@@ -758,7 +770,7 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
       "cv-offset" => Some(2),
       _ => None,
     },
-    ModuleType::ChordSequencer | ModuleType::PolyrhythmSequencer => match port_id {
+    ModuleType::ChordSequencer | ModuleType::PolyrhythmSequencer | ModuleType::ClockDivider => match port_id {
       "clock" | "clk" => Some(0),
       "reset" | "rst" => Some(1),
       _ => None,
@@ -1150,6 +1162,13 @@ pub fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize
       "cv-4" => Some(6),
       "gate-4" => Some(7),
       "step-out" => Some(8),
+      _ => None,
+    },
+    ModuleType::ClockDivider => match port_id {
+      "div-2" => Some(0),
+      "div-4" => Some(1),
+      "div-8" => Some(2),
+      "div-16" => Some(3),
       _ => None,
     },
     ModuleType::Tb303 => match port_id {

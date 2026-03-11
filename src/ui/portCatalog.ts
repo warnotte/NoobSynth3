@@ -336,6 +336,18 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
       { id: 'step-out', label: 'Step', kind: 'cv', direction: 'out' },
     ],
   },
+  'clock-divider': {
+    inputs: [
+      { id: 'clock', label: 'Clk', kind: 'sync', direction: 'in' },
+      { id: 'reset', label: 'Rst', kind: 'sync', direction: 'in' },
+    ],
+    outputs: [
+      { id: 'div-2', label: '/2', kind: 'sync', direction: 'out' },
+      { id: 'div-4', label: '/4', kind: 'sync', direction: 'out' },
+      { id: 'div-8', label: '/8', kind: 'sync', direction: 'out' },
+      { id: 'div-16', label: '/16', kind: 'sync', direction: 'out' },
+    ],
+  },
   'chord-sequencer': {
     inputs: [
       { id: 'clock', label: 'Clk', kind: 'sync', direction: 'in' },

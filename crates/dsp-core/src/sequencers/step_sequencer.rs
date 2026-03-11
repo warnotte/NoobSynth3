@@ -1,6 +1,6 @@
 //! Step Sequencer module.
 //!
-//! 16-step sequencer with pitch/gate/velocity/slide per step.
+//! 64-step sequencer with pitch/gate/velocity/slide per step.
 
 use crate::common::{sample_at, Sample};
 use super::RATE_DIVISIONS;
@@ -51,18 +51,18 @@ impl Xorshift32 {
     }
 }
 
-/// 16-step sequencer.
+/// 64-step sequencer.
 ///
 /// Classic step sequencer with pitch CV, gate, velocity, and slide per step.
 /// Supports multiple direction modes and external clock sync.
 ///
 /// # Features
 ///
-/// - 16 programmable steps
+/// - 64 programmable steps
 /// - Pitch offset (-24 to +24 semitones per step)
 /// - Per-step gate, velocity, and slide
 /// - Forward, reverse, ping-pong, random directions
-/// - Adjustable sequence length (1-16)
+/// - Adjustable sequence length (1-64)
 /// - Swing support
 /// - External clock sync
 ///
@@ -95,8 +95,8 @@ impl Xorshift32 {
 pub struct StepSequencer {
     sample_rate: f32,
 
-    // Step data - 16 steps
-    steps: [SeqStep; 16],
+    // Step data - 64 steps
+    steps: [SeqStep; 64],
 
     // Playback state
     current_step: usize,
@@ -162,7 +162,7 @@ pub struct StepSequencerParams<'a> {
     pub swing: &'a [Sample],
     /// Global slide time in ms (0-500)
     pub slide_time: &'a [Sample],
-    /// Active step count (1-16)
+    /// Active step count (1-64)
     pub length: &'a [Sample],
     /// Direction mode (0=fwd, 1=rev, 2=pingpong, 3=random)
     pub direction: &'a [Sample],
@@ -176,7 +176,7 @@ pub struct StepSequencerOutputs<'a> {
     pub gate_out: &'a mut [Sample],
     /// Velocity output (0-1)
     pub velocity_out: &'a mut [Sample],
-    /// Current step position (0-15)
+    /// Current step position (0-63)
     pub step_out: &'a mut [Sample],
 }
 
@@ -185,7 +185,7 @@ impl StepSequencer {
     pub fn new(sample_rate: f32) -> Self {
         Self {
             sample_rate: sample_rate.max(1.0),
-            steps: [SeqStep::default(); 16],
+            steps: [SeqStep::default(); 64],
             current_step: 0,
             phase: 0.0,
             samples_per_beat: sample_rate as f64 * 0.5, // Default 1/8 at 120 BPM
@@ -218,14 +218,14 @@ impl StepSequencer {
         self.sample_rate = sample_rate.max(1.0);
     }
 
-    /// Get current step position (0-15).
+    /// Get current step position (0-63).
     pub fn current_step(&self) -> usize {
         self.current_step
     }
 
     /// Set step data from parsed values.
     pub fn set_step(&mut self, index: usize, pitch: f32, gate: bool, velocity: f32, slide: bool) {
-        if index < 16 {
+        if index < 64 {
             self.steps[index] = SeqStep {
                 pitch: pitch.clamp(-24.0, 24.0),
                 gate,
@@ -284,7 +284,7 @@ impl StepSequencer {
                             }
                         }
                         // Save step
-                        if step_idx < 16 {
+                        if step_idx < 64 {
                             self.steps[step_idx] = SeqStep {
                                 pitch: current_pitch.clamp(-24.0, 24.0),
                                 gate: current_gate,
@@ -361,7 +361,7 @@ impl StepSequencer {
         let gate_pct = sample_at(params.gate_length, 0, 50.0).clamp(10.0, 100.0) / 100.0;
         let swing = sample_at(params.swing, 0, 0.0).clamp(0.0, 90.0) / 100.0;
         let slide_time_ms = sample_at(params.slide_time, 0, 50.0).clamp(0.0, 500.0);
-        let length = (sample_at(params.length, 0, 16.0) as usize).clamp(1, 16);
+        let length = (sample_at(params.length, 0, 16.0) as usize).clamp(1, 64);
         let dir_mode = (sample_at(params.direction, 0, 0.0) as usize).min(3);
 
         // Calculate timing

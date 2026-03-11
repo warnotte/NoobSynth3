@@ -19,6 +19,7 @@ import { SidPlayerControls } from './SidPlayerControls'
 import { AyPlayerControls } from './AyPlayerControls'
 import { ChordSequencerControls } from './ChordSequencerControls'
 import { PolyrhythmSequencerControls } from './PolyrhythmSequencerControls'
+import { ClockDividerControls } from './ClockDividerControls'
 
 export function renderSequencerControls(props: ControlProps): React.ReactElement | null {
   const { module } = props
@@ -48,6 +49,8 @@ export function renderSequencerControls(props: ControlProps): React.ReactElement
       return <ChordSequencerControls {...props} />
     case 'polyrhythm-sequencer':
       return <PolyrhythmSequencerControls {...props} />
+    case 'clock-divider':
+      return <ClockDividerControls />
     default:
       return null
   }

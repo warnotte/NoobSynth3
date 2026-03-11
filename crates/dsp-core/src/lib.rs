@@ -121,6 +121,7 @@ pub use sequencers::{
     ChordStep,
     PolyrhythmSequencer, PolyrhythmParams, PolyrhythmInputs, PolyrhythmOutputs,
     PolyStep, POLY_MAX_STEPS, POLY_TRACKS,
+    ClockDivider, ClockDividerInputs, ClockDividerOutputs,
 };
 
 // Re-export chips

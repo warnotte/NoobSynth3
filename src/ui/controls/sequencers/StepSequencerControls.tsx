@@ -1,11 +1,12 @@
 /**
  * Step Sequencer Module Controls
  *
- * 16-step sequencer with pitch, gate, velocity, and slide per step.
+ * 64-step sequencer with pitch, gate, velocity, and slide per step.
+ * Steps are displayed 16 at a time with page navigation.
  */
 
 import type React from 'react'
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { ControlProps } from '../types'
 import { RotaryKnob } from '../../RotaryKnob'
 import { ToggleButton, ToggleGroup } from '../../ToggleButton'
@@ -15,6 +16,9 @@ import { formatInt } from '../../formatters'
 import { seqRateOptions, DEFAULT_RATES } from './shared/rateOptions'
 
 type StepData = { pitch: number; gate: boolean; velocity: number; slide: boolean }
+
+const MAX_STEPS = 64
+const STEPS_PER_PAGE = 16
 
 export function StepSequencerControls({ module, engine, status, audioMode, nativeSequencer, updateParam }: ControlProps) {
   const enabled = module.params.enabled !== false
@@ -27,6 +31,9 @@ export function StepSequencerControls({ module, engine, status, audioMode, nativ
   const length = Number(module.params.length ?? 16)
   const direction = Number(module.params.direction ?? 0)
 
+  const [page, setPage] = useState(0)
+  const totalPages = Math.ceil(length / STEPS_PER_PAGE)
+
   let steps: StepData[] = []
   try {
     const raw = module.params.stepData
@@ -34,9 +41,9 @@ export function StepSequencerControls({ module, engine, status, audioMode, nativ
       steps = JSON.parse(raw)
     }
   } catch {
-    steps = Array.from({ length: 16 }, () => ({ pitch: 0, gate: true, velocity: 100, slide: false }))
+    steps = Array.from({ length: MAX_STEPS }, () => ({ pitch: 0, gate: true, velocity: 100, slide: false }))
   }
-  while (steps.length < 16) {
+  while (steps.length < MAX_STEPS) {
     steps.push({ pitch: 0, gate: true, velocity: 100, slide: false })
   }
 
@@ -45,38 +52,50 @@ export function StepSequencerControls({ module, engine, status, audioMode, nativ
   }
 
   const patternPresets = [
-    { id: 'init', label: 'Init', steps: Array.from({ length: 16 }, () => ({ pitch: 0, gate: true, velocity: 100, slide: false })) },
-    { id: 'moroder', label: 'Moroder', steps: [
-      { pitch: 0, gate: true, velocity: 100, slide: false }, { pitch: 0, gate: true, velocity: 70, slide: false },
-      { pitch: 12, gate: true, velocity: 90, slide: false }, { pitch: 0, gate: true, velocity: 60, slide: false },
-      { pitch: 7, gate: true, velocity: 100, slide: true }, { pitch: 12, gate: true, velocity: 70, slide: false },
-      { pitch: 0, gate: true, velocity: 80, slide: false }, { pitch: 7, gate: true, velocity: 60, slide: false },
-      { pitch: 12, gate: true, velocity: 100, slide: false }, { pitch: 0, gate: true, velocity: 70, slide: false },
-      { pitch: 7, gate: true, velocity: 90, slide: true }, { pitch: 0, gate: true, velocity: 60, slide: false },
-      { pitch: 0, gate: true, velocity: 100, slide: false }, { pitch: 12, gate: true, velocity: 70, slide: false },
-      { pitch: 7, gate: true, velocity: 80, slide: true }, { pitch: 0, gate: true, velocity: 60, slide: false },
-    ]},
-    { id: 'acid', label: 'Acid', steps: [
-      { pitch: 0, gate: true, velocity: 100, slide: false }, { pitch: 0, gate: true, velocity: 60, slide: true },
-      { pitch: 12, gate: true, velocity: 100, slide: false }, { pitch: 0, gate: false, velocity: 100, slide: false },
-      { pitch: 7, gate: true, velocity: 80, slide: true }, { pitch: 5, gate: true, velocity: 70, slide: true },
-      { pitch: 0, gate: true, velocity: 100, slide: false }, { pitch: 0, gate: true, velocity: 50, slide: false },
-      { pitch: 0, gate: true, velocity: 100, slide: false }, { pitch: 12, gate: true, velocity: 60, slide: true },
-      { pitch: 7, gate: true, velocity: 90, slide: false }, { pitch: 0, gate: false, velocity: 100, slide: false },
-      { pitch: 3, gate: true, velocity: 80, slide: true }, { pitch: 0, gate: true, velocity: 70, slide: false },
-      { pitch: 0, gate: true, velocity: 100, slide: false }, { pitch: 0, gate: true, velocity: 50, slide: false },
-    ]},
-    { id: 'octaves', label: 'Octaves', steps: [
-      { pitch: 0, gate: true, velocity: 100, slide: false }, { pitch: 12, gate: true, velocity: 80, slide: false },
-      { pitch: 0, gate: true, velocity: 90, slide: false }, { pitch: 12, gate: true, velocity: 70, slide: false },
-      { pitch: 0, gate: true, velocity: 100, slide: false }, { pitch: 12, gate: true, velocity: 80, slide: false },
-      { pitch: 0, gate: true, velocity: 90, slide: false }, { pitch: 12, gate: true, velocity: 70, slide: false },
-      { pitch: 0, gate: true, velocity: 100, slide: false }, { pitch: 12, gate: true, velocity: 80, slide: false },
-      { pitch: 0, gate: true, velocity: 90, slide: false }, { pitch: 12, gate: true, velocity: 70, slide: false },
-      { pitch: 0, gate: true, velocity: 100, slide: false }, { pitch: 12, gate: true, velocity: 80, slide: false },
-      { pitch: 0, gate: true, velocity: 90, slide: false }, { pitch: 12, gate: true, velocity: 70, slide: false },
-    ]},
-    { id: 'random', label: 'Random', steps: Array.from({ length: 16 }, () => ({
+    { id: 'init', label: 'Init', steps: Array.from({ length: MAX_STEPS }, () => ({ pitch: 0, gate: true, velocity: 100, slide: false })) },
+    { id: 'moroder', label: 'Moroder', steps: (() => {
+      const base = [
+        { pitch: 0, gate: true, velocity: 100, slide: false }, { pitch: 0, gate: true, velocity: 70, slide: false },
+        { pitch: 12, gate: true, velocity: 90, slide: false }, { pitch: 0, gate: true, velocity: 60, slide: false },
+        { pitch: 7, gate: true, velocity: 100, slide: true }, { pitch: 12, gate: true, velocity: 70, slide: false },
+        { pitch: 0, gate: true, velocity: 80, slide: false }, { pitch: 7, gate: true, velocity: 60, slide: false },
+        { pitch: 12, gate: true, velocity: 100, slide: false }, { pitch: 0, gate: true, velocity: 70, slide: false },
+        { pitch: 7, gate: true, velocity: 90, slide: true }, { pitch: 0, gate: true, velocity: 60, slide: false },
+        { pitch: 0, gate: true, velocity: 100, slide: false }, { pitch: 12, gate: true, velocity: 70, slide: false },
+        { pitch: 7, gate: true, velocity: 80, slide: true }, { pitch: 0, gate: true, velocity: 60, slide: false },
+      ]
+      const out = []
+      for (let i = 0; i < MAX_STEPS; i++) out.push({ ...base[i % base.length] })
+      return out
+    })()},
+    { id: 'acid', label: 'Acid', steps: (() => {
+      const base = [
+        { pitch: 0, gate: true, velocity: 100, slide: false }, { pitch: 0, gate: true, velocity: 60, slide: true },
+        { pitch: 12, gate: true, velocity: 100, slide: false }, { pitch: 0, gate: false, velocity: 100, slide: false },
+        { pitch: 7, gate: true, velocity: 80, slide: true }, { pitch: 5, gate: true, velocity: 70, slide: true },
+        { pitch: 0, gate: true, velocity: 100, slide: false }, { pitch: 0, gate: true, velocity: 50, slide: false },
+        { pitch: 0, gate: true, velocity: 100, slide: false }, { pitch: 12, gate: true, velocity: 60, slide: true },
+        { pitch: 7, gate: true, velocity: 90, slide: false }, { pitch: 0, gate: false, velocity: 100, slide: false },
+        { pitch: 3, gate: true, velocity: 80, slide: true }, { pitch: 0, gate: true, velocity: 70, slide: false },
+        { pitch: 0, gate: true, velocity: 100, slide: false }, { pitch: 0, gate: true, velocity: 50, slide: false },
+      ]
+      const out = []
+      for (let i = 0; i < MAX_STEPS; i++) out.push({ ...base[i % base.length] })
+      return out
+    })()},
+    { id: 'octaves', label: 'Octaves', steps: (() => {
+      const out = []
+      for (let i = 0; i < MAX_STEPS; i++) {
+        out.push({
+          pitch: i % 2 === 0 ? 0 : 12,
+          gate: true,
+          velocity: i % 2 === 0 ? 100 : 80,
+          slide: false,
+        })
+      }
+      return out
+    })()},
+    { id: 'random', label: 'Random', steps: Array.from({ length: MAX_STEPS }, () => ({
       pitch: Math.floor(Math.random() * 25) - 12,
       gate: Math.random() > 0.2,
       velocity: 50 + Math.floor(Math.random() * 50),
@@ -162,6 +181,14 @@ export function StepSequencerControls({ module, engine, status, audioMode, nativ
     void poll()
     return () => { active = false }
   }, [enabled, status, module.id, isNativeMode, nativeSequencer, updatePlayhead])
+
+  // Clamp page when length changes
+  useEffect(() => {
+    const maxPage = Math.max(0, Math.ceil(length / STEPS_PER_PAGE) - 1)
+    if (page > maxPage) setPage(maxPage)
+  }, [length, page])
+
+  const pageOffset = page * STEPS_PER_PAGE
 
   return (
     <>
@@ -249,20 +276,38 @@ export function StepSequencerControls({ module, engine, status, audioMode, nativ
             options={[
               { id: 4, label: '4' },
               { id: 8, label: '8' },
-              { id: 12, label: '12' },
               { id: 16, label: '16' },
+              { id: 32, label: '32' },
+              { id: 48, label: '48' },
+              { id: 64, label: '64' },
             ]}
             value={length}
             onChange={(value) => updateParam(module.id, 'length', value)}
+            columns={3}
           />
         </ControlBox>
       </ControlBoxRow>
 
+      {totalPages > 1 && (
+        <div className="seq-page-nav">
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={i}
+              type="button"
+              className={`seq-page-btn ${page === i ? 'active' : ''}`}
+              onClick={() => setPage(i)}
+            >
+              {i * STEPS_PER_PAGE + 1}-{Math.min((i + 1) * STEPS_PER_PAGE, length)}
+            </button>
+          ))}
+        </div>
+      )}
+
       <div className="seq-step-grid" ref={gridRef}>
-        {[0, 8].map((offset) => (
-          <div key={offset} className="seq-step-bank">
-            {steps.slice(offset, offset + 8).map((step, i) => {
-              const stepIndex = offset + i
+        {[0, 8].map((bankOffset) => (
+          <div key={bankOffset} className="seq-step-bank">
+            {steps.slice(pageOffset + bankOffset, pageOffset + bankOffset + 8).map((step, i) => {
+              const stepIndex = pageOffset + bankOffset + i
               return (
                 <div key={stepIndex} data-step={stepIndex} className={`seq-step ${stepIndex >= length ? 'disabled' : ''}`}>
                   <div className="seq-step-led" />

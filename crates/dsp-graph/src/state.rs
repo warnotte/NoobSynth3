@@ -1,7 +1,7 @@
 //! Module state definitions for all DSP modules.
 
 use dsp_core::{
-    Adsr, Arpeggiator, AyPlayer, BitCrusher, Chaos, ChordSequencer, Choir, Chorus, Clap808, Clap909, Compressor, Cowbell808, Delay, DrumSequencer, Ensemble,
+    Adsr, Arpeggiator, AyPlayer, BitCrusher, Chaos, ChordSequencer, Choir, Chorus, Clap808, Clap909, ClockDivider, Compressor, Cowbell808, Delay, DrumSequencer, Ensemble,
     EnvelopeFollower, Eq3, EuclideanSequencer, Flanger, FmMatrix, FmOperator, FrequencyShifter, Glitch, Granular, GranularDelay, HiHat808, HiHat909, Hpf, KarplusStrong, Leslie,
     Kick808, Kick909, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, ParticleCloud, Phaser, PipeOrgan, PitchShifter,
     PolyrhythmSequencer, Resonator, Reverb, Rimshot909, SampleHold, Shepard, SidPlayer, SlewLimiter, Snare808, Snare909, SnesOsc, SpectralSwarm, SpeechSynth,
@@ -731,6 +731,10 @@ pub struct ChordSequencerState {
     pub voicing: ParamBuffer,
 }
 
+pub struct ClockDividerState {
+    pub divider: ClockDivider,
+}
+
 pub struct PolyrhythmSequencerState {
     pub seq: PolyrhythmSequencer,
     pub enabled: ParamBuffer,
@@ -967,6 +971,7 @@ pub enum ModuleState {
     AyPlayer(AyPlayerState),
     ChordSequencer(ChordSequencerState),
     PolyrhythmSequencer(PolyrhythmSequencerState),
+    ClockDivider(ClockDividerState),
 
     // TR-909 Drums
     Kick909(Kick909State),

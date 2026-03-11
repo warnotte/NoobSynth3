@@ -13,7 +13,7 @@
 //!
 //! ## Note Sequencers
 //! - [`Arpeggiator`] - Arpeggiator with multiple modes and patterns
-//! - [`StepSequencer`] - 16-step CV/gate sequencer with slide
+//! - [`StepSequencer`] - 64-step CV/gate sequencer with slide
 //! - [`MidiFileSequencer`] - MIDI file playback with 8 tracks
 //!
 //! ## Rhythm Sequencers
@@ -69,6 +69,7 @@ pub mod sid_player;
 pub mod ay_player;
 pub mod chord_sequencer;
 pub mod polyrhythm_sequencer;
+pub mod clock_divider;
 
 // ============================================================================
 // Shared Rate Divisions
@@ -172,4 +173,7 @@ pub use chord_sequencer::{
 pub use polyrhythm_sequencer::{
     PolyrhythmSequencer, PolyrhythmInputs, PolyrhythmParams, PolyrhythmOutputs,
     PolyStep, POLY_MAX_STEPS, POLY_TRACKS,
+};
+pub use clock_divider::{
+    ClockDivider, ClockDividerInputs, ClockDividerOutputs,
 };

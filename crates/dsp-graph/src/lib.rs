@@ -893,6 +893,8 @@ fn normalize_module_type(raw: &str) -> ModuleType {
     "chord-sequencer" => ModuleType::ChordSequencer,
     // Polyrhythm Sequencer
     "polyrhythm-sequencer" => ModuleType::PolyrhythmSequencer,
+    // Clock Divider
+    "clock-divider" => ModuleType::ClockDivider,
     _ => ModuleType::Oscillator,
   }
 }

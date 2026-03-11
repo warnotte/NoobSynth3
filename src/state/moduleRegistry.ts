@@ -105,6 +105,8 @@ export const moduleSizes: Record<ModuleType, string> = {
   'leslie': '2x3',
   'wah': '2x2',
   'tube-amp': '2x2',
+  // Clock Divider
+  'clock-divider': '1x2',
 }
 
 export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>> = {
@@ -178,6 +180,7 @@ export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>>
   'leslie': 'strip',
   'wah': 'strip',
   'tube-amp': 'strip',
+  'clock-divider': 'strip',
 }
 
 export type ModuleCategory =
@@ -286,6 +289,7 @@ export const moduleCatalog: { type: ModuleType; label: string; category: ModuleC
   { type: 'ay-player', label: 'AY Player', category: 'sequencers' },
   { type: 'chord-sequencer', label: 'Chord Seq', category: 'sequencers' },
   { type: 'polyrhythm-sequencer', label: 'Polyrhythm', category: 'sequencers' },
+  { type: 'clock-divider', label: 'Clock Div', category: 'sequencers' },
   { type: 'mario', label: 'Mario IO', category: 'sequencers' },
   // TR-909 Drums
   { type: '909-kick', label: '909 Kick', category: 'drums' },
@@ -399,6 +403,7 @@ export const modulePrefixes: Record<ModuleType, string> = {
   'ay-player': 'ay',
   'chord-sequencer': 'chordseq',
   'polyrhythm-sequencer': 'polyseq',
+  'clock-divider': 'clkdiv',
   'envelope-follower': 'envf',
   'bit-crusher': 'crush',
   'flanger': 'flng',
@@ -498,6 +503,7 @@ export const moduleLabels: Record<ModuleType, string> = {
   'ay-player': 'AY Player',
   'chord-sequencer': 'Chord Seq',
   'polyrhythm-sequencer': 'Polyrhythm',
+  'clock-divider': 'Clock Div',
   'envelope-follower': 'Env Follower',
   'bit-crusher': 'Bit Crusher',
   'flanger': 'Flanger',
@@ -1157,6 +1163,7 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
       }).flat()
     ),
   },
+  'clock-divider': {},
 }
 
 export const getNextModuleIndex = (type: ModuleType, modules: ModuleSpec[]) => {

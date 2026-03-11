@@ -105,6 +105,8 @@ export type ModuleType =
   | 'leslie'
   | 'wah'
   | 'tube-amp'
+  // Clock Divider
+  | 'clock-divider'
 
 export interface ModuleSpec {
   id: string

@@ -43,6 +43,7 @@ use dsp_core::{
     SpeechSynthInputs, SpeechSynthParams,
     AyPlayerInputs, AyPlayerOutputs, AyPlayerParams,
     ChordSequencerInputs, ChordSequencerOutputs, ChordSequencerParams,
+    ClockDividerInputs, ClockDividerOutputs,
     PolyrhythmInputs, PolyrhythmOutputs, PolyrhythmParams,
     SlewInputs, SlewParams,
     EnvelopeFollowerInputs, EnvelopeFollowerParams,
@@ -2373,6 +2374,22 @@ pub(crate) fn process_module(
                 step_out: o8[0].channel_mut(0),
             };
             state.seq.process_block(poly_outputs, poly_inputs, params);
+        }
+        ModuleState::ClockDivider(state) => {
+            let clock = if connections[0].is_empty() { None } else { Some(inputs[0].channel(0)) };
+            let reset = if connections[1].is_empty() { None } else { Some(inputs[1].channel(0)) };
+            // 4 outputs: div-2, div-4, div-8, div-16
+            let (o0, rest) = outputs.split_at_mut(1);
+            let (o1, rest) = rest.split_at_mut(1);
+            let (o2, o3) = rest.split_at_mut(1);
+            let div_inputs = ClockDividerInputs { clock, reset };
+            let div_outputs = ClockDividerOutputs {
+                div2: o0[0].channel_mut(0),
+                div4: o1[0].channel_mut(0),
+                div8: o2[0].channel_mut(0),
+                div16: o3[0].channel_mut(0),
+            };
+            state.divider.process_block(div_outputs, div_inputs);
         }
         ModuleState::Meter(state) => {
             // Track peak amplitude from stereo input
