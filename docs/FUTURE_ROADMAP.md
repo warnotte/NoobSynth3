@@ -710,14 +710,15 @@ const [viewState, setViewState] = useState({
 
 ## 5. Audio & DSP
 
-### 5.1 WASM Optimization (Priorité: Basse)
+### 5.1 WASM Optimization ✅ FAIT
 
-**Problème:** `wasm-opt` désactivé (bulk memory mismatch)
+**Statut:** ✅ Implémenté en mars 2026
 
-**Investigation nécessaire:**
-1. Identifier le flag causant le problème
-2. Tester avec versions récentes de wasm-bindgen
-3. Mesurer gain de performance attendu (~5-15%)
+**Solution:**
+- `wasm-opt` réactivé avec flags `-O2 --enable-bulk-memory --enable-nontrapping-float-to-int`
+- Le WASM Rust utilise `memory.copy`/`memory.fill` (bulk memory) et `i32.trunc_sat_f32_*` (nontrapping float-to-int)
+- Résultat: ~15% réduction de taille (931KB → 794KB)
+- Intégré dans `scripts/build-wasm.ps1`, skip gracieux si wasm-opt non installé
 
 ### 5.2 Sample Rate Flexibility (Priorité: Basse)
 

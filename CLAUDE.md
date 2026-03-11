@@ -142,13 +142,17 @@ Voir `src/hooks/HOOKS.md` pour la documentation détaillée.
 | `src/engine/worklets/wasm-graph-processor.ts` | AudioWorklet processor |
 | `src/shared/rates.ts` | Unified rate divisions constants (TS) |
 | `crates/dsp-core/src/sequencers/mod.rs` | Unified rate divisions constants (Rust) |
+| `crates/dsp-graph/tests/presets.rs` | Integration tests: load + render all presets |
+| `scripts/build-wasm.ps1` | WASM build script (cargo + wasm-opt + wasm-bindgen) |
 
 ## Build Commands
 
 ```bash
-npm run build:wasm    # Build Rust to WASM
+npm run build:wasm    # Build Rust to WASM (+ wasm-opt optimization)
 npm run dev           # Start dev server
 npm run build         # Production build
+npm test              # Run all Rust tests
+npm run test:presets  # Run preset integration tests (load + render all presets)
 ```
 
 ## Scripts
@@ -490,7 +494,30 @@ Ces features ont les structures de données en place mais la logique n'est pas c
 
 ---
 
-## Testing Notes
+## Testing
+
+### Automated Preset Tests
+
+`crates/dsp-graph/tests/presets.rs` — Integration tests that validate all presets:
+
+| Test | Description |
+|------|-------------|
+| `all_presets_load_without_error` | Loads all 211+ graph-format presets via `GraphEngine::set_graph_json()` |
+| `all_presets_render_without_nan` | Renders 750 blocks (~2s) per preset, checks NaN/Inf/panic/amplitude |
+| `engine_basic_render` | Empty graph renders silence |
+| `engine_single_oscillator` | Single oscillator produces non-zero, non-NaN output |
+
+```bash
+npm test              # All workspace tests
+npm run test:presets  # Preset tests only (with output)
+```
+
+**Notes:**
+- Tests run in 8MB stack threads (poly presets need extra stack in debug builds)
+- Each preset renders in its own thread to catch panics without aborting the suite
+- Old-format presets (24 files using `updates` instead of `graph`) are skipped
+
+### Manual Testing Notes
 
 - **Arpeggiator:** Pas suffisamment testé, notamment:
   - Comportement avec différents nombres de notes
@@ -731,6 +758,7 @@ Les port IDs dans les presets doivent correspondre **exactement** à ceux défin
 | Presets Showcase/Chord trop faibles | Accumulation d'atténuations (gain×mixer×VCF×reverb) | Recalibrage gains, mixer levels, VCF cutoff sur 15 presets |
 | Phaser feedback runaway | Feedback pris depuis l'état interne allpass (croissance infinie) | Feedback via sortie bornée par `tanh()` avant réinjection |
 | Ajout module = full restart | `applyGraphUpdate()` appelait `queueEngineRestart()` pour tout changement | Update incrémental (`set_graph` preserve state), full restart uniquement pour presets (`set_graph_fresh`) |
+| Turing Machine panic | `1u16 << length` overflow quand `length == 16` | Guard `if length >= 16 { 0xFFFF }` |
 
 ---
 
@@ -777,7 +805,7 @@ Les port IDs dans les presets doivent correspondre **exactement** à ceux défin
 | VST Scope | Oscilloscope non fonctionnel (taps non connectés via IPC) |
 | VST UI | L'éditeur est un launcher; UI complète dans fenêtre Tauri externe |
 | VST Macros | Les édits UI ne modifient pas l'automation DAW |
-| WASM | `wasm-opt` désactivé (bulk memory mismatch); non optimisé |
+| WASM | `wasm-opt` actif avec `-O2 --enable-bulk-memory --enable-nontrapping-float-to-int` (~15% plus petit) |
 | **Mixers Gain Staging** | Tous les mixers (2ch, 6ch, 8ch) divisent par `√N` (N = entrées connectées). Formule standard DAW (sommation de puissance). Ancien comportement: 2ch divisait toujours par 2, multi-ch par N. |
 | **RSID partiellement supporté** | Certains fichiers RSID (Great Giana Sisters, RoboCop) ne jouent pas correctement. L'émulation CPU 6502/CIA/VIC n'est pas assez précise pour les tunes RSID les plus exigeantes (timer modulation dynamique, échantillons digi). Les PSID fonctionnent tous. |
 

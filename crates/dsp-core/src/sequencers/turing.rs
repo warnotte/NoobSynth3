@@ -132,8 +132,8 @@ impl TuringMachine {
 
                 // Calculate CV from register
                 // Use lower 'length' bits, normalize to 0-1
-                let mask = (1u16 << length) - 1;
-                let value = (self.register & mask) as f32 / mask as f32;
+                let mask: u16 = if length >= 16 { 0xFFFF } else { (1u16 << length) - 1 };
+                let value = if mask > 0 { (self.register & mask) as f32 / mask as f32 } else { 0.0 };
 
                 // Scale to voltage range (in octaves, centered around 0)
                 let cv_raw = (value - 0.5) * range;

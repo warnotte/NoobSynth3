@@ -3,6 +3,7 @@ $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 $cargo = Join-Path $env:USERPROFILE '.cargo\bin\cargo.exe'
 $bindgen = Join-Path $env:USERPROFILE '.cargo\bin\wasm-bindgen.exe'
+$wasmOpt = Join-Path $env:USERPROFILE '.cargo\bin\wasm-opt.exe'
 $outDir = Join-Path $root 'src\engine\worklets\wasm'
 $wasmPath = Join-Path $root 'target\wasm32-unknown-unknown\release\dsp_wasm.wasm'
 
@@ -15,6 +16,17 @@ if ($env:CARGO_NET_OFFLINE -eq 'true') {
 
 if (!(Test-Path $outDir)) {
   New-Item -ItemType Directory -Force -Path $outDir | Out-Null
+}
+
+# Optimize WASM with wasm-opt if available (~15% smaller + faster)
+if (Test-Path $wasmOpt) {
+  $sizeBefore = (Get-Item $wasmPath).Length
+  & $wasmOpt $wasmPath -O2 --enable-bulk-memory --enable-nontrapping-float-to-int -o $wasmPath
+  $sizeAfter = (Get-Item $wasmPath).Length
+  $reduction = [math]::Round((1 - $sizeAfter / $sizeBefore) * 100, 1)
+  Write-Host "wasm-opt: $sizeBefore -> $sizeAfter bytes (-$reduction%)"
+} else {
+  Write-Host 'wasm-opt not found, skipping optimization (cargo install wasm-opt)'
 }
 
 & $bindgen $wasmPath --out-dir $outDir --target web --no-typescript
