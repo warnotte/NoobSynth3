@@ -395,12 +395,14 @@ mod tests {
         let mut ay = Ay3_8910::new(1773400.0, 44100.0);
 
         // Enable tone on A, noise on B
-        ay.write_reg(7, 0b00_110_110);  // A tone, B noise
+        // R7 is active-low: bit=0 means enabled
+        // Bits: xx_NcNbNa_TcTbTa
+        ay.write_reg(7, 0b00_101_110);  // Na=1(off), Nb=0(on), Ta=0(on), Tb=1(off)
 
-        assert!(ay.tone_enabled(0));
-        assert!(!ay.tone_enabled(1));
-        assert!(!ay.noise_enabled(0));
-        assert!(ay.noise_enabled(1));
+        assert!(ay.tone_enabled(0));    // bit0 = 0 → enabled
+        assert!(!ay.tone_enabled(1));   // bit1 = 1 → disabled
+        assert!(!ay.noise_enabled(0));  // bit3 = 1 → disabled
+        assert!(ay.noise_enabled(1));   // bit4 = 0 → enabled
     }
 
     #[test]
