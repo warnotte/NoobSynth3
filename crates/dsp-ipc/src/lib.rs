@@ -968,6 +968,6 @@ mod tests {
 
     #[test]
     fn test_command_slot_size() {
-        assert_eq!(std::mem::size_of::<CommandSlot>(), 24);
+        assert_eq!(std::mem::size_of::<CommandSlot>(), 20);
     }
 }
