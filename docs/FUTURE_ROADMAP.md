@@ -728,23 +728,22 @@ const [viewState, setViewState] = useState({
 - Supporter 44.1kHz, 48kHz, 96kHz
 - Ajuster coefficients de filtres dynamiquement
 
-### 5.3 CPU Metering (Priorité: Moyenne)
+### 5.3 CPU Metering ✅ FAIT
 
-**Feature demandée:**
-- Afficher % CPU par module
-- Identifier modules coûteux
-- Warning si >80% CPU total
+**Statut:** ✅ Implémenté en mars 2026
 
-```
-┌─────────────────────────────────────┐
-│  CPU: 34%  ████████░░░░░░░░░░░░░   │
-│                                     │
-│  Top consumers:                     │
-│  - Granular: 12%                    │
-│  - Reverb: 8%                       │
-│  - FM Matrix: 6%                    │
-└─────────────────────────────────────┘
-```
+**Fonctionnalités:**
+- Bouton toggle CPU dans la zone View de la TopBar
+- Barre de progression + pourcentage avec code couleur (vert/orange/rouge)
+- Peak marker (trait blanc)
+- Report avg + peak toutes les ~500ms
+- Fonctionne en Web Audio (worklet) et Tauri (cpal)
+- Zero overhead quand désactivé
+
+**Améliorations futures possibles:**
+- Afficher % CPU par module (nécessite instrumentation Rust par module)
+- Historique/graphe de charge sur le temps
+- Warning automatique si >80%
 
 ---
 
