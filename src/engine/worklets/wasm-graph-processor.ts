@@ -70,6 +70,7 @@ type GraphMessage =
   | { type: 'watchParticles'; moduleIds: string[] }
   | { type: 'loadParticleBuffer'; moduleId: string; data: number[] }
   | { type: 'watchMeters'; moduleIds: string[] }
+  | { type: 'enableCpuLoad'; enabled: boolean }
 
 class WasmGraphProcessor extends AudioWorkletProcessor {
   private engine: InstanceType<NonNullable<typeof WasmGraphEngine>> | null = null
@@ -86,8 +87,12 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
   private watchedAys: string[] = []
   private watchedParticles: string[] = []
   private watchedMeters: string[] = []
-  private debugCounter = 0
   private messageQueue: GraphMessage[] = []
+  private cpuLoadEnabled = false
+  private cpuLoadAccum = 0
+  private cpuLoadSamples = 0
+  private cpuLoadPeak = 0
+  private cpuLoadReportCounter = 0
 
   constructor() {
     super()
@@ -142,6 +147,14 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
     }
     if (message.type === 'watchMeters') {
       this.watchedMeters = message.moduleIds
+      return
+    }
+    if (message.type === 'enableCpuLoad') {
+      this.cpuLoadEnabled = message.enabled
+      this.cpuLoadAccum = 0
+      this.cpuLoadSamples = 0
+      this.cpuLoadPeak = 0
+      this.cpuLoadReportCounter = 0
       return
     }
     // Queue other messages to be processed in process() before render()
@@ -275,7 +288,16 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
       this.engine.clear_external_input()
     }
 
+    const t0 = this.cpuLoadEnabled ? Date.now() : 0
     const data = this.engine.render(frames)
+    if (this.cpuLoadEnabled) {
+      const elapsed = Date.now() - t0
+      const budget = (frames / sampleRate) * 1000
+      const load = budget > 0 ? elapsed / budget : 0
+      this.cpuLoadAccum += load
+      if (load > this.cpuLoadPeak) this.cpuLoadPeak = load
+      this.cpuLoadSamples += 1
+    }
     const channelCount = outputs.length + 1
     const expected = channelCount * frames
     if (data.length < expected) {
@@ -297,6 +319,23 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
       }
     }
 
+    // Report CPU load every ~500ms (~190 blocks at 48kHz/128)
+    if (this.cpuLoadEnabled) {
+      this.cpuLoadReportCounter += 1
+      if (this.cpuLoadReportCounter >= 190) {
+        const avg = this.cpuLoadSamples > 0 ? this.cpuLoadAccum / this.cpuLoadSamples : 0
+        this.port.postMessage({
+          type: 'cpuLoad',
+          avg: Math.round(avg * 1000) / 10,
+          peak: Math.round(this.cpuLoadPeak * 1000) / 10,
+        })
+        this.cpuLoadAccum = 0
+        this.cpuLoadSamples = 0
+        this.cpuLoadPeak = 0
+        this.cpuLoadReportCounter = 0
+      }
+    }
+
     // Poll every ~20ms (at 48kHz, 128 frames = 2.67ms, so poll every 8 blocks)
     this.stepPollCounter += 1
     const shouldPoll = this.stepPollCounter >= 8
@@ -310,12 +349,6 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
       for (const moduleId of this.watchedSequencers) {
         const step = this.engine.get_sequencer_step(moduleId)
         const lastStep = this.lastSteps.get(moduleId) ?? -1
-        // Debug: send periodic debug info (every ~2 seconds = 100 polls)
-        this.debugCounter++
-        if (this.debugCounter % 100 === 0) {
-          const rustTotalTicks = this.engine.get_midi_total_ticks(moduleId)
-          this.port.postMessage({ type: 'debug', info: { moduleId, step, lastStep, rustTotalTicks, watched: this.watchedSequencers.length } })
-        }
         if (step !== lastStep && step >= 0) {
           updates[moduleId] = step
           this.lastSteps.set(moduleId, step)

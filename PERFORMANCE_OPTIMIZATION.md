@@ -4,12 +4,31 @@ Ce document référence les stratégies d'optimisation identifiées pour le proj
 
 ## Table des matières
 
-1. [État actuel](#état-actuel)
-2. [Goulots d'étranglement potentiels](#goulots-détranglement-potentiels)
-3. [Optimisation SIMD](#optimisation-simd)
-4. [Multi-threading avec SharedArrayBuffer](#multi-threading-avec-sharedarraybuffer)
-5. [Optimisations React/UI](#optimisations-reactui)
-6. [Feuille de route](#feuille-de-route)
+1. [CPU Meter intégré](#cpu-meter-intégré)
+2. [État actuel](#état-actuel)
+3. [Goulots d'étranglement potentiels](#goulots-détranglement-potentiels)
+4. [Optimisation SIMD](#optimisation-simd)
+5. [Multi-threading avec SharedArrayBuffer](#multi-threading-avec-sharedarraybuffer)
+6. [Optimisations React/UI](#optimisations-reactui)
+7. [Feuille de route](#feuille-de-route)
+
+---
+
+## CPU Meter intégré
+
+Un indicateur de charge DSP est intégré dans la TopBar (bouton CPU dans la zone View). Il mesure le pourcentage du budget temps audio consommé par `engine.render()`.
+
+**Utilisation :** Cliquer le bouton CPU (icone puce) dans la zone View de la TopBar. La barre et le pourcentage apparaissent à droite.
+
+**Interprétation :**
+- **< 50% (vert)** : Confortable, marge pour ajouter des modules
+- **50-80% (orange)** : Charge élevée, attention à la polyphonie et aux effets lourds
+- **> 80% (rouge)** : Risque de glitchs audio, réduire la complexité du patch
+- **Trait blanc** : Peak (valeur max sur la dernière fenêtre de 500ms)
+
+**Overhead :** Quand désactivé, zéro overhead (pas de timing). Quand activé, 2× `Date.now()` par buffer audio (~375/s à 48kHz/128 frames) + 1 postMessage/500ms. Négligeable.
+
+**Limitations :** La précision de `Date.now()` est de ~1ms dans les AudioWorklets, ce qui est grossier par buffer (~2.67ms). La moyenne lissée sur 500ms compense.
 
 ---
 

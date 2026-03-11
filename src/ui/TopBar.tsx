@@ -21,6 +21,9 @@ type TopBarProps = {
   onRedo?: () => void
   onExportPreset?: () => void
   onImportPreset?: () => void
+  cpuLoad?: { avg: number; peak: number } | null
+  showCpuMeter?: boolean
+  onToggleCpuMeter?: () => void
 }
 
 // Icons
@@ -70,6 +73,12 @@ const ResizeIcon = () => (
     <path d="M21 21l-6-6m6 6v-6m0 6h-6M3 3l6 6M3 3v6m0-6h6"/>
   </svg>
 )
+const CpuIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <rect x="6" y="6" width="12" height="12" rx="1"/>
+    <path d="M9 1v4M15 1v4M9 19v4M15 19v4M1 9h4M1 15h4M19 9h4M19 15h4"/>
+  </svg>
+)
 
 export const TopBar = ({
   status,
@@ -93,6 +102,9 @@ export const TopBar = ({
   onRedo = () => {},
   onExportPreset,
   onImportPreset,
+  cpuLoad = null,
+  showCpuMeter = false,
+  onToggleCpuMeter = () => {},
 }: TopBarProps) => {
   return (
     <>
@@ -218,8 +230,37 @@ export const TopBar = ({
               >
                 <CableIcon />
               </button>
+              <button
+                type="button"
+                className={`ui-btn ui-btn--pill view-toggle ${showCpuMeter ? 'active' : ''}`}
+                onClick={onToggleCpuMeter}
+                aria-pressed={showCpuMeter}
+                title="Toggle DSP CPU meter"
+              >
+                <CpuIcon />
+              </button>
             </div>
           </div>
+          {showCpuMeter && (
+            <div
+              className="cpu-meter"
+              title={cpuLoad ? `DSP load — avg: ${cpuLoad.avg.toFixed(1)}% peak: ${cpuLoad.peak.toFixed(1)}%` : 'Waiting for data...'}
+            >
+              <div className="cpu-meter-bar">
+                <div
+                  className={`cpu-meter-fill ${(cpuLoad?.avg ?? 0) > 80 ? 'hot' : (cpuLoad?.avg ?? 0) > 50 ? 'warm' : ''}`}
+                  style={{ width: `${Math.min(cpuLoad?.avg ?? 0, 100)}%` }}
+                />
+                {cpuLoad && (
+                  <div
+                    className="cpu-meter-peak"
+                    style={{ left: `${Math.min(cpuLoad.peak, 100)}%` }}
+                  />
+                )}
+              </div>
+              <span className="cpu-meter-text">{cpuLoad ? `${cpuLoad.avg.toFixed(1)}%` : '—'}</span>
+            </div>
+          )}
         </div>
 
         {showDevTools && (

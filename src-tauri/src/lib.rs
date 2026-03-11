@@ -6,8 +6,10 @@ use dsp_ipc::{SharedParams, TauriBridge};
 use midir::MidiInput;
 use serde::Serialize;
 use std::collections::VecDeque;
+use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::{mpsc, Arc, Mutex};
 use std::thread;
+use std::time::Instant;
 use tauri::{Manager, State};
 
 #[derive(Serialize)]
@@ -313,10 +315,11 @@ struct AudioThreadState {
   input_error: Option<String>,
   input_buffer: Arc<Mutex<InputRing>>,
   scope: Arc<Mutex<ScopeSnapshot>>,
+  cpu_load: Arc<CpuLoadMetrics>,
 }
 
 impl AudioThreadState {
-  fn new(scope: Arc<Mutex<ScopeSnapshot>>) -> Self {
+  fn new(scope: Arc<Mutex<ScopeSnapshot>>, cpu_load: Arc<CpuLoadMetrics>) -> Self {
     Self {
       stream: None,
       input_stream: None,
@@ -331,6 +334,7 @@ impl AudioThreadState {
       input_error: None,
       input_buffer: Arc::new(Mutex::new(InputRing::new(0))),
       scope,
+      cpu_load,
     }
   }
 }
@@ -350,9 +354,41 @@ impl AudioThreadState {
   }
 }
 
+/// Atomic CPU load tracking for the audio thread (lock-free).
+/// Values stored as load × 10 (e.g. 42 = 4.2%).
+struct CpuLoadMetrics {
+  avg: AtomicU32,
+  peak: AtomicU32,
+  // accumulator state (only touched from audio callback)
+  accum: Mutex<CpuLoadAccum>,
+}
+
+struct CpuLoadAccum {
+  sum: f64,
+  peak: f64,
+  count: u32,
+  last_report: Instant,
+}
+
+impl CpuLoadMetrics {
+  fn new() -> Self {
+    Self {
+      avg: AtomicU32::new(0),
+      peak: AtomicU32::new(0),
+      accum: Mutex::new(CpuLoadAccum {
+        sum: 0.0,
+        peak: 0.0,
+        count: 0,
+        last_report: Instant::now(),
+      }),
+    }
+  }
+}
+
 struct NativeAudioState {
   tx: mpsc::Sender<AudioCommand>,
   scope: Arc<Mutex<ScopeSnapshot>>,
+  cpu_load: Arc<CpuLoadMetrics>,
 }
 
 impl NativeAudioState {
@@ -360,8 +396,10 @@ impl NativeAudioState {
     let (tx, rx) = mpsc::channel();
     let scope = Arc::new(Mutex::new(ScopeSnapshot::new(SCOPE_FRAMES)));
     let thread_scope = Arc::clone(&scope);
-    thread::spawn(move || audio_thread(rx, thread_scope));
-    Self { tx, scope }
+    let cpu_load = Arc::new(CpuLoadMetrics::new());
+    let thread_cpu = Arc::clone(&cpu_load);
+    thread::spawn(move || audio_thread(rx, thread_scope, thread_cpu));
+    Self { tx, scope, cpu_load }
   }
 }
 
@@ -383,8 +421,8 @@ where
     .map_err(|_| "native audio thread unavailable".to_string())?
 }
 
-fn audio_thread(rx: mpsc::Receiver<AudioCommand>, scope: Arc<Mutex<ScopeSnapshot>>) {
-  let mut state = AudioThreadState::new(scope);
+fn audio_thread(rx: mpsc::Receiver<AudioCommand>, scope: Arc<Mutex<ScopeSnapshot>>, cpu_load: Arc<CpuLoadMetrics>) {
+  let mut state = AudioThreadState::new(scope, cpu_load);
   while let Ok(command) = rx.recv() {
     match command {
       AudioCommand::Start {
@@ -719,6 +757,7 @@ fn start_audio(
   engine.set_graph_json(&graph_payload)?;
   let graph = Arc::new(Mutex::new(engine));
   let scope = Arc::clone(&state.scope);
+  let cpu_load = Arc::clone(&state.cpu_load);
   let stream = match output_config.sample_format() {
     SampleFormat::F32 => {
       build_graph_stream::<f32>(
@@ -728,6 +767,7 @@ fn start_audio(
         scope,
         sample_rate,
         input_buffer.clone(),
+        cpu_load,
       )?
     }
     SampleFormat::I16 => {
@@ -738,6 +778,7 @@ fn start_audio(
         scope,
         sample_rate,
         input_buffer.clone(),
+        cpu_load,
       )?
     }
     SampleFormat::U16 => {
@@ -748,6 +789,7 @@ fn start_audio(
         scope,
         sample_rate,
         input_buffer.clone(),
+        cpu_load,
       )?
     }
     sample_format => {
@@ -920,6 +962,7 @@ fn write_graph_output<T>(
   scope: &Arc<Mutex<ScopeSnapshot>>,
   sample_rate: u32,
   input_buffer: &Arc<Mutex<InputRing>>,
+  cpu_load: &Arc<CpuLoadMetrics>,
 ) where
   T: Sample + FromSample<f32>,
 {
@@ -944,7 +987,26 @@ fn write_graph_output<T>(
     } else if locked {
       engine.clear_external_input();
     }
+    let t0 = Instant::now();
     let data = engine.render(frames);
+    let elapsed_us = t0.elapsed().as_micros() as f64;
+    let budget_us = (frames as f64 / sample_rate as f64) * 1_000_000.0;
+    let load = if budget_us > 0.0 { elapsed_us / budget_us * 100.0 } else { 0.0 };
+    if let Ok(mut acc) = cpu_load.accum.try_lock() {
+      acc.sum += load;
+      if load > acc.peak { acc.peak = load; }
+      acc.count += 1;
+      if acc.last_report.elapsed().as_millis() >= 500 {
+        let avg = if acc.count > 0 { acc.sum / acc.count as f64 } else { 0.0 };
+        cpu_load.avg.store((avg * 10.0) as u32, Ordering::Relaxed);
+        cpu_load.peak.store((acc.peak * 10.0) as u32, Ordering::Relaxed);
+        acc.sum = 0.0;
+        acc.peak = 0.0;
+        acc.count = 0;
+        acc.last_report = Instant::now();
+      }
+    }
+
     let left = &data[0..frames];
     let right = if data.len() >= frames * 2 {
       &data[frames..frames * 2]
@@ -988,6 +1050,7 @@ fn build_graph_stream<T: Sample + FromSample<f32> + cpal::SizedSample>(
   scope: Arc<Mutex<ScopeSnapshot>>,
   sample_rate: u32,
   input_buffer: Arc<Mutex<InputRing>>,
+  cpu_load: Arc<CpuLoadMetrics>,
 ) -> Result<cpal::Stream, String> {
   let channels = config.channels as usize;
   let err_fn = |err| eprintln!("audio stream error: {err}");
@@ -995,7 +1058,7 @@ fn build_graph_stream<T: Sample + FromSample<f32> + cpal::SizedSample>(
     .build_output_stream(
       config,
       move |data: &mut [T], _| {
-        write_graph_output(data, channels, &graph, &scope, sample_rate, &input_buffer)
+        write_graph_output(data, channels, &graph, &scope, sample_rate, &input_buffer, &cpu_load)
       },
       err_fn,
       None,
@@ -1244,6 +1307,19 @@ fn native_status(state: State<NativeAudioState>) -> Result<NativeStatus, String>
 fn native_get_scope(state: State<NativeAudioState>) -> Result<ScopePacket, String> {
   let scope = state.scope.lock().map_err(|_| "scope unavailable")?;
   scope.export().ok_or_else(|| "scope not ready".to_string())
+}
+
+#[derive(Serialize)]
+struct CpuLoadPacket {
+  avg: f64,
+  peak: f64,
+}
+
+#[tauri::command]
+fn native_get_cpu_load(state: State<NativeAudioState>) -> CpuLoadPacket {
+  let avg = state.cpu_load.avg.load(Ordering::Relaxed) as f64 / 10.0;
+  let peak = state.cpu_load.peak.load(Ordering::Relaxed) as f64 / 10.0;
+  CpuLoadPacket { avg, peak }
 }
 
 // ============================================================================
@@ -1797,6 +1873,7 @@ pub fn run() {
       native_stop_graph,
       native_status,
       native_get_scope,
+      native_get_cpu_load,
       // SID/AY Player commands
       native_load_sid_file,
       native_load_ym_file,

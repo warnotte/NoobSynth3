@@ -245,6 +245,55 @@
   gap: 6px;
 }
 
+.cpu-meter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 4px;
+}
+
+.cpu-meter-bar {
+  position: relative;
+  width: 48px;
+  height: 8px;
+  background: rgba(20, 26, 34, 0.8);
+  border: 1px solid rgba(100, 114, 136, 0.5);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.cpu-meter-fill {
+  height: 100%;
+  background: #4ed88a;
+  transition: width 0.4s ease;
+  border-radius: 2px;
+}
+
+.cpu-meter-fill.warm {
+  background: #f0b06b;
+}
+
+.cpu-meter-fill.hot {
+  background: #e85858;
+}
+
+.cpu-meter-peak {
+  position: absolute;
+  top: 0;
+  width: 1px;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.7);
+  transition: left 0.4s ease;
+}
+
+.cpu-meter-text {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: rgba(200, 215, 230, 0.9);
+  min-width: 36px;
+  text-align: right;
+}
+
 .dev-toggle {
   --ui-btn-padding: 10px;
   --ui-btn-bg: rgba(20, 26, 34, 0.9);

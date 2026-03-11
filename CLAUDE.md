@@ -219,6 +219,7 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 | Drum Sequencer | Playhead position | ✅ | ✅ `NativeSequencerBridge` |
 | MIDI Sequencer | Playhead + seek | ✅ | ✅ `NativeSequencerBridge` |
 | Granular | Position + buffer load | ✅ | ✅ `NativeGranularBridge` |
+| CPU Meter | DSP load avg + peak | ✅ | ✅ `native_get_cpu_load` |
 
 **⚠️ RÈGLE:** Toute nouvelle feature UI↔Audio DOIT être implémentée pour Tauri en même temps que Web. Ne jamais merger une feature Web-only.
 
@@ -269,7 +270,7 @@ Implémenté via `useReducer` dans `src/hooks/useUndoableState.ts` :
 La TopBar est divisée en deux éléments frères :
 - `<header className="topbar-head">` — Brand + subtitle, scroll normalement
 - `<div className="topbar-body">` — Toolbar sticky (z-index 1100, au-dessus des câbles)
-- **Zones** : Status | Transport (play/stop/record) | Patch (undo/redo/export/import) | View (cables toggle) | Dev (resize toggle)
+- **Zones** : Status | Transport (play/stop/record) | Patch (undo/redo/export/import) | View (cables toggle, CPU meter toggle) | Dev (resize toggle)
 - **Mobile** : Header masqué, toolbar wrap horizontal, labels cachés, SidePanel en drawer slide-in
 
 ### Recording (WAV Export)
@@ -279,6 +280,33 @@ Le bouton Record dans la TopBar capture l'audio en WAV 16-bit PCM stéréo :
 - **Format** : `.wav` (PCM 16-bit, stéréo, sample rate du AudioContext)
 - **Fichiers clés** : `src/App.tsx` (`handleToggleRecording`), `src/ui/TopBar.tsx` (bouton)
 - Le batch export (`runPresetBatchExport`) utilise le même encodage WAV
+
+### CPU Meter (DSP Load)
+Indicateur de charge CPU audio en temps réel, activable via le bouton CPU dans la zone View de la TopBar.
+
+**Fonctionnement :**
+- Mesure le temps réel de `engine.render()` vs le budget temps du buffer audio
+- `CPU% = (temps de render) / (durée du buffer) × 100`
+- Report avg + peak toutes les ~500ms
+- Couleur : vert < 50%, orange < 80%, rouge > 80%. Trait blanc = peak.
+
+**Mode Web Audio :**
+- Worklet : `Date.now()` avant/après `engine.render()`, accumulation, report via `postMessage`
+- Engine : `watchCpuLoad(callback)` active/désactive la mesure
+- Overhead quand désactivé : zéro (pas de timing)
+
+**Mode Tauri :**
+- `Instant::now()` autour de `engine.render()` dans le callback cpal
+- `CpuLoadMetrics` avec `AtomicU32` (lock-free pour le read côté UI)
+- Commande `native_get_cpu_load` pollée toutes les 500ms
+
+**Fichiers clés :**
+- `src/engine/worklets/wasm-graph-processor.ts` — mesure + report
+- `src/engine/WasmGraphEngine.ts` — `watchCpuLoad()` subscription
+- `src/ui/TopBar.tsx` — UI (barre + texte)
+- `src/App.tsx` — `useEffect` CPU load monitoring
+- `src-tauri/src/lib.rs` — `CpuLoadMetrics`, `native_get_cpu_load`
+- `src/styles.css` — `.cpu-meter-*`
 
 ### Drum Sequencer
 - 8 tracks (Kick, Snare, HH-C, HH-O, Clap, Tom, Rim, Aux)

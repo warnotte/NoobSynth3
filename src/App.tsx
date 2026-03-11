@@ -366,6 +366,8 @@ function App() {
   const [devResizeEnabled, setDevResizeEnabled] = useState(() => isDev)
   const [cablesVisible, setCablesVisible] = useState(true)
   const [isRecording, setIsRecording] = useState(false)
+  const [showCpuMeter, setShowCpuMeter] = useState(false)
+  const [cpuLoad, setCpuLoad] = useState<{ avg: number; peak: number } | null>(null)
   const [moduleSizeOverrides, setModuleSizeOverrides] = useState<Record<string, string>>({})
   const [moduleResizePreview, setModuleResizePreview] = useState<ModuleResizePreview | null>(null)
   const [contextMenu, setContextMenu] = useState<{
@@ -780,6 +782,33 @@ function App() {
   )
 
   useEffect(() => () => engine.dispose(), [engine])
+
+  // CPU load monitoring — re-subscribe when engine starts (status changes)
+  useEffect(() => {
+    if (!showCpuMeter) return
+    if (isTauri) {
+      if (!tauriNativeRunning) return
+      const interval = setInterval(async () => {
+        try {
+          const load = await invokeTauri<{ avg: number; peak: number }>('native_get_cpu_load')
+          setCpuLoad(load)
+        } catch {
+          // ignore if command not available
+        }
+      }, 500)
+      return () => {
+        clearInterval(interval)
+        setCpuLoad(null)
+      }
+    }
+    // Web Audio mode — only subscribe when engine is running
+    if (status !== 'running') return
+    const unsub = engine.watchCpuLoad((avg, peak) => setCpuLoad({ avg, peak }))
+    return () => {
+      unsub()
+      setCpuLoad(null)
+    }
+  }, [engine, showCpuMeter, isTauri, status, tauriNativeRunning])
 
   useEffect(() => {
     let active = true
@@ -2480,6 +2509,9 @@ function App() {
           onImportPreset={handleImportPreset}
           isRecording={isRecording}
           onToggleRecording={handleToggleRecording}
+          cpuLoad={cpuLoad}
+          showCpuMeter={showCpuMeter}
+          onToggleCpuMeter={() => setShowCpuMeter((prev) => !prev)}
         />
       <main className="workbench">
         <RackView

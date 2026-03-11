@@ -33,6 +33,7 @@ export class AudioEngine {
   private watchedParticles: Set<string> = new Set()
   private meterCallbacks: Map<string, (peakL: number, peakR: number) => void> = new Map()
   private watchedMeters: Set<string> = new Set()
+  private cpuLoadCallback: ((avg: number, peak: number) => void) | null = null
 
   async start(graph: GraphState): Promise<void> {
     await this.init()
@@ -282,14 +283,12 @@ export class AudioEngine {
   }
 
   watchSequencer(moduleId: string, callback: (step: number) => void): () => void {
-    console.log('[Engine] watchSequencer called for:', moduleId)
     this.sequencerStepCallbacks.set(moduleId, callback)
     this.watchedSequencers.add(moduleId)
     this.syncWatchedSequencers()
 
     // Return unsubscribe function
     return () => {
-      console.log('[Engine] unwatch sequencer:', moduleId)
       this.sequencerStepCallbacks.delete(moduleId)
       this.watchedSequencers.delete(moduleId)
       this.syncWatchedSequencers()
@@ -418,6 +417,15 @@ export class AudioEngine {
     this.graphNode?.port.postMessage({ type: 'seekMidiSeq', moduleId, tick })
   }
 
+  watchCpuLoad(callback: (avg: number, peak: number) => void): () => void {
+    this.cpuLoadCallback = callback
+    this.graphNode?.port.postMessage({ type: 'enableCpuLoad', enabled: true })
+    return () => {
+      this.cpuLoadCallback = null
+      this.graphNode?.port.postMessage({ type: 'enableCpuLoad', enabled: false })
+    }
+  }
+
   loadGranularBuffer(moduleId: string, data: Float32Array): Promise<number> {
     return new Promise((resolve, reject) => {
       if (!this.graphNode) {
@@ -542,24 +550,18 @@ export class AudioEngine {
     // Listen for messages from the worklet
     this.graphNode.port.onmessage = (event) => {
       const data = event.data as { type: string; steps?: Record<string, number>; positions?: Record<string, number> | number[]; data?: number[]; voices?: Record<string, number[]>; elapsed?: Record<string, number>; moduleId?: string; peakL?: number; peakR?: number }
-      if (data.type === 'sequencerSteps' && data.steps) {
-        // Debug: log incoming step updates (throttled)
-        const stepEntries = Object.entries(data.steps)
-        if (stepEntries.length > 0 && stepEntries[0][1] % 200 === 0) {
-          console.log('[Engine] Received sequencerSteps:', data.steps)
+      if (data.type === 'cpuLoad') {
+        const cpuData = data as { type: string; avg: number; peak: number }
+        if (this.cpuLoadCallback) {
+          this.cpuLoadCallback(cpuData.avg, cpuData.peak)
         }
-        for (const [moduleId, step] of stepEntries) {
+      } else if (data.type === 'sequencerSteps' && data.steps) {
+        for (const [moduleId, step] of Object.entries(data.steps)) {
           const callback = this.sequencerStepCallbacks.get(moduleId)
           if (callback) {
             callback(step)
-          } else {
-            // Debug: log if callback not found
-            console.warn('[Engine] No callback for moduleId:', moduleId, 'watched:', Array.from(this.sequencerStepCallbacks.keys()))
           }
         }
-      } else if (data.type === 'debug') {
-        // Debug message from worklet
-        console.log('[Worklet Debug]', (data as { type: string; info: unknown }).info)
       } else if (data.type === 'midiEvents' && data.data && this.midiEventCallback) {
         const events: Array<{track: number, note: number, velocity: number, isNoteOn: boolean}> = []
         for (let i = 0; i < data.data.length; i += 4) {
@@ -626,6 +628,11 @@ export class AudioEngine {
           }
         }
       }
+    }
+
+    // Re-enable CPU load monitoring if active
+    if (this.cpuLoadCallback) {
+      this.graphNode.port.postMessage({ type: 'enableCpuLoad', enabled: true })
     }
 
     // Re-send watched sequencers if any
