@@ -232,6 +232,15 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // clock
       PortInfo { channels: 1 },  // reset
     ],
+    // Game of Life - 2 inputs (clock, reset)
+    ModuleType::GameOfLife => vec![
+      PortInfo { channels: 1 },  // clock
+      PortInfo { channels: 1 },  // reset
+    ],
+    // Gravity Sequencer - 1 input (reset)
+    ModuleType::GravitySequencer => vec![
+      PortInfo { channels: 1 },  // reset
+    ],
     // Granular - 4 inputs (audio, trigger, position CV, pitch CV)
     ModuleType::Granular => vec![
       PortInfo { channels: 1 },  // audio in (for recording)
@@ -522,6 +531,21 @@ pub fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // cv
       PortInfo { channels: 1 },  // gate
       PortInfo { channels: 1 },  // pulse
+    ],
+    // Game of Life - 4 outputs (cv, gate, pulse, density)
+    ModuleType::GameOfLife => vec![
+      PortInfo { channels: 1 },  // cv
+      PortInfo { channels: 1 },  // gate
+      PortInfo { channels: 1 },  // pulse
+      PortInfo { channels: 1 },  // density
+    ],
+    // Gravity Sequencer - 5 outputs (cv, gate, pulse, x, y)
+    ModuleType::GravitySequencer => vec![
+      PortInfo { channels: 1 },  // cv
+      PortInfo { channels: 1 },  // gate
+      PortInfo { channels: 1 },  // pulse
+      PortInfo { channels: 1 },  // x
+      PortInfo { channels: 1 },  // y
     ],
     // Granular - 1 stereo output
     ModuleType::Granular => vec![
@@ -890,6 +914,15 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
     ModuleType::TuringMachine => match port_id {
       "clock" | "clk" => Some(0),
       "reset" | "rst" => Some(1),
+      _ => None,
+    },
+    ModuleType::GameOfLife => match port_id {
+      "clock" | "clk" => Some(0),
+      "reset" | "rst" => Some(1),
+      _ => None,
+    },
+    ModuleType::GravitySequencer => match port_id {
+      "reset" | "rst" => Some(0),
       _ => None,
     },
     // Granular - 4 inputs
@@ -1306,6 +1339,21 @@ pub fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize
       "cv" | "cv-out" => Some(0),
       "gate" | "gate-out" => Some(1),
       "pulse" | "trig" => Some(2),
+      _ => None,
+    },
+    ModuleType::GameOfLife => match port_id {
+      "cv" | "cv-out" => Some(0),
+      "gate" | "gate-out" => Some(1),
+      "pulse" | "trig" => Some(2),
+      "density" => Some(3),
+      _ => None,
+    },
+    ModuleType::GravitySequencer => match port_id {
+      "cv" | "cv-out" => Some(0),
+      "gate" | "gate-out" => Some(1),
+      "pulse" | "trig" => Some(2),
+      "x" | "x-out" => Some(3),
+      "y" | "y-out" => Some(4),
       _ => None,
     },
     // Granular - 1 stereo output

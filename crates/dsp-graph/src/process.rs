@@ -56,6 +56,8 @@ use dsp_core::{
     Tb303Inputs, Tb303Outputs, Tb303Params,
     Tom808Inputs, Tom808Params, Tom909Inputs, Tom909Params,
     TuringInputs, TuringParams,
+    GameOfLifeInputs, GameOfLifeParams,
+    GravityInputs, GravityParams,
     Vca, VcfInputs, VcfParams, VcoInputs, VcoParams,
     VocoderInputs, VocoderParams, Wavefolder, WavefolderParams,
     WavetableInputs, WavetableParams,
@@ -1889,6 +1891,64 @@ pub(crate) fn process_module(
             let pulse_out = pulse_group[0].channel_mut(0);
 
             state.turing.process_block(cv_out, gate_out, pulse_out, turing_inputs, params);
+        }
+        ModuleState::GameOfLife(state) => {
+            let clock = if !connections[0].is_empty() { Some(inputs[0].channel(0)) } else { None };
+            let reset = if connections.len() > 1 && !connections[1].is_empty() {
+                Some(inputs[1].channel(0))
+            } else {
+                None
+            };
+
+            let gol_inputs = GameOfLifeInputs { clock, reset };
+            let params = GameOfLifeParams {
+                evolve_rate: state.evolve_rate.slice(frames),
+                range: state.range.slice(frames),
+                scale: state.scale.slice(frames),
+                root: state.root.slice(frames),
+                wrap: state.wrap.slice(frames),
+            };
+
+            let (cv_group, rest) = outputs.split_at_mut(1);
+            let (gate_group, rest2) = rest.split_at_mut(1);
+            let (pulse_group, density_group) = rest2.split_at_mut(1);
+            let cv_out = cv_group[0].channel_mut(0);
+            let gate_out = gate_group[0].channel_mut(0);
+            let pulse_out = pulse_group[0].channel_mut(0);
+            let density_out = density_group[0].channel_mut(0);
+
+            state.gol.process_block(cv_out, gate_out, pulse_out, density_out, gol_inputs, params);
+        }
+        ModuleState::GravitySequencer(state) => {
+            let reset = if !connections[0].is_empty() {
+                Some(inputs[0].channel(0))
+            } else {
+                None
+            };
+
+            let gravity_inputs = GravityInputs { reset };
+            let params = GravityParams {
+                speed: state.speed.slice(frames),
+                bodies: state.bodies.slice(frames),
+                eccentricity: state.eccentricity.slice(frames),
+                spread: state.spread.slice(frames),
+                range: state.range.slice(frames),
+                scale: state.scale.slice(frames),
+                root: state.root.slice(frames),
+                chaos: state.chaos.slice(frames),
+            };
+
+            let (cv_group, rest) = outputs.split_at_mut(1);
+            let (gate_group, rest2) = rest.split_at_mut(1);
+            let (pulse_group, rest3) = rest2.split_at_mut(1);
+            let (x_group, y_group) = rest3.split_at_mut(1);
+            let cv_out = cv_group[0].channel_mut(0);
+            let gate_out = gate_group[0].channel_mut(0);
+            let pulse_out = pulse_group[0].channel_mut(0);
+            let x_out = x_group[0].channel_mut(0);
+            let y_out = y_group[0].channel_mut(0);
+
+            state.gravity.process_block(cv_out, gate_out, pulse_out, x_out, y_out, gravity_inputs, params);
         }
         ModuleState::Granular(state) => {
             // Input 0: audio in (for recording), Input 1: trigger, Input 2: position CV, Input 3: pitch CV

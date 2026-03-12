@@ -1575,6 +1575,79 @@ Polyrhythm [gate-1..4] → 4× ADSR [gate]
 
 Les différentes longueurs de pistes créent des cycles qui ne se répètent qu'après le PPCM (ex: 8×12×16×7 = 1344 steps avant répétition exacte).
 
+### Game of Life Sequencer
+
+Conway's Game of Life comme séquenceur musical. Grille 16×16, la tête de lecture scanne les colonnes, les cellules vivantes génèrent CV/gate.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `evolveRate` | 1-16 | Steps de clock entre chaque évolution |
+| `range` | 1-5 oct | Plage de pitch en octaves |
+| `scale` | 0-8 | Quantification (0=off, 2=Major, 3=Minor, etc.) |
+| `root` | 0-11 | Note fondamentale (C à B) |
+| `wrap` | 0/1 | Toroïdal (bords connectés) |
+| `cellData` | JSON | État de la grille (16×u16 bitfield) |
+
+**Entrées :**
+| Port | ID | Description |
+|------|----|-------------|
+| Clock | `clock` | Horloge — avance la tête de lecture |
+| Reset | `reset` | Reset la tête de lecture à la colonne 0 |
+
+**Sorties :**
+| Port | ID | Description |
+|------|----|-------------|
+| CV | `cv` | Pitch CV basé sur les cellules vivantes de la colonne |
+| Gate | `gate` | Gate (haut si au moins une cellule vivante dans la colonne) |
+| Pulse | `pulse` | Trigger court à chaque step |
+| Density | `density` | CV proportionnel au nombre de cellules vivantes dans la colonne |
+
+**Usage typique :**
+```
+Clock → GOL [clock]
+GOL [cv] → Osc [pitch]
+GOL [gate] → ADSR [gate]
+GOL [density] → VCF [mod]
+```
+
+### Gravity Sequencer
+
+Séquenceur orbital : jusqu'à 8 corps en orbite autour d'un attracteur central suivant les lois de Kepler. Chaque corps déclenche un gate au périhélie (point le plus proche) et génère un CV basé sur son index.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `speed` | 0.1-10 | Vitesse orbitale globale |
+| `bodies` | 1-8 | Nombre de corps actifs |
+| `eccentricity` | 0-0.9 | Excentricité (0=cercle, 0.9=comète) |
+| `spread` | 0.5-4 | Écart des périodes entre corps |
+| `range` | 1-5 oct | Plage de pitch en octaves |
+| `scale` | 0-8 | Quantification de pitch |
+| `root` | 0-11 | Note fondamentale |
+| `chaos` | 0-1 | Perturbation orbitale aléatoire |
+
+**Ratios de périodes :** 1 (fondamentale), φ (1.618), √5, e, π, √13, φ³, √29 — irrationnels deux à deux pour des polyrythmies riches.
+
+**Entrées :**
+| Port | ID | Description |
+|------|----|-------------|
+| Reset | `reset` | Reset tous les corps à leurs positions initiales |
+
+**Sorties :**
+| Port | ID | Description |
+|------|----|-------------|
+| CV | `cv` | Pitch CV (index du corps → pitch dans la plage) |
+| Gate | `gate` | Gate fusionné de tous les corps |
+| Pulse | `pulse` | Trigger court (~5ms) au périhélie |
+| X | `x` | Position X du corps 0 (modulation) |
+| Y | `y` | Position Y du corps 0 (modulation) |
+
+**Usage typique :**
+```
+Gravity [cv] → Osc [pitch]
+Gravity [gate] → ADSR [gate]
+Gravity [x] → VCF [mod]
+```
+
 ### Main Out
 
 Sortie audio principale.

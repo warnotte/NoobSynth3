@@ -1,0 +1,141 @@
+{
+  "id": "game-of-life-generative",
+  "name": "Game of Life — Generative",
+  "description": "Conway's Game of Life drives a melodic sequence through filter and delay.",
+  "group": "Generative",
+  "graph": {
+    "modules": [
+      {
+        "id": "clock-1",
+        "type": "clock",
+        "name": "Clock",
+        "position": { "col": 1, "row": 1 },
+        "params": { "tempo": 140, "running": 1, "rate": 4 }
+      },
+      {
+        "id": "gol-1",
+        "type": "game-of-life",
+        "name": "Game of Life",
+        "position": { "col": 3, "row": 1 },
+        "params": {
+          "evolveRate": 4,
+          "range": 2,
+          "scale": 2,
+          "root": 0,
+          "wrap": 1
+        }
+      },
+      {
+        "id": "osc-1",
+        "type": "oscillator",
+        "name": "Saw Lead",
+        "position": { "col": 7, "row": 1 },
+        "params": { "frequency": 261.63, "type": "sawtooth", "level": 0.7 }
+      },
+      {
+        "id": "osc-2",
+        "type": "oscillator",
+        "name": "Sub Sine",
+        "position": { "col": 7, "row": 3 },
+        "params": { "frequency": 130.81, "type": "sine", "level": 0.4 }
+      },
+      {
+        "id": "adsr-1",
+        "type": "adsr",
+        "name": "Amp Env",
+        "position": { "col": 9, "row": 1 },
+        "params": { "attack": 0.01, "decay": 0.3, "sustain": 0.4, "release": 0.5 }
+      },
+      {
+        "id": "adsr-2",
+        "type": "adsr",
+        "name": "Filter Env",
+        "position": { "col": 9, "row": 3 },
+        "params": { "attack": 0.005, "decay": 0.2, "sustain": 0.1, "release": 0.3 }
+      },
+      {
+        "id": "mix-1",
+        "type": "mixer",
+        "name": "Osc Mix",
+        "position": { "col": 11, "row": 1 },
+        "params": {}
+      },
+      {
+        "id": "vca-1",
+        "type": "gain",
+        "name": "VCA",
+        "position": { "col": 11, "row": 3 },
+        "params": { "level": 1 }
+      },
+      {
+        "id": "vcf-1",
+        "type": "vcf",
+        "name": "Filter",
+        "position": { "col": 13, "row": 1 },
+        "params": { "cutoff": 1200, "resonance": 0.35, "drive": 0.1, "model": "svf", "mode": "lp", "slope": 24 }
+      },
+      {
+        "id": "delay-1",
+        "type": "delay",
+        "name": "Delay",
+        "position": { "col": 15, "row": 1 },
+        "params": { "time": 375, "feedback": 0.45, "mix": 0.3, "tempoSync": 0, "lpCutoff": 4000 }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "col": 17, "row": 1 },
+        "params": { "decay": 2.5, "damping": 0.4, "mix": 0.25 }
+      },
+      {
+        "id": "lfo-1",
+        "type": "lfo",
+        "name": "Density Mod",
+        "position": { "col": 13, "row": 3 },
+        "params": { "rate": 0.15, "shape": "sine", "depth": 1, "offset": 0, "bipolar": true }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Output",
+        "position": { "col": 19, "row": 1 },
+        "params": { "level": 1 }
+      },
+      {
+        "id": "scope-1",
+        "type": "scope",
+        "name": "Scope",
+        "position": { "col": 19, "row": 3 },
+        "params": {}
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "col": 1, "row": 5 },
+        "params": {
+          "text": "GAME OF LIFE — GENERATIVE\n\nConway's Game of Life drives a melody.\nThe 16x16 grid evolves every 4 clock ticks.\n\n- Click cells on the grid to paint patterns\n- Random/Clear/R-pent buttons for presets\n- Range: 2 octaves, C Major scale\n- Density output modulates filter cutoff\n\nTry changing evolve rate and scale!"
+        }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "gol-1", "portId": "clock" }, "kind": "sync" },
+      { "from": { "moduleId": "gol-1", "portId": "cv" }, "to": { "moduleId": "osc-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "gol-1", "portId": "cv" }, "to": { "moduleId": "osc-2", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "gol-1", "portId": "gate" }, "to": { "moduleId": "adsr-1", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "gol-1", "portId": "gate" }, "to": { "moduleId": "adsr-2", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "gol-1", "portId": "density" }, "to": { "moduleId": "vcf-1", "portId": "mod" }, "kind": "cv" },
+      { "from": { "moduleId": "osc-1", "portId": "out" }, "to": { "moduleId": "mix-1", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "osc-2", "portId": "out" }, "to": { "moduleId": "mix-1", "portId": "in-b" }, "kind": "audio" },
+      { "from": { "moduleId": "mix-1", "portId": "out" }, "to": { "moduleId": "vca-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-1", "portId": "env" }, "to": { "moduleId": "vca-1", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "vca-1", "portId": "out" }, "to": { "moduleId": "vcf-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-2", "portId": "env" }, "to": { "moduleId": "vcf-1", "portId": "env" }, "kind": "cv" },
+      { "from": { "moduleId": "vcf-1", "portId": "out" }, "to": { "moduleId": "delay-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "delay-1", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "scope-1", "portId": "in-a" }, "kind": "audio" }
+    ]
+  }
+}

@@ -107,6 +107,9 @@ export const moduleSizes: Record<ModuleType, string> = {
   'tube-amp': '2x2',
   // Clock Divider
   'clock-divider': '1x2',
+  // Generative
+  'game-of-life': '4x4',
+  'gravity-sequencer': '2x4',
 }
 
 export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>> = {
@@ -181,6 +184,8 @@ export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>>
   'wah': 'strip',
   'tube-amp': 'strip',
   'clock-divider': 'strip',
+  'game-of-life': 'stacked',
+  'gravity-sequencer': 'stacked',
 }
 
 export type ModuleCategory =
@@ -290,6 +295,8 @@ export const moduleCatalog: { type: ModuleType; label: string; category: ModuleC
   { type: 'chord-sequencer', label: 'Chord Seq', category: 'sequencers' },
   { type: 'polyrhythm-sequencer', label: 'Polyrhythm', category: 'sequencers' },
   { type: 'clock-divider', label: 'Clock Div', category: 'sequencers' },
+  { type: 'game-of-life', label: 'Game of Life', category: 'sequencers' },
+  { type: 'gravity-sequencer', label: 'Gravity Seq', category: 'sequencers' },
   { type: 'mario', label: 'Mario IO', category: 'sequencers' },
   // TR-909 Drums
   { type: '909-kick', label: '909 Kick', category: 'drums' },
@@ -404,6 +411,8 @@ export const modulePrefixes: Record<ModuleType, string> = {
   'chord-sequencer': 'chordseq',
   'polyrhythm-sequencer': 'polyseq',
   'clock-divider': 'clkdiv',
+  'game-of-life': 'gol',
+  'gravity-sequencer': 'grav',
   'envelope-follower': 'envf',
   'bit-crusher': 'crush',
   'flanger': 'flng',
@@ -504,6 +513,8 @@ export const moduleLabels: Record<ModuleType, string> = {
   'chord-sequencer': 'Chord Seq',
   'polyrhythm-sequencer': 'Polyrhythm',
   'clock-divider': 'Clock Div',
+  'game-of-life': 'Game of Life',
+  'gravity-sequencer': 'Gravity Seq',
   'envelope-follower': 'Env Follower',
   'bit-crusher': 'Bit Crusher',
   'flanger': 'Flanger',
@@ -1164,6 +1175,23 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     ),
   },
   'clock-divider': {},
+  'game-of-life': {
+    evolveRate: 4,
+    range: 2,
+    scale: 0,
+    root: 0,
+    wrap: 1,
+  },
+  'gravity-sequencer': {
+    speed: 1,
+    bodies: 4,
+    eccentricity: 0.3,
+    spread: 1,
+    range: 2,
+    scale: 0,
+    root: 0,
+    chaos: 0,
+  },
 }
 
 export const getNextModuleIndex = (type: ModuleType, modules: ModuleSpec[]) => {

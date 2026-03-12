@@ -20,6 +20,8 @@ export class AudioEngine {
   private micMeterData: Uint8Array<ArrayBuffer> | null = null
   private sequencerStepCallbacks: Map<string, (step: number) => void> = new Map()
   private watchedSequencers: Set<string> = new Set()
+  private golGridCallbacks: Map<string, (grid: number[], step: number) => void> = new Map()
+  private watchedGolModules: Set<string> = new Set()
   private midiEventCallback: ((events: Array<{track: number, note: number, velocity: number, isNoteOn: boolean}>) => void) | null = null
   private watchedMidiSeq: string | null = null
   private granularLoadCallbacks: Map<string, (length: number) => void> = new Map()
@@ -302,6 +304,24 @@ export class AudioEngine {
     })
   }
 
+  watchGolGrid(moduleId: string, callback: (grid: number[], step: number) => void): () => void {
+    this.golGridCallbacks.set(moduleId, callback)
+    this.watchedGolModules.add(moduleId)
+    this.syncWatchedGolModules()
+    return () => {
+      this.golGridCallbacks.delete(moduleId)
+      this.watchedGolModules.delete(moduleId)
+      this.syncWatchedGolModules()
+    }
+  }
+
+  private syncWatchedGolModules(): void {
+    this.graphNode?.port.postMessage({
+      type: 'watchGol',
+      moduleIds: Array.from(this.watchedGolModules),
+    })
+  }
+
   watchGranularPosition(moduleId: string, callback: (position: number) => void): () => void {
     this.granularPositionCallbacks.set(moduleId, callback)
     this.watchedGranulars.add(moduleId)
@@ -562,6 +582,11 @@ export class AudioEngine {
             callback(step)
           }
         }
+      } else if (data.type === 'golGrid') {
+        const callback = this.golGridCallbacks.get(data.moduleId)
+        if (callback) {
+          callback(data.grid, data.step)
+        }
       } else if (data.type === 'midiEvents' && data.data && this.midiEventCallback) {
         const events: Array<{track: number, note: number, velocity: number, isNoteOn: boolean}> = []
         for (let i = 0; i < data.data.length; i += 4) {
@@ -648,6 +673,11 @@ export class AudioEngine {
     // Re-send watched granulars if any
     if (this.watchedGranulars.size > 0) {
       this.syncWatchedGranulars()
+    }
+
+    // Re-send watched GOL modules if any
+    if (this.watchedGolModules.size > 0) {
+      this.syncWatchedGolModules()
     }
 
     // Re-send watched SIDs if any

@@ -70,6 +70,8 @@ pub mod ay_player;
 pub mod chord_sequencer;
 pub mod polyrhythm_sequencer;
 pub mod clock_divider;
+pub mod game_of_life;
+pub mod gravity;
 
 // ============================================================================
 // Shared Rate Divisions
@@ -177,3 +179,5 @@ pub use polyrhythm_sequencer::{
 pub use clock_divider::{
     ClockDivider, ClockDividerInputs, ClockDividerOutputs,
 };
+pub use game_of_life::{GameOfLife, GameOfLifeParams, GameOfLifeInputs};
+pub use gravity::{GravitySequencer, GravityParams, GravityInputs};

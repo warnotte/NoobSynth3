@@ -7,6 +7,8 @@ use dsp_core::{
     PolyrhythmSequencer, Resonator, Reverb, Rimshot909, SampleHold, Shepard, SidPlayer, SlewLimiter, Snare808, Snare909, SnesOsc, SpectralSwarm, SpeechSynth,
     SpringReverb, StepSequencer, Supersaw, TapeDelay, Tb303, Tom808, Tom909, TubeAmp, TuringMachine, Vcf, Vco, Vocoder, Wah, Wavetable,
 };
+use dsp_core::sequencers::game_of_life::GameOfLife;
+use dsp_core::sequencers::gravity::GravitySequencer as GravitySeq;
 
 use crate::types::ParamBuffer;
 
@@ -705,6 +707,27 @@ pub struct TuringState {
     pub root: ParamBuffer,
 }
 
+pub struct GameOfLifeState {
+    pub gol: GameOfLife,
+    pub evolve_rate: ParamBuffer,
+    pub range: ParamBuffer,
+    pub scale: ParamBuffer,
+    pub root: ParamBuffer,
+    pub wrap: ParamBuffer,
+}
+
+pub struct GravityState {
+    pub gravity: GravitySeq,
+    pub speed: ParamBuffer,
+    pub bodies: ParamBuffer,
+    pub eccentricity: ParamBuffer,
+    pub spread: ParamBuffer,
+    pub range: ParamBuffer,
+    pub scale: ParamBuffer,
+    pub root: ParamBuffer,
+    pub chaos: ParamBuffer,
+}
+
 pub struct SidPlayerState {
     pub sid_player: SidPlayer,
     pub playing: ParamBuffer,
@@ -967,6 +990,8 @@ pub enum ModuleState {
     Mario(MarioState),
     MidiFileSequencer(MidiFileSequencerState),
     TuringMachine(TuringState),
+    GameOfLife(GameOfLifeState),
+    GravitySequencer(GravityState),
     SidPlayer(SidPlayerState),
     AyPlayer(AyPlayerState),
     ChordSequencer(ChordSequencerState),

@@ -20,6 +20,8 @@ import { AyPlayerControls } from './AyPlayerControls'
 import { ChordSequencerControls } from './ChordSequencerControls'
 import { PolyrhythmSequencerControls } from './PolyrhythmSequencerControls'
 import { ClockDividerControls } from './ClockDividerControls'
+import { GameOfLifeControls } from './GameOfLifeControls'
+import { GravityControls } from './GravityControls'
 
 export function renderSequencerControls(props: ControlProps): React.ReactElement | null {
   const { module } = props
@@ -51,6 +53,10 @@ export function renderSequencerControls(props: ControlProps): React.ReactElement
       return <PolyrhythmSequencerControls {...props} />
     case 'clock-divider':
       return <ClockDividerControls />
+    case 'game-of-life':
+      return <GameOfLifeControls {...props} />
+    case 'gravity-sequencer':
+      return <GravityControls {...props} />
     default:
       return null
   }

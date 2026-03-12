@@ -85,6 +85,8 @@ pub enum ModuleType {
     ChordSequencer,
     PolyrhythmSequencer,
     ClockDivider,
+    GameOfLife,
+    GravitySequencer,
 
     // TR-909 Drums
     Kick909,

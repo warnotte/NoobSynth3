@@ -107,6 +107,9 @@ export type ModuleType =
   | 'tube-amp'
   // Clock Divider
   | 'clock-divider'
+  // Generative
+  | 'game-of-life'
+  | 'gravity-sequencer'
 
 export interface ModuleSpec {
   id: string

@@ -1617,6 +1617,41 @@
       "description": "Full-throttle Hammond B3 with all drawbars cranked, fast Leslie and hall reverb.",
       "file": "organ-gospel.json",
       "group": "Leslie"
+    },
+    {
+      "id": "game-of-life-generative",
+      "name": "Game of Life — Generative",
+      "description": "Conway's Game of Life drives a melodic sequence through filter and delay.",
+      "file": "game-of-life-generative.json",
+      "group": "Generative"
+    },
+    {
+      "id": "gravity-orbits",
+      "name": "Gravity Orbits",
+      "description": "4 orbital bodies create polyrhythmic triggers with Kepler physics.",
+      "file": "gravity-orbits.json",
+      "group": "Generative"
+    },
+    {
+      "id": "gravity-comets",
+      "name": "Gravity Comets",
+      "description": "2 cometary bodies with extreme eccentricity — sparse dramatic plucks.",
+      "file": "gravity-comets.json",
+      "group": "Generative"
+    },
+    {
+      "id": "gravity-cosmos",
+      "name": "Gravity Cosmos",
+      "description": "8 bodies in slow orbit — dense generative ambient pad.",
+      "file": "gravity-cosmos.json",
+      "group": "Generative"
+    },
+    {
+      "id": "gravity-chaos",
+      "name": "Gravity Chaos",
+      "description": "6 bodies with maximum chaos — unpredictable rhythmic mayhem.",
+      "file": "gravity-chaos.json",
+      "group": "Generative"
     }
   ]
 }

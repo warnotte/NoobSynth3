@@ -9,6 +9,8 @@ use dsp_core::{
   ClockDivider, PolyrhythmSequencer, Resonator, Reverb, Rimshot909, SampleHold, Shepard, SidPlayer, SlewLimiter, Snare808, Snare909, SnesOsc, SpectralSwarm, SpeechSynth,
   SpringReverb, StepSequencer, Supersaw, TapeDelay, Tb303, Tom808, Tom909, TubeAmp, TuringMachine, Vcf, Vco, Vocoder, Wah, Wavetable,
 };
+use dsp_core::sequencers::game_of_life::GameOfLife;
+use dsp_core::sequencers::gravity::GravitySequencer as GravitySeq;
 
 use crate::state::*;
 use crate::types::{ModuleType, ParamBuffer};
@@ -697,6 +699,33 @@ pub(crate) fn create_state(
       range: ParamBuffer::new(param_number(params, "range", 2.0)),
       scale: ParamBuffer::new(param_number(params, "scale", 0.0)),
       root: ParamBuffer::new(param_number(params, "root", 0.0)),
+    }),
+    ModuleType::GameOfLife => {
+      let mut gol = GameOfLife::new(sample_rate);
+      if let Some(cell_data) = params.get("cellData") {
+        if let Some(s) = cell_data.as_str() {
+          gol.set_cell_data(s);
+        }
+      }
+      ModuleState::GameOfLife(GameOfLifeState {
+        gol,
+        evolve_rate: ParamBuffer::new(param_number(params, "evolveRate", 4.0)),
+        range: ParamBuffer::new(param_number(params, "range", 2.0)),
+        scale: ParamBuffer::new(param_number(params, "scale", 0.0)),
+        root: ParamBuffer::new(param_number(params, "root", 0.0)),
+        wrap: ParamBuffer::new(param_number(params, "wrap", 1.0)),
+      })
+    }
+    ModuleType::GravitySequencer => ModuleState::GravitySequencer(GravityState {
+      gravity: GravitySeq::new(sample_rate),
+      speed: ParamBuffer::new(param_number(params, "speed", 1.0)),
+      bodies: ParamBuffer::new(param_number(params, "bodies", 4.0)),
+      eccentricity: ParamBuffer::new(param_number(params, "eccentricity", 0.3)),
+      spread: ParamBuffer::new(param_number(params, "spread", 1.0)),
+      range: ParamBuffer::new(param_number(params, "range", 2.0)),
+      scale: ParamBuffer::new(param_number(params, "scale", 0.0)),
+      root: ParamBuffer::new(param_number(params, "root", 0.0)),
+      chaos: ParamBuffer::new(param_number(params, "chaos", 0.0)),
     }),
     ModuleType::SidPlayer => ModuleState::SidPlayer(SidPlayerState {
       sid_player: SidPlayer::new(sample_rate),
@@ -1500,6 +1529,25 @@ pub(crate) fn apply_param(state: &mut ModuleState, param: &str, value: f32) {
       "root" => state.root.set(value),
       _ => {}
     },
+    ModuleState::GameOfLife(state) => match param {
+      "evolveRate" => state.evolve_rate.set(value),
+      "range" => state.range.set(value),
+      "scale" => state.scale.set(value),
+      "root" => state.root.set(value),
+      "wrap" => state.wrap.set(value),
+      _ => {}
+    },
+    ModuleState::GravitySequencer(state) => match param {
+      "speed" => state.speed.set(value),
+      "bodies" => state.bodies.set(value),
+      "eccentricity" => state.eccentricity.set(value),
+      "spread" => state.spread.set(value),
+      "range" => state.range.set(value),
+      "scale" => state.scale.set(value),
+      "root" => state.root.set(value),
+      "chaos" => state.chaos.set(value),
+      _ => {}
+    },
     ModuleState::SidPlayer(state) => match param {
       "playing" => state.playing.set(value),
       "song" => state.song.set(value),
@@ -1651,6 +1699,11 @@ pub(crate) fn apply_param_str(state: &mut ModuleState, param: &str, value: &str)
     ModuleState::PolyrhythmSequencer(state) => {
       if param == "stepData" {
         state.seq.parse_step_data(value);
+      }
+    }
+    ModuleState::GameOfLife(state) => {
+      if param == "cellData" {
+        state.gol.set_cell_data(value);
       }
     }
     _ => {}

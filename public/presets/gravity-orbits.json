@@ -1,0 +1,147 @@
+{
+  "id": "gravity-orbits",
+  "name": "Gravity Orbits",
+  "description": "4 orbital bodies create polyrhythmic triggers with Kepler physics. X/Y modulate filter and delay.",
+  "group": "Generative",
+  "graph": {
+    "modules": [
+      {
+        "id": "grav-1",
+        "type": "gravity-sequencer",
+        "name": "Gravity",
+        "position": { "col": 1, "row": 1 },
+        "params": {
+          "speed": 1.5,
+          "bodies": 4,
+          "eccentricity": 0.5,
+          "spread": 1.2,
+          "range": 3,
+          "scale": 3,
+          "root": 0,
+          "chaos": 0.1
+        }
+      },
+      {
+        "id": "osc-1",
+        "type": "oscillator",
+        "name": "Pluck Osc",
+        "position": { "col": 5, "row": 1 },
+        "params": { "frequency": 261.63, "type": "sawtooth", "level": 0.6 }
+      },
+      {
+        "id": "osc-2",
+        "type": "karplus",
+        "name": "String",
+        "position": { "col": 5, "row": 3 },
+        "params": { "frequency": 261.63, "brightness": 0.6, "damping": 0.5 }
+      },
+      {
+        "id": "adsr-1",
+        "type": "adsr",
+        "name": "Pluck Env",
+        "position": { "col": 7, "row": 1 },
+        "params": { "attack": 0.002, "decay": 0.15, "sustain": 0.0, "release": 0.3 }
+      },
+      {
+        "id": "adsr-2",
+        "type": "adsr",
+        "name": "String Env",
+        "position": { "col": 7, "row": 3 },
+        "params": { "attack": 0.01, "decay": 0.8, "sustain": 0.3, "release": 1.0 }
+      },
+      {
+        "id": "vca-1",
+        "type": "gain",
+        "name": "Pluck VCA",
+        "position": { "col": 9, "row": 1 },
+        "params": { "level": 1 }
+      },
+      {
+        "id": "vca-2",
+        "type": "gain",
+        "name": "String VCA",
+        "position": { "col": 9, "row": 3 },
+        "params": { "level": 1 }
+      },
+      {
+        "id": "mix-1",
+        "type": "mixer",
+        "name": "Mix",
+        "position": { "col": 11, "row": 1 },
+        "params": {}
+      },
+      {
+        "id": "vcf-1",
+        "type": "vcf",
+        "name": "Filter",
+        "position": { "col": 13, "row": 1 },
+        "params": { "cutoff": 2000, "resonance": 0.25, "drive": 0.05, "model": "svf", "mode": "lp", "slope": 12 }
+      },
+      {
+        "id": "delay-1",
+        "type": "delay",
+        "name": "Delay",
+        "position": { "col": 15, "row": 1 },
+        "params": { "time": 500, "feedback": 0.5, "mix": 0.35, "tempoSync": 0, "lpCutoff": 3500 }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Hall",
+        "position": { "col": 17, "row": 1 },
+        "params": { "decay": 4.0, "damping": 0.3, "mix": 0.4 }
+      },
+      {
+        "id": "chorus-1",
+        "type": "chorus",
+        "name": "Chorus",
+        "position": { "col": 15, "row": 3 },
+        "params": { "rate": 0.8, "depth": 0.4, "mix": 0.3 }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Output",
+        "position": { "col": 19, "row": 1 },
+        "params": { "level": 1 }
+      },
+      {
+        "id": "scope-1",
+        "type": "scope",
+        "name": "Scope",
+        "position": { "col": 19, "row": 3 },
+        "params": {}
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "col": 1, "row": 5 },
+        "params": {
+          "text": "GRAVITY ORBITS\n\n4 bodies orbit with Kepler physics.\nGolden ratio & pi create natural polyrhythms.\n\n- Speed: global tempo\n- Eccent: orbit shape (0=circle, 0.9=comet)\n- Spread: period ratios between bodies\n- Chaos: random orbital perturbations\n- X/Y outputs: body 1 position → filter mod & env\n\nSaw osc + Karplus string through VCAs, filter, chorus, delay, reverb.\nTry different eccentricities and spreads!"
+        }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "grav-1", "portId": "cv" }, "to": { "moduleId": "osc-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "grav-1", "portId": "cv" }, "to": { "moduleId": "osc-2", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "grav-1", "portId": "gate" }, "to": { "moduleId": "adsr-1", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "grav-1", "portId": "gate" }, "to": { "moduleId": "adsr-2", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "grav-1", "portId": "gate" }, "to": { "moduleId": "osc-2", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "grav-1", "portId": "x" }, "to": { "moduleId": "vcf-1", "portId": "mod" }, "kind": "cv" },
+      { "from": { "moduleId": "grav-1", "portId": "y" }, "to": { "moduleId": "vcf-1", "portId": "env" }, "kind": "cv" },
+      { "from": { "moduleId": "osc-1", "portId": "out" }, "to": { "moduleId": "vca-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-1", "portId": "env" }, "to": { "moduleId": "vca-1", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "osc-2", "portId": "out" }, "to": { "moduleId": "vca-2", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-2", "portId": "env" }, "to": { "moduleId": "vca-2", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "vca-1", "portId": "out" }, "to": { "moduleId": "mix-1", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "vca-2", "portId": "out" }, "to": { "moduleId": "mix-1", "portId": "in-b" }, "kind": "audio" },
+      { "from": { "moduleId": "mix-1", "portId": "out" }, "to": { "moduleId": "vcf-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "vcf-1", "portId": "out" }, "to": { "moduleId": "chorus-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "chorus-1", "portId": "out" }, "to": { "moduleId": "delay-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "delay-1", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "scope-1", "portId": "in-a" }, "kind": "audio" }
+    ]
+  }
+}

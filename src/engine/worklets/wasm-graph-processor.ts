@@ -80,6 +80,7 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
   private watchedSequencers: string[] = []
   private lastSteps: Map<string, number> = new Map()
   private stepPollCounter = 0
+  private watchedGolModules: string[] = []
   private watchedMidiSeq: string | null = null
   private watchedGranulars: string[] = []
   private lastPositions: Map<string, number> = new Map()
@@ -122,6 +123,10 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
     if (message.type === 'watchSequencers') {
       this.watchedSequencers = message.moduleIds
       this.lastSteps.clear()
+      return
+    }
+    if (message.type === 'watchGol') {
+      this.watchedGolModules = message.moduleIds
       return
     }
     if (message.type === 'watchMidiSeq') {
@@ -356,6 +361,17 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
       }
       if (Object.keys(updates).length > 0) {
         this.port.postMessage({ type: 'sequencerSteps', steps: updates })
+      }
+    }
+
+    // Poll GOL grid state
+    if (shouldPoll && this.watchedGolModules.length > 0) {
+      for (const moduleId of this.watchedGolModules) {
+        const grid = this.engine.get_gol_grid(moduleId)
+        if (grid.length > 0) {
+          const step = this.engine.get_sequencer_step(moduleId)
+          this.port.postMessage({ type: 'golGrid', moduleId, grid: Array.from(grid), step })
+        }
       }
     }
 

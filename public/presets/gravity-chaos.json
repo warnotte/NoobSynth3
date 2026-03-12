@@ -1,0 +1,112 @@
+{
+  "id": "gravity-chaos",
+  "name": "Gravity Chaos",
+  "description": "6 bodies with maximum chaos — unpredictable rhythmic mayhem through distortion.",
+  "group": "Generative",
+  "graph": {
+    "modules": [
+      {
+        "id": "grav-1",
+        "type": "gravity-sequencer",
+        "name": "Chaos",
+        "position": { "col": 1, "row": 1 },
+        "params": {
+          "speed": 3.0,
+          "bodies": 6,
+          "eccentricity": 0.6,
+          "spread": 3.0,
+          "range": 4,
+          "scale": 1,
+          "root": 0,
+          "chaos": 0.8
+        }
+      },
+      {
+        "id": "osc-1",
+        "type": "fm-op",
+        "name": "FM",
+        "position": { "col": 5, "row": 1 },
+        "params": { "frequency": 261.63, "ratio": 3.5, "index": 4.0, "level": 0.5 }
+      },
+      {
+        "id": "adsr-1",
+        "type": "adsr",
+        "name": "Env",
+        "position": { "col": 7, "row": 1 },
+        "params": { "attack": 0.001, "decay": 0.1, "sustain": 0.0, "release": 0.15 }
+      },
+      {
+        "id": "vca-1",
+        "type": "gain",
+        "name": "VCA",
+        "position": { "col": 9, "row": 1 },
+        "params": { "level": 0.8 }
+      },
+      {
+        "id": "dist-1",
+        "type": "distortion",
+        "name": "Distort",
+        "position": { "col": 11, "row": 1 },
+        "params": { "drive": 0.6, "tone": 0.5, "mix": 0.7 }
+      },
+      {
+        "id": "vcf-1",
+        "type": "vcf",
+        "name": "Filter",
+        "position": { "col": 13, "row": 1 },
+        "params": { "cutoff": 3500, "resonance": 0.4, "drive": 0.2, "model": "svf", "mode": "lp", "slope": 24 }
+      },
+      {
+        "id": "delay-1",
+        "type": "delay",
+        "name": "Delay",
+        "position": { "col": 15, "row": 1 },
+        "params": { "time": 200, "feedback": 0.6, "mix": 0.3, "tempoSync": 0, "lpCutoff": 5000 }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "col": 17, "row": 1 },
+        "params": { "decay": 2.0, "damping": 0.5, "mix": 0.25 }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Output",
+        "position": { "col": 19, "row": 1 },
+        "params": { "level": 1 }
+      },
+      {
+        "id": "scope-1",
+        "type": "scope",
+        "name": "Scope",
+        "position": { "col": 19, "row": 3 },
+        "params": {}
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "col": 1, "row": 5 },
+        "params": {
+          "text": "GRAVITY CHAOS\n\n6 bodies, high chaos, chromatic scale.\nFast FM percussion through distortion.\n\n- Speed 3x = rapid triggers\n- Chaos 80% = orbital perturbations\n- Chromatic = atonal, unpredictable\n- FM + distortion = harsh metallic hits\n- Reduce chaos or change scale to tame it"
+        }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "grav-1", "portId": "cv" }, "to": { "moduleId": "osc-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "grav-1", "portId": "gate" }, "to": { "moduleId": "osc-1", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "grav-1", "portId": "gate" }, "to": { "moduleId": "adsr-1", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "grav-1", "portId": "x" }, "to": { "moduleId": "vcf-1", "portId": "mod" }, "kind": "cv" },
+      { "from": { "moduleId": "osc-1", "portId": "out" }, "to": { "moduleId": "vca-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-1", "portId": "env" }, "to": { "moduleId": "vca-1", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "vca-1", "portId": "out" }, "to": { "moduleId": "dist-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "dist-1", "portId": "out" }, "to": { "moduleId": "vcf-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "vcf-1", "portId": "out" }, "to": { "moduleId": "delay-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "delay-1", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "scope-1", "portId": "in-a" }, "kind": "audio" }
+    ]
+  }
+}

@@ -247,11 +247,25 @@ impl GraphEngine {
           ModuleState::MidiFileSequencer(state) => return state.seq.current_tick() as i32,
           ModuleState::ChordSequencer(state) => return state.seq.current_step() as i32,
           ModuleState::PolyrhythmSequencer(state) => return state.seq.current_step() as i32,
+          ModuleState::GameOfLife(state) => return state.gol.current_step() as i32,
           _ => {}
         }
       }
     }
     -1
+  }
+
+  /// Get Game of Life grid state for UI visualization
+  /// Returns 16 u16 values (one per row, each bit = one column)
+  pub fn get_gol_grid(&self, module_id: &str) -> Vec<u16> {
+    if let Some(index) = self.module_map.get(module_id).and_then(|list| list.first()) {
+      if let Some(module) = self.modules.get(*index) {
+        if let ModuleState::GameOfLife(state) = &module.state {
+          return state.gol.grid_state().to_vec();
+        }
+      }
+    }
+    Vec::new()
   }
 
   /// Get meter peak levels as [peak_l, peak_r] encoded in a single u32.
@@ -895,6 +909,9 @@ fn normalize_module_type(raw: &str) -> ModuleType {
     "polyrhythm-sequencer" => ModuleType::PolyrhythmSequencer,
     // Clock Divider
     "clock-divider" => ModuleType::ClockDivider,
+    // Generative sequencers
+    "game-of-life" => ModuleType::GameOfLife,
+    "gravity-sequencer" => ModuleType::GravitySequencer,
     _ => ModuleType::Oscillator,
   }
 }

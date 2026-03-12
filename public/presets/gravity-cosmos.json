@@ -1,0 +1,103 @@
+{
+  "id": "gravity-cosmos",
+  "name": "Gravity Cosmos",
+  "description": "8 bodies in slow orbit — dense generative ambient pad.",
+  "group": "Generative",
+  "graph": {
+    "modules": [
+      {
+        "id": "grav-1",
+        "type": "gravity-sequencer",
+        "name": "Cosmos",
+        "position": { "col": 1, "row": 1 },
+        "params": {
+          "speed": 0.3,
+          "bodies": 8,
+          "eccentricity": 0.3,
+          "spread": 1.5,
+          "range": 2,
+          "scale": 7,
+          "root": 0,
+          "chaos": 0.2
+        }
+      },
+      {
+        "id": "osc-1",
+        "type": "supersaw",
+        "name": "Supersaw",
+        "position": { "col": 5, "row": 1 },
+        "params": { "frequency": 261.63, "detune": 0.3, "mix": 0.7, "level": 0.5 }
+      },
+      {
+        "id": "adsr-1",
+        "type": "adsr",
+        "name": "Pad Env",
+        "position": { "col": 7, "row": 1 },
+        "params": { "attack": 0.005, "decay": 1.5, "sustain": 0.4, "release": 4.0 }
+      },
+      {
+        "id": "vca-1",
+        "type": "gain",
+        "name": "VCA",
+        "position": { "col": 9, "row": 1 },
+        "params": { "level": 0.7 }
+      },
+      {
+        "id": "vcf-1",
+        "type": "vcf",
+        "name": "Filter",
+        "position": { "col": 11, "row": 1 },
+        "params": { "cutoff": 1500, "resonance": 0.15, "drive": 0, "model": "svf", "mode": "lp", "slope": 12 }
+      },
+      {
+        "id": "chorus-1",
+        "type": "ensemble",
+        "name": "Ensemble",
+        "position": { "col": 13, "row": 1 },
+        "params": { "rate": 0.3, "depth": 0.5, "mix": 0.4 }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Hall",
+        "position": { "col": 15, "row": 1 },
+        "params": { "decay": 8.0, "damping": 0.2, "mix": 0.55 }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Output",
+        "position": { "col": 17, "row": 1 },
+        "params": { "level": 1 }
+      },
+      {
+        "id": "scope-1",
+        "type": "scope",
+        "name": "Scope",
+        "position": { "col": 17, "row": 3 },
+        "params": {}
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "col": 1, "row": 5 },
+        "params": {
+          "text": "GRAVITY COSMOS\n\n8 bodies in slow orbit, pentatonic major.\nSupersaw pad shaped by ADSR + long reverb.\n\n- 8 bodies = dense overlapping triggers\n- Slow speed + high spread = evolving rhythm\n- Ensemble + huge reverb for space\n- Chaos adds subtle orbital perturbation\n- Try increasing speed or changing scale"
+        }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "grav-1", "portId": "cv" }, "to": { "moduleId": "osc-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "grav-1", "portId": "gate" }, "to": { "moduleId": "adsr-1", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "grav-1", "portId": "x" }, "to": { "moduleId": "vcf-1", "portId": "mod" }, "kind": "cv" },
+      { "from": { "moduleId": "osc-1", "portId": "out" }, "to": { "moduleId": "vca-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr-1", "portId": "env" }, "to": { "moduleId": "vca-1", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "vca-1", "portId": "out" }, "to": { "moduleId": "vcf-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "vcf-1", "portId": "out" }, "to": { "moduleId": "chorus-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "chorus-1", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "scope-1", "portId": "in-a" }, "kind": "audio" }
+    ]
+  }
+}

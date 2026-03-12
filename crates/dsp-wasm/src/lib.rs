@@ -90,6 +90,11 @@ impl WasmGraphEngine {
     self.engine.get_sequencer_step(module_id)
   }
 
+  /// Get Game of Life grid state as flat array of 16 u16 values
+  pub fn get_gol_grid(&self, module_id: &str) -> Vec<u16> {
+    self.engine.get_gol_grid(module_id)
+  }
+
   /// Get meter peak levels packed as u32 (high16=left, low16=right)
   pub fn get_meter_level(&self, module_id: &str) -> u32 {
     self.engine.get_meter_level(module_id)

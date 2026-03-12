@@ -40,8 +40,8 @@ App.tsx                          # Root component, state management, undo/redo
 │   │       ├── index.tsx        # Router → category files
 │   │       ├── sources/         # Source modules (15 files)
 │   │       │   └── ... (15 modules)
-│   │       ├── sequencers/      # Sequencer modules (10 files)
-│   │       │   └── ... (10 modules)
+│   │       ├── sequencers/      # Sequencer modules (12 files)
+│   │       │   └── ... (12 modules)
 │   │       ├── io/              # I/O modules (6 files)
 │   │       │   └── ... (6 modules)
 │   │       ├── FilterControls.tsx
@@ -224,10 +224,11 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 | MIDI Sequencer | Playhead + seek | ✅ | ✅ `NativeSequencerBridge` |
 | Granular | Position + buffer load | ✅ | ✅ `NativeGranularBridge` |
 | CPU Meter | DSP load avg + peak | ✅ | ✅ `native_get_cpu_load` |
+| Game of Life | Grid state + playhead | ✅ | ❌ (Web-only for now) |
 
 **⚠️ RÈGLE:** Toute nouvelle feature UI↔Audio DOIT être implémentée pour Tauri en même temps que Web. Ne jamais merger une feature Web-only.
 
-## Module Types (87 total)
+## Module Types (89 total)
 
 ### Sources (17)
 oscillator, supersaw, karplus, fm-op, fm-matrix, nes-osc, snes-osc, noise, tb-303, shepard, pipe-organ, spectral-swarm, resonator, wavetable, granular, particle-cloud, speech-synth
@@ -244,8 +245,8 @@ chorus, ensemble, choir, vocoder, delay, granular-delay, tape-delay, spring-reve
 ### Modulators (8)
 adsr, lfo, mod-router, sample-hold, slew, quantizer, chaos, envelope-follower
 
-### Sequencers (12)
-clock, arpeggiator, step-sequencer, euclidean, drum-sequencer, midi-file-sequencer, turing-machine, mario, sid-player, ay-player, chord-sequencer, polyrhythm-sequencer
+### Sequencers (14)
+clock, arpeggiator, step-sequencer, euclidean, drum-sequencer, midi-file-sequencer, turing-machine, mario, sid-player, ay-player, chord-sequencer, polyrhythm-sequencer, game-of-life, gravity-sequencer
 
 ### TR-909 Drums (6)
 909-kick, 909-snare, 909-hihat, 909-clap, 909-tom, 909-rimshot
