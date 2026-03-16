@@ -196,7 +196,7 @@ export function GameOfLifeControls({ module, updateParam, engine, status }: Cont
   return (
     <>
       {/* Grid canvas */}
-      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 6 }}>
+      <div style={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'center', marginBottom: 6 }}>
         <canvas
           ref={canvasRef}
           width={gridWidth}
