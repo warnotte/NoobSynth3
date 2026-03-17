@@ -64,6 +64,7 @@ pub struct PolyrhythmSequencer {
 
     // Timing
     phase: f64,
+    prev_rate_idx: usize,
 
     // Swing
     swing_pending: [bool; POLY_TRACKS],
@@ -74,6 +75,11 @@ pub struct PolyrhythmSequencer {
     // Clock
     prev_clock: f32,
     prev_reset: f32,
+
+    // Global transport state (set by graph engine before process_block)
+    pub transport_beats: f64,
+    pub transport_bps: f64,
+    pub last_transport_step: usize,
 }
 
 /// Input signals.
@@ -118,12 +124,16 @@ impl PolyrhythmSequencer {
             sample_rate: sample_rate.max(1.0),
             tracks: Default::default(),
             phase: 0.0,
+            prev_rate_idx: 4,
             swing_pending: [false; POLY_TRACKS],
             swing_delay_remaining: [0; POLY_TRACKS],
             swing_step_data: [PolyStep::default(); POLY_TRACKS],
             swing_gate_length: [0; POLY_TRACKS],
             prev_clock: 0.0,
             prev_reset: 0.0,
+            transport_beats: 0.0,
+            transport_bps: 0.0,
+            last_transport_step: usize::MAX,
         }
     }
 
@@ -242,8 +252,17 @@ impl PolyrhythmSequencer {
         }
 
         let enabled = sample_at(params.enabled, 0, 1.0) > 0.5;
-        let tempo = sample_at(params.tempo, 0, 120.0).clamp(40.0, 300.0);
+        let tempo = if self.transport_bps > 0.0 {
+            (self.transport_bps * 60.0 * self.sample_rate as f64) as f32
+        } else {
+            sample_at(params.tempo, 0, 120.0).clamp(40.0, 300.0)
+        };
         let rate_idx = (sample_at(params.rate, 0, 3.0) as usize).min(RATE_DIVISIONS.len() - 1);
+        // Reset phase on rate change to avoid desync
+        if rate_idx != self.prev_rate_idx {
+            self.prev_rate_idx = rate_idx;
+            self.phase = 0.0;
+        }
         let gate_pct = sample_at(params.gate_length, 0, 50.0).clamp(10.0, 100.0) / 100.0;
         let swing = sample_at(params.swing, 0, 0.0).clamp(0.0, 90.0) / 100.0;
 
@@ -316,6 +335,17 @@ impl PolyrhythmSequencer {
 
             let step_advance = if use_external_clock {
                 clock_trigger
+            } else if self.transport_bps > 0.0 {
+                // Derive step position from global transport (deterministic)
+                let beat_now = self.transport_beats + i as f64 * self.transport_bps;
+                let rate_beats = RATE_DIVISIONS[rate_idx];
+                let step_idx = (beat_now / rate_beats).floor() as usize;
+                if step_idx != self.last_transport_step {
+                    self.last_transport_step = step_idx;
+                    true
+                } else {
+                    false
+                }
             } else {
                 self.phase += 1.0 / step_duration_samples;
                 if self.phase >= 1.0 {

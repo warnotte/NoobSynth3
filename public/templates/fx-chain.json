@@ -1,0 +1,59 @@
+{
+  "id": "fx-chain",
+  "name": "FX Chain",
+  "description": "Chorus + Delay + Reverb in series.",
+  "category": "Effects",
+  "modules": [
+    {
+      "id": "chr",
+      "type": "chorus",
+      "name": "Chorus",
+      "position": { "x": 0, "y": 0 },
+      "params": {
+        "rate": 0.3,
+        "depth": 8,
+        "delay": 18,
+        "mix": 0.4,
+        "spread": 0.6,
+        "feedback": 0.1
+      }
+    },
+    {
+      "id": "dly",
+      "type": "delay",
+      "name": "Delay",
+      "position": { "x": 1, "y": 0 },
+      "params": {
+        "time": 360,
+        "feedback": 0.25,
+        "mix": 0.2,
+        "tone": 0.6,
+        "pingPong": false
+      }
+    },
+    {
+      "id": "rev",
+      "type": "reverb",
+      "name": "Reverb",
+      "position": { "x": 2, "y": 0 },
+      "params": {
+        "time": 0.6,
+        "damp": 0.4,
+        "preDelay": 18,
+        "mix": 0.2
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": { "moduleId": "chr", "portId": "out" },
+      "to": { "moduleId": "dly", "portId": "in" },
+      "kind": "audio"
+    },
+    {
+      "from": { "moduleId": "dly", "portId": "out" },
+      "to": { "moduleId": "rev", "portId": "in" },
+      "kind": "audio"
+    }
+  ]
+}

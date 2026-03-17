@@ -110,6 +110,9 @@ export type ModuleType =
   // Generative
   | 'game-of-life'
   | 'gravity-sequencer'
+  // Send/Receive (inter-rack routing)
+  | 'send'
+  | 'receive'
 
 export interface ModuleSpec {
   id: string
@@ -147,4 +150,21 @@ export interface GraphState {
   modules: ModuleSpec[]
   connections: Connection[]
   macros?: MacroSpec[]
+}
+
+export interface RackSpec {
+  id: string
+  name: string
+  graph: GraphState
+}
+
+export interface TemplateSpec {
+  id: string
+  name: string
+  description: string
+  category?: string
+  /** Modules included in this template (IDs are local/relative) */
+  modules: ModuleSpec[]
+  /** Internal connections between template modules */
+  connections: Connection[]
 }

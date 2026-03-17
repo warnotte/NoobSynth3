@@ -8,6 +8,10 @@ type TopBarProps = {
   isRunning: boolean
   onStart: () => void
   onStop: () => void
+  rackCount?: number
+  onResync?: () => void
+  masterTempo?: number
+  onMasterTempoChange?: (bpm: number) => void
   showCables?: boolean
   onToggleCables?: () => void
   showDevTools?: boolean
@@ -89,6 +93,10 @@ export const TopBar = ({
   isRunning,
   onStart,
   onStop,
+  rackCount = 1,
+  onResync = () => {},
+  masterTempo = 120,
+  onMasterTempoChange = () => {},
   showCables = true,
   onToggleCables = () => {},
   showDevTools = false,
@@ -165,6 +173,30 @@ export const TopBar = ({
               >
                 <RecordIcon />
               </button>
+              <button
+                type="button"
+                className="button icon-btn"
+                onClick={onResync}
+                disabled={!isRunning}
+                title="Resync — restart all clocks &amp; sequencers from beat 0"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M1 4v6h6M23 20v-6h-6"/>
+                  <path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/>
+                </svg>
+              </button>
+              <div className="master-tempo-control">
+                <input
+                  type="number"
+                  className="master-tempo-input"
+                  min={30}
+                  max={300}
+                  value={masterTempo}
+                  onChange={(e) => onMasterTempoChange(Number(e.target.value))}
+                  title="Master tempo (BPM)"
+                />
+                <span className="master-tempo-label">BPM</span>
+              </div>
             </div>
           </div>
         </div>

@@ -168,6 +168,7 @@ pub struct Arpeggiator {
 
     // Timing state
     phase: f64,
+    prev_rate_idx: usize,
     samples_per_beat: f64,
     current_step: usize,
     pattern_length: usize,
@@ -217,6 +218,11 @@ pub struct Arpeggiator {
 
     // RNG
     rng: Xorshift32,
+
+    // Global transport state (set by graph engine before process_block)
+    pub transport_beats: f64,
+    pub transport_bps: f64,
+    pub last_transport_step: usize,
 }
 
 /// Input signals for Arpeggiator.
@@ -289,6 +295,7 @@ impl Arpeggiator {
             pattern: Vec::with_capacity(64),
             random_pattern: Vec::with_capacity(64),
             phase: 0.0,
+            prev_rate_idx: 3,
             samples_per_beat: (sample_rate as f64) / 2.0, // 120 BPM default
             current_step: 0,
             pattern_length: 0,
@@ -317,6 +324,9 @@ impl Arpeggiator {
             swing_accent: 0.0,
             swing_ratchet_count: 1,
             rng: Xorshift32::new(12345),
+            transport_beats: 0.0,
+            transport_bps: 0.0,
+            last_transport_step: usize::MAX,
         }
     }
 
@@ -505,9 +515,18 @@ impl Arpeggiator {
         let mode = ArpMode::from_index(mode_idx);
         let octaves = (sample_at(params.octaves, 0, 1.0) as usize).clamp(1, 4);
         let rate_idx = (sample_at(params.rate, 0, 7.0) as usize).min(15);
+        // Reset phase on rate change to avoid desync
+        if rate_idx != self.prev_rate_idx {
+            self.prev_rate_idx = rate_idx;
+            self.phase = 0.0;
+        }
         let gate_pct = sample_at(params.gate, 0, 75.0).clamp(10.0, 100.0) / 100.0;
         let swing = sample_at(params.swing, 0, 0.0).clamp(0.0, 100.0) / 100.0;
-        let tempo = sample_at(params.tempo, 0, 120.0).clamp(40.0, 300.0);
+        let tempo = if self.transport_bps > 0.0 {
+            (self.transport_bps * 60.0 * self.sample_rate as f64) as f32
+        } else {
+            sample_at(params.tempo, 0, 120.0).clamp(40.0, 300.0)
+        };
         let ratchet = (sample_at(params.ratchet, 0, 1.0) as usize).clamp(1, 8);
         let ratchet_decay = sample_at(params.ratchet_decay, 0, 0.0).clamp(0.0, 100.0) / 100.0;
         let probability = sample_at(params.probability, 0, 100.0).clamp(0.0, 100.0) / 100.0;
@@ -590,6 +609,17 @@ impl Arpeggiator {
             let use_external_clock = clock_in >= 0.0;
             let step_advance = if use_external_clock {
                 clock_trigger
+            } else if self.transport_bps > 0.0 {
+                // Derive step position from global transport (deterministic)
+                let beat_now = self.transport_beats + i as f64 * self.transport_bps;
+                let rate_beats = RATE_DIVISIONS[rate_idx];
+                let step_idx = (beat_now / rate_beats).floor() as usize;
+                if step_idx != self.last_transport_step {
+                    self.last_transport_step = step_idx;
+                    true
+                } else {
+                    false
+                }
             } else {
                 self.phase += 1.0 / step_duration_samples;
                 if self.phase >= 1.0 {

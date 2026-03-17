@@ -67,10 +67,18 @@ pub struct MasterClock {
     bar_on: bool,
     bar_samples: usize,
 
+    // Rate change detection
+    prev_rate_idx: usize,
+
     // External trigger edge detection
     prev_start: f32,
     prev_stop: f32,
     prev_reset_in: f32,
+
+    // Global transport state (set by graph engine before process_block)
+    pub transport_beats: f64,
+    pub transport_bps: f64,
+    pub last_transport_step: usize,
 }
 
 /// Input signals for MasterClock.
@@ -126,9 +134,13 @@ impl MasterClock {
             beat_count: 0,
             bar_on: false,
             bar_samples: 0,
+            prev_rate_idx: 4, // default 1/16
             prev_start: 0.0,
             prev_stop: 0.0,
             prev_reset_in: 0.0,
+            transport_beats: 0.0,
+            transport_bps: 0.0,
+            last_transport_step: usize::MAX,
         }
     }
 
@@ -157,7 +169,11 @@ impl MasterClock {
 
         for i in 0..frames {
             let running_param = sample_at(params.running, i, 0.0) > 0.5;
-            let tempo = sample_at(params.tempo, i, 120.0).clamp(40.0, 300.0);
+            let tempo = if self.transport_bps > 0.0 {
+                (self.transport_bps * 60.0 * self.sample_rate as f64) as f32
+            } else {
+                sample_at(params.tempo, i, 120.0).clamp(40.0, 300.0)
+            };
             let rate = sample_at(params.rate, i, 4.0); // default 1/16
             let swing = sample_at(params.swing, i, 0.0).clamp(0.0, 90.0);
 
@@ -209,34 +225,58 @@ impl MasterClock {
             let rate_div = RATE_DIVISIONS[rate_idx];
             self.samples_per_beat = (self.sample_rate as f64) * 60.0 / (tempo as f64) * rate_div;
 
+            // Reset phase on rate change to stay grid-aligned
+            if rate_idx != self.prev_rate_idx {
+                self.prev_rate_idx = rate_idx;
+                self.phase = 0.0;
+            }
+
             // Process clock if running
             if is_running {
-                self.phase += 1.0;
-
-                // Check if we should trigger a clock pulse
-                // Apply swing to odd beats (every other clock)
-                let is_odd_beat = (self.beat_count % 2) == 1;
-                let swing_delay = if is_odd_beat && swing > 0.0 {
-                    (self.samples_per_beat * (swing as f64) / 100.0 * 0.5) as usize
+                if self.transport_bps > 0.0 {
+                    // Derive pulse timing from global transport (deterministic)
+                    let beat_now = self.transport_beats + i as f64 * self.transport_bps;
+                    let pulse_idx = (beat_now / rate_div).floor() as usize;
+                    let should_pulse = pulse_idx != self.last_transport_step;
+                    if should_pulse {
+                        self.last_transport_step = pulse_idx;
+                        self.clock_on = true;
+                        self.clock_samples = 0;
+                        self.beat_count += 1;
+                        // Bar pulse every 4 quarter notes
+                        let clocks_per_bar = (4.0 / rate_div).round() as usize;
+                        if self.beat_count % clocks_per_bar.max(1) == 0 {
+                            self.bar_on = true;
+                            self.bar_samples = 0;
+                        }
+                    }
                 } else {
-                    0
-                };
+                    // Legacy phase accumulation (transport disabled)
+                    self.phase += 1.0;
 
-                let trigger_point = self.samples_per_beat + swing_delay as f64;
+                    // Check if we should trigger a clock pulse
+                    // Apply swing to odd beats (every other clock)
+                    let is_odd_beat = (self.beat_count % 2) == 1;
+                    let swing_delay = if is_odd_beat && swing > 0.0 {
+                        (self.samples_per_beat * (swing as f64) / 100.0 * 0.5) as usize
+                    } else {
+                        0
+                    };
 
-                if self.phase >= trigger_point {
-                    self.phase -= self.samples_per_beat; // Keep fractional part
-                    self.clock_on = true;
-                    self.clock_samples = 0;
-                    self.beat_count += 1;
+                    let trigger_point = self.samples_per_beat + swing_delay as f64;
 
-                    // Bar pulse every 4 quarter notes
-                    // Since rate affects clock speed, we need to count actual beats
-                    // At 1/16, 16 clocks = 4 beats = 1 bar
-                    let clocks_per_bar = (4.0 / rate_div).round() as usize;
-                    if self.beat_count % clocks_per_bar.max(1) == 0 {
-                        self.bar_on = true;
-                        self.bar_samples = 0;
+                    if self.phase >= trigger_point {
+                        self.phase -= self.samples_per_beat; // Keep fractional part
+                        self.clock_on = true;
+                        self.clock_samples = 0;
+                        self.beat_count += 1;
+
+                        // Bar pulse every 4 quarter notes
+                        let clocks_per_bar = (4.0 / rate_div).round() as usize;
+                        if self.beat_count % clocks_per_bar.max(1) == 0 {
+                            self.bar_on = true;
+                            self.bar_samples = 0;
+                        }
                     }
                 }
             } else {

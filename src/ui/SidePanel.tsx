@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import type { GraphState, MacroSpec, MacroTarget, ModuleSpec, ModuleType } from '../shared/graph'
+import type { GraphState, MacroSpec, MacroTarget, ModuleSpec, ModuleType, TemplateSpec } from '../shared/graph'
 import type { PresetSpec } from '../state/presets'
 import {
   moduleCatalog,
@@ -58,6 +58,11 @@ type SidePanelProps = {
   onTauriOutputChange: (value: string) => void
   onTauriInputChange: (value: string) => void
   onTauriSyncGraph: () => void
+  templates: TemplateSpec[]
+  templateStatus: 'loading' | 'ready' | 'error'
+  onInsertTemplate: (template: TemplateSpec) => void
+  onDeleteTemplate: (templateId: string) => void
+  onExportTemplate: (template: TemplateSpec) => void
 }
 
 export const SidePanel = ({
@@ -108,6 +113,11 @@ export const SidePanel = ({
   onTauriOutputChange,
   onTauriInputChange,
   onTauriSyncGraph,
+  templates,
+  templateStatus,
+  onInsertTemplate,
+  onDeleteTemplate,
+  onExportTemplate,
 }: SidePanelProps) => {
   const [compactPresets, setCompactPresets] = useState(false)
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({})
@@ -115,6 +125,7 @@ export const SidePanel = ({
   // All sections collapsed by default
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({
     library: true,
+    templates: true,
     presets: true,
     macros: true,
     tauri: true,
@@ -199,6 +210,36 @@ export const SidePanel = ({
 
   const toggleGroup = (group: string) => {
     setCollapsedGroups((prev) => ({ ...prev, [group]: !prev[group] }))
+  }
+
+  const [templateQuery, setTemplateQuery] = useState('')
+  const normalizedTemplateQuery = templateQuery.trim().toLowerCase()
+  const [collapsedTemplateCategories, setCollapsedTemplateCategories] = useState<Record<string, boolean>>({})
+
+  const filteredTemplates = useMemo(() => {
+    if (!normalizedTemplateQuery) return templates
+    return templates.filter((t) => {
+      const haystack = `${t.name} ${t.description ?? ''} ${t.category ?? ''}`.toLowerCase()
+      return haystack.includes(normalizedTemplateQuery)
+    })
+  }, [normalizedTemplateQuery, templates])
+
+  const groupedTemplates = useMemo(() => {
+    const order: string[] = []
+    const groups = new Map<string, TemplateSpec[]>()
+    filteredTemplates.forEach((t) => {
+      const cat = t.category ?? 'Other'
+      if (!groups.has(cat)) {
+        groups.set(cat, [])
+        order.push(cat)
+      }
+      groups.get(cat)?.push(t)
+    })
+    return order.map((cat) => ({ category: cat, templates: groups.get(cat) ?? [] }))
+  }, [filteredTemplates])
+
+  const toggleTemplateCategory = (cat: string) => {
+    setCollapsedTemplateCategories((prev) => ({ ...prev, [cat]: !prev[cat] }))
   }
 
   const isSearching = normalizedQuery.length > 0
@@ -304,6 +345,107 @@ export const SidePanel = ({
                 )
               })}
             </div>
+      </PanelSection>
+      <PanelSection
+        title="Templates"
+        collapsed={collapsedSections.templates}
+        onToggle={() => toggleSection('templates')}
+      >
+        <p className="muted">
+          Insert a pre-wired group of modules into the rack.
+        </p>
+        <input
+          className="module-search"
+          type="search"
+          placeholder="Search templates..."
+          value={templateQuery}
+          onChange={(e) => setTemplateQuery(e.target.value)}
+        />
+        {templateStatus === 'loading' && (
+          <div className="preset-status">Loading templates...</div>
+        )}
+        {templateStatus === 'error' && (
+          <div className="preset-status">Unable to load templates.</div>
+        )}
+        {templateStatus === 'ready' && filteredTemplates.length === 0 && (
+          <div className="preset-status">No templates match your search.</div>
+        )}
+        {templateStatus === 'ready' && filteredTemplates.length > 0 && (
+          <div className="preset-groups">
+            {groupedTemplates.map(({ category, templates: catTemplates }) => {
+              const isTemplateCatCollapsed = normalizedTemplateQuery
+                ? false
+                : collapsedTemplateCategories[category] !== false
+              return (
+                <div key={category} className="preset-group">
+                  <button
+                    type="button"
+                    className={`preset-group-header ${isTemplateCatCollapsed ? 'collapsed' : ''}`}
+                    onClick={() => toggleTemplateCategory(category)}
+                    disabled={!!normalizedTemplateQuery}
+                  >
+                    <span className="preset-group-title">{category}</span>
+                    {!normalizedTemplateQuery && (
+                      <span className="preset-group-meta">
+                        <span className="preset-group-count">{catTemplates.length}</span>
+                        <span className="preset-group-arrow">{isTemplateCatCollapsed ? '+' : '-'}</span>
+                      </span>
+                    )}
+                  </button>
+                  {!isTemplateCatCollapsed && (
+                    <div className="preset-list">
+                      {catTemplates.map((tpl) => {
+                        const isUser = tpl.id.startsWith('user-')
+                        return (
+                          <div key={tpl.id} className="preset-card">
+                            <div>
+                              <div className="preset-name">{tpl.name}</div>
+                              <div className="preset-desc">
+                                {tpl.description}
+                                <span className="template-module-count">
+                                  {' '}{tpl.modules.length} modules
+                                </span>
+                              </div>
+                            </div>
+                            <div className="template-actions">
+                              <button
+                                type="button"
+                                className="ui-btn ui-btn--pill preset-load"
+                                onClick={() => onInsertTemplate(tpl)}
+                              >
+                                Insert
+                              </button>
+                              {isUser && (
+                                <>
+                                  <button
+                                    type="button"
+                                    className="ui-btn ui-btn--pill template-action-btn"
+                                    onClick={() => onExportTemplate(tpl)}
+                                    title="Export as JSON"
+                                  >
+                                    Export
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="ui-btn ui-btn--pill template-action-btn template-delete"
+                                    onClick={() => onDeleteTemplate(tpl.id)}
+                                    title="Delete template"
+                                  >
+                                    Del
+                                  </button>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        )}
       </PanelSection>
       <PanelSection
         title="Presets"

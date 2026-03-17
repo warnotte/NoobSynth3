@@ -591,6 +591,22 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
     inputs: [],
     outputs: [],
   },
+  send: {
+    inputs: [
+      { id: 'in', label: 'In', kind: 'audio', direction: 'in' },
+    ],
+    outputs: [
+      { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
+    ],
+  },
+  receive: {
+    inputs: [
+      { id: 'in', label: 'In', kind: 'audio', direction: 'in' },
+    ],
+    outputs: [
+      { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
+    ],
+  },
   clock: {
     inputs: [
       { id: 'start', label: 'Start', kind: 'gate', direction: 'in' },

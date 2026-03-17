@@ -1,0 +1,48 @@
+{
+  "id": "clock-step",
+  "name": "Clock + Step Seq",
+  "description": "Master clock driving a 16-step sequencer.",
+  "category": "Sequencers",
+  "modules": [
+    {
+      "id": "clk",
+      "type": "clock",
+      "name": "Clock",
+      "position": { "x": 0, "y": 0 },
+      "params": {
+        "running": true,
+        "tempo": 120,
+        "rate": 4,
+        "swing": 0
+      }
+    },
+    {
+      "id": "seq",
+      "type": "step-sequencer",
+      "name": "Step Seq",
+      "position": { "x": 1, "y": 0 },
+      "params": {
+        "enabled": true,
+        "tempo": 120,
+        "rate": 3,
+        "gateLength": 50,
+        "swing": 0,
+        "length": 16,
+        "direction": 0,
+        "slideTime": 50
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": { "moduleId": "clk", "portId": "clock" },
+      "to": { "moduleId": "seq", "portId": "clock" },
+      "kind": "sync"
+    },
+    {
+      "from": { "moduleId": "clk", "portId": "reset" },
+      "to": { "moduleId": "seq", "portId": "reset" },
+      "kind": "sync"
+    }
+  ]
+}

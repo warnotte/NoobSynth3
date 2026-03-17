@@ -8,7 +8,7 @@ mod instantiate;
 use dsp_core::{Sample, MARIO_CHANNELS};
 
 // Re-export types from our modules
-pub use types::{ModuleType, PortInfo, ConnectionEdge, TapSource, ParamBuffer};
+pub use types::{ModuleType, PortInfo, ConnectionEdge, TapSource, ParamBuffer, TransportContext};
 pub use buffer::{Buffer, mix_buffers, downmix_to_mono};
 pub use state::*;
 pub use ports::{input_ports, output_ports, input_port_index, output_port_index};
@@ -77,6 +77,8 @@ pub struct GraphEngine {
   output_channels: usize,
   external_input: Vec<Sample>,
   external_input_frames: usize,
+  transport_beats: f64,
+  transport_tempo: f32,
 }
 
 impl GraphEngine {
@@ -96,6 +98,8 @@ impl GraphEngine {
       output_channels: 2,
       external_input: Vec::new(),
       external_input_frames: 0,
+      transport_beats: 0.0,
+      transport_tempo: 120.0,
     }
   }
 
@@ -143,6 +147,14 @@ impl GraphEngine {
   pub fn clear_external_input(&mut self) {
     self.external_input.clear();
     self.external_input_frames = 0;
+  }
+
+  pub fn set_transport_tempo(&mut self, tempo: f32) {
+    self.transport_tempo = tempo.clamp(1.0, 999.0);
+  }
+
+  pub fn reset_transport(&mut self) {
+    self.transport_beats = 0.0;
   }
 
   pub fn set_control_voice_cv(&mut self, module_id: &str, voice: usize, value: f32) {
@@ -520,6 +532,11 @@ impl GraphEngine {
       return &self.output_data;
     }
 
+    let transport = TransportContext {
+      beats: self.transport_beats,
+      beats_per_sample: self.transport_tempo as f64 / 60.0 / self.sample_rate as f64,
+    };
+
     for &module_index in &self.order {
       {
         let module = &self.modules[module_index];
@@ -558,8 +575,10 @@ impl GraphEngine {
           }
           continue;
         }
-      module.process(inputs, outputs, frames, self.sample_rate);
+      module.process(inputs, outputs, frames, self.sample_rate, transport);
     }
+
+    self.transport_beats += frames as f64 * (self.transport_tempo as f64 / 60.0 / self.sample_rate as f64);
 
     self.main_buffer.resize(2, frames);
     self.main_buffer.clear();
@@ -802,8 +821,8 @@ impl ModuleNode {
     instantiate::apply_param_str(&mut self.state, param, value);
   }
 
-  fn process(&mut self, inputs: &[Buffer], outputs: &mut [Buffer], frames: usize, _sample_rate: f32) {
-    process::process_module(&mut self.state, &self.connections, inputs, outputs, frames);
+  fn process(&mut self, inputs: &[Buffer], outputs: &mut [Buffer], frames: usize, _sample_rate: f32, transport: TransportContext) {
+    process::process_module(&mut self.state, &self.connections, inputs, outputs, frames, transport);
   }
 }
 fn normalize_module_type(raw: &str) -> ModuleType {
@@ -912,6 +931,9 @@ fn normalize_module_type(raw: &str) -> ModuleType {
     // Generative sequencers
     "game-of-life" => ModuleType::GameOfLife,
     "gravity-sequencer" => ModuleType::GravitySequencer,
+    // Send/Receive (audio bus pass-through)
+    "send" => ModuleType::Send,
+    "receive" => ModuleType::Receive,
     _ => ModuleType::Oscillator,
   }
 }

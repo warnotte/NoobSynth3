@@ -909,6 +909,15 @@ pub struct MeterState {
     pub peak_r: f32,
 }
 
+// -- Send/Receive (audio bus pass-through) -----------------------------------
+pub struct SendState {
+    pub bus: u32,
+}
+
+pub struct ReceiveState {
+    pub bus: u32,
+}
+
 // =============================================================================
 // Module State Enum
 // =============================================================================
@@ -1022,6 +1031,8 @@ pub enum ModuleState {
     Scope,
     Meter(MeterState),
     Notes,
+    Send(SendState),
+    Receive(ReceiveState),
 
     /// Placeholder used during state transfer (never used in processing)
     Empty,

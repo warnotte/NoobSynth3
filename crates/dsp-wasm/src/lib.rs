@@ -182,4 +182,14 @@ impl WasmGraphEngine {
   pub fn get_ay_elapsed(&self, module_id: &str) -> f32 {
     self.engine.get_ay_elapsed(module_id)
   }
+
+  /// Set the global transport tempo (BPM).
+  pub fn set_transport_tempo(&mut self, tempo: f32) {
+    self.engine.set_transport_tempo(tempo);
+  }
+
+  /// Reset the global transport beat counter to zero.
+  pub fn reset_transport(&mut self) {
+    self.engine.reset_transport();
+  }
 }

@@ -112,6 +112,8 @@ pub enum ModuleType {
     Scope,
     Meter,
     Notes,
+    Send,
+    Receive,
 }
 
 /// Port channel configuration.
@@ -125,6 +127,15 @@ pub struct ConnectionEdge {
     pub source_module: usize,
     pub source_port: usize,
     pub gain: f32,
+}
+
+/// Global transport state passed to each module during processing.
+#[derive(Clone, Copy, Debug)]
+pub struct TransportContext {
+    /// Cumulative beat position since transport start (quarter notes)
+    pub beats: f64,
+    /// Beats per sample (tempo / 60 / sample_rate)
+    pub beats_per_sample: f64,
 }
 
 /// A tap source for audio monitoring.
