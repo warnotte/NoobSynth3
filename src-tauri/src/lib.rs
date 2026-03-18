@@ -39,6 +39,10 @@ enum AudioCommand {
     graph_json: String,
     reply: mpsc::Sender<Result<NativeStatus, String>>,
   },
+  SetGraphFresh {
+    graph_json: String,
+    reply: mpsc::Sender<Result<NativeStatus, String>>,
+  },
   SetParam {
     module_id: String,
     param_id: String,
@@ -448,6 +452,10 @@ fn audio_thread(rx: mpsc::Receiver<AudioCommand>, scope: Arc<Mutex<ScopeSnapshot
       }
       AudioCommand::SetGraph { graph_json, reply } => {
         let result = set_graph(&mut state, graph_json);
+        let _ = reply.send(result);
+      }
+      AudioCommand::SetGraphFresh { graph_json, reply } => {
+        let result = set_graph_fresh(&mut state, graph_json);
         let _ = reply.send(result);
       }
       AudioCommand::SetParam {
@@ -875,6 +883,15 @@ fn set_graph(state: &mut AudioThreadState, graph_json: String) -> Result<NativeS
   Ok(state.status())
 }
 
+fn set_graph_fresh(state: &mut AudioThreadState, graph_json: String) -> Result<NativeStatus, String> {
+  state.graph_json = Some(graph_json.clone());
+  if let Some(graph) = &state.graph {
+    let mut engine = graph.lock().map_err(|_| "graph engine unavailable")?;
+    engine.set_graph_json_fresh(&graph_json)?;
+  }
+  Ok(state.status())
+}
+
 fn find_output_device(name: Option<&str>) -> Result<cpal::Device, String> {
   let host = cpal::default_host();
   if let Some(name) = name {
@@ -1158,6 +1175,11 @@ fn list_midi_inputs() -> Result<Vec<String>, String> {
 #[tauri::command]
 fn native_set_graph(state: State<NativeAudioState>, graph_json: String) -> Result<(), String> {
   send_audio_command(&state, |reply| AudioCommand::SetGraph { graph_json, reply }).map(|_| ())
+}
+
+#[tauri::command]
+fn native_set_graph_fresh(state: State<NativeAudioState>, graph_json: String) -> Result<(), String> {
+  send_audio_command(&state, |reply| AudioCommand::SetGraphFresh { graph_json, reply }).map(|_| ())
 }
 
 #[tauri::command]
@@ -1918,6 +1940,7 @@ pub fn run() {
         list_audio_inputs,
         list_midi_inputs,
       native_set_graph,
+      native_set_graph_fresh,
       native_set_param,
       native_set_param_string,
       native_set_control_voice_cv,

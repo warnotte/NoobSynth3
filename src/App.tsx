@@ -505,7 +505,9 @@ function App() {
       }
       const runSync = () => {
         const graphJson = buildNativeGraphJson(nextGraph)
-        void invokeTauri('native_set_graph', { graphJson })
+        // Use fresh mode for preset loads (immediate), preserve mode for incremental updates
+        const command = options?.immediate ? 'native_set_graph_fresh' : 'native_set_graph'
+        void invokeTauri(command, { graphJson })
           .then(() => {
             nativeGraphSyncRef.current.lastSignature = signature
           })
@@ -2836,7 +2838,9 @@ function App() {
 
   /** Send mixer levels directly to the engine via setParam on output modules */
   const applyMixerToEngine = (nextMixer: Record<string, MixerChannelState>) => {
-    if (statusRef.current !== 'running' || racksRef.current.length <= 1) return
+    const webRunning = statusRef.current === 'running'
+    const nativeRunning = isTauri && tauriNativeRunning
+    if ((!webRunning && !nativeRunning) || racksRef.current.length <= 1) return
     const hasSolo = Object.values(nextMixer).some((ch) => ch.solo)
     const multiRack = racksRef.current.length > 1
     for (const rack of racksRef.current) {
