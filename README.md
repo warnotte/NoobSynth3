@@ -80,4 +80,4 @@ Ouvrir l'app, cliquer **Play**, puis jouer avec le clavier ou charger un preset.
 
 ## Licence
 
-MIT
+Pas de licence définie pour le moment. Tous droits réservés.
