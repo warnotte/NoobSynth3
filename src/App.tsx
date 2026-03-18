@@ -14,6 +14,17 @@ import {
 } from './utils/urlSharing'
 import { defaultGraph } from './state/defaultGraph'
 import { loadPresets, type PresetSpec } from './state/presets'
+import {
+  loadTemplates,
+  instantiateTemplate,
+  extractTemplate,
+  loadUserTemplates,
+  saveUserTemplate,
+  deleteUserTemplate,
+  exportTemplateAsFile,
+} from './state/templates'
+import { flattenRacks } from './state/rackFlatten'
+import type { TemplateSpec } from './shared/graph'
 import { marioSongs } from './state/marioSongs'
 import {
   isGraphState,
@@ -36,9 +47,11 @@ import {
   readGridMetrics,
 } from './state/gridLayout'
 import { buildModuleSpec, moduleSizes } from './state/moduleRegistry'
-import type { GraphState, MacroSpec, MacroTarget, ModuleSpec, ModuleType } from './shared/graph'
+import type { GraphState, MacroSpec, MacroTarget, ModuleSpec, ModuleType, RackSpec } from './shared/graph'
 import { PatchLayer } from './ui/PatchLayer'
 import { RackView } from './ui/RackView'
+import { MixerConsole, type MixerChannelState } from './ui/MixerConsole'
+import { RackTabs, type ViewMode } from './ui/RackTabs'
 import { SidePanel } from './ui/SidePanel'
 import { TopBar } from './ui/TopBar'
 import { ContextMenu, type ContextMenuAction } from './ui/ContextMenu'
@@ -339,6 +352,33 @@ function App() {
   const [presetStatus, setPresetStatus] = useState<'loading' | 'ready' | 'error'>('loading')
   const [presetError, setPresetError] = useState<string | null>(null)
   const [currentPresetId, setCurrentPresetId] = useState<string | null>(null)
+  const [builtinTemplates, setBuiltinTemplates] = useState<TemplateSpec[]>([])
+  const [userTemplates, setUserTemplates] = useState<TemplateSpec[]>(() => loadUserTemplates())
+  const [templateStatus, setTemplateStatus] = useState<'loading' | 'ready' | 'error'>('loading')
+  const allTemplates = useMemo(
+    () => [...builtinTemplates, ...userTemplates],
+    [builtinTemplates, userTemplates],
+  )
+
+  // ── Multi-rack state ──
+  const [racks, setRacks] = useState<RackSpec[]>([
+    { id: 'rack-1', name: 'Main', graph: defaultGraph },
+  ])
+  const [activeRackId, setActiveRackId] = useState('rack-1')
+  const rackCounterRef = useRef(1)
+  const [mixerState, setMixerState] = useState<Record<string, MixerChannelState>>({
+    'rack-1': { volume: 0.8, mute: false, solo: false },
+  })
+  const [masterVolume, setMasterVolume] = useState(0.8)
+  const masterVolumeRef = useRef(0.8)
+  const [masterTempo, setMasterTempo] = useState(120)
+  const masterTempoRef = useRef(120)
+  const [viewMode, setViewMode] = useState<ViewMode>('rack')
+  const mixerStateRef = useRef(mixerState)
+
+  const racksRef = useRef(racks)
+  const activeRackIdRef = useRef(activeRackId)
+
   const [importError, setImportError] = useState<string | null>(null)
   const [gridError, setGridError] = useState<string | null>(null)
   const [tauriStatus, setTauriStatus] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle')
@@ -840,8 +880,59 @@ function App() {
   }, [])
 
   useEffect(() => {
+    let active = true
+    setTemplateStatus('loading')
+    loadTemplates()
+      .then((result) => {
+        if (!active) return
+        setBuiltinTemplates(result.templates)
+        setTemplateStatus('ready')
+      })
+      .catch((error) => {
+        console.error('Template loading failed:', error)
+        if (!active) return
+        setBuiltinTemplates([])
+        setTemplateStatus('ready') // user templates still work
+      })
+    return () => { active = false }
+  }, [])
+
+  useEffect(() => {
     graphRef.current = graph
   }, [graph])
+  useEffect(() => {
+    racksRef.current = racks
+    // Auto-create mixer channels for new racks
+    setMixerState((prev) => {
+      let next = prev
+      for (const rack of racks) {
+        if (!next[rack.id]) {
+          next = { ...next, [rack.id]: { volume: 0.8, mute: false, solo: false } }
+        }
+      }
+      return next
+    })
+  }, [racks])
+  useEffect(() => {
+    mixerStateRef.current = mixerState
+  }, [mixerState])
+  useEffect(() => {
+    activeRackIdRef.current = activeRackId
+  }, [activeRackId])
+
+  // Update engine module ID mapper when rack context changes
+  useEffect(() => {
+    if (racks.length > 1) {
+      engine.moduleIdMapper = (id: string) => `${activeRackId}/${id}`
+    } else {
+      engine.moduleIdMapper = null
+    }
+  }, [engine, activeRackId, racks.length])
+
+  // Sync transport tempo with engine
+  useEffect(() => {
+    engine.setTransportTempo(masterTempo)
+  }, [engine, masterTempo])
 
   // Undo/redo engine sync: when undo/redo fires, sync the audio engine
   const pendingUndoSyncRef = useRef(false)
@@ -858,7 +949,7 @@ function App() {
     if (!pendingUndoSyncRef.current) return
     pendingUndoSyncRef.current = false
     if (statusRef.current === 'running') {
-      engine.updateGraph(graph)
+      engine.updateGraph(buildCombinedGraph(graph))
       activeVoiceCountRef.current = getVoiceCountFromGraph(graph)
       // After updateGraph (preserve mode), the WASM engine restores old module
       // states including old param values. Re-send all params to sync the sound.
@@ -944,7 +1035,14 @@ function App() {
 
   useEffect(() => {
     if (status === 'running') {
-      engine.setConnections(graph.connections)
+      // In multi-rack mode, always send the full combined graph connections
+      // to avoid overwriting inactive racks' connections.
+      const combined = buildCombinedGraph(graph)
+      engine.setConnections(combined.connections)
+      // Re-apply mixer levels since setConnections rebuilds the graph internally
+      if (racksRef.current.length > 1) {
+        applyMixerToEngine(mixerStateRef.current)
+      }
     }
   }, [engine, graph.connections, status])
 
@@ -1659,7 +1757,7 @@ function App() {
     if (statusRef.current !== 'running') {
       return
     }
-    pendingRestartRef.current = nextGraph
+    pendingRestartRef.current = buildCombinedGraph(nextGraph)
     if (restartInFlightRef.current) {
       setIsBooting(true)
       return
@@ -1674,6 +1772,10 @@ function App() {
           await engine.start(graphToStart)
           setStatus('running')
           activeVoiceCountRef.current = getVoiceCountFromGraph(graphToStart)
+          // After restart, re-apply transport tempo and mixer levels
+          // (the new WASM engine defaults to 120 BPM)
+          engine.setTransportTempo(masterTempoRef.current)
+          applyMixerToEngine(mixerStateRef.current)
         } catch (error) {
           console.error(error)
           setStatus('error')
@@ -1712,10 +1814,9 @@ function App() {
       setCurrentPresetId(null)
       clearUrlShareParams()
     }
-    // Always do a full engine restart when switching presets to ensure
-    // all WASM module states are rebuilt from scratch (compressor envelopes,
-    // reverb tails, effect states, etc.) and avoid stale state leaking.
     if (statusRef.current === 'running') {
+      // Full restart ensures all clocks start from beat 0 (synced).
+      // In multi-rack mode this resyncs all racks automatically.
       queueEngineRestart(layouted)
     }
     if (isTauri && tauriNativeRunning) {
@@ -1745,18 +1846,48 @@ function App() {
   }, [urlGraph, urlPresetId])
 
   const handleExportPreset = useCallback(() => {
-    const payload = { version: 1, graph: graphRef.current }
-    const json = JSON.stringify(payload, null, 2)
-    const blob = new Blob([json], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
-    link.href = url
-    link.download = `noobsynth3-patch-${timestamp}.json`
-    document.body.appendChild(link)
-    link.click()
-    link.remove()
-    URL.revokeObjectURL(url)
+    // Save current rack's graph before export
+    const currentRacks = racksRef.current.map((r) =>
+      r.id === activeRackIdRef.current
+        ? { ...r, graph: cloneGraph(graphRef.current) }
+        : r,
+    )
+    if (currentRacks.length > 1) {
+      // Multi-rack: export full project (version 2)
+      const payload = {
+        version: 2,
+        type: 'project',
+        masterTempo: masterTempoRef.current,
+        masterVolume: masterVolumeRef.current,
+        activeRackId: activeRackIdRef.current,
+        racks: currentRacks.map((r) => ({ id: r.id, name: r.name, graph: r.graph })),
+        mixer: mixerStateRef.current,
+      }
+      const json = JSON.stringify(payload, null, 2)
+      const blob = new Blob([json], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `noobsynth3-project-${timestamp}.json`
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      URL.revokeObjectURL(url)
+    } else {
+      // Single rack: export patch (version 1, backward compatible)
+      const payload = { version: 1, graph: graphRef.current }
+      const json = JSON.stringify(payload, null, 2)
+      const blob = new Blob([json], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `noobsynth3-patch-${timestamp}.json`
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      URL.revokeObjectURL(url)
+    }
   }, [])
 
   const handleImportPreset = useCallback(() => {
@@ -1774,11 +1905,69 @@ function App() {
       try {
         const text = await file.text()
         const payload = JSON.parse(text) as unknown
-        if (!isRecord(payload) || payload.version !== 1 || !isGraphState(payload.graph)) {
-          throw new Error('Invalid preset file.')
+        if (!isRecord(payload)) {
+          throw new Error('Invalid file.')
         }
-        setImportError(null)
-        applyPreset(payload.graph)
+
+        if (payload.version === 2 && payload.type === 'project' && Array.isArray(payload.racks)) {
+          // Version 2: full project import
+          const projectRacks = (payload.racks as Array<{ id: string; name: string; graph: unknown }>)
+            .filter((r) => isRecord(r) && typeof r.id === 'string' && isGraphState(r.graph))
+            .map((r) => ({
+              id: r.id,
+              name: typeof r.name === 'string' ? r.name : 'Rack',
+              graph: r.graph as GraphState,
+            }))
+          if (projectRacks.length === 0) throw new Error('Project has no valid racks.')
+          const projectMixer = (isRecord(payload.mixer) ? payload.mixer : {}) as Record<string, MixerChannelState>
+          const projectTempo = typeof payload.masterTempo === 'number' ? payload.masterTempo : 120
+          const projectVolume = typeof payload.masterVolume === 'number' ? payload.masterVolume : 0.8
+          const projectActiveId = typeof payload.activeRackId === 'string'
+            ? payload.activeRackId
+            : projectRacks[0].id
+
+          // Find the active rack
+          const activeRack = projectRacks.find((r) => r.id === projectActiveId) ?? projectRacks[0]
+          const layouted = layoutGraph(cloneGraph(activeRack.graph), moduleSizes, gridMetricsRef.current, { getModuleSize })
+
+          // Update rack counter to avoid ID collisions
+          let maxIdx = 0
+          for (const r of projectRacks) {
+            const match = /^rack-(\d+)$/.exec(r.id)
+            if (match) maxIdx = Math.max(maxIdx, Number(match[1]))
+          }
+          rackCounterRef.current = maxIdx
+
+          // Apply state
+          racksRef.current = projectRacks
+          activeRackIdRef.current = activeRack.id
+          mixerStateRef.current = projectMixer
+          masterTempoRef.current = projectTempo
+          masterVolumeRef.current = projectVolume
+
+          setRacks(projectRacks)
+          setActiveRackId(activeRack.id)
+          setMixerState(projectMixer)
+          setMasterTempo(projectTempo)
+          setMasterVolume(projectVolume)
+          resetPatching()
+          setGridError(null)
+          setGraph(layouted, { skipHistory: true })
+          clearHistory()
+          setCurrentPresetId(null)
+          setImportError(null)
+
+          if (statusRef.current === 'running') {
+            queueEngineRestart(layouted)
+          }
+          // Transport tempo will be synced by the useEffect on masterTempo
+        } else if (payload.version === 1 && isGraphState(payload.graph)) {
+          // Version 1: single patch — load into active rack
+          setImportError(null)
+          applyPreset(payload.graph)
+        } else {
+          throw new Error('Unsupported file format.')
+        }
       } catch (error) {
         console.error(error)
         setImportError('Import failed. Unsupported or corrupt file.')
@@ -1955,9 +2144,11 @@ function App() {
     pendingRestartRef.current = null
     restartInFlightRef.current = false
     try {
-      await engine.start(graph)
+      await engine.start(buildCombinedGraph(graph))
       setStatus('running')
       activeVoiceCountRef.current = voiceCount
+      engine.setTransportTempo(masterTempoRef.current)
+      applyMixerToEngine(mixerStateRef.current)
     } catch (error) {
       console.error(error)
       setStatus('error')
@@ -1972,6 +2163,12 @@ function App() {
     activeVoiceCountRef.current = null
     pendingRestartRef.current = null
     restartInFlightRef.current = false
+  }
+
+  const handleResync = () => {
+    if (statusRef.current !== 'running') return
+    // Reset global transport to beat 0 — all clocks/sequencers restart in sync
+    engine.resetTransport()
   }
 
   const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
@@ -2316,13 +2513,25 @@ function App() {
     applyGraphUpdate(normalized, { skipHistory: true })
   }, [gridMetrics.columns])
 
+  /** Meter IDs for VU meters in mixer (rackId → engine meter module ID) */
+  const meterIdsRef = useRef<Record<string, string>>({})
+
+  /** Build the combined graph (all racks flattened) for the engine */
+  const buildCombinedGraph = (activeGraph: GraphState): GraphState => {
+    const result = flattenRacks(racksRef.current, activeRackIdRef.current, activeGraph, {
+      mixerState: mixerStateRef.current,
+    })
+    meterIdsRef.current = result.meterIds
+    return { modules: result.modules, connections: result.connections }
+  }
+
   const applyGraphUpdate = (nextGraph: GraphState, options?: { skipHistory?: boolean }) => {
     resetPatching()
     graphRef.current = nextGraph
     setGraph(nextGraph, { skipHistory: options?.skipHistory })
     // Incremental update: preserve existing module states
     if (statusRef.current === 'running') {
-      engine.updateGraph(nextGraph)
+      engine.updateGraph(buildCombinedGraph(nextGraph))
       activeVoiceCountRef.current = getVoiceCountFromGraph(nextGraph)
     }
     // Clear preset tracking when graph is modified
@@ -2353,6 +2562,33 @@ function App() {
       {
         ...current,
         modules: [...current.modules, nextModule],
+      },
+      moduleSizes,
+      gridMetricsRef.current,
+      { getModuleSize },
+    )
+    setGridError(null)
+    applyGraphUpdate(nextGraph)
+  }
+
+  const handleDeleteTemplate = (templateId: string) => {
+    const updated = deleteUserTemplate(templateId)
+    setUserTemplates(updated)
+  }
+
+  const handleExportTemplate = (template: TemplateSpec) => {
+    exportTemplateAsFile(template)
+  }
+
+  const handleInsertTemplate = (template: TemplateSpec) => {
+    const current = graphRef.current
+    const { modules: newModules, connections: newConnections } =
+      instantiateTemplate(template, current.modules)
+    const nextGraph = layoutGraph(
+      {
+        ...current,
+        modules: [...current.modules, ...newModules],
+        connections: [...current.connections, ...newConnections],
       },
       moduleSizes,
       gridMetricsRef.current,
@@ -2414,6 +2650,28 @@ function App() {
         applyGraphUpdate({ ...current, connections: nextConnections })
         break
       }
+      case 'save-template': {
+        const current = graphRef.current
+        // Collect the clicked module + all modules connected to it
+        const connected = new Set<string>([moduleId])
+        current.connections.forEach((c) => {
+          if (c.from.moduleId === moduleId) connected.add(c.to.moduleId)
+          if (c.to.moduleId === moduleId) connected.add(c.from.moduleId)
+        })
+        const mod = current.modules.find((m) => m.id === moduleId)
+        const defaultName = mod?.name ?? 'Template'
+        const templateName = window.prompt('Template name:', defaultName)
+        if (!templateName) break
+        const template = extractTemplate(
+          connected,
+          current.modules,
+          current.connections,
+          { name: templateName, description: `${connected.size} modules.`, category: 'User' },
+        )
+        const updated = saveUserTemplate(template)
+        setUserTemplates(updated)
+        break
+      }
       case 'delete':
         handleRemoveModule(moduleId)
         break
@@ -2428,6 +2686,7 @@ function App() {
     return [
       { id: 'duplicate', label: 'Duplicate', shortcut: 'Ctrl+D' },
       { id: 'disconnect', label: 'Disconnect All' },
+      { id: 'save-template', label: 'Save as Template' },
       { id: 'delete', label: 'Delete', shortcut: 'Del', danger: true, disabled: isOutput },
     ]
   }
@@ -2436,6 +2695,176 @@ function App() {
     setGridError(null)
     applyGraphUpdate({ modules: [], connections: [] })
     clearHistory()
+  }
+
+  // ── Multi-rack handlers ──
+
+  const handleSwitchRack = (rackId: string) => {
+    if (rackId === activeRackId) return
+    // Save current graph to active rack slot
+    const currentGraph = graphRef.current
+    const updatedRacks = racks.map((r) =>
+      r.id === activeRackId ? { ...r, graph: cloneGraph(currentGraph) } : r,
+    )
+    // Load the target rack's graph
+    const targetRack = updatedRacks.find((r) => r.id === rackId)
+    if (!targetRack) return
+    const layouted = layoutGraph(
+      cloneGraph(targetRack.graph),
+      moduleSizes,
+      gridMetricsRef.current,
+      { getModuleSize },
+    )
+    // Update refs BEFORE calling engine (refs are synchronous)
+    racksRef.current = updatedRacks
+    activeRackIdRef.current = rackId
+    // Update React state
+    setRacks(updatedRacks)
+    resetPatching()
+    setGridError(null)
+    setGraph(layouted, { skipHistory: true })
+    clearHistory()
+    setActiveRackId(rackId)
+    setCurrentPresetId(null)
+    // Incremental update — preserves running module states (sequencers keep playing)
+    if (statusRef.current === 'running') {
+      engine.updateGraph(buildCombinedGraph(layouted))
+      activeVoiceCountRef.current = getVoiceCountFromGraph(layouted)
+      // Re-apply mixer levels after graph update
+      applyMixerToEngine(mixerStateRef.current)
+    }
+  }
+
+  const handleAddRack = () => {
+    // Save current state first
+    const currentGraph = graphRef.current
+    rackCounterRef.current += 1
+    const newId = `rack-${rackCounterRef.current}`
+    const emptyGraph: GraphState = { modules: [], connections: [] }
+    const updatedRacks = [
+      ...racks.map((r) =>
+        r.id === activeRackId ? { ...r, graph: cloneGraph(currentGraph) } : r,
+      ),
+      { id: newId, name: `Rack ${rackCounterRef.current}`, graph: emptyGraph },
+    ]
+    // Update refs BEFORE calling engine
+    racksRef.current = updatedRacks
+    activeRackIdRef.current = newId
+    // Update React state
+    setRacks(updatedRacks)
+    resetPatching()
+    setGridError(null)
+    setGraph(emptyGraph, { skipHistory: true })
+    clearHistory()
+    setActiveRackId(newId)
+    setCurrentPresetId(null)
+    if (statusRef.current === 'running') {
+      engine.updateGraph(buildCombinedGraph(emptyGraph))
+    }
+  }
+
+  const handleRemoveRack = (rackId: string) => {
+    if (racks.length <= 1) return
+    // If removing the active rack, save current graph first
+    const updatedRacks = rackId === activeRackId
+      ? racks.map((r) =>
+          r.id === activeRackId ? { ...r, graph: cloneGraph(graphRef.current) } : r,
+        )
+      : racks
+    const remaining = updatedRacks.filter((r) => r.id !== rackId)
+    // Update refs
+    racksRef.current = remaining
+    setRacks(remaining)
+    // If removing the active rack, switch to the first remaining one
+    if (rackId === activeRackId) {
+      const target = remaining[0]
+      const layouted = layoutGraph(
+        cloneGraph(target.graph),
+        moduleSizes,
+        gridMetricsRef.current,
+        { getModuleSize },
+      )
+      activeRackIdRef.current = target.id
+      resetPatching()
+      setGridError(null)
+      setGraph(layouted, { skipHistory: true })
+      clearHistory()
+      setActiveRackId(target.id)
+      setCurrentPresetId(null)
+      if (statusRef.current === 'running') {
+        engine.updateGraph(buildCombinedGraph(layouted))
+        activeVoiceCountRef.current = getVoiceCountFromGraph(layouted)
+      }
+    } else if (statusRef.current === 'running') {
+      // Removing an inactive rack: just update the engine with fewer modules
+      engine.updateGraph(buildCombinedGraph(graphRef.current))
+    }
+  }
+
+  const handleRenameRack = (rackId: string, name: string) => {
+    setRacks((prev) =>
+      prev.map((r) => (r.id === rackId ? { ...r, name } : r)),
+    )
+  }
+
+  // ── Mixer handlers ──
+
+  /** Send mixer levels directly to the engine via setParam on output modules */
+  const applyMixerToEngine = (nextMixer: Record<string, MixerChannelState>) => {
+    if (statusRef.current !== 'running' || racksRef.current.length <= 1) return
+    const hasSolo = Object.values(nextMixer).some((ch) => ch.solo)
+    const multiRack = racksRef.current.length > 1
+    for (const rack of racksRef.current) {
+      const ch = nextMixer[rack.id]
+      if (!ch) continue
+      const isMuted = ch.mute || (hasSolo && !ch.solo)
+      const effectiveLevel = isMuted ? 0 : ch.volume * masterVolumeRef.current
+      const graph = rack.id === activeRackIdRef.current ? graphRef.current : rack.graph
+      const outputMod = graph.modules.find((m) => m.type === 'output')
+      if (outputMod) {
+        // In multi-rack mode, IDs are prefixed in the engine
+        const engineModuleId = multiRack ? `${rack.id}/${outputMod.id}` : outputMod.id
+        engine.setParamDirect(engineModuleId, 'level', effectiveLevel)
+      }
+    }
+  }
+
+  const handleMixerVolumeChange = (rackId: string, volume: number) => {
+    const next = { ...mixerState, [rackId]: { ...mixerState[rackId], volume } }
+    setMixerState(next)
+    mixerStateRef.current = next
+    applyMixerToEngine(next)
+  }
+
+  const handleMixerMuteToggle = (rackId: string) => {
+    const ch = mixerState[rackId]
+    if (!ch) return
+    const next = { ...mixerState, [rackId]: { ...ch, mute: !ch.mute } }
+    setMixerState(next)
+    mixerStateRef.current = next
+    applyMixerToEngine(next)
+  }
+
+  const handleMixerSoloToggle = (rackId: string) => {
+    const ch = mixerState[rackId]
+    if (!ch) return
+    const next = { ...mixerState, [rackId]: { ...ch, solo: !ch.solo } }
+    setMixerState(next)
+    mixerStateRef.current = next
+    applyMixerToEngine(next)
+  }
+
+  const handleMasterVolumeChange = (volume: number) => {
+    setMasterVolume(volume)
+    masterVolumeRef.current = volume
+    applyMixerToEngine(mixerStateRef.current)
+  }
+
+  const handleMasterTempoChange = (bpm: number) => {
+    const clamped = Math.max(30, Math.min(300, bpm))
+    setMasterTempo(clamped)
+    masterTempoRef.current = clamped
+    // Transport tempo is synced via the useEffect on masterTempo
   }
 
   const handleAutoLayout = () => {
@@ -2512,31 +2941,62 @@ function App() {
           cpuLoad={cpuLoad}
           showCpuMeter={showCpuMeter}
           onToggleCpuMeter={() => setShowCpuMeter((prev) => !prev)}
+          rackCount={racks.length}
+          onResync={handleResync}
+          masterTempo={masterTempo}
+          onMasterTempoChange={handleMasterTempoChange}
         />
+      <RackTabs
+        racks={racks}
+        activeRackId={activeRackId}
+        viewMode={viewMode}
+        onSwitchRack={handleSwitchRack}
+        onAddRack={handleAddRack}
+        onRemoveRack={handleRemoveRack}
+        onRenameRack={handleRenameRack}
+        onViewModeChange={setViewMode}
+      />
       <main className="workbench">
-        <RackView
-          graph={graph}
-          rackRef={rackRef}
-          modulesRef={modulesRef}
-          onRackDoubleClick={handleRackDoubleClick}
-          collapsed={rackCollapsed}
-          onToggleCollapsed={() => setRackCollapsed((prev) => !prev)}
-          getModuleGridStyle={getModuleGridStyle}
-          onRemoveModule={handleRemoveModule}
-          onModuleContextMenu={handleModuleContextMenu}
-          onHeaderPointerDown={handleModulePointerDown}
-          getModuleSize={getModuleSize}
-          showResizeHandles={devResizeEnabled}
-          onResizeHandlePointerDown={handleModuleResizePointerDown}
-          selectedPortKey={selectedPortKey}
-          connectedInputs={connectedInputs}
-          validTargets={dragTargets}
-          hoverTargetKey={hoverTargetKey}
-          onPortPointerDown={handlePortPointerDown}
-          moduleDragPreview={moduleDragPreview}
-          moduleResizePreview={moduleResizePreview}
-          moduleControls={moduleControls}
-        />
+        {viewMode === 'mixer' && racks.length > 1 ? (
+          <MixerConsole
+            racks={racks}
+            activeRackId={activeRackId}
+            mixerState={mixerState}
+            masterVolume={masterVolume}
+            meterIds={meterIdsRef.current}
+            engine={engine}
+            engineRunning={status === 'running'}
+            onVolumeChange={handleMixerVolumeChange}
+            onMuteToggle={handleMixerMuteToggle}
+            onSoloToggle={handleMixerSoloToggle}
+            onSwitchRack={(id) => { handleSwitchRack(id); setViewMode('rack') }}
+            onMasterVolumeChange={handleMasterVolumeChange}
+          />
+        ) : (
+          <RackView
+            graph={graph}
+            rackRef={rackRef}
+            modulesRef={modulesRef}
+            onRackDoubleClick={handleRackDoubleClick}
+            collapsed={rackCollapsed}
+            onToggleCollapsed={() => setRackCollapsed((prev) => !prev)}
+            getModuleGridStyle={getModuleGridStyle}
+            onRemoveModule={handleRemoveModule}
+            onModuleContextMenu={handleModuleContextMenu}
+            onHeaderPointerDown={handleModulePointerDown}
+            getModuleSize={getModuleSize}
+            showResizeHandles={devResizeEnabled}
+            onResizeHandlePointerDown={handleModuleResizePointerDown}
+            selectedPortKey={selectedPortKey}
+            connectedInputs={connectedInputs}
+            validTargets={dragTargets}
+            hoverTargetKey={hoverTargetKey}
+            onPortPointerDown={handlePortPointerDown}
+            moduleDragPreview={moduleDragPreview}
+            moduleResizePreview={moduleResizePreview}
+            moduleControls={moduleControls}
+          />
+        )}
         <SidePanel
           gridError={gridError}
           hasControlModule={hasControlModule}
@@ -2585,10 +3045,15 @@ function App() {
           onTauriOutputChange={handleTauriOutputChange}
           onTauriInputChange={handleTauriInputChange}
           onTauriSyncGraph={handleTauriSyncGraph}
+          templates={allTemplates}
+          templateStatus={templateStatus}
+          onInsertTemplate={handleInsertTemplate}
+          onDeleteTemplate={handleDeleteTemplate}
+          onExportTemplate={handleExportTemplate}
         />
       </main>
       <PatchLayer
-        connections={cablesVisible ? graph.connections : []}
+        connections={cablesVisible && viewMode === 'rack' ? graph.connections : []}
         renderCable={renderCable}
         renderGhostCable={renderGhostCable}
       />

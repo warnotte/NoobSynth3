@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(wc:*)",
+      "Bash(xargs basename:*)",
+      "Bash(ls:*)",
+      "Bash(grep:*)",
+      "WebSearch",
+      "WebFetch(domain:entokey.com)",
+      "WebFetch(domain:www.fon.hum.uva.nl)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:corpus.eduhk.hk)",
+      "WebFetch(domain:www.researchgate.net)",
+      "WebFetch(domain:www.apple-iigs.info)",
+      "WebFetch(domain:wikipedia.org)",
+      "Bash(node:*)",
+      "Bash(mv:*)",
+      "Bash(npm run:*)",
+      "Bash(npx tsc:*)",
+      "Bash(cargo check:*)",
+      "Bash(git status:*)",
+      "Bash(git commit:*)",
+      "Bash(curl:*)",
+      "Bash(cargo --version && rustc --version)",
+      "Bash(cargo test:*)",
+      "Bash(cd E:/CODEX/NoobSynth3 && grep -c '\"id\"' public/presets/manifest.json)",
+      "Bash(git checkout:*)",
+      "Bash(cd:*)",
+      "Bash(npm test:*)"
+    ]
+  }
+}

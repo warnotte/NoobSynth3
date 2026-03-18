@@ -228,7 +228,7 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 
 **⚠️ RÈGLE:** Toute nouvelle feature UI↔Audio DOIT être implémentée pour Tauri en même temps que Web. Ne jamais merger une feature Web-only.
 
-## Module Types (89 total)
+## Module Types (91 total)
 
 ### Sources (17)
 oscillator, supersaw, karplus, fm-op, fm-matrix, nes-osc, snes-osc, noise, tb-303, shepard, pipe-organ, spectral-swarm, resonator, wavetable, granular, particle-cloud, speech-synth
@@ -254,12 +254,78 @@ clock, arpeggiator, step-sequencer, euclidean, drum-sequencer, midi-file-sequenc
 ### TR-808 Drums (6)
 808-kick, 808-snare, 808-hihat, 808-cowbell, 808-clap, 808-tom
 
-### I/O & Utilities (7)
-control, output, audio-in, scope, meter, lab, notes
+### I/O & Utilities (9)
+control, output, audio-in, scope, meter, lab, notes, send, receive
 
 ---
 
 ## Features Implementation Notes
+
+### Multi-Rack System
+NoobSynth3 supporte plusieurs racks (patchs) jouant simultanément.
+
+**Architecture :**
+- `App.tsx` gère N `RackSpec` (id, name, graph) avec un `activeRackId`
+- `flattenRacks()` combine tous les racks en un seul graphe pour le moteur audio
+- Tous les module IDs sont préfixés (`rack-1/osc-1`) pour éviter les collisions
+- `engine.moduleIdMapper` traduit les IDs UI → engine, `unmapId` fait l'inverse
+- Un seul `Control` module actif (dans le rack sélectionné), les autres racks jouent via leurs séquenceurs
+
+**Fichiers clés :**
+- `src/state/rackFlatten.ts` — Flatten + Send/Receive routing + mixer levels
+- `src/ui/RackTabs.tsx` — Onglets de racks + switch Rack/Mixer
+- `src/ui/MixerConsole.tsx` — Volume/Mute/Solo par rack + Master
+
+### Global Transport
+Système de timing centralisé. Tous les séquenceurs dérivent leur position de step du même compteur global `transport_beats`.
+
+**Architecture :**
+- `GraphEngine` maintient `transport_beats: f64` et `transport_tempo: f32`
+- `transport_beats` avance de `frames × tempo / 60 / sample_rate` à chaque render
+- Chaque séquenceur calcule : `step = floor(transport_beats / rate_beats) % length`
+- Résultat : synchronisation parfaite, changer le rate ne cause jamais de desync
+- `engine.setTransportTempo(bpm)` contrôle le tempo global
+- `engine.resetTransport()` remet `transport_beats = 0` (resync)
+
+**Modules concernés :** Clock, StepSequencer, DrumSequencer, Arpeggiator, Euclidean, ChordSequencer, PolyrhythmSequencer. Chacun a des champs `transport_beats`, `transport_bps`, `last_transport_step`.
+
+**External clock mode :** inchangé — les séquenceurs avancent sur les pulses reçus, le transport n'intervient pas.
+
+**Fichiers clés :**
+- `crates/dsp-graph/src/types.rs` — `TransportContext` struct
+- `crates/dsp-graph/src/lib.rs` — Transport state dans GraphEngine, avancement dans render()
+- `crates/dsp-graph/src/process.rs` — Injection du transport dans chaque module
+- `crates/dsp-core/src/sequencers/*.rs` — Branche `transport_bps > 0.0` dans process_block
+- `src/engine/WasmGraphEngine.ts` — `setTransportTempo()`, `resetTransport()`
+- `src/engine/worklets/wasm-graph-processor.ts` — Messages transport
+
+### Module Templates
+Groupes de modules pré-câblés réutilisables.
+
+**Fonctionnalités :**
+- **Insert** : ajouter un template dans le rack (IDs régénérés, positions auto-layout)
+- **Save as Template** : clic droit → sélectionne le module + ses voisins connectés, sauvegarde en localStorage
+- **Export/Delete** : gestion des templates utilisateur
+
+**Fichiers clés :**
+- `src/state/templates.ts` — Load/save/instantiate/extract
+- `public/templates/manifest.json` + fichiers JSON — Templates built-in (5 demos)
+- `src/ui/SidePanel.tsx` — Section Templates dans le panel
+
+### Send/Receive Modules
+Modules de routing audio inter-racks via bus nommés (A-H).
+
+- `Send` et `Receive` sont des pass-through audio (stéréo in → stéréo out)
+- `flattenRacks()` crée automatiquement les connexions entre Send/Receive du même bus
+- Param `bus` (0-7) sélectionne le bus
+
+### Mixer Console
+Vue mixer avec volume/mute/solo par rack + master volume.
+
+- Volume contrôle le param `level` du module `output` de chaque rack via `setParamDirect`
+- Solo = mute tous les non-solo
+- Master BPM dans le transport (TopBar), toujours visible
+- Resync = `resetTransport()`, remet tout au beat 0
 
 ### Undo/Redo System
 Implémenté via `useReducer` dans `src/hooks/useUndoableState.ts` :

@@ -110,6 +110,9 @@ export const moduleSizes: Record<ModuleType, string> = {
   // Generative
   'game-of-life': '4x4',
   'gravity-sequencer': '2x4',
+  // Send/Receive
+  'send': '1x1',
+  'receive': '1x1',
 }
 
 export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>> = {
@@ -298,6 +301,9 @@ export const moduleCatalog: { type: ModuleType; label: string; category: ModuleC
   { type: 'game-of-life', label: 'Game of Life', category: 'sequencers' },
   { type: 'gravity-sequencer', label: 'Gravity Seq', category: 'sequencers' },
   { type: 'mario', label: 'Mario IO', category: 'sequencers' },
+  // Send/Receive
+  { type: 'send', label: 'Send', category: 'io' },
+  { type: 'receive', label: 'Receive', category: 'io' },
   // TR-909 Drums
   { type: '909-kick', label: '909 Kick', category: 'drums' },
   { type: '909-snare', label: '909 Snare', category: 'drums' },
@@ -413,6 +419,8 @@ export const modulePrefixes: Record<ModuleType, string> = {
   'clock-divider': 'clkdiv',
   'game-of-life': 'gol',
   'gravity-sequencer': 'grav',
+  'send': 'send',
+  'receive': 'recv',
   'envelope-follower': 'envf',
   'bit-crusher': 'crush',
   'flanger': 'flng',
@@ -515,6 +523,8 @@ export const moduleLabels: Record<ModuleType, string> = {
   'clock-divider': 'Clock Div',
   'game-of-life': 'Game of Life',
   'gravity-sequencer': 'Gravity Seq',
+  'send': 'Send',
+  'receive': 'Receive',
   'envelope-follower': 'Env Follower',
   'bit-crusher': 'Bit Crusher',
   'flanger': 'Flanger',
@@ -1191,6 +1201,12 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     scale: 0,
     root: 0,
     chaos: 0,
+  },
+  'send': {
+    bus: 0,
+  },
+  'receive': {
+    bus: 0,
   },
 }
 

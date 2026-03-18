@@ -1,0 +1,83 @@
+{
+  "id": "basic-voice",
+  "name": "Basic Voice",
+  "description": "VCO + VCF + ADSR + VCA — classic subtractive voice.",
+  "category": "Voices",
+  "modules": [
+    {
+      "id": "osc",
+      "type": "oscillator",
+      "name": "VCO",
+      "position": { "x": 0, "y": 0 },
+      "params": {
+        "frequency": 220,
+        "type": "sawtooth",
+        "pwm": 0.5,
+        "unison": 1,
+        "detune": 0,
+        "subMix": 0,
+        "subOct": 1
+      }
+    },
+    {
+      "id": "vcf",
+      "type": "vcf",
+      "name": "VCF",
+      "position": { "x": 1, "y": 0 },
+      "params": {
+        "cutoff": 1200,
+        "resonance": 0.3,
+        "drive": 0.1,
+        "envAmount": 0.5,
+        "modAmount": 0,
+        "keyTrack": 0.5,
+        "model": "svf",
+        "mode": "lp",
+        "slope": 12
+      }
+    },
+    {
+      "id": "adsr",
+      "type": "adsr",
+      "name": "ADSR",
+      "position": { "x": 0, "y": 1 },
+      "params": {
+        "attack": 0.01,
+        "decay": 0.3,
+        "sustain": 0.6,
+        "release": 0.4
+      }
+    },
+    {
+      "id": "vca",
+      "type": "gain",
+      "name": "VCA",
+      "position": { "x": 1, "y": 1 },
+      "params": {
+        "gain": 0.8
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": { "moduleId": "osc", "portId": "out" },
+      "to": { "moduleId": "vcf", "portId": "in" },
+      "kind": "audio"
+    },
+    {
+      "from": { "moduleId": "vcf", "portId": "out" },
+      "to": { "moduleId": "vca", "portId": "in" },
+      "kind": "audio"
+    },
+    {
+      "from": { "moduleId": "adsr", "portId": "env" },
+      "to": { "moduleId": "vca", "portId": "cv" },
+      "kind": "cv"
+    },
+    {
+      "from": { "moduleId": "adsr", "portId": "env" },
+      "to": { "moduleId": "vcf", "portId": "env" },
+      "kind": "cv"
+    }
+  ]
+}

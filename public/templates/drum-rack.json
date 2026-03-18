@@ -1,0 +1,140 @@
+{
+  "id": "drum-rack",
+  "name": "Drum Rack 909",
+  "description": "Drum sequencer with kick, snare, hihat, and clap.",
+  "category": "Drums",
+  "modules": [
+    {
+      "id": "dseq",
+      "type": "drum-sequencer",
+      "name": "Drum Seq",
+      "position": { "x": 0, "y": 0 },
+      "params": {
+        "enabled": true,
+        "tempo": 120,
+        "rate": 4,
+        "gateLength": 50,
+        "swing": 0,
+        "length": 16
+      }
+    },
+    {
+      "id": "kick",
+      "type": "909-kick",
+      "name": "Kick",
+      "position": { "x": 3, "y": 0 },
+      "params": {
+        "tune": 55,
+        "attack": 0.5,
+        "decay": 0.5,
+        "drive": 0.3
+      }
+    },
+    {
+      "id": "snare",
+      "type": "909-snare",
+      "name": "Snare",
+      "position": { "x": 4, "y": 0 },
+      "params": {
+        "tune": 200,
+        "tone": 0.5,
+        "snappy": 0.5,
+        "decay": 0.3
+      }
+    },
+    {
+      "id": "hihat",
+      "type": "909-hihat",
+      "name": "HiHat",
+      "position": { "x": 3, "y": 1 },
+      "params": {
+        "openDecay": 0.4,
+        "closedDecay": 0.1,
+        "tone": 0.6,
+        "mix": 0.5
+      }
+    },
+    {
+      "id": "clap",
+      "type": "909-clap",
+      "name": "Clap",
+      "position": { "x": 4, "y": 1 },
+      "params": {
+        "tone": 0.5,
+        "decay": 0.4,
+        "spread": 0.5
+      }
+    },
+    {
+      "id": "mix",
+      "type": "mixer",
+      "name": "Drum Mix",
+      "position": { "x": 5, "y": 0 },
+      "params": {
+        "gain": 0.8
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": { "moduleId": "dseq", "portId": "gate-kick" },
+      "to": { "moduleId": "kick", "portId": "trigger" },
+      "kind": "gate"
+    },
+    {
+      "from": { "moduleId": "dseq", "portId": "gate-snare" },
+      "to": { "moduleId": "snare", "portId": "trigger" },
+      "kind": "gate"
+    },
+    {
+      "from": { "moduleId": "dseq", "portId": "gate-hhc" },
+      "to": { "moduleId": "hihat", "portId": "trigger" },
+      "kind": "gate"
+    },
+    {
+      "from": { "moduleId": "dseq", "portId": "gate-clap" },
+      "to": { "moduleId": "clap", "portId": "trigger" },
+      "kind": "gate"
+    },
+    {
+      "from": { "moduleId": "dseq", "portId": "acc-kick" },
+      "to": { "moduleId": "kick", "portId": "accent" },
+      "kind": "cv"
+    },
+    {
+      "from": { "moduleId": "dseq", "portId": "acc-snare" },
+      "to": { "moduleId": "snare", "portId": "accent" },
+      "kind": "cv"
+    },
+    {
+      "from": { "moduleId": "dseq", "portId": "acc-hhc" },
+      "to": { "moduleId": "hihat", "portId": "accent" },
+      "kind": "cv"
+    },
+    {
+      "from": { "moduleId": "dseq", "portId": "acc-clap" },
+      "to": { "moduleId": "clap", "portId": "accent" },
+      "kind": "cv"
+    },
+    {
+      "from": { "moduleId": "kick", "portId": "out" },
+      "to": { "moduleId": "mix", "portId": "in-1" },
+      "kind": "audio"
+    },
+    {
+      "from": { "moduleId": "snare", "portId": "out" },
+      "to": { "moduleId": "mix", "portId": "in-2" },
+      "kind": "audio"
+    },
+    {
+      "from": { "moduleId": "hihat", "portId": "out" },
+      "to": { "moduleId": "mix", "portId": "in-3" },
+      "kind": "audio"
+    },
+    {
+      "from": { "moduleId": "clap", "portId": "out" },
+      "to": { "moduleId": "mix", "portId": "in-4" },
+      "kind": "audio"
+    }
+  ]
+}

@@ -11,6 +11,32 @@ export class AudioEngine {
   private graphNode: AudioWorkletNode | null = null
   private workletsLoaded = false
   private currentGraph: GraphState | null = null
+  /**
+   * Optional ID mapper for multi-rack mode. When set, all module IDs
+   * passed to setParam/setControlVoice/watch* methods are transformed
+   * through this function before being sent to the worklet.
+   */
+  moduleIdMapper: ((moduleId: string) => string) | null = null
+
+  private mapId(moduleId: string): string {
+    // IDs starting with '_' are engine-internal (e.g. _meter/rack-1), skip mapping
+    if (moduleId.startsWith('_')) return moduleId
+    return this.moduleIdMapper ? this.moduleIdMapper(moduleId) : moduleId
+  }
+
+  /**
+   * Reverse-map an engine-side module ID back to the UI-side ID.
+   * Strips the rack prefix added by moduleIdMapper.
+   * Used when receiving data back from the worklet (step positions, meter levels, etc.)
+   */
+  private unmapId(engineModuleId: string): string {
+    if (!this.moduleIdMapper) return engineModuleId
+    // Engine-internal IDs (e.g. _meter/rack-1) pass through as-is
+    if (engineModuleId.startsWith('_')) return engineModuleId
+    // The mapper prepends "rackId/" — strip it
+    const slashIndex = engineModuleId.indexOf('/')
+    return slashIndex >= 0 ? engineModuleId.slice(slashIndex + 1) : engineModuleId
+  }
   private tapOutputs: TapOutput[] = []
   private scopeAnalysers = new Map<string, Map<string, AnalyserNode>>()
   private recordingDestination: MediaStreamAudioDestinationNode | null = null
@@ -161,18 +187,39 @@ export class AudioEngine {
     this.loadGraph(graph)
   }
 
+  // ── Global Transport ──
+
+  setTransportTempo(tempo: number): void {
+    this.graphNode?.port.postMessage({ type: 'setTransportTempo', tempo })
+  }
+
+  resetTransport(): void {
+    this.graphNode?.port.postMessage({ type: 'resetTransport' })
+  }
+
+  /** Send a param directly using the full engine-side module ID (bypasses moduleIdMapper). */
+  setParamDirect(engineModuleId: string, paramId: string, value: number): void {
+    this.graphNode?.port.postMessage({
+      type: 'setParam',
+      moduleId: engineModuleId,
+      paramId,
+      value,
+    })
+  }
+
   setParam(moduleId: string, paramId: string, value: number | string | boolean): void {
     const node = this.graphNode
     if (!node) {
       return
     }
+    const mapped = this.mapId(moduleId)
     const numeric = this.normalizeParamValue(paramId, value)
     if (Number.isNaN(numeric)) {
       return
     }
     node.port.postMessage({
       type: 'setParam',
-      moduleId,
+      moduleId: mapped,
       paramId,
       value: numeric,
     })
@@ -180,7 +227,7 @@ export class AudioEngine {
       this.currentGraph = {
         ...this.currentGraph,
         modules: this.currentGraph.modules.map((module) =>
-          module.id === moduleId
+          module.id === mapped
             ? { ...module, params: { ...module.params, [paramId]: value } }
             : module,
         ),
@@ -193,9 +240,10 @@ export class AudioEngine {
     if (!node) {
       return
     }
+    const mapped = this.mapId(moduleId)
     node.port.postMessage({
       type: 'setParamString',
-      moduleId,
+      moduleId: mapped,
       paramId,
       value,
     })
@@ -203,7 +251,7 @@ export class AudioEngine {
       this.currentGraph = {
         ...this.currentGraph,
         modules: this.currentGraph.modules.map((module) =>
-          module.id === moduleId
+          module.id === mapped
             ? { ...module, params: { ...module.params, [paramId]: value } }
             : module,
         ),
@@ -214,7 +262,7 @@ export class AudioEngine {
   setControlVoiceCv(moduleId: string, voiceIndex: number, value: number): void {
     this.graphNode?.port.postMessage({
       type: 'controlVoiceCv',
-      moduleId,
+      moduleId: this.mapId(moduleId),
       voice: voiceIndex,
       value,
     })
@@ -224,7 +272,7 @@ export class AudioEngine {
     const numeric = typeof value === 'boolean' ? (value ? 1 : 0) : value
     this.graphNode?.port.postMessage({
       type: 'controlVoiceGate',
-      moduleId,
+      moduleId: this.mapId(moduleId),
       voice: voiceIndex,
       value: numeric,
     })
@@ -233,7 +281,7 @@ export class AudioEngine {
   triggerControlVoiceGate(moduleId: string, voiceIndex: number): void {
     this.graphNode?.port.postMessage({
       type: 'controlVoiceTriggerGate',
-      moduleId,
+      moduleId: this.mapId(moduleId),
       voice: voiceIndex,
     })
   }
@@ -241,7 +289,7 @@ export class AudioEngine {
   triggerControlVoiceSync(moduleId: string, voiceIndex: number): void {
     this.graphNode?.port.postMessage({
       type: 'controlVoiceTriggerSync',
-      moduleId,
+      moduleId: this.mapId(moduleId),
       voice: voiceIndex,
     })
   }
@@ -254,7 +302,7 @@ export class AudioEngine {
   ): void {
     this.graphNode?.port.postMessage({
       type: 'controlVoiceVelocity',
-      moduleId,
+      moduleId: this.mapId(moduleId),
       voice: voiceIndex,
       value,
       slew: slewSeconds,
@@ -264,7 +312,7 @@ export class AudioEngine {
   setMarioChannelCv(moduleId: string, channel: 1 | 2 | 3 | 4 | 5, value: number): void {
     this.graphNode?.port.postMessage({
       type: 'marioCv',
-      moduleId,
+      moduleId: this.mapId(moduleId),
       channel,
       value,
     })
@@ -278,7 +326,7 @@ export class AudioEngine {
     const numeric = typeof value === 'boolean' ? (value ? 1 : 0) : value
     this.graphNode?.port.postMessage({
       type: 'marioGate',
-      moduleId,
+      moduleId: this.mapId(moduleId),
       channel,
       value: numeric,
     })
@@ -300,7 +348,7 @@ export class AudioEngine {
   private syncWatchedSequencers(): void {
     this.graphNode?.port.postMessage({
       type: 'watchSequencers',
-      moduleIds: Array.from(this.watchedSequencers),
+      moduleIds: Array.from(this.watchedSequencers).map((id) => this.mapId(id)),
     })
   }
 
@@ -318,7 +366,7 @@ export class AudioEngine {
   private syncWatchedGolModules(): void {
     this.graphNode?.port.postMessage({
       type: 'watchGol',
-      moduleIds: Array.from(this.watchedGolModules),
+      moduleIds: Array.from(this.watchedGolModules).map((id) => this.mapId(id)),
     })
   }
 
@@ -337,7 +385,7 @@ export class AudioEngine {
   private syncWatchedGranulars(): void {
     this.graphNode?.port.postMessage({
       type: 'watchGranulars',
-      moduleIds: Array.from(this.watchedGranulars),
+      moduleIds: Array.from(this.watchedGranulars).map((id) => this.mapId(id)),
     })
   }
 
@@ -359,7 +407,7 @@ export class AudioEngine {
   private syncWatchedParticles(): void {
     this.graphNode?.port.postMessage({
       type: 'watchParticles',
-      moduleIds: Array.from(this.watchedParticles),
+      moduleIds: Array.from(this.watchedParticles).map((id) => this.mapId(id)),
     })
   }
 
@@ -381,7 +429,7 @@ export class AudioEngine {
   private syncWatchedMeters(): void {
     this.graphNode?.port.postMessage({
       type: 'watchMeters',
-      moduleIds: Array.from(this.watchedMeters),
+      moduleIds: Array.from(this.watchedMeters).map((id) => this.mapId(id)),
     })
   }
 
@@ -389,7 +437,7 @@ export class AudioEngine {
     return new Promise((resolve) => {
       this.graphNode?.port.postMessage({
         type: 'loadParticleBuffer',
-        moduleId,
+        moduleId: this.mapId(moduleId),
         data: Array.from(data),
       })
       // Buffer loading is async, just resolve with length
@@ -415,7 +463,7 @@ export class AudioEngine {
   private syncWatchedSids(): void {
     this.graphNode?.port.postMessage({
       type: 'watchSids',
-      moduleIds: Array.from(this.watchedSids),
+      moduleIds: Array.from(this.watchedSids).map((id) => this.mapId(id)),
     })
   }
 
@@ -425,7 +473,7 @@ export class AudioEngine {
   ): () => void {
     this.midiEventCallback = callback
     this.watchedMidiSeq = moduleId
-    this.graphNode?.port.postMessage({ type: 'watchMidiSeq', moduleId })
+    this.graphNode?.port.postMessage({ type: 'watchMidiSeq', moduleId: this.mapId(moduleId) })
     return () => {
       this.midiEventCallback = null
       this.watchedMidiSeq = null
@@ -434,7 +482,7 @@ export class AudioEngine {
   }
 
   seekMidiSequencer(moduleId: string, tick: number): void {
-    this.graphNode?.port.postMessage({ type: 'seekMidiSeq', moduleId, tick })
+    this.graphNode?.port.postMessage({ type: 'seekMidiSeq', moduleId: this.mapId(moduleId), tick })
   }
 
   watchCpuLoad(callback: (avg: number, peak: number) => void): () => void {
@@ -455,7 +503,7 @@ export class AudioEngine {
       this.granularLoadCallbacks.set(moduleId, resolve)
       // Transfer the buffer to avoid copying
       this.graphNode.port.postMessage(
-        { type: 'loadGranularBuffer', moduleId, data },
+        { type: 'loadGranularBuffer', moduleId: this.mapId(moduleId), data },
         [data.buffer]
       )
     })
@@ -468,7 +516,7 @@ export class AudioEngine {
     }
     // Transfer the buffer to the worklet
     this.graphNode.port.postMessage(
-      { type: 'loadSidFile', moduleId, data },
+      { type: 'loadSidFile', moduleId: this.mapId(moduleId), data },
       [data.buffer]
     )
   }
@@ -492,7 +540,7 @@ export class AudioEngine {
     if (!this.graphNode) return
     this.graphNode.port.postMessage({
       type: 'watchAyVoices',
-      moduleIds: Array.from(this.watchedAys),
+      moduleIds: Array.from(this.watchedAys).map((id) => this.mapId(id)),
     })
   }
 
@@ -503,7 +551,7 @@ export class AudioEngine {
     }
     // Transfer the buffer to the worklet
     this.graphNode.port.postMessage(
-      { type: 'loadYmFile', moduleId, data },
+      { type: 'loadYmFile', moduleId: this.mapId(moduleId), data },
       [data.buffer]
     )
   }
@@ -576,14 +624,14 @@ export class AudioEngine {
           this.cpuLoadCallback(cpuData.avg, cpuData.peak)
         }
       } else if (data.type === 'sequencerSteps' && data.steps) {
-        for (const [moduleId, step] of Object.entries(data.steps)) {
-          const callback = this.sequencerStepCallbacks.get(moduleId)
+        for (const [engineId, step] of Object.entries(data.steps)) {
+          const callback = this.sequencerStepCallbacks.get(this.unmapId(engineId))
           if (callback) {
             callback(step)
           }
         }
       } else if (data.type === 'golGrid') {
-        const callback = this.golGridCallbacks.get(data.moduleId)
+        const callback = this.golGridCallbacks.get(this.unmapId(data.moduleId))
         if (callback) {
           callback(data.grid, data.step)
         }
@@ -600,21 +648,21 @@ export class AudioEngine {
         this.midiEventCallback(events)
       } else if (data.type === 'granularBufferLoaded') {
         const { moduleId, length } = data as { type: string; moduleId: string; length: number }
-        const callback = this.granularLoadCallbacks.get(moduleId)
+        const callback = this.granularLoadCallbacks.get(this.unmapId(moduleId))
         if (callback) {
           callback(length)
-          this.granularLoadCallbacks.delete(moduleId)
+          this.granularLoadCallbacks.delete(this.unmapId(moduleId))
         }
       } else if (data.type === 'granularPositions' && data.positions) {
         const posMap = data.positions as Record<string, number>
-        for (const [moduleId, position] of Object.entries(posMap)) {
-          const callback = this.granularPositionCallbacks.get(moduleId)
+        for (const [engineId, position] of Object.entries(posMap)) {
+          const callback = this.granularPositionCallbacks.get(this.unmapId(engineId))
           if (callback) {
             callback(position)
           }
         }
       } else if (data.type === 'particlePositions' && data.moduleId) {
-        const callback = this.particlePositionCallbacks.get(data.moduleId)
+        const callback = this.particlePositionCallbacks.get(this.unmapId(data.moduleId))
         if (callback && data.positions) {
           const posArr = data.positions as number[]
           const positions = new Float32Array(posArr.slice(0, 64))
@@ -622,16 +670,16 @@ export class AudioEngine {
           callback(positions, activeCount)
         }
       } else if (data.type === 'meterLevel' && data.moduleId) {
-        const callback = this.meterCallbacks.get(data.moduleId)
+        const callback = this.meterCallbacks.get(this.unmapId(data.moduleId))
         if (callback) {
           callback(data.peakL as number, data.peakR as number)
         }
       } else if (data.type === 'sidVoiceStates' && data.voices) {
         const elapsedMap = (data.elapsed || {}) as Record<string, number>
-        for (const [moduleId, voiceData] of Object.entries(data.voices as Record<string, number[]>)) {
-          const callback = this.sidVoiceCallbacks.get(moduleId)
+        for (const [engineId, voiceData] of Object.entries(data.voices as Record<string, number[]>)) {
+          const callback = this.sidVoiceCallbacks.get(this.unmapId(engineId))
           if (callback && voiceData.length === 9) {
-            const elapsed = elapsedMap[moduleId] ?? 0
+            const elapsed = elapsedMap[engineId] ?? 0
             callback([
               { freq: voiceData[0], gate: voiceData[1] !== 0, waveform: voiceData[2] },
               { freq: voiceData[3], gate: voiceData[4] !== 0, waveform: voiceData[5] },
@@ -641,10 +689,10 @@ export class AudioEngine {
         }
       } else if (data.type === 'ayVoiceStates' && data.voices) {
         const elapsedMap = (data.elapsed || {}) as Record<string, number>
-        for (const [moduleId, voiceData] of Object.entries(data.voices as Record<string, number[]>)) {
-          const callback = this.ayVoiceCallbacks.get(moduleId)
+        for (const [engineId, voiceData] of Object.entries(data.voices as Record<string, number[]>)) {
+          const callback = this.ayVoiceCallbacks.get(this.unmapId(engineId))
           if (callback && voiceData.length === 9) {
-            const elapsed = elapsedMap[moduleId] ?? 0
+            const elapsed = elapsedMap[engineId] ?? 0
             callback([
               { period: voiceData[0], active: voiceData[1] !== 0, flags: voiceData[2] },
               { period: voiceData[3], active: voiceData[4] !== 0, flags: voiceData[5] },
@@ -667,7 +715,7 @@ export class AudioEngine {
 
     // Re-sync watched MIDI sequencer if any
     if (this.watchedMidiSeq) {
-      this.graphNode.port.postMessage({ type: 'watchMidiSeq', moduleId: this.watchedMidiSeq })
+      this.graphNode.port.postMessage({ type: 'watchMidiSeq', moduleId: this.mapId(this.watchedMidiSeq) })
     }
 
     // Re-send watched granulars if any

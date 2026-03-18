@@ -79,6 +79,7 @@ pub struct DrumSequencer {
     // Playback state
     current_step: usize,
     phase: f64,
+    prev_rate_idx: usize,
     samples_per_step: f64,
 
     // Gate timing (per track)
@@ -99,6 +100,11 @@ pub struct DrumSequencer {
     // Output values (per track)
     current_gates: [f32; DRUM_TRACKS],
     current_accents: [f32; DRUM_TRACKS],
+
+    // Global transport state (set by graph engine before process_block)
+    pub transport_beats: f64,
+    pub transport_bps: f64,
+    pub last_transport_step: usize,
 }
 
 /// Input signals for DrumSequencer.
@@ -157,6 +163,7 @@ impl DrumSequencer {
             steps: [[DrumStep::default(); DRUM_STEPS]; DRUM_TRACKS],
             current_step: 0,
             phase: 0.0,
+            prev_rate_idx: 4,
             samples_per_step: sample_rate as f64 * 0.125, // Default 1/16 at 120 BPM
             gate_on: [false; DRUM_TRACKS],
             gate_samples: [0; DRUM_TRACKS],
@@ -169,6 +176,9 @@ impl DrumSequencer {
             prev_reset: 0.0,
             current_gates: [0.0; DRUM_TRACKS],
             current_accents: [0.0; DRUM_TRACKS],
+            transport_beats: 0.0,
+            transport_bps: 0.0,
+            last_transport_step: usize::MAX,
         }
     }
 
@@ -328,8 +338,17 @@ impl DrumSequencer {
 
         // Read params
         let enabled = sample_at(params.enabled, 0, 1.0) > 0.5;
-        let tempo = sample_at(params.tempo, 0, 120.0).clamp(40.0, 300.0);
+        let tempo = if self.transport_bps > 0.0 {
+            (self.transport_bps * 60.0 * self.sample_rate as f64) as f32
+        } else {
+            sample_at(params.tempo, 0, 120.0).clamp(40.0, 300.0)
+        };
         let rate_idx = (sample_at(params.rate, 0, 4.0) as usize).min(RATE_DIVISIONS.len() - 1);
+        // Reset phase on rate change to avoid desync
+        if rate_idx != self.prev_rate_idx {
+            self.prev_rate_idx = rate_idx;
+            self.phase = 0.0;
+        }
         let gate_pct = sample_at(params.gate_length, 0, 50.0).clamp(10.0, 100.0) / 100.0;
         let swing = sample_at(params.swing, 0, 0.0).clamp(0.0, 90.0) / 100.0;
         let length = (sample_at(params.length, 0, 16.0) as usize).clamp(4, 16);
@@ -418,6 +437,17 @@ impl DrumSequencer {
 
             let step_advance = if use_external_clock {
                 clock_trigger
+            } else if self.transport_bps > 0.0 {
+                // Derive step position from global transport (deterministic)
+                let beat_now = self.transport_beats + i as f64 * self.transport_bps;
+                let rate_beats = RATE_DIVISIONS[rate_idx];
+                let step_idx = (beat_now / rate_beats).floor() as usize;
+                if step_idx != self.last_transport_step {
+                    self.last_transport_step = step_idx;
+                    true
+                } else {
+                    false
+                }
             } else {
                 self.phase += 1.0 / step_duration_samples;
                 if self.phase >= 1.0 {

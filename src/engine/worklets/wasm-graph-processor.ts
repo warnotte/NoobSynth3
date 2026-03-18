@@ -71,6 +71,8 @@ type GraphMessage =
   | { type: 'loadParticleBuffer'; moduleId: string; data: number[] }
   | { type: 'watchMeters'; moduleIds: string[] }
   | { type: 'enableCpuLoad'; enabled: boolean }
+  | { type: 'setTransportTempo'; tempo: number }
+  | { type: 'resetTransport' }
 
 class WasmGraphProcessor extends AudioWorkletProcessor {
   private engine: InstanceType<NonNullable<typeof WasmGraphEngine>> | null = null
@@ -244,6 +246,12 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
         break
       case 'loadParticleBuffer':
         this.engine!.load_particle_buffer(message.moduleId, new Float32Array(message.data))
+        break
+      case 'setTransportTempo':
+        this.engine!.set_transport_tempo(message.tempo)
+        break
+      case 'resetTransport':
+        this.engine!.reset_transport()
         break
       default:
         break

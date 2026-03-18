@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "templates": [
+    {
+      "id": "basic-voice",
+      "name": "Basic Voice",
+      "description": "VCO + VCF + ADSR + VCA — classic subtractive voice.",
+      "file": "basic-voice.json",
+      "category": "Voices"
+    },
+    {
+      "id": "fm-duo",
+      "name": "FM Duo",
+      "description": "Two FM operators with carrier/modulator routing.",
+      "file": "fm-duo.json",
+      "category": "Voices"
+    },
+    {
+      "id": "clock-step",
+      "name": "Clock + Step Seq",
+      "description": "Master clock driving a 16-step sequencer.",
+      "file": "clock-step.json",
+      "category": "Sequencers"
+    },
+    {
+      "id": "drum-rack",
+      "name": "Drum Rack 909",
+      "description": "Drum sequencer with kick, snare, hihat, and clap.",
+      "file": "drum-rack.json",
+      "category": "Drums"
+    },
+    {
+      "id": "fx-chain",
+      "name": "FX Chain",
+      "description": "Chorus + Delay + Reverb in series.",
+      "file": "fx-chain.json",
+      "category": "Effects"
+    }
+  ]
+}

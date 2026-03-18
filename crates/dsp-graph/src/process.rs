@@ -67,7 +67,7 @@ use dsp_core::{
 
 use crate::buffer::{mix_buffers, Buffer};
 use crate::state::*;
-use crate::types::ConnectionEdge;
+use crate::types::{ConnectionEdge, TransportContext};
 
 /// Static zero buffer for default input values.
 /// Size 4096 to handle WASAPI and other backends with large buffer sizes.
@@ -82,6 +82,7 @@ pub(crate) fn process_module(
     inputs: &[Buffer],
     outputs: &mut [Buffer],
     frames: usize,
+    transport: TransportContext,
 ) {
     match state {
         ModuleState::Vco(state) => {
@@ -961,6 +962,8 @@ pub(crate) fn process_module(
             }
         }
         ModuleState::Arpeggiator(state) => {
+            state.arp.transport_beats = transport.beats;
+            state.arp.transport_bps = transport.beats_per_sample;
             let cv_in = if connections[0].is_empty() { None } else { Some(inputs[0].channel(0)) };
             let gate_in = if connections[1].is_empty() { None } else { Some(inputs[1].channel(0)) };
             let clock = if connections[2].is_empty() { None } else { Some(inputs[2].channel(0)) };
@@ -994,6 +997,8 @@ pub(crate) fn process_module(
             state.arp.process_block(arp_outputs, arp_inputs, params);
         }
         ModuleState::StepSequencer(state) => {
+            state.seq.transport_beats = transport.beats;
+            state.seq.transport_bps = transport.beats_per_sample;
             let clock = if connections[0].is_empty() { None } else { Some(inputs[0].channel(0)) };
             let reset = if connections[1].is_empty() { None } else { Some(inputs[1].channel(0)) };
             let cv_offset = if connections[2].is_empty() { None } else { Some(inputs[2].channel(0)) };
@@ -1188,6 +1193,8 @@ pub(crate) fn process_module(
             state.tom.process_block(out, tom_inputs, params);
         }
         ModuleState::DrumSequencer(state) => {
+            state.seq.transport_beats = transport.beats;
+            state.seq.transport_bps = transport.beats_per_sample;
             let clock = if connections[0].is_empty() { None } else { Some(inputs[0].channel(0)) };
             let reset = if connections[1].is_empty() { None } else { Some(inputs[1].channel(0)) };
 
@@ -1385,6 +1392,8 @@ pub(crate) fn process_module(
             state.shifter.process_block(outputs[0].channel_mut(0), shifter_inputs, params);
         }
         ModuleState::Clock(state) => {
+            state.clock.transport_beats = transport.beats;
+            state.clock.transport_bps = transport.beats_per_sample;
             let start = if !connections[0].is_empty() { Some(inputs[0].channel(0)) } else { None };
             let stop = if connections.len() > 1 && !connections[1].is_empty() {
                 Some(inputs[1].channel(0))
@@ -1425,6 +1434,8 @@ pub(crate) fn process_module(
             outputs[3].channel_mut(0)[..safe_frames].copy_from_slice(&buf_bar[..safe_frames]);
         }
         ModuleState::Euclidean(state) => {
+            state.euclidean.transport_beats = transport.beats;
+            state.euclidean.transport_bps = transport.beats_per_sample;
             let clock = if !connections[0].is_empty() { Some(inputs[0].channel(0)) } else { None };
             let reset = if connections.len() > 1 && !connections[1].is_empty() {
                 Some(inputs[1].channel(0))
@@ -2356,6 +2367,8 @@ pub(crate) fn process_module(
             state.tube_amp.process_block(out, TubeAmpInputs { input }, params);
         }
         ModuleState::ChordSequencer(state) => {
+            state.seq.transport_beats = transport.beats;
+            state.seq.transport_bps = transport.beats_per_sample;
             let clock = if connections[0].is_empty() { None } else { Some(inputs[0].channel(0)) };
             let reset = if connections[1].is_empty() { None } else { Some(inputs[1].channel(0)) };
             // 10 outputs: cv1,gate1,cv2,gate2,cv3,gate3,cv4,gate4,step,root_cv
@@ -2395,6 +2408,8 @@ pub(crate) fn process_module(
             state.seq.process_block(seq_outputs, seq_inputs, params);
         }
         ModuleState::PolyrhythmSequencer(state) => {
+            state.seq.transport_beats = transport.beats;
+            state.seq.transport_bps = transport.beats_per_sample;
             let clock = if connections[0].is_empty() { None } else { Some(inputs[0].channel(0)) };
             let reset = if connections[1].is_empty() { None } else { Some(inputs[1].channel(0)) };
             // 9 outputs: cv1,gate1,cv2,gate2,cv3,gate3,cv4,gate4,step
@@ -2465,6 +2480,36 @@ pub(crate) fn process_module(
             let decay = 0.95_f32;
             state.peak_l = (state.peak_l * decay).max(peak_l);
             state.peak_r = (state.peak_r * decay).max(peak_r);
+        }
+        ModuleState::Send(_state) => {
+            // Pass-through: copy stereo input to stereo output
+            let input_connected = !connections[0].is_empty();
+            if input_connected {
+                for channel in 0..2 {
+                    let src = if inputs[0].channel_count() == 1 {
+                        inputs[0].channel(0)
+                    } else {
+                        inputs[0].channel(channel)
+                    };
+                    let output = outputs[0].channel_mut(channel);
+                    output[..frames].copy_from_slice(&src[..frames]);
+                }
+            }
+        }
+        ModuleState::Receive(_state) => {
+            // Pass-through: copy stereo input to stereo output
+            let input_connected = !connections[0].is_empty();
+            if input_connected {
+                for channel in 0..2 {
+                    let src = if inputs[0].channel_count() == 1 {
+                        inputs[0].channel(0)
+                    } else {
+                        inputs[0].channel(channel)
+                    };
+                    let output = outputs[0].channel_mut(channel);
+                    output[..frames].copy_from_slice(&src[..frames]);
+                }
+            }
         }
         ModuleState::Notes | ModuleState::Empty => {
             // UI-only module / placeholder, no audio processing

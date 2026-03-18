@@ -1,0 +1,47 @@
+{
+  "id": "fm-duo",
+  "name": "FM Duo",
+  "description": "Two FM operators with carrier/modulator routing.",
+  "category": "Voices",
+  "modules": [
+    {
+      "id": "carrier",
+      "type": "fm-op",
+      "name": "Carrier",
+      "position": { "x": 1, "y": 0 },
+      "params": {
+        "frequency": 440,
+        "ratio": 1,
+        "level": 1,
+        "feedback": 0,
+        "attack": 10,
+        "decay": 200,
+        "sustain": 0.7,
+        "release": 300
+      }
+    },
+    {
+      "id": "modulator",
+      "type": "fm-op",
+      "name": "Modulator",
+      "position": { "x": 0, "y": 0 },
+      "params": {
+        "frequency": 440,
+        "ratio": 2,
+        "level": 0.6,
+        "feedback": 0,
+        "attack": 5,
+        "decay": 150,
+        "sustain": 0.4,
+        "release": 200
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": { "moduleId": "modulator", "portId": "out" },
+      "to": { "moduleId": "carrier", "portId": "fm" },
+      "kind": "audio"
+    }
+  ]
+}

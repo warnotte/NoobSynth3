@@ -692,6 +692,12 @@ pub(crate) fn create_state(
       })
     }
     ModuleType::Notes => ModuleState::Notes,  // UI-only, no DSP
+    ModuleType::Send => ModuleState::Send(SendState {
+      bus: param_number(params, "bus", 0.0) as u32,
+    }),
+    ModuleType::Receive => ModuleState::Receive(ReceiveState {
+      bus: param_number(params, "bus", 0.0) as u32,
+    }),
     ModuleType::TuringMachine => ModuleState::TuringMachine(TuringState {
       turing: TuringMachine::new(sample_rate),
       probability: ParamBuffer::new(param_number(params, "probability", 0.5)),
@@ -1664,6 +1670,16 @@ pub(crate) fn apply_param(state: &mut ModuleState, param: &str, value: f32) {
       _ => {}
     },
     ModuleState::ClockDivider(_) => {},
+    ModuleState::Send(state) => {
+      if param == "bus" {
+        state.bus = value as u32;
+      }
+    }
+    ModuleState::Receive(state) => {
+      if param == "bus" {
+        state.bus = value as u32;
+      }
+    }
     _ => {}
   }
 }
