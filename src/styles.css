@@ -217,171 +217,235 @@
   padding: 24px;
   gap: 16px;
   overflow-y: auto;
+  background: radial-gradient(circle at center, rgba(30, 40, 55, 0.4) 0%, transparent 100%);
 }
 
 .mixer-strips {
   display: flex;
-  gap: 6px;
+  gap: 12px;
   flex: 1;
-  align-items: stretch;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 10px;
 }
 
 .mixer-strip {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  padding: 16px 12px;
-  min-width: 80px;
-  flex: 1;
-  max-width: 120px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.025);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  transition: border-color 0.15s, opacity 0.2s;
+  gap: 12px;
+  padding: 16px 10px;
+  width: 100px; /* Largeur fixe pour éviter les sauts de layout */
+  flex-shrink: 0;
+  border-radius: 4px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+  position: relative;
 }
 
 .mixer-strip.active {
-  border-color: rgba(91, 182, 255, 0.3);
-  background: rgba(91, 182, 255, 0.04);
+  background: linear-gradient(180deg, rgba(91, 182, 255, 0.06) 0%, rgba(91, 182, 255, 0.02) 100%);
+  border-color: rgba(91, 182, 255, 0.2);
 }
 
-.mixer-strip.muted .mixer-strip-name,
-.mixer-strip.muted .mixer-strip-db,
+.mixer-strip.active::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  border-radius: 4px;
+  pointer-events: none;
+  border: 1px solid rgba(91, 182, 255, 0.3);
+}
+
+.mixer-strip.muted {
+  opacity: 0.7;
+}
+
 .mixer-strip.muted .vu-meter {
-  opacity: 0.3;
+  opacity: 0.2;
+  filter: grayscale(1);
 }
 
 .mixer-strip-name {
-  background: none;
-  border: none;
-  color: rgba(216, 230, 246, 0.85);
-  font-size: 0.65rem;
-  font-weight: 600;
-  letter-spacing: 0.05em;
+  background: rgba(20, 26, 34, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 2px;
+  color: rgba(216, 230, 246, 0.9);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   cursor: pointer;
-  padding: 0;
+  padding: 4px 2px;
   width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   text-align: center;
+  transition: all 0.15s;
 }
 
-.mixer-strip-name:hover { color: #5bb6ff; }
-
-.mixer-strip-fader {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  flex: 1;
-  min-height: 160px;
-  width: 100%;
-}
-
-.mixer-fader-vertical {
-  -webkit-appearance: slider-vertical;
-  appearance: auto;
-  writing-mode: vertical-lr;
-  direction: rtl;
-  width: 28px;
-  flex: 1;
-  cursor: pointer;
-  accent-color: #5bb6ff;
-}
-
-.mixer-strip-db {
-  font-size: 0.5rem;
-  font-family: var(--font-mono);
-  color: rgba(198, 214, 232, 0.5);
-  white-space: nowrap;
+.mixer-strip-name:hover { 
+  color: #5bb6ff; 
+  background: rgba(91, 182, 255, 0.1);
 }
 
 .mixer-strip-body {
   display: flex;
-  gap: 6px;
-  flex: 1;
+  gap: 8px;
+  height: 180px; /* Hauteur fixe pour le corps */
   align-items: stretch;
-  min-height: 140px;
+  justify-content: center;
+  width: 100%;
 }
 
+/* ── VU Meter Styled ── */
 .vu-meter {
   display: flex;
   gap: 2px;
-  width: 12px;
+  width: 14px;
   flex-shrink: 0;
+  padding: 2px;
+  background: #0a0e14;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
 }
 
 .vu-meter-channel {
   flex: 1;
-  background: rgba(20, 26, 34, 0.9);
-  border: 1px solid rgba(100, 114, 136, 0.2);
-  border-radius: 2px;
+  background: #111;
   position: relative;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.4) 0px,
+    rgba(0, 0, 0, 0.4) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  background-size: 100% 3px;
 }
 
 .vu-meter-fill {
   width: 100%;
-  border-radius: 1px;
-  transition: height 0.06s linear;
-  min-height: 0;
+  transition: height 0.05s linear;
+}
+
+/* ── Fader vertical fixe ── */
+.mixer-strip-fader {
+  position: relative;
+  width: 56px; /* Élargi pour éviter le chevauchement */
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end; /* Pousse le fader vers la droite */
+}
+
+.mixer-fader-scale {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 22px; /* Un peu plus de place pour les chiffres */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 8px 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.mixer-fader-scale span {
+  font-size: 8px;
+  color: rgba(255, 255, 255, 0.3);
+  font-family: var(--font-mono);
+  line-height: 1;
+  text-align: left;
+}
+
+.mixer-fader-vertical {
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  cursor: pointer;
+  width: 160px; 
+  height: 40px;
+  position: absolute;
+  right: -52px; /* Ajusté pour centrer la piste à droite de l'échelle */
+  transform: rotate(-90deg);
+  transform-origin: center;
+  margin: 0;
+  z-index: 2;
+}
+
+.mixer-fader-vertical::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 4px;
+  background: #0a0e14;
+  border-radius: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mixer-fader-vertical::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  height: 32px;
+  width: 20px;
+  background: linear-gradient(90deg, #444 0%, #222 50%, #111 100%);
+  border: 1px solid #000;
+  border-radius: 2px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.6);
+  margin-top: -14px; /* Centrage sur la piste */
+  background-image: linear-gradient(180deg, transparent 48%, #e85858 48%, #e85858 52%, transparent 52%);
+}
+
+.mixer-strip-db {
+  font-size: 0.55rem;
+  font-family: var(--font-mono);
+  color: rgba(198, 214, 232, 0.7);
+  background: #0a0e14;
+  padding: 1px 4px;
+  border-radius: 2px;
+  width: 100%;
+  text-align: center;
+  margin-top: 4px;
 }
 
 .mixer-strip-controls {
   display: flex;
-  gap: 4px;
+  gap: 6px;
+  width: 100%;
+  margin-top: 4px;
 }
 
 .mixer-btn {
-  width: 22px;
-  height: 20px;
-  padding: 0;
+  flex: 1;
+  height: 24px;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 3px;
-  background: rgba(255, 255, 255, 0.03);
-  color: rgba(198, 214, 232, 0.45);
-  font-size: 0.55rem;
-  font-weight: 700;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #2a3442 0%, #1a2432 100%);
+  color: rgba(198, 214, 232, 0.6);
+  font-size: 0.65rem;
+  font-weight: 800;
   cursor: pointer;
-  transition: background 0.12s, color 0.12s, border-color 0.12s;
-}
-
-.mixer-btn:hover {
-  background: rgba(255, 255, 255, 0.07);
-  color: rgba(216, 230, 246, 0.8);
-}
-
-.mixer-mute.on {
-  background: rgba(232, 88, 88, 0.2);
-  border-color: rgba(232, 88, 88, 0.45);
-  color: #e85858;
-}
-
-.mixer-solo.on {
-  background: rgba(78, 216, 138, 0.15);
-  border-color: rgba(78, 216, 138, 0.45);
-  color: #4ed88a;
 }
 
 .mixer-strip-master {
-  border-color: rgba(240, 176, 107, 0.2);
-  background: rgba(240, 176, 107, 0.03);
-  min-width: 120px;
+  width: 110px;
+  margin-left: 10px;
+  background: linear-gradient(180deg, rgba(240, 176, 107, 0.05) 0%, rgba(240, 176, 107, 0.02) 100%);
+  border-color: rgba(240, 176, 107, 0.15);
 }
 
-.mixer-strip-name-master {
-  color: rgba(240, 176, 107, 0.85);
-  cursor: default;
+.mixer-strip-master .mixer-fader-vertical::-webkit-slider-thumb {
+  background-image: linear-gradient(180deg, transparent 48%, #f0b06b 48%, #f0b06b 52%, transparent 52%);
 }
 
-.mixer-strip-name-master:hover {
-  color: rgba(240, 176, 107, 0.85);
-}
 
 .mixer-tempo {
   display: flex;
@@ -413,6 +477,7 @@
 .mixer-tempo-input:focus {
   border-color: rgba(240, 176, 107, 0.5);
 }
+
 
 /* Zone layout: left | center | right */
 .topbar-zone {

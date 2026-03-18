@@ -55,19 +55,50 @@ const VuMeter = ({
   }, [engine, meterId, running])
 
   const clamp = (v: number) => Math.min(100, Math.max(0, v * 100))
-  const color = (v: number) => v > 0.85 ? '#e85858' : v > 0.5 ? '#f0b06b' : '#4ed88a'
+  
+  // LED colors: Green -> Yellow -> Red
+  const getGradient = (v: number) => {
+    if (v > 0.85) return 'linear-gradient(to top, #4ed88a 0%, #f0b06b 70%, #ff5252 90%)'
+    if (v > 0.5) return 'linear-gradient(to top, #4ed88a 0%, #f0b06b 100%)'
+    return '#4ed88a'
+  }
 
   return (
     <div className="vu-meter">
       <div className="vu-meter-channel">
-        <div className="vu-meter-fill" style={{ height: `${clamp(peakL)}%`, background: color(peakL) }} />
+        <div 
+          className="vu-meter-fill" 
+          style={{ 
+            height: `${clamp(peakL)}%`, 
+            background: getGradient(peakL),
+            boxShadow: peakL > 0.9 ? '0 0 8px rgba(255, 82, 82, 0.5)' : 'none'
+          }} 
+        />
       </div>
       <div className="vu-meter-channel">
-        <div className="vu-meter-fill" style={{ height: `${clamp(peakR)}%`, background: color(peakR) }} />
+        <div 
+          className="vu-meter-fill" 
+          style={{ 
+            height: `${clamp(peakR)}%`, 
+            background: getGradient(peakR),
+            boxShadow: peakR > 0.9 ? '0 0 8px rgba(255, 82, 82, 0.5)' : 'none'
+          }} 
+        />
       </div>
     </div>
   )
 }
+
+const FaderScale = () => (
+  <div className="mixer-fader-scale">
+    <span className="major">+6</span>
+    <span>0</span>
+    <span>-6</span>
+    <span className="major">-12</span>
+    <span>-24</span>
+    <span>-inf</span>
+  </div>
+)
 
 export const MixerConsole = ({
   racks,
@@ -114,15 +145,15 @@ export const MixerConsole = ({
                   running={engineRunning}
                 />
                 <div className="mixer-strip-fader">
+                  <FaderScale />
                   <input
                     type="range"
                     className="mixer-fader-vertical"
                     min={0}
-                    max={1}
+                    max={1.5} // Allow some gain boost up to +6dB approx
                     step={0.01}
                     value={ch.volume}
                     onChange={(e) => onVolumeChange(rack.id, Number(e.target.value))}
-                    orient="vertical"
                   />
                 </div>
               </div>
@@ -134,6 +165,7 @@ export const MixerConsole = ({
                   type="button"
                   className={`mixer-btn mixer-mute ${ch.mute ? 'on' : ''}`}
                   onClick={() => onMuteToggle(rack.id)}
+                  title="Mute"
                 >
                   M
                 </button>
@@ -141,6 +173,7 @@ export const MixerConsole = ({
                   type="button"
                   className={`mixer-btn mixer-solo ${ch.solo ? 'on' : ''}`}
                   onClick={() => onSoloToggle(rack.id)}
+                  title="Solo"
                 >
                   S
                 </button>
@@ -154,15 +187,15 @@ export const MixerConsole = ({
           <span className="mixer-strip-name mixer-strip-name-master">Master</span>
           <div className="mixer-strip-body">
             <div className="mixer-strip-fader">
+              <FaderScale />
               <input
                 type="range"
                 className="mixer-fader-vertical"
                 min={0}
-                max={1}
+                max={1.5}
                 step={0.01}
                 value={masterVolume}
                 onChange={(e) => onMasterVolumeChange(Number(e.target.value))}
-                orient="vertical"
               />
             </div>
           </div>
@@ -172,3 +205,4 @@ export const MixerConsole = ({
     </div>
   )
 }
+
