@@ -5,6 +5,13 @@ export type FlattenOptions = {
   mixerState?: Record<string, MixerChannelState>
 }
 
+export type FlattenResult = {
+  modules: ModuleSpec[]
+  connections: Connection[]
+  /** Map of rackId → engine-side meter module ID (for VU meters) */
+  meterIds: Record<string, string>
+}
+
 /**
  * Flatten multiple racks into a single GraphState for the audio engine.
  *
@@ -23,9 +30,9 @@ export const flattenRacks = (
   activeRackId: string,
   activeGraph: GraphState,
   options?: FlattenOptions,
-): GraphState => {
+): FlattenResult => {
   if (racks.length <= 1) {
-    return activeGraph
+    return { modules: activeGraph.modules, connections: activeGraph.connections, meterIds: {} }
   }
 
   const { mixerState, masterTempo } = options ?? {}
@@ -100,7 +107,31 @@ export const flattenRacks = (
     }
   }
 
-  return { modules: allModules, connections: allConnections }
+  // Inject virtual meter modules for each rack's output (for VU meters)
+  const meterIds: Record<string, string> = {}
+  for (const rack of racks) {
+    const prefix = `${rack.id}/`
+    const graph = rack.id === activeRackId ? activeGraph : rack.graph
+    const outputMod = graph.modules.find((m) => m.type === 'output')
+    if (outputMod) {
+      const meterId = `_meter/${rack.id}`
+      meterIds[rack.id] = meterId
+      allModules.push({
+        id: meterId,
+        type: 'meter',
+        name: `Meter ${rack.name}`,
+        position: { x: -1, y: -1 },
+        params: {},
+      })
+      allConnections.push({
+        from: { moduleId: `${prefix}${outputMod.id}`, portId: 'out' },
+        to: { moduleId: meterId, portId: 'in' },
+        kind: 'audio',
+      })
+    }
+  }
+
+  return { modules: allModules, connections: allConnections, meterIds }
 }
 
 /**

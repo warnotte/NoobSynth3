@@ -246,8 +246,10 @@
   background: rgba(91, 182, 255, 0.04);
 }
 
-.mixer-strip.muted {
-  opacity: 0.35;
+.mixer-strip.muted .mixer-strip-name,
+.mixer-strip.muted .mixer-strip-db,
+.mixer-strip.muted .vu-meter {
+  opacity: 0.3;
 }
 
 .mixer-strip-name {
@@ -294,6 +296,40 @@
   font-family: var(--font-mono);
   color: rgba(198, 214, 232, 0.5);
   white-space: nowrap;
+}
+
+.mixer-strip-body {
+  display: flex;
+  gap: 6px;
+  flex: 1;
+  align-items: stretch;
+  min-height: 140px;
+}
+
+.vu-meter {
+  display: flex;
+  gap: 2px;
+  width: 12px;
+  flex-shrink: 0;
+}
+
+.vu-meter-channel {
+  flex: 1;
+  background: rgba(20, 26, 34, 0.9);
+  border: 1px solid rgba(100, 114, 136, 0.2);
+  border-radius: 2px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.vu-meter-fill {
+  width: 100%;
+  border-radius: 1px;
+  transition: height 0.06s linear;
+  min-height: 0;
 }
 
 .mixer-strip-controls {

@@ -2513,11 +2513,17 @@ function App() {
     applyGraphUpdate(normalized, { skipHistory: true })
   }, [gridMetrics.columns])
 
+  /** Meter IDs for VU meters in mixer (rackId → engine meter module ID) */
+  const meterIdsRef = useRef<Record<string, string>>({})
+
   /** Build the combined graph (all racks flattened) for the engine */
-  const buildCombinedGraph = (activeGraph: GraphState) =>
-    flattenRacks(racksRef.current, activeRackIdRef.current, activeGraph, {
+  const buildCombinedGraph = (activeGraph: GraphState): GraphState => {
+    const result = flattenRacks(racksRef.current, activeRackIdRef.current, activeGraph, {
       mixerState: mixerStateRef.current,
     })
+    meterIdsRef.current = result.meterIds
+    return { modules: result.modules, connections: result.connections }
+  }
 
   const applyGraphUpdate = (nextGraph: GraphState, options?: { skipHistory?: boolean }) => {
     resetPatching()
@@ -2957,6 +2963,9 @@ function App() {
             activeRackId={activeRackId}
             mixerState={mixerState}
             masterVolume={masterVolume}
+            meterIds={meterIdsRef.current}
+            engine={engine}
+            engineRunning={status === 'running'}
             onVolumeChange={handleMixerVolumeChange}
             onMuteToggle={handleMixerMuteToggle}
             onSoloToggle={handleMixerSoloToggle}

@@ -19,6 +19,8 @@ export class AudioEngine {
   moduleIdMapper: ((moduleId: string) => string) | null = null
 
   private mapId(moduleId: string): string {
+    // IDs starting with '_' are engine-internal (e.g. _meter/rack-1), skip mapping
+    if (moduleId.startsWith('_')) return moduleId
     return this.moduleIdMapper ? this.moduleIdMapper(moduleId) : moduleId
   }
 
@@ -29,6 +31,8 @@ export class AudioEngine {
    */
   private unmapId(engineModuleId: string): string {
     if (!this.moduleIdMapper) return engineModuleId
+    // Engine-internal IDs (e.g. _meter/rack-1) pass through as-is
+    if (engineModuleId.startsWith('_')) return engineModuleId
     // The mapper prepends "rackId/" — strip it
     const slashIndex = engineModuleId.indexOf('/')
     return slashIndex >= 0 ? engineModuleId.slice(slashIndex + 1) : engineModuleId
