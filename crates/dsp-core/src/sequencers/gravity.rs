@@ -111,7 +111,8 @@ pub struct GravitySequencer {
     gate_state: f32,
     /// Per-body trigger timers
     trigger_timers: [i32; MAX_BODIES],
-    /// RNG state for chaos
+    /// RNG state for chaos (reserved for future use)
+    #[allow(dead_code)]
     rng_state: u32,
 }
 
@@ -135,6 +136,7 @@ impl GravitySequencer {
         }
     }
 
+    #[allow(dead_code)]
     fn next_random(&mut self) -> f32 {
         self.rng_state = self.rng_state.wrapping_mul(1664525).wrapping_add(1013904223);
         (self.rng_state as f32) / (u32::MAX as f32)

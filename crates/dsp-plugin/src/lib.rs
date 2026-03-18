@@ -201,6 +201,7 @@ struct MacroTarget {
 #[derive(Clone)]
 struct MacroSpec {
     id: u8,
+    #[allow(dead_code)]
     name: Option<String>,
     targets: Vec<MacroTarget>,
 }

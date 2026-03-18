@@ -1,4 +1,4 @@
-use crate::common::{clamp, input_at, sample_at, Sample};
+use crate::common::{input_at, sample_at, Sample};
 
 // ============================================================================
 // Leslie Rotary Speaker

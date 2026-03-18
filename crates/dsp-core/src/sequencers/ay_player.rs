@@ -26,6 +26,7 @@ use crate::common::Sample;
 use crate::chips::Ay3_8910;
 
 /// Number of AY registers per frame
+#[allow(dead_code)]
 const REGS_PER_FRAME: usize = 16;
 
 /// YM file header info

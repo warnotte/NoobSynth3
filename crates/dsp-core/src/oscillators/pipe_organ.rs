@@ -337,7 +337,7 @@ impl PipeOrgan {
                 self.chiff_envelope = 1.0;
             }
             // Key click: fast decay ~8ms for tonal click + 40ms noise tail
-            let click_decay = (-self.inv_sample_rate / 0.008).exp();
+            let _click_decay = (-self.inv_sample_rate / 0.008).exp();
             let noise_decay = (-self.inv_sample_rate / 0.04).exp();
             self.chiff_envelope *= noise_decay;
             // Tonal click component: broadband burst at contact
