@@ -262,6 +262,9 @@ impl EuclideanSequencer {
         self.gate_length_samples = ((self.samples_per_step * (gate_len_pct as f64 / 100.0)) as usize).max(1);
 
         let has_external_clock = inputs.clock.is_some();
+        // When using external clock, force swing to 0 to avoid double-swing
+        // (the master clock already applies its own swing)
+        let swing_pct = if has_external_clock { 0.0 } else { swing_pct };
 
         for i in 0..frames {
             // Handle reset
