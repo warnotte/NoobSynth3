@@ -1,6 +1,6 @@
 # NoobSynth3 - Roadmap
 
-## Completed (branch feature/module-templates)
+## Completed
 
 ### Phase 1 — Module Templates
 - [x] Save/load/insert pre-wired module groups
@@ -32,6 +32,7 @@
 - [x] Transport tempo applied to all timing (gate, swing, step duration)
 - [x] set_graph_fresh resets transport to 0
 - [x] Queued transport messages for deterministic timing
+- [x] Swing stacking fix (external clock disables local swing)
 
 ### Project Export/Import
 - [x] Version 2 format: all racks + mixer state + tempo
@@ -39,58 +40,66 @@
 
 ---
 
-## In Progress / Known Issues
+## Next Up (priority order)
 
-### Desync Issues
-- [ ] Rate changes can sometimes cause brief desync between racks
-- [ ] Need to investigate specific edge cases
-- [ ] Consider global phase alignment for rate changes
+### 1. Multi-Rack Presets
+Presets that load a complete project (2-3 pre-configured racks with mixer settings).
+- [ ] Create 5-10 multi-rack demo presets showcasing the system
+- [ ] Example: "Acid House" (303 bass rack + 909 drums rack + FX rack)
+- [ ] Example: "Ambient Layers" (pad rack + sequence rack + drone rack)
+- [ ] Presets load as version 2 project files
+- **Why:** Immediately demonstrates multi-rack value to users
 
-### Mixer UI
+### 2. Preset Quality & Migration
+Adapt existing mono-rack presets and improve overall quality.
+- [ ] Review key presets for audio quality with global transport
+- [ ] Ensure sequenced presets work well when loaded in multi-rack context
+- [ ] Fix any presets broken by transport changes
+- [ ] Test all 211+ presets systematically
+- **Why:** Existing content must work flawlessly
+
+### 3. Stabilization & Desync Fixes
+Fix remaining synchronization edge cases and merge to main.
+- [ ] Investigate and document specific desync reproduction steps
+- [ ] Consider quantized rate changes (snap to next beat/bar)
+- [ ] Transport position display in UI (bars:beats)
+- [ ] Comprehensive testing of multi-rack + transport + mixer
+- [ ] Merge feature/subpatches to main when stable
+- **Why:** Reliability is non-negotiable
+
+### 4. Multi-Module Selection (Lasso / Shift-Click)
+Select, move, copy, delete multiple modules at once.
+- [ ] Shift-click to add/remove modules from selection
+- [ ] Lasso (drag rectangle) to select area
+- [ ] Move selected group
+- [ ] Delete selected group
+- [ ] Copy/paste selected group
+- [ ] "Create Template from selection" (replaces connected-modules heuristic)
+- **Why:** Fundamental workflow improvement missing from the UI
+
+---
+
+## Backlog (lower priority)
+
+### Mixer UI Polish
 - [ ] VU meter on master channel
 - [ ] Better visual design (professional look)
 - [ ] Pan per channel
 - [ ] Insert FX slots
 
----
-
-## Planned
-
-### Phase 3 — Worker Threads (Performance)
-- [ ] SharedArrayBuffer + Worker per rack for true parallelism
-- [ ] One AudioWorklet master collects rendered buffers
-- [ ] Requires COOP/COEP headers
-- [ ] Significant perf gain for complex multi-rack setups
-- **Priority:** Low (no perf issues reported yet)
-
-### Phase 4 — Subpatches
+### Subpatches (Phase 4 — deferred)
 - [ ] Collapse a group of modules into a single reusable module
-- [ ] Exposed ports (inputs/outputs of the subpatch)
-- [ ] Nestable (subpatch within subpatch)
-- [ ] Based on multi-rack infrastructure (a subpatch = an inline rack)
-- **Priority:** High (most differentiating feature)
+- [ ] Exposed ports, nestable, based on multi-rack infrastructure
+- [ ] Requires multi-module selection first
+- **Note:** Explored and reverted — templates + multi-rack cover most use cases
 
-### Master Clock Architecture
-- [ ] True global transport with bar/beat/tick position
-- [ ] Quantized rate changes (snap to next beat/bar)
-- [ ] Transport position display in UI (bars:beats:ticks)
-- [ ] Clock module derives from transport instead of maintaining own phase
-- **Priority:** Medium (current transport works but has edge cases)
+### Worker Threads (Phase 3 — deferred)
+- [ ] SharedArrayBuffer + Worker per rack for true parallelism
+- [ ] Not needed until performance becomes an issue
 
-### UI/UX Improvements
-- [ ] Mixer UI overhaul (professional design, vertical faders)
-- [ ] Module selection (lasso) for template save
-- [ ] Drag & drop template import
-- [ ] Keyboard shortcuts for rack/mixer operations
-- [ ] Mobile/tablet responsive mixer
-
-### Audio & DSP
+### Other
+- [ ] Master bus FX (EQ, compressor)
+- [ ] MIDI export
 - [ ] Per-rack pan control
-- [ ] Master bus FX (EQ, compressor on master)
-- [ ] MIDI file sequencer transport sync
-- [ ] Sidechain between racks (via Send/Receive)
-
-### Infrastructure
-- [ ] Preset migration to version 2 format
-- [ ] Automated multi-rack integration tests
-- [ ] Performance benchmarks (multi-rack CPU usage)
+- [ ] Mobile/tablet responsive mixer
+- [ ] Keyboard shortcuts for rack/mixer operations
