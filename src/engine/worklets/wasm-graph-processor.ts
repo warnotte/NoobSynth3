@@ -164,18 +164,6 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
       this.cpuLoadReportCounter = 0
       return
     }
-    if (message.type === 'setTransportTempo') {
-      if (this.ready && this.engine) {
-        this.engine.set_transport_tempo(message.tempo)
-      }
-      return
-    }
-    if (message.type === 'resetTransport') {
-      if (this.ready && this.engine) {
-        this.engine.reset_transport()
-      }
-      return
-    }
     // Queue other messages to be processed in process() before render()
     this.messageQueue.push(message)
   }
@@ -258,6 +246,12 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
         break
       case 'loadParticleBuffer':
         this.engine!.load_particle_buffer(message.moduleId, new Float32Array(message.data))
+        break
+      case 'setTransportTempo':
+        this.engine!.set_transport_tempo(message.tempo)
+        break
+      case 'resetTransport':
+        this.engine!.reset_transport()
         break
       default:
         break

@@ -612,6 +612,7 @@ impl GraphEngine {
 
   fn set_graph_fresh(&mut self, graph: GraphPayload) {
     self.set_graph_inner(graph, false);
+    self.transport_beats = 0.0;
   }
 
   fn set_graph_inner(&mut self, graph: GraphPayload, preserve_state: bool) {

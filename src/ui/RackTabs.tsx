@@ -119,15 +119,15 @@ export const RackTabs = ({
             </div>
           )
         })}
+        <button
+          type="button"
+          className="rack-tab-add"
+          onClick={onAddRack}
+          title="Add new rack"
+        >
+          +
+        </button>
       </div>
-      <button
-        type="button"
-        className="rack-tab-add"
-        onClick={onAddRack}
-        title="Add new rack"
-      >
-        +
-      </button>
     </div>
   )
 }

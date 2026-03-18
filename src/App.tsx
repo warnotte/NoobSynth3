@@ -1772,6 +1772,10 @@ function App() {
           await engine.start(graphToStart)
           setStatus('running')
           activeVoiceCountRef.current = getVoiceCountFromGraph(graphToStart)
+          // After restart, re-apply transport tempo and mixer levels
+          // (the new WASM engine defaults to 120 BPM)
+          engine.setTransportTempo(masterTempoRef.current)
+          applyMixerToEngine(mixerStateRef.current)
         } catch (error) {
           console.error(error)
           setStatus('error')
@@ -1842,18 +1846,48 @@ function App() {
   }, [urlGraph, urlPresetId])
 
   const handleExportPreset = useCallback(() => {
-    const payload = { version: 1, graph: graphRef.current }
-    const json = JSON.stringify(payload, null, 2)
-    const blob = new Blob([json], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
-    link.href = url
-    link.download = `noobsynth3-patch-${timestamp}.json`
-    document.body.appendChild(link)
-    link.click()
-    link.remove()
-    URL.revokeObjectURL(url)
+    // Save current rack's graph before export
+    const currentRacks = racksRef.current.map((r) =>
+      r.id === activeRackIdRef.current
+        ? { ...r, graph: cloneGraph(graphRef.current) }
+        : r,
+    )
+    if (currentRacks.length > 1) {
+      // Multi-rack: export full project (version 2)
+      const payload = {
+        version: 2,
+        type: 'project',
+        masterTempo: masterTempoRef.current,
+        masterVolume: masterVolumeRef.current,
+        activeRackId: activeRackIdRef.current,
+        racks: currentRacks.map((r) => ({ id: r.id, name: r.name, graph: r.graph })),
+        mixer: mixerStateRef.current,
+      }
+      const json = JSON.stringify(payload, null, 2)
+      const blob = new Blob([json], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `noobsynth3-project-${timestamp}.json`
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      URL.revokeObjectURL(url)
+    } else {
+      // Single rack: export patch (version 1, backward compatible)
+      const payload = { version: 1, graph: graphRef.current }
+      const json = JSON.stringify(payload, null, 2)
+      const blob = new Blob([json], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `noobsynth3-patch-${timestamp}.json`
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      URL.revokeObjectURL(url)
+    }
   }, [])
 
   const handleImportPreset = useCallback(() => {
@@ -1871,11 +1905,69 @@ function App() {
       try {
         const text = await file.text()
         const payload = JSON.parse(text) as unknown
-        if (!isRecord(payload) || payload.version !== 1 || !isGraphState(payload.graph)) {
-          throw new Error('Invalid preset file.')
+        if (!isRecord(payload)) {
+          throw new Error('Invalid file.')
         }
-        setImportError(null)
-        applyPreset(payload.graph)
+
+        if (payload.version === 2 && payload.type === 'project' && Array.isArray(payload.racks)) {
+          // Version 2: full project import
+          const projectRacks = (payload.racks as Array<{ id: string; name: string; graph: unknown }>)
+            .filter((r) => isRecord(r) && typeof r.id === 'string' && isGraphState(r.graph))
+            .map((r) => ({
+              id: r.id,
+              name: typeof r.name === 'string' ? r.name : 'Rack',
+              graph: r.graph as GraphState,
+            }))
+          if (projectRacks.length === 0) throw new Error('Project has no valid racks.')
+          const projectMixer = (isRecord(payload.mixer) ? payload.mixer : {}) as Record<string, MixerChannelState>
+          const projectTempo = typeof payload.masterTempo === 'number' ? payload.masterTempo : 120
+          const projectVolume = typeof payload.masterVolume === 'number' ? payload.masterVolume : 0.8
+          const projectActiveId = typeof payload.activeRackId === 'string'
+            ? payload.activeRackId
+            : projectRacks[0].id
+
+          // Find the active rack
+          const activeRack = projectRacks.find((r) => r.id === projectActiveId) ?? projectRacks[0]
+          const layouted = layoutGraph(cloneGraph(activeRack.graph), moduleSizes, gridMetricsRef.current, { getModuleSize })
+
+          // Update rack counter to avoid ID collisions
+          let maxIdx = 0
+          for (const r of projectRacks) {
+            const match = /^rack-(\d+)$/.exec(r.id)
+            if (match) maxIdx = Math.max(maxIdx, Number(match[1]))
+          }
+          rackCounterRef.current = maxIdx
+
+          // Apply state
+          racksRef.current = projectRacks
+          activeRackIdRef.current = activeRack.id
+          mixerStateRef.current = projectMixer
+          masterTempoRef.current = projectTempo
+          masterVolumeRef.current = projectVolume
+
+          setRacks(projectRacks)
+          setActiveRackId(activeRack.id)
+          setMixerState(projectMixer)
+          setMasterTempo(projectTempo)
+          setMasterVolume(projectVolume)
+          resetPatching()
+          setGridError(null)
+          setGraph(layouted, { skipHistory: true })
+          clearHistory()
+          setCurrentPresetId(null)
+          setImportError(null)
+
+          if (statusRef.current === 'running') {
+            queueEngineRestart(layouted)
+          }
+          // Transport tempo will be synced by the useEffect on masterTempo
+        } else if (payload.version === 1 && isGraphState(payload.graph)) {
+          // Version 1: single patch — load into active rack
+          setImportError(null)
+          applyPreset(payload.graph)
+        } else {
+          throw new Error('Unsupported file format.')
+        }
       } catch (error) {
         console.error(error)
         setImportError('Import failed. Unsupported or corrupt file.')
@@ -2055,6 +2147,8 @@ function App() {
       await engine.start(buildCombinedGraph(graph))
       setStatus('running')
       activeVoiceCountRef.current = voiceCount
+      engine.setTransportTempo(masterTempoRef.current)
+      applyMixerToEngine(mixerStateRef.current)
     } catch (error) {
       console.error(error)
       setStatus('error')
