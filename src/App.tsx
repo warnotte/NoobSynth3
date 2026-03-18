@@ -379,6 +379,10 @@ function App() {
   const racksRef = useRef(racks)
   const activeRackIdRef = useRef(activeRackId)
 
+  /** Map a UI module ID to the engine-side ID for Tauri calls */
+  const tauriMapId = (moduleId: string) =>
+    racksRef.current.length > 1 ? `${activeRackIdRef.current}/${moduleId}` : moduleId
+
   const [importError, setImportError] = useState<string | null>(null)
   const [gridError, setGridError] = useState<string | null>(null)
   const [tauriStatus, setTauriStatus] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle')
@@ -1134,12 +1138,13 @@ function App() {
       }
       if (isTauri && tauriNativeRunning && !options?.skipEngine) {
         // String params like stepData/drumData/midiData need special handling
+        const mappedId = tauriMapId(moduleId)
         if (typeof value === 'string' && (paramId === 'stepData' || paramId === 'drumData' || paramId === 'midiData' || paramId === 'speechText' || paramId === 'cellData')) {
-          void invokeTauri('native_set_param_string', { moduleId, paramId, value })
+          void invokeTauri('native_set_param_string', { moduleId: mappedId, paramId, value })
         } else {
           const numeric = normalizeNativeParamValue(paramId, value)
           if (!Number.isNaN(numeric)) {
-            void invokeTauri('native_set_param', { moduleId, paramId, value: numeric })
+            void invokeTauri('native_set_param', { moduleId: mappedId, paramId, value: numeric })
           }
         }
       }
@@ -1283,25 +1288,25 @@ function App() {
     return {
       isActive: tauriNativeRunning,
       loadSidFile: async (moduleId: string, data: Uint8Array) => {
-        await invokeTauri('native_load_sid_file', { moduleId, data: Array.from(data) })
+        await invokeTauri('native_load_sid_file', { moduleId: tauriMapId(moduleId), data: Array.from(data) })
       },
       loadYmFile: async (moduleId: string, data: Uint8Array) => {
-        await invokeTauri('native_load_ym_file', { moduleId, data: Array.from(data) })
+        await invokeTauri('native_load_ym_file', { moduleId: tauriMapId(moduleId), data: Array.from(data) })
       },
       getSidVoiceStates: async (moduleId: string): Promise<number[]> => {
-        const result = await invokeTauri<number[]>('native_get_sid_voice_states', { moduleId })
+        const result = await invokeTauri<number[]>('native_get_sid_voice_states', { moduleId: tauriMapId(moduleId) })
         return result
       },
       getAyVoiceStates: async (moduleId: string): Promise<number[]> => {
-        const result = await invokeTauri<number[]>('native_get_ay_voice_states', { moduleId })
+        const result = await invokeTauri<number[]>('native_get_ay_voice_states', { moduleId: tauriMapId(moduleId) })
         return result
       },
       getSidElapsed: async (moduleId: string): Promise<number> => {
-        const result = await invokeTauri<number>('native_get_sid_elapsed', { moduleId })
+        const result = await invokeTauri<number>('native_get_sid_elapsed', { moduleId: tauriMapId(moduleId) })
         return result
       },
       getAyElapsed: async (moduleId: string): Promise<number> => {
-        const result = await invokeTauri<number>('native_get_ay_elapsed', { moduleId })
+        const result = await invokeTauri<number>('native_get_ay_elapsed', { moduleId: tauriMapId(moduleId) })
         return result
       },
     }
@@ -1315,11 +1320,11 @@ function App() {
     return {
       isActive: tauriNativeRunning,
       getSequencerStep: async (moduleId: string): Promise<number> => {
-        const result = await invokeTauri<number>('native_get_sequencer_step', { moduleId })
+        const result = await invokeTauri<number>('native_get_sequencer_step', { moduleId: tauriMapId(moduleId) })
         return result
       },
       seekMidiSequencer: async (moduleId: string, tick: number): Promise<void> => {
-        await invokeTauri('native_seek_midi_sequencer', { moduleId, tick })
+        await invokeTauri('native_seek_midi_sequencer', { moduleId: tauriMapId(moduleId), tick })
       },
     }
   }, [isTauri, tauriNativeRunning])
@@ -1332,12 +1337,12 @@ function App() {
     return {
       isActive: tauriNativeRunning,
       getGranularPosition: async (moduleId: string): Promise<number> => {
-        const result = await invokeTauri<number>('native_get_granular_position', { moduleId })
+        const result = await invokeTauri<number>('native_get_granular_position', { moduleId: tauriMapId(moduleId) })
         return result
       },
       loadGranularBuffer: async (moduleId: string, data: Float32Array): Promise<number> => {
         const result = await invokeTauri<number>('native_load_granular_buffer', {
-          moduleId,
+          moduleId: tauriMapId(moduleId),
           data: Array.from(data),
         })
         return result
@@ -1566,7 +1571,7 @@ function App() {
       setControlVoiceCv: (moduleId: string, voiceIndex: number, value: number) => {
         if (!shouldSend()) return
         void invokeTauri('native_set_control_voice_cv', {
-          moduleId,
+          moduleId: tauriMapId(moduleId),
           voice: voiceIndex,
           value,
         })
@@ -1579,18 +1584,18 @@ function App() {
         if (!shouldSend()) return
         const numeric = typeof value === 'boolean' ? (value ? 1 : 0) : value
         void invokeTauri('native_set_control_voice_gate', {
-          moduleId,
+          moduleId: tauriMapId(moduleId),
           voice: voiceIndex,
           value: numeric,
         })
       },
       triggerControlVoiceGate: (moduleId: string, voiceIndex: number) => {
         if (!shouldSend()) return
-        void invokeTauri('native_trigger_control_voice_gate', { moduleId, voice: voiceIndex })
+        void invokeTauri('native_trigger_control_voice_gate', { moduleId: tauriMapId(moduleId), voice: voiceIndex })
       },
       triggerControlVoiceSync: (moduleId: string, voiceIndex: number) => {
         if (!shouldSend()) return
-        void invokeTauri('native_trigger_control_voice_sync', { moduleId, voice: voiceIndex })
+        void invokeTauri('native_trigger_control_voice_sync', { moduleId: tauriMapId(moduleId), voice: voiceIndex })
       },
       setControlVoiceVelocity: (
         moduleId: string,
@@ -1600,7 +1605,7 @@ function App() {
       ) => {
         if (!shouldSend()) return
         void invokeTauri('native_set_control_voice_velocity', {
-          moduleId,
+          moduleId: tauriMapId(moduleId),
           voice: voiceIndex,
           value,
           slew: slewSeconds,
@@ -1608,7 +1613,7 @@ function App() {
       },
       setMarioChannelCv: (moduleId: string, channel: 1 | 2 | 3 | 4 | 5, value: number) => {
         if (!shouldSend()) return
-        void invokeTauri('native_set_mario_channel_cv', { moduleId, channel, value })
+        void invokeTauri('native_set_mario_channel_cv', { moduleId: tauriMapId(moduleId), channel, value })
       },
       setMarioChannelGate: (
         moduleId: string,
@@ -1617,7 +1622,7 @@ function App() {
       ) => {
         if (!shouldSend()) return
         const numeric = typeof value === 'boolean' ? (value ? 1 : 0) : value
-        void invokeTauri('native_set_mario_channel_gate', { moduleId, channel, value: numeric })
+        void invokeTauri('native_set_mario_channel_gate', { moduleId: tauriMapId(moduleId), channel, value: numeric })
       },
     }
   }, [isTauri, tauriNativeRunning])
@@ -1779,6 +1784,13 @@ function App() {
           // (the new WASM engine defaults to 120 BPM)
           engine.setTransportTempo(masterTempoRef.current)
           applyMixerToEngine(mixerStateRef.current)
+          // Also restart Tauri native engine if running
+          if (isTauri && tauriNativeRunning) {
+            const combined = buildCombinedGraph(graphRef.current)
+            const graphJson = JSON.stringify({ modules: combined.modules, connections: combined.connections, taps: nativeScopeTapsRef.current, macros: [] })
+            void invokeTauri('native_set_graph', { graphJson }).catch(() => {})
+            void invokeTauri('native_set_transport_tempo', { tempo: masterTempoRef.current }).catch(() => {})
+          }
         } catch (error) {
           console.error(error)
           setStatus('error')
@@ -2833,6 +2845,9 @@ function App() {
         // In multi-rack mode, IDs are prefixed in the engine
         const engineModuleId = multiRack ? `${rack.id}/${outputMod.id}` : outputMod.id
         engine.setParamDirect(engineModuleId, 'level', effectiveLevel)
+        if (isTauri && tauriNativeRunning) {
+          void invokeTauri('native_set_param', { moduleId: engineModuleId, paramId: 'level', value: effectiveLevel }).catch(() => {})
+        }
       }
     }
   }
