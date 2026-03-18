@@ -396,6 +396,9 @@ impl StepSequencer {
         // Use external clock if connected
         let use_external_clock = inputs.clock.is_some()
             && inputs.clock.map_or(false, |c| c.iter().any(|&v| v >= 0.0));
+        // When using external clock, force swing to 0 to avoid double-swing
+        // (the master clock already applies its own swing)
+        let swing = if use_external_clock { 0.0 } else { swing };
 
         for i in 0..frames {
             if !enabled {

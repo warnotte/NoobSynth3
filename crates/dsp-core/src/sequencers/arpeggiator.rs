@@ -521,7 +521,11 @@ impl Arpeggiator {
             self.phase = 0.0;
         }
         let gate_pct = sample_at(params.gate, 0, 75.0).clamp(10.0, 100.0) / 100.0;
-        let swing = sample_at(params.swing, 0, 0.0).clamp(0.0, 100.0) / 100.0;
+        let swing_raw = sample_at(params.swing, 0, 0.0).clamp(0.0, 100.0) / 100.0;
+        // When using external clock, force swing to 0 to avoid double-swing
+        // (the master clock already applies its own swing)
+        let use_external_clock = inputs.clock.is_some();
+        let swing = if use_external_clock { 0.0 } else { swing_raw };
         let tempo = if self.transport_bps > 0.0 {
             (self.transport_bps * 60.0 * self.sample_rate as f64) as f32
         } else {
@@ -653,7 +657,7 @@ impl Arpeggiator {
                 // Calculate swing for odd steps (limited to 45% to prevent overlap)
                 let is_odd_step = self.current_step % 2 == 1;
                 let swing_clamped = swing.min(0.9); // Max 90% swing = 45% delay
-                let swing_delay_samples = if is_odd_step && swing_clamped > 0.0 && !use_external_clock {
+                let swing_delay_samples = if is_odd_step && swing_clamped > 0.0 {
                     (swing_clamped as f64 * 0.5 * step_duration_samples) as usize
                 } else {
                     0
