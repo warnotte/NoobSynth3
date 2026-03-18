@@ -38,6 +38,9 @@ type WasmGraphEngineCtor = new (sampleRate: number) => {
   get_ay_elapsed(moduleId: string): number
   load_particle_buffer(moduleId: string, data: Float32Array): void
   get_particle_positions(moduleId: string): Float32Array
+  get_gol_grid(moduleId: string): Uint16Array
+  set_transport_tempo(tempo: number): void
+  reset_transport(): void
 }
 
 const WasmGraphEngine = (wasm as unknown as { WasmGraphEngine?: WasmGraphEngineCtor })

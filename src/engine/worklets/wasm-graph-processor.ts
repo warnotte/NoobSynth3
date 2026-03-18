@@ -73,6 +73,7 @@ type GraphMessage =
   | { type: 'enableCpuLoad'; enabled: boolean }
   | { type: 'setTransportTempo'; tempo: number }
   | { type: 'resetTransport' }
+  | { type: 'watchGol'; moduleIds: string[] }
 
 class WasmGraphProcessor extends AudioWorkletProcessor {
   private engine: InstanceType<NonNullable<typeof WasmGraphEngine>> | null = null

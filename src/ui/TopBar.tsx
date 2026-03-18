@@ -93,7 +93,7 @@ export const TopBar = ({
   isRunning,
   onStart,
   onStop,
-  rackCount = 1,
+  rackCount: _rackCount = 1,
   onResync = () => {},
   masterTempo = 120,
   onMasterTempoChange = () => {},

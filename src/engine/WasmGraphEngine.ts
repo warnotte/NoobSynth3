@@ -617,7 +617,7 @@ export class AudioEngine {
 
     // Listen for messages from the worklet
     this.graphNode.port.onmessage = (event) => {
-      const data = event.data as { type: string; steps?: Record<string, number>; positions?: Record<string, number> | number[]; data?: number[]; voices?: Record<string, number[]>; elapsed?: Record<string, number>; moduleId?: string; peakL?: number; peakR?: number }
+      const data = event.data as { type: string; steps?: Record<string, number>; positions?: Record<string, number> | number[]; data?: number[]; voices?: Record<string, number[]>; elapsed?: Record<string, number>; moduleId?: string; peakL?: number; peakR?: number; grid?: number[]; step?: number }
       if (data.type === 'cpuLoad') {
         const cpuData = data as { type: string; avg: number; peak: number }
         if (this.cpuLoadCallback) {
@@ -631,9 +631,9 @@ export class AudioEngine {
           }
         }
       } else if (data.type === 'golGrid') {
-        const callback = this.golGridCallbacks.get(this.unmapId(data.moduleId))
-        if (callback) {
-          callback(data.grid, data.step)
+        const callback = data.moduleId ? this.golGridCallbacks.get(this.unmapId(data.moduleId)) : undefined
+        if (callback && data.grid) {
+          callback(data.grid, data.step ?? 0)
         }
       } else if (data.type === 'midiEvents' && data.data && this.midiEventCallback) {
         const events: Array<{track: number, note: number, velocity: number, isNoteOn: boolean}> = []

@@ -35,7 +35,7 @@ export const flattenRacks = (
     return { modules: activeGraph.modules, connections: activeGraph.connections, meterIds: {} }
   }
 
-  const { mixerState, masterTempo } = options ?? {}
+  const { mixerState } = options ?? {}
   const hasSolo = mixerState
     ? Object.values(mixerState).some((ch) => ch.solo)
     : false
@@ -55,7 +55,6 @@ export const flattenRacks = (
 
     const prefixedModules = graph.modules.map((m) => {
       const prefixed: ModuleSpec = { ...m, id: `${prefix}${m.id}` }
-      let patchParams = false
 
       // Apply mixer volume to output modules
       if (m.type === 'output' && ch) {

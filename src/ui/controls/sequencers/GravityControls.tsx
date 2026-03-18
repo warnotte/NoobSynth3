@@ -8,7 +8,7 @@
 import { useEffect, useRef } from 'react'
 import type { ControlProps } from '../types'
 import { RotaryKnob } from '../../RotaryKnob'
-import { ControlBox, ControlBoxRow } from '../../ControlBox'
+import { ControlBox } from '../../ControlBox'
 import { ControlButtons } from '../../ControlButtons'
 import { formatInt } from '../../formatters'
 
