@@ -16,6 +16,7 @@ type MixerConsoleProps = {
   meterIds: Record<string, string>
   engine: AudioEngine
   engineRunning: boolean
+  nativeMode: boolean
   onVolumeChange: (rackId: string, volume: number) => void
   onMuteToggle: (rackId: string) => void
   onSoloToggle: (rackId: string) => void
@@ -25,14 +26,19 @@ type MixerConsoleProps = {
 
 const dbDisplay = (v: number) => v > 0 ? `${(20 * Math.log10(v)).toFixed(1)}` : '-inf'
 
+const invokeTauri = (window as unknown as { __TAURI__?: { invoke: (cmd: string, args?: Record<string, unknown>) => Promise<unknown> } })
+  .__TAURI__?.invoke ?? null
+
 const VuMeter = ({
   engine,
   meterId,
   running,
+  nativeMode,
 }: {
   engine: AudioEngine
   meterId: string | undefined
   running: boolean
+  nativeMode: boolean
 }) => {
   const [peakL, setPeakL] = useState(0)
   const [peakR, setPeakR] = useState(0)
@@ -44,15 +50,37 @@ const VuMeter = ({
       setPeakR(0)
       return
     }
+
+    if (nativeMode && invokeTauri) {
+      // Tauri: poll meter levels
+      let active = true
+      const poll = async () => {
+        while (active) {
+          try {
+            const packed = (await invokeTauri('native_get_meter_level', { moduleId: meterId })) as number
+            const l = ((packed >>> 16) & 0xFFFF) / 10000
+            const r = (packed & 0xFFFF) / 10000
+            decayRef.current.l = Math.max(l, decayRef.current.l * 0.92)
+            decayRef.current.r = Math.max(r, decayRef.current.r * 0.92)
+            setPeakL(decayRef.current.l)
+            setPeakR(decayRef.current.r)
+          } catch { /* ignore */ }
+          await new Promise((resolve) => setTimeout(resolve, 50))
+        }
+      }
+      void poll()
+      return () => { active = false }
+    }
+
+    // Web Audio: subscribe via watchMeter
     const unsub = engine.watchMeter(meterId, (l, r) => {
-      // Smooth decay
       decayRef.current.l = Math.max(l, decayRef.current.l * 0.92)
       decayRef.current.r = Math.max(r, decayRef.current.r * 0.92)
       setPeakL(decayRef.current.l)
       setPeakR(decayRef.current.r)
     })
     return unsub
-  }, [engine, meterId, running])
+  }, [engine, meterId, running, nativeMode])
 
   const clamp = (v: number) => Math.min(100, Math.max(0, v * 100))
   
@@ -108,6 +136,7 @@ export const MixerConsole = ({
   meterIds,
   engine,
   engineRunning,
+  nativeMode,
   onVolumeChange,
   onMuteToggle,
   onSoloToggle,
@@ -143,6 +172,7 @@ export const MixerConsole = ({
                   engine={engine}
                   meterId={meterIds[rack.id]}
                   running={engineRunning}
+                  nativeMode={nativeMode}
                 />
                 <div className="mixer-strip-fader">
                   <FaderScale />

@@ -146,6 +146,11 @@ enum AudioCommand {
     data: Vec<f32>,
     reply: mpsc::Sender<Result<usize, String>>,
   },
+  // Meter
+  GetMeterLevel {
+    module_id: String,
+    reply: mpsc::Sender<Result<u32, String>>,
+  },
   // Transport commands
   SetTransportTempo {
     tempo: f32,
@@ -665,6 +670,17 @@ fn audio_thread(rx: mpsc::Receiver<AudioCommand>, scope: Arc<Mutex<ScopeSnapshot
           }
         } else {
           Err("no graph".to_string())
+        };
+        let _ = reply.send(result);
+      }
+      AudioCommand::GetMeterLevel { module_id, reply } => {
+        let result = if let Some(graph) = &state.graph {
+          match graph.lock() {
+            Ok(engine) => Ok(engine.get_meter_level(&module_id)),
+            Err(_) => Err("graph engine unavailable".to_string()),
+          }
+        } else {
+          Ok(0)
         };
         let _ = reply.send(result);
       }
@@ -1561,6 +1577,24 @@ fn native_load_granular_buffer(
 }
 
 #[tauri::command]
+fn native_get_meter_level(
+  state: State<NativeAudioState>,
+  module_id: String,
+) -> Result<u32, String> {
+  let (reply_tx, reply_rx) = mpsc::channel();
+  state
+    .tx
+    .send(AudioCommand::GetMeterLevel {
+      module_id,
+      reply: reply_tx,
+    })
+    .map_err(|_| "native audio thread unavailable".to_string())?;
+  reply_rx
+    .recv()
+    .map_err(|_| "native audio thread unavailable".to_string())?
+}
+
+#[tauri::command]
 fn native_set_transport_tempo(
   state: State<NativeAudioState>,
   tempo: f32,
@@ -1968,6 +2002,8 @@ pub fn run() {
       // Granular commands
       native_get_granular_position,
       native_load_granular_buffer,
+      // Meter
+      native_get_meter_level,
       // Transport commands
       native_set_transport_tempo,
       native_reset_transport,

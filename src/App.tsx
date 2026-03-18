@@ -2997,7 +2997,8 @@ function App() {
             masterVolume={masterVolume}
             meterIds={meterIdsRef.current}
             engine={engine}
-            engineRunning={status === 'running'}
+            engineRunning={status === 'running' || (isTauri && tauriNativeRunning)}
+            nativeMode={audioMode === 'native' && tauriNativeRunning}
             onVolumeChange={handleMixerVolumeChange}
             onMuteToggle={handleMixerMuteToggle}
             onSoloToggle={handleMixerSoloToggle}
