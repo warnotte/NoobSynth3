@@ -929,10 +929,13 @@ function App() {
     }
   }, [engine, activeRackId, racks.length])
 
-  // Sync transport tempo with engine
+  // Sync transport tempo with engine (Web Audio + Tauri)
   useEffect(() => {
     engine.setTransportTempo(masterTempo)
-  }, [engine, masterTempo])
+    if (isTauri && tauriNativeRunning) {
+      void invokeTauri('native_set_transport_tempo', { tempo: masterTempo }).catch(() => {})
+    }
+  }, [engine, masterTempo, isTauri, tauriNativeRunning])
 
   // Undo/redo engine sync: when undo/redo fires, sync the audio engine
   const pendingUndoSyncRef = useRef(false)
@@ -1002,7 +1005,7 @@ function App() {
     if (!isTauri || !tauriNativeRunning) {
       return
     }
-    scheduleNativeGraphSync(graphRef.current, graphStructureSignature)
+    scheduleNativeGraphSync(buildCombinedGraph(graphRef.current), graphStructureSignature)
   }, [graphStructureSignature, isTauri, scheduleNativeGraphSync, tauriNativeRunning])
 
   useEffect(() => {
@@ -1820,7 +1823,7 @@ function App() {
       queueEngineRestart(layouted)
     }
     if (isTauri && tauriNativeRunning) {
-      scheduleNativeGraphSync(layouted, signature, { immediate: true })
+      scheduleNativeGraphSync(buildCombinedGraph(layouted), signature, { immediate: true })
     }
     // Sync to VST when in VST mode
     if (isVst && vstConnected) {
@@ -2076,11 +2079,12 @@ function App() {
     }
     setTauriNativeError(null)
     try {
-      const taps = buildScopeTaps(graphRef.current.modules)
+      const combined = buildCombinedGraph(graphRef.current)
+      const taps = buildScopeTaps(combined.modules)
       nativeScopeTapsRef.current = taps
       const graphJson = JSON.stringify({
-        modules: graphRef.current.modules,
-        connections: graphRef.current.connections,
+        modules: combined.modules,
+        connections: combined.connections,
         taps,
         macros: graphRef.current.macros ?? [],
       })
@@ -2099,11 +2103,12 @@ function App() {
     setTauriNativeError(null)
     setTauriNativeBooting(true)
     try {
-      const taps = buildScopeTaps(graphRef.current.modules)
+      const combined = buildCombinedGraph(graphRef.current)
+      const taps = buildScopeTaps(combined.modules)
       nativeScopeTapsRef.current = taps
       const graphJson = JSON.stringify({
-        modules: graphRef.current.modules,
-        connections: graphRef.current.connections,
+        modules: combined.modules,
+        connections: combined.connections,
         taps,
         macros: graphRef.current.macros ?? [],
       })
@@ -2169,6 +2174,9 @@ function App() {
     if (statusRef.current !== 'running') return
     // Reset global transport to beat 0 — all clocks/sequencers restart in sync
     engine.resetTransport()
+    if (isTauri && tauriNativeRunning) {
+      void invokeTauri('native_reset_transport').catch(() => {})
+    }
   }
 
   const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))

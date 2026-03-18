@@ -142,6 +142,14 @@ enum AudioCommand {
     data: Vec<f32>,
     reply: mpsc::Sender<Result<usize, String>>,
   },
+  // Transport commands
+  SetTransportTempo {
+    tempo: f32,
+    reply: mpsc::Sender<Result<(), String>>,
+  },
+  ResetTransport {
+    reply: mpsc::Sender<Result<(), String>>,
+  },
 }
 
 const SCOPE_FRAMES: usize = 2048;
@@ -651,6 +659,22 @@ fn audio_thread(rx: mpsc::Receiver<AudioCommand>, scope: Arc<Mutex<ScopeSnapshot
           Err("no graph".to_string())
         };
         let _ = reply.send(result);
+      }
+      AudioCommand::SetTransportTempo { tempo, reply } => {
+        if let Some(graph) = &state.graph {
+          if let Ok(mut engine) = graph.lock() {
+            engine.set_transport_tempo(tempo);
+          }
+        }
+        let _ = reply.send(Ok(()));
+      }
+      AudioCommand::ResetTransport { reply } => {
+        if let Some(graph) = &state.graph {
+          if let Ok(mut engine) = graph.lock() {
+            engine.reset_transport();
+          }
+        }
+        let _ = reply.send(Ok(()));
       }
     }
   }
@@ -1514,6 +1538,40 @@ fn native_load_granular_buffer(
     .map_err(|_| "native audio thread unavailable".to_string())?
 }
 
+#[tauri::command]
+fn native_set_transport_tempo(
+  state: State<NativeAudioState>,
+  tempo: f32,
+) -> Result<(), String> {
+  let (reply_tx, reply_rx) = mpsc::channel();
+  state
+    .tx
+    .send(AudioCommand::SetTransportTempo {
+      tempo,
+      reply: reply_tx,
+    })
+    .map_err(|_| "native audio thread unavailable".to_string())?;
+  reply_rx
+    .recv()
+    .map_err(|_| "native audio thread unavailable".to_string())?
+}
+
+#[tauri::command]
+fn native_reset_transport(
+  state: State<NativeAudioState>,
+) -> Result<(), String> {
+  let (reply_tx, reply_rx) = mpsc::channel();
+  state
+    .tx
+    .send(AudioCommand::ResetTransport {
+      reply: reply_tx,
+    })
+    .map_err(|_| "native audio thread unavailable".to_string())?;
+  reply_rx
+    .recv()
+    .map_err(|_| "native audio thread unavailable".to_string())?
+}
+
 // ============================================================================
 // VST Mode Support
 // ============================================================================
@@ -1887,6 +1945,9 @@ pub fn run() {
       // Granular commands
       native_get_granular_position,
       native_load_granular_buffer,
+      // Transport commands
+      native_set_transport_tempo,
+      native_reset_transport,
       // VST mode commands
       is_vst_mode,
       vst_connect,
