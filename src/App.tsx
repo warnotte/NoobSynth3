@@ -2101,6 +2101,8 @@ function App() {
         macros: graphRef.current.macros ?? [],
       })
       await invokeTauri('native_set_graph', { graphJson })
+      await invokeTauri('native_set_transport_tempo', { tempo: masterTempoRef.current }).catch(() => {})
+      applyMixerToEngine(mixerStateRef.current)
       await refreshTauriStatus()
     } catch (error) {
       console.error(error)
@@ -2129,6 +2131,9 @@ function App() {
         deviceName: tauriSelectedOutput || null,
         inputDeviceName: tauriSelectedInput || null,
       })
+      // Sync transport tempo and mixer after native start
+      await invokeTauri('native_set_transport_tempo', { tempo: masterTempoRef.current }).catch(() => {})
+      applyMixerToEngine(mixerStateRef.current)
       await refreshTauriStatus()
     } catch (error) {
       console.error(error)
