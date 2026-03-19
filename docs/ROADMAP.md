@@ -18,6 +18,7 @@
 - [x] Per-rack volume fader, mute, solo
 - [x] Master volume
 - [x] VU meters (injected meter modules, watchMeter subscription)
+- [x] VU meters in Tauri mode (native_get_meter_level polling)
 - [x] Rack/Mixer view switch
 
 ### Phase 2c — Send/Receive
@@ -38,44 +39,67 @@
 - [x] Version 2 format: all racks + mixer state + tempo
 - [x] Backward compatible with version 1 (single patch)
 
+### Tauri Parity
+- [x] All graph syncs send combined (flattened) graph
+- [x] tauriMapId helper for module ID prefixing in multi-rack
+- [x] All native bridges use prefixed IDs (control, chiptune, sequencer, granular)
+- [x] native_set_graph_fresh command for clean preset loading
+- [x] Transport tempo synced to Tauri on change and after start
+- [x] Mixer levels sent to Tauri native engine
+- [x] VU meters via native_get_meter_level polling
+- [x] Resync sends native_reset_transport
+
+### Code Quality
+- [x] Zero TypeScript errors (strict tsc -b mode)
+- [x] Zero Rust warnings across workspace
+- [x] 211+ presets render without NaN/panic
+- [x] Updated dsp_wasm.d.ts and dsp_wasm_wrapper.ts with all WASM methods
+
+---
+
+## Known Issues
+
+### File-Loading Modules Lose Data on Engine Restart
+- SID Player, AY Player, Granular Sampler lose their loaded file data when:
+  - Transport Stop → Play
+  - Adding a new rack (triggers graph rebuild)
+  - Loading a preset (triggers set_graph_fresh)
+- **Workaround:** Reload the file manually after restart
+- **Root cause:** File data is loaded via separate API calls (loadSidFile, loadYmFile, loadGranularBuffer) and is not persisted in the graph JSON params
+- **Fix needed:** Store loaded file data in a ref and re-send after engine restart with appropriate delay
+- MIDI File Sequencer is NOT affected (data stored in midiData param)
+
+### Rate Change Desync (Edge Cases)
+- Changing sequencer rate division can sometimes cause brief desync between racks
+- Same behavior in both Web Audio and Tauri modes (same Rust DSP code)
+- Resync button restores alignment
+
+### Mixer UI
+- VU meter on master channel not implemented
+- Visual design is functional but basic
+- No per-channel pan control
+
 ---
 
 ## Next Up (priority order)
 
-### 1. Multi-Rack Presets
-Presets that load a complete project (2-3 pre-configured racks with mixer settings).
-- [ ] Create 5-10 multi-rack demo presets showcasing the system
-- [ ] Example: "Acid House" (303 bass rack + 909 drums rack + FX rack)
-- [ ] Example: "Ambient Layers" (pad rack + sequence rack + drone rack)
-- [ ] Presets load as version 2 project files
-- **Why:** Immediately demonstrates multi-rack value to users
+### 1. File Reload After Engine Restart
+Fix SID/AY/Granular data loss on engine restart.
+- [ ] Store loaded file data in refs
+- [ ] Re-send after engine restart with delay
+- **Why:** Critical UX issue — users lose sound unexpectedly
 
-### 2. Preset Quality & Migration
-Adapt existing mono-rack presets and improve overall quality.
-- [ ] Review key presets for audio quality with global transport
-- [ ] Ensure sequenced presets work well when loaded in multi-rack context
-- [ ] Fix any presets broken by transport changes
-- [ ] Test all 211+ presets systematically
-- **Why:** Existing content must work flawlessly
-
-### 3. Stabilization & Desync Fixes
-Fix remaining synchronization edge cases and merge to main.
-- [ ] Investigate and document specific desync reproduction steps
-- [ ] Consider quantized rate changes (snap to next beat/bar)
-- [ ] Transport position display in UI (bars:beats)
-- [ ] Comprehensive testing of multi-rack + transport + mixer
-- [ ] Merge feature/subpatches to main when stable
-- **Why:** Reliability is non-negotiable
-
-### 4. Multi-Module Selection (Lasso / Shift-Click)
+### 2. Multi-Module Selection (Lasso / Shift-Click)
 Select, move, copy, delete multiple modules at once.
 - [ ] Shift-click to add/remove modules from selection
 - [ ] Lasso (drag rectangle) to select area
-- [ ] Move selected group
-- [ ] Delete selected group
-- [ ] Copy/paste selected group
-- [ ] "Create Template from selection" (replaces connected-modules heuristic)
-- **Why:** Fundamental workflow improvement missing from the UI
+- [ ] Move/delete/copy selected group
+- **Why:** Fundamental workflow improvement
+
+### 3. Preset Quality & Testing
+- [ ] Test all 211+ presets with global transport
+- [ ] Fix any presets broken by transport changes
+- **Why:** Existing content must work flawlessly
 
 ---
 
@@ -83,23 +107,21 @@ Select, move, copy, delete multiple modules at once.
 
 ### Mixer UI Polish
 - [ ] VU meter on master channel
-- [ ] Better visual design (professional look)
+- [ ] Professional visual design
 - [ ] Pan per channel
 - [ ] Insert FX slots
 
-### Subpatches (Phase 4 — deferred)
-- [ ] Collapse a group of modules into a single reusable module
-- [ ] Exposed ports, nestable, based on multi-rack infrastructure
-- [ ] Requires multi-module selection first
-- **Note:** Explored and reverted — templates + multi-rack cover most use cases
+### Subpatches (deferred)
+- [ ] Explored and reverted — templates + multi-rack cover most use cases
+- [ ] Revisit if there's clear user demand
 
-### Worker Threads (Phase 3 — deferred)
-- [ ] SharedArrayBuffer + Worker per rack for true parallelism
+### Worker Threads (deferred)
 - [ ] Not needed until performance becomes an issue
 
 ### Other
 - [ ] Master bus FX (EQ, compressor)
 - [ ] MIDI export
-- [ ] Per-rack pan control
 - [ ] Mobile/tablet responsive mixer
 - [ ] Keyboard shortcuts for rack/mixer operations
+- [ ] Quantized rate changes (snap to next beat/bar)
+- [ ] Transport position display in UI (bars:beats)
