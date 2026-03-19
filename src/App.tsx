@@ -3017,11 +3017,24 @@ function App() {
             engine={engine}
             engineRunning={status === 'running' || (isTauri && tauriNativeRunning)}
             nativeMode={audioMode === 'native' && tauriNativeRunning}
+            channelFxIds={channelFxIdsRef.current}
             onVolumeChange={handleMixerVolumeChange}
             onMuteToggle={handleMixerMuteToggle}
             onSoloToggle={handleMixerSoloToggle}
             onSwitchRack={(id) => { handleSwitchRack(id); setViewMode('rack') }}
             onMasterVolumeChange={handleMasterVolumeChange}
+            onChannelFxParam={(engineModuleId, paramId, value) => {
+              engine.setParamDirect(engineModuleId, paramId, value)
+              if (isTauri && tauriNativeRunning) {
+                void invokeTauri('native_set_param', { moduleId: engineModuleId, paramId, value }).catch(() => {})
+              }
+            }}
+            onMasterFxParam={(param, value) => {
+              engine.setMasterFxParam(param, value)
+              if (isTauri && tauriNativeRunning) {
+                void invokeTauri('native_set_master_fx_param', { param, value }).catch(() => {})
+              }
+            }}
           />
         ) : (
           <RackView
