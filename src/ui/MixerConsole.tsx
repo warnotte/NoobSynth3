@@ -26,8 +26,10 @@ type MixerConsoleProps = {
 
 const dbDisplay = (v: number) => v > 0 ? `${(20 * Math.log10(v)).toFixed(1)}` : '-inf'
 
-const invokeTauri = (window as unknown as { __TAURI__?: { invoke: (cmd: string, args?: Record<string, unknown>) => Promise<unknown> } })
-  .__TAURI__?.invoke ?? null
+const callTauri = async <T,>(command: string, payload?: Record<string, unknown>): Promise<T> => {
+  const { invoke } = await import('@tauri-apps/api/core')
+  return invoke<T>(command, payload)
+}
 
 const VuMeter = ({
   engine,
@@ -51,13 +53,13 @@ const VuMeter = ({
       return
     }
 
-    if (nativeMode && invokeTauri) {
+    if (nativeMode) {
       // Tauri: poll meter levels
       let active = true
       const poll = async () => {
         while (active) {
           try {
-            const packed = (await invokeTauri('native_get_meter_level', { moduleId: meterId })) as number
+            const packed = await callTauri<number>('native_get_meter_level', { moduleId: meterId })
             const l = ((packed >>> 16) & 0xFFFF) / 10000
             const r = (packed & 0xFFFF) / 10000
             decayRef.current.l = Math.max(l, decayRef.current.l * 0.92)
