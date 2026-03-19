@@ -12,6 +12,7 @@ type TopBarProps = {
   onResync?: () => void
   masterTempo?: number
   onMasterTempoChange?: (bpm: number) => void
+  transportBeats?: number
   showCables?: boolean
   onToggleCables?: () => void
   showDevTools?: boolean
@@ -97,6 +98,7 @@ export const TopBar = ({
   onResync = () => {},
   masterTempo = 120,
   onMasterTempoChange = () => {},
+  transportBeats = 0,
   showCables = true,
   onToggleCables = () => {},
   showDevTools = false,
@@ -197,6 +199,11 @@ export const TopBar = ({
                 />
                 <span className="master-tempo-label">BPM</span>
               </div>
+              {isRunning && (
+                <span className="transport-position" title="Bar : Beat">
+                  {Math.floor(transportBeats / 4) + 1}:{Math.floor(transportBeats % 4) + 1}
+                </span>
+              )}
             </div>
           </div>
         </div>

@@ -412,6 +412,7 @@ function App() {
   const [isRecording, setIsRecording] = useState(false)
   const [showCpuMeter, setShowCpuMeter] = useState(false)
   const [cpuLoad, setCpuLoad] = useState<{ avg: number; peak: number } | null>(null)
+  const [transportBeats, setTransportBeats] = useState(0)
   const [moduleSizeOverrides, setModuleSizeOverrides] = useState<Record<string, string>>({})
   const [moduleResizePreview, setModuleResizePreview] = useState<ModuleResizePreview | null>(null)
   const [contextMenu, setContextMenu] = useState<{
@@ -855,6 +856,19 @@ function App() {
       setCpuLoad(null)
     }
   }, [engine, showCpuMeter, isTauri, status, tauriNativeRunning])
+
+  // Subscribe to transport position updates
+  useEffect(() => {
+    if (status !== 'running') {
+      setTransportBeats(0)
+      return
+    }
+    const unsub = engine.watchTransportBeats((beats) => setTransportBeats(beats))
+    return () => {
+      unsub()
+      setTransportBeats(0)
+    }
+  }, [engine, status])
 
   useEffect(() => {
     let active = true
@@ -2977,6 +2991,7 @@ function App() {
           onResync={handleResync}
           masterTempo={masterTempo}
           onMasterTempoChange={handleMasterTempoChange}
+          transportBeats={transportBeats}
         />
       <RackTabs
         racks={racks}

@@ -189,6 +189,13 @@ export class AudioEngine {
 
   // ── Global Transport ──
 
+  private transportBeatsCallback: ((beats: number) => void) | null = null
+
+  watchTransportBeats(callback: (beats: number) => void): () => void {
+    this.transportBeatsCallback = callback
+    return () => { this.transportBeatsCallback = null }
+  }
+
   setTransportTempo(tempo: number): void {
     this.graphNode?.port.postMessage({ type: 'setTransportTempo', tempo })
   }
@@ -617,8 +624,12 @@ export class AudioEngine {
 
     // Listen for messages from the worklet
     this.graphNode.port.onmessage = (event) => {
-      const data = event.data as { type: string; steps?: Record<string, number>; positions?: Record<string, number> | number[]; data?: number[]; voices?: Record<string, number[]>; elapsed?: Record<string, number>; moduleId?: string; peakL?: number; peakR?: number; grid?: number[]; step?: number }
-      if (data.type === 'cpuLoad') {
+      const data = event.data as { type: string; steps?: Record<string, number>; positions?: Record<string, number> | number[]; data?: number[]; voices?: Record<string, number[]>; elapsed?: Record<string, number>; moduleId?: string; peakL?: number; peakR?: number; grid?: number[]; step?: number; beats?: number }
+      if (data.type === 'transportBeats' && data.beats != null) {
+        if (this.transportBeatsCallback) {
+          this.transportBeatsCallback(data.beats)
+        }
+      } else if (data.type === 'cpuLoad') {
         const cpuData = data as { type: string; avg: number; peak: number }
         if (this.cpuLoadCallback) {
           this.cpuLoadCallback(cpuData.avg, cpuData.peak)

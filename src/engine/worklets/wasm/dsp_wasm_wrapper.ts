@@ -41,6 +41,7 @@ type WasmGraphEngineCtor = new (sampleRate: number) => {
   get_gol_grid(moduleId: string): Uint16Array
   set_transport_tempo(tempo: number): void
   reset_transport(): void
+  get_transport_beats(): number
 }
 
 const WasmGraphEngine = (wasm as unknown as { WasmGraphEngine?: WasmGraphEngineCtor })

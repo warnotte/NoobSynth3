@@ -468,6 +468,12 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
       }
     }
 
+    // Report transport position every ~500ms (~190 blocks)
+    if (shouldPoll && this.cpuLoadReportCounter % 24 === 0) {
+      const beats = this.engine.get_transport_beats()
+      this.port.postMessage({ type: 'transportBeats', beats })
+    }
+
     return true
   }
 }

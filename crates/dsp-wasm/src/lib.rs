@@ -192,4 +192,9 @@ impl WasmGraphEngine {
   pub fn reset_transport(&mut self) {
     self.engine.reset_transport();
   }
+
+  /// Get the current transport beat position.
+  pub fn get_transport_beats(&self) -> f64 {
+    self.engine.get_transport_beats()
+  }
 }

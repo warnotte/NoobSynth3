@@ -157,6 +157,10 @@ impl GraphEngine {
     self.transport_beats = 0.0;
   }
 
+  pub fn get_transport_beats(&self) -> f64 {
+    self.transport_beats
+  }
+
   pub fn set_control_voice_cv(&mut self, module_id: &str, voice: usize, value: f32) {
     if let Some(index) = self.find_voice_instance(module_id, voice) {
       if let Some(ModuleState::Control(state)) = self.modules.get_mut(index).map(|m| &mut m.state) {

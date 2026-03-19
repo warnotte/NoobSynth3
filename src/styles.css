@@ -724,6 +724,16 @@
   text-align: right;
 }
 
+.transport-position {
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: rgba(216, 230, 246, 0.7);
+  min-width: 32px;
+  text-align: center;
+  letter-spacing: 0.05em;
+}
+
 .dev-toggle {
   --ui-btn-padding: 10px;
   --ui-btn-bg: rgba(20, 26, 34, 0.9);

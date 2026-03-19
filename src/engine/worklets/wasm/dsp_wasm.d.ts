@@ -37,6 +37,7 @@ export class WasmGraphEngine {
   get_particle_positions(module_id: string): Float32Array;
   set_transport_tempo(tempo: number): void;
   reset_transport(): void;
+  get_transport_beats(): number;
 }
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
