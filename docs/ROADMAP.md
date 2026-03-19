@@ -119,9 +119,7 @@ Select, move, copy, delete multiple modules at once.
 - [ ] Not needed until performance becomes an issue
 
 ### Other
-- [ ] Master bus FX (EQ, compressor)
-- [ ] MIDI export
-- [ ] Mobile/tablet responsive mixer
-- [ ] Keyboard shortcuts for rack/mixer operations
-- [ ] Quantized rate changes (snap to next beat/bar)
+- [ ] Master bus FX (EQ, compressor on master output)
+- [ ] Quantized rate changes (snap to next beat/bar — fixes desync edge cases)
 - [ ] Transport position display in UI (bars:beats)
+- [ ] Mobile/tablet responsive mixer
