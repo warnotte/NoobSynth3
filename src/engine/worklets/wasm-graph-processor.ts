@@ -253,6 +253,7 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
         break
       case 'resetTransport':
         this.engine!.reset_transport()
+        this.lastSteps.clear()
         break
       default:
         break
