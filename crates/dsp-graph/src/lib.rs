@@ -155,19 +155,6 @@ impl GraphEngine {
 
   pub fn reset_transport(&mut self) {
     self.transport_beats = 0.0;
-    // Reset last_transport_step on all sequencer modules so they re-trigger step 0
-    for module in &mut self.modules {
-      match &mut module.state {
-        ModuleState::Clock(s) => { s.clock.last_transport_step = usize::MAX; }
-        ModuleState::StepSequencer(s) => { s.seq.last_transport_step = usize::MAX; }
-        ModuleState::DrumSequencer(s) => { s.seq.last_transport_step = usize::MAX; }
-        ModuleState::Arpeggiator(s) => { s.arp.last_transport_step = usize::MAX; }
-        ModuleState::Euclidean(s) => { s.euclidean.last_transport_step = usize::MAX; }
-        ModuleState::ChordSequencer(s) => { s.seq.last_transport_step = usize::MAX; }
-        ModuleState::PolyrhythmSequencer(s) => { s.seq.last_transport_step = usize::MAX; }
-        _ => {}
-      }
-    }
   }
 
   pub fn get_transport_beats(&self) -> f64 {

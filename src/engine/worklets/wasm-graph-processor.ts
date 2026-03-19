@@ -92,7 +92,6 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
   private watchedParticles: string[] = []
   private watchedMeters: string[] = []
   private messageQueue: GraphMessage[] = []
-  private forceStepReport = false
   private cpuLoadEnabled = false
   private cpuLoadAccum = 0
   private cpuLoadSamples = 0
@@ -254,8 +253,6 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
         break
       case 'resetTransport':
         this.engine!.reset_transport()
-        this.lastSteps.clear()
-        this.forceStepReport = true
         break
       default:
         break
@@ -360,16 +357,13 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
       this.stepPollCounter = 0
     }
 
-    // Poll sequencer steps (force immediate report after transport reset)
-    const pollSteps = shouldPoll || this.forceStepReport
-    if (pollSteps && this.watchedSequencers.length > 0) {
-      const force = this.forceStepReport
-      this.forceStepReport = false
+    // Poll sequencer steps
+    if (shouldPoll && this.watchedSequencers.length > 0) {
       const updates: Record<string, number> = {}
       for (const moduleId of this.watchedSequencers) {
         const step = this.engine.get_sequencer_step(moduleId)
         const lastStep = this.lastSteps.get(moduleId) ?? -1
-        if (force || (step !== lastStep && step >= 0)) {
+        if (step !== lastStep && step >= 0) {
           updates[moduleId] = step
           this.lastSteps.set(moduleId, step)
         }
