@@ -34,6 +34,7 @@
 - [x] set_graph_fresh resets transport to 0
 - [x] Queued transport messages for deterministic timing
 - [x] Swing stacking fix (external clock disables local swing)
+- [x] Transport position display (Bar:Beat) in TopBar
 
 ### Project Export/Import
 - [x] Version 2 format: all racks + mixer state + tempo
@@ -48,78 +49,67 @@
 - [x] Mixer levels sent to Tauri native engine
 - [x] VU meters via native_get_meter_level polling
 - [x] Resync sends native_reset_transport
+- [x] native_set_master_fx_param command
+
+### Master Bus & Channel Strip FX (in progress)
+- [x] Master bus EQ3 + Compressor in GraphEngine::render()
+- [x] set_master_fx_param() API (Web Audio + Tauri)
+- [x] Per-rack channel strip injection in flattenRacks (EQ3 → Comp → Reverb)
+- [x] Master FX knobs in MixerConsole UI
+- [ ] Channel strip FX knobs on each mixer channel (only master has them currently)
+- [ ] More params exposed (comp attack/release, reverb time/damp, EQ frequencies)
+- [ ] Better visual design for FX controls (current mini sliders too small)
+- [ ] Channel strip FX should work in single-rack mode too
 
 ### Code Quality
 - [x] Zero TypeScript errors (strict tsc -b mode)
 - [x] Zero Rust warnings across workspace
 - [x] 211+ presets render without NaN/panic
-- [x] Updated dsp_wasm.d.ts and dsp_wasm_wrapper.ts with all WASM methods
 
 ---
 
 ## Known Issues
 
 ### File-Loading Modules Lose Data on Engine Restart
-- SID Player, AY Player, Granular Sampler lose their loaded file data when:
-  - Transport Stop → Play
-  - Adding a new rack (triggers graph rebuild)
-  - Loading a preset (triggers set_graph_fresh)
+- SID Player, AY Player, Granular Sampler lose their loaded file data on Stop→Play
 - **Workaround:** Reload the file manually after restart
-- **Root cause:** File data is loaded via separate API calls (loadSidFile, loadYmFile, loadGranularBuffer) and is not persisted in the graph JSON params
-- **Fix needed:** Store loaded file data in a ref and re-send after engine restart with appropriate delay
 - MIDI File Sequencer is NOT affected (data stored in midiData param)
 
-### Rate Change Desync (Edge Cases)
-- Changing sequencer rate division can sometimes cause brief desync between racks
-- Same behavior in both Web Audio and Tauri modes (same Rust DSP code)
-- Resync button restores alignment
+### Playhead Visual Reset on Resync
+- Transport position (Bar:Beat) resets correctly
+- Sequencer playhead visual indicators may not reset to step 0
+- Sound IS synced correctly, only the visual is sometimes off
 
-### Mixer UI
-- VU meter on master channel not implemented
-- Visual design is functional but basic
-- No per-channel pan control
+### Rate Change Desync (Edge Cases)
+- Changing sequencer rate can sometimes cause brief desync
+- Same behavior in Web Audio and Tauri
 
 ---
 
 ## Next Up (priority order)
 
-### 1. File Reload After Engine Restart
-Fix SID/AY/Granular data loss on engine restart.
-- [ ] Store loaded file data in refs
-- [ ] Re-send after engine restart with delay
-- **Why:** Critical UX issue — users lose sound unexpectedly
+### 1. Complete Channel Strip FX UI
+- [ ] Show EQ/Comp/Reverb knobs on each channel strip (not just master)
+- [ ] Inject channel FX in single-rack mode too
+- [ ] Full param set: comp attack/release, reverb time/damp/preDelay, EQ freqs
+- [ ] Better visual design (larger controls, proper layout)
 
-### 2. Multi-Module Selection (Lasso / Shift-Click)
-Select, move, copy, delete multiple modules at once.
-- [ ] Shift-click to add/remove modules from selection
-- [ ] Lasso (drag rectangle) to select area
-- [ ] Move/delete/copy selected group
-- **Why:** Fundamental workflow improvement
+### 2. File Reload After Engine Restart
+- [ ] Store loaded file data in refs, re-send after restart
+- [ ] Affects: SID, AY, Granular
 
-### 3. Preset Quality & Testing
-- [ ] Test all 211+ presets with global transport
-- [ ] Fix any presets broken by transport changes
-- **Why:** Existing content must work flawlessly
+### 3. Multi-Module Selection (Lasso / Shift-Click)
+- [ ] Shift-click, lasso, move/delete/copy groups
+
+### 4. Quantized Rate Changes
+- [ ] Snap rate changes to next beat/bar to prevent desync
 
 ---
 
-## Backlog (lower priority)
+## Backlog
 
-### Mixer UI Polish
+- [ ] Master bus FX: limiter, more effects
+- [ ] Per-channel pan control
 - [ ] VU meter on master channel
-- [ ] Professional visual design
-- [ ] Pan per channel
-- [ ] Insert FX slots
-
-### Subpatches (deferred)
-- [ ] Explored and reverted — templates + multi-rack cover most use cases
-- [ ] Revisit if there's clear user demand
-
-### Worker Threads (deferred)
-- [ ] Not needed until performance becomes an issue
-
-### Other
-- [ ] Master bus FX (EQ, compressor on master output)
-- [ ] Quantized rate changes (snap to next beat/bar — fixes desync edge cases)
-- [ ] Transport position display in UI (bars:beats)
 - [ ] Mobile/tablet responsive mixer
+- [ ] Quantized rate changes (snap to next beat/bar)
