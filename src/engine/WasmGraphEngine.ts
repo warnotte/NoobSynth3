@@ -196,6 +196,10 @@ export class AudioEngine {
     return () => { this.transportBeatsCallback = null }
   }
 
+  setMasterFxParam(param: string, value: number): void {
+    this.graphNode?.port.postMessage({ type: 'setMasterFxParam', param, value })
+  }
+
   setTransportTempo(tempo: number): void {
     this.graphNode?.port.postMessage({ type: 'setTransportTempo', tempo })
   }

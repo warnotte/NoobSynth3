@@ -151,6 +151,12 @@ enum AudioCommand {
     module_id: String,
     reply: mpsc::Sender<Result<u32, String>>,
   },
+  // Master FX
+  SetMasterFxParam {
+    param: String,
+    value: f32,
+    reply: mpsc::Sender<Result<(), String>>,
+  },
   // Transport commands
   SetTransportTempo {
     tempo: f32,
@@ -683,6 +689,14 @@ fn audio_thread(rx: mpsc::Receiver<AudioCommand>, scope: Arc<Mutex<ScopeSnapshot
           Ok(0)
         };
         let _ = reply.send(result);
+      }
+      AudioCommand::SetMasterFxParam { param, value, reply } => {
+        if let Some(graph) = &state.graph {
+          if let Ok(mut engine) = graph.lock() {
+            engine.set_master_fx_param(&param, value);
+          }
+        }
+        let _ = reply.send(Ok(()));
       }
       AudioCommand::SetTransportTempo { tempo, reply } => {
         if let Some(graph) = &state.graph {
@@ -1595,6 +1609,26 @@ fn native_get_meter_level(
 }
 
 #[tauri::command]
+fn native_set_master_fx_param(
+  state: State<NativeAudioState>,
+  param: String,
+  value: f32,
+) -> Result<(), String> {
+  let (reply_tx, reply_rx) = mpsc::channel();
+  state
+    .tx
+    .send(AudioCommand::SetMasterFxParam {
+      param,
+      value,
+      reply: reply_tx,
+    })
+    .map_err(|_| "native audio thread unavailable".to_string())?;
+  reply_rx
+    .recv()
+    .map_err(|_| "native audio thread unavailable".to_string())?
+}
+
+#[tauri::command]
 fn native_set_transport_tempo(
   state: State<NativeAudioState>,
   tempo: f32,
@@ -2004,6 +2038,8 @@ pub fn run() {
       native_load_granular_buffer,
       // Meter
       native_get_meter_level,
+      // Master FX
+      native_set_master_fx_param,
       // Transport commands
       native_set_transport_tempo,
       native_reset_transport,

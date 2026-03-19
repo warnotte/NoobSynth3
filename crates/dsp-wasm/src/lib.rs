@@ -193,6 +193,11 @@ impl WasmGraphEngine {
     self.engine.reset_transport();
   }
 
+  /// Set a master bus FX parameter.
+  pub fn set_master_fx_param(&mut self, param: &str, value: f32) {
+    self.engine.set_master_fx_param(param, value);
+  }
+
   /// Get the current transport beat position.
   pub fn get_transport_beats(&self) -> f64 {
     self.engine.get_transport_beats()

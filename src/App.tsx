@@ -2556,6 +2556,8 @@ function App() {
 
   /** Meter IDs for VU meters in mixer (rackId → engine meter module ID) */
   const meterIdsRef = useRef<Record<string, string>>({})
+  /** Channel strip FX IDs (rackId → {eq, comp, reverb}) */
+  const channelFxIdsRef = useRef<Record<string, import('./state/rackFlatten').ChannelFxIds>>({})
 
   /** Build the combined graph (all racks flattened) for the engine */
   const buildCombinedGraph = (activeGraph: GraphState): GraphState => {
@@ -2563,6 +2565,7 @@ function App() {
       mixerState: mixerStateRef.current,
     })
     meterIdsRef.current = result.meterIds
+    channelFxIdsRef.current = result.channelFxIds
     return { modules: result.modules, connections: result.connections }
   }
 

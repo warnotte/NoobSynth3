@@ -38,6 +38,7 @@ export class WasmGraphEngine {
   set_transport_tempo(tempo: number): void;
   reset_transport(): void;
   get_transport_beats(): number;
+  set_master_fx_param(param: string, value: number): void;
 }
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;

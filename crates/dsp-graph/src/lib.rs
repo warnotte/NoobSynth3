@@ -6,6 +6,8 @@ mod process;
 mod instantiate;
 
 use dsp_core::{Sample, MARIO_CHANNELS};
+use dsp_core::effects::eq3::{Eq3, Eq3Inputs, Eq3Params};
+use dsp_core::effects::compressor::{Compressor, CompressorParams};
 
 // Re-export types from our modules
 pub use types::{ModuleType, PortInfo, ConnectionEdge, TapSource, ParamBuffer, TransportContext};
@@ -79,6 +81,17 @@ pub struct GraphEngine {
   external_input_frames: usize,
   transport_beats: f64,
   transport_tempo: f32,
+  // Master bus FX
+  master_eq: Eq3,
+  master_comp: Compressor,
+  master_eq_low: f32,
+  master_eq_mid: f32,
+  master_eq_high: f32,
+  master_comp_threshold: f32,
+  master_comp_ratio: f32,
+  master_comp_attack: f32,
+  master_comp_release: f32,
+  master_fx_enabled: bool,
 }
 
 impl GraphEngine {
@@ -100,6 +113,16 @@ impl GraphEngine {
       external_input_frames: 0,
       transport_beats: 0.0,
       transport_tempo: 120.0,
+      master_eq: Eq3::new(sample_rate),
+      master_comp: Compressor::new(sample_rate),
+      master_eq_low: 0.0,
+      master_eq_mid: 0.0,
+      master_eq_high: 0.0,
+      master_comp_threshold: 0.0,
+      master_comp_ratio: 1.0,
+      master_comp_attack: 10.0,
+      master_comp_release: 100.0,
+      master_fx_enabled: true,
     }
   }
 
@@ -159,6 +182,20 @@ impl GraphEngine {
 
   pub fn get_transport_beats(&self) -> f64 {
     self.transport_beats
+  }
+
+  pub fn set_master_fx_param(&mut self, param: &str, value: f32) {
+    match param {
+      "eqLow" => self.master_eq_low = value.clamp(-12.0, 12.0),
+      "eqMid" => self.master_eq_mid = value.clamp(-12.0, 12.0),
+      "eqHigh" => self.master_eq_high = value.clamp(-12.0, 12.0),
+      "compThreshold" => self.master_comp_threshold = value.clamp(-60.0, 0.0),
+      "compRatio" => self.master_comp_ratio = value.clamp(1.0, 20.0),
+      "compAttack" => self.master_comp_attack = value.clamp(0.5, 200.0),
+      "compRelease" => self.master_comp_release = value.clamp(10.0, 2000.0),
+      "masterFxEnabled" => self.master_fx_enabled = value > 0.5,
+      _ => {}
+    }
   }
 
   pub fn set_control_voice_cv(&mut self, module_id: &str, voice: usize, value: f32) {
@@ -590,6 +627,49 @@ impl GraphEngine {
       let outputs = &self.output_buffers[index];
       if let Some(out_port) = outputs.get(0) {
         mix_buffers(&mut self.main_buffer, out_port, 1.0);
+      }
+    }
+
+    // Master bus FX: EQ → Compressor (process in-place on main_buffer)
+    if self.master_fx_enabled && frames > 0 {
+      // EQ3: needs separate input slices, so copy first
+      let needs_eq = self.master_eq_low.abs() > 0.01 || self.master_eq_mid.abs() > 0.01 || self.master_eq_high.abs() > 0.01;
+      if needs_eq {
+        let mut tmp_l = vec![0.0f32; frames];
+        let mut tmp_r = vec![0.0f32; frames];
+        tmp_l.copy_from_slice(&self.main_buffer.channel(0)[..frames]);
+        tmp_r.copy_from_slice(&self.main_buffer.channel(1)[..frames]);
+        let (out_l, out_r) = self.main_buffer.channels_mut_2();
+        self.master_eq.process_block(
+          out_l, out_r,
+          Eq3Inputs { input_l: Some(&tmp_l), input_r: Some(&tmp_r) },
+          Eq3Params {
+            low_gain: &[self.master_eq_low],
+            mid_gain: &[self.master_eq_mid],
+            high_gain: &[self.master_eq_high],
+            low_freq: &[200.0],
+            mid_freq: &[1000.0],
+            high_freq: &[5000.0],
+            mid_q: &[1.0],
+          },
+        );
+      }
+      // Compressor (only if ratio > 1)
+      if self.master_comp_ratio > 1.01 {
+        let (left, right) = self.main_buffer.channels_mut_2();
+        self.master_comp.process_block_stereo(
+          left, right,
+          None, None,
+          CompressorParams {
+            threshold: &[self.master_comp_threshold],
+            ratio: &[self.master_comp_ratio],
+            attack: &[self.master_comp_attack],
+            release: &[self.master_comp_release],
+            makeup: &[0.0],
+            mix: &[1.0],
+          },
+          None, None,
+        );
       }
     }
 

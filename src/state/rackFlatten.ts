@@ -5,11 +5,19 @@ export type FlattenOptions = {
   mixerState?: Record<string, MixerChannelState>
 }
 
+export type ChannelFxIds = {
+  eq: string
+  comp: string
+  reverb: string
+}
+
 export type FlattenResult = {
   modules: ModuleSpec[]
   connections: Connection[]
   /** Map of rackId → engine-side meter module ID (for VU meters) */
   meterIds: Record<string, string>
+  /** Map of rackId → engine-side channel strip FX module IDs */
+  channelFxIds: Record<string, ChannelFxIds>
 }
 
 /**
@@ -32,7 +40,7 @@ export const flattenRacks = (
   options?: FlattenOptions,
 ): FlattenResult => {
   if (racks.length <= 1) {
-    return { modules: activeGraph.modules, connections: activeGraph.connections, meterIds: {} }
+    return { modules: activeGraph.modules, connections: activeGraph.connections, meterIds: {}, channelFxIds: {} }
   }
 
   const { mixerState } = options ?? {}
@@ -106,31 +114,57 @@ export const flattenRacks = (
     }
   }
 
-  // Inject virtual meter modules for each rack's output (for VU meters)
+  // Inject channel strip FX and meters for each rack's output
   const meterIds: Record<string, string> = {}
+  const channelFxIds: Record<string, ChannelFxIds> = {}
   for (const rack of racks) {
     const prefix = `${rack.id}/`
     const graph = rack.id === activeRackId ? activeGraph : rack.graph
     const outputMod = graph.modules.find((m) => m.type === 'output')
     if (outputMod) {
+      const outputEngineId = `${prefix}${outputMod.id}`
+      const eqId = `_eq/${rack.id}`
+      const compId = `_comp/${rack.id}`
+      const reverbId = `_reverb/${rack.id}`
       const meterId = `_meter/${rack.id}`
+
+      channelFxIds[rack.id] = { eq: eqId, comp: compId, reverb: reverbId }
       meterIds[rack.id] = meterId
-      allModules.push({
-        id: meterId,
-        type: 'meter',
-        name: `Meter ${rack.name}`,
-        position: { x: -1, y: -1 },
-        params: {},
-      })
-      allConnections.push({
-        from: { moduleId: `${prefix}${outputMod.id}`, portId: 'out' },
-        to: { moduleId: meterId, portId: 'in' },
-        kind: 'audio',
-      })
+
+      // Channel strip modules with neutral defaults
+      allModules.push(
+        { id: eqId, type: 'eq3', name: `EQ ${rack.name}`, position: { x: -1, y: -1 },
+          params: { lowGain: 0, midGain: 0, highGain: 0, lowFreq: 200, midFreq: 1000, highFreq: 5000, midQ: 1 } },
+        { id: compId, type: 'compressor', name: `Comp ${rack.name}`, position: { x: -1, y: -1 },
+          params: { threshold: 0, ratio: 1, attack: 10, release: 100, makeup: 0, mix: 1 } },
+        { id: reverbId, type: 'reverb', name: `Reverb ${rack.name}`, position: { x: -1, y: -1 },
+          params: { time: 0.5, damp: 0.5, preDelay: 10, mix: 0 } },
+        { id: meterId, type: 'meter', name: `Meter ${rack.name}`, position: { x: -1, y: -1 },
+          params: {} },
+      )
+
+      // Redirect connections going to Output's 'in' port through the FX chain
+      // Find all connections targeting this output's input
+      for (let i = 0; i < allConnections.length; i++) {
+        const c = allConnections[i]
+        if (c.to.moduleId === outputEngineId && c.to.portId === 'in') {
+          // Redirect: source → EQ instead of source → Output
+          allConnections[i] = { ...c, to: { moduleId: eqId, portId: 'in' } }
+        }
+      }
+
+      // Chain: EQ → Comp → Reverb → Output
+      allConnections.push(
+        { from: { moduleId: eqId, portId: 'out' }, to: { moduleId: compId, portId: 'in' }, kind: 'audio' },
+        { from: { moduleId: compId, portId: 'out' }, to: { moduleId: reverbId, portId: 'in' }, kind: 'audio' },
+        { from: { moduleId: reverbId, portId: 'out' }, to: { moduleId: outputEngineId, portId: 'in' }, kind: 'audio' },
+        // Meter taps the output
+        { from: { moduleId: outputEngineId, portId: 'out' }, to: { moduleId: meterId, portId: 'in' }, kind: 'audio' },
+      )
     }
   }
 
-  return { modules: allModules, connections: allConnections, meterIds }
+  return { modules: allModules, connections: allConnections, meterIds, channelFxIds }
 }
 
 /**

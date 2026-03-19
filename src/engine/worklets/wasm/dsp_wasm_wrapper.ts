@@ -42,6 +42,7 @@ type WasmGraphEngineCtor = new (sampleRate: number) => {
   set_transport_tempo(tempo: number): void
   reset_transport(): void
   get_transport_beats(): number
+  set_master_fx_param(param: string, value: number): void
 }
 
 const WasmGraphEngine = (wasm as unknown as { WasmGraphEngine?: WasmGraphEngineCtor })
