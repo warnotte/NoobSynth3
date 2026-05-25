@@ -1982,6 +1982,7 @@ function App() {
             const inc = incomingChannelFx[r.id]
             projectChannelFx[r.id] = inc
               ? {
+                  enabled: { ...NEUTRAL_CHANNEL_FX.enabled, ...(inc.enabled ?? {}) },
                   eq: { ...NEUTRAL_CHANNEL_FX.eq, ...(inc.eq ?? {}) },
                   comp: { ...NEUTRAL_CHANNEL_FX.comp, ...(inc.comp ?? {}) },
                   reverb: { ...NEUTRAL_CHANNEL_FX.reverb, ...(inc.reverb ?? {}) },
@@ -2910,21 +2911,28 @@ function App() {
     const webRunning = statusRef.current === 'running'
     const nativeRunning = isTauri && tauriNativeRunning
     if (!webRunning && !nativeRunning) return
-    for (const [param, value] of Object.entries(fx)) {
+    const send = (param: string, value: number) => {
       engine.setMasterFxParam(param, value)
       if (nativeRunning) {
         void invokeTauri('native_set_master_fx_param', { param, value }).catch(() => {})
       }
     }
+    // Bypassed sections push neutral values (transparent)
+    send('eqLow', fx.eqEnabled ? fx.eqLow : 0)
+    send('eqMid', fx.eqEnabled ? fx.eqMid : 0)
+    send('eqHigh', fx.eqEnabled ? fx.eqHigh : 0)
+    send('compThreshold', fx.compEnabled ? fx.compThreshold : 0)
+    send('compRatio', fx.compEnabled ? fx.compRatio : 1)
+    send('compAttack', fx.compAttack)
+    send('compRelease', fx.compRelease)
   }
 
   /** Send mixer levels directly to the engine via setParam on output modules */
   const applyMixerToEngine = (nextMixer: Record<string, MixerChannelState>) => {
     const webRunning = statusRef.current === 'running'
     const nativeRunning = isTauri && tauriNativeRunning
-    if ((!webRunning && !nativeRunning) || racksRef.current.length <= 1) return
+    if (!webRunning && !nativeRunning) return
     const hasSolo = Object.values(nextMixer).some((ch) => ch.solo)
-    const multiRack = racksRef.current.length > 1
     for (const rack of racksRef.current) {
       const ch = nextMixer[rack.id]
       if (!ch) continue
@@ -2933,8 +2941,8 @@ function App() {
       const graph = rack.id === activeRackIdRef.current ? graphRef.current : rack.graph
       const outputMod = graph.modules.find((m) => m.type === 'output')
       if (outputMod) {
-        // In multi-rack mode, IDs are prefixed in the engine
-        const engineModuleId = multiRack ? `${rack.id}/${outputMod.id}` : outputMod.id
+        // Module IDs are always prefixed with the rack id in the engine graph
+        const engineModuleId = `${rack.id}/${outputMod.id}`
         engine.setParamDirect(engineModuleId, 'level', effectiveLevel)
         if (isTauri && tauriNativeRunning) {
           void invokeTauri('native_set_param', { moduleId: engineModuleId, paramId: 'level', value: effectiveLevel }).catch(() => {})
@@ -3091,10 +3099,14 @@ function App() {
             onSwitchRack={(id) => { handleSwitchRack(id); setViewMode('rack') }}
             onMasterVolumeChange={handleMasterVolumeChange}
             onChannelFxChange={(rackId, engineModuleId, section, paramId, value) => {
-              // Live engine update (immediate audio, no graph rebuild)
-              engine.setParamDirect(engineModuleId, paramId, value)
-              if (isTauri && tauriNativeRunning) {
-                void invokeTauri('native_set_param', { moduleId: engineModuleId, paramId, value }).catch(() => {})
+              // Live engine update — but only if the section is enabled (a bypassed
+              // section keeps neutral params in the engine; the knob still persists).
+              const enabled = channelFxRef.current[rackId]?.enabled?.[section] ?? true
+              if (enabled) {
+                engine.setParamDirect(engineModuleId, paramId, value)
+                if (isTauri && tauriNativeRunning) {
+                  void invokeTauri('native_set_param', { moduleId: engineModuleId, paramId, value }).catch(() => {})
+                }
               }
               // Persist so the value survives transport restart and export/import
               setChannelFx((prev) => {
@@ -3105,12 +3117,54 @@ function App() {
                 }
               })
             }}
+            onChannelFxToggle={(rackId, fxIds, section) => {
+              const current = channelFxRef.current[rackId] ?? NEUTRAL_CHANNEL_FX
+              const nextOn = !current.enabled[section]
+              const modId = fxIds[section]
+              // Push stored (enable) or neutral (bypass) params to the engine live
+              const src = nextOn ? current[section] : NEUTRAL_CHANNEL_FX[section]
+              for (const [paramId, value] of Object.entries(src)) {
+                engine.setParamDirect(modId, paramId, value as number)
+                if (isTauri && tauriNativeRunning) {
+                  void invokeTauri('native_set_param', { moduleId: modId, paramId, value }).catch(() => {})
+                }
+              }
+              setChannelFx((prev) => {
+                const c = prev[rackId] ?? NEUTRAL_CHANNEL_FX
+                return { ...prev, [rackId]: { ...c, enabled: { ...c.enabled, [section]: nextOn } } }
+              })
+            }}
             onMasterFxChange={(param, value) => {
-              engine.setMasterFxParam(param, value)
-              if (isTauri && tauriNativeRunning) {
-                void invokeTauri('native_set_master_fx_param', { param, value }).catch(() => {})
+              const section = param.startsWith('eq') ? 'eq' : 'comp'
+              const enabled = section === 'eq' ? masterFxRef.current.eqEnabled : masterFxRef.current.compEnabled
+              if (enabled) {
+                engine.setMasterFxParam(param, value)
+                if (isTauri && tauriNativeRunning) {
+                  void invokeTauri('native_set_master_fx_param', { param, value }).catch(() => {})
+                }
               }
               setMasterFx((prev) => ({ ...prev, [param]: value }))
+            }}
+            onMasterFxToggle={(section) => {
+              const cur = masterFxRef.current
+              const send = (param: string, value: number) => {
+                engine.setMasterFxParam(param, value)
+                if (isTauri && tauriNativeRunning) {
+                  void invokeTauri('native_set_master_fx_param', { param, value }).catch(() => {})
+                }
+              }
+              if (section === 'eq') {
+                const on = !cur.eqEnabled
+                send('eqLow', on ? cur.eqLow : 0)
+                send('eqMid', on ? cur.eqMid : 0)
+                send('eqHigh', on ? cur.eqHigh : 0)
+                setMasterFx((prev) => ({ ...prev, eqEnabled: on }))
+              } else {
+                const on = !cur.compEnabled
+                send('compThreshold', on ? cur.compThreshold : 0)
+                send('compRatio', on ? cur.compRatio : 1)
+                setMasterFx((prev) => ({ ...prev, compEnabled: on }))
+              }
             }}
           />
         ) : (

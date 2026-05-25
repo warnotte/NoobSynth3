@@ -15,6 +15,8 @@ export type ChannelFxIds = {
 
 /** Persisted per-rack channel strip FX parameter values. */
 export type ChannelFxParams = {
+  /** Per-section bypass: false = neutral params pushed to the engine (transparent). */
+  enabled: { eq: boolean; comp: boolean; reverb: boolean }
   eq: { lowGain: number; midGain: number; highGain: number; lowFreq: number; midFreq: number; highFreq: number; midQ: number }
   comp: { threshold: number; ratio: number; attack: number; release: number; makeup: number }
   reverb: { mix: number; time: number; damp: number; preDelay: number }
@@ -22,6 +24,7 @@ export type ChannelFxParams = {
 
 /** Neutral (no-op) channel strip FX defaults. */
 export const NEUTRAL_CHANNEL_FX: ChannelFxParams = {
+  enabled: { eq: true, comp: true, reverb: true },
   eq: { lowGain: 0, midGain: 0, highGain: 0, lowFreq: 200, midFreq: 1000, highFreq: 5000, midQ: 1 },
   comp: { threshold: 0, ratio: 1, attack: 10, release: 100, makeup: 0 },
   reverb: { mix: 0, time: 0.5, damp: 0.5, preDelay: 10 },
@@ -29,12 +32,14 @@ export const NEUTRAL_CHANNEL_FX: ChannelFxParams = {
 
 /** Persisted master bus FX parameter values (applied via engine.setMasterFxParam). */
 export type MasterFxParams = {
+  eqEnabled: boolean; compEnabled: boolean
   eqLow: number; eqMid: number; eqHigh: number
   compThreshold: number; compRatio: number; compAttack: number; compRelease: number
 }
 
 /** Neutral (no-op) master bus FX defaults. */
 export const NEUTRAL_MASTER_FX: MasterFxParams = {
+  eqEnabled: true, compEnabled: true,
   eqLow: 0, eqMid: 0, eqHigh: 0,
   compThreshold: 0, compRatio: 1, compAttack: 10, compRelease: 100,
 }
@@ -155,16 +160,20 @@ export const flattenRacks = (
       channelFxIds[rack.id] = { eq: eqId, comp: compId, reverb: reverbId }
       meterIds[rack.id] = meterId
 
-      // Channel strip params: use persisted values for this rack, fall back to neutral
+      // Channel strip params: use persisted values for this rack, fall back to neutral.
+      // A bypassed (disabled) section gets neutral params so it passes audio through.
       const fx = options?.channelFx?.[rack.id] ?? NEUTRAL_CHANNEL_FX
+      const eqParams = fx.enabled.eq ? fx.eq : NEUTRAL_CHANNEL_FX.eq
+      const compParams = fx.enabled.comp ? fx.comp : NEUTRAL_CHANNEL_FX.comp
+      const revParams = fx.enabled.reverb ? fx.reverb : NEUTRAL_CHANNEL_FX.reverb
 
       allModules.push(
         { id: eqId, type: 'eq3', name: `EQ ${rack.name}`, position: { x: -1, y: -1 },
-          params: { ...fx.eq } },
+          params: { ...eqParams } },
         { id: compId, type: 'compressor', name: `Comp ${rack.name}`, position: { x: -1, y: -1 },
-          params: { ...fx.comp, mix: 1 } },
+          params: { ...compParams, mix: 1 } },
         { id: reverbId, type: 'reverb', name: `Reverb ${rack.name}`, position: { x: -1, y: -1 },
-          params: { ...fx.reverb } },
+          params: { ...revParams } },
         { id: meterId, type: 'meter', name: `Meter ${rack.name}`, position: { x: -1, y: -1 },
           params: {} },
       )

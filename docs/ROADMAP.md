@@ -67,6 +67,13 @@
 - [x] FX values saved in / restored from version-2 project export (channelFx + masterFx fields)
 - [x] ChannelFx/MasterFx are controlled components (knobs refresh on project import)
 
+### Mixer UI Redesign
+- [x] Channel strip FX: real rotary knobs (MixerKnob) in a 3-col grid, replacing tiny sliders
+- [x] Wider strips (168px), color-coded sections (EQ blue / Comp mint / Reverb rose)
+- [x] Formatted readouts (dB, Hz→k, :1, %, ms) + double-click to type a value
+- [x] Per-section bypass via clickable LED (neutral params pushed live, knob values retained)
+- [x] Fixed: per-rack & master volume faders had no effect in single-rack mode (stale `length <= 1` guard + unprefixed engine ID after always-prefix change)
+
 ### Code Quality
 - [x] Zero TypeScript errors (strict tsc -b mode)
 - [x] Zero Rust warnings across workspace
@@ -118,3 +125,4 @@
 - [ ] VU meter on master channel
 - [ ] Mobile/tablet responsive mixer
 - [ ] Quantized rate changes (snap to next beat/bar)
+- [ ] **Type-safety: engine param API** — `setParamDirect`/`setMasterFxParam` take bare `string` paramIds at the WASM/worklet seam (stringly-typed, fragile to refactors). Consider per-module param-name enums/registry. The UI-side section/param literals are already type-checked (keyof / string-literal unions); only the engine boundary is loose.
