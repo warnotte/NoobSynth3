@@ -3,12 +3,40 @@ import type { MixerChannelState } from '../ui/MixerConsole'
 
 export type FlattenOptions = {
   mixerState?: Record<string, MixerChannelState>
+  /** Per-rack channel strip FX values (rackId → params). Falls back to neutral. */
+  channelFx?: Record<string, ChannelFxParams>
 }
 
 export type ChannelFxIds = {
   eq: string
   comp: string
   reverb: string
+}
+
+/** Persisted per-rack channel strip FX parameter values. */
+export type ChannelFxParams = {
+  eq: { lowGain: number; midGain: number; highGain: number; lowFreq: number; midFreq: number; highFreq: number; midQ: number }
+  comp: { threshold: number; ratio: number; attack: number; release: number; makeup: number }
+  reverb: { mix: number; time: number; damp: number; preDelay: number }
+}
+
+/** Neutral (no-op) channel strip FX defaults. */
+export const NEUTRAL_CHANNEL_FX: ChannelFxParams = {
+  eq: { lowGain: 0, midGain: 0, highGain: 0, lowFreq: 200, midFreq: 1000, highFreq: 5000, midQ: 1 },
+  comp: { threshold: 0, ratio: 1, attack: 10, release: 100, makeup: 0 },
+  reverb: { mix: 0, time: 0.5, damp: 0.5, preDelay: 10 },
+}
+
+/** Persisted master bus FX parameter values (applied via engine.setMasterFxParam). */
+export type MasterFxParams = {
+  eqLow: number; eqMid: number; eqHigh: number
+  compThreshold: number; compRatio: number; compAttack: number; compRelease: number
+}
+
+/** Neutral (no-op) master bus FX defaults. */
+export const NEUTRAL_MASTER_FX: MasterFxParams = {
+  eqLow: 0, eqMid: 0, eqHigh: 0,
+  compThreshold: 0, compRatio: 1, compAttack: 10, compRelease: 100,
 }
 
 export type FlattenResult = {
@@ -127,14 +155,16 @@ export const flattenRacks = (
       channelFxIds[rack.id] = { eq: eqId, comp: compId, reverb: reverbId }
       meterIds[rack.id] = meterId
 
-      // Channel strip modules with neutral defaults
+      // Channel strip params: use persisted values for this rack, fall back to neutral
+      const fx = options?.channelFx?.[rack.id] ?? NEUTRAL_CHANNEL_FX
+
       allModules.push(
         { id: eqId, type: 'eq3', name: `EQ ${rack.name}`, position: { x: -1, y: -1 },
-          params: { lowGain: 0, midGain: 0, highGain: 0, lowFreq: 200, midFreq: 1000, highFreq: 5000, midQ: 1 } },
+          params: { ...fx.eq } },
         { id: compId, type: 'compressor', name: `Comp ${rack.name}`, position: { x: -1, y: -1 },
-          params: { threshold: 0, ratio: 1, attack: 10, release: 100, makeup: 0, mix: 1 } },
+          params: { ...fx.comp, mix: 1 } },
         { id: reverbId, type: 'reverb', name: `Reverb ${rack.name}`, position: { x: -1, y: -1 },
-          params: { time: 0.5, damp: 0.5, preDelay: 10, mix: 0 } },
+          params: { ...fx.reverb } },
         { id: meterId, type: 'meter', name: `Meter ${rack.name}`, position: { x: -1, y: -1 },
           params: {} },
       )

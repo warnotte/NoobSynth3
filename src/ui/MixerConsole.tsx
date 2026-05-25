@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import type { RackSpec } from '../shared/graph'
 import type { AudioEngine } from '../engine/WasmGraphEngine'
-import type { ChannelFxIds } from '../state/rackFlatten'
+import { NEUTRAL_CHANNEL_FX } from '../state/rackFlatten'
+import type { ChannelFxIds, ChannelFxParams, MasterFxParams } from '../state/rackFlatten'
 
 export type MixerChannelState = {
   volume: number
@@ -19,13 +20,15 @@ type MixerConsoleProps = {
   engineRunning: boolean
   nativeMode: boolean
   channelFxIds: Record<string, ChannelFxIds>
+  channelFx: Record<string, ChannelFxParams>
+  masterFx: MasterFxParams
   onVolumeChange: (rackId: string, volume: number) => void
   onMuteToggle: (rackId: string) => void
   onSoloToggle: (rackId: string) => void
   onSwitchRack: (rackId: string) => void
   onMasterVolumeChange: (volume: number) => void
-  onChannelFxParam: (engineModuleId: string, paramId: string, value: number) => void
-  onMasterFxParam: (param: string, value: number) => void
+  onChannelFxChange: (rackId: string, engineModuleId: string, section: keyof ChannelFxParams, paramId: string, value: number) => void
+  onMasterFxChange: (param: keyof MasterFxParams, value: number) => void
 }
 
 const dbDisplay = (v: number) => v > 0 ? `${(20 * Math.log10(v)).toFixed(1)}` : '-inf'
@@ -151,118 +154,85 @@ const FxSection = ({ title, expanded, onToggle, children }: {
   </div>
 )
 
-const ChannelFx = ({ fxIds, onParam }: {
+const ChannelFx = ({ rackId, fxIds, values, onChange }: {
+  rackId: string
   fxIds: ChannelFxIds
-  onParam: (engineModuleId: string, paramId: string, value: number) => void
+  values: ChannelFxParams
+  onChange: (rackId: string, engineModuleId: string, section: keyof ChannelFxParams, paramId: string, value: number) => void
 }) => {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({ eq: false, comp: false, rev: false })
   const toggle = (key: string) => setExpanded((prev) => ({ ...prev, [key]: !prev[key] }))
 
-  // EQ
-  const [eqLow, setEqLow] = useState(0)
-  const [eqMid, setEqMid] = useState(0)
-  const [eqHigh, setEqHigh] = useState(0)
-  const [eqLowFreq, setEqLowFreq] = useState(200)
-  const [eqMidFreq, setEqMidFreq] = useState(1000)
-  const [eqHighFreq, setEqHighFreq] = useState(5000)
-  const [eqMidQ, setEqMidQ] = useState(1)
-  // Comp
-  const [compThresh, setCompThresh] = useState(0)
-  const [compRatio, setCompRatio] = useState(1)
-  const [compAttack, setCompAttack] = useState(10)
-  const [compRelease, setCompRelease] = useState(100)
-  const [compMakeup, setCompMakeup] = useState(0)
-  // Reverb
-  const [revTime, setRevTime] = useState(0.5)
-  const [revDamp, setRevDamp] = useState(0.5)
-  const [revPreDelay, setRevPreDelay] = useState(10)
-  const [revMix, setRevMix] = useState(0)
-
-  const setEq = (param: string, v: number, setter: (v: number) => void) => {
-    setter(v); onParam(fxIds.eq, param, v)
-  }
-  const setComp = (param: string, v: number, setter: (v: number) => void) => {
-    setter(v); onParam(fxIds.comp, param, v)
-  }
-  const setRev = (param: string, v: number, setter: (v: number) => void) => {
-    setter(v); onParam(fxIds.reverb, param, v)
-  }
+  const setEq = (param: keyof ChannelFxParams['eq'], v: number) => onChange(rackId, fxIds.eq, 'eq', param, v)
+  const setComp = (param: keyof ChannelFxParams['comp'], v: number) => onChange(rackId, fxIds.comp, 'comp', param, v)
+  const setRev = (param: keyof ChannelFxParams['reverb'], v: number) => onChange(rackId, fxIds.reverb, 'reverb', param, v)
 
   return (
     <div className="channel-fx">
       <FxSection title="EQ" expanded={expanded.eq} onToggle={() => toggle('eq')}>
         <div className="channel-fx-row">
-          <MiniKnob label="Lo" value={eqLow} min={-12} max={12} step={0.5} onChange={(v) => setEq('lowGain', v, setEqLow)} unit="dB" />
-          <MiniKnob label="Mid" value={eqMid} min={-12} max={12} step={0.5} onChange={(v) => setEq('midGain', v, setEqMid)} unit="dB" />
-          <MiniKnob label="Hi" value={eqHigh} min={-12} max={12} step={0.5} onChange={(v) => setEq('highGain', v, setEqHigh)} unit="dB" />
+          <MiniKnob label="Lo" value={values.eq.lowGain} min={-12} max={12} step={0.5} onChange={(v) => setEq('lowGain', v)} unit="dB" />
+          <MiniKnob label="Mid" value={values.eq.midGain} min={-12} max={12} step={0.5} onChange={(v) => setEq('midGain', v)} unit="dB" />
+          <MiniKnob label="Hi" value={values.eq.highGain} min={-12} max={12} step={0.5} onChange={(v) => setEq('highGain', v)} unit="dB" />
         </div>
         <div className="channel-fx-row">
-          <MiniKnob label="LoF" value={eqLowFreq} min={40} max={500} step={10} onChange={(v) => setEq('lowFreq', v, setEqLowFreq)} unit="Hz" />
-          <MiniKnob label="MiF" value={eqMidFreq} min={200} max={8000} step={50} onChange={(v) => setEq('midFreq', v, setEqMidFreq)} unit="Hz" />
-          <MiniKnob label="HiF" value={eqHighFreq} min={2000} max={16000} step={100} onChange={(v) => setEq('highFreq', v, setEqHighFreq)} unit="Hz" />
+          <MiniKnob label="LoF" value={values.eq.lowFreq} min={40} max={500} step={10} onChange={(v) => setEq('lowFreq', v)} unit="Hz" />
+          <MiniKnob label="MiF" value={values.eq.midFreq} min={200} max={8000} step={50} onChange={(v) => setEq('midFreq', v)} unit="Hz" />
+          <MiniKnob label="HiF" value={values.eq.highFreq} min={2000} max={16000} step={100} onChange={(v) => setEq('highFreq', v)} unit="Hz" />
         </div>
         <div className="channel-fx-row">
-          <MiniKnob label="Q" value={eqMidQ} min={0.3} max={8} step={0.1} onChange={(v) => setEq('midQ', v, setEqMidQ)} />
+          <MiniKnob label="Q" value={values.eq.midQ} min={0.3} max={8} step={0.1} onChange={(v) => setEq('midQ', v)} />
         </div>
       </FxSection>
       <FxSection title="Comp" expanded={expanded.comp} onToggle={() => toggle('comp')}>
         <div className="channel-fx-row">
-          <MiniKnob label="Thr" value={compThresh} min={-40} max={0} step={1} onChange={(v) => setComp('threshold', v, setCompThresh)} unit="dB" />
-          <MiniKnob label="Rat" value={compRatio} min={1} max={20} step={0.5} onChange={(v) => setComp('ratio', v, setCompRatio)} />
-          <MiniKnob label="Mkp" value={compMakeup} min={-12} max={12} step={0.5} onChange={(v) => setComp('makeup', v, setCompMakeup)} unit="dB" />
+          <MiniKnob label="Thr" value={values.comp.threshold} min={-40} max={0} step={1} onChange={(v) => setComp('threshold', v)} unit="dB" />
+          <MiniKnob label="Rat" value={values.comp.ratio} min={1} max={20} step={0.5} onChange={(v) => setComp('ratio', v)} />
+          <MiniKnob label="Mkp" value={values.comp.makeup} min={-12} max={12} step={0.5} onChange={(v) => setComp('makeup', v)} unit="dB" />
         </div>
         <div className="channel-fx-row">
-          <MiniKnob label="Atk" value={compAttack} min={0.5} max={200} step={0.5} onChange={(v) => setComp('attack', v, setCompAttack)} unit="ms" />
-          <MiniKnob label="Rel" value={compRelease} min={10} max={2000} step={10} onChange={(v) => setComp('release', v, setCompRelease)} unit="ms" />
+          <MiniKnob label="Atk" value={values.comp.attack} min={0.5} max={200} step={0.5} onChange={(v) => setComp('attack', v)} unit="ms" />
+          <MiniKnob label="Rel" value={values.comp.release} min={10} max={2000} step={10} onChange={(v) => setComp('release', v)} unit="ms" />
         </div>
       </FxSection>
       <FxSection title="Rev" expanded={expanded.rev} onToggle={() => toggle('rev')}>
         <div className="channel-fx-row">
-          <MiniKnob label="Mix" value={revMix} min={0} max={1} step={0.01} onChange={(v) => setRev('mix', v, setRevMix)} />
-          <MiniKnob label="Time" value={revTime} min={0.1} max={2} step={0.05} onChange={(v) => setRev('time', v, setRevTime)} unit="s" />
+          <MiniKnob label="Mix" value={values.reverb.mix} min={0} max={1} step={0.01} onChange={(v) => setRev('mix', v)} />
+          <MiniKnob label="Time" value={values.reverb.time} min={0.1} max={2} step={0.05} onChange={(v) => setRev('time', v)} unit="s" />
         </div>
         <div className="channel-fx-row">
-          <MiniKnob label="Damp" value={revDamp} min={0} max={1} step={0.05} onChange={(v) => setRev('damp', v, setRevDamp)} />
-          <MiniKnob label="Pre" value={revPreDelay} min={0} max={100} step={1} onChange={(v) => setRev('preDelay', v, setRevPreDelay)} unit="ms" />
+          <MiniKnob label="Damp" value={values.reverb.damp} min={0} max={1} step={0.05} onChange={(v) => setRev('damp', v)} />
+          <MiniKnob label="Pre" value={values.reverb.preDelay} min={0} max={100} step={1} onChange={(v) => setRev('preDelay', v)} unit="ms" />
         </div>
       </FxSection>
     </div>
   )
 }
 
-const MasterFx = ({ onParam }: { onParam: (param: string, value: number) => void }) => {
+const MasterFx = ({ values, onChange }: {
+  values: MasterFxParams
+  onChange: (param: keyof MasterFxParams, value: number) => void
+}) => {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({ eq: false, comp: false })
   const toggle = (key: string) => setExpanded((prev) => ({ ...prev, [key]: !prev[key] }))
-
-  const [eqLow, setEqLow] = useState(0)
-  const [eqMid, setEqMid] = useState(0)
-  const [eqHigh, setEqHigh] = useState(0)
-  const [compThresh, setCompThresh] = useState(0)
-  const [compRatio, setCompRatio] = useState(1)
-  const [compAttack, setCompAttack] = useState(10)
-  const [compRelease, setCompRelease] = useState(100)
-
-  const set = (param: string, v: number, setter: (v: number) => void) => {
-    setter(v); onParam(param, v)
-  }
 
   return (
     <div className="channel-fx">
       <FxSection title="EQ" expanded={expanded.eq} onToggle={() => toggle('eq')}>
         <div className="channel-fx-row">
-          <MiniKnob label="Lo" value={eqLow} min={-12} max={12} step={0.5} onChange={(v) => set('eqLow', v, setEqLow)} unit="dB" />
-          <MiniKnob label="Mid" value={eqMid} min={-12} max={12} step={0.5} onChange={(v) => set('eqMid', v, setEqMid)} unit="dB" />
-          <MiniKnob label="Hi" value={eqHigh} min={-12} max={12} step={0.5} onChange={(v) => set('eqHigh', v, setEqHigh)} unit="dB" />
+          <MiniKnob label="Lo" value={values.eqLow} min={-12} max={12} step={0.5} onChange={(v) => onChange('eqLow', v)} unit="dB" />
+          <MiniKnob label="Mid" value={values.eqMid} min={-12} max={12} step={0.5} onChange={(v) => onChange('eqMid', v)} unit="dB" />
+          <MiniKnob label="Hi" value={values.eqHigh} min={-12} max={12} step={0.5} onChange={(v) => onChange('eqHigh', v)} unit="dB" />
         </div>
       </FxSection>
       <FxSection title="Comp" expanded={expanded.comp} onToggle={() => toggle('comp')}>
         <div className="channel-fx-row">
-          <MiniKnob label="Thr" value={compThresh} min={-40} max={0} step={1} onChange={(v) => set('compThreshold', v, setCompThresh)} unit="dB" />
-          <MiniKnob label="Rat" value={compRatio} min={1} max={20} step={0.5} onChange={(v) => set('compRatio', v, setCompRatio)} />
+          <MiniKnob label="Thr" value={values.compThreshold} min={-40} max={0} step={1} onChange={(v) => onChange('compThreshold', v)} unit="dB" />
+          <MiniKnob label="Rat" value={values.compRatio} min={1} max={20} step={0.5} onChange={(v) => onChange('compRatio', v)} />
         </div>
         <div className="channel-fx-row">
-          <MiniKnob label="Atk" value={compAttack} min={0.5} max={200} step={0.5} onChange={(v) => set('compAttack', v, setCompAttack)} unit="ms" />
-          <MiniKnob label="Rel" value={compRelease} min={10} max={2000} step={10} onChange={(v) => set('compRelease', v, setCompRelease)} unit="ms" />
+          <MiniKnob label="Atk" value={values.compAttack} min={0.5} max={200} step={0.5} onChange={(v) => onChange('compAttack', v)} unit="ms" />
+          <MiniKnob label="Rel" value={values.compRelease} min={10} max={2000} step={10} onChange={(v) => onChange('compRelease', v)} unit="ms" />
         </div>
       </FxSection>
     </div>
@@ -290,13 +260,15 @@ export const MixerConsole = ({
   engineRunning,
   nativeMode,
   channelFxIds,
+  channelFx,
+  masterFx,
   onVolumeChange,
   onMuteToggle,
   onSoloToggle,
   onSwitchRack,
   onMasterVolumeChange,
-  onChannelFxParam,
-  onMasterFxParam,
+  onChannelFxChange,
+  onMasterFxChange,
 }: MixerConsoleProps) => {
   const hasSolo = Object.values(mixerState).some((ch) => ch.solo)
 
@@ -346,7 +318,12 @@ export const MixerConsole = ({
               <span className="mixer-strip-db">{dbDisplay(ch.volume)} dB</span>
 
               {channelFxIds[rack.id] && (
-                <ChannelFx fxIds={channelFxIds[rack.id]} onParam={onChannelFxParam} />
+                <ChannelFx
+                  rackId={rack.id}
+                  fxIds={channelFxIds[rack.id]}
+                  values={channelFx[rack.id] ?? NEUTRAL_CHANNEL_FX}
+                  onChange={onChannelFxChange}
+                />
               )}
 
               <div className="mixer-strip-controls">
@@ -389,7 +366,7 @@ export const MixerConsole = ({
             </div>
           </div>
           <span className="mixer-strip-db">{dbDisplay(masterVolume)} dB</span>
-          <MasterFx onParam={onMasterFxParam} />
+          <MasterFx values={masterFx} onChange={onMasterFxChange} />
         </div>
       </div>
     </div>

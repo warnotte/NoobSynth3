@@ -23,7 +23,8 @@ import {
   deleteUserTemplate,
   exportTemplateAsFile,
 } from './state/templates'
-import { flattenRacks } from './state/rackFlatten'
+import { flattenRacks, NEUTRAL_CHANNEL_FX, NEUTRAL_MASTER_FX } from './state/rackFlatten'
+import type { ChannelFxParams, MasterFxParams } from './state/rackFlatten'
 import type { TemplateSpec } from './shared/graph'
 import { marioSongs } from './state/marioSongs'
 import {
@@ -369,6 +370,14 @@ function App() {
   const [mixerState, setMixerState] = useState<Record<string, MixerChannelState>>({
     'rack-1': { volume: 0.8, mute: false, solo: false },
   })
+  // Persisted channel strip FX (per rack) and master bus FX — survive transport
+  // restart and are saved with exported projects.
+  const [channelFx, setChannelFx] = useState<Record<string, ChannelFxParams>>({
+    'rack-1': NEUTRAL_CHANNEL_FX,
+  })
+  const channelFxRef = useRef(channelFx)
+  const [masterFx, setMasterFx] = useState<MasterFxParams>(NEUTRAL_MASTER_FX)
+  const masterFxRef = useRef(masterFx)
   const [masterVolume, setMasterVolume] = useState(0.8)
   const masterVolumeRef = useRef(0.8)
   const [masterTempo, setMasterTempo] = useState(120)
@@ -932,10 +941,26 @@ function App() {
       }
       return next
     })
+    // Auto-create neutral channel FX for new racks
+    setChannelFx((prev) => {
+      let next = prev
+      for (const rack of racks) {
+        if (!next[rack.id]) {
+          next = { ...next, [rack.id]: NEUTRAL_CHANNEL_FX }
+        }
+      }
+      return next
+    })
   }, [racks])
   useEffect(() => {
     mixerStateRef.current = mixerState
   }, [mixerState])
+  useEffect(() => {
+    channelFxRef.current = channelFx
+  }, [channelFx])
+  useEffect(() => {
+    masterFxRef.current = masterFx
+  }, [masterFx])
   useEffect(() => {
     activeRackIdRef.current = activeRackId
   }, [activeRackId])
@@ -1796,6 +1821,7 @@ function App() {
           // (the new WASM engine defaults to 120 BPM)
           engine.setTransportTempo(masterTempoRef.current)
           applyMixerToEngine(mixerStateRef.current)
+          applyMasterFxToEngine(masterFxRef.current)
           // Also restart Tauri native engine if running
           if (isTauri && tauriNativeRunning) {
             const combined = buildCombinedGraph(graphRef.current)
@@ -1890,6 +1916,8 @@ function App() {
         activeRackId: activeRackIdRef.current,
         racks: currentRacks.map((r) => ({ id: r.id, name: r.name, graph: r.graph })),
         mixer: mixerStateRef.current,
+        channelFx: channelFxRef.current,
+        masterFx: masterFxRef.current,
       }
       const json = JSON.stringify(payload, null, 2)
       const blob = new Blob([json], { type: 'application/json' })
@@ -1947,6 +1975,23 @@ function App() {
             }))
           if (projectRacks.length === 0) throw new Error('Project has no valid racks.')
           const projectMixer = (isRecord(payload.mixer) ? payload.mixer : {}) as Record<string, MixerChannelState>
+          // Restore channel FX (merge over neutral so partial/old files still work)
+          const incomingChannelFx = (isRecord(payload.channelFx) ? payload.channelFx : {}) as Record<string, Partial<ChannelFxParams>>
+          const projectChannelFx: Record<string, ChannelFxParams> = {}
+          for (const r of projectRacks) {
+            const inc = incomingChannelFx[r.id]
+            projectChannelFx[r.id] = inc
+              ? {
+                  eq: { ...NEUTRAL_CHANNEL_FX.eq, ...(inc.eq ?? {}) },
+                  comp: { ...NEUTRAL_CHANNEL_FX.comp, ...(inc.comp ?? {}) },
+                  reverb: { ...NEUTRAL_CHANNEL_FX.reverb, ...(inc.reverb ?? {}) },
+                }
+              : NEUTRAL_CHANNEL_FX
+          }
+          const projectMasterFx: MasterFxParams = {
+            ...NEUTRAL_MASTER_FX,
+            ...(isRecord(payload.masterFx) ? (payload.masterFx as Partial<MasterFxParams>) : {}),
+          }
           const projectTempo = typeof payload.masterTempo === 'number' ? payload.masterTempo : 120
           const projectVolume = typeof payload.masterVolume === 'number' ? payload.masterVolume : 0.8
           const projectActiveId = typeof payload.activeRackId === 'string'
@@ -1969,12 +2014,16 @@ function App() {
           racksRef.current = projectRacks
           activeRackIdRef.current = activeRack.id
           mixerStateRef.current = projectMixer
+          channelFxRef.current = projectChannelFx
+          masterFxRef.current = projectMasterFx
           masterTempoRef.current = projectTempo
           masterVolumeRef.current = projectVolume
 
           setRacks(projectRacks)
           setActiveRackId(activeRack.id)
           setMixerState(projectMixer)
+          setChannelFx(projectChannelFx)
+          setMasterFx(projectMasterFx)
           setMasterTempo(projectTempo)
           setMasterVolume(projectVolume)
           resetPatching()
@@ -2183,6 +2232,7 @@ function App() {
       activeVoiceCountRef.current = voiceCount
       engine.setTransportTempo(masterTempoRef.current)
       applyMixerToEngine(mixerStateRef.current)
+      applyMasterFxToEngine(masterFxRef.current)
     } catch (error) {
       console.error(error)
       setStatus('error')
@@ -2559,6 +2609,7 @@ function App() {
   const buildCombinedGraph = (activeGraph: GraphState): GraphState => {
     const result = flattenRacks(racksRef.current, activeRackIdRef.current, activeGraph, {
       mixerState: mixerStateRef.current,
+      channelFx: channelFxRef.current,
     })
     meterIdsRef.current = result.meterIds
     channelFxIdsRef.current = result.channelFxIds
@@ -2815,6 +2866,11 @@ function App() {
     // Update refs
     racksRef.current = remaining
     setRacks(remaining)
+    setChannelFx((prev) => {
+      const next = { ...prev }
+      delete next[rackId]
+      return next
+    })
     // If removing the active rack, switch to the first remaining one
     if (rackId === activeRackId) {
       const target = remaining[0]
@@ -2848,6 +2904,19 @@ function App() {
   }
 
   // ── Mixer handlers ──
+
+  /** Re-apply persisted master bus FX to the engine (master FX is not a graph module) */
+  const applyMasterFxToEngine = (fx: MasterFxParams) => {
+    const webRunning = statusRef.current === 'running'
+    const nativeRunning = isTauri && tauriNativeRunning
+    if (!webRunning && !nativeRunning) return
+    for (const [param, value] of Object.entries(fx)) {
+      engine.setMasterFxParam(param, value)
+      if (nativeRunning) {
+        void invokeTauri('native_set_master_fx_param', { param, value }).catch(() => {})
+      }
+    }
+  }
 
   /** Send mixer levels directly to the engine via setParam on output modules */
   const applyMixerToEngine = (nextMixer: Record<string, MixerChannelState>) => {
@@ -3014,22 +3083,34 @@ function App() {
             engineRunning={status === 'running' || (isTauri && tauriNativeRunning)}
             nativeMode={audioMode === 'native' && tauriNativeRunning}
             channelFxIds={channelFxIdsRef.current}
+            channelFx={channelFx}
+            masterFx={masterFx}
             onVolumeChange={handleMixerVolumeChange}
             onMuteToggle={handleMixerMuteToggle}
             onSoloToggle={handleMixerSoloToggle}
             onSwitchRack={(id) => { handleSwitchRack(id); setViewMode('rack') }}
             onMasterVolumeChange={handleMasterVolumeChange}
-            onChannelFxParam={(engineModuleId, paramId, value) => {
+            onChannelFxChange={(rackId, engineModuleId, section, paramId, value) => {
+              // Live engine update (immediate audio, no graph rebuild)
               engine.setParamDirect(engineModuleId, paramId, value)
               if (isTauri && tauriNativeRunning) {
                 void invokeTauri('native_set_param', { moduleId: engineModuleId, paramId, value }).catch(() => {})
               }
+              // Persist so the value survives transport restart and export/import
+              setChannelFx((prev) => {
+                const current = prev[rackId] ?? NEUTRAL_CHANNEL_FX
+                return {
+                  ...prev,
+                  [rackId]: { ...current, [section]: { ...current[section], [paramId]: value } },
+                }
+              })
             }}
-            onMasterFxParam={(param, value) => {
+            onMasterFxChange={(param, value) => {
               engine.setMasterFxParam(param, value)
               if (isTauri && tauriNativeRunning) {
                 void invokeTauri('native_set_master_fx_param', { param, value }).catch(() => {})
               }
+              setMasterFx((prev) => ({ ...prev, [param]: value }))
             }}
           />
         ) : (
