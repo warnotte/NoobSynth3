@@ -182,7 +182,7 @@ Si on garde le séquenceur interne:
 | SequencerControls.tsx | 2052 | 10 modules | ⏳ À faire |
 | IOControls.tsx | 840 | 6 modules | ⏳ À faire |
 
-**Solution:** Structure modulaire (voir `docs/CONTROLS_REFACTORING_PLAN.md`)
+**Solution:** Structure modulaire (voir `docs/archive/CONTROLS_REFACTORING_PLAN.md`)
 
 ```
 src/ui/controls/
@@ -480,7 +480,7 @@ export function MidiStatusPanel({
 
 **Statut:** ✅ Implémenté en mars 2026 (branche `feat/ux-improvements`)
 
-**Approche retenue:** `useReducer` (v2) — voir `docs/UNDO_REDO_ROADMAP.md`
+**Approche retenue:** `useReducer` (v2) — voir `docs/archive/UNDO_REDO_ROADMAP.md`
 
 **Fichiers créés:**
 - `src/hooks/useUndoableState.ts` — Hook principal (useReducer-based)

@@ -850,7 +850,9 @@ Les port IDs dans les presets doivent correspondre **exactement** à ceux défin
 | Document | Description |
 |----------|-------------|
 | [docs/FUTURE_ROADMAP.md](./docs/FUTURE_ROADMAP.md) | Plan de développement complet (Control v2, refactoring, nouveaux modules) |
-| [docs/UNDO_REDO_ROADMAP.md](./docs/UNDO_REDO_ROADMAP.md) | Plan d'implémentation Undo/Redo |
+
+### Archives (plans terminés)
+Les plans/analyses de features déjà implémentées sont conservés dans [docs/archive/](./docs/archive/) pour référence historique (Controls Refactoring, Undo/Redo, MIDI Polyphony, Resonator Pop).
 
 ### Crates Rust
 | Document | Description |
