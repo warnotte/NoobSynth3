@@ -50,24 +50,22 @@ export const RackTabs = ({
   return (
     <div className="rack-tabs">
       {/* View mode switch */}
-      {racks.length > 1 && (
-        <div className="rack-tabs-view-switch">
-          <button
-            type="button"
-            className={`rack-tabs-view-btn ${viewMode === 'rack' ? 'active' : ''}`}
-            onClick={() => onViewModeChange('rack')}
-          >
-            Rack
-          </button>
-          <button
-            type="button"
-            className={`rack-tabs-view-btn ${viewMode === 'mixer' ? 'active' : ''}`}
-            onClick={() => onViewModeChange('mixer')}
-          >
-            Mixer
-          </button>
-        </div>
-      )}
+      <div className="rack-tabs-view-switch">
+        <button
+          type="button"
+          className={`rack-tabs-view-btn ${viewMode === 'rack' ? 'active' : ''}`}
+          onClick={() => onViewModeChange('rack')}
+        >
+          Rack
+        </button>
+        <button
+          type="button"
+          className={`rack-tabs-view-btn ${viewMode === 'mixer' ? 'active' : ''}`}
+          onClick={() => onViewModeChange('mixer')}
+        >
+          Mixer
+        </button>
+      </div>
 
       {/* Rack tabs */}
       <div className="rack-tabs-list">

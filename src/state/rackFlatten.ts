@@ -39,10 +39,6 @@ export const flattenRacks = (
   activeGraph: GraphState,
   options?: FlattenOptions,
 ): FlattenResult => {
-  if (racks.length <= 1) {
-    return { modules: activeGraph.modules, connections: activeGraph.connections, meterIds: {}, channelFxIds: {} }
-  }
-
   const { mixerState } = options ?? {}
   const hasSolo = mixerState
     ? Object.values(mixerState).some((ch) => ch.solo)
@@ -169,8 +165,7 @@ export const flattenRacks = (
 
 /**
  * Return the engine-side module ID for a UI module ID in the active rack.
- * In single-rack mode, returns the ID as-is.
- * In multi-rack mode, prepends the active rack prefix.
+ * Always prepends the active rack prefix.
  */
-export const toEngineId = (moduleId: string, activeRackId: string, rackCount: number): string =>
-  rackCount > 1 ? `${activeRackId}/${moduleId}` : moduleId
+export const toEngineId = (moduleId: string, activeRackId: string, _rackCount?: number): string =>
+  `${activeRackId}/${moduleId}`

@@ -51,15 +51,17 @@
 - [x] Resync sends native_reset_transport
 - [x] native_set_master_fx_param command
 
-### Master Bus & Channel Strip FX (in progress)
+### Master Bus & Channel Strip FX
 - [x] Master bus EQ3 + Compressor in GraphEngine::render()
 - [x] set_master_fx_param() API (Web Audio + Tauri)
 - [x] Per-rack channel strip injection in flattenRacks (EQ3 → Comp → Reverb)
 - [x] Master FX knobs in MixerConsole UI
-- [ ] Channel strip FX knobs on each mixer channel (only master has them currently)
-- [ ] More params exposed (comp attack/release, reverb time/damp, EQ frequencies)
-- [ ] Better visual design for FX controls (current mini sliders too small)
-- [ ] Channel strip FX should work in single-rack mode too
+- [x] Channel strip FX knobs on each mixer channel
+- [x] Full params: EQ gains+freqs+Q, Comp threshold/ratio/attack/release/makeup, Reverb mix/time/damp/preDelay
+- [x] Collapsible FX sections (EQ, Comp, Rev) with larger slider thumbs
+- [x] Channel strip FX works in single-rack mode (no more early return in flattenRacks)
+- [x] Module ID prefixing always active (no single-rack vs multi-rack distinction)
+- [x] Mixer view accessible with any number of racks
 
 ### Code Quality
 - [x] Zero TypeScript errors (strict tsc -b mode)
@@ -88,11 +90,10 @@
 
 ## Next Up (priority order)
 
-### 1. Complete Channel Strip FX UI
-- [ ] Show EQ/Comp/Reverb knobs on each channel strip (not just master)
-- [ ] Inject channel FX in single-rack mode too
-- [ ] Full param set: comp attack/release, reverb time/damp/preDelay, EQ freqs
-- [ ] Better visual design (larger controls, proper layout)
+### 1. Channel Strip FX Polish
+- [ ] Per-channel pan control
+- [ ] VU meter on master channel
+- [ ] Master bus limiter
 
 ### 2. File Reload After Engine Restart
 - [ ] Store loaded file data in refs, re-send after restart

@@ -942,12 +942,8 @@ function App() {
 
   // Update engine module ID mapper when rack context changes
   useEffect(() => {
-    if (racks.length > 1) {
-      engine.moduleIdMapper = (id: string) => `${activeRackId}/${id}`
-    } else {
-      engine.moduleIdMapper = null
-    }
-  }, [engine, activeRackId, racks.length])
+    engine.moduleIdMapper = (id: string) => `${activeRackId}/${id}`
+  }, [engine, activeRackId])
 
   // Sync transport tempo with engine (Web Audio + Tauri)
   useEffect(() => {
@@ -3007,7 +3003,7 @@ function App() {
         onViewModeChange={setViewMode}
       />
       <main className="workbench">
-        {viewMode === 'mixer' && racks.length > 1 ? (
+        {viewMode === 'mixer' ? (
           <MixerConsole
             racks={racks}
             activeRackId={activeRackId}

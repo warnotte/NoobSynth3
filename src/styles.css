@@ -419,7 +419,7 @@
 .channel-fx {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
   width: 100%;
   padding: 4px 0;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
@@ -427,17 +427,47 @@
 
 .channel-fx-section {
   display: flex;
-  align-items: center;
-  gap: 3px;
+  flex-direction: column;
 }
 
 .channel-fx-title {
-  font-size: 0.45rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.5rem;
   font-weight: 700;
-  color: rgba(198, 214, 232, 0.35);
+  color: rgba(198, 214, 232, 0.4);
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  min-width: 22px;
+  padding: 2px 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  border-radius: 2px;
+}
+.channel-fx-title:hover {
+  color: rgba(198, 214, 232, 0.7);
+  background: rgba(255, 255, 255, 0.03);
+}
+.channel-fx-arrow {
+  font-size: 0.45rem;
+  opacity: 0.5;
+}
+
+.channel-fx-params {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 3px 2px 4px;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 3px;
+}
+
+.channel-fx-row {
+  display: flex;
+  gap: 2px;
+  justify-content: center;
 }
 
 .mini-knob {
@@ -445,32 +475,37 @@
   flex-direction: column;
   align-items: center;
   gap: 1px;
+  flex: 1;
+  min-width: 0;
 }
 
 .mini-knob-slider {
   -webkit-appearance: none;
   appearance: none;
-  width: 32px;
-  height: 4px;
+  width: 100%;
+  height: 6px;
   background: rgba(20, 26, 34, 0.8);
-  border: 1px solid rgba(100, 114, 136, 0.2);
-  border-radius: 2px;
+  border: 1px solid rgba(100, 114, 136, 0.25);
+  border-radius: 3px;
   outline: none;
   cursor: pointer;
 }
 
 .mini-knob-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 8px;
-  height: 10px;
-  background: rgba(198, 214, 232, 0.5);
+  width: 10px;
+  height: 14px;
+  background: rgba(198, 214, 232, 0.6);
   border-radius: 2px;
   cursor: pointer;
 }
+.mini-knob-slider::-webkit-slider-thumb:hover {
+  background: rgba(198, 214, 232, 0.85);
+}
 
 .mini-knob-label {
-  font-size: 0.4rem;
-  color: rgba(198, 214, 232, 0.3);
+  font-size: 0.42rem;
+  color: rgba(198, 214, 232, 0.35);
   letter-spacing: 0.05em;
 }
 
