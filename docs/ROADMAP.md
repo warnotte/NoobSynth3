@@ -37,8 +37,9 @@
 - [x] Transport position display (Bar:Beat) in TopBar
 
 ### Project Export/Import
-- [x] Version 2 format: all racks + mixer state + tempo
+- [x] Version 2 format: all racks + mixer state + tempo + channel/master FX
 - [x] Backward compatible with version 1 (single patch)
+- [x] FX fields merge over neutral defaults (older v2 files without FX still load)
 
 ### Tauri Parity
 - [x] All graph syncs send combined (flattened) graph
@@ -62,6 +63,9 @@
 - [x] Channel strip FX works in single-rack mode (no more early return in flattenRacks)
 - [x] Module ID prefixing always active (no single-rack vs multi-rack distinction)
 - [x] Mixer view accessible with any number of racks
+- [x] FX values persist across transport stop/start (channelFx baked into flattened graph; masterFx re-applied on restart)
+- [x] FX values saved in / restored from version-2 project export (channelFx + masterFx fields)
+- [x] ChannelFx/MasterFx are controlled components (knobs refresh on project import)
 
 ### Code Quality
 - [x] Zero TypeScript errors (strict tsc -b mode)

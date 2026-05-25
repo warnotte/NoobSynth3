@@ -18,13 +18,14 @@ Synthétiseur modulaire inspiré de VCV Rack, construit avec React + Rust/WASM.
 - **Plusieurs racks** jouant simultanément (onglets)
 - **Global Transport** : compteur de beats partagé, tous les séquenceurs synchronisés
 - **Mixer Console** : volume/mute/solo par rack, master volume, VU meters temps réel
+- **Channel Strip FX** : EQ 3 bandes + compresseur + reverb par canal, EQ/comp master — réglages persistés (restart transport + export projet)
 - **Send/Receive** : routing audio inter-racks via 8 bus (A-H)
 - **Master BPM** : tempo global dans la barre de transport
 
 ### Workflow
 - **Module Templates** : sauvegarder/charger des groupes de modules pré-câblés
 - **190+ presets** : Jupiter, Juno, Moog, Prophet, Jarre, Acid, Moroder, TR-909, Shepard, MIDI Organ, Vocal Synthesis...
-- **Export/Import projet** : sauvegarder tous les racks + mixer + tempo en un fichier
+- **Export/Import projet** : sauvegarder tous les racks + mixer + FX + tempo en un fichier
 - **MIDI** : entrée Web MIDI avec vélocité
 - **Undo/Redo** : historique avec transactions (knobs, modules)
 - **Enregistrement WAV** : capture audio stéréo 16-bit

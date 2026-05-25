@@ -320,12 +320,21 @@ Modules de routing audio inter-racks via bus nommés (A-H).
 - Param `bus` (0-7) sélectionne le bus
 
 ### Mixer Console
-Vue mixer avec volume/mute/solo par rack + master volume.
+Vue mixer avec volume/mute/solo par rack + master volume + channel strip FX.
 
 - Volume contrôle le param `level` du module `output` de chaque rack via `setParamDirect`
 - Solo = mute tous les non-solo
 - Master BPM dans le transport (TopBar), toujours visible
 - Resync = `resetTransport()`, remet tout au beat 0
+
+**Channel Strip FX (par canal) + Master FX :**
+- Chaque rack avec un module `output` reçoit une chaîne FX injectée par `flattenRacks` : **EQ3 → Compressor → Reverb** (modules `_eq/<rackId>`, `_comp/<rackId>`, `_reverb/<rackId>`). Le master bus a EQ3 + Compressor (dans `GraphEngine::render()`, via `setMasterFxParam`).
+- **Persistance (IMPORTANT)** : les valeurs FX sont stockées dans l'état App (`channelFx: Record<rackId, ChannelFxParams>` et `masterFx: MasterFxParams`), **pas seulement envoyées au moteur**.
+  - `channelFx` est passé à `flattenRacks` (option `channelFx`) → les modules FX injectés portent les vraies valeurs (au lieu des neutres). Le graphe reconstruit au restart les conserve.
+  - `masterFx` (bus master, pas un module de graphe) est ré-appliqué via `applyMasterFxToEngine()` dans `handleStart` ET `queueEngineRestart`.
+  - `ChannelFx`/`MasterFx` (MixerConsole) sont des **composants contrôlés** : ils lisent leurs valeurs en props → l'import projet rafraîchit les knobs.
+  - Valeurs neutres : `NEUTRAL_CHANNEL_FX` / `NEUTRAL_MASTER_FX` dans `rackFlatten.ts`.
+- **Fichiers clés** : `src/state/rackFlatten.ts` (types + injection), `src/ui/MixerConsole.tsx` (UI contrôlée), `src/App.tsx` (état `channelFx`/`masterFx`, `applyMasterFxToEngine`, export/import v2).
 
 ### Undo/Redo System
 Implémenté via `useReducer` dans `src/hooks/useUndoableState.ts` :
@@ -826,6 +835,7 @@ Les port IDs dans les presets doivent correspondre **exactement** à ceux défin
 | Phaser feedback runaway | Feedback pris depuis l'état interne allpass (croissance infinie) | Feedback via sortie bornée par `tanh()` avant réinjection |
 | Ajout module = full restart | `applyGraphUpdate()` appelait `queueEngineRestart()` pour tout changement | Update incrémental (`set_graph` preserve state), full restart uniquement pour presets (`set_graph_fresh`) |
 | Turing Machine panic | `1u16 << length` overflow quand `length == 16` | Guard `if length >= 16 { 0xFFFF }` |
+| Channel/Master FX reset au restart transport | Valeurs FX envoyées au moteur en direct, jamais stockées → graphe reconstruit avec valeurs neutres au stop/start | Persister `channelFx`/`masterFx` dans l'état App ; `channelFx` injecté via `flattenRacks`, `masterFx` ré-appliqué dans `handleStart`/`queueEngineRestart` |
 
 ---
 
