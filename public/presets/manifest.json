@@ -16,6 +16,27 @@
       "group": "Theremin"
     },
     {
+      "id": "theremin-sequenced",
+      "name": "Theremin Sequenced",
+      "description": "Un step sequencer joue le Theremin (Pitch + Gate) ; le curseur danse. Override souris.",
+      "file": "theremin-sequenced.json",
+      "group": "Theremin"
+    },
+    {
+      "id": "theremin-siren",
+      "name": "Theremin Siren",
+      "description": "Un LFO balaye la hauteur du Theremin : sirène sci-fi continue.",
+      "file": "theremin-siren.json",
+      "group": "Theremin"
+    },
+    {
+      "id": "theremin-duo",
+      "name": "Theremin Duo",
+      "description": "Joue un theremin ; ses CV jouent un second en doublure. Un geste, deux timbres.",
+      "file": "theremin-duo.json",
+      "group": "Theremin"
+    },
+    {
       "id": "jupiter-pad",
       "name": "Jupiter Pad",
       "description": "Wide, slow pad with chorus.",

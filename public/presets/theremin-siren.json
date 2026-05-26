@@ -1,0 +1,52 @@
+{
+  "id": "theremin-siren",
+  "name": "Theremin Siren",
+  "description": "Un LFO balaye la hauteur du Theremin (entrée Pitch) : sirène sci-fi continue. Sans gate connecté, le Theremin sonne en continu.",
+  "group": "Theremin",
+  "graph": {
+    "modules": [
+      {
+        "id": "lfo-1",
+        "type": "lfo",
+        "name": "LFO",
+        "position": { "x": 40, "y": 60 },
+        "params": { "rate": 0.4, "depth": 1, "offset": 0, "shape": "triangle", "bipolar": true }
+      },
+      {
+        "id": "theremin-1",
+        "type": "theremin",
+        "name": "Theremin",
+        "position": { "x": 420, "y": 60 },
+        "params": { "frequency": 440, "volume": 0.8, "touch": 0, "waveform": 2, "vibratoRate": 6, "vibratoDepth": 0.1, "tremoloRate": 5, "tremoloDepth": 0, "tone": 0.72, "glide": 0.05, "level": 0.7, "loFreq": 130.81, "hiFreq": 1046.5 }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "x": 1280, "y": 60 },
+        "params": { "time": 1.2, "damp": 0.4, "preDelay": 28, "mix": 0.4 }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Main Out",
+        "position": { "x": 1560, "y": 60 },
+        "params": { "level": 1 }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 40, "y": 460 },
+        "params": {
+          "text": "THEREMIN SIREN\n\nUn LFO pilote la hauteur → sirène continue.\n\n- LFO (triangle, lent) → entrée Pitch du Theremin.\n- Pas de Gate connecté → le Theremin sonne en continu (drone) ; le curseur balaye gauche-droite.\n- Règle la vitesse du LFO (Rate) pour accélérer la sirène.\n- ATTRAPE le pad → reprise manuelle (override) tant que tu touches.\n\nSignal : Theremin → Reverb → Sortie."
+        }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "lfo-1", "portId": "cv-out" }, "to": { "moduleId": "theremin-1", "portId": "pitch-in" }, "kind": "cv" },
+      { "from": { "moduleId": "theremin-1", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}

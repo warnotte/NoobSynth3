@@ -82,6 +82,18 @@
 
 ---
 
+## To Verify
+
+### Standalone (Tauri) + VST3 runtime after recent changes (BUILDS OK, RUN UNTESTED)
+- The mixer redesign, Theremin module, and Theremin CV-control all compile for
+  every target (`cargo check` passes for `dsp-graph`, `dsp-wasm`, `src-tauri`,
+  `dsp-plugin`).
+- **Not yet run:** Tauri standalone (cpal native audio) and the VST3/CLAP plugin
+  in a DAW. To check: theremin audio + CV control, the `native_get_theremin_state`
+  cursor polling, channel-strip FX, and the volume faders in native mode.
+- VST UI is a launcher (per docs/VST.md), so the theremin pad lives in the
+  external window; confirm it still drives audio through the plugin.
+
 ## Known Issues
 
 ### Multi-Rack: inactive rack with a Control sequencer goes silent (DIAGNOSED, not yet fixed)
