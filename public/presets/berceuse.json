@@ -1,0 +1,98 @@
+{
+  "id": "berceuse",
+  "name": "Berceuse",
+  "description": "Ambient génératif qui se joue tout seul : une mélodie pentatonique au Theremin sur un drone filtré qui respire, dans un grand delay + reverb. Appuie sur Play et ferme les yeux.",
+  "group": "Ambient",
+  "graph": {
+    "modules": [
+      {
+        "id": "seq-1",
+        "type": "step-sequencer",
+        "name": "Mélodie",
+        "position": { "x": 40, "y": 60 },
+        "params": {
+          "enabled": true, "tempo": 120, "rate": 1, "gateLength": 70, "swing": 0,
+          "slideTime": 120, "length": 16, "direction": 0,
+          "stepData": "[{\"pitch\":0,\"gate\":true,\"velocity\":70,\"slide\":true},{\"pitch\":0,\"gate\":false,\"velocity\":0,\"slide\":false},{\"pitch\":7,\"gate\":true,\"velocity\":85,\"slide\":false},{\"pitch\":0,\"gate\":false,\"velocity\":0,\"slide\":false},{\"pitch\":4,\"gate\":true,\"velocity\":60,\"slide\":true},{\"pitch\":0,\"gate\":false,\"velocity\":0,\"slide\":false},{\"pitch\":9,\"gate\":true,\"velocity\":90,\"slide\":false},{\"pitch\":0,\"gate\":false,\"velocity\":0,\"slide\":false},{\"pitch\":12,\"gate\":true,\"velocity\":75,\"slide\":true},{\"pitch\":0,\"gate\":false,\"velocity\":0,\"slide\":false},{\"pitch\":7,\"gate\":true,\"velocity\":65,\"slide\":false},{\"pitch\":0,\"gate\":false,\"velocity\":0,\"slide\":false},{\"pitch\":4,\"gate\":true,\"velocity\":80,\"slide\":true},{\"pitch\":2,\"gate\":true,\"velocity\":55,\"slide\":false},{\"pitch\":0,\"gate\":true,\"velocity\":70,\"slide\":false},{\"pitch\":0,\"gate\":false,\"velocity\":0,\"slide\":false}]"
+        }
+      },
+      {
+        "id": "theremin-1",
+        "type": "theremin",
+        "name": "Voix",
+        "position": { "x": 460, "y": 60 },
+        "params": { "frequency": 440, "volume": 0.8, "touch": 0, "waveform": 0, "vibratoRate": 4.5, "vibratoDepth": 0.18, "tremoloRate": 5, "tremoloDepth": 0, "tone": 0.5, "glide": 0.2, "level": 0.55, "loFreq": 130.81, "hiFreq": 1046.5 }
+      },
+      {
+        "id": "osc-1",
+        "type": "oscillator",
+        "name": "Drone",
+        "position": { "x": 40, "y": 480 },
+        "params": { "frequency": 130.81, "type": "triangle", "pwm": 0.5, "unison": 2, "detune": 6, "fmLin": 0, "fmExp": 0, "subMix": 0.2, "subOct": 1 }
+      },
+      {
+        "id": "lfo-1",
+        "type": "lfo",
+        "name": "LFO Filtre",
+        "position": { "x": 40, "y": 760 },
+        "params": { "rate": 0.08, "depth": 0.4, "offset": 0.1, "shape": "triangle", "bipolar": false }
+      },
+      {
+        "id": "vcf-1",
+        "type": "vcf",
+        "name": "Filtre Drone",
+        "position": { "x": 460, "y": 480 },
+        "params": { "cutoff": 380, "resonance": 0.22, "drive": 0.1, "envAmount": 0, "modAmount": 0.7, "keyTrack": 0, "model": "svf", "mode": "lp", "slope": 24 }
+      },
+      {
+        "id": "mix-1",
+        "type": "mixer",
+        "name": "Mix",
+        "position": { "x": 920, "y": 260 },
+        "params": { "levelA": 0.7, "levelB": 0.5 }
+      },
+      {
+        "id": "delay-1",
+        "type": "tape-delay",
+        "name": "Tape Delay",
+        "position": { "x": 1200, "y": 260 },
+        "params": { "time": 600, "feedback": 0.25, "mix": 0.22, "tone": 0.55, "wow": 0.25, "flutter": 0.2, "drive": 0.06 }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "x": 1480, "y": 260 },
+        "params": { "time": 1.6, "damp": 0.45, "preDelay": 30, "mix": 0.42 }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Main Out",
+        "position": { "x": 1760, "y": 260 },
+        "params": { "level": 0.9 }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 920, "y": 600 },
+        "params": {
+          "text": "BERCEUSE 🌙\n\nAmbient génératif — ça se joue tout seul.\n\n- Appuie sur PLAY, baisse la lumière, écoute.\n- Mélodie : un séquenceur joue le Theremin en pentatonique (toujours doux), avec glide.\n- Drone : un oscillateur grave passe dans un filtre que le LFO ouvre/ferme lentement (ça respire).\n- Le tout dans un grand Tape Delay + Reverb.\n\nPour varier : change le Rate du LFO Filtre, le tempo (barre du haut), ou attrape le pad du Theremin pour jouer par-dessus.\n\nBonne nuit."
+        }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "seq-1", "portId": "cv-out" }, "to": { "moduleId": "theremin-1", "portId": "pitch-in" }, "kind": "cv" },
+      { "from": { "moduleId": "seq-1", "portId": "gate-out" }, "to": { "moduleId": "theremin-1", "portId": "gate-in" }, "kind": "gate" },
+      { "from": { "moduleId": "seq-1", "portId": "velocity-out" }, "to": { "moduleId": "theremin-1", "portId": "vol-in" }, "kind": "cv" },
+      { "from": { "moduleId": "osc-1", "portId": "out" }, "to": { "moduleId": "vcf-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "lfo-1", "portId": "cv-out" }, "to": { "moduleId": "vcf-1", "portId": "mod" }, "kind": "cv" },
+      { "from": { "moduleId": "theremin-1", "portId": "out" }, "to": { "moduleId": "mix-1", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "vcf-1", "portId": "out" }, "to": { "moduleId": "mix-1", "portId": "in-b" }, "kind": "audio" },
+      { "from": { "moduleId": "mix-1", "portId": "out" }, "to": { "moduleId": "delay-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "delay-1", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}
