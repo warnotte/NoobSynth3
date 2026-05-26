@@ -183,9 +183,13 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 - [ ] `README.md` - Mettre à jour le compte de modules (actuellement 80)
 - [ ] `CLAUDE.md` - Ajouter à la liste "Module Types" si pertinent
 
+### Vérification (après ajout/modif de module)
+- [ ] `npm run check:modules` - **Cohérence TS↔Rust** : vérifie que chaque port déclaré dans `portCatalog` est résolu par `ports.rs`, et que le type est mappé dans `normalize_module_type`. Attrape le bug silencieux « câble branché mais moteur ignore ».
+- [ ] `npm run module-ref` - Régénère `docs/MODULE_REFERENCE.md` (référence auto : ports + params + defaults de tous les modules — **le truc à consulter** pour construire un patch/preset).
+- [ ] `npm run build:wasm` - Rebuild WASM après modifs Rust
+
 ### Optionnel
 - [ ] `public/presets/` - Preset de démonstration
-- [ ] `npm run build:wasm` - Rebuild WASM après modifs Rust
 
 ## UI ↔ Audio Communication Checklist (IMPORTANT)
 
@@ -399,7 +403,8 @@ Presets dans `public/presets/`, structure `{ id, name, description, group, graph
 |----------|-------------|
 | [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) | Vue d'ensemble des 3 modes (Web, Tauri, VST) |
 | [docs/DEVELOPMENT.md](./docs/DEVELOPMENT.md) | Guide de build, workflow, contribution |
-| [docs/MODULES.md](./docs/MODULES.md) | Référence complète des modules DSP |
+| [docs/MODULES.md](./docs/MODULES.md) | Référence complète des modules DSP (prose) |
+| [docs/MODULE_REFERENCE.md](./docs/MODULE_REFERENCE.md) | **Auto-généré** (`npm run module-ref`) : ports + params + defaults de chaque module. À consulter pour construire patchs/presets. |
 | [docs/FEATURES.md](./docs/FEATURES.md) | Notes d'implémentation détaillées par feature/module (extrait de CLAUDE.md) |
 | [docs/PRESETS.md](./docs/PRESETS.md) | Format preset complet, checklist, exemples, référence port IDs |
 | [docs/VST.md](./docs/VST.md) | Documentation plugin DAW |

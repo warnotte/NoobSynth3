@@ -678,7 +678,7 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
   theremin: {
     frequency: 440,       // current pitch Hz (driven by XY pad X)
     volume: 0,            // current volume 0-1 (driven by XY pad Y)
-    gate: 0,              // 0/1 playing (pointer down)
+    touch: 0,             // 1 while the mouse holds the pad (overrides CV inputs)
     waveform: 0,          // 0=sin, 1=tri, 2=saw, 3=sqr
     vibratoRate: 5,       // Hz
     vibratoDepth: 0,      // 0-1 (→ up to ~2 semitones)

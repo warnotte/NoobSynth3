@@ -9,6 +9,8 @@
     "build:wasm": "powershell -ExecutionPolicy Bypass -File scripts/build-wasm.ps1",
     "test": "cargo test --workspace",
     "test:presets": "cargo test -p dsp-graph --test presets -- --nocapture",
+    "module-ref": "node scripts/gen-module-reference.mjs",
+    "check:modules": "node scripts/check-modules.mjs",
     "lint": "eslint .",
     "preview": "vite preview",
     "tauri": "tauri",
