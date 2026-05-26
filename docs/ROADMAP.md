@@ -71,7 +71,8 @@
 - [x] Channel strip FX: real rotary knobs (MixerKnob) in a 3-col grid, replacing tiny sliders
 - [x] Wider strips (168px), color-coded sections (EQ blue / Comp mint / Reverb rose)
 - [x] Formatted readouts (dB, Hz→k, :1, %, ms) + double-click to type a value
-- [x] Per-section bypass via clickable LED (neutral params pushed live, knob values retained)
+- [x] Per-section bypass via clickable LED — true bypass: disabled section is removed from the flattened graph (zero DSP cost), re-injected on enable with stored values
+- [x] Channel & master FX OFF by default (no idle CPU until a section is enabled)
 - [x] Fixed: per-rack & master volume faders had no effect in single-rack mode (stale `length <= 1` guard + unprefixed engine ID after always-prefix change)
 
 ### Code Quality

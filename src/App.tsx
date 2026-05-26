@@ -3117,22 +3117,25 @@ function App() {
                 }
               })
             }}
-            onChannelFxToggle={(rackId, fxIds, section) => {
+            onChannelFxToggle={(rackId, _fxIds, section) => {
               const current = channelFxRef.current[rackId] ?? NEUTRAL_CHANNEL_FX
               const nextOn = !current.enabled[section]
-              const modId = fxIds[section]
-              // Push stored (enable) or neutral (bypass) params to the engine live
-              const src = nextOn ? current[section] : NEUTRAL_CHANNEL_FX[section]
-              for (const [paramId, value] of Object.entries(src)) {
-                engine.setParamDirect(modId, paramId, value as number)
-                if (isTauri && tauriNativeRunning) {
-                  void invokeTauri('native_set_param', { moduleId: modId, paramId, value }).catch(() => {})
-                }
+              const next = {
+                ...channelFxRef.current,
+                [rackId]: { ...current, enabled: { ...current.enabled, [section]: nextOn } },
               }
-              setChannelFx((prev) => {
-                const c = prev[rackId] ?? NEUTRAL_CHANNEL_FX
-                return { ...prev, [rackId]: { ...c, enabled: { ...c.enabled, [section]: nextOn } } }
-              })
+              channelFxRef.current = next // sync ref before rebuild (buildCombinedGraph reads it)
+              setChannelFx(next)
+              // Rebuild the engine graph so the FX module is injected (on) or removed
+              // (off → zero DSP cost). Preserve mode keeps every other module's state.
+              if (statusRef.current === 'running') {
+                engine.updateGraph(buildCombinedGraph(graphRef.current))
+              }
+              if (isTauri && tauriNativeRunning) {
+                const c = buildCombinedGraph(graphRef.current)
+                const graphJson = JSON.stringify({ modules: c.modules, connections: c.connections, taps: nativeScopeTapsRef.current, macros: [] })
+                void invokeTauri('native_set_graph', { graphJson }).catch(() => {})
+              }
             }}
             onMasterFxChange={(param, value) => {
               const section = param.startsWith('eq') ? 'eq' : 'comp'

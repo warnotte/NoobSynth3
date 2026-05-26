@@ -24,7 +24,7 @@ export type ChannelFxParams = {
 
 /** Neutral (no-op) channel strip FX defaults. */
 export const NEUTRAL_CHANNEL_FX: ChannelFxParams = {
-  enabled: { eq: true, comp: true, reverb: true },
+  enabled: { eq: false, comp: false, reverb: false },
   eq: { lowGain: 0, midGain: 0, highGain: 0, lowFreq: 200, midFreq: 1000, highFreq: 5000, midQ: 1 },
   comp: { threshold: 0, ratio: 1, attack: 10, release: 100, makeup: 0 },
   reverb: { mix: 0, time: 0.5, damp: 0.5, preDelay: 10 },
@@ -39,7 +39,7 @@ export type MasterFxParams = {
 
 /** Neutral (no-op) master bus FX defaults. */
 export const NEUTRAL_MASTER_FX: MasterFxParams = {
-  eqEnabled: true, compEnabled: true,
+  eqEnabled: false, compEnabled: false,
   eqLow: 0, eqMid: 0, eqHigh: 0,
   compThreshold: 0, compRatio: 1, compAttack: 10, compRelease: 100,
 }
@@ -160,42 +160,42 @@ export const flattenRacks = (
       channelFxIds[rack.id] = { eq: eqId, comp: compId, reverb: reverbId }
       meterIds[rack.id] = meterId
 
-      // Channel strip params: use persisted values for this rack, fall back to neutral.
-      // A bypassed (disabled) section gets neutral params so it passes audio through.
+      // Only ENABLED sections are injected — a disabled section is absent from
+      // the graph (zero DSP cost). Build the chain from the enabled modules,
+      // in fixed order EQ → Comp → Reverb.
       const fx = options?.channelFx?.[rack.id] ?? NEUTRAL_CHANNEL_FX
-      const eqParams = fx.enabled.eq ? fx.eq : NEUTRAL_CHANNEL_FX.eq
-      const compParams = fx.enabled.comp ? fx.comp : NEUTRAL_CHANNEL_FX.comp
-      const revParams = fx.enabled.reverb ? fx.reverb : NEUTRAL_CHANNEL_FX.reverb
-
-      allModules.push(
-        { id: eqId, type: 'eq3', name: `EQ ${rack.name}`, position: { x: -1, y: -1 },
-          params: { ...eqParams } },
-        { id: compId, type: 'compressor', name: `Comp ${rack.name}`, position: { x: -1, y: -1 },
-          params: { ...compParams, mix: 1 } },
-        { id: reverbId, type: 'reverb', name: `Reverb ${rack.name}`, position: { x: -1, y: -1 },
-          params: { ...revParams } },
-        { id: meterId, type: 'meter', name: `Meter ${rack.name}`, position: { x: -1, y: -1 },
-          params: {} },
-      )
-
-      // Redirect connections going to Output's 'in' port through the FX chain
-      // Find all connections targeting this output's input
-      for (let i = 0; i < allConnections.length; i++) {
-        const c = allConnections[i]
-        if (c.to.moduleId === outputEngineId && c.to.portId === 'in') {
-          // Redirect: source → EQ instead of source → Output
-          allConnections[i] = { ...c, to: { moduleId: eqId, portId: 'in' } }
-        }
+      const chain: ModuleSpec[] = []
+      if (fx.enabled.eq) {
+        chain.push({ id: eqId, type: 'eq3', name: `EQ ${rack.name}`, position: { x: -1, y: -1 }, params: { ...fx.eq } })
+      }
+      if (fx.enabled.comp) {
+        chain.push({ id: compId, type: 'compressor', name: `Comp ${rack.name}`, position: { x: -1, y: -1 }, params: { ...fx.comp, mix: 1 } })
+      }
+      if (fx.enabled.reverb) {
+        chain.push({ id: reverbId, type: 'reverb', name: `Reverb ${rack.name}`, position: { x: -1, y: -1 }, params: { ...fx.reverb } })
       }
 
-      // Chain: EQ → Comp → Reverb → Output
-      allConnections.push(
-        { from: { moduleId: eqId, portId: 'out' }, to: { moduleId: compId, portId: 'in' }, kind: 'audio' },
-        { from: { moduleId: compId, portId: 'out' }, to: { moduleId: reverbId, portId: 'in' }, kind: 'audio' },
-        { from: { moduleId: reverbId, portId: 'out' }, to: { moduleId: outputEngineId, portId: 'in' }, kind: 'audio' },
-        // Meter taps the output
-        { from: { moduleId: outputEngineId, portId: 'out' }, to: { moduleId: meterId, portId: 'in' }, kind: 'audio' },
-      )
+      allModules.push(...chain)
+      // Meter is always present (negligible cost) so the VU keeps working
+      allModules.push({ id: meterId, type: 'meter', name: `Meter ${rack.name}`, position: { x: -1, y: -1 }, params: {} })
+
+      if (chain.length > 0) {
+        const firstId = chain[0].id
+        // Redirect connections that targeted Output's 'in' to the first FX module
+        for (let i = 0; i < allConnections.length; i++) {
+          const c = allConnections[i]
+          if (c.to.moduleId === outputEngineId && c.to.portId === 'in') {
+            allConnections[i] = { ...c, to: { moduleId: firstId, portId: 'in' } }
+          }
+        }
+        // Chain enabled modules in sequence, last → Output
+        for (let i = 0; i < chain.length - 1; i++) {
+          allConnections.push({ from: { moduleId: chain[i].id, portId: 'out' }, to: { moduleId: chain[i + 1].id, portId: 'in' }, kind: 'audio' })
+        }
+        allConnections.push({ from: { moduleId: chain[chain.length - 1].id, portId: 'out' }, to: { moduleId: outputEngineId, portId: 'in' }, kind: 'audio' })
+      }
+      // Meter taps the output (FX present or not)
+      allConnections.push({ from: { moduleId: outputEngineId, portId: 'out' }, to: { moduleId: meterId, portId: 'in' }, kind: 'audio' })
     }
   }
 
