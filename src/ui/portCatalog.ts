@@ -241,6 +241,7 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
     inputs: [
       { id: 'rate', label: 'Rate', kind: 'cv', direction: 'in' },
       { id: 'sync', label: 'Sync', kind: 'sync', direction: 'in' },
+      { id: 'depth', label: 'Depth', kind: 'cv', direction: 'in' },
     ],
     outputs: [{ id: 'cv-out', label: 'CV', kind: 'cv', direction: 'out' }],
   },

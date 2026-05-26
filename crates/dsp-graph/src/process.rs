@@ -378,6 +378,11 @@ pub(crate) fn process_module(
             } else {
                 Some(inputs[1].channel(0))
             };
+            let depth_cv = if connections.len() > 2 && !connections[2].is_empty() {
+                Some(inputs[2].channel(0))
+            } else {
+                None
+            };
             let params = LfoParams {
                 rate: state.rate.slice(frames),
                 shape: state.shape.slice(frames),
@@ -385,7 +390,7 @@ pub(crate) fn process_module(
                 offset: state.offset.slice(frames),
                 bipolar: state.bipolar.slice(frames),
             };
-            let lfo_inputs = LfoInputs { rate_cv, sync };
+            let lfo_inputs = LfoInputs { rate_cv, sync, depth_cv };
             let output = outputs[0].channel_mut(0);
             state.lfo.process_block(output, lfo_inputs, params);
         }

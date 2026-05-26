@@ -27,7 +27,7 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
     ModuleType::CvVca => vec![PortInfo { channels: 1 }, PortInfo { channels: 1 }],
     ModuleType::Output => vec![PortInfo { channels: 2 }],
     ModuleType::Lab => vec![PortInfo { channels: 2 }, PortInfo { channels: 2 }],
-    ModuleType::Lfo => vec![PortInfo { channels: 1 }, PortInfo { channels: 1 }],
+    ModuleType::Lfo => vec![PortInfo { channels: 1 }, PortInfo { channels: 1 }, PortInfo { channels: 1 }],
     ModuleType::Adsr => vec![PortInfo { channels: 1 }],
     ModuleType::Vcf => vec![
       PortInfo { channels: 1 },
@@ -707,6 +707,7 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
     ModuleType::Lfo => match port_id {
       "rate" => Some(0),
       "sync" => Some(1),
+      "depth" | "depth-cv" => Some(2),
       _ => None,
     },
     ModuleType::Adsr => match port_id {

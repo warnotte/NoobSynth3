@@ -44,6 +44,9 @@ pub struct LfoInputs<'a> {
     pub rate_cv: Option<&'a [Sample]>,
     /// Sync/reset trigger (resets phase on rising edge)
     pub sync: Option<&'a [Sample]>,
+    /// Depth CV modulation (added to the base depth, clamped 0..1) —
+    /// e.g. a second LFO making the depth "breathe".
+    pub depth_cv: Option<&'a [Sample]>,
 }
 
 /// Parameters for LFO.
@@ -94,7 +97,7 @@ impl Lfo {
             let rate_base = sample_at(params.rate, i, 2.0);
             let rate_cv = input_at(inputs.rate_cv, i);
             let sync = input_at(inputs.sync, i);
-            let depth = sample_at(params.depth, i, 0.7);
+            let depth = (sample_at(params.depth, i, 0.7) + input_at(inputs.depth_cv, i)).clamp(0.0, 1.0);
             let offset = sample_at(params.offset, i, 0.0);
 
             // Reset phase on sync rising edge

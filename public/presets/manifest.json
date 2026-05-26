@@ -37,6 +37,13 @@
       "group": "Theremin"
     },
     {
+      "id": "theremin-flutter",
+      "name": "Theremin Flutter",
+      "description": "LFO module LFO : un vibrato rapide dont l'amplitude respire (entrée Depth du LFO).",
+      "file": "theremin-flutter.json",
+      "group": "Theremin"
+    },
+    {
       "id": "jupiter-pad",
       "name": "Jupiter Pad",
       "description": "Wide, slow pad with chorus.",
