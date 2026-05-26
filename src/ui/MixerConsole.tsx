@@ -229,10 +229,10 @@ const MasterFx = ({ values, onChange, onToggleSection }: {
 
 const FaderScale = () => (
   <div className="mixer-fader-scale">
-    <span className="major">+6</span>
-    <span>0</span>
+    <span>+6</span>
+    <span className="major">0</span>
     <span>-6</span>
-    <span className="major">-12</span>
+    <span>-12</span>
     <span>-24</span>
     <span>-inf</span>
   </div>
