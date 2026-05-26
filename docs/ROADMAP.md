@@ -84,6 +84,16 @@
 
 ## Known Issues
 
+### Multi-Rack: inactive rack with a Control sequencer goes silent (DIAGNOSED, not yet fixed)
+- Repro: rack 1 plays a sequence via the Control I/O internal sequencer (`seqOn`); add/switch to another rack → rack 1 becomes inactive and goes completely silent.
+- **Root cause:** `flattenRacks` removes ALL `control` modules from inactive racks (state/rackFlatten.ts, the `else` branch ~L112-125). For a `seqOn` control that drives the rack, removing it kills the sequence. (The exclusion is unnecessary for keyboard isolation — live CV/gate is only sent to the active rack's control via `moduleIdMapper`; it only existed to avoid a stuck note on an idle control.)
+- **Proposed fix:** only exclude an inactive rack's control when its sequencer is OFF (`!seqOn`). If `seqOn`, keep it so the sequence keeps playing (no stuck note since the sequencer drives the gate).
+
+### Multi-Rack: output `level` resets to mixer default on rack switch (DIAGNOSED, not yet fixed)
+- Symptom: switching racks resets a preset's output level to the channel default (engine value changes; UI knob does not).
+- **Root cause:** `flattenRacks` overwrites the `output` module's `level` param with the mixer channel volume (default 0.8) on every flatten (rackFlatten.ts ~L96-99). A preset's custom output level is clobbered on rebuild.
+- **Proposed fix (more involved):** reconcile output-`level` ↔ mixer-volume — e.g. initialize the mixer channel volume from the output level on load, or apply mixer volume via a separate gain stage instead of overwriting the param.
+
 ### File-Loading Modules Lose Data on Engine Restart
 - SID Player, AY Player, Granular Sampler lose their loaded file data on Stop→Play
 - **Workaround:** Reload the file manually after restart
