@@ -297,8 +297,13 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // gate
       PortInfo { channels: 1 },  // clock
     ],
-    // Theremin - no inputs (mouse/XY driven)
-    ModuleType::Theremin => vec![],
+    // Theremin - CV inputs (pitch, volume, gate) so it can be driven by
+    // a sequencer / LFO / another theremin. The mouse overrides when touched.
+    ModuleType::Theremin => vec![
+      PortInfo { channels: 1 },  // pitch CV
+      PortInfo { channels: 1 },  // volume CV
+      PortInfo { channels: 1 },  // gate
+    ],
     // Send - 1 stereo input
     ModuleType::Send => vec![
       PortInfo { channels: 2 },  // audio in (stereo)
@@ -1017,8 +1022,13 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
       "clock" | "clk" => Some(2),
       _ => None,
     },
-    // Theremin - no inputs
-    ModuleType::Theremin => None,
+    // Theremin - pitch / volume / gate CV inputs
+    ModuleType::Theremin => match port_id {
+      "pitch" | "pitch-cv" | "pitch-in" | "1volt" => Some(0),
+      "vol" | "vol-in" | "volume" => Some(1),
+      "gate" | "gate-in" => Some(2),
+      _ => None,
+    },
     // Send - 1 input
     ModuleType::Send => match port_id {
       "in" => Some(0),

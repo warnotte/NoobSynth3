@@ -695,7 +695,7 @@ pub(crate) fn create_state(
       theremin: Theremin::new(sample_rate),
       frequency: ParamBuffer::new(param_number(params, "frequency", 440.0)),
       volume: ParamBuffer::new(param_number(params, "volume", 0.0)),
-      gate: ParamBuffer::new(param_number(params, "gate", 0.0)),
+      touch: ParamBuffer::new(param_number(params, "touch", 0.0)),
       waveform: ParamBuffer::new(param_number(params, "waveform", 0.0)),
       vibrato_rate: ParamBuffer::new(param_number(params, "vibratoRate", 5.0)),
       vibrato_depth: ParamBuffer::new(param_number(params, "vibratoDepth", 0.0)),
@@ -704,6 +704,8 @@ pub(crate) fn create_state(
       tone: ParamBuffer::new(param_number(params, "tone", 0.6)),
       glide: ParamBuffer::new(param_number(params, "glide", 0.05)),
       level: ParamBuffer::new(param_number(params, "level", 1.0)),
+      lo_freq: ParamBuffer::new(param_number(params, "loFreq", 130.81)),
+      hi_freq: ParamBuffer::new(param_number(params, "hiFreq", 1046.5)),
     }),
     ModuleType::Notes => ModuleState::Notes,  // UI-only, no DSP
     ModuleType::Send => ModuleState::Send(SendState {
@@ -1544,7 +1546,7 @@ pub(crate) fn apply_param(state: &mut ModuleState, param: &str, value: f32) {
     ModuleState::Theremin(state) => match param {
       "frequency" => state.frequency.set(value),
       "volume" => state.volume.set(value),
-      "gate" => state.gate.set(value),
+      "touch" => state.touch.set(value),
       "waveform" => state.waveform.set(value),
       "vibratoRate" => state.vibrato_rate.set(value),
       "vibratoDepth" => state.vibrato_depth.set(value),
@@ -1553,6 +1555,8 @@ pub(crate) fn apply_param(state: &mut ModuleState, param: &str, value: f32) {
       "tone" => state.tone.set(value),
       "glide" => state.glide.set(value),
       "level" => state.level.set(value),
+      "loFreq" => state.lo_freq.set(value),
+      "hiFreq" => state.hi_freq.set(value),
       _ => {}
     },
     ModuleState::TuringMachine(state) => match param {

@@ -151,6 +151,10 @@ enum AudioCommand {
     module_id: String,
     reply: mpsc::Sender<Result<u32, String>>,
   },
+  GetThereminState {
+    module_id: String,
+    reply: mpsc::Sender<Result<u32, String>>,
+  },
   // Master FX
   SetMasterFxParam {
     param: String,
@@ -683,6 +687,17 @@ fn audio_thread(rx: mpsc::Receiver<AudioCommand>, scope: Arc<Mutex<ScopeSnapshot
         let result = if let Some(graph) = &state.graph {
           match graph.lock() {
             Ok(engine) => Ok(engine.get_meter_level(&module_id)),
+            Err(_) => Err("graph engine unavailable".to_string()),
+          }
+        } else {
+          Ok(0)
+        };
+        let _ = reply.send(result);
+      }
+      AudioCommand::GetThereminState { module_id, reply } => {
+        let result = if let Some(graph) = &state.graph {
+          match graph.lock() {
+            Ok(engine) => Ok(engine.get_theremin_state(&module_id)),
             Err(_) => Err("graph engine unavailable".to_string()),
           }
         } else {
@@ -1609,6 +1624,24 @@ fn native_get_meter_level(
 }
 
 #[tauri::command]
+fn native_get_theremin_state(
+  state: State<NativeAudioState>,
+  module_id: String,
+) -> Result<u32, String> {
+  let (reply_tx, reply_rx) = mpsc::channel();
+  state
+    .tx
+    .send(AudioCommand::GetThereminState {
+      module_id,
+      reply: reply_tx,
+    })
+    .map_err(|_| "native audio thread unavailable".to_string())?;
+  reply_rx
+    .recv()
+    .map_err(|_| "native audio thread unavailable".to_string())?
+}
+
+#[tauri::command]
 fn native_set_master_fx_param(
   state: State<NativeAudioState>,
   param: String,
@@ -2038,6 +2071,7 @@ pub fn run() {
       native_load_granular_buffer,
       // Meter
       native_get_meter_level,
+      native_get_theremin_state,
       // Master FX
       native_set_master_fx_param,
       // Transport commands

@@ -41,6 +41,16 @@ export type NativeSequencerBridge = {
 }
 
 /**
+ * Bridge for the native theremin (Tauri mode): live param control + polling
+ * the display position (packed u32: gate<<24 | x<<12 | y).
+ */
+export type NativeThereminBridge = {
+  isActive: boolean
+  setParam: (moduleId: string, paramId: string, value: number) => void
+  getState: (moduleId: string) => Promise<number>
+}
+
+/**
  * Bridge for native granular operations (Tauri mode)
  */
 export type NativeGranularBridge = {
@@ -78,6 +88,8 @@ export type ControlProps = {
   nativeChiptune?: NativeChiptuneBridge | null
   /** Native sequencer bridge for step/drum/midi sequencers (Tauri mode) */
   nativeSequencer?: NativeSequencerBridge | null
+  /** Native theremin bridge (Tauri mode) */
+  nativeTheremin?: NativeThereminBridge | null
   /** Native granular bridge (Tauri mode) */
   nativeGranular?: NativeGranularBridge | null
   /** Native particle cloud bridge (Tauri mode) */

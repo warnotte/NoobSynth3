@@ -49,7 +49,7 @@ const snapToScale = (freq: number, scale: number[], root: number): number => {
   return 440 * Math.pow(2, (best - 69) / 12)
 }
 
-export function ThereminControls({ module, engine, updateParam }: ControlProps) {
+export function ThereminControls({ module, engine, connections, status, nativeTheremin, updateParam }: ControlProps) {
   const p = module.params
   const num = (k: string, d: number) => Number(p[k] ?? d)
   const truthy = (k: string) => p[k] === true || p[k] === 1
@@ -92,16 +92,22 @@ export function ThereminControls({ module, engine, updateParam }: ControlProps) 
     // Live performance values go straight to the engine (no history / no patch persist)
     engine.setParam(module.id, 'frequency', f)
     engine.setParam(module.id, 'volume', vol)
+    if (nativeTheremin?.isActive) {
+      nativeTheremin.setParam(module.id, 'frequency', f)
+      nativeTheremin.setParam(module.id, 'volume', vol)
+    }
     cursorRef.current = { x: nx, y: ny, on: draggingRef.current }
     if (draggingRef.current) trailRef.current.push({ x: nx, y: ny, age: 0 })
     setReadout({ note: freqToNoteName(f), hz: Math.round(f) })
-  }, [engine, module.id, xyToFreqVol])
+  }, [engine, module.id, xyToFreqVol, nativeTheremin])
 
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     e.preventDefault()
     padRef.current?.setPointerCapture(e.pointerId)
     draggingRef.current = true
-    engine.setParam(module.id, 'gate', 1)
+    // `touch` tells the DSP the mouse is active → it overrides any CV input
+    engine.setParam(module.id, 'touch', 1)
+    if (nativeTheremin?.isActive) nativeTheremin.setParam(module.id, 'touch', 1)
     handleMove(e.clientX, e.clientY)
   }
   const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -112,7 +118,8 @@ export function ThereminControls({ module, engine, updateParam }: ControlProps) 
     if (!draggingRef.current) return
     draggingRef.current = false
     padRef.current?.releasePointerCapture(e.pointerId)
-    engine.setParam(module.id, 'gate', 0)
+    engine.setParam(module.id, 'touch', 0)
+    if (nativeTheremin?.isActive) nativeTheremin.setParam(module.id, 'touch', 0)
     cursorRef.current.on = false
   }
 
@@ -171,6 +178,41 @@ export function ThereminControls({ module, engine, updateParam }: ControlProps) 
     raf = requestAnimationFrame(draw)
     return () => cancelAnimationFrame(raf)
   }, [])
+
+  // When driven by CV inputs (not the mouse), poll the engine so the cursor
+  // moves on its own — you SEE the incoming pitch/volume being played.
+  const cvDriven = connections.some(
+    (c) => c.to.moduleId === module.id &&
+      (c.to.portId === 'pitch-in' || c.to.portId === 'vol-in' || c.to.portId === 'gate-in'),
+  )
+  useEffect(() => {
+    const running = status === 'running' || !!nativeTheremin?.isActive
+    if (!running || !cvDriven) return
+    const apply = (x: number, y: number, gate: boolean) => {
+      if (draggingRef.current) return // mouse override wins, even visually
+      cursorRef.current = { x, y, on: gate }
+      if (gate) trailRef.current.push({ x, y, age: 0 })
+      const m = mapRef.current
+      const f = m.loFreq * Math.pow(m.hiFreq / m.loFreq, x)
+      setReadout(gate ? { note: freqToNoteName(f), hz: Math.round(f) } : { note: '—', hz: 0 })
+    }
+    if (nativeTheremin?.isActive) {
+      // Tauri native: poll the packed state (gate<<24 | x<<12 | y)
+      let alive = true
+      const poll = async () => {
+        while (alive) {
+          try {
+            const packed = await nativeTheremin.getState(module.id)
+            apply(((packed >>> 12) & 0xfff) / 4095, (packed & 0xfff) / 4095, ((packed >>> 24) & 0x1) === 1)
+          } catch { /* ignore */ }
+          await new Promise((r) => setTimeout(r, 40))
+        }
+      }
+      void poll()
+      return () => { alive = false }
+    }
+    return engine.watchTheremin(module.id, apply)
+  }, [engine, module.id, status, cvDriven, nativeTheremin])
 
   const cyclePreset = (dir: number) => {
     const next = ((presetIdx + dir) % PRESETS.length + PRESETS.length) % PRESETS.length

@@ -57,4 +57,4 @@ pub use wavetable::{Wavetable, WavetableParams, WavetableInputs};
 pub use granular::{Granular, GranularParams, GranularInputs, GrainShape};
 pub use particle_cloud::{ParticleCloud, ParticleCloudParams, ParticleCloudInputs, ParticleMode, OscShape};
 pub use speech_synth::{SpeechSynth, SpeechSynthParams, SpeechSynthInputs};
-pub use theremin::{Theremin, ThereminParams, ThereminOutputs};
+pub use theremin::{Theremin, ThereminParams, ThereminInputs, ThereminOutputs};

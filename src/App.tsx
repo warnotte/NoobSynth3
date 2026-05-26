@@ -1366,6 +1366,22 @@ function App() {
     }
   }, [isTauri, tauriNativeRunning])
 
+  // Native theremin bridge for Tauri standalone mode
+  const nativeThereminBridge = useMemo(() => {
+    if (!isTauri) {
+      return null
+    }
+    return {
+      isActive: tauriNativeRunning,
+      setParam: (moduleId: string, paramId: string, value: number): void => {
+        void invokeTauri('native_set_param', { moduleId: tauriMapId(moduleId), paramId, value }).catch(() => {})
+      },
+      getState: async (moduleId: string): Promise<number> => {
+        return invokeTauri<number>('native_get_theremin_state', { moduleId: tauriMapId(moduleId) })
+      },
+    }
+  }, [isTauri, tauriNativeRunning])
+
   // Native granular bridge for Tauri standalone mode
   const nativeGranularBridge = useMemo(() => {
     if (!isTauri) {
@@ -3009,6 +3025,7 @@ function App() {
     nativeScope: nativeScopeBridge,
     nativeChiptune: nativeChiptuneBridge,
     nativeSequencer: nativeSequencerBridge,
+    nativeTheremin: nativeThereminBridge,
     nativeGranular: nativeGranularBridge,
     updateParam,
     setManualGate,

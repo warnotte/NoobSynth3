@@ -445,7 +445,7 @@ portamento (glide) et enveloppe de gate anti-clic.
 |-----------|-------|-------------|
 | `frequency` | 16-8000 Hz | Hauteur courante (pilotée par X — live, non sauvegardée) |
 | `volume` | 0-1 | Volume courant (piloté par Y — live) |
-| `gate` | 0/1 | Joue (pointer down) — live |
+| `touch` | 0/1 | Souris active (pointer down) — override les entrées CV — live |
 | `waveform` | 0-3 | 0=sin, 1=tri, 2=saw, 3=sqr |
 | `vibratoRate` | 0-20 Hz | Vitesse du vibrato |
 | `vibratoDepth` | 0-1 | Profondeur (→ jusqu'à ~2 demi-tons) |
@@ -459,13 +459,19 @@ portamento (glide) et enveloppe de gate anti-clic.
 | `loFreq` / `hiFreq` | Hz | Bornes de l'axe X (UI) |
 
 **Particularités :**
-- Les valeurs live (`frequency`/`volume`/`gate`) sont envoyées au moteur en
-  direct (`engine.setParam`), **hors historique/patch** — c'est de la performance.
+- Les valeurs live (`frequency`/`volume`/`touch`) sont envoyées au moteur en
+  direct (`engine.setParam` / `native_set_param`), **hors historique/patch**.
+- **Nœud bidirectionnel** : le theremin peut aussi être **piloté par des entrées CV**
+  (pitch/volume/gate) — par un séquenceur, un LFO, ou un autre theremin.
+  - **Priorité** : `souris (touch) > CV > silence`. Attraper le pad **bypasse** le
+    signal d'entrée tant qu'on touche.
+  - **Feedback visuel** : quand il est piloté par CV, le curseur du pad bouge tout
+    seul (l'UI poll `get_theremin_state` via `watchTheremin` en Web, `native_get_theremin_state` en Tauri).
 - **Scale Lock** : cale la hauteur sur une gamme (chromatique/majeure/mineure/penta) + tonique.
-- **Sorties CV** : le pad XY peut piloter tout le rack, pas seulement son oscillateur.
+- **Sorties CV** : reflètent la valeur réellement jouée (souris ou CV) → les chaînes theremin→theremin passent.
 - UI : pad avec traînée lumineuse réactive, lecture note/Hz, presets (Classic/Sci-Fi/Lead/Pad).
 
-**Entrées** : aucune (piloté à la souris / XY)
+**Entrées** : pitch-in (CV 1V/oct), vol-in (CV), gate-in (gate)
 **Sorties** : out (audio stéréo), pitch-cv (CV 1V/oct), gate, vol (CV)
 
 **Polyphonie** : Non (monophonique).

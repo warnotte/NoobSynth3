@@ -70,6 +70,7 @@ type GraphMessage =
   | { type: 'watchParticles'; moduleIds: string[] }
   | { type: 'loadParticleBuffer'; moduleId: string; data: number[] }
   | { type: 'watchMeters'; moduleIds: string[] }
+  | { type: 'watchTheremins'; moduleIds: string[] }
   | { type: 'enableCpuLoad'; enabled: boolean }
   | { type: 'setTransportTempo'; tempo: number }
   | { type: 'resetTransport' }
@@ -92,6 +93,7 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
   private watchedAys: string[] = []
   private watchedParticles: string[] = []
   private watchedMeters: string[] = []
+  private watchedTheremins: string[] = []
   private messageQueue: GraphMessage[] = []
   private cpuLoadEnabled = false
   private cpuLoadAccum = 0
@@ -156,6 +158,10 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
     }
     if (message.type === 'watchMeters') {
       this.watchedMeters = message.moduleIds
+      return
+    }
+    if (message.type === 'watchTheremins') {
+      this.watchedTheremins = message.moduleIds
       return
     }
     if (message.type === 'enableCpuLoad') {
@@ -468,6 +474,19 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
           moduleId,
           peakL: ((packed >>> 16) & 0xffff) / 10000,
           peakR: (packed & 0xffff) / 10000,
+        })
+      }
+    }
+
+    if (shouldPoll && this.watchedTheremins.length > 0) {
+      for (const moduleId of this.watchedTheremins) {
+        const packed = this.engine.get_theremin_state(moduleId)
+        this.port.postMessage({
+          type: 'thereminState',
+          moduleId,
+          x: ((packed >>> 12) & 0xfff) / 4095,
+          y: (packed & 0xfff) / 4095,
+          gate: ((packed >>> 24) & 0x1) === 1,
         })
       }
     }

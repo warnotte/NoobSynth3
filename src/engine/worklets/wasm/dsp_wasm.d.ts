@@ -13,6 +13,7 @@ export class WasmGraphEngine {
   get_sequencer_step(module_id: string): number;
   get_gol_grid(module_id: string): Uint16Array;
   get_meter_level(module_id: string): number;
+  get_theremin_state(module_id: string): number;
   get_midi_total_ticks(module_id: string): number;
   seek_midi_sequencer(module_id: string, tick: number): void;
   drain_midi_events(module_id: string): Uint8Array;

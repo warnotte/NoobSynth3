@@ -336,6 +336,25 @@ impl GraphEngine {
     0
   }
 
+  /// Get the theremin's current display position (for the UI cursor) packed
+  /// into a u32: bit 24 = gate, bits 12..24 = x (0..4095), bits 0..12 = y.
+  /// x/y are the normalized pad position (0..1) of whatever is being played
+  /// (mouse or incoming CV).
+  pub fn get_theremin_state(&self, module_id: &str) -> u32 {
+    if let Some(index) = self.module_map.get(module_id).and_then(|list| list.first()) {
+      if let Some(module) = self.modules.get(*index) {
+        if let ModuleState::Theremin(state) = &module.state {
+          let (x, y, gate) = state.theremin.display_state();
+          let xq = (x.clamp(0.0, 1.0) * 4095.0) as u32;
+          let yq = (y.clamp(0.0, 1.0) * 4095.0) as u32;
+          let g = if gate > 0.5 { 1u32 } else { 0u32 };
+          return (g << 24) | (xq << 12) | yq;
+        }
+      }
+    }
+    0
+  }
+
   /// Get total ticks for a MIDI file sequencer module
   /// Returns 0 if module not found or not a MIDI file sequencer
   pub fn get_midi_total_ticks(&self, module_id: &str) -> i32 {

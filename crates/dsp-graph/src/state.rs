@@ -278,7 +278,7 @@ pub struct ThereminState {
     pub theremin: Theremin,
     pub frequency: ParamBuffer,
     pub volume: ParamBuffer,
-    pub gate: ParamBuffer,
+    pub touch: ParamBuffer,
     pub waveform: ParamBuffer,
     pub vibrato_rate: ParamBuffer,
     pub vibrato_depth: ParamBuffer,
@@ -287,6 +287,8 @@ pub struct ThereminState {
     pub tone: ParamBuffer,
     pub glide: ParamBuffer,
     pub level: ParamBuffer,
+    pub lo_freq: ParamBuffer,
+    pub hi_freq: ParamBuffer,
 }
 
 // =============================================================================

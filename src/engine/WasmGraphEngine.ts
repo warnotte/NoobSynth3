@@ -61,6 +61,8 @@ export class AudioEngine {
   private watchedParticles: Set<string> = new Set()
   private meterCallbacks: Map<string, (peakL: number, peakR: number) => void> = new Map()
   private watchedMeters: Set<string> = new Set()
+  private thereminCallbacks: Map<string, (x: number, y: number, gate: boolean) => void> = new Map()
+  private watchedTheremins: Set<string> = new Set()
   private cpuLoadCallback: ((avg: number, peak: number) => void) | null = null
 
   async start(graph: GraphState): Promise<void> {
@@ -444,6 +446,28 @@ export class AudioEngine {
     })
   }
 
+  /** Subscribe to a theremin's display position (x/y 0..1, gate) for the UI cursor. */
+  watchTheremin(
+    moduleId: string,
+    callback: (x: number, y: number, gate: boolean) => void,
+  ): () => void {
+    this.thereminCallbacks.set(moduleId, callback)
+    this.watchedTheremins.add(moduleId)
+    this.syncWatchedTheremins()
+    return () => {
+      this.thereminCallbacks.delete(moduleId)
+      this.watchedTheremins.delete(moduleId)
+      this.syncWatchedTheremins()
+    }
+  }
+
+  private syncWatchedTheremins(): void {
+    this.graphNode?.port.postMessage({
+      type: 'watchTheremins',
+      moduleIds: Array.from(this.watchedTheremins).map((id) => this.mapId(id)),
+    })
+  }
+
   loadParticleBuffer(moduleId: string, data: Float32Array): Promise<number> {
     return new Promise((resolve) => {
       this.graphNode?.port.postMessage({
@@ -628,7 +652,7 @@ export class AudioEngine {
 
     // Listen for messages from the worklet
     this.graphNode.port.onmessage = (event) => {
-      const data = event.data as { type: string; steps?: Record<string, number>; positions?: Record<string, number> | number[]; data?: number[]; voices?: Record<string, number[]>; elapsed?: Record<string, number>; moduleId?: string; peakL?: number; peakR?: number; grid?: number[]; step?: number; beats?: number }
+      const data = event.data as { type: string; steps?: Record<string, number>; positions?: Record<string, number> | number[]; data?: number[]; voices?: Record<string, number[]>; elapsed?: Record<string, number>; moduleId?: string; peakL?: number; peakR?: number; grid?: number[]; step?: number; beats?: number; x?: number; y?: number; gate?: boolean }
       if (data.type === 'transportBeats' && data.beats != null) {
         if (this.transportBeatsCallback) {
           this.transportBeatsCallback(data.beats)
@@ -688,6 +712,11 @@ export class AudioEngine {
         const callback = this.meterCallbacks.get(this.unmapId(data.moduleId))
         if (callback) {
           callback(data.peakL as number, data.peakR as number)
+        }
+      } else if (data.type === 'thereminState' && data.moduleId) {
+        const callback = this.thereminCallbacks.get(this.unmapId(data.moduleId as string))
+        if (callback) {
+          callback(data.x as number, data.y as number, data.gate as boolean)
         }
       } else if (data.type === 'sidVoiceStates' && data.voices) {
         const elapsedMap = (data.elapsed || {}) as Record<string, number>

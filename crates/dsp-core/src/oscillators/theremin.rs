@@ -1,68 +1,82 @@
-//! Theremin — an expressive XY-pad performance instrument.
+//! Theremin — an expressive XY-pad performance instrument that is also a
+//! modular control node.
 //!
 //! "Played without touching it": the host UI maps mouse X → pitch and
-//! mouse Y → volume, sending `frequency` / `volume` / `gate` params here.
-//! This DSP turns that into a smooth, singing voice:
+//! mouse Y → volume. But the theremin can equally be **driven by CV inputs**
+//! (pitch / volume / gate) — by a sequencer, an LFO, or even another theremin.
 //!
-//! - Multi-waveform oscillator (sine / triangle / saw / square), saw & square
-//!   anti-aliased with polyBLEP.
-//! - Portamento (`glide`) so pitch slides continuously like a real theremin.
-//! - Vibrato (pitch LFO) and tremolo (amplitude LFO) for the eerie character.
-//! - A one-pole tone (brightness) filter, opened slightly more as you play louder.
-//! - A click-free gate envelope.
+//! Priority per sample: **mouse touch > CV inputs > silent**. While the user
+//! holds the pad (`touch` param), the mouse overrides any incoming signal.
+//! Otherwise, connected CV inputs drive the voice; the UI polls
+//! [`Theremin::display_state`] to draw the cursor at the CV-driven position.
 //!
-//! It also emits control voltages (pitch / gate / volume) so the XY pad can
-//! drive the rest of the patch, not just its own oscillator.
+//! Voicing: multi-waveform oscillator (sine/tri/saw/sqr, saw & square
+//! anti-aliased with polyBLEP), portamento glide, vibrato (pitch LFO),
+//! tremolo (amp LFO), a volume-tracking tone filter, and a click-free gate
+//! envelope. It emits pitch / gate / volume CVs reflecting whatever is
+//! actually being played, so theremin → theremin chains pass through.
 
-use crate::common::{poly_blep, sample_at, freq_to_midi, Sample};
+use crate::common::{input_at, poly_blep, sample_at, freq_to_midi, Sample};
 use std::f32::consts::TAU;
 
 const WAVE_TRIANGLE: u8 = 1;
 const WAVE_SAW: u8 = 2;
 const WAVE_SQUARE: u8 = 3;
 
+/// Convert a 1V/oct CV (project convention: MIDI 60 = C4 = 0 V) to Hz.
+/// Inverse of the pitch CV the theremin emits.
+#[inline]
+fn cv_to_freq(cv: f32) -> f32 {
+    440.0 * 2.0_f32.powf((cv * 12.0 - 9.0) / 12.0)
+}
+
 /// Theremin voice state.
 pub struct Theremin {
     sample_rate: f32,
     inv_sr: f32,
-    /// Main oscillator phase (0..1)
     phase: f32,
-    /// Smoothed (glided) frequency in Hz
     glided_freq: f32,
-    /// Vibrato LFO phase (0..1)
     vibrato_phase: f32,
-    /// Tremolo LFO phase (0..1)
     tremolo_phase: f32,
-    /// Amplitude envelope (0..1), smooths the gate to avoid clicks
     env: f32,
-    /// One-pole low-pass state (tone filter)
     lp_z1: f32,
+    // Last displayed position (for the UI cursor): normalized X/Y + gate.
+    vis_x: f32,
+    vis_y: f32,
+    vis_gate: f32,
 }
 
 /// Per-block parameters (one slice each; constant or per-sample).
 pub struct ThereminParams<'a> {
-    /// Target pitch in Hz (from the XY pad's X axis)
+    /// Mouse-target pitch in Hz (XY pad X)
     pub frequency: &'a [Sample],
-    /// Volume 0..1 (from the XY pad's Y axis)
+    /// Mouse-target volume 0..1 (XY pad Y)
     pub volume: &'a [Sample],
-    /// Gate 0/1 (pointer down = playing)
-    pub gate: &'a [Sample],
+    /// Mouse touch 0/1 — while 1, the mouse overrides CV inputs
+    pub touch: &'a [Sample],
     /// Waveform: 0=sine, 1=triangle, 2=saw, 3=square
     pub waveform: &'a [Sample],
-    /// Vibrato rate in Hz
     pub vibrato_rate: &'a [Sample],
-    /// Vibrato depth 0..1 (scaled to ~2 semitones)
     pub vibrato_depth: &'a [Sample],
-    /// Tremolo rate in Hz
     pub tremolo_rate: &'a [Sample],
-    /// Tremolo depth 0..1
     pub tremolo_depth: &'a [Sample],
-    /// Tone / brightness 0..1 (low-pass cutoff)
     pub tone: &'a [Sample],
-    /// Portamento time in seconds
     pub glide: &'a [Sample],
-    /// Master level 0..~1.5
     pub level: &'a [Sample],
+    /// X-axis low frequency (for normalizing the display position)
+    pub lo_freq: &'a [Sample],
+    /// X-axis high frequency
+    pub hi_freq: &'a [Sample],
+}
+
+/// CV inputs that can drive the theremin when the mouse isn't touching.
+pub struct ThereminInputs<'a> {
+    /// Pitch CV (1V/oct). `None` = not connected.
+    pub pitch: Option<&'a [Sample]>,
+    /// Volume CV 0..1
+    pub volume: Option<&'a [Sample]>,
+    /// Gate 0/1
+    pub gate: Option<&'a [Sample]>,
 }
 
 /// Buffers the theremin writes to: stereo audio + three CVs.
@@ -86,6 +100,9 @@ impl Theremin {
             tremolo_phase: 0.0,
             env: 0.0,
             lp_z1: 0.0,
+            vis_x: 0.5,
+            vis_y: 1.0,
+            vis_gate: 0.0,
         }
     }
 
@@ -94,7 +111,11 @@ impl Theremin {
         self.inv_sr = 1.0 / self.sample_rate;
     }
 
-    /// Band-limited waveform sample for the current phase / phase increment.
+    /// Current display position for the UI cursor: (x 0..1, y 0..1, gate 0/1).
+    pub fn display_state(&self) -> (f32, f32, f32) {
+        (self.vis_x, self.vis_y, self.vis_gate)
+    }
+
     #[inline]
     fn generate_wave(phase: f32, dt: f32, waveform: u8) -> f32 {
         match waveform {
@@ -102,30 +123,53 @@ impl Theremin {
                 let p = phase * 4.0;
                 if p < 1.0 { p } else if p < 3.0 { 2.0 - p } else { p - 4.0 }
             }
-            WAVE_SAW => {
-                // naive saw minus polyBLEP correction at the wrap discontinuity
-                (2.0 * phase - 1.0) - poly_blep(phase, dt)
-            }
+            WAVE_SAW => (2.0 * phase - 1.0) - poly_blep(phase, dt),
             WAVE_SQUARE => {
                 let naive = if phase < 0.5 { 1.0 } else { -1.0 };
                 let mut p2 = phase + 0.5;
                 if p2 >= 1.0 { p2 -= 1.0; }
                 naive + poly_blep(phase, dt) - poly_blep(p2, dt)
             }
-            _ => (phase * TAU).sin(), // sine
+            _ => (phase * TAU).sin(),
         }
     }
 
-    pub fn process_block(&mut self, outs: ThereminOutputs<'_>, params: ThereminParams<'_>) {
+    pub fn process_block(
+        &mut self,
+        outs: ThereminOutputs<'_>,
+        inputs: ThereminInputs<'_>,
+        params: ThereminParams<'_>,
+    ) {
         let n = outs.out_l.len();
         if n == 0 {
             return;
         }
+        let has_pitch_in = inputs.pitch.is_some();
+        let has_vol_in = inputs.volume.is_some();
+        let has_gate_in = inputs.gate.is_some();
 
         for i in 0..n {
-            let target_freq = sample_at(params.frequency, i, 440.0).clamp(16.0, 8000.0);
-            let volume = sample_at(params.volume, i, 0.0).clamp(0.0, 1.0);
-            let gate = sample_at(params.gate, i, 0.0);
+            let touching = sample_at(params.touch, i, 0.0) > 0.5;
+            let mouse_freq = sample_at(params.frequency, i, 440.0);
+            let mouse_vol = sample_at(params.volume, i, 0.0).clamp(0.0, 1.0);
+            let lo = sample_at(params.lo_freq, i, 130.81).max(8.0);
+            let hi = sample_at(params.hi_freq, i, 1046.5).max(lo * 1.001);
+
+            // Priority: mouse touch > CV inputs > hold/silent.
+            let (target_freq, volume, gate_on) = if touching {
+                (mouse_freq, mouse_vol, true)
+            } else {
+                let f = if has_pitch_in { cv_to_freq(input_at(inputs.pitch, i)) } else { mouse_freq };
+                let v = if has_vol_in { input_at(inputs.volume, i).clamp(0.0, 1.0) } else { mouse_vol };
+                let g = if has_gate_in {
+                    input_at(inputs.gate, i) > 0.5
+                } else {
+                    has_pitch_in // pitch-driven drone when only pitch is patched
+                };
+                (f, v, g)
+            };
+            let target_freq = target_freq.clamp(16.0, 8000.0);
+
             let waveform = (sample_at(params.waveform, i, 0.0) as u8).min(3);
             let vib_rate = sample_at(params.vibrato_rate, i, 5.0).clamp(0.0, 20.0);
             let vib_depth = sample_at(params.vibrato_depth, i, 0.0).clamp(0.0, 1.0);
@@ -135,7 +179,7 @@ impl Theremin {
             let glide = sample_at(params.glide, i, 0.0).max(0.0);
             let level = sample_at(params.level, i, 1.0).clamp(0.0, 2.0);
 
-            // Portamento: slide glided_freq toward target.
+            // Portamento.
             if glide <= 0.0001 {
                 self.glided_freq = target_freq;
             } else {
@@ -143,15 +187,15 @@ impl Theremin {
                 self.glided_freq += (target_freq - self.glided_freq) * coeff;
             }
 
-            // Vibrato: pitch LFO in semitones (depth up to ~2 st).
+            // Vibrato.
             self.vibrato_phase += vib_rate * self.inv_sr;
             if self.vibrato_phase >= 1.0 { self.vibrato_phase -= 1.0; }
             let vib_lfo = (self.vibrato_phase * TAU).sin();
             let vib_mod = 2.0_f32.powf(vib_lfo * vib_depth * 2.0 / 12.0);
             let freq = (self.glided_freq * vib_mod).clamp(8.0, 0.45 * self.sample_rate);
 
-            // Gate envelope: ~6ms attack/release for click-free notes.
-            let target_env = if gate > 0.5 { 1.0 } else { 0.0 };
+            // Gate envelope.
+            let target_env = if gate_on { 1.0 } else { 0.0 };
             let env_coeff = 1.0 - (-self.inv_sr / 0.006).exp();
             self.env += (target_env - self.env) * env_coeff;
 
@@ -161,14 +205,14 @@ impl Theremin {
             if self.phase >= 1.0 { self.phase -= self.phase.floor(); }
             let raw = Self::generate_wave(self.phase, dt, waveform);
 
-            // Tone filter: cutoff from `tone`, opened a bit more when louder.
+            // Tone filter.
             let cutoff_hz = (200.0 + tone * 11_800.0) * (0.6 + 0.4 * volume);
             let cutoff = cutoff_hz.clamp(60.0, 0.45 * self.sample_rate);
             let alpha = 1.0 - (-TAU * cutoff * self.inv_sr).exp();
             self.lp_z1 += alpha * (raw - self.lp_z1);
             let filtered = self.lp_z1;
 
-            // Tremolo: amplitude LFO, depth fraction off full.
+            // Tremolo.
             self.tremolo_phase += trem_rate * self.inv_sr;
             if self.tremolo_phase >= 1.0 { self.tremolo_phase -= 1.0; }
             let trem_lfo = (self.tremolo_phase * TAU).sin();
@@ -180,11 +224,15 @@ impl Theremin {
             outs.out_l[i] = sample;
             outs.out_r[i] = sample;
 
-            // CV outputs (so the pad can drive the rest of the patch).
-            // Pitch CV uses the project convention: MIDI 60 (C4) = 0 V/oct.
-            outs.pitch_cv[i] = (freq_to_midi(freq) - 60.0) / 12.0;
+            // CVs reflect whatever is actually played (mouse or incoming CV).
+            outs.pitch_cv[i] = (freq_to_midi(target_freq) - 60.0) / 12.0;
             outs.gate_cv[i] = target_env;
             outs.vol_cv[i] = volume * self.env;
+
+            // Display position (normalized) for the UI cursor.
+            self.vis_x = ((target_freq / lo).ln() / (hi / lo).ln()).clamp(0.0, 1.0);
+            self.vis_y = (1.0 - volume).clamp(0.0, 1.0);
+            self.vis_gate = target_env;
         }
     }
 }

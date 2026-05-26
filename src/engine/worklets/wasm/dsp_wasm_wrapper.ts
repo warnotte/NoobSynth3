@@ -5,6 +5,7 @@ type WasmGraphEngineCtor = new (sampleRate: number) => {
   set_graph(graphJson: string): void
   set_graph_fresh(graphJson: string): void
   get_meter_level(moduleId: string): number
+  get_theremin_state(moduleId: string): number
   set_param(moduleId: string, paramId: string, value: number): void
   set_param_string(moduleId: string, paramId: string, value: string): void
   set_control_voice_cv(moduleId: string, voice: number, value: number): void

@@ -41,7 +41,7 @@ use dsp_core::{
     SampleHoldInputs, SampleHoldParams, ShepardInputs, ShepardParams,
     SidPlayerInputs, SidPlayerOutputs, SidPlayerParams,
     SpeechSynthInputs, SpeechSynthParams,
-    ThereminOutputs, ThereminParams,
+    ThereminInputs, ThereminOutputs, ThereminParams,
     AyPlayerInputs, AyPlayerOutputs, AyPlayerParams,
     ChordSequencerInputs, ChordSequencerOutputs, ChordSequencerParams,
     ClockDividerInputs, ClockDividerOutputs,
@@ -2072,6 +2072,7 @@ pub(crate) fn process_module(
             state.synth.process_block(out, synth_inputs, params);
         }
         ModuleState::Theremin(state) => {
+            // Inputs: 0 = pitch CV, 1 = volume CV, 2 = gate
             // Outputs: 0 = stereo audio, 1 = pitch CV, 2 = gate, 3 = volume CV
             const TH_BUF: usize = 4096;
             let sf = frames.min(TH_BUF);
@@ -2081,10 +2082,15 @@ pub(crate) fn process_module(
             let mut buf_gate = [0.0_f32; TH_BUF];
             let mut buf_vol = [0.0_f32; TH_BUF];
 
+            let pitch_in = if !connections[0].is_empty() { Some(inputs[0].channel(0)) } else { None };
+            let vol_in = if connections.len() > 1 && !connections[1].is_empty() { Some(inputs[1].channel(0)) } else { None };
+            let gate_in = if connections.len() > 2 && !connections[2].is_empty() { Some(inputs[2].channel(0)) } else { None };
+
+            let th_inputs = ThereminInputs { pitch: pitch_in, volume: vol_in, gate: gate_in };
             let params = ThereminParams {
                 frequency: state.frequency.slice(frames),
                 volume: state.volume.slice(frames),
-                gate: state.gate.slice(frames),
+                touch: state.touch.slice(frames),
                 waveform: state.waveform.slice(frames),
                 vibrato_rate: state.vibrato_rate.slice(frames),
                 vibrato_depth: state.vibrato_depth.slice(frames),
@@ -2093,6 +2099,8 @@ pub(crate) fn process_module(
                 tone: state.tone.slice(frames),
                 glide: state.glide.slice(frames),
                 level: state.level.slice(frames),
+                lo_freq: state.lo_freq.slice(frames),
+                hi_freq: state.hi_freq.slice(frames),
             };
             let th_outs = ThereminOutputs {
                 out_l: &mut buf_l[..sf],
@@ -2101,7 +2109,7 @@ pub(crate) fn process_module(
                 gate_cv: &mut buf_gate[..sf],
                 vol_cv: &mut buf_vol[..sf],
             };
-            state.theremin.process_block(th_outs, params);
+            state.theremin.process_block(th_outs, th_inputs, params);
 
             let (out_l, out_r) = outputs[0].channels_mut_2();
             out_l[..sf].copy_from_slice(&buf_l[..sf]);
