@@ -15,6 +15,7 @@ export const moduleSizes: Record<ModuleType, string> = {
   'granular': '3x4',
   'particle-cloud': '2x3',
   'speech-synth': '3x3',
+  theremin: '4x3',
   'mod-router': '2x2',
   'sample-hold': '2x1',
   slew: '1x2',
@@ -128,6 +129,7 @@ export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>>
   'granular': 'strip',
   'particle-cloud': 'strip',
   'speech-synth': 'strip',
+  theremin: 'strip',
   vcf: 'strip',
   control: 'strip',
   lab: 'strip',
@@ -242,6 +244,7 @@ export const moduleCatalog: { type: ModuleType; label: string; category: ModuleC
   { type: 'granular', label: 'Granular', category: 'sources' },
   { type: 'particle-cloud', label: 'Particle Cloud', category: 'sources' },
   { type: 'speech-synth', label: 'Speech Synth', category: 'sources' },
+  { type: 'theremin', label: 'Theremin', category: 'sources' },
   // Filters
   { type: 'vcf', label: 'VCF', category: 'filters' },
   { type: 'hpf', label: 'HPF', category: 'filters' },
@@ -343,6 +346,7 @@ export const modulePrefixes: Record<ModuleType, string> = {
   'granular': 'gran',
   'particle-cloud': 'pcloud',
   'speech-synth': 'speech',
+  theremin: 'theremin',
   'mod-router': 'modr',
   'sample-hold': 'sh',
   slew: 'slew',
@@ -447,6 +451,7 @@ export const moduleLabels: Record<ModuleType, string> = {
   'granular': 'Granular',
   'particle-cloud': 'Particle Cloud',
   'speech-synth': 'Speech Synth',
+  theremin: 'Theremin',
   'mod-router': 'Mod Router',
   'sample-hold': 'S&H',
   slew: 'Slew',
@@ -669,6 +674,25 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     smoothing: 0.3,       // Transition smoothing (0-1)
     buzz: 0.7,            // Buzz brightness (0-1)
     noise: 0.15,          // Noise mix (0-1)
+  },
+  theremin: {
+    frequency: 440,       // current pitch Hz (driven by XY pad X)
+    volume: 0,            // current volume 0-1 (driven by XY pad Y)
+    gate: 0,              // 0/1 playing (pointer down)
+    waveform: 0,          // 0=sin, 1=tri, 2=saw, 3=sqr
+    vibratoRate: 5,       // Hz
+    vibratoDepth: 0,      // 0-1 (→ up to ~2 semitones)
+    tremoloRate: 5,       // Hz
+    tremoloDepth: 0,      // 0-1
+    tone: 0.6,            // brightness 0-1
+    glide: 0.05,          // portamento seconds
+    level: 1,             // master volume
+    // UI-only (XY mapping + scale lock)
+    scaleLock: false,     // snap pitch to scale
+    scale: 2,             // UI scale index (0=chromatic,1=major,2=minor,3=majPenta,4=minPenta)
+    root: 0,              // 0=C .. 11=B
+    loFreq: 130.81,       // C3 — X-axis low end
+    hiFreq: 1046.5,       // C6 — X-axis high end
   },
   'mod-router': { depthPitch: 0, depthPwm: 0, depthVcf: 0, depthVca: 0 },
   'sample-hold': { mode: 0 },

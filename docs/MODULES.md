@@ -433,6 +433,45 @@ Style Daft Punk / Kraftwerk — convertit du texte en voix chantée robotique.
 
 ---
 
+### Theremin
+
+Instrument de performance « joué sans le toucher » : un **pad XY** où la souris
+contrôle la hauteur (axe X, log) et le volume (axe Y). Oscillateur multi-forme
+(sin/tri/saw/sqr, saw & square anti-aliasés via polyBLEP) avec vibrato (LFO de
+pitch), trémolo (LFO d'amplitude), filtre tone (brillance liée au volume),
+portamento (glide) et enveloppe de gate anti-clic.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `frequency` | 16-8000 Hz | Hauteur courante (pilotée par X — live, non sauvegardée) |
+| `volume` | 0-1 | Volume courant (piloté par Y — live) |
+| `gate` | 0/1 | Joue (pointer down) — live |
+| `waveform` | 0-3 | 0=sin, 1=tri, 2=saw, 3=sqr |
+| `vibratoRate` | 0-20 Hz | Vitesse du vibrato |
+| `vibratoDepth` | 0-1 | Profondeur (→ jusqu'à ~2 demi-tons) |
+| `tremoloRate` | 0-20 Hz | Vitesse du trémolo |
+| `tremoloDepth` | 0-1 | Profondeur d'amplitude |
+| `tone` | 0-1 | Brillance (cutoff passe-bas) |
+| `glide` | 0-1 s | Portamento |
+| `level` | 0-1.5 | Volume général |
+| `scaleLock` | bool | Cale la hauteur sur une gamme (UI) |
+| `scale` / `root` | idx / 0-11 | Gamme + tonique pour le scale lock (UI) |
+| `loFreq` / `hiFreq` | Hz | Bornes de l'axe X (UI) |
+
+**Particularités :**
+- Les valeurs live (`frequency`/`volume`/`gate`) sont envoyées au moteur en
+  direct (`engine.setParam`), **hors historique/patch** — c'est de la performance.
+- **Scale Lock** : cale la hauteur sur une gamme (chromatique/majeure/mineure/penta) + tonique.
+- **Sorties CV** : le pad XY peut piloter tout le rack, pas seulement son oscillateur.
+- UI : pad avec traînée lumineuse réactive, lecture note/Hz, presets (Classic/Sci-Fi/Lead/Pad).
+
+**Entrées** : aucune (piloté à la souris / XY)
+**Sorties** : out (audio stéréo), pitch-cv (CV 1V/oct), gate, vol (CV)
+
+**Polyphonie** : Non (monophonique).
+
+---
+
 ## Filtres
 
 ### VCF (Voltage Controlled Filter)

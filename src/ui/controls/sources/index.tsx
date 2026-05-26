@@ -25,6 +25,7 @@ import { ResonatorControls } from './ResonatorControls'
 import { WavetableControls } from './WavetableControls'
 import { ParticleCloudControls } from './ParticleCloudControls'
 import { SpeechSynthControls } from './SpeechSynthControls'
+import { ThereminControls } from './ThereminControls'
 
 // Granular is already extracted to its own file
 import { GranularControls } from '../GranularControls'
@@ -105,6 +106,9 @@ export function renderSourceControls(props: ControlProps): React.ReactElement | 
     case 'speech-synth':
       return <SpeechSynthControls {...props} />
 
+    case 'theremin':
+      return <ThereminControls {...props} />
+
     default:
       return null
   }
@@ -128,4 +132,5 @@ export {
   WavetableControls,
   ParticleCloudControls,
   SpeechSynthControls,
+  ThereminControls,
 }

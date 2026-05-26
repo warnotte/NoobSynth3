@@ -41,6 +41,7 @@ use dsp_core::{
     SampleHoldInputs, SampleHoldParams, ShepardInputs, ShepardParams,
     SidPlayerInputs, SidPlayerOutputs, SidPlayerParams,
     SpeechSynthInputs, SpeechSynthParams,
+    ThereminOutputs, ThereminParams,
     AyPlayerInputs, AyPlayerOutputs, AyPlayerParams,
     ChordSequencerInputs, ChordSequencerOutputs, ChordSequencerParams,
     ClockDividerInputs, ClockDividerOutputs,
@@ -2069,6 +2070,45 @@ pub(crate) fn process_module(
 
             let out = outputs[0].channel_mut(0);
             state.synth.process_block(out, synth_inputs, params);
+        }
+        ModuleState::Theremin(state) => {
+            // Outputs: 0 = stereo audio, 1 = pitch CV, 2 = gate, 3 = volume CV
+            const TH_BUF: usize = 4096;
+            let sf = frames.min(TH_BUF);
+            let mut buf_l = [0.0_f32; TH_BUF];
+            let mut buf_r = [0.0_f32; TH_BUF];
+            let mut buf_pitch = [0.0_f32; TH_BUF];
+            let mut buf_gate = [0.0_f32; TH_BUF];
+            let mut buf_vol = [0.0_f32; TH_BUF];
+
+            let params = ThereminParams {
+                frequency: state.frequency.slice(frames),
+                volume: state.volume.slice(frames),
+                gate: state.gate.slice(frames),
+                waveform: state.waveform.slice(frames),
+                vibrato_rate: state.vibrato_rate.slice(frames),
+                vibrato_depth: state.vibrato_depth.slice(frames),
+                tremolo_rate: state.tremolo_rate.slice(frames),
+                tremolo_depth: state.tremolo_depth.slice(frames),
+                tone: state.tone.slice(frames),
+                glide: state.glide.slice(frames),
+                level: state.level.slice(frames),
+            };
+            let th_outs = ThereminOutputs {
+                out_l: &mut buf_l[..sf],
+                out_r: &mut buf_r[..sf],
+                pitch_cv: &mut buf_pitch[..sf],
+                gate_cv: &mut buf_gate[..sf],
+                vol_cv: &mut buf_vol[..sf],
+            };
+            state.theremin.process_block(th_outs, params);
+
+            let (out_l, out_r) = outputs[0].channels_mut_2();
+            out_l[..sf].copy_from_slice(&buf_l[..sf]);
+            out_r[..sf].copy_from_slice(&buf_r[..sf]);
+            outputs[1].channel_mut(0)[..sf].copy_from_slice(&buf_pitch[..sf]);
+            outputs[2].channel_mut(0)[..sf].copy_from_slice(&buf_gate[..sf]);
+            outputs[3].channel_mut(0)[..sf].copy_from_slice(&buf_vol[..sf]);
         }
         ModuleState::SidPlayer(state) => {
             // Input 0: reset trigger (optional)

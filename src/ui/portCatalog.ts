@@ -587,6 +587,15 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
       { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
     ],
   },
+  theremin: {
+    inputs: [],
+    outputs: [
+      { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
+      { id: 'pitch-cv', label: 'Pitch', kind: 'cv', direction: 'out' },
+      { id: 'gate', label: 'Gate', kind: 'gate', direction: 'out' },
+      { id: 'vol', label: 'Vol', kind: 'cv', direction: 'out' },
+    ],
+  },
   notes: {
     inputs: [],
     outputs: [],

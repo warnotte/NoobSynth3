@@ -297,6 +297,8 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // gate
       PortInfo { channels: 1 },  // clock
     ],
+    // Theremin - no inputs (mouse/XY driven)
+    ModuleType::Theremin => vec![],
     // Send - 1 stereo input
     ModuleType::Send => vec![
       PortInfo { channels: 2 },  // audio in (stereo)
@@ -617,6 +619,13 @@ pub fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
     // SpeechSynth - 1 mono output
     ModuleType::SpeechSynth => vec![
       PortInfo { channels: 1 },  // audio out
+    ],
+    // Theremin - stereo audio + pitch/gate/volume CV outs
+    ModuleType::Theremin => vec![
+      PortInfo { channels: 2 },  // audio out (stereo)
+      PortInfo { channels: 1 },  // pitch CV
+      PortInfo { channels: 1 },  // gate
+      PortInfo { channels: 1 },  // volume CV
     ],
     // Send - 1 stereo output
     ModuleType::Send => vec![
@@ -1008,6 +1017,8 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
       "clock" | "clk" => Some(2),
       _ => None,
     },
+    // Theremin - no inputs
+    ModuleType::Theremin => None,
     // Send - 1 input
     ModuleType::Send => match port_id {
       "in" => Some(0),
@@ -1454,6 +1465,14 @@ pub fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize
     // SpeechSynth - 1 output
     ModuleType::SpeechSynth => match port_id {
       "out" | "output" => Some(0),
+      _ => None,
+    },
+    // Theremin - audio out + pitch/gate/volume CV
+    ModuleType::Theremin => match port_id {
+      "out" | "output" => Some(0),
+      "pitch-cv" | "pitch" => Some(1),
+      "gate" | "gate-out" => Some(2),
+      "vol" | "vol-cv" | "volume" => Some(3),
       _ => None,
     },
     // Send - 1 output

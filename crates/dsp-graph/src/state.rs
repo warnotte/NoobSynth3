@@ -5,7 +5,7 @@ use dsp_core::{
     EnvelopeFollower, Eq3, EuclideanSequencer, Flanger, FmMatrix, FmOperator, FrequencyShifter, Glitch, Granular, GranularDelay, HiHat808, HiHat909, Hpf, KarplusStrong, Leslie,
     Kick808, Kick909, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, ParticleCloud, Phaser, PipeOrgan, PitchShifter,
     PolyrhythmSequencer, Resonator, Reverb, Rimshot909, SampleHold, Shepard, SidPlayer, SlewLimiter, Snare808, Snare909, SnesOsc, SpectralSwarm, SpeechSynth,
-    SpringReverb, StepSequencer, Supersaw, TapeDelay, Tb303, Tom808, Tom909, TubeAmp, TuringMachine, Vcf, Vco, Vocoder, Wah, Wavetable,
+    SpringReverb, StepSequencer, Supersaw, TapeDelay, Tb303, Theremin, Tom808, Tom909, TubeAmp, TuringMachine, Vcf, Vco, Vocoder, Wah, Wavetable,
 };
 use dsp_core::sequencers::game_of_life::GameOfLife;
 use dsp_core::sequencers::gravity::GravitySequencer as GravitySeq;
@@ -272,6 +272,21 @@ pub struct SpeechSynthState {
     pub smoothing: ParamBuffer,
     pub buzz: ParamBuffer,
     pub noise_mix: ParamBuffer,
+}
+
+pub struct ThereminState {
+    pub theremin: Theremin,
+    pub frequency: ParamBuffer,
+    pub volume: ParamBuffer,
+    pub gate: ParamBuffer,
+    pub waveform: ParamBuffer,
+    pub vibrato_rate: ParamBuffer,
+    pub vibrato_depth: ParamBuffer,
+    pub tremolo_rate: ParamBuffer,
+    pub tremolo_depth: ParamBuffer,
+    pub tone: ParamBuffer,
+    pub glide: ParamBuffer,
+    pub level: ParamBuffer,
 }
 
 // =============================================================================
@@ -942,6 +957,7 @@ pub enum ModuleState {
     Granular(GranularState),
     ParticleCloud(ParticleCloudState),
     SpeechSynth(SpeechSynthState),
+    Theremin(ThereminState),
 
     // Filters
     Vcf(VcfState),

@@ -90,6 +90,7 @@ export type ModuleType =
   | 'ay-player'
   // Speech Synth (robotic voice)
   | 'speech-synth'
+  | 'theremin'
   // Chord Sequencer
   | 'chord-sequencer'
   // Polyrhythm Sequencer

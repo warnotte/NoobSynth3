@@ -1007,6 +1007,7 @@ fn normalize_module_type(raw: &str) -> ModuleType {
     "ay-player" => ModuleType::AyPlayer,
     // Speech Synth
     "speech-synth" => ModuleType::SpeechSynth,
+    "theremin" => ModuleType::Theremin,
     // Chord Sequencer
     "chord-sequencer" => ModuleType::ChordSequencer,
     // Polyrhythm Sequencer

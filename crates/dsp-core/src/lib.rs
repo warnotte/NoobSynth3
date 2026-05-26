@@ -52,6 +52,7 @@ pub use oscillators::{
     Granular, GranularParams, GranularInputs, GrainShape,
     ParticleCloud, ParticleCloudParams, ParticleCloudInputs, ParticleMode, OscShape,
     SpeechSynth, SpeechSynthParams, SpeechSynthInputs,
+    Theremin, ThereminParams, ThereminOutputs,
 };
 
 // Re-export filters

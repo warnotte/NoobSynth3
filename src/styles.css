@@ -5521,3 +5521,160 @@ textarea:focus-visible,
   color: #f44;
   font-weight: bold;
 }
+
+/* ============================================================
+   THEREMIN — XY-pad performance instrument
+   ============================================================ */
+.theremin {
+  --thm-purple: #b06bff;
+  --thm-orange: #ff7a45;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  padding: 4px;
+}
+
+.theremin-presets {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  align-self: flex-start;
+  padding: 3px 6px;
+  border-radius: 6px;
+  background: linear-gradient(180deg, rgba(176, 107, 255, 0.18), rgba(176, 107, 255, 0.06));
+  border: 1px solid rgba(176, 107, 255, 0.35);
+}
+.thm-preset-btn {
+  width: 20px; height: 18px;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid rgba(176, 107, 255, 0.4);
+  border-radius: 4px;
+  background: rgba(176, 107, 255, 0.12);
+  color: #e9d8ff;
+  font-size: 0.6rem;
+  cursor: pointer;
+}
+.thm-preset-btn:hover { background: rgba(176, 107, 255, 0.3); }
+.thm-preset-name {
+  min-width: 64px; text-align: center;
+  font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: #e9d8ff;
+}
+
+.theremin-body {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: stretch;
+}
+
+.theremin-pad-wrap { flex: 1 1 320px; min-width: 280px; display: flex; }
+
+.theremin-pad {
+  position: relative;
+  flex: 1;
+  min-height: 200px;
+  border-radius: 8px;
+  background:
+    radial-gradient(120% 100% at 50% 0%, rgba(176, 107, 255, 0.10), transparent 60%),
+    linear-gradient(180deg, #150b22, #0c0713);
+  border: 2px solid var(--thm-orange);
+  box-shadow: 0 0 18px rgba(255, 122, 69, 0.25), inset 0 0 30px rgba(0, 0, 0, 0.5);
+  cursor: crosshair;
+  touch-action: none;
+  overflow: hidden;
+  user-select: none;
+}
+.theremin-pad.active {
+  box-shadow: 0 0 28px rgba(255, 122, 69, 0.5), inset 0 0 30px rgba(0, 0, 0, 0.4);
+}
+.theremin-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+}
+.theremin-readout {
+  position: absolute;
+  top: 10px; left: 12px;
+  pointer-events: none;
+}
+.thm-note {
+  font-size: 1.6rem; font-weight: 800; line-height: 1;
+  color: var(--thm-orange);
+  text-shadow: 0 0 12px rgba(255, 122, 69, 0.5);
+}
+.thm-hz {
+  font-size: 0.7rem; font-family: var(--font-mono);
+  color: rgba(233, 216, 255, 0.7);
+  margin-top: 2px;
+}
+.theremin-hint {
+  position: absolute;
+  right: 14px; bottom: 12px;
+  text-align: right;
+  font-size: 0.62rem; line-height: 1.5;
+  color: rgba(233, 216, 255, 0.4);
+  pointer-events: none;
+}
+
+.theremin-panels {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-content: flex-start;
+}
+.thm-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(176, 107, 255, 0.05);
+  border: 1px solid rgba(176, 107, 255, 0.22);
+}
+.thm-panel-title {
+  font-size: 0.6rem; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--thm-purple);
+  text-align: center;
+}
+.thm-wave-row { display: flex; gap: 4px; }
+.thm-wave-btn {
+  flex: 1; min-width: 30px; padding: 5px 4px;
+  border-radius: 5px;
+  border: 1px solid rgba(176, 107, 255, 0.25);
+  background: rgba(0, 0, 0, 0.25);
+  color: rgba(233, 216, 255, 0.7);
+  font-size: 0.55rem; font-weight: 700; letter-spacing: 0.05em;
+  cursor: pointer;
+}
+.thm-wave-btn:hover { border-color: rgba(176, 107, 255, 0.5); color: #fff; }
+.thm-wave-btn.active {
+  border-color: var(--accent-mint);
+  color: #04140d;
+  background: var(--accent-mint);
+  box-shadow: 0 0 10px rgba(66, 226, 177, 0.4);
+}
+.thm-scale-row { display: flex; gap: 4px; align-items: center; }
+.thm-scale-toggle {
+  padding: 4px 7px; border-radius: 5px;
+  border: 1px solid rgba(176, 107, 255, 0.3);
+  background: rgba(0, 0, 0, 0.25);
+  color: rgba(233, 216, 255, 0.7);
+  font-size: 0.55rem; font-weight: 700; letter-spacing: 0.05em; cursor: pointer;
+}
+.thm-scale-toggle.active {
+  border-color: var(--thm-orange); color: #1a0d06;
+  background: var(--thm-orange);
+}
+.thm-select {
+  flex: 1; min-width: 0; padding: 3px 4px;
+  border-radius: 5px;
+  border: 1px solid rgba(176, 107, 255, 0.25);
+  background: rgba(10, 6, 16, 0.9);
+  color: rgba(233, 216, 255, 0.9);
+  font-size: 0.55rem;
+}
+.thm-select:disabled { opacity: 0.4; }
+.thm-knob-row { display: flex; gap: 8px; justify-content: center; }

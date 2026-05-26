@@ -23,6 +23,7 @@ pub enum ModuleType {
     Granular,
     ParticleCloud,
     SpeechSynth,
+    Theremin,
 
     // Filters
     Vcf,

@@ -7,7 +7,7 @@ use dsp_core::{
   EnvelopeFollower, Eq3, EuclideanSequencer, Flanger, FmMatrix, FmOperator, FrequencyShifter, Glitch, Granular, GranularDelay, HiHat808, HiHat909, Hpf, KarplusStrong,
   Kick808, Kick909, Leslie, Lfo, Mario, MasterClock, MidiFileSequencer, NesOsc, Noise, ParticleCloud, Phaser, PipeOrgan, PitchShifter,
   ClockDivider, PolyrhythmSequencer, Resonator, Reverb, Rimshot909, SampleHold, Shepard, SidPlayer, SlewLimiter, Snare808, Snare909, SnesOsc, SpectralSwarm, SpeechSynth,
-  SpringReverb, StepSequencer, Supersaw, TapeDelay, Tb303, Tom808, Tom909, TubeAmp, TuringMachine, Vcf, Vco, Vocoder, Wah, Wavetable,
+  SpringReverb, StepSequencer, Supersaw, TapeDelay, Tb303, Theremin, Tom808, Tom909, TubeAmp, TuringMachine, Vcf, Vco, Vocoder, Wah, Wavetable,
 };
 use dsp_core::sequencers::game_of_life::GameOfLife;
 use dsp_core::sequencers::gravity::GravitySequencer as GravitySeq;
@@ -691,6 +691,20 @@ pub(crate) fn create_state(
         noise_mix: ParamBuffer::new(param_number(params, "noise", 0.15)),
       })
     }
+    ModuleType::Theremin => ModuleState::Theremin(ThereminState {
+      theremin: Theremin::new(sample_rate),
+      frequency: ParamBuffer::new(param_number(params, "frequency", 440.0)),
+      volume: ParamBuffer::new(param_number(params, "volume", 0.0)),
+      gate: ParamBuffer::new(param_number(params, "gate", 0.0)),
+      waveform: ParamBuffer::new(param_number(params, "waveform", 0.0)),
+      vibrato_rate: ParamBuffer::new(param_number(params, "vibratoRate", 5.0)),
+      vibrato_depth: ParamBuffer::new(param_number(params, "vibratoDepth", 0.0)),
+      tremolo_rate: ParamBuffer::new(param_number(params, "tremoloRate", 5.0)),
+      tremolo_depth: ParamBuffer::new(param_number(params, "tremoloDepth", 0.0)),
+      tone: ParamBuffer::new(param_number(params, "tone", 0.6)),
+      glide: ParamBuffer::new(param_number(params, "glide", 0.05)),
+      level: ParamBuffer::new(param_number(params, "level", 1.0)),
+    }),
     ModuleType::Notes => ModuleState::Notes,  // UI-only, no DSP
     ModuleType::Send => ModuleState::Send(SendState {
       bus: param_number(params, "bus", 0.0) as u32,
@@ -1525,6 +1539,20 @@ pub(crate) fn apply_param(state: &mut ModuleState, param: &str, value: f32) {
       "smoothing" => state.smoothing.set(value),
       "buzz" => state.buzz.set(value),
       "noise" => state.noise_mix.set(value),
+      _ => {}
+    },
+    ModuleState::Theremin(state) => match param {
+      "frequency" => state.frequency.set(value),
+      "volume" => state.volume.set(value),
+      "gate" => state.gate.set(value),
+      "waveform" => state.waveform.set(value),
+      "vibratoRate" => state.vibrato_rate.set(value),
+      "vibratoDepth" => state.vibrato_depth.set(value),
+      "tremoloRate" => state.tremolo_rate.set(value),
+      "tremoloDepth" => state.tremolo_depth.set(value),
+      "tone" => state.tone.set(value),
+      "glide" => state.glide.set(value),
+      "level" => state.level.set(value),
       _ => {}
     },
     ModuleState::TuringMachine(state) => match param {
