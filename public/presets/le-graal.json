@@ -1,0 +1,109 @@
+{
+  "id": "le-graal",
+  "name": "Le Graal 🏆",
+  "description": "Ambient génératif grandiose en La mineur : un shimmer Shepard sans fin, un drone qui respire, et une mélodie Turing qui évolue à l'infini au Theremin. Ça se joue tout seul, ça ne se répète jamais.",
+  "group": "Ambient",
+  "graph": {
+    "modules": [
+      {
+        "id": "shep-1",
+        "type": "shepard",
+        "name": "Shimmer Shepard",
+        "position": { "x": 40, "y": 60 },
+        "params": { "voices": 8, "rate": 0.08, "baseFreq": 110, "spread": 1.3, "mix": 0.9, "waveform": 0, "stereo": 0.7, "detune": 6, "direction": 0, "risset": false, "phaseSpread": 0.3, "interval": 0, "tilt": 0, "feedback": 0, "vibrato": 0.15, "shimmer": 0.2 }
+      },
+      {
+        "id": "osc-1",
+        "type": "oscillator",
+        "name": "Sub Drone",
+        "position": { "x": 40, "y": 420 },
+        "params": { "frequency": 55, "type": "triangle", "pwm": 0.5, "unison": 2, "detune": 8, "fmLin": 0, "fmExp": 0, "subMix": 0.25, "subOct": 1 }
+      },
+      {
+        "id": "lfo-1",
+        "type": "lfo",
+        "name": "LFO Filtre",
+        "position": { "x": 40, "y": 700 },
+        "params": { "rate": 0.05, "depth": 0.4, "offset": 0.1, "shape": "triangle", "bipolar": false }
+      },
+      {
+        "id": "vcf-1",
+        "type": "vcf",
+        "name": "Filtre Drone",
+        "position": { "x": 420, "y": 420 },
+        "params": { "cutoff": 260, "resonance": 0.2, "drive": 0.1, "envAmount": 0, "modAmount": 0.7, "keyTrack": 0, "model": "svf", "mode": "lp", "slope": 24 }
+      },
+      {
+        "id": "clock-1",
+        "type": "clock",
+        "name": "Clock",
+        "position": { "x": 40, "y": 980 },
+        "params": { "running": true, "tempo": 110, "rate": 3, "swing": 0 }
+      },
+      {
+        "id": "turing-1",
+        "type": "turing-machine",
+        "name": "Mélodie générative",
+        "position": { "x": 420, "y": 980 },
+        "params": { "probability": 0.35, "length": 12, "range": 2, "scale": 8, "root": 9 }
+      },
+      {
+        "id": "theremin-1",
+        "type": "theremin",
+        "name": "Voix",
+        "position": { "x": 880, "y": 700 },
+        "params": { "frequency": 440, "volume": 0.8, "touch": 0, "waveform": 0, "vibratoRate": 4.5, "vibratoDepth": 0.15, "tremoloRate": 5, "tremoloDepth": 0, "tone": 0.5, "glide": 0.18, "level": 0.5, "loFreq": 110, "hiFreq": 880 }
+      },
+      {
+        "id": "mix-1",
+        "type": "mixer-8",
+        "name": "Mix",
+        "position": { "x": 1340, "y": 260 },
+        "params": {}
+      },
+      {
+        "id": "delay-1",
+        "type": "tape-delay",
+        "name": "Tape Delay",
+        "position": { "x": 1620, "y": 260 },
+        "params": { "time": 540, "feedback": 0.28, "mix": 0.25, "tone": 0.55, "wow": 0.25, "flutter": 0.2, "drive": 0.06 }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Cathédrale",
+        "position": { "x": 1900, "y": 260 },
+        "params": { "time": 2.2, "damp": 0.5, "preDelay": 35, "mix": 0.45 }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Main Out",
+        "position": { "x": 2180, "y": 260 },
+        "params": { "level": 0.85 }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 1340, "y": 620 },
+        "params": {
+          "text": "LE GRAAL 🏆\n\nAmbient génératif grandiose, La mineur — ça se joue tout seul et ne se répète jamais.\n\n3 couches :\n- SHIMMER : un Shepard (illusion de montée sans fin) → la nappe scintillante.\n- DRONE : un oscillateur grave (La1) dans un filtre que le LFO ouvre lentement (respiration).\n- VOIX : une Turing Machine (mélodie qui mute en gamme penta La min) joue le Theremin, avec glide.\n\nLe tout dans un Tape Delay + une grande Reverb cathédrale.\n\nÀ explorer : la PROBABILITÉ de la Turing (0=boucle figée, 0.5=évolue, 1=chaos), le tempo, le Rate du Shepard, ou attrape le pad du Theremin pour improviser."
+        }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "shep-1", "portId": "out" }, "to": { "moduleId": "mix-1", "portId": "in-1" }, "kind": "audio" },
+      { "from": { "moduleId": "osc-1", "portId": "out" }, "to": { "moduleId": "vcf-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "lfo-1", "portId": "cv-out" }, "to": { "moduleId": "vcf-1", "portId": "mod" }, "kind": "cv" },
+      { "from": { "moduleId": "vcf-1", "portId": "out" }, "to": { "moduleId": "mix-1", "portId": "in-2" }, "kind": "audio" },
+      { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "turing-1", "portId": "clock" }, "kind": "sync" },
+      { "from": { "moduleId": "turing-1", "portId": "cv" }, "to": { "moduleId": "theremin-1", "portId": "pitch-in" }, "kind": "cv" },
+      { "from": { "moduleId": "turing-1", "portId": "gate" }, "to": { "moduleId": "theremin-1", "portId": "gate-in" }, "kind": "gate" },
+      { "from": { "moduleId": "theremin-1", "portId": "out" }, "to": { "moduleId": "mix-1", "portId": "in-3" }, "kind": "audio" },
+      { "from": { "moduleId": "mix-1", "portId": "out" }, "to": { "moduleId": "delay-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "delay-1", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}

@@ -2,6 +2,13 @@
   "version": 1,
   "presets": [
     {
+      "id": "le-graal",
+      "name": "Le Graal 🏆",
+      "description": "Ambient génératif grandiose : shimmer Shepard sans fin + drone qui respire + mélodie Turing au Theremin. La mineur.",
+      "file": "le-graal.json",
+      "group": "Ambient"
+    },
+    {
       "id": "berceuse",
       "name": "Berceuse 🌙",
       "description": "Ambient génératif qui se joue tout seul : mélodie pentatonique au Theremin sur un drone qui respire. Play, et ferme les yeux.",
