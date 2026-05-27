@@ -16,6 +16,13 @@
       "group": "Ambient"
     },
     {
+      "id": "elegie",
+      "name": "Élégie 🕯️",
+      "description": "Mélodie composée (pas de hasard) au Theremin qui chante sur des accords lush en La mineur — Am7·FMaj7·CMaj7·G7. Tape delay + reverb cathédrale.",
+      "file": "elegie.json",
+      "group": "Ambient"
+    },
+    {
       "id": "theremin-aurora",
       "name": "Theremin Aurora",
       "description": "Theremin éthéré dans un tape delay chaud et une grande reverb.",
