@@ -704,6 +704,8 @@ pub(crate) fn create_state(
       tone: ParamBuffer::new(param_number(params, "tone", 0.6)),
       glide: ParamBuffer::new(param_number(params, "glide", 0.05)),
       level: ParamBuffer::new(param_number(params, "level", 1.0)),
+      attack: ParamBuffer::new(param_number(params, "attack", 0.02)),
+      release: ParamBuffer::new(param_number(params, "release", 0.15)),
       lo_freq: ParamBuffer::new(param_number(params, "loFreq", 130.81)),
       hi_freq: ParamBuffer::new(param_number(params, "hiFreq", 1046.5)),
     }),
@@ -1555,6 +1557,8 @@ pub(crate) fn apply_param(state: &mut ModuleState, param: &str, value: f32) {
       "tone" => state.tone.set(value),
       "glide" => state.glide.set(value),
       "level" => state.level.set(value),
+      "attack" => state.attack.set(value),
+      "release" => state.release.set(value),
       "loFreq" => state.lo_freq.set(value),
       "hiFreq" => state.hi_freq.set(value),
       _ => {}

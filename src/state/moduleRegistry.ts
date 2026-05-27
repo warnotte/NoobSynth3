@@ -687,6 +687,8 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     tone: 0.6,            // brightness 0-1
     glide: 0.05,          // portamento seconds
     level: 1,             // master volume
+    attack: 0.02,         // gate-envelope attack (s) — note swell-in
+    release: 0.15,        // gate-envelope release (s) — note fade-out
     // UI-only (XY mapping + scale lock)
     scaleLock: false,     // snap pitch to scale
     scale: 2,             // UI scale index (0=chromatic,1=major,2=minor,3=majPenta,4=minPenta)

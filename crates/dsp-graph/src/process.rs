@@ -2104,6 +2104,8 @@ pub(crate) fn process_module(
                 tone: state.tone.slice(frames),
                 glide: state.glide.slice(frames),
                 level: state.level.slice(frames),
+                attack: state.attack.slice(frames),
+                release: state.release.slice(frames),
                 lo_freq: state.lo_freq.slice(frames),
                 hi_freq: state.hi_freq.slice(frames),
             };

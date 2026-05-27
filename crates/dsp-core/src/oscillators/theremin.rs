@@ -63,6 +63,10 @@ pub struct ThereminParams<'a> {
     pub tone: &'a [Sample],
     pub glide: &'a [Sample],
     pub level: &'a [Sample],
+    /// Gate-envelope attack time in seconds (note swell-in)
+    pub attack: &'a [Sample],
+    /// Gate-envelope release time in seconds (note fade-out)
+    pub release: &'a [Sample],
     /// X-axis low frequency (for normalizing the display position)
     pub lo_freq: &'a [Sample],
     /// X-axis high frequency
@@ -194,9 +198,14 @@ impl Theremin {
             let vib_mod = 2.0_f32.powf(vib_lfo * vib_depth * 2.0 / 12.0);
             let freq = (self.glided_freq * vib_mod).clamp(8.0, 0.45 * self.sample_rate);
 
-            // Gate envelope.
+            // Gate envelope with separate attack / release (notes swell in/out).
             let target_env = if gate_on { 1.0 } else { 0.0 };
-            let env_coeff = 1.0 - (-self.inv_sr / 0.006).exp();
+            let env_time = if target_env > self.env {
+                sample_at(params.attack, i, 0.02)
+            } else {
+                sample_at(params.release, i, 0.15)
+            }.max(0.0005);
+            let env_coeff = 1.0 - (-self.inv_sr / env_time).exp();
             self.env += (target_env - self.env) * env_coeff;
 
             // Oscillator.

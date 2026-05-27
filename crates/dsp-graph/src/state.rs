@@ -287,6 +287,8 @@ pub struct ThereminState {
     pub tone: ParamBuffer,
     pub glide: ParamBuffer,
     pub level: ParamBuffer,
+    pub attack: ParamBuffer,
+    pub release: ParamBuffer,
     pub lo_freq: ParamBuffer,
     pub hi_freq: ParamBuffer,
 }

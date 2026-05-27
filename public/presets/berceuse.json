@@ -21,7 +21,7 @@
         "type": "theremin",
         "name": "Voix",
         "position": { "x": 460, "y": 60 },
-        "params": { "frequency": 440, "volume": 0.8, "touch": 0, "waveform": 0, "vibratoRate": 4.5, "vibratoDepth": 0.18, "tremoloRate": 5, "tremoloDepth": 0, "tone": 0.5, "glide": 0.2, "level": 0.55, "loFreq": 130.81, "hiFreq": 1046.5 }
+        "params": { "frequency": 440, "volume": 0.8, "touch": 0, "waveform": 0, "vibratoRate": 4.5, "vibratoDepth": 0.18, "tremoloRate": 5, "tremoloDepth": 0, "tone": 0.5, "glide": 0.2, "level": 0.55, "attack": 0.15, "release": 0.8, "loFreq": 130.81, "hiFreq": 1046.5 }
       },
       {
         "id": "osc-1",

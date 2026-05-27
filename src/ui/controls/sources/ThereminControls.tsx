@@ -316,6 +316,14 @@ export function ThereminControls({ module, engine, connections, status, nativeTh
           </div>
 
           <div className="thm-panel">
+            <span className="thm-panel-title">Env</span>
+            <div className="thm-knob-row">
+              <RotaryKnob label="Attack" min={0.0005} max={2} step={0.005} unit="s" value={num('attack', 0.02)} onChange={(v) => updateParam(module.id, 'attack', v)} />
+              <RotaryKnob label="Release" min={0.005} max={4} step={0.01} unit="s" value={num('release', 0.15)} onChange={(v) => updateParam(module.id, 'release', v)} />
+            </div>
+          </div>
+
+          <div className="thm-panel">
             <span className="thm-panel-title">Voice</span>
             <div className="thm-knob-row">
               <RotaryKnob label="Tone" min={0} max={1} step={0.01} value={num('tone', 0.6)} onChange={(v) => updateParam(module.id, 'tone', v)} />
