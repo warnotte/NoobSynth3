@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { GraphState, MacroSpec, MacroTarget, ModuleSpec, ModuleType, TemplateSpec } from '../shared/graph'
-import type { PresetSpec } from '../state/presets'
+import type { PresetSpec, ProjectSpec } from '../state/presets'
 import {
   moduleCatalog,
   moduleCategoryMeta,
@@ -24,6 +24,8 @@ type SidePanelProps = {
   presetStatus: 'loading' | 'ready' | 'error'
   presets: PresetSpec[]
   onApplyPreset: (graph: GraphState, presetId?: string) => void
+  projects: ProjectSpec[]
+  onApplyProject: (file: string) => void
   macros: MacroSpec[]
   macroValues: number[]
   macroOverride: boolean
@@ -79,6 +81,8 @@ export const SidePanel = ({
   presetStatus,
   presets,
   onApplyPreset,
+  projects,
+  onApplyProject,
   macros,
   macroValues,
   macroOverride,
@@ -127,6 +131,7 @@ export const SidePanel = ({
     library: true,
     templates: true,
     presets: true,
+    projects: true,
     macros: true,
     tauri: true,
   })
@@ -537,6 +542,37 @@ export const SidePanel = ({
                 })}
               </div>
             )}
+      </PanelSection>
+      <PanelSection
+        title="Projects"
+        collapsed={collapsedSections.projects}
+        onToggle={() => toggleSection('projects')}
+      >
+        <p className="muted">
+          Load a full multi-rack project (racks + mixer + tempo). Use Export/Import
+          in Presets to save or open your own.
+        </p>
+        {projects.length === 0 ? (
+          <div className="preset-status">No projects available.</div>
+        ) : (
+          <div className="preset-list">
+            {projects.map((project) => (
+              <div key={project.id} className="preset-card">
+                <div>
+                  <div className="preset-name">{project.name}</div>
+                  <div className="preset-desc">{project.description}</div>
+                </div>
+                <button
+                  type="button"
+                  className="ui-btn ui-btn--pill preset-load"
+                  onClick={() => onApplyProject(project.file)}
+                >
+                  Load
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </PanelSection>
       <PanelSection
         title="Macros"

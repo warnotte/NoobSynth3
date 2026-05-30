@@ -46,6 +46,27 @@ export type PresetLoadResult = {
   errors: string[]
 }
 
+// Multi-rack projects (version 2). Unlike presets, we don't parse the whole
+// project here — we only keep the manifest metadata + the resolved file URL,
+// and fetch/parse the full payload lazily when the user clicks Load.
+export type ProjectSpec = {
+  id: string
+  name: string
+  description: string
+  group?: string
+  file: string
+}
+
+type ProjectManifest = {
+  version: number
+  projects: PresetManifestEntry[]
+}
+
+export type ProjectLoadResult = {
+  projects: ProjectSpec[]
+  errors: string[]
+}
+
 const cloneGraph = (graph: GraphState): GraphState =>
   JSON.parse(JSON.stringify(graph)) as GraphState
 
@@ -161,4 +182,47 @@ export const loadPresets = async (): Promise<PresetLoadResult> => {
   const results = await Promise.all(tasks)
   const presets = results.filter((preset): preset is PresetSpec => preset !== null)
   return { presets, errors }
+}
+
+const resolveProjectManifestUrl = () =>
+  new URL(`${import.meta.env.BASE_URL ?? '/'}projects/manifest.json`, window.location.href)
+
+export const loadProjects = async (): Promise<ProjectLoadResult> => {
+  const manifestUrl = resolveProjectManifestUrl()
+  const errors: string[] = []
+  let data: unknown
+  try {
+    const response = await fetch(manifestUrl.toString(), { cache: 'no-cache' })
+    if (!response.ok) {
+      // No projects manifest is a valid state (not every build ships projects).
+      if (response.status === 404) {
+        return { projects: [], errors }
+      }
+      throw new Error(`Project manifest request failed: ${response.status}`)
+    }
+    data = await response.json()
+  } catch (error) {
+    console.error('Failed to load project manifest:', error)
+    return { projects: [], errors: ['Failed to load projects.'] }
+  }
+
+  if (!isRecord(data) || !Array.isArray((data as ProjectManifest).projects)) {
+    return { projects: [], errors: ['Project manifest is invalid.'] }
+  }
+
+  const projects: ProjectSpec[] = []
+  for (const entry of (data as ProjectManifest).projects) {
+    if (!isManifestEntry(entry)) {
+      errors.push('Project manifest entry is invalid.')
+      continue
+    }
+    projects.push({
+      id: entry.id,
+      name: entry.name,
+      description: entry.description,
+      group: entry.group,
+      file: new URL(entry.file, manifestUrl).toString(),
+    })
+  }
+  return { projects, errors }
 }

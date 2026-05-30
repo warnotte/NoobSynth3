@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "projects": [
+    {
+      "id": "elegie-multitrack",
+      "name": "Élégie (multitrack)",
+      "description": "Ambient en 3 racks (Mélodie, Harmonie, Nappe) + batterie 808, tempo 76. Charge un projet complet : racks, mixer et tempo.",
+      "file": "elegie-multitrack.json",
+      "group": "Ambient"
+    }
+  ]
+}

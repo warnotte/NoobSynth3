@@ -13,7 +13,7 @@ import {
   clearUrlShareParams,
 } from './utils/urlSharing'
 import { defaultGraph } from './state/defaultGraph'
-import { loadPresets, type PresetSpec } from './state/presets'
+import { loadPresets, loadProjects, type PresetSpec, type ProjectSpec } from './state/presets'
 import {
   loadTemplates,
   instantiateTemplate,
@@ -350,6 +350,7 @@ function App() {
   const [status, setStatus] = useState<'idle' | 'running' | 'error'>('idle')
   const [isBooting, setIsBooting] = useState(false)
   const [presets, setPresets] = useState<PresetSpec[]>([])
+  const [projects, setProjects] = useState<ProjectSpec[]>([])
   const [presetStatus, setPresetStatus] = useState<'loading' | 'ready' | 'error'>('loading')
   const [presetError, setPresetError] = useState<string | null>(null)
   const [currentPresetId, setCurrentPresetId] = useState<string | null>(null)
@@ -902,6 +903,25 @@ function App() {
         setPresets([])
         setPresetStatus('error')
         setPresetError('Unable to load presets.')
+      })
+    return () => {
+      active = false
+    }
+  }, [])
+
+  // Load multi-rack projects (separate manifest from presets).
+  useEffect(() => {
+    let active = true
+    loadProjects()
+      .then((result) => {
+        if (!active) return
+        setProjects(result.projects)
+        if (result.errors.length > 0) {
+          console.warn('Some projects failed to load:', result.errors)
+        }
+      })
+      .catch((error) => {
+        console.error('Failed to load projects:', error)
       })
     return () => {
       active = false
@@ -1961,10 +1981,107 @@ function App() {
     }
   }, [])
 
+  // Apply a multi-rack project (version 2) payload: restores all racks, mixer,
+  // channel/master FX, tempo and volume. Shared by the Import button and the
+  // Projects section of the side panel. Throws on invalid payloads.
+  const applyProject = useCallback((payload: Record<string, unknown>) => {
+    if (!(payload.version === 2 && payload.type === 'project' && Array.isArray(payload.racks))) {
+      throw new Error('Not a valid project file.')
+    }
+    const projectRacks = (payload.racks as Array<{ id: string; name: string; graph: unknown }>)
+      .filter((r) => isRecord(r) && typeof r.id === 'string' && isGraphState(r.graph))
+      .map((r) => ({
+        id: r.id,
+        name: typeof r.name === 'string' ? r.name : 'Rack',
+        graph: r.graph as GraphState,
+      }))
+    if (projectRacks.length === 0) throw new Error('Project has no valid racks.')
+    const projectMixer = (isRecord(payload.mixer) ? payload.mixer : {}) as Record<string, MixerChannelState>
+    // Restore channel FX (merge over neutral so partial/old files still work)
+    const incomingChannelFx = (isRecord(payload.channelFx) ? payload.channelFx : {}) as Record<string, Partial<ChannelFxParams>>
+    const projectChannelFx: Record<string, ChannelFxParams> = {}
+    for (const r of projectRacks) {
+      const inc = incomingChannelFx[r.id]
+      projectChannelFx[r.id] = inc
+        ? {
+            enabled: { ...NEUTRAL_CHANNEL_FX.enabled, ...(inc.enabled ?? {}) },
+            eq: { ...NEUTRAL_CHANNEL_FX.eq, ...(inc.eq ?? {}) },
+            comp: { ...NEUTRAL_CHANNEL_FX.comp, ...(inc.comp ?? {}) },
+            reverb: { ...NEUTRAL_CHANNEL_FX.reverb, ...(inc.reverb ?? {}) },
+          }
+        : NEUTRAL_CHANNEL_FX
+    }
+    const projectMasterFx: MasterFxParams = {
+      ...NEUTRAL_MASTER_FX,
+      ...(isRecord(payload.masterFx) ? (payload.masterFx as Partial<MasterFxParams>) : {}),
+    }
+    const projectTempo = typeof payload.masterTempo === 'number' ? payload.masterTempo : 120
+    const projectVolume = typeof payload.masterVolume === 'number' ? payload.masterVolume : 0.8
+    const projectActiveId = typeof payload.activeRackId === 'string'
+      ? payload.activeRackId
+      : projectRacks[0].id
+
+    // Find the active rack
+    const activeRack = projectRacks.find((r) => r.id === projectActiveId) ?? projectRacks[0]
+    const layouted = layoutGraph(cloneGraph(activeRack.graph), moduleSizes, gridMetricsRef.current, { getModuleSize })
+
+    // Update rack counter to avoid ID collisions
+    let maxIdx = 0
+    for (const r of projectRacks) {
+      const match = /^rack-(\d+)$/.exec(r.id)
+      if (match) maxIdx = Math.max(maxIdx, Number(match[1]))
+    }
+    rackCounterRef.current = maxIdx
+
+    // Apply state
+    racksRef.current = projectRacks
+    activeRackIdRef.current = activeRack.id
+    mixerStateRef.current = projectMixer
+    channelFxRef.current = projectChannelFx
+    masterFxRef.current = projectMasterFx
+    masterTempoRef.current = projectTempo
+    masterVolumeRef.current = projectVolume
+
+    setRacks(projectRacks)
+    setActiveRackId(activeRack.id)
+    setMixerState(projectMixer)
+    setChannelFx(projectChannelFx)
+    setMasterFx(projectMasterFx)
+    setMasterTempo(projectTempo)
+    setMasterVolume(projectVolume)
+    resetPatching()
+    setGridError(null)
+    setGraph(layouted, { skipHistory: true })
+    clearHistory()
+    setCurrentPresetId(null)
+    setImportError(null)
+
+    if (statusRef.current === 'running') {
+      queueEngineRestart(layouted)
+    }
+    // Transport tempo will be synced by the useEffect on masterTempo
+  }, [])
+
   const handleImportPreset = useCallback(() => {
     setImportError(null)
     presetFileRef.current?.click()
   }, [])
+
+  // Load a project listed in the Projects section: fetch its file then apply it
+  // through the same path as the Import button.
+  const handleApplyProject = useCallback(async (file: string) => {
+    setImportError(null)
+    try {
+      const response = await fetch(file, { cache: 'no-cache' })
+      if (!response.ok) throw new Error(`Project request failed: ${response.status}`)
+      const payload = (await response.json()) as unknown
+      if (!isRecord(payload)) throw new Error('Invalid project file.')
+      applyProject(payload)
+    } catch (error) {
+      console.error(error)
+      setImportError('Failed to load project.')
+    }
+  }, [applyProject])
 
   const handlePresetFileChange = useCallback(
     async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -1982,78 +2099,7 @@ function App() {
 
         if (payload.version === 2 && payload.type === 'project' && Array.isArray(payload.racks)) {
           // Version 2: full project import
-          const projectRacks = (payload.racks as Array<{ id: string; name: string; graph: unknown }>)
-            .filter((r) => isRecord(r) && typeof r.id === 'string' && isGraphState(r.graph))
-            .map((r) => ({
-              id: r.id,
-              name: typeof r.name === 'string' ? r.name : 'Rack',
-              graph: r.graph as GraphState,
-            }))
-          if (projectRacks.length === 0) throw new Error('Project has no valid racks.')
-          const projectMixer = (isRecord(payload.mixer) ? payload.mixer : {}) as Record<string, MixerChannelState>
-          // Restore channel FX (merge over neutral so partial/old files still work)
-          const incomingChannelFx = (isRecord(payload.channelFx) ? payload.channelFx : {}) as Record<string, Partial<ChannelFxParams>>
-          const projectChannelFx: Record<string, ChannelFxParams> = {}
-          for (const r of projectRacks) {
-            const inc = incomingChannelFx[r.id]
-            projectChannelFx[r.id] = inc
-              ? {
-                  enabled: { ...NEUTRAL_CHANNEL_FX.enabled, ...(inc.enabled ?? {}) },
-                  eq: { ...NEUTRAL_CHANNEL_FX.eq, ...(inc.eq ?? {}) },
-                  comp: { ...NEUTRAL_CHANNEL_FX.comp, ...(inc.comp ?? {}) },
-                  reverb: { ...NEUTRAL_CHANNEL_FX.reverb, ...(inc.reverb ?? {}) },
-                }
-              : NEUTRAL_CHANNEL_FX
-          }
-          const projectMasterFx: MasterFxParams = {
-            ...NEUTRAL_MASTER_FX,
-            ...(isRecord(payload.masterFx) ? (payload.masterFx as Partial<MasterFxParams>) : {}),
-          }
-          const projectTempo = typeof payload.masterTempo === 'number' ? payload.masterTempo : 120
-          const projectVolume = typeof payload.masterVolume === 'number' ? payload.masterVolume : 0.8
-          const projectActiveId = typeof payload.activeRackId === 'string'
-            ? payload.activeRackId
-            : projectRacks[0].id
-
-          // Find the active rack
-          const activeRack = projectRacks.find((r) => r.id === projectActiveId) ?? projectRacks[0]
-          const layouted = layoutGraph(cloneGraph(activeRack.graph), moduleSizes, gridMetricsRef.current, { getModuleSize })
-
-          // Update rack counter to avoid ID collisions
-          let maxIdx = 0
-          for (const r of projectRacks) {
-            const match = /^rack-(\d+)$/.exec(r.id)
-            if (match) maxIdx = Math.max(maxIdx, Number(match[1]))
-          }
-          rackCounterRef.current = maxIdx
-
-          // Apply state
-          racksRef.current = projectRacks
-          activeRackIdRef.current = activeRack.id
-          mixerStateRef.current = projectMixer
-          channelFxRef.current = projectChannelFx
-          masterFxRef.current = projectMasterFx
-          masterTempoRef.current = projectTempo
-          masterVolumeRef.current = projectVolume
-
-          setRacks(projectRacks)
-          setActiveRackId(activeRack.id)
-          setMixerState(projectMixer)
-          setChannelFx(projectChannelFx)
-          setMasterFx(projectMasterFx)
-          setMasterTempo(projectTempo)
-          setMasterVolume(projectVolume)
-          resetPatching()
-          setGridError(null)
-          setGraph(layouted, { skipHistory: true })
-          clearHistory()
-          setCurrentPresetId(null)
-          setImportError(null)
-
-          if (statusRef.current === 'running') {
-            queueEngineRestart(layouted)
-          }
-          // Transport tempo will be synced by the useEffect on masterTempo
+          applyProject(payload)
         } else if (payload.version === 1 && isGraphState(payload.graph)) {
           // Version 1: single patch — load into active rack
           setImportError(null)
@@ -2066,7 +2112,7 @@ function App() {
         setImportError('Import failed. Unsupported or corrupt file.')
       }
     },
-    [applyPreset],
+    [applyPreset, applyProject],
   )
 
   const refreshTauriStatus = useCallback(async () => {
@@ -3226,6 +3272,8 @@ function App() {
           presetStatus={presetStatus}
           presets={presets}
           onApplyPreset={(g, presetId) => applyPreset(g, { presetId })}
+          projects={projects}
+          onApplyProject={handleApplyProject}
           macros={macroSpecs}
           macroValues={macroValues}
           macroOverride={macroOverride}
