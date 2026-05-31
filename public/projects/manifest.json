@@ -28,6 +28,13 @@
       "description": "Drone cristallin glacé sans mélodie : 2 Spectral Swarm en quinte + Granular Delay + Freq Shifter + sub-drone. Pure texture méditative. 3 racks.",
       "file": "verglas.json",
       "group": "Ambient"
+    },
+    {
+      "id": "larsen",
+      "name": "Larsen 🌀",
+      "description": "Un organisme à rétroaction qui se joue tout seul : le son EST la boucle de feedback, accordée pour chanter, qui dérive via un attracteur de Lorenz. + voix FM générative + orgue grave. 3 racks.",
+      "file": "larsen.json",
+      "group": "Ambient"
     }
   ]
 }
