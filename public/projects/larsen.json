@@ -1,0 +1,235 @@
+{
+  "version": 2,
+  "type": "project",
+  "masterTempo": 60,
+  "masterVolume": 0.82,
+  "activeRackId": "rack-1",
+  "racks": [
+    {
+      "id": "rack-1",
+      "name": "Le Cœur",
+      "graph": {
+        "modules": [
+          {
+            "id": "clk",
+            "type": "clock",
+            "name": "Clock",
+            "position": { "x": 40, "y": 60 },
+            "params": { "running": true, "tempo": 60, "rate": 4, "swing": 0 }
+          },
+          {
+            "id": "euclid",
+            "type": "euclidean",
+            "name": "Graine (rythme)",
+            "position": { "x": 40, "y": 320 },
+            "params": { "enabled": true, "tempo": 60, "rate": 2, "steps": 16, "pulses": 2, "rotation": 0, "gateLength": 8, "swing": 0 }
+          },
+          {
+            "id": "seed",
+            "type": "resonator",
+            "name": "Graine (pluck)",
+            "position": { "x": 360, "y": 60 },
+            "params": { "frequency": 220, "structure": 0.5, "brightness": 0.6, "damping": 0.55, "position": 0.4, "mode": 0, "polyphony": 1, "internalExc": 0.8, "chorus": 0.1 }
+          },
+          {
+            "id": "chaos",
+            "type": "chaos",
+            "name": "Dérive (Lorenz)",
+            "position": { "x": 360, "y": 360 },
+            "params": { "speed": 0.12, "rho": 28, "sigma": 10, "beta": 2.66, "scale": 0, "root": 0 }
+          },
+          {
+            "id": "seedlvl",
+            "type": "gain",
+            "name": "Niveau graine",
+            "position": { "x": 680, "y": 60 },
+            "params": { "gain": 0.6 }
+          },
+          {
+            "id": "vcf",
+            "type": "vcf",
+            "name": "Résonance (chante)",
+            "position": { "x": 940, "y": 60 },
+            "params": { "cutoff": 520, "resonance": 0.88, "drive": 0.05, "envAmount": 0, "modAmount": 0.5, "keyTrack": 0, "model": "svf", "mode": "lp", "slope": 12 }
+          },
+          {
+            "id": "dly",
+            "type": "tape-delay",
+            "name": "Boucle (retard tenu)",
+            "position": { "x": 1200, "y": 60 },
+            "params": { "time": 540, "feedback": 0.62, "mix": 0.7, "tone": 0.5, "wow": 0.25, "flutter": 0.2, "drive": 0.05 }
+          },
+          {
+            "id": "rev",
+            "type": "reverb",
+            "name": "Cathédrale",
+            "position": { "x": 1200, "y": 320 },
+            "params": { "time": 2.2, "damp": 0.5, "preDelay": 30, "mix": 0.35 }
+          },
+          {
+            "id": "out",
+            "type": "output",
+            "name": "Out Cœur",
+            "position": { "x": 1460, "y": 60 },
+            "params": { "level": 1 }
+          },
+          {
+            "id": "notes-1",
+            "type": "notes",
+            "name": "Info",
+            "position": { "x": 360, "y": 640 },
+            "params": {
+              "text": "LARSEN — un organisme à rétroaction qui se joue tout seul (multi-rack)\n\nIci, le son N'EST PAS produit par un oscillateur : c'est la BOUCLE DE RÉTROACTION elle-même qui chante.\n\nLE CŒUR (ce rack) :\n- Un Euclidean très clairsemé frappe une « graine » (un pluck de Resonator) de temps en temps.\n- Cette graine entre dans une boucle : Mixer → Filtre résonant → Delay → et RETOUR dans le mixer. Le gain de boucle est < 1, donc c'est toujours stable, mais le filtre très résonant fait CHANTER la boucle longtemps après chaque graine, comme un bol tibétain frappé.\n- Un attracteur de Lorenz (Chaos) déplace lentement la fréquence du filtre → la note chantée DÉRIVE sans jamais se répéter.\n\nLes 2 autres racks (vue MIXER) : LA VOIX = une mélodie FM générative (timbre qui se transforme), LE SOUFFLE = un orgue grave chaleureux.\n\nÀ explorer : la RÉSONANCE du filtre (plus haut = chante plus longtemps), le FEEDBACK du delay, la VITESSE du Chaos (dérive), les PULSES de l'Euclidean (densité des graines)."
+            }
+          }
+        ],
+        "connections": [
+          { "from": { "moduleId": "clk", "portId": "clock" }, "to": { "moduleId": "euclid", "portId": "clock" }, "kind": "sync" },
+          { "from": { "moduleId": "euclid", "portId": "gate" }, "to": { "moduleId": "seed", "portId": "gate" }, "kind": "gate" },
+          { "from": { "moduleId": "seed", "portId": "out" }, "to": { "moduleId": "seedlvl", "portId": "in" }, "kind": "audio" },
+          { "from": { "moduleId": "seedlvl", "portId": "out" }, "to": { "moduleId": "vcf", "portId": "in" }, "kind": "audio" },
+          { "from": { "moduleId": "chaos", "portId": "x" }, "to": { "moduleId": "vcf", "portId": "mod" }, "kind": "cv" },
+          { "from": { "moduleId": "vcf", "portId": "out" }, "to": { "moduleId": "dly", "portId": "in" }, "kind": "audio" },
+          { "from": { "moduleId": "dly", "portId": "out" }, "to": { "moduleId": "rev", "portId": "in" }, "kind": "audio" },
+          { "from": { "moduleId": "rev", "portId": "out" }, "to": { "moduleId": "out", "portId": "in" }, "kind": "audio" }
+        ]
+      }
+    },
+    {
+      "id": "rack-2",
+      "name": "La Voix",
+      "graph": {
+        "modules": [
+          {
+            "id": "chaos2",
+            "type": "chaos",
+            "name": "Compositeur (Lorenz)",
+            "position": { "x": 40, "y": 60 },
+            "params": { "speed": 0.1, "rho": 28, "sigma": 10, "beta": 2.66, "scale": 0, "root": 0 }
+          },
+          {
+            "id": "quant",
+            "type": "quantizer",
+            "name": "Gamme (penta)",
+            "position": { "x": 360, "y": 60 },
+            "params": { "root": 0, "scale": 7 }
+          },
+          {
+            "id": "modosc",
+            "type": "oscillator",
+            "name": "Modulateur FM",
+            "position": { "x": 680, "y": 320 },
+            "params": { "frequency": 440, "type": "sine", "pwm": 0.5, "unison": 1, "detune": 0, "fmLin": 0, "fmExp": 0, "subMix": 0, "subOct": 1 }
+          },
+          {
+            "id": "carosc",
+            "type": "oscillator",
+            "name": "Porteuse FM",
+            "position": { "x": 680, "y": 60 },
+            "params": { "frequency": 220, "type": "sine", "pwm": 0.5, "unison": 1, "detune": 0, "fmLin": 0.5, "fmExp": 0, "subMix": 0, "subOct": 1 }
+          },
+          {
+            "id": "lvl2",
+            "type": "gain",
+            "name": "Niveau",
+            "position": { "x": 940, "y": 60 },
+            "params": { "gain": 0.17 }
+          },
+          {
+            "id": "vcf2",
+            "type": "vcf",
+            "name": "Adoucir",
+            "position": { "x": 1200, "y": 60 },
+            "params": { "cutoff": 1400, "resonance": 0.15, "drive": 0.05, "envAmount": 0, "modAmount": 0, "keyTrack": 0, "model": "svf", "mode": "lp", "slope": 12 }
+          },
+          {
+            "id": "rev2",
+            "type": "reverb",
+            "name": "Reverb",
+            "position": { "x": 1460, "y": 60 },
+            "params": { "time": 3, "damp": 0.5, "preDelay": 40, "mix": 0.45 }
+          },
+          {
+            "id": "out2",
+            "type": "output",
+            "name": "Out Voix",
+            "position": { "x": 1720, "y": 60 },
+            "params": { "level": 1 }
+          }
+        ],
+        "connections": [
+          { "from": { "moduleId": "chaos2", "portId": "x" }, "to": { "moduleId": "quant", "portId": "in" }, "kind": "cv" },
+          { "from": { "moduleId": "quant", "portId": "out" }, "to": { "moduleId": "carosc", "portId": "pitch" }, "kind": "cv" },
+          { "from": { "moduleId": "quant", "portId": "out" }, "to": { "moduleId": "modosc", "portId": "pitch" }, "kind": "cv" },
+          { "from": { "moduleId": "modosc", "portId": "out" }, "to": { "moduleId": "carosc", "portId": "fm-audio" }, "kind": "audio" },
+          { "from": { "moduleId": "carosc", "portId": "out" }, "to": { "moduleId": "lvl2", "portId": "in" }, "kind": "audio" },
+          { "from": { "moduleId": "lvl2", "portId": "out" }, "to": { "moduleId": "vcf2", "portId": "in" }, "kind": "audio" },
+          { "from": { "moduleId": "vcf2", "portId": "out" }, "to": { "moduleId": "rev2", "portId": "in" }, "kind": "audio" },
+          { "from": { "moduleId": "rev2", "portId": "out" }, "to": { "moduleId": "out2", "portId": "in" }, "kind": "audio" }
+        ]
+      }
+    },
+    {
+      "id": "rack-3",
+      "name": "Le Souffle",
+      "graph": {
+        "modules": [
+          {
+            "id": "gate3",
+            "type": "lfo",
+            "name": "Gate tenu",
+            "position": { "x": 40, "y": 320 },
+            "params": { "rate": 0.1, "depth": 0, "offset": 1, "shape": "sine", "bipolar": false }
+          },
+          {
+            "id": "organ",
+            "type": "pipe-organ",
+            "name": "Orgue grave",
+            "position": { "x": 360, "y": 60 },
+            "params": { "frequency": 110, "drawbar16": 0.5, "drawbar8": 0.5, "drawbar4": 0.2, "drawbar223": 0, "drawbar2": 0.08, "drawbar135": 0, "drawbar113": 0, "drawbar1": 0, "voicing": 1, "chiff": 0, "percussion": 0, "percHarmonic": 0, "percDecay": 0, "percVolume": 0, "chorusVibrato": 0.3, "tremulant": 0.2, "tremRate": 4.5, "wind": 0.1, "brightness": 0.45 }
+          },
+          {
+            "id": "vca3",
+            "type": "gain",
+            "name": "Niveau",
+            "position": { "x": 680, "y": 60 },
+            "params": { "gain": 0.45 }
+          },
+          {
+            "id": "vcf3",
+            "type": "vcf",
+            "name": "Filtre",
+            "position": { "x": 940, "y": 60 },
+            "params": { "cutoff": 600, "resonance": 0.12, "drive": 0.05, "envAmount": 0, "modAmount": 0, "keyTrack": 0, "model": "svf", "mode": "lp", "slope": 24 }
+          },
+          {
+            "id": "rev3",
+            "type": "reverb",
+            "name": "Reverb",
+            "position": { "x": 1200, "y": 60 },
+            "params": { "time": 3.2, "damp": 0.55, "preDelay": 35, "mix": 0.4 }
+          },
+          {
+            "id": "out3",
+            "type": "output",
+            "name": "Out Souffle",
+            "position": { "x": 1460, "y": 60 },
+            "params": { "level": 1 }
+          }
+        ],
+        "connections": [
+          { "from": { "moduleId": "gate3", "portId": "cv-out" }, "to": { "moduleId": "organ", "portId": "gate" }, "kind": "gate" },
+          { "from": { "moduleId": "organ", "portId": "out" }, "to": { "moduleId": "vca3", "portId": "in" }, "kind": "audio" },
+          { "from": { "moduleId": "vca3", "portId": "out" }, "to": { "moduleId": "vcf3", "portId": "in" }, "kind": "audio" },
+          { "from": { "moduleId": "vcf3", "portId": "out" }, "to": { "moduleId": "rev3", "portId": "in" }, "kind": "audio" },
+          { "from": { "moduleId": "rev3", "portId": "out" }, "to": { "moduleId": "out3", "portId": "in" }, "kind": "audio" }
+        ]
+      }
+    }
+  ],
+  "mixer": {
+    "rack-1": { "volume": 0.8, "mute": false, "solo": false },
+    "rack-2": { "volume": 0.5, "mute": false, "solo": false },
+    "rack-3": { "volume": 0.6, "mute": false, "solo": false }
+  }
+}
