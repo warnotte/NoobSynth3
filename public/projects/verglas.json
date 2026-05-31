@@ -1,0 +1,170 @@
+{
+  "version": 2,
+  "type": "project",
+  "masterTempo": 60,
+  "masterVolume": 0.8,
+  "activeRackId": "rack-1",
+  "racks": [
+    {
+      "id": "rack-1",
+      "name": "Givre",
+      "graph": {
+        "modules": [
+          {
+            "id": "gate-1",
+            "type": "lfo",
+            "name": "Gate tenu",
+            "position": { "x": 40, "y": 60 },
+            "params": { "rate": 0.1, "depth": 0, "offset": 1, "shape": "sine", "bipolar": false }
+          },
+          {
+            "id": "swarm-1",
+            "type": "spectral-swarm",
+            "name": "Givre (grave)",
+            "position": { "x": 360, "y": 60 },
+            "params": { "frequency": 110, "partials": 24, "detune": 10, "drift": 0.2, "density": 0.7, "evolution": 8, "inharmonic": 0.15, "tilt": -4, "spread": 0.8, "shimmer": 0.15, "attack": 6, "release": 8, "waveform": 0, "oddEven": 0, "fundamentalMix": 0.4, "formantFreq": 0, "formantQ": 2, "freeze": 0, "chorus": 0.4, "attackLow": 1, "attackHigh": 1, "releaseLow": 1, "releaseHigh": 1 }
+          },
+          {
+            "id": "shift-1",
+            "type": "freq-shifter",
+            "name": "Métal",
+            "position": { "x": 820, "y": 60 },
+            "params": { "shift": 2, "mix": 0.3 }
+          },
+          {
+            "id": "rev-1",
+            "type": "reverb",
+            "name": "Reverb",
+            "position": { "x": 1140, "y": 60 },
+            "params": { "time": 3.5, "damp": 0.4, "preDelay": 45, "mix": 0.5 }
+          },
+          {
+            "id": "out-1",
+            "type": "output",
+            "name": "Out Givre",
+            "position": { "x": 1460, "y": 60 },
+            "params": { "level": 1 }
+          },
+          {
+            "id": "notes-1",
+            "type": "notes",
+            "name": "Info",
+            "position": { "x": 360, "y": 420 },
+            "params": {
+              "text": "VERGLAS — drone cristallin glacé (multi-rack)\n\nPas de mélodie : pure texture méditative. 3 racks, vue MIXER pour doser :\n\n1. GIVRE — un Spectral Swarm grave (La), tenu par un gate constant (LFO offset=1). Il dérive et évolue tout seul. Un léger Freq Shifter donne le côté métallique/glacé.\n2. CRISTAUX — un second Spectral Swarm une quinte au-dessus (Mi), granularisé par un Granular Delay accordé à l'octave → éclats scintillants.\n3. SOUFFLE — un sub-drone sinus très grave qui donne le poids.\n\nÀ explorer : le FREEZE des Swarms (fige le spectre), le SHIMMER, l'INHARMONIC, le SHIFT du Freq Shifter (Hz), le mix du Granular Delay. Tout est tenu — laisse tourner. Tempo libre."
+            }
+          }
+        ],
+        "connections": [
+          { "from": { "moduleId": "gate-1", "portId": "cv-out" }, "to": { "moduleId": "swarm-1", "portId": "gate" }, "kind": "gate" },
+          { "from": { "moduleId": "swarm-1", "portId": "out" }, "to": { "moduleId": "shift-1", "portId": "in" }, "kind": "audio" },
+          { "from": { "moduleId": "shift-1", "portId": "out" }, "to": { "moduleId": "rev-1", "portId": "in" }, "kind": "audio" },
+          { "from": { "moduleId": "rev-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+        ]
+      }
+    },
+    {
+      "id": "rack-2",
+      "name": "Cristaux",
+      "graph": {
+        "modules": [
+          {
+            "id": "gate-2",
+            "type": "lfo",
+            "name": "Gate tenu",
+            "position": { "x": 40, "y": 60 },
+            "params": { "rate": 0.1, "depth": 0, "offset": 1, "shape": "sine", "bipolar": false }
+          },
+          {
+            "id": "swarm-2",
+            "type": "spectral-swarm",
+            "name": "Cristaux (aigu)",
+            "position": { "x": 360, "y": 60 },
+            "params": { "frequency": 165, "partials": 18, "detune": 16, "drift": 0.4, "density": 0.6, "evolution": 5, "inharmonic": 0.25, "tilt": -2, "spread": 0.7, "shimmer": 0.3, "attack": 5, "release": 7, "waveform": 0, "oddEven": 0, "fundamentalMix": 0.3, "formantFreq": 0, "formantQ": 2, "freeze": 0, "chorus": 0.3, "attackLow": 1, "attackHigh": 1, "releaseLow": 1, "releaseHigh": 1 }
+          },
+          {
+            "id": "gdly-2",
+            "type": "granular-delay",
+            "name": "Granular",
+            "position": { "x": 820, "y": 60 },
+            "params": { "time": 480, "size": 100, "density": 8, "pitch": 2, "feedback": 0.45, "mix": 0.5 }
+          },
+          {
+            "id": "rev-2",
+            "type": "reverb",
+            "name": "Reverb",
+            "position": { "x": 1140, "y": 60 },
+            "params": { "time": 4, "damp": 0.35, "preDelay": 50, "mix": 0.55 }
+          },
+          {
+            "id": "out-2",
+            "type": "output",
+            "name": "Out Cristaux",
+            "position": { "x": 1460, "y": 60 },
+            "params": { "level": 1 }
+          }
+        ],
+        "connections": [
+          { "from": { "moduleId": "gate-2", "portId": "cv-out" }, "to": { "moduleId": "swarm-2", "portId": "gate" }, "kind": "gate" },
+          { "from": { "moduleId": "swarm-2", "portId": "out" }, "to": { "moduleId": "gdly-2", "portId": "in" }, "kind": "audio" },
+          { "from": { "moduleId": "gdly-2", "portId": "out" }, "to": { "moduleId": "rev-2", "portId": "in" }, "kind": "audio" },
+          { "from": { "moduleId": "rev-2", "portId": "out" }, "to": { "moduleId": "out-2", "portId": "in" }, "kind": "audio" }
+        ]
+      }
+    },
+    {
+      "id": "rack-3",
+      "name": "Souffle",
+      "graph": {
+        "modules": [
+          {
+            "id": "osc-3",
+            "type": "oscillator",
+            "name": "Sub Drone",
+            "position": { "x": 40, "y": 60 },
+            "params": { "frequency": 55, "type": "sine", "pwm": 0.5, "unison": 1, "detune": 0, "fmLin": 0, "fmExp": 0, "subMix": 0.2, "subOct": 1 }
+          },
+          {
+            "id": "lfo-3",
+            "type": "lfo",
+            "name": "LFO Filtre",
+            "position": { "x": 40, "y": 320 },
+            "params": { "rate": 0.03, "depth": 0.3, "offset": 0.1, "shape": "sine", "bipolar": false }
+          },
+          {
+            "id": "vcf-3",
+            "type": "vcf",
+            "name": "Filtre",
+            "position": { "x": 360, "y": 60 },
+            "params": { "cutoff": 160, "resonance": 0.1, "drive": 0.05, "envAmount": 0, "modAmount": 0.5, "keyTrack": 0, "model": "svf", "mode": "lp", "slope": 24 }
+          },
+          {
+            "id": "rev-3",
+            "type": "reverb",
+            "name": "Reverb",
+            "position": { "x": 820, "y": 60 },
+            "params": { "time": 2.5, "damp": 0.6, "preDelay": 30, "mix": 0.3 }
+          },
+          {
+            "id": "out-3",
+            "type": "output",
+            "name": "Out Souffle",
+            "position": { "x": 1140, "y": 60 },
+            "params": { "level": 1 }
+          }
+        ],
+        "connections": [
+          { "from": { "moduleId": "osc-3", "portId": "out" }, "to": { "moduleId": "vcf-3", "portId": "in" }, "kind": "audio" },
+          { "from": { "moduleId": "lfo-3", "portId": "cv-out" }, "to": { "moduleId": "vcf-3", "portId": "mod" }, "kind": "cv" },
+          { "from": { "moduleId": "vcf-3", "portId": "out" }, "to": { "moduleId": "rev-3", "portId": "in" }, "kind": "audio" },
+          { "from": { "moduleId": "rev-3", "portId": "out" }, "to": { "moduleId": "out-3", "portId": "in" }, "kind": "audio" }
+        ]
+      }
+    }
+  ],
+  "mixer": {
+    "rack-1": { "volume": 0.55, "mute": false, "solo": false },
+    "rack-2": { "volume": 0.5, "mute": false, "solo": false },
+    "rack-3": { "volume": 0.5, "mute": false, "solo": false }
+  }
+}

@@ -1,0 +1,187 @@
+{
+  "version": 2,
+  "type": "project",
+  "masterTempo": 60,
+  "masterVolume": 0.82,
+  "activeRackId": "rack-1",
+  "racks": [
+    {
+      "id": "rack-1",
+      "name": "Orbites",
+      "graph": {
+        "modules": [
+          {
+            "id": "grav-1",
+            "type": "gravity-sequencer",
+            "name": "Orbites",
+            "position": { "x": 40, "y": 60 },
+            "params": { "speed": 1, "bodies": 5, "eccentricity": 0.4, "spread": 1.2, "range": 2, "scale": 8, "root": 9, "chaos": 0.05 }
+          },
+          {
+            "id": "gate-1",
+            "type": "lfo",
+            "name": "Gate tenu",
+            "position": { "x": 40, "y": 320 },
+            "params": { "rate": 0.1, "depth": 0, "offset": 1, "shape": "sine", "bipolar": false }
+          },
+          {
+            "id": "organ-1",
+            "type": "pipe-organ",
+            "name": "Orgue",
+            "position": { "x": 360, "y": 60 },
+            "params": { "frequency": 220, "drawbar16": 0.22, "drawbar8": 0.28, "drawbar4": 0.15, "drawbar223": 0, "drawbar2": 0.06, "drawbar135": 0, "drawbar113": 0, "drawbar1": 0.03, "voicing": 1, "chiff": 0.08, "percussion": 0, "percHarmonic": 0, "percDecay": 0, "percVolume": 0, "chorusVibrato": 0.3, "tremulant": 0.25, "tremRate": 5.2, "wind": 0.12, "brightness": 0.55 }
+          },
+          {
+            "id": "leslie-1",
+            "type": "leslie",
+            "name": "Leslie",
+            "position": { "x": 820, "y": 60 },
+            "params": { "speed": 0, "brake": 0, "drive": 0.1, "depth": 0.6, "hornDrum": 0.5, "micDist": 0.3, "ramp": 0.5, "mix": 1 }
+          },
+          {
+            "id": "rev-1",
+            "type": "reverb",
+            "name": "Cathédrale",
+            "position": { "x": 1140, "y": 60 },
+            "params": { "time": 2.6, "damp": 0.5, "preDelay": 35, "mix": 0.4 }
+          },
+          {
+            "id": "out-1",
+            "type": "output",
+            "name": "Out Orbites",
+            "position": { "x": 1460, "y": 60 },
+            "params": { "level": 1 }
+          },
+          {
+            "id": "notes-1",
+            "type": "notes",
+            "name": "Info",
+            "position": { "x": 360, "y": 420 },
+            "params": {
+              "text": "PULSAR — ambient génératif spatial (multi-rack)\n\n3 racks, à équilibrer dans la vue MIXER (faders, mute, solo, FX par canal) :\n\n1. ORBITES — un Gravity Sequencer : des corps en orbite déclenchent les notes d'un Pipe Organ (La mineur pentatonique), à travers un Leslie lent + grande reverb. Les périodes orbitales ne se réalignent jamais → mélodie qui revient sans se répéter.\n2. CRISTAL — un Spectral Swarm tenu (gate « toujours ouvert » via un LFO constant), nappe qui dérive toute seule, dans un Tape Delay long.\n3. SOUFFLE — un sub-drone grave que le LFO ouvre lentement.\n\nÀ explorer : la VITESSE et le CHAOS du Gravity, le nombre de BODIES, la registration de l'orgue (drawbars), la vitesse du Leslie (chorale/tremolo). Tempo libre (60 BPM)."
+            }
+          }
+        ],
+        "connections": [
+          { "from": { "moduleId": "grav-1", "portId": "cv" }, "to": { "moduleId": "organ-1", "portId": "pitch" }, "kind": "cv" },
+          { "from": { "moduleId": "gate-1", "portId": "cv-out" }, "to": { "moduleId": "organ-1", "portId": "gate" }, "kind": "gate" },
+          { "from": { "moduleId": "organ-1", "portId": "out" }, "to": { "moduleId": "vca-1", "portId": "in" }, "kind": "audio" },
+          { "from": { "moduleId": "vca-1", "portId": "out" }, "to": { "moduleId": "leslie-1", "portId": "in" }, "kind": "audio" },
+          { "from": { "moduleId": "leslie-1", "portId": "out" }, "to": { "moduleId": "rev-1", "portId": "in" }, "kind": "audio" },
+          { "from": { "moduleId": "rev-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+        ]
+      }
+    },
+    {
+      "id": "rack-2",
+      "name": "Cristal",
+      "graph": {
+        "modules": [
+          {
+            "id": "gate-2",
+            "type": "lfo",
+            "name": "Gate tenu",
+            "position": { "x": 40, "y": 60 },
+            "params": { "rate": 0.1, "depth": 0, "offset": 1, "shape": "sine", "bipolar": false }
+          },
+          {
+            "id": "swarm-2",
+            "type": "spectral-swarm",
+            "name": "Nappe",
+            "position": { "x": 360, "y": 60 },
+            "params": { "frequency": 165, "partials": 20, "detune": 14, "drift": 0.35, "density": 0.8, "evolution": 6, "inharmonic": 0.05, "tilt": -3, "spread": 0.7, "shimmer": 0.2, "attack": 4, "release": 5, "waveform": 0, "oddEven": 0, "fundamentalMix": 0.5, "formantFreq": 0, "formantQ": 2, "freeze": 0, "chorus": 0.3, "attackLow": 1, "attackHigh": 1, "releaseLow": 1, "releaseHigh": 1 }
+          },
+          {
+            "id": "delay-2",
+            "type": "tape-delay",
+            "name": "Tape Delay",
+            "position": { "x": 820, "y": 60 },
+            "params": { "time": 600, "feedback": 0.3, "mix": 0.25, "tone": 0.5, "wow": 0.25, "flutter": 0.2, "drive": 0.05 }
+          },
+          {
+            "id": "rev-2",
+            "type": "reverb",
+            "name": "Reverb",
+            "position": { "x": 1140, "y": 60 },
+            "params": { "time": 3, "damp": 0.45, "preDelay": 40, "mix": 0.4 }
+          },
+          {
+            "id": "out-2",
+            "type": "output",
+            "name": "Out Cristal",
+            "position": { "x": 1460, "y": 60 },
+            "params": { "level": 1 }
+          }
+        ],
+        "connections": [
+          { "from": { "moduleId": "gate-2", "portId": "cv-out" }, "to": { "moduleId": "swarm-2", "portId": "gate" }, "kind": "gate" },
+          { "from": { "moduleId": "swarm-2", "portId": "out" }, "to": { "moduleId": "delay-2", "portId": "in" }, "kind": "audio" },
+          { "from": { "moduleId": "delay-2", "portId": "out" }, "to": { "moduleId": "rev-2", "portId": "in" }, "kind": "audio" },
+          { "from": { "moduleId": "rev-2", "portId": "out" }, "to": { "moduleId": "out-2", "portId": "in" }, "kind": "audio" }
+        ]
+      }
+    },
+    {
+      "id": "rack-3",
+      "name": "Souffle",
+      "graph": {
+        "modules": [
+          {
+            "id": "osc-3",
+            "type": "oscillator",
+            "name": "Sub Drone",
+            "position": { "x": 40, "y": 60 },
+            "params": { "frequency": 55, "type": "triangle", "pwm": 0.5, "unison": 1, "detune": 6, "fmLin": 0, "fmExp": 0, "subMix": 0.2, "subOct": 1 }
+          },
+          {
+            "id": "lfo-3",
+            "type": "lfo",
+            "name": "LFO Filtre",
+            "position": { "x": 40, "y": 320 },
+            "params": { "rate": 0.05, "depth": 0.4, "offset": 0.1, "shape": "triangle", "bipolar": false }
+          },
+          {
+            "id": "vca-3",
+            "type": "gain",
+            "name": "Niveau",
+            "position": { "x": 360, "y": 60 },
+            "params": { "gain": 0.38 }
+          },
+          {
+            "id": "vcf-3",
+            "type": "vcf",
+            "name": "Filtre",
+            "position": { "x": 620, "y": 60 },
+            "params": { "cutoff": 220, "resonance": 0.15, "drive": 0.08, "envAmount": 0, "modAmount": 0.6, "keyTrack": 0, "model": "svf", "mode": "lp", "slope": 24 }
+          },
+          {
+            "id": "rev-3",
+            "type": "reverb",
+            "name": "Reverb",
+            "position": { "x": 880, "y": 60 },
+            "params": { "time": 2, "damp": 0.6, "preDelay": 25, "mix": 0.25 }
+          },
+          {
+            "id": "out-3",
+            "type": "output",
+            "name": "Out Souffle",
+            "position": { "x": 1140, "y": 60 },
+            "params": { "level": 1 }
+          }
+        ],
+        "connections": [
+          { "from": { "moduleId": "osc-3", "portId": "out" }, "to": { "moduleId": "vca-3", "portId": "in" }, "kind": "audio" },
+          { "from": { "moduleId": "vca-3", "portId": "out" }, "to": { "moduleId": "vcf-3", "portId": "in" }, "kind": "audio" },
+          { "from": { "moduleId": "lfo-3", "portId": "cv-out" }, "to": { "moduleId": "vcf-3", "portId": "mod" }, "kind": "cv" },
+          { "from": { "moduleId": "vcf-3", "portId": "out" }, "to": { "moduleId": "rev-3", "portId": "in" }, "kind": "audio" },
+          { "from": { "moduleId": "rev-3", "portId": "out" }, "to": { "moduleId": "out-3", "portId": "in" }, "kind": "audio" }
+        ]
+      }
+    }
+  ],
+  "mixer": {
+    "rack-1": { "volume": 0.7, "mute": false, "solo": false },
+    "rack-2": { "volume": 0.5, "mute": false, "solo": false },
+    "rack-3": { "volume": 0.55, "mute": false, "solo": false }
+  }
+}

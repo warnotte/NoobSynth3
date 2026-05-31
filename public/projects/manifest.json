@@ -7,6 +7,27 @@
       "description": "Ambient en 3 racks (Mélodie, Harmonie, Nappe) + batterie 808, tempo 76. Charge un projet complet : racks, mixer et tempo.",
       "file": "elegie-multitrack.json",
       "group": "Ambient"
+    },
+    {
+      "id": "pulsar",
+      "name": "Pulsar 🌌",
+      "description": "Ambient génératif spatial : un Gravity Sequencer pilote un Pipe Organ à travers un Leslie + nappe Spectral Swarm + sub-drone. 3 racks, jamais répétitif.",
+      "file": "pulsar.json",
+      "group": "Ambient"
+    },
+    {
+      "id": "conways-dream",
+      "name": "Conway's Dream 🧬",
+      "description": "Ambient cellulaire : le jeu de la vie de Conway compose la mélodie (Wavetable), cloches Resonator + nappe Supersaw. 3 racks auto-évolutifs.",
+      "file": "conways-dream.json",
+      "group": "Ambient"
+    },
+    {
+      "id": "verglas",
+      "name": "Verglas ❄️",
+      "description": "Drone cristallin glacé sans mélodie : 2 Spectral Swarm en quinte + Granular Delay + Freq Shifter + sub-drone. Pure texture méditative. 3 racks.",
+      "file": "verglas.json",
+      "group": "Ambient"
     }
   ]
 }
