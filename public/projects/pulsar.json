@@ -32,11 +32,18 @@
             "params": { "frequency": 220, "drawbar16": 0.22, "drawbar8": 0.28, "drawbar4": 0.15, "drawbar223": 0, "drawbar2": 0.06, "drawbar135": 0, "drawbar113": 0, "drawbar1": 0.03, "voicing": 1, "chiff": 0.08, "percussion": 0, "percHarmonic": 0, "percDecay": 0, "percVolume": 0, "chorusVibrato": 0.3, "tremulant": 0.25, "tremRate": 5.2, "wind": 0.12, "brightness": 0.55 }
           },
           {
+            "id": "vca-1",
+            "type": "gain",
+            "name": "Niveau Orgue",
+            "position": { "x": 620, "y": 60 },
+            "params": { "gain": 0.5 }
+          },
+          {
             "id": "leslie-1",
             "type": "leslie",
             "name": "Leslie",
-            "position": { "x": 820, "y": 60 },
-            "params": { "speed": 0, "brake": 0, "drive": 0.1, "depth": 0.6, "hornDrum": 0.5, "micDist": 0.3, "ramp": 0.5, "mix": 1 }
+            "position": { "x": 880, "y": 60 },
+            "params": { "speed": 0, "brake": 0, "drive": 0, "depth": 0.6, "hornDrum": 0.5, "micDist": 0.3, "ramp": 0.5, "mix": 1 }
           },
           {
             "id": "rev-1",
