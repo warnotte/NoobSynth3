@@ -1,0 +1,31 @@
+{
+  "id": "atelier-auto-ecoute",
+  "name": "Atelier — Auto-Écoute",
+  "description": "Le filtre qui s'écoute : sa propre sortie passe dans un envelope-follower qui ouvre sa coupure. Chaque pluck rythmique (Euclidean) fait \"wah\" tout seul — boucle de modulation maîtrisée.",
+  "group": "Atelier Signal",
+  "graph": {
+    "modules": [
+      { "id": "clk", "type": "clock", "name": "Clock", "position": { "x": 40, "y": 60 }, "params": { "running": true, "tempo": 100, "rate": 4, "swing": 0 } },
+      { "id": "euclid", "type": "euclidean", "name": "Rythme", "position": { "x": 40, "y": 320 }, "params": { "enabled": true, "tempo": 100, "rate": 4, "steps": 16, "pulses": 7, "rotation": 0, "gateLength": 25, "swing": 0 } },
+      { "id": "osc", "type": "oscillator", "name": "Source", "position": { "x": 460, "y": 60 }, "params": { "frequency": 110, "type": "sawtooth", "pwm": 0.5, "unison": 1, "detune": 0, "fmLin": 0, "fmExp": 0, "subMix": 0.2, "subOct": 1 } },
+      { "id": "adsr", "type": "adsr", "name": "Enveloppe ampli", "position": { "x": 460, "y": 320 }, "params": { "attack": 0.005, "decay": 0.18, "sustain": 0.0, "release": 0.15 } },
+      { "id": "vca", "type": "gain", "name": "VCA", "position": { "x": 820, "y": 60 }, "params": { "gain": 0.8 } },
+      { "id": "vcf", "type": "vcf", "name": "VCF (auto-ouvert)", "position": { "x": 1080, "y": 60 }, "params": { "cutoff": 250, "resonance": 0.6, "drive": 0.1, "envAmount": 0, "modAmount": 0.9, "keyTrack": 0, "model": "svf", "mode": "lp", "slope": 12 } },
+      { "id": "ef", "type": "envelope-follower", "name": "Suiveur d'enveloppe", "position": { "x": 1080, "y": 320 }, "params": { "attack": 0.01, "release": 0.15, "gain": 2.5 } },
+      { "id": "rev", "type": "reverb", "name": "Reverb", "position": { "x": 1340, "y": 60 }, "params": { "time": 1.8, "damp": 0.5, "preDelay": 20, "mix": 0.28 } },
+      { "id": "out", "type": "output", "name": "Out", "position": { "x": 1600, "y": 60 }, "params": { "level": 0.8 } },
+      { "id": "notes", "type": "notes", "name": "Info", "position": { "x": 820, "y": 320 }, "params": { "text": "AUTO-ÉCOUTE (auto-wah)\n\nLa clé : le VCA alimente À LA FOIS le filtre ET un ENVELOPPE-FOLLOWER, dont la sortie ouvre la coupure du filtre (port mod). Le filtre suit donc la dynamique du signal : plus la note est forte, plus il s'ouvre. Résultat = un \"wah\" automatique sur chaque pluck.\n\nÀ explorer : le gain et le release du suiveur (vitesse du wah), modAmount du VCF, la résonance." } }
+    ],
+    "connections": [
+      { "from": { "moduleId": "clk", "portId": "clock" }, "to": { "moduleId": "euclid", "portId": "clock" }, "kind": "sync" },
+      { "from": { "moduleId": "euclid", "portId": "gate" }, "to": { "moduleId": "adsr", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "osc", "portId": "out" }, "to": { "moduleId": "vca", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr", "portId": "env" }, "to": { "moduleId": "vca", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "vca", "portId": "out" }, "to": { "moduleId": "vcf", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "vca", "portId": "out" }, "to": { "moduleId": "ef", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "ef", "portId": "out" }, "to": { "moduleId": "vcf", "portId": "mod" }, "kind": "cv" },
+      { "from": { "moduleId": "vcf", "portId": "out" }, "to": { "moduleId": "rev", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "rev", "portId": "out" }, "to": { "moduleId": "out", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}

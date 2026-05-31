@@ -1,0 +1,30 @@
+{
+  "id": "atelier-ring-cloches",
+  "name": "Atelier — Cloches Ring",
+  "description": "Modulation en anneau de deux oscillateurs sinus à des fréquences non harmoniques : produit des sons métalliques type cloche (somme et différence des fréquences). Déclenché par un motif Euclidean.",
+  "group": "Atelier Signal",
+  "graph": {
+    "modules": [
+      { "id": "clk", "type": "clock", "name": "Clock", "position": { "x": 40, "y": 60 }, "params": { "running": true, "tempo": 84, "rate": 3, "swing": 0 } },
+      { "id": "euclid", "type": "euclidean", "name": "Rythme", "position": { "x": 40, "y": 320 }, "params": { "enabled": true, "tempo": 84, "rate": 3, "steps": 16, "pulses": 5, "rotation": 2, "gateLength": 15, "swing": 0 } },
+      { "id": "oscA", "type": "oscillator", "name": "Osc A", "position": { "x": 460, "y": 60 }, "params": { "frequency": 330, "type": "sine", "pwm": 0.5, "unison": 1, "detune": 0, "fmLin": 0, "fmExp": 0, "subMix": 0, "subOct": 1 } },
+      { "id": "oscB", "type": "oscillator", "name": "Osc B (inharmonique)", "position": { "x": 460, "y": 320 }, "params": { "frequency": 467, "type": "sine", "pwm": 0.5, "unison": 1, "detune": 0, "fmLin": 0, "fmExp": 0, "subMix": 0, "subOct": 1 } },
+      { "id": "rm", "type": "ring-mod", "name": "Ring Mod", "position": { "x": 820, "y": 60 }, "params": { "level": 0.9 } },
+      { "id": "adsr", "type": "adsr", "name": "Enveloppe cloche", "position": { "x": 820, "y": 320 }, "params": { "attack": 0.002, "decay": 0.6, "sustain": 0.0, "release": 0.5 } },
+      { "id": "vca", "type": "gain", "name": "VCA", "position": { "x": 1080, "y": 60 }, "params": { "gain": 0.7 } },
+      { "id": "rev", "type": "reverb", "name": "Reverb", "position": { "x": 1340, "y": 60 }, "params": { "time": 2.2, "damp": 0.4, "preDelay": 25, "mix": 0.4 } },
+      { "id": "out", "type": "output", "name": "Out", "position": { "x": 1600, "y": 60 }, "params": { "level": 0.8 } },
+      { "id": "notes", "type": "notes", "name": "Info", "position": { "x": 1080, "y": 320 }, "params": { "text": "CLOCHES RING\n\nLa clé : OSC A et OSC B → RING-MOD. La modulation en anneau ne garde que la somme et la différence des deux fréquences. Avec des fréquences non harmoniques (330 et 467 Hz), on obtient des partiels inharmoniques = timbre métallique de cloche.\n\nÀ explorer : les fréquences des deux oscillateurs (caractère de la cloche), le decay de l'enveloppe." } }
+    ],
+    "connections": [
+      { "from": { "moduleId": "clk", "portId": "clock" }, "to": { "moduleId": "euclid", "portId": "clock" }, "kind": "sync" },
+      { "from": { "moduleId": "euclid", "portId": "gate" }, "to": { "moduleId": "adsr", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "oscA", "portId": "out" }, "to": { "moduleId": "rm", "portId": "in-a" }, "kind": "audio" },
+      { "from": { "moduleId": "oscB", "portId": "out" }, "to": { "moduleId": "rm", "portId": "in-b" }, "kind": "audio" },
+      { "from": { "moduleId": "rm", "portId": "out" }, "to": { "moduleId": "vca", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr", "portId": "env" }, "to": { "moduleId": "vca", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "vca", "portId": "out" }, "to": { "moduleId": "rev", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "rev", "portId": "out" }, "to": { "moduleId": "out", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}

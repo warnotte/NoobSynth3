@@ -1,0 +1,30 @@
+{
+  "id": "atelier-fm",
+  "name": "Atelier — FM 2 opérateurs",
+  "description": "FM à taux audio entre deux oscillateurs (ratio 2:1) : le modulateur entre dans le port fm-audio de la porteuse. Un step sequencer joue une phrase, l'enveloppe sculpte chaque note.",
+  "group": "Atelier Signal",
+  "graph": {
+    "modules": [
+      { "id": "clk", "type": "clock", "name": "Clock", "position": { "x": 40, "y": 60 }, "params": { "running": true, "tempo": 96, "rate": 3, "swing": 0 } },
+      { "id": "seq", "type": "step-sequencer", "name": "Mélodie", "position": { "x": 40, "y": 320 }, "params": { "enabled": true, "tempo": 96, "rate": 3, "gateLength": 60, "swing": 0, "slideTime": 30, "length": 8, "direction": 0, "stepData": "[{\"pitch\":0,\"gate\":true,\"velocity\":90,\"slide\":false},{\"pitch\":7,\"gate\":true,\"velocity\":80,\"slide\":false},{\"pitch\":3,\"gate\":true,\"velocity\":85,\"slide\":false},{\"pitch\":10,\"gate\":true,\"velocity\":88,\"slide\":false},{\"pitch\":12,\"gate\":true,\"velocity\":92,\"slide\":false},{\"pitch\":7,\"gate\":true,\"velocity\":80,\"slide\":false},{\"pitch\":15,\"gate\":true,\"velocity\":85,\"slide\":false},{\"pitch\":10,\"gate\":true,\"velocity\":82,\"slide\":false}]" } },
+      { "id": "modosc", "type": "oscillator", "name": "Modulateur (2:1)", "position": { "x": 460, "y": 320 }, "params": { "frequency": 440, "type": "sine", "pwm": 0.5, "unison": 1, "detune": 0, "fmLin": 0, "fmExp": 0, "subMix": 0, "subOct": 1 } },
+      { "id": "carosc", "type": "oscillator", "name": "Porteuse (FM)", "position": { "x": 460, "y": 60 }, "params": { "frequency": 220, "type": "sine", "pwm": 0.5, "unison": 1, "detune": 0, "fmLin": 0.6, "fmExp": 0, "subMix": 0, "subOct": 1 } },
+      { "id": "adsr", "type": "adsr", "name": "Enveloppe", "position": { "x": 460, "y": 580 }, "params": { "attack": 0.005, "decay": 0.25, "sustain": 0.4, "release": 0.4 } },
+      { "id": "vca", "type": "gain", "name": "VCA", "position": { "x": 820, "y": 60 }, "params": { "gain": 0.38 } },
+      { "id": "rev", "type": "reverb", "name": "Reverb", "position": { "x": 1080, "y": 60 }, "params": { "time": 1.6, "damp": 0.5, "preDelay": 20, "mix": 0.25 } },
+      { "id": "out", "type": "output", "name": "Out", "position": { "x": 1340, "y": 60 }, "params": { "level": 0.8 } },
+      { "id": "notes", "type": "notes", "name": "Info", "position": { "x": 820, "y": 320 }, "params": { "text": "FM 2 OPÉRATEURS\n\nLa clé est le câble MODULATEUR → PORTEUSE (port fm-audio) : un oscillateur module l'autre à taux audio. Comme les deux suivent le même pitch (ratio 2:1), le timbre FM reste constant sur toute la tessiture.\n\nÀ explorer : le param fmLin de la Porteuse (= profondeur FM, donc richesse), la fréquence du Modulateur (change le ratio → timbre)." } }
+    ],
+    "connections": [
+      { "from": { "moduleId": "clk", "portId": "clock" }, "to": { "moduleId": "seq", "portId": "clock" }, "kind": "sync" },
+      { "from": { "moduleId": "seq", "portId": "cv-out" }, "to": { "moduleId": "carosc", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "seq", "portId": "cv-out" }, "to": { "moduleId": "modosc", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "modosc", "portId": "out" }, "to": { "moduleId": "carosc", "portId": "fm-audio" }, "kind": "audio" },
+      { "from": { "moduleId": "seq", "portId": "gate-out" }, "to": { "moduleId": "adsr", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "carosc", "portId": "out" }, "to": { "moduleId": "vca", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr", "portId": "env" }, "to": { "moduleId": "vca", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "vca", "portId": "out" }, "to": { "moduleId": "rev", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "rev", "portId": "out" }, "to": { "moduleId": "out", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}

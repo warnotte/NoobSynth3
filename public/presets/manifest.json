@@ -2,6 +2,55 @@
   "version": 1,
   "presets": [
     {
+      "id": "atelier-fm",
+      "name": "Atelier — FM 2 opérateurs",
+      "description": "FM à taux audio (osc → fm-audio, ratio 2:1). Démo de la chaîne du signal.",
+      "file": "atelier-fm.json",
+      "group": "Atelier Signal"
+    },
+    {
+      "id": "atelier-filtre-vivant",
+      "name": "Atelier — Filtre Vivant",
+      "description": "FM de filtre à taux audio (osc → VCF mod). Formants animés. Démo de la chaîne.",
+      "file": "atelier-filtre-vivant.json",
+      "group": "Atelier Signal"
+    },
+    {
+      "id": "atelier-auto-ecoute",
+      "name": "Atelier — Auto-Écoute",
+      "description": "Auto-wah : le filtre suit la dynamique du signal via un envelope-follower. Démo de la chaîne.",
+      "file": "atelier-auto-ecoute.json",
+      "group": "Atelier Signal"
+    },
+    {
+      "id": "atelier-chaos-melodie",
+      "name": "Atelier — Mélodie du Chaos",
+      "description": "Attracteur de Lorenz → quantizer → pitch. Mélodie générative. Démo de la chaîne.",
+      "file": "atelier-chaos-melodie.json",
+      "group": "Atelier Signal"
+    },
+    {
+      "id": "atelier-ring-cloches",
+      "name": "Atelier — Cloches Ring",
+      "description": "Ring-mod de 2 oscillateurs inharmoniques = timbre métallique de cloche. Démo de la chaîne.",
+      "file": "atelier-ring-cloches.json",
+      "group": "Atelier Signal"
+    },
+    {
+      "id": "atelier-wavefolder",
+      "name": "Atelier — Pli Harmonique",
+      "description": "Amplitude (LFO+VCA) → wavefolder : harmoniques dynamiques, un sinus qui respire. Démo de la chaîne.",
+      "file": "atelier-wavefolder.json",
+      "group": "Atelier Signal"
+    },
+    {
+      "id": "atelier-sample-hold",
+      "name": "Atelier — Sample & Hold",
+      "description": "Bruit → S&H (cadencé) → quantizer → pitch. Séquence aléatoire Berlin school. Démo de la chaîne.",
+      "file": "atelier-sample-hold.json",
+      "group": "Atelier Signal"
+    },
+    {
       "id": "le-graal",
       "name": "Le Graal 🏆",
       "description": "Ambient génératif grandiose : shimmer Shepard sans fin + drone qui respire + mélodie Turing au Theremin. La mineur.",

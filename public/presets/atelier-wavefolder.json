@@ -1,0 +1,26 @@
+{
+  "id": "atelier-wavefolder",
+  "name": "Atelier — Pli Harmonique",
+  "description": "Du sinus pur aux harmoniques riches : un LFO gonfle l'amplitude d'un sinus via un VCA, et plus le niveau monte, plus le wavefolder replie l'onde et génère d'harmoniques. Le timbre respire tout seul.",
+  "group": "Atelier Signal",
+  "graph": {
+    "modules": [
+      { "id": "osc", "type": "oscillator", "name": "Sinus", "position": { "x": 40, "y": 60 }, "params": { "frequency": 110, "type": "sine", "pwm": 0.5, "unison": 2, "detune": 6, "fmLin": 0, "fmExp": 0, "subMix": 0, "subOct": 1 } },
+      { "id": "lfo", "type": "lfo", "name": "Gonflement", "position": { "x": 40, "y": 320 }, "params": { "rate": 0.1, "depth": 0.8, "offset": 0.2, "shape": "sine", "bipolar": false } },
+      { "id": "vca", "type": "gain", "name": "VCA (niveau)", "position": { "x": 460, "y": 60 }, "params": { "gain": 1.0 } },
+      { "id": "folder", "type": "wavefolder", "name": "Wavefolder", "position": { "x": 720, "y": 60 }, "params": { "drive": 0.5, "fold": 0.6, "bias": 0, "mix": 1.0 } },
+      { "id": "vcf", "type": "vcf", "name": "Adoucir", "position": { "x": 980, "y": 60 }, "params": { "cutoff": 3000, "resonance": 0.1, "drive": 0.05, "envAmount": 0, "modAmount": 0, "keyTrack": 0, "model": "svf", "mode": "lp", "slope": 12 } },
+      { "id": "rev", "type": "reverb", "name": "Reverb", "position": { "x": 1240, "y": 60 }, "params": { "time": 2.0, "damp": 0.5, "preDelay": 25, "mix": 0.3 } },
+      { "id": "out", "type": "output", "name": "Out", "position": { "x": 1500, "y": 60 }, "params": { "level": 0.55 } },
+      { "id": "notes", "type": "notes", "name": "Info", "position": { "x": 460, "y": 320 }, "params": { "text": "PLI HARMONIQUE\n\nLe wavefolder n'a pas d'entrée CV pour le pli — alors on module l'AMPLITUDE d'entrée. La clé : LFO → VCA → WAVEFOLDER. Quand le LFO gonfle le niveau, le wavefolder replie davantage le sinus → de plus en plus d'harmoniques. Un sinus pur devient un timbre cuivré qui respire.\n\nÀ explorer : fold et drive du wavefolder, depth/offset du LFO (amplitude min/max), cutoff du filtre." } }
+    ],
+    "connections": [
+      { "from": { "moduleId": "osc", "portId": "out" }, "to": { "moduleId": "vca", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "lfo", "portId": "cv-out" }, "to": { "moduleId": "vca", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "vca", "portId": "out" }, "to": { "moduleId": "folder", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "folder", "portId": "out" }, "to": { "moduleId": "vcf", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "vcf", "portId": "out" }, "to": { "moduleId": "rev", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "rev", "portId": "out" }, "to": { "moduleId": "out", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}

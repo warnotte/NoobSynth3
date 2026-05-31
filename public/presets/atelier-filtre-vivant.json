@@ -1,0 +1,24 @@
+{
+  "id": "atelier-filtre-vivant",
+  "name": "Atelier — Filtre Vivant",
+  "description": "FM de filtre à taux audio : un oscillateur module la coupure du VCF (port mod) à fréquence audible, créant des formants vivants. Un LFO lent balaie le modulateur pour faire évoluer le timbre.",
+  "group": "Atelier Signal",
+  "graph": {
+    "modules": [
+      { "id": "osc", "type": "oscillator", "name": "Source (drone)", "position": { "x": 40, "y": 60 }, "params": { "frequency": 110, "type": "sawtooth", "pwm": 0.5, "unison": 2, "detune": 6, "fmLin": 0, "fmExp": 0, "subMix": 0.15, "subOct": 1 } },
+      { "id": "modosc", "type": "oscillator", "name": "Modulateur filtre", "position": { "x": 40, "y": 320 }, "params": { "frequency": 75, "type": "sine", "pwm": 0.5, "unison": 1, "detune": 0, "fmLin": 0, "fmExp": 0, "subMix": 0, "subOct": 1 } },
+      { "id": "lfo", "type": "lfo", "name": "Balayage lent", "position": { "x": 40, "y": 560 }, "params": { "rate": 0.08, "depth": 0.5, "offset": 0, "shape": "sine", "bipolar": true } },
+      { "id": "vcf", "type": "vcf", "name": "VCF (modulé audio)", "position": { "x": 460, "y": 60 }, "params": { "cutoff": 350, "resonance": 0.7, "drive": 0.1, "envAmount": 0, "modAmount": 1.0, "keyTrack": 0, "model": "svf", "mode": "lp", "slope": 12 } },
+      { "id": "rev", "type": "reverb", "name": "Reverb", "position": { "x": 820, "y": 60 }, "params": { "time": 2.0, "damp": 0.5, "preDelay": 25, "mix": 0.3 } },
+      { "id": "out", "type": "output", "name": "Out", "position": { "x": 1080, "y": 60 }, "params": { "level": 0.5 } },
+      { "id": "notes", "type": "notes", "name": "Info", "position": { "x": 460, "y": 320 }, "params": { "text": "FILTRE VIVANT\n\nLa clé est le câble MODULATEUR → VCF (port mod) à TAUX AUDIO : au lieu d'un LFO lent, c'est un oscillateur à ~75 Hz qui ouvre/ferme la coupure des milliers de fois par seconde → formants et timbres animés.\n\nUn LFO très lent balaie la fréquence du modulateur → le caractère évolue tout seul. À explorer : modAmount du VCF, la résonance, la fréquence du Modulateur." } }
+    ],
+    "connections": [
+      { "from": { "moduleId": "osc", "portId": "out" }, "to": { "moduleId": "vcf", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "modosc", "portId": "out" }, "to": { "moduleId": "vcf", "portId": "mod" }, "kind": "cv" },
+      { "from": { "moduleId": "lfo", "portId": "cv-out" }, "to": { "moduleId": "modosc", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "vcf", "portId": "out" }, "to": { "moduleId": "rev", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "rev", "portId": "out" }, "to": { "moduleId": "out", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}

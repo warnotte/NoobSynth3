@@ -1,0 +1,31 @@
+{
+  "id": "atelier-chaos-melodie",
+  "name": "Atelier — Mélodie du Chaos",
+  "description": "Un attracteur de Lorenz comme compositeur : sa sortie X passe dans un quantizer (penta) puis pilote le pitch. Sa sortie gate déclenche les notes. Mélodie générative qui ne se répète jamais.",
+  "group": "Atelier Signal",
+  "graph": {
+    "modules": [
+      { "id": "chaos", "type": "chaos", "name": "Lorenz", "position": { "x": 40, "y": 60 }, "params": { "speed": 0.35, "rho": 28, "sigma": 10, "beta": 2.66, "scale": 0, "root": 0 } },
+      { "id": "quant", "type": "quantizer", "name": "Gamme (penta)", "position": { "x": 360, "y": 60 }, "params": { "root": 0, "scale": 7 } },
+      { "id": "osc", "type": "oscillator", "name": "Voix", "position": { "x": 680, "y": 60 }, "params": { "frequency": 220, "type": "triangle", "pwm": 0.5, "unison": 1, "detune": 0, "fmLin": 0, "fmExp": 0, "subMix": 0.1, "subOct": 1 } },
+      { "id": "adsr", "type": "adsr", "name": "Enveloppe", "position": { "x": 680, "y": 320 }, "params": { "attack": 0.01, "decay": 0.3, "sustain": 0.3, "release": 0.4 } },
+      { "id": "vca", "type": "gain", "name": "VCA", "position": { "x": 940, "y": 60 }, "params": { "gain": 0.22 } },
+      { "id": "vcf", "type": "vcf", "name": "Filtre", "position": { "x": 1200, "y": 60 }, "params": { "cutoff": 1200, "resonance": 0.3, "drive": 0.05, "envAmount": 0, "modAmount": 0, "keyTrack": 0, "model": "svf", "mode": "lp", "slope": 12 } },
+      { "id": "delay", "type": "delay", "name": "Delay", "position": { "x": 1460, "y": 60 }, "params": { "time": 333, "feedback": 0.28, "mix": 0.25, "tone": 0.6, "pingPong": true } },
+      { "id": "rev", "type": "reverb", "name": "Reverb", "position": { "x": 1720, "y": 60 }, "params": { "time": 2.2, "damp": 0.5, "preDelay": 25, "mix": 0.3 } },
+      { "id": "out", "type": "output", "name": "Out", "position": { "x": 1980, "y": 60 }, "params": { "level": 0.8 } },
+      { "id": "notes", "type": "notes", "name": "Info", "position": { "x": 360, "y": 320 }, "params": { "text": "MÉLODIE DU CHAOS\n\nLa clé : LORENZ (x) → QUANTIZER → pitch. Un système chaotique continu devient une mélodie, snappée sur une gamme pentatonique. Le gate du Lorenz déclenche chaque note. Déterministe mais jamais périodique.\n\nÀ explorer : la VITESSE du Lorenz (densité/tempo), root/scale du quantizer (tonalité), rho/sigma/beta (forme de l'attracteur)." } }
+    ],
+    "connections": [
+      { "from": { "moduleId": "chaos", "portId": "x" }, "to": { "moduleId": "quant", "portId": "in" }, "kind": "cv" },
+      { "from": { "moduleId": "quant", "portId": "out" }, "to": { "moduleId": "osc", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "chaos", "portId": "gate" }, "to": { "moduleId": "adsr", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "osc", "portId": "out" }, "to": { "moduleId": "vca", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "adsr", "portId": "env" }, "to": { "moduleId": "vca", "portId": "cv" }, "kind": "cv" },
+      { "from": { "moduleId": "vca", "portId": "out" }, "to": { "moduleId": "vcf", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "vcf", "portId": "out" }, "to": { "moduleId": "delay", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "delay", "portId": "out" }, "to": { "moduleId": "rev", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "rev", "portId": "out" }, "to": { "moduleId": "out", "portId": "in" }, "kind": "audio" }
+    ]
+  }
+}
