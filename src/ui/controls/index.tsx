@@ -15,7 +15,7 @@ import type { ControlProps, NativeScopeBridge, NativeChiptuneBridge, NativeSeque
 import { renderSourceControls } from './sources'
 import { renderFilterControls } from './FilterControls'
 import { renderAmplifierControls } from './AmplifierControls'
-import { renderEffectControls } from './EffectControls'
+import { renderEffectControls } from './effects'
 import { renderModulatorControls } from './ModulatorControls'
 import { renderSequencerControls } from './sequencers'
 import { renderDrumControls } from './DrumControls'
