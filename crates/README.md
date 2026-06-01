@@ -39,17 +39,17 @@ crates/
 
 ## dsp-core
 
-Bibliothèque de traitement audio sans dépendance externe (~9200 lignes, 48 fichiers).
+Bibliothèque de traitement audio sans dépendance externe (~20800 lignes, 88 fichiers).
 
 **Structure modulaire :**
 | Dossier | Contenu |
 |---------|---------|
-| `oscillators/` | VCO, Supersaw, Karplus, FM, TB-303, NES, SNES, Noise |
+| `oscillators/` | VCO, Supersaw, Karplus, FM, TB-303, NES, SNES, Noise, Wavetable, Granular, Theremin… (18) |
 | `filters/` | VCF (SVF/Ladder, multi-mode), HPF |
-| `modulators/` | ADSR, LFO, Sample & Hold, Slew, Quantizer |
-| `effects/` | Chorus, Ensemble, Choir, Vocoder, Delays, Reverbs, Phaser, Distortion |
-| `drums/` | TR-909 (Kick, Snare, HiHat, Clap, Tom, Rimshot) |
-| `sequencers/` | Clock, Arpeggiator, Step, Drum, Euclidean, Mario |
+| `modulators/` | ADSR, LFO, Sample & Hold, Slew, Quantizer, Chaos, Envelope Follower |
+| `effects/` | Chorus, Ensemble, Choir, Vocoder, Delays, Reverbs, Phaser, Distortion, Leslie, Wah, Tube Amp… (23) |
+| `drums/` | TR-909 + TR-808 (Kick, Snare, HiHat, Clap, Tom, Rimshot, Cowbell) (12) |
+| `sequencers/` | Clock, Arpeggiator, Step, Drum, Euclidean, Mario, SID/AY players, Game of Life, Gravity… (15) |
 
 Note: Arpeggiator gate handling ignores short retrigger dips; when HOLD is off and no notes remain, Control IO forces gates low to avoid stuck arp.
 

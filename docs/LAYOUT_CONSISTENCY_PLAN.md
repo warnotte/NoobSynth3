@@ -265,4 +265,4 @@ Modules à tester visuellement :
 - [ ] Un seul système de compact mode
 - [ ] Pas de CSS orphelin
 - [ ] Documentation à jour
-- [ ] Aucune régression visuelle sur les 73 modules
+- [ ] Aucune régression visuelle sur les 93 modules

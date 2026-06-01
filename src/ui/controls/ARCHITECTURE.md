@@ -13,7 +13,7 @@ src/ui/controls/
 ├── types.ts                 # Types partagés (ControlProps, etc.)
 ├── index.tsx                # Composant principal + router
 │
-├── sources/                 # Oscillateurs et générateurs (15 modules)
+├── sources/                 # Oscillateurs et générateurs (18 modules)
 │   ├── index.tsx            # Router pour sources
 │   ├── OscillatorControls.tsx
 │   ├── NoiseControls.tsx
@@ -30,10 +30,12 @@ src/ui/controls/
 │   ├── ResonatorControls.tsx
 │   ├── WavetableControls.tsx
 │   ├── ParticleCloudControls.tsx
+│   ├── SpeechSynthControls.tsx
+│   ├── ThereminControls.tsx
 │   └── shared/
 │       └── sidWaveformHelpers.ts  # Helpers CV pour NES/SNES
 │
-├── sequencers/              # Sequenceurs (10 modules)
+├── sequencers/              # Sequenceurs (15 modules)
 │   ├── index.tsx            # Router pour sequencers
 │   ├── ArpeggiatorControls.tsx
 │   ├── StepSequencerControls.tsx
@@ -45,19 +47,26 @@ src/ui/controls/
 │   ├── TuringMachineControls.tsx
 │   ├── SidPlayerControls.tsx
 │   ├── AyPlayerControls.tsx
+│   ├── ChordSequencerControls.tsx
+│   ├── ClockDividerControls.tsx
+│   ├── GameOfLifeControls.tsx
+│   ├── GravityControls.tsx
+│   ├── PolyrhythmSequencerControls.tsx
 │   └── shared/
 │       ├── rateOptions.ts       # Rate divisions partagées
 │       ├── midiHelpers.ts       # Helpers MIDI
 │       └── chiptuneHelpers.ts   # Helpers SID/AY
 │
-├── io/                      # I/O et utilitaires (6 modules)
+├── io/                      # I/O et utilitaires (9 modules)
 │   ├── index.tsx            # Router pour io
 │   ├── OutputControls.tsx
 │   ├── AudioInControls.tsx
 │   ├── ControlModuleControls.tsx
 │   ├── ScopeControls.tsx
+│   ├── MeterControls.tsx
 │   ├── LabControls.tsx
-│   └── NotesControls.tsx
+│   ├── NotesControls.tsx
+│   └── SendReceiveControls.tsx  # send + receive
 │
 ├── FilterControls.tsx       # vcf, hpf
 ├── AmplifierControls.tsx    # gain, cv-vca, mixer, mixer-1x2, ring-mod

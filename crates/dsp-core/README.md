@@ -32,7 +32,9 @@ src/
 │   ├── resonator.rs    # Résonance sympathique (Rings-style)
 │   ├── wavetable.rs    # Synthèse wavetable
 │   ├── granular.rs     # Synthèse granulaire
-│   └── particle_cloud.rs # Nuage de particules sonores
+│   ├── particle_cloud.rs # Nuage de particules sonores
+│   ├── speech_synth.rs # Synthèse vocale (formants)
+│   └── theremin.rs     # Theremin (pitch/volume CV, monophonique)
 ├── filters/            # Filtres
 │   ├── vcf.rs          # VCF multi-mode (SVF/Ladder, LP/HP/BP/Notch)
 │   └── hpf.rs          # High-pass 1-pole
@@ -43,7 +45,7 @@ src/
 │   ├── slew.rs         # Slew limiter (portamento)
 │   ├── quantizer.rs    # Quantification de notes
 │   └── chaos.rs        # Chaos generator (Lorenz)
-├── effects/            # Effets audio (15 modules)
+├── effects/            # Effets audio (23 modules)
 │   ├── chorus.rs       # Chorus stéréo BBD-style
 │   ├── ensemble.rs     # Chorus large (strings)
 │   ├── choir.rs        # Formant filter (voyelles)
@@ -58,8 +60,16 @@ src/
 │   ├── wavefolder.rs   # Wavefolding (Buchla-style)
 │   ├── pitch_shifter.rs # Pitch shifter granulaire
 │   ├── ring_mod.rs     # Ring modulation
-│   └── compressor.rs   # Compresseur dynamique
-├── drums/              # TR-909 + TR-808 drums (13 modules)
+│   ├── compressor.rs   # Compresseur dynamique
+│   ├── bit_crusher.rs  # Bit crusher (réduction bits/sample rate)
+│   ├── flanger.rs      # Flanger (LFO + feedback)
+│   ├── frequency_shifter.rs # Frequency shifter (Bode/SSB)
+│   ├── eq3.rs          # EQ 3 bandes
+│   ├── glitch.rs       # Glitch / stutter / buffer repeat
+│   ├── leslie.rs       # Cabine Leslie (rotary horn/drum)
+│   ├── wah.rs          # Wah-wah (auto/pédale)
+│   └── tube_amp.rs     # Ampli à lampes (saturation)
+├── drums/              # TR-909 + TR-808 drums (12 modules)
 │   ├── kick.rs         # 909 Kick drum
 │   ├── snare.rs        # 909 Snare drum
 │   ├── hihat.rs        # 909 Hi-hat (closed/open)
@@ -76,7 +86,7 @@ src/
 │   ├── sid.rs          # MOS 6581/8580 (C64)
 │   ├── ay3_8910.rs     # AY-3-8910 (ZX Spectrum, CPC, MSX)
 │   └── cpu6502.rs      # Émulation CPU 6502 (pour SID)
-└── sequencers/         # Séquenceurs (11 modules)
+└── sequencers/         # Séquenceurs (15 modules)
     ├── clock.rs        # Master clock
     ├── arpeggiator.rs  # Arpégiateur
     ├── step_sequencer.rs # Séquenceur 16 steps
@@ -86,10 +96,15 @@ src/
     ├── midi_file_sequencer.rs # Lecteur MIDI
     ├── sid_player.rs   # Lecteur SID (C64)
     ├── ay_player.rs    # Lecteur AY (Spectrum/CPC/Atari)
-    └── turing.rs       # Machine de Turing (aléatoire)
+    ├── turing.rs       # Machine de Turing (aléatoire)
+    ├── clock_divider.rs # Diviseur d'horloge (sous-divisions tempo)
+    ├── chord_sequencer.rs # Séquenceur d'accords
+    ├── polyrhythm_sequencer.rs # Séquenceur polyrythmique (pistes multi-tempo)
+    ├── game_of_life.rs # Jeu de la vie (Conway) → notes/gates
+    └── gravity.rs      # Gravity sequencer (gravité/rebonds)
 ```
 
-**Total : ~18000 lignes en 70+ fichiers**
+**Total : ~20800 lignes en 88 fichiers**
 
 ## Modules
 

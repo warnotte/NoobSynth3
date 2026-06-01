@@ -178,9 +178,9 @@ Si on garde le séquenceur interne:
 
 | Fichier | Lignes | Modules | Statut |
 |---------|--------|---------|--------|
-| sources/ | ~1700 | 15 modules | ✅ Fait |
-| SequencerControls.tsx | 2052 | 10 modules | ⏳ À faire |
-| IOControls.tsx | 840 | 6 modules | ⏳ À faire |
+| sources/ | ~1700 | 18 modules | ✅ Fait |
+| sequencers/ | ~2050 | 15 modules | ✅ Fait |
+| io/ | ~840 | 9 modules | ✅ Fait |
 
 **Solution:** Structure modulaire (voir `docs/archive/CONTROLS_REFACTORING_PLAN.md`)
 
@@ -611,7 +611,7 @@ let scale = 1.0 / active_count as Sample;
 
 ### 4.1 Module Search (Priorité: Moyenne)
 
-**Problème:** 72 modules → difficile à trouver
+**Problème:** 93 modules → difficile à trouver
 
 **Solution:**
 ```
@@ -891,7 +891,7 @@ jobs:
         run: npm ci
 
       - name: Type check
-        run: npm run typecheck
+        run: npx tsc -b
 
       - name: Lint
         run: npm run lint

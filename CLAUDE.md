@@ -38,12 +38,12 @@ App.tsx                          # Root component, state management, undo/redo
 │   ├── ModuleCard.tsx           # Single module frame (header, ports, body)
 │   │   └── controls/            # Module-specific controls
 │   │       ├── index.tsx        # Router → category files
-│   │       ├── sources/         # Source modules (15 files)
+│   │       ├── sources/         # Source modules (18 files)
+│   │       │   └── ... (18 modules)
+│   │       ├── sequencers/      # Sequencer modules (16 files)
 │   │       │   └── ... (15 modules)
-│   │       ├── sequencers/      # Sequencer modules (12 files)
-│   │       │   └── ... (12 modules)
-│   │       ├── io/              # I/O modules (6 files)
-│   │       │   └── ... (6 modules)
+│   │       ├── io/              # I/O modules (9 files)
+│   │       │   └── ... (9 modules)
 │   │       ├── FilterControls.tsx
 │   │       ├── AmplifierControls.tsx
 │   │       ├── EffectControls.tsx
@@ -106,6 +106,7 @@ Câbles et jacks sont colorés par type de signal :
 | `useMidi` | Web MIDI input | `hooks/useMidi.ts` |
 | `useComputerKeyboard` | Clavier AZERTY/QWERTY | `hooks/useComputerKeyboard.ts` |
 | `useMarioSequencer` | Séquenceur module Mario | `hooks/useMarioSequencer.ts` |
+| `useUrlPreset` | Chargement preset/patch depuis l'URL (`?preset` / `?patch`, liens partageables) | `hooks/useUrlPreset.ts` |
 
 Voir `src/hooks/HOOKS.md` pour la documentation détaillée.
 
@@ -180,7 +181,7 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 
 ### Documentation (obligatoire)
 - [ ] `docs/MODULES.md` - Documentation complète du module
-- [ ] `README.md` - Mettre à jour le compte de modules (actuellement 80)
+- [ ] `README.md` - Mettre à jour le compte de modules (actuellement 93)
 - [ ] `CLAUDE.md` - Ajouter à la liste "Module Types" si pertinent
 
 ### Vérification (après ajout/modif de module)
@@ -232,7 +233,7 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 
 **⚠️ RÈGLE:** Toute nouvelle feature UI↔Audio DOIT être implémentée pour Tauri en même temps que Web. Ne jamais merger une feature Web-only.
 
-## Module Types (92 total)
+## Module Types (93 total)
 
 ### Sources (18)
 oscillator, supersaw, karplus, fm-op, fm-matrix, nes-osc, snes-osc, noise, tb-303, shepard, pipe-organ, spectral-swarm, resonator, wavetable, granular, particle-cloud, speech-synth, theremin
@@ -249,8 +250,8 @@ chorus, ensemble, choir, vocoder, delay, granular-delay, tape-delay, spring-reve
 ### Modulators (8)
 adsr, lfo, mod-router, sample-hold, slew, quantizer, chaos, envelope-follower
 
-### Sequencers (14)
-clock, arpeggiator, step-sequencer, euclidean, drum-sequencer, midi-file-sequencer, turing-machine, mario, sid-player, ay-player, chord-sequencer, polyrhythm-sequencer, game-of-life, gravity-sequencer
+### Sequencers (15)
+clock, clock-divider, arpeggiator, step-sequencer, euclidean, drum-sequencer, midi-file-sequencer, turing-machine, mario, sid-player, ay-player, chord-sequencer, polyrhythm-sequencer, game-of-life, gravity-sequencer
 
 ### TR-909 Drums (6)
 909-kick, 909-snare, 909-hihat, 909-clap, 909-tom, 909-rimshot
@@ -306,7 +307,7 @@ Ces features ont les structures de données en place mais la logique n'est pas c
 
 | Test | Description |
 |------|-------------|
-| `all_presets_load_without_error` | Loads all 211+ graph-format presets via `GraphEngine::set_graph_json()` |
+| `all_presets_load_without_error` | Loads all 230+ graph-format presets via `GraphEngine::set_graph_json()` |
 | `all_presets_render_without_nan` | Renders 750 blocks (~2s) per preset, checks NaN/Inf/panic/amplitude |
 | `engine_basic_render` | Empty graph renders silence |
 | `engine_single_oscillator` | Single oscillator produces non-zero, non-NaN output |
@@ -416,10 +417,13 @@ Presets dans `public/presets/`, structure `{ id, name, description, group, graph
 | [src/ui/controls/ARCHITECTURE.md](./src/ui/controls/ARCHITECTURE.md) | Structure du refactor ModuleControls |
 | [src/hooks/HOOKS.md](./src/hooks/HOOKS.md) | Documentation des React hooks |
 
-### Roadmaps (features en attente)
+### Roadmaps & Plans
 | Document | Description |
 |----------|-------------|
 | [docs/FUTURE_ROADMAP.md](./docs/FUTURE_ROADMAP.md) | Plan de développement complet (Control v2, refactoring, nouveaux modules) |
+| [docs/ROADMAP.md](./docs/ROADMAP.md) | Statut des features livrées (checklist « Completed ») |
+| [docs/ARPEGGIATOR_PLAN.md](./docs/ARPEGGIATOR_PLAN.md) | Plan d'amélioration de l'arpégiateur (partiellement implémenté) |
+| [docs/LAYOUT_CONSISTENCY_PLAN.md](./docs/LAYOUT_CONSISTENCY_PLAN.md) | Plan d'harmonisation des boutons UI |
 
 ### Archives (plans terminés)
 Les plans/analyses de features déjà implémentées sont conservés dans [docs/archive/](./docs/archive/) pour référence historique (Controls Refactoring, Undo/Redo, MIDI Polyphony, Resonator Pop).

@@ -476,6 +476,62 @@ portamento (glide) et enveloppe de gate anti-clic.
 
 **Polyphonie** : Non (monophonique).
 
+### Pipe Organ
+
+Orgue à tuyaux / Hammond B3 — le **module de référence** du synthé (synthèse additive historique). 8 drawbars indépendants (un par harmonique), 3 voicings, chiff d'attaque, percussion, tremulant et simulation de soufflerie. Polyphonique.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `frequency` | 40-1200 Hz | Fréquence de base |
+| `drawbar16` | 0-1 | Tirette 16' (sub-octave) |
+| `drawbar8` | 0-1 | Tirette 8' (fondamentale) |
+| `drawbar4` | 0-1 | Tirette 4' (octave) |
+| `drawbar223` | 0-1 | Tirette 2⅔' (quinte) |
+| `drawbar2` | 0-1 | Tirette 2' (15ᵉ) |
+| `drawbar135` | 0-1 | Tirette 1⅗' (tierce majeure) |
+| `drawbar113` | 0-1 | Tirette 1⅓' (quinte aiguë) |
+| `drawbar1` | 0-1 | Tirette 1' |
+| `voicing` | 0-2 | 0=Diapason, 1=Flute, 2=String |
+| `chiff` | 0-1 | Bruit d'attaque (souffle du tuyau) |
+| `percussion` | 0/1 | Percussion harmonique (clic Hammond) |
+| `percHarmonic` | 0-1 | Harmonique de la percussion (2ⁿᵈ/3ʳᵈ) |
+| `percDecay` | 0-1 | Déclin de la percussion |
+| `percVolume` | 0-1 | Volume de la percussion |
+| `chorusVibrato` | 0-1 | Chorus/vibrato scanner |
+| `tremulant` | 0-1 | Profondeur du tremulant |
+| `tremRate` | 0-12 Hz | Vitesse du tremulant |
+| `wind` | 0-1 | Instabilité de soufflerie (rend l'orgue vivant) |
+| `brightness` | 0-1 | Brillance globale |
+
+**Entrées** : pitch (CV 1V/oct), gate (gate)
+**Sorties** : out (audio)
+
+**Polyphonie** : Oui (accords riches — révèle le voice stealing et les artefacts DSP).
+
+Combiné à un **Leslie**, c'est le test ultime du signal path (presets groupe « Leslie » : `hammond-leslie`, `midi-leslie-organ`, `midi-leslie-organ-8trk`).
+
+### Granular
+
+Synthèse granulaire : découpe un buffer audio (chargé ou enregistré en live) en « grains » courts rejoués en nuage. Time-stretch, pitch-shift, textures et clouds ambiantes.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `position` | 0-1 | Position de lecture dans le buffer |
+| `size` | 10-500 ms | Durée d'un grain |
+| `density` | 1-50 /s | Nombre de grains par seconde |
+| `pitch` | 0.25-4 × | Transposition des grains |
+| `spray` | 0-1 | Dispersion aléatoire de la position |
+| `scatter` | 0-1 | Jitter temporel des grains |
+| `panSpread` | 0-1 | Étalement stéréo |
+| `shape` | 0-1 | Forme d'enveloppe du grain |
+| `level` | 0-1 | Niveau de sortie |
+| `enabled` | 0/1 | Active le moteur granulaire |
+
+**Entrées** : in (audio, buffer source), trigger (gate), position (CV), pitch (CV)
+**Sorties** : out (audio)
+
+L'UI permet de charger/enregistrer un buffer et affiche la position de lecture (`watchGranular` en Web, `native_get_granular_state` en Tauri).
+
 ---
 
 ## Filtres
@@ -894,6 +950,116 @@ Notes :
 - Mix permet le blend parallèle avec le signal propre
 - Combiné avec un VCF en sortie pour adoucir les artefacts
 
+### Flanger
+
+Modulation d'un délai très court avec feedback → effet « jet/avion » métallique balayé.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `rate` | 0.05-5 Hz | Vitesse du LFO |
+| `depth` | 0-5 ms | Profondeur du sweep |
+| `feedback` | 0-0.95 | Réinjection (résonance/intensité) |
+| `mix` | 0-1 | Dry/wet |
+
+**Entrées** : in (audio)  
+**Sorties** : out (audio)
+
+### Frequency Shifter
+
+Décalage de fréquence (Bode/SSB) : décale tout le spectre d'un nombre de **Hz fixe** (≠ pitch shift — casse les rapports harmoniques). Effets métalliques, dissonants, dub/clangs.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `shift` | -1000 à 1000 Hz | Décalage en Hz (≠ ratio) |
+| `mix` | 0-1 | Dry/wet |
+
+**Entrées** : in (audio)  
+**Sorties** : out (audio)
+
+### EQ 3-Band
+
+Égaliseur 3 bandes : low shelf, mid peak (cloche), high shelf.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `lowGain` | -18 à 18 dB | Gain grave (shelf) |
+| `midGain` | -18 à 18 dB | Gain médium (peak) |
+| `highGain` | -18 à 18 dB | Gain aigu (shelf) |
+| `lowFreq` | 50-500 Hz | Fréquence du shelf grave |
+| `midFreq` | 200-5000 Hz | Centre de la cloche médium |
+| `highFreq` | 2000-12000 Hz | Fréquence du shelf aigu |
+| `midQ` | 0.3-5 | Largeur de la cloche médium |
+
+**Entrées** : in (audio)  
+**Sorties** : out (audio)
+
+### Glitch
+
+Stutter / buffer-repeat synchronisé à l'horloge : capture des tranches et les répète/inverse/repitch de façon probabiliste.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `probability` | 0-1 | Probabilité de déclencher un glitch |
+| `sliceMs` | 10-500 ms | Taille de la tranche capturée |
+| `repeats` | 1-16 | Nombre de répétitions |
+| `reverseChance` | 0-1 | Probabilité de lecture inversée |
+| `pitchRange` | 0-24 st | Plage de repitch aléatoire |
+| `mix` | 0-1 | Dry/wet |
+
+**Entrées** : in (audio), clock (sync)  
+**Sorties** : out (audio)
+
+### Leslie
+
+Cabine Leslie : haut-parleur rotatif (horn aigu + drum grave) avec Doppler, AM et accélération/freinage progressifs des rotors. Le compagnon historique du Pipe Organ.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `speed` | 0/1 | Chorale (lent) / Tremolo (rapide) |
+| `brake` | 0/1 | Arrêt des rotors |
+| `drive` | 0-1 | Saturation de l'ampli à lampes |
+| `depth` | 0-1 | Profondeur Doppler/AM |
+| `hornDrum` | 0-1 | Balance horn (aigu) ↔ drum (grave) |
+| `micDist` | 0-1 | Distance/largeur des micros |
+| `ramp` | 0-1 | Vitesse d'accélération/freinage des rotors |
+| `mix` | 0-1 | Dry/wet |
+
+**Entrées** : in (audio)  
+**Sorties** : out (audio)
+
+### Wah-Wah
+
+Filtre passe-bande balayé : pédale wah manuelle, auto-wah (LFO) ou envelope-wah (suit l'enveloppe du signal).
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `mode` | 0-2 | 0=Manuel, 1=Auto (LFO), 2=Envelope |
+| `freq` | 200-3000 Hz | Fréquence centrale (mode manuel) |
+| `range` | 0-1 | Amplitude du balayage |
+| `resonance` | 0-1 | Résonance (Q du pic) |
+| `speed` | 0.1-10 Hz | Vitesse du LFO (mode auto) |
+| `sensitivity` | 0-1 | Sensibilité (mode envelope) |
+| `mix` | 0-1 | Dry/wet |
+
+**Entrées** : in (audio)  
+**Sorties** : out (audio)
+
+### Tube Amp
+
+Préampli à lampes : étages de saturation triode en cascade avec bias asymétrique et sag (compression d'alimentation). Chaleur et harmoniques paires.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `gain` | 0-1 | Drive d'entrée |
+| `stages` | 1-4 | Nombre d'étages de lampes |
+| `tone` | 0-1 | Tonalité (sombre → brillant) |
+| `bias` | 0-1 | Asymétrie (harmoniques paires) |
+| `sag` | 0-1 | Compression d'alimentation (power sag) |
+| `mix` | 0-1 | Dry/wet |
+
+**Entrées** : in (audio)  
+**Sorties** : out (audio)
+
 ---
 
 ## Utilitaires
@@ -969,6 +1135,17 @@ Mixe jusqu'à 8 sources.
 **Entrées** : in-1, in-2, ..., in-8 (audio)
 **Sorties** : out (audio)
 
+### Crossfader
+
+Fondu équal-power entre deux sources audio, piloté par paramètre ou CV.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `mix` | 0-1 | Balance A↔B (0 = A seul, 1 = B seul) |
+
+**Entrées** : in-a (audio), in-b (audio), mix (CV)  
+**Sorties** : out (audio)
+
 ### Gain Staging des Mixeurs
 
 Tous les mixeurs utilisent une **sommation de puissance** : la sortie est divisée par `√N` (N = nombre d'entrées connectées). Cette formule est le standard DAW et préserve mieux le volume perçu que la division linéaire `1/N`.
@@ -1032,6 +1209,28 @@ Module de documentation pour annoter votre patch. Aucun traitement audio.
 | `text` | string | Texte libre |
 
 Utile pour documenter le fonctionnement d'un patch ou laisser des notes pour plus tard.
+
+### Send
+
+Envoie le signal vers un **bus nommé (A-H)** sans câble. Le `Receive` assigné au même bus le récupère. Idéal pour les bus d'effets partagés (reverb/delay) et le routing multi-rack.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `bus` | 0-7 (A-H) | Bus de destination |
+
+**Entrées** : in (audio)  
+**Sorties** : out (audio, passthrough du signal d'entrée)
+
+### Receive
+
+Récupère (sommés) tous les `Send` assignés au même bus. Voir Send.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `bus` | 0-7 (A-H) | Bus source |
+
+**Entrées** : in (audio, optionnel — mixé avec le bus)  
+**Sorties** : out (audio)
 
 ---
 
@@ -1097,6 +1296,36 @@ La sortie Bar pulse toutes les 4 beats (1 mesure en 4/4). Utile pour :
 Clock (bar) → 909 Crash (gate)      # Crash sur beat 1
 Clock (bar) → LFO (sync)            # Reset LFO chaque mesure
 ```
+
+### Clock Divider
+
+Diviseur d'horloge : prend un signal de clock en entrée et génère 4 sorties sync divisées (÷2, ÷4, ÷8, ÷16). Idéal pour faire tourner plusieurs séquenceurs à des vitesses relatives entières, ou créer des structures polyrythmiques à partir d'une seule horloge maîtresse.
+
+Aucun paramètre : le module se configure entièrement par le câblage.
+
+**Entrées :**
+| Port | ID | Description |
+|------|----|-------------|
+| Clock | `clock` | Horloge d'entrée (depuis Master Clock ou tout module sync) |
+| Reset | `reset` | Remet tous les compteurs de division à zéro |
+
+**Sorties :**
+| Port | ID | Description |
+|------|----|-------------|
+| ÷2 | `div-2` | Une pulse toutes les 2 pulses d'entrée |
+| ÷4 | `div-4` | Une pulse toutes les 4 pulses d'entrée |
+| ÷8 | `div-8` | Une pulse toutes les 8 pulses d'entrée |
+| ÷16 | `div-16` | Une pulse toutes les 16 pulses d'entrée |
+
+**Utilisation type :**
+```
+Master Clock  → clock → Clock Divider (clock)
+Clock Divider → div-2  → Step Sequencer A (clock)   # moitié vitesse
+Clock Divider → div-4  → Drum Sequencer (clock)      # quart de vitesse
+Clock Divider → div-16 → LFO (sync)                  # reset lent
+```
+
+Combiné à plusieurs séquenceurs, le Clock Divider permet de construire des hiérarchies rythmiques (nappes lentes sur rythmiques rapides, couplets/refrains) depuis une horloge unique.
 
 ### Step Sequencer
 
@@ -1776,6 +2005,82 @@ Rimshot/cross-stick.
 | `tune` | 400-2000 Hz | Fréquence |
 | `decay` | 0-1 | Durée |
 | `snap` | 0-1 | Attaque claquante |
+
+---
+
+## TR-808 Drums
+
+Émulation des sons de la Roland TR-808 — kick sub profond et timbres analogiques chauds (le cœur du hip-hop, de la trap et de l'électro). Mêmes ports que les TR-909.
+
+**Ports communs à tous les drums :**
+- **Entrées** : trigger (gate), accent (CV)
+- **Sorties** : out (audio)
+
+Le CV d'accent est "latché" au moment du trigger (comme les 909).
+
+### 808 Kick
+
+Grosse caisse 808 — sub-boom long et rond, avec transitoire de click réglable.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `tune` | 30-80 Hz | Fréquence de base |
+| `decay` | 0.1-2 | Longueur du boom (long = sub profond) |
+| `tone` | 0-1 | Brillance du corps |
+| `click` | 0-1 | Intensité du transitoire d'attaque |
+
+### 808 Snare
+
+Caisse claire 808 avec balance tone/noise.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `tune` | 100-300 Hz | Fréquence du tone |
+| `tone` | 0-1 | Balance tone/noise |
+| `snappy` | 0-1 | Snap du noise |
+| `decay` | 0-1 | Durée du son |
+
+### 808 HiHat
+
+Hi-hat 808 (banque de carrés métalliques).
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `tune` | 0.5-2 × | Accordage (multiplicateur) |
+| `decay` | 0-1 | Durée |
+| `tone` | 0-1 | Brillance |
+| `snap` | 0-1 | Attaque |
+
+### 808 Cowbell
+
+La cowbell 808 culte (deux oscillateurs carrés désaccordés).
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `tune` | 0.5-2 × | Accordage |
+| `decay` | 0-1 | Durée |
+| `tone` | 0-1 | Brillance |
+
+### 808 Clap
+
+Handclap 808.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `tone` | 0-1 | Brillance |
+| `decay` | 0-1 | Durée de la réverb |
+| `spread` | 0-1 | Espace entre les claps |
+
+### 808 Tom
+
+Tom 808 avec enveloppe de pitch.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `tune` | 60-300 Hz | Fréquence de base |
+| `decay` | 0-1 | Durée |
+| `pitch` | 0-1 | Profondeur de l'enveloppe de pitch |
+| `tone` | 0-1 | Brillance |
 
 ---
 

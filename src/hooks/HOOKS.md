@@ -15,7 +15,8 @@ App.tsx
 ├── useControlVoices()   → Polyphonie, voice stealing, séquenceur interne
 ├── useMidi()            → Web MIDI input
 ├── useMarioSequencer()  → Séquenceur dédié au module Mario
-└── useComputerKeyboard() → Clavier AZERTY/QWERTY comme input
+├── useComputerKeyboard() → Clavier AZERTY/QWERTY comme input
+└── useUrlPreset()       → Chargement preset/patch depuis l'URL (?preset / ?patch)
 
 Context:
 └── UndoContext          → Partage begin/end/cancelTransaction aux composants
@@ -264,6 +265,36 @@ Extra haute:                     I O P
   ch5?: (number | null)[] // Optionnel
 }
 ```
+
+---
+
+## useUrlPreset
+
+**Fichier:** `useUrlPreset.ts`
+
+**Rôle:** Parse les paramètres d'URL au démarrage pour le partage de presets/patches.
+Retourne un graph à appliquer (le cas échéant), qu'`App.tsx` applique ensuite.
+
+**Modes supportés:**
+- `?preset=<id>` — Charge un preset existant par son ID
+- `?patch=<compressed>` — Charge un patch custom (JSON compressé via LZ-string)
+
+**Params:**
+```typescript
+{
+  presets: PresetSpec[]   // Liste des presets disponibles (loadPresets)
+  presetsReady: boolean   // Les presets sont-ils chargés?
+}
+```
+
+**Retourne:**
+- `urlGraph` - Graph à appliquer depuis l'URL (`null` si aucun ou déjà appliqué)
+- `urlPresetId` - ID du preset si chargement d'un preset connu
+- `clearUrlGraph()` - À appeler après application (efface les params d'URL)
+
+**Note:** L'URL est parsée une seule fois au niveau module (avant tout render), via
+`parseUrlShare()` / `clearUrlShareParams()` de `utils/urlSharing`. Pour retirer la
+feature : supprimer le fichier et son import dans `App.tsx`.
 
 ---
 

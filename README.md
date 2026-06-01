@@ -9,7 +9,7 @@ Synthétiseur modulaire inspiré de VCV Rack, construit avec React + Rust/WASM.
 ## Caractéristiques
 
 ### Moteur Audio
-- **92 modules DSP** : oscillateurs (VCO, Supersaw, FM, Karplus, Wavetable, Granular, Particle Cloud, Speech Synth, Theremin...), filtres (SVF/Ladder), effets (Reverb, Delay, Chorus, Leslie, Tube Amp, Glitch...), séquenceurs, drums TR-909/808, et plus
+- **93 modules DSP** : oscillateurs (VCO, Supersaw, FM, Karplus, Wavetable, Granular, Particle Cloud, Speech Synth, Theremin...), filtres (SVF/Ladder), effets (Reverb, Delay, Chorus, Leslie, Tube Amp, Glitch...), séquenceurs, drums TR-909/808, et plus
 - **Polyphonie** : 1/2/4/8 voix avec voice stealing
 - **Rust → WebAssembly** : DSP haute performance dans un AudioWorklet
 - **3 modes** : Web Audio, Standalone (Tauri/WASAPI), VST3/CLAP plugin
@@ -75,7 +75,7 @@ Ouvrir l'app, cliquer **Play**, puis jouer avec le clavier ou charger un preset.
 |----------|-------------|
 | [Architecture](docs/ARCHITECTURE.md) | Vue d'ensemble technique (3 modes) |
 | [Développement](docs/DEVELOPMENT.md) | Guide de build et contribution |
-| [Modules](docs/MODULES.md) | Référence des 92 modules DSP |
+| [Modules](docs/MODULES.md) | Référence des 93 modules DSP |
 | [VST Plugin](docs/VST.md) | Documentation plugin DAW |
 | [Roadmap](docs/ROADMAP.md) | Plan de développement |
 
