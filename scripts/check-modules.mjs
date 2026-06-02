@@ -35,8 +35,8 @@ const { moduleCatalog, modulePorts } = await import(
 )
 
 // ── Parse Rust: normalize_module_type → { typeString: VariantName } ──
-const libRs = read('crates/dsp-graph/src/lib.rs')
-const normBody = libRs.slice(libRs.indexOf('fn normalize_module_type'))
+const moduleTypeRs = read('crates/dsp-graph/src/module_type.rs')
+const normBody = moduleTypeRs.slice(moduleTypeRs.indexOf('fn normalize_module_type'))
 const typeToVariant = {}
 // Arms can list aliases: `"eq3" | "eq-3" => ModuleType::Eq3`
 for (const m of normBody.matchAll(/((?:"[^"]+"\s*\|\s*)*"[^"]+")\s*=>\s*ModuleType::(\w+)/g)) {

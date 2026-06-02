@@ -169,7 +169,7 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 ### Code (obligatoire)
 - [ ] `crates/dsp-core/src/lib.rs` - Implémentation DSP Rust
 - [ ] `crates/dsp-graph/src/types.rs` - Ajouter variante à `ModuleType` enum
-- [ ] `crates/dsp-graph/src/lib.rs` - **CRITIQUE:** Ajouter `"module-name" => ModuleType::...` dans `parse_module_type()`
+- [ ] `crates/dsp-graph/src/module_type.rs` - **CRITIQUE:** Ajouter `"module-name" => ModuleType::...` dans `normalize_module_type()`
 - [ ] `crates/dsp-graph/src/state.rs` - Struct d'état du module
 - [ ] `crates/dsp-graph/src/instantiate.rs` - `create_state()` + `apply_param()`
 - [ ] `crates/dsp-graph/src/process.rs` - Logique DSP dans `process_module()`
