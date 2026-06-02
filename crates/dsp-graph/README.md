@@ -15,6 +15,7 @@ Moteur d'exécution du graphe modulaire. Parse le JSON et exécute les modules D
 ```
 src/
 ├── lib.rs          # GraphEngine, routing, ModuleType enum (~1020 lignes)
+├── module_type.rs  # Mapping string → ModuleType (~125 lignes)
 ├── process.rs      # Traitement DSP de tous les modules (~2065 lignes)
 ├── instantiate.rs  # Création des modules et paramètres (~1380 lignes)
 ├── state.rs        # Structs d'état pour chaque module (~850 lignes)
@@ -28,6 +29,7 @@ src/
 | Fichier | Responsabilité |
 |---------|----------------|
 | `lib.rs` | Point d'entrée, GraphEngine, tri topologique, routage |
+| `module_type.rs` | `normalize_module_type()` - mapping string → ModuleType |
 | `process.rs` | `process_module()` - logique DSP pour chaque type de module |
 | `instantiate.rs` | `create_state()`, `apply_param()`, `apply_param_str()` |
 | `state.rs` | Structs `*State` (VcoState, VcfState, etc.) |

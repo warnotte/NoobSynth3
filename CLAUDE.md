@@ -44,9 +44,10 @@ App.tsx                          # Root component, state management, undo/redo
 │   │       │   └── ... (15 modules)
 │   │       ├── io/              # I/O modules (9 files)
 │   │       │   └── ... (9 modules)
+│   │       ├── effects/         # Effect modules (23 files)
+│   │       │   └── ... (22 modules)
 │   │       ├── FilterControls.tsx
 │   │       ├── AmplifierControls.tsx
-│   │       ├── EffectControls.tsx
 │   │       ├── ModulatorControls.tsx
 │   │       └── DrumControls.tsx
 │   └── PatchLayer.tsx           # SVG cable rendering
@@ -136,6 +137,7 @@ Voir `src/hooks/HOOKS.md` pour la documentation détaillée.
 | `crates/dsp-graph/src/instantiate.rs` | Module creation and parameter updates |
 | `crates/dsp-graph/src/state.rs` | State structs for each module type |
 | `crates/dsp-graph/src/ports.rs` | Port definitions per module |
+| `crates/dsp-graph/src/module_type.rs` | `normalize_module_type()` — module-type string → ModuleType enum map |
 | `src/ui/controls/` | UI controls split by category (see controls/ARCHITECTURE.md) |
 | `src/state/moduleRegistry.ts` | Module catalog, defaults, categories |
 | `src/ui/portCatalog.ts` | Port definitions for each module |

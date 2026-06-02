@@ -68,9 +68,33 @@ src/ui/controls/
 │   ├── NotesControls.tsx
 │   └── SendReceiveControls.tsx  # send + receive
 │
+├── effects/                 # Effets (22 modules)
+│   ├── index.tsx            # Router pour effects
+│   ├── ChorusControls.tsx
+│   ├── EnsembleControls.tsx
+│   ├── ChoirControls.tsx
+│   ├── VocoderControls.tsx
+│   ├── DelayControls.tsx
+│   ├── GranularDelayControls.tsx
+│   ├── TapeDelayControls.tsx
+│   ├── SpringReverbControls.tsx
+│   ├── ReverbControls.tsx
+│   ├── PhaserControls.tsx
+│   ├── DistortionControls.tsx
+│   ├── WavefolderControls.tsx
+│   ├── PitchShifterControls.tsx
+│   ├── BitCrusherControls.tsx
+│   ├── CompressorControls.tsx
+│   ├── FlangerControls.tsx
+│   ├── FreqShifterControls.tsx
+│   ├── Eq3Controls.tsx
+│   ├── GlitchControls.tsx
+│   ├── LeslieControls.tsx
+│   ├── WahControls.tsx
+│   └── TubeAmpControls.tsx
+│
 ├── FilterControls.tsx       # vcf, hpf
 ├── AmplifierControls.tsx    # gain, cv-vca, mixer, mixer-1x2, ring-mod
-├── EffectControls.tsx       # chorus, ensemble, choir, vocoder, delay, granular-delay, tape-delay, spring-reverb, reverb, phaser, distortion, wavefolder, pitch-shifter
 ├── ModulatorControls.tsx    # adsr, lfo, mod-router, sample-hold, slew, quantizer, chaos
 ├── DrumControls.tsx         # 909-*, 808-*
 └── GranularControls.tsx     # granular (extrait car complexe)
@@ -594,3 +618,4 @@ Avant de créer un nouveau module, vérifier :
 - **Janvier 2026** : Extraction de `SourceControls.tsx` (1695 lignes) vers `sources/` (15 fichiers)
 - **Janvier 2026** : Extraction de `SequencerControls.tsx` (2052 lignes) vers `sequencers/` (10 fichiers)
 - **Janvier 2026** : Extraction de `IOControls.tsx` (840 lignes) vers `io/` (6 fichiers)
+- **Juin 2026** : Extraction de `EffectControls.tsx` (1301 lignes) vers `effects/` (23 fichiers, un composant par effet)
