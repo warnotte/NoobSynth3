@@ -68,11 +68,11 @@ Moteur d'exécution du graphe modulaire.
 | Fichier | Rôle |
 |---------|------|
 | `lib.rs` | GraphEngine, routing |
-| `process.rs` | Traitement DSP |
-| `instantiate.rs` | Création modules |
-| `state.rs` | Structs d'état |
-| `ports.rs` | Ports I/O |
 | `module_type.rs` | Mapping string → ModuleType (`normalize_module_type`) |
+| `state/` | Structs d'état par catégorie + enum ModuleState |
+| `ports/` | Ports I/O (un fichier par fonction) |
+| `instantiate/` | Création modules + params (un fichier par fonction) |
+| `process/` | Traitement DSP par catégorie |
 
 [Voir dsp-graph/README.md](dsp-graph/README.md)
 

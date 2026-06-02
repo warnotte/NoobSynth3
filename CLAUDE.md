@@ -133,10 +133,10 @@ Voir `src/hooks/HOOKS.md` pour la documentation détaillée.
 |------|-------------|
 | `crates/dsp-core/src/lib.rs` | All DSP module implementations |
 | `crates/dsp-graph/src/lib.rs` | Graph engine, ModuleType enum, routing |
-| `crates/dsp-graph/src/process.rs` | DSP processing for all module types |
-| `crates/dsp-graph/src/instantiate.rs` | Module creation and parameter updates |
-| `crates/dsp-graph/src/state.rs` | State structs for each module type |
-| `crates/dsp-graph/src/ports.rs` | Port definitions per module |
+| `crates/dsp-graph/src/process/` | DSP processing for all module types (split by category) |
+| `crates/dsp-graph/src/instantiate/` | Module creation and parameter updates (per function) |
+| `crates/dsp-graph/src/state/` | State structs for each module type (split by category) |
+| `crates/dsp-graph/src/ports/` | Port definitions per module (per function) |
 | `crates/dsp-graph/src/module_type.rs` | `normalize_module_type()` — module-type string → ModuleType enum map |
 | `src/ui/controls/` | UI controls split by category (see controls/ARCHITECTURE.md) |
 | `src/state/moduleRegistry.ts` | Module catalog, defaults, categories |
