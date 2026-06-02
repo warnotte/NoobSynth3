@@ -572,7 +572,7 @@ fn advance_step(&mut self, mode: ArpMode) -> usize {
 
 **Fichiers modifiés:**
 - `crates/dsp-core/src/lib.rs` - Nouvelles méthodes `process_block_stereo` et `process_block_multi_stereo`
-- `crates/dsp-graph/src/process.rs` - Utilisation de `channels_mut_2()` pour les sorties stéréo
+- `crates/dsp-graph/src/process/` - Utilisation de `channels_mut_2()` pour les sorties stéréo (mixers → `process/amplifiers.rs`)
 
 **Problème restant - Division de volume:**
 

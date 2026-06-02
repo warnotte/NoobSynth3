@@ -36,7 +36,7 @@ Système de timing centralisé. Tous les séquenceurs dérivent leur position de
 **Fichiers clés :**
 - `crates/dsp-graph/src/types.rs` — `TransportContext` struct
 - `crates/dsp-graph/src/lib.rs` — Transport state dans GraphEngine, avancement dans render()
-- `crates/dsp-graph/src/process.rs` — Injection du transport dans chaque module
+- `crates/dsp-graph/src/process/` — Injection du transport dans chaque module (par catégorie)
 - `crates/dsp-core/src/sequencers/*.rs` — Branche `transport_bps > 0.0` dans process_block
 - `src/engine/WasmGraphEngine.ts` — `setTransportTempo()`, `resetTransport()`
 - `src/engine/worklets/wasm-graph-processor.ts` — Messages transport

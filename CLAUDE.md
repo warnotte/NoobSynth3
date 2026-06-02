@@ -172,10 +172,10 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 - [ ] `crates/dsp-core/src/lib.rs` - Implémentation DSP Rust
 - [ ] `crates/dsp-graph/src/types.rs` - Ajouter variante à `ModuleType` enum
 - [ ] `crates/dsp-graph/src/module_type.rs` - **CRITIQUE:** Ajouter `"module-name" => ModuleType::...` dans `normalize_module_type()`
-- [ ] `crates/dsp-graph/src/state.rs` - Struct d'état du module
-- [ ] `crates/dsp-graph/src/instantiate.rs` - `create_state()` + `apply_param()`
-- [ ] `crates/dsp-graph/src/process.rs` - Logique DSP dans `process_module()`
-- [ ] `crates/dsp-graph/src/ports.rs` - Définition des ports I/O
+- [ ] `crates/dsp-graph/src/state/<catégorie>.rs` - Struct d'état (+ variante dans `state/mod.rs` enum `ModuleState`)
+- [ ] `crates/dsp-graph/src/instantiate/{create_state,apply_param}.rs` - `create_state()` + `apply_param()`
+- [ ] `crates/dsp-graph/src/process/<catégorie>.rs` - Logique DSP (bras du `match` de la catégorie)
+- [ ] `crates/dsp-graph/src/ports/{input_ports,output_ports,input_port_index,output_port_index}.rs` - Ports I/O
 - [ ] `src/shared/graph.ts` - Type TypeScript
 - [ ] `src/state/moduleRegistry.ts` - Taille, labels, defaults, catégorie
 - [ ] `src/ui/portCatalog.ts` - Définition des ports UI
