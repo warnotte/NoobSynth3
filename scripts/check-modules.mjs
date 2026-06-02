@@ -44,7 +44,10 @@ for (const m of normBody.matchAll(/((?:"[^"]+"\s*\|\s*)*"[^"]+")\s*=>\s*ModuleTy
 }
 
 // ── Parse Rust: per-variant accepted port ids in an index function ──
-const portsRs = read('crates/dsp-graph/src/ports.rs')
+const portsRs =
+  read('crates/dsp-graph/src/ports/input_port_index.rs') +
+  '\n' +
+  read('crates/dsp-graph/src/ports/output_port_index.rs')
 const sliceFn = (name) => {
   const start = portsRs.indexOf(`pub fn ${name}`)
   const after = portsRs.indexOf('\npub fn ', start + 1)
