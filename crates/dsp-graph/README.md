@@ -14,28 +14,28 @@ Moteur d'exécution du graphe modulaire. Parse le JSON et exécute les modules D
 
 ```
 src/
-├── lib.rs          # GraphEngine, routing, ModuleType enum (~1020 lignes)
-├── module_type.rs  # Mapping string → ModuleType (~125 lignes)
-├── process.rs      # Traitement DSP de tous les modules (~2065 lignes)
-├── instantiate.rs  # Création des modules et paramètres (~1380 lignes)
-├── state.rs        # Structs d'état pour chaque module (~850 lignes)
-├── ports.rs        # Définitions des ports I/O (~1140 lignes)
-├── types.rs        # Types de base (ModuleType, PortKind) (~156 lignes)
-└── buffer.rs       # Gestion des buffers audio (~133 lignes)
+├── lib.rs          # GraphEngine, tri topologique, routage (~1020 lignes)
+├── module_type.rs  # normalize_module_type : string → ModuleType (~125 lignes)
+├── types.rs        # ModuleType, PortInfo, ParamBuffer, TransportContext (~166 lignes)
+├── buffer.rs       # Buffer, mix_buffers, downmix (~122 lignes)
+├── state/          # Structs *State par catégorie + enum ModuleState (9 fichiers, ~955 l)
+├── ports/          # Ports I/O + résolution d'index, un fichier par fonction (5 fichiers, ~1510 l)
+├── instantiate/    # create_state / apply_param / apply_param_str (4 fichiers, ~1762 l)
+└── process/        # process_module + traitement DSP par catégorie (9 fichiers, ~3105 l)
 ```
 
-**Total : ~6745 lignes**
+**Total : ~8760 lignes en 31 fichiers** (découpé par catégorie, cf. dsp-core)
 
 | Fichier | Responsabilité |
 |---------|----------------|
 | `lib.rs` | Point d'entrée, GraphEngine, tri topologique, routage |
 | `module_type.rs` | `normalize_module_type()` - mapping string → ModuleType |
-| `process.rs` | `process_module()` - logique DSP pour chaque type de module |
-| `instantiate.rs` | `create_state()`, `apply_param()`, `apply_param_str()` |
-| `state.rs` | Structs `*State` (VcoState, VcfState, etc.) |
-| `ports.rs` | `module_ports()` - définition entrées/sorties par module |
 | `types.rs` | Enums `ModuleType`, `PortKind`, `ConnectionEdge` |
 | `buffer.rs` | `Buffer`, `mix_buffers()`, `downmix_to_mono()` |
+| `state/` | Structs `*State` par catégorie (oscillators, effects…) + enum `ModuleState` |
+| `ports/` | `input_ports`/`output_ports`/`input_port_index`/`output_port_index` (un fichier par fonction) |
+| `instantiate/` | `create_state()`, `apply_param()`, `apply_param_str()` (un fichier chacun) |
+| `process/` | `process_module()` dispatch + traitement DSP par catégorie |
 
 ## Architecture
 
