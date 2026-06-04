@@ -130,6 +130,19 @@ enum AudioCommand {
     module_id: String,
     reply: mpsc::Sender<Result<i32, String>>,
   },
+  GetGolGrid {
+    module_id: String,
+    reply: mpsc::Sender<Result<GolGridPacket, String>>,
+  },
+  GetParticlePositions {
+    module_id: String,
+    reply: mpsc::Sender<Result<Vec<f32>, String>>,
+  },
+  LoadParticleBuffer {
+    module_id: String,
+    data: Vec<f32>,
+    reply: mpsc::Sender<Result<usize, String>>,
+  },
   SeekMidiSequencer {
     module_id: String,
     tick: u32,
@@ -657,6 +670,39 @@ fn audio_thread(rx: mpsc::Receiver<AudioCommand>, scope: Arc<Mutex<ScopeSnapshot
         } else {
           Ok(-1)
         };
+        let _ = reply.send(result);
+      }
+      AudioCommand::GetGolGrid { module_id, reply } => {
+        let result = if let Some(graph) = &state.graph {
+          match graph.lock() {
+            Ok(engine) => Ok(GolGridPacket {
+              grid: engine.get_gol_grid(&module_id),
+              step: engine.get_sequencer_step(&module_id),
+            }),
+            Err(_) => Err("graph engine unavailable".to_string()),
+          }
+        } else {
+          Ok(GolGridPacket { grid: Vec::new(), step: -1 })
+        };
+        let _ = reply.send(result);
+      }
+      AudioCommand::GetParticlePositions { module_id, reply } => {
+        let result = if let Some(graph) = &state.graph {
+          match graph.lock() {
+            Ok(engine) => Ok(engine.get_particle_positions(&module_id)),
+            Err(_) => Err("graph engine unavailable".to_string()),
+          }
+        } else {
+          Ok(Vec::new())
+        };
+        let _ = reply.send(result);
+      }
+      AudioCommand::LoadParticleBuffer { module_id, data, reply } => {
+        let len = data.len();
+        let result = with_graph_mut(&mut state, |engine| {
+          engine.load_particle_buffer(&module_id, &data);
+        })
+        .map(|_| len);
         let _ = reply.send(result);
       }
       AudioCommand::SeekMidiSequencer { module_id, tick, reply } => {
@@ -1555,6 +1601,69 @@ fn native_get_sequencer_step(
     .map_err(|_| "native audio thread unavailable".to_string())?
 }
 
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct GolGridPacket {
+  grid: Vec<u16>,
+  step: i32,
+}
+
+#[tauri::command]
+fn native_get_gol_grid(
+  state: State<NativeAudioState>,
+  module_id: String,
+) -> Result<GolGridPacket, String> {
+  let (reply_tx, reply_rx) = mpsc::channel();
+  state
+    .tx
+    .send(AudioCommand::GetGolGrid {
+      module_id,
+      reply: reply_tx,
+    })
+    .map_err(|_| "native audio thread unavailable".to_string())?;
+  reply_rx
+    .recv()
+    .map_err(|_| "native audio thread unavailable".to_string())?
+}
+
+#[tauri::command]
+fn native_get_particle_positions(
+  state: State<NativeAudioState>,
+  module_id: String,
+) -> Result<Vec<f32>, String> {
+  let (reply_tx, reply_rx) = mpsc::channel();
+  state
+    .tx
+    .send(AudioCommand::GetParticlePositions {
+      module_id,
+      reply: reply_tx,
+    })
+    .map_err(|_| "native audio thread unavailable".to_string())?;
+  reply_rx
+    .recv()
+    .map_err(|_| "native audio thread unavailable".to_string())?
+}
+
+#[tauri::command]
+fn native_load_particle_buffer(
+  state: State<NativeAudioState>,
+  module_id: String,
+  data: Vec<f32>,
+) -> Result<usize, String> {
+  let (reply_tx, reply_rx) = mpsc::channel();
+  state
+    .tx
+    .send(AudioCommand::LoadParticleBuffer {
+      module_id,
+      data,
+      reply: reply_tx,
+    })
+    .map_err(|_| "native audio thread unavailable".to_string())?;
+  reply_rx
+    .recv()
+    .map_err(|_| "native audio thread unavailable".to_string())?
+}
+
 #[tauri::command]
 fn native_seek_midi_sequencer(
   state: State<NativeAudioState>,
@@ -1742,6 +1851,9 @@ pub fn run() {
       native_get_ay_elapsed,
       // Sequencer commands
       native_get_sequencer_step,
+      native_get_gol_grid,
+      native_get_particle_positions,
+      native_load_particle_buffer,
       native_seek_midi_sequencer,
       // Granular commands
       native_get_granular_position,

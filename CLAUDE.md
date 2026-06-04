@@ -187,6 +187,7 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 
 ### Vérification (après ajout/modif de module)
 - [ ] `npm run check:modules` - **Cohérence TS↔Rust** : vérifie que chaque port déclaré dans `portCatalog` est résolu par `ports.rs`, et que le type est mappé dans `normalize_module_type`. Attrape le bug silencieux « câble branché mais moteur ignore ».
+- [ ] `npm run check:ui-audio` - **Parité Web↔Tauri** : si le module a un playhead/état visualisé (`engine.watch*`), vérifie qu'il a aussi un chemin natif Tauri. Attrape le bug récurrent « feature livrée Web-only, oubliée en Tauri » (Game of Life, Meter…).
 - [ ] `npm run module-ref` - Régénère `docs/MODULE_REFERENCE.md` (référence auto : ports + params + defaults de tous les modules — **le truc à consulter** pour construire un patch/preset).
 - [ ] `npm run build:wasm` - Rebuild WASM après modifs Rust
 
@@ -230,9 +231,12 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 | MIDI Sequencer | Playhead + seek | ✅ | ✅ `NativeSequencerBridge` |
 | Granular | Position + buffer load | ✅ | ✅ `NativeGranularBridge` |
 | CPU Meter | DSP load avg + peak | ✅ | ✅ `native_get_cpu_load` |
-| Game of Life | Grid state + playhead | ✅ | ❌ (Web-only for now) |
+| Game of Life | Grid state + playhead | ✅ | ✅ `NativeGameOfLifeBridge` |
+| Meter | Peak L/R level | ✅ | ✅ `NativeMeterBridge` |
+| Theremin | Pad position | ✅ | ✅ `NativeThereminBridge` |
+| Particle Cloud | Grain positions | ⚠️ flaky | ⚠️ câblage OK (`NativeParticleBridge`, parité Web atteinte) mais la viz n'anime pas de façon fiable — **en Web AUSSI** → bug du module, pas du câblage (voir Known Limitations) |
 
-**⚠️ RÈGLE:** Toute nouvelle feature UI↔Audio DOIT être implémentée pour Tauri en même temps que Web. Ne jamais merger une feature Web-only.
+**⚠️ RÈGLE:** Toute nouvelle feature UI↔Audio DOIT être implémentée pour Tauri en même temps que Web. Ne jamais merger une feature Web-only. **Garde-fou auto:** `npm run check:ui-audio` échoue si un contrôle utilise `engine.watch*` sans chemin natif (le bug récurrent type Game-of-Life/Meter).
 
 ## Module Types (93 total)
 
@@ -447,6 +451,7 @@ Les plans/analyses de features déjà implémentées sont conservés dans [docs/
 | WASM | `wasm-opt` actif avec `-O2 --enable-bulk-memory --enable-nontrapping-float-to-int` (~15% plus petit) |
 | **Mixers Gain Staging** | Tous les mixers (2ch, 6ch, 8ch) divisent par `√N` (N = entrées connectées). Formule standard DAW (sommation de puissance). Ancien comportement: 2ch divisait toujours par 2, multi-ch par N. |
 | **RSID partiellement supporté** | Certains fichiers RSID (Great Giana Sisters, RoboCop) ne jouent pas correctement. L'émulation CPU 6502/CIA/VIC n'est pas assez précise pour les tunes RSID les plus exigeantes (timer modulation dynamique, échantillons digi). Les PSID fonctionnent tous. |
+| **Particle Cloud viz (À DÉBUGGER)** | Les particules n'animent pas de façon fiable — **en Web ET en Tauri**. Le câblage UI↔Audio est correct et identique à Theremin/Meter (qui marchent) : `native_get_particle_positions` → `get_particle_positions`, parité Web/Tauri atteinte. Le souci est donc **dans le module lui-même** (DSP `crates/dsp-core/src/oscillators/particle_cloud.rs` ou le rendu canvas de `ParticleCloudControls.tsx`), pas dans le pont Tauri. **À débugger en Web d'abord** (source de vérité) : vérifier que `process_block` met bien à jour les positions et que `get_positions`/`active_count_cache` reflètent le mouvement (les particules bougent par physique dès que le moteur tourne, ≥1 active par défaut — donc si rien ne bouge, regarder pourquoi `process_block` ne tourne pas ou pourquoi les positions restent figées). |
 
 ---
 

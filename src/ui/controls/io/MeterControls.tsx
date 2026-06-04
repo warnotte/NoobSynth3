@@ -53,18 +53,44 @@ function MeterBar({ db }: { db: number }) {
   )
 }
 
-export function MeterControls({ module, engine, status }: ControlProps) {
+export function MeterControls({ module, engine, status, audioMode, nativeMeter }: ControlProps) {
   const [peakL, setPeakL] = useState(0)
   const [peakR, setPeakR] = useState(0)
 
+  const isNativeMode = audioMode === 'native' && nativeMeter?.isActive
+
+  // Web mode: subscription-based peak updates from the WASM engine
   useEffect(() => {
+    if (isNativeMode) return
     if (status !== 'running' || !engine) return
     const unsub = engine.watchMeter(module.id, (l, r) => {
       setPeakL(l)
       setPeakR(r)
     })
     return unsub
-  }, [module.id, engine, status])
+  }, [module.id, engine, status, isNativeMode])
+
+  // Native (Tauri) mode: poll the packed u32 peak level and decode L/R
+  useEffect(() => {
+    if (!isNativeMode || !nativeMeter) return
+    if (status !== 'running') return
+    let active = true
+    const poll = async () => {
+      while (active) {
+        try {
+          const packed = await nativeMeter.getMeterLevel(module.id)
+          if (!active) break
+          setPeakL(((packed >>> 16) & 0xffff) / 10000)
+          setPeakR((packed & 0xffff) / 10000)
+        } catch (err) {
+          console.error('Failed to poll meter level:', err)
+        }
+        await new Promise((resolve) => setTimeout(resolve, 30))
+      }
+    }
+    void poll()
+    return () => { active = false }
+  }, [isNativeMode, nativeMeter, module.id, status])
 
   const dbL = toDb(peakL)
   const dbR = toDb(peakR)

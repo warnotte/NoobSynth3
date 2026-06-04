@@ -69,6 +69,23 @@ export type NativeParticleBridge = {
 }
 
 /**
+ * Bridge for the native Game of Life sequencer (Tauri mode): grid + playhead.
+ */
+export type NativeGameOfLifeBridge = {
+  isActive: boolean
+  getGolGrid: (moduleId: string) => Promise<{ grid: number[]; step: number }>
+}
+
+/**
+ * Bridge for the native level meter (Tauri mode): packed peak L/R (u32,
+ * L in the high 16 bits, R in the low 16 bits, each fixed-point /10000).
+ */
+export type NativeMeterBridge = {
+  isActive: boolean
+  getMeterLevel: (moduleId: string) => Promise<number>
+}
+
+/**
  * Props passed to all control render functions
  */
 export type ControlProps = {
@@ -94,6 +111,10 @@ export type ControlProps = {
   nativeGranular?: NativeGranularBridge | null
   /** Native particle cloud bridge (Tauri mode) */
   nativeParticle?: NativeParticleBridge | null
+  /** Native Game of Life bridge (Tauri mode) */
+  nativeGameOfLife?: NativeGameOfLifeBridge | null
+  /** Native level meter bridge (Tauri mode) */
+  nativeMeter?: NativeMeterBridge | null
   /** Update a module parameter */
   updateParam: (
     moduleId: string,
