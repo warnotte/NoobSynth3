@@ -29,6 +29,5 @@ tauri = { version = "2.9.5", features = [] }
 tauri-plugin-log = "2"
 dsp-core = { path = "../crates/dsp-core" }
 dsp-graph = { path = "../crates/dsp-graph" }
-dsp-ipc = { path = "../crates/dsp-ipc" }
 cpal = "0.15"
 midir = "0.10"

@@ -2,7 +2,6 @@ use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 use cpal::{FromSample, Sample, SampleFormat, StreamConfig};
 use dsp_core::{Node, SineOsc};
 use dsp_graph::GraphEngine;
-use dsp_ipc::{SharedParams, TauriBridge};
 use midir::MidiInput;
 use serde::Serialize;
 use std::collections::VecDeque;
@@ -10,7 +9,7 @@ use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::{mpsc, Arc, Mutex};
 use std::thread;
 use std::time::Instant;
-use tauri::{Manager, State};
+use tauri::State;
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -1695,346 +1694,15 @@ fn native_reset_transport(
     .map_err(|_| "native audio thread unavailable".to_string())?
 }
 
-// ============================================================================
-// VST Mode Support
-// ============================================================================
-
-/// State for VST bridge connection
-struct VstBridgeState {
-  bridge: Mutex<Option<TauriBridge>>,
-  last_vst_graph_version: Mutex<u64>,
-  last_vst_param_version: Mutex<u64>,
-  instance_id: Option<String>,
-}
-
-impl VstBridgeState {
-  fn new(instance_id: Option<String>) -> Self {
-    Self {
-      bridge: Mutex::new(None),
-      last_vst_graph_version: Mutex::new(0),
-      last_vst_param_version: Mutex::new(0),
-      instance_id,
-    }
-  }
-}
-
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-struct VstStatus {
-  connected: bool,
-  vst_connected: bool,
-  sample_rate: u32,
-}
-
-/// Try to connect to VST shared memory
-#[tauri::command]
-fn vst_connect(state: State<VstBridgeState>) -> Result<VstStatus, String> {
-  let mut bridge_lock = state.bridge.lock().map_err(|_| "lock error")?;
-  let instance_id = state.instance_id.as_deref();
-
-  // If we already have a bridge, return its status
-  if let Some(bridge) = bridge_lock.as_ref() {
-    return Ok(VstStatus {
-      connected: true,
-      vst_connected: bridge.is_vst_connected(),
-      sample_rate: bridge.sample_rate(),
-    });
-  }
-
-  // Try to open existing shared memory (VST should have created it)
-  match TauriBridge::open_with_id(instance_id) {
-    Ok(bridge) => {
-      eprintln!("[NoobSynth] VST IPC bridge opened successfully");
-      let sample_rate = bridge.sample_rate();
-      let vst_connected = bridge.is_vst_connected();
-      *bridge_lock = Some(bridge);
-      if let Ok(mut last) = state.last_vst_graph_version.lock() {
-        *last = 0;
-      }
-      if let Ok(mut last) = state.last_vst_param_version.lock() {
-        *last = 0;
-      }
-      Ok(VstStatus {
-        connected: true,
-        vst_connected,
-        sample_rate,
-      })
-    }
-    Err(open_err) => {
-      eprintln!("[NoobSynth] TauriBridge::open failed: {:?}", open_err);
-      // Try to create it (we might be starting before VST)
-      match TauriBridge::new_with_id(instance_id) {
-        Ok(bridge) => {
-          eprintln!("[NoobSynth] VST IPC bridge created successfully");
-          let sample_rate = bridge.sample_rate();
-          let vst_connected = bridge.is_vst_connected();
-          *bridge_lock = Some(bridge);
-          if let Ok(mut last) = state.last_vst_graph_version.lock() {
-            *last = 0;
-          }
-          if let Ok(mut last) = state.last_vst_param_version.lock() {
-            *last = 0;
-          }
-          Ok(VstStatus {
-            connected: true,
-            vst_connected,
-            sample_rate,
-          })
-        }
-        Err(create_err) => {
-          eprintln!("[NoobSynth] TauriBridge::new failed: {:?}", create_err);
-          Err(format!("VST IPC failed - open: {:?}, create: {:?}", open_err, create_err))
-        }
-      }
-    }
-  }
-}
-
-/// Disconnect from VST
-#[tauri::command]
-fn vst_disconnect(state: State<VstBridgeState>) -> Result<(), String> {
-  let mut bridge_lock = state.bridge.lock().map_err(|_| "lock error")?;
-  *bridge_lock = None;
-  if let Ok(mut last) = state.last_vst_graph_version.lock() {
-    *last = 0;
-  }
-  if let Ok(mut last) = state.last_vst_param_version.lock() {
-    *last = 0;
-  }
-  Ok(())
-}
-
-/// Get VST connection status
-#[tauri::command]
-fn vst_status(state: State<VstBridgeState>) -> Result<VstStatus, String> {
-  let bridge_lock = state.bridge.lock().map_err(|_| "lock error")?;
-  match &*bridge_lock {
-    Some(bridge) => Ok(VstStatus {
-      connected: true,
-      vst_connected: bridge.is_vst_connected(),
-      sample_rate: bridge.sample_rate(),
-    }),
-    None => Ok(VstStatus {
-      connected: false,
-      vst_connected: false,
-      sample_rate: 0,
-    }),
-  }
-}
-
-/// Set graph via VST
-#[tauri::command]
-fn vst_set_graph(state: State<VstBridgeState>, graph_json: String) -> Result<(), String> {
-  let mut bridge_lock = state.bridge.lock().map_err(|_| "lock error")?;
-  let bridge = bridge_lock.as_mut().ok_or("VST not connected")?;
-  bridge.set_graph(&graph_json);
-  Ok(())
-}
-
-/// Set parameter via VST
-#[tauri::command]
-fn vst_set_param(
-  state: State<VstBridgeState>,
-  module_id: String,
-  param_id: String,
-  value: f32,
-) -> Result<(), String> {
-  let mut bridge_lock = state.bridge.lock().map_err(|_| "lock error")?;
-  let bridge = bridge_lock.as_mut().ok_or("VST not connected")?;
-  bridge.set_param(&module_id, &param_id, value);
-  Ok(())
-}
-
-/// Fetch the current graph from the VST plugin (if available)
-#[tauri::command]
-fn vst_pull_graph(state: State<VstBridgeState>) -> Result<Option<String>, String> {
-  let bridge_lock = state.bridge.lock().map_err(|_| "lock error")?;
-  let bridge = bridge_lock.as_ref().ok_or("VST not connected")?;
-  let current = bridge.vst_graph_version();
-  let mut last = state
-    .last_vst_graph_version
-    .lock()
-    .map_err(|_| "lock error")?;
-  if current == 0 {
-    return Ok(None);
-  }
-  if current < *last {
-    *last = 0;
-  }
-  if current == *last {
-    return Ok(None);
-  }
-  *last = current;
-  Ok(bridge.read_vst_graph())
-}
-
-#[tauri::command]
-fn vst_set_macros(state: State<VstBridgeState>, macros: Vec<f32>) -> Result<(), String> {
-  let mut bridge_lock = state.bridge.lock().map_err(|_| "lock error")?;
-  let bridge = bridge_lock.as_mut().ok_or("VST not connected")?;
-  let mut values = [0.0_f32; 8];
-  for (index, value) in macros.into_iter().enumerate().take(8) {
-    values[index] = value.clamp(0.0, 1.0);
-  }
-  bridge.set_params(SharedParams {
-    macros: values,
-    _padding: [0.0; 8],
-  });
-  Ok(())
-}
-
-#[tauri::command]
-fn vst_pull_macros(state: State<VstBridgeState>) -> Result<Option<Vec<f32>>, String> {
-  let bridge_lock = state.bridge.lock().map_err(|_| "lock error")?;
-  let bridge = bridge_lock.as_ref().ok_or("VST not connected")?;
-  let current = bridge.vst_param_version();
-  let mut last = state
-    .last_vst_param_version
-    .lock()
-    .map_err(|_| "lock error")?;
-  if current == 0 {
-    return Ok(None);
-  }
-  if current < *last {
-    *last = 0;
-  }
-  if current == *last {
-    return Ok(None);
-  }
-  *last = current;
-  let params = bridge.params();
-  Ok(Some(params.macros.to_vec()))
-}
-
-/// Set control voice CV via VST
-#[tauri::command]
-fn vst_set_control_voice_cv(
-  state: State<VstBridgeState>,
-  _module_id: String,
-  voice: usize,
-  value: f32,
-) -> Result<(), String> {
-  let mut bridge_lock = state.bridge.lock().map_err(|_| "lock error")?;
-  let bridge = bridge_lock.as_mut().ok_or("VST not connected")?;
-  bridge.set_voice_cv(voice as u8, value);
-  Ok(())
-}
-
-/// Trigger gate via VST
-#[tauri::command]
-fn vst_trigger_control_voice_gate(
-  state: State<VstBridgeState>,
-  _module_id: String,
-  voice: usize,
-) -> Result<(), String> {
-  let mut bridge_lock = state.bridge.lock().map_err(|_| "lock error")?;
-  let bridge = bridge_lock.as_mut().ok_or("VST not connected")?;
-  bridge.trigger_gate(voice as u8);
-  Ok(())
-}
-
-/// Release gate via VST
-#[tauri::command]
-fn vst_release_control_voice_gate(
-  state: State<VstBridgeState>,
-  _module_id: String,
-  voice: usize,
-) -> Result<(), String> {
-  let mut bridge_lock = state.bridge.lock().map_err(|_| "lock error")?;
-  let bridge = bridge_lock.as_mut().ok_or("VST not connected")?;
-  bridge.release_gate(voice as u8);
-  Ok(())
-}
-
-/// Set voice velocity via VST
-#[tauri::command]
-fn vst_set_control_voice_velocity(
-  state: State<VstBridgeState>,
-  _module_id: String,
-  voice: usize,
-  value: f32,
-  _slew: f32,
-) -> Result<(), String> {
-  let mut bridge_lock = state.bridge.lock().map_err(|_| "lock error")?;
-  let bridge = bridge_lock.as_mut().ok_or("VST not connected")?;
-  bridge.set_voice_velocity(voice as u8, value);
-  Ok(())
-}
-
-/// Note on via VST
-#[tauri::command]
-fn vst_note_on(
-  state: State<VstBridgeState>,
-  voice: u8,
-  note: u8,
-  velocity: f32,
-) -> Result<(), String> {
-  let mut bridge_lock = state.bridge.lock().map_err(|_| "lock error")?;
-  let bridge = bridge_lock.as_mut().ok_or("VST not connected")?;
-  bridge.note_on(voice, note, velocity);
-  Ok(())
-}
-
-/// Note off via VST
-#[tauri::command]
-fn vst_note_off(
-  state: State<VstBridgeState>,
-  voice: u8,
-  note: u8,
-) -> Result<(), String> {
-  let mut bridge_lock = state.bridge.lock().map_err(|_| "lock error")?;
-  let bridge = bridge_lock.as_mut().ok_or("VST not connected")?;
-  bridge.note_off(voice, note);
-  Ok(())
-}
-
-/// State to track if we're in VST mode
-struct VstModeState {
-  enabled: bool,
-}
-
-/// Check if we're running in VST mode
-#[tauri::command]
-fn is_vst_mode(state: State<VstModeState>) -> bool {
-  state.enabled
-}
-
-fn parse_vst_instance_id(args: &[String]) -> Option<String> {
-  let mut iter = args.iter().enumerate();
-  while let Some((index, arg)) = iter.next() {
-    if let Some(value) = arg.strip_prefix("--vst-id=") {
-      if !value.is_empty() {
-        return Some(value.to_string());
-      }
-    }
-    if arg == "--vst-id" {
-      if let Some(next) = args.get(index + 1) {
-        if !next.is_empty() && !next.starts_with("--") {
-          return Some(next.to_string());
-        }
-      }
-    }
-  }
-  None
-}
-
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-  // Check for --vst-mode argument
   let args: Vec<String> = std::env::args().collect();
-  let vst_mode = args.iter().any(|arg| arg == "--vst-mode");
-  let vst_instance_id = parse_vst_instance_id(&args);
-  let vst_instance_id_for_setup = vst_instance_id.clone();
-  let vst_instance_id_for_window = vst_instance_id.clone();
 
   // Log startup info
   eprintln!("[NoobSynth] Starting with args: {:?}", args);
-  eprintln!("[NoobSynth] VST mode: {}", vst_mode);
 
   tauri::Builder::default()
     .manage(NativeAudioState::new())
-    .manage(VstBridgeState::new(vst_instance_id.clone()))
-    .manage(VstModeState { enabled: vst_mode })
       .invoke_handler(tauri::generate_handler![
         dsp_ping,
         list_audio_outputs,
@@ -2077,22 +1745,6 @@ pub fn run() {
       // Transport commands
       native_set_transport_tempo,
       native_reset_transport,
-      // VST mode commands
-      is_vst_mode,
-      vst_connect,
-      vst_disconnect,
-      vst_status,
-      vst_set_graph,
-      vst_set_param,
-      vst_pull_graph,
-      vst_set_macros,
-      vst_pull_macros,
-      vst_set_control_voice_cv,
-      vst_trigger_control_voice_gate,
-      vst_release_control_voice_gate,
-      vst_set_control_voice_velocity,
-      vst_note_on,
-      vst_note_off
     ])
     .setup(move |app| {
       if cfg!(debug_assertions) {
@@ -2103,40 +1755,7 @@ pub fn run() {
         )?;
       }
 
-      // If VST mode, set a global flag that the frontend can check
-      if vst_mode {
-        use tauri::Manager;
-        if let Some(window) = app.get_webview_window("main") {
-          // Set global flag BEFORE the page loads React
-          if let Some(instance_id) = &vst_instance_id_for_setup {
-            let id_js = serde_json::to_string(instance_id).unwrap_or_else(|_| "\"\"".to_string());
-            let script = format!(
-              "window.__NOOBSYNTH_VST_MODE__ = true; window.__NOOBSYNTH_VST_INSTANCE_ID__ = {id_js}; console.log('VST mode enabled');"
-            );
-            let _ = window.eval(&script);
-          } else {
-            let _ = window.eval("window.__NOOBSYNTH_VST_MODE__ = true; console.log('VST mode enabled');");
-          }
-        }
-      }
-
       Ok(())
-    })
-    .on_window_event({
-      let vst_mode_flag = vst_mode;
-      let vst_instance_id = vst_instance_id_for_window;
-      move |window, event| {
-        if !vst_mode_flag {
-          return;
-        }
-        if let tauri::WindowEvent::CloseRequested { api, .. } = event {
-          api.prevent_close();
-          if let Ok(bridge) = TauriBridge::open_with_id(vst_instance_id.as_deref()) {
-            drop(bridge);
-          }
-          let _ = window.app_handle().exit(0);
-        }
-      }
     })
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
