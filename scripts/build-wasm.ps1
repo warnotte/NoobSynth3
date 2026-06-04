@@ -7,6 +7,24 @@ $wasmOpt = Join-Path $env:USERPROFILE '.cargo\bin\wasm-opt.exe'
 $outDir = Join-Path $root 'src\engine\worklets\wasm'
 $wasmPath = Join-Path $root 'target\wasm32-unknown-unknown\release\dsp_wasm.wasm'
 
+# wasm-bindgen requires the installed CLI binary and the `wasm-bindgen` crate
+# (pinned in Cargo.lock) to be the EXACT same version, or the bindgen step fails
+# with a cryptic "schema version" mismatch. Check up front and print the one-line
+# fix instead. (The crate version follows whatever Tauri / cargo update resolve.)
+if (Test-Path $bindgen) {
+  $lock = Get-Content (Join-Path $root 'Cargo.lock') -Raw
+  if ($lock -match '(?ms)^name = "wasm-bindgen"\r?\nversion = "([^"]+)"') {
+    $crateVer = $Matches[1]
+    $cliVer = ((& $bindgen --version) -replace '^wasm-bindgen\s+', '').Trim()
+    if ($cliVer -ne $crateVer) {
+      Write-Host "wasm-bindgen CLI ($cliVer) does not match the crate in Cargo.lock ($crateVer)." -ForegroundColor Yellow
+      Write-Host "Install the matching CLI, then re-run:" -ForegroundColor Yellow
+      Write-Host "    cargo install -f wasm-bindgen-cli --version $crateVer"
+      exit 1
+    }
+  }
+}
+
 if ($env:CARGO_NET_OFFLINE -eq 'true') {
   Write-Host 'CARGO_NET_OFFLINE=true, disabling for wasm build.'
   $env:CARGO_NET_OFFLINE = 'false'

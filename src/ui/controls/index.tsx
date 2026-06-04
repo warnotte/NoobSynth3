@@ -26,7 +26,7 @@ export type ModuleControlsProps = {
   engine: AudioEngine
   connections: Connection[]
   status: 'idle' | 'running' | 'error'
-  audioMode: 'web' | 'native' | 'vst'
+  audioMode: 'web' | 'native'
   nativeScope?: NativeScopeBridge | null
   nativeChiptune?: NativeChiptuneBridge | null
   nativeSequencer?: NativeSequencerBridge | null

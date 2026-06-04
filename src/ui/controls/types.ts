@@ -9,7 +9,7 @@ import type { AudioEngine } from '../../engine/WasmGraphEngine'
 import type { Connection, ModuleSpec } from '../../shared/graph'
 
 /**
- * Bridge for native scope data (Tauri/VST mode)
+ * Bridge for native scope data (Tauri mode)
  */
 export type NativeScopeBridge = {
   isActive: boolean
@@ -81,8 +81,8 @@ export type ControlProps = {
   /** Current engine status */
   status: 'idle' | 'running' | 'error'
   /** Audio backend mode */
-  audioMode: 'web' | 'native' | 'vst'
-  /** Native scope data bridge (for Tauri/VST) */
+  audioMode: 'web' | 'native'
+  /** Native scope data bridge (for Tauri) */
   nativeScope?: NativeScopeBridge | null
   /** Native chiptune bridge for SID/AY players (Tauri mode) */
   nativeChiptune?: NativeChiptuneBridge | null

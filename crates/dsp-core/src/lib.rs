@@ -4,7 +4,7 @@
 //
 // This crate provides digital signal processing modules for audio synthesis.
 // All modules are designed to be sample-rate agnostic and work across
-// Web (WASM), Standalone (Tauri), and Plugin (VST/CLAP) targets.
+// Web (WASM) and Standalone (Tauri) targets.
 //
 // ## Module Organization
 //

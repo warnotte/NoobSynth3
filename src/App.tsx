@@ -45,7 +45,7 @@ import {
 } from './state/gridLayout'
 import { useModuleResize } from './hooks/useModuleResize'
 import { buildModuleSpec, moduleSizes } from './state/moduleRegistry'
-import type { GraphState, MacroSpec, MacroTarget, ModuleSpec, ModuleType, RackSpec } from './shared/graph'
+import type { GraphState, ModuleSpec, ModuleType, RackSpec } from './shared/graph'
 import { PatchLayer } from './ui/PatchLayer'
 import { RackView } from './ui/RackView'
 import { MixerConsole, type MixerChannelState } from './ui/MixerConsole'
@@ -73,33 +73,9 @@ type NativeScopeSnapshot = {
   buffers: Map<string, Float32Array>
 }
 
-type VstStatus = {
-  connected: boolean
-  vstConnected: boolean
-  sampleRate: number
-}
-
 const invokeTauri = async <T,>(command: string, payload?: Record<string, unknown>) => {
   const { invoke } = await import('@tauri-apps/api/core')
   return invoke<T>(command, payload)
-}
-
-const isVstMode = () => {
-  if (typeof window === 'undefined') return false
-  // Check global flag set by Tauri (for VST auto-launch)
-  const scopedWindow = window as typeof window & { __NOOBSYNTH_VST_MODE__?: boolean }
-  if (scopedWindow.__NOOBSYNTH_VST_MODE__ === true) return true
-  // Also check URL parameter (for manual testing)
-  const params = new URLSearchParams(window.location.search)
-  return params.get('vst') === '1' || params.get('vst-mode') === '1'
-}
-
-const getVstInstanceId = () => {
-  if (typeof window === 'undefined') return null
-  const scopedWindow = window as typeof window & {
-    __NOOBSYNTH_VST_INSTANCE_ID__?: string
-  }
-  return scopedWindow.__NOOBSYNTH_VST_INSTANCE_ID__ ?? null
 }
 
 const buildScopeTaps = (modules: ModuleSpec[]): NativeTap[] => {
@@ -128,9 +104,7 @@ const buildGraphSignature = (graph: GraphState): string => {
     )
     .sort()
     .join('|')
-  const macros = (graph.macros ?? []).slice().sort((a, b) => a.id - b.id)
-  const macroSignature = macros.length > 0 ? JSON.stringify(macros) : ''
-  return `${moduleSignature}::${connectionSignature}::${macroSignature}`
+  return `${moduleSignature}::${connectionSignature}`
 }
 
 const normalizeNativeParamValue = (paramId: string, value: number | string | boolean): number => {
@@ -168,135 +142,6 @@ const normalizeNativeParamValue = (paramId: string, value: number | string | boo
     return text === 'ladder' ? 1 : 0
   }
   return Number.NaN
-}
-
-const BOOLEAN_PARAMS = new Set([
-  'pingPong',
-  'freeze',
-  'bipolar',
-  'midiEnabled',
-  'midiVelocity',
-  'seqOn',
-  'running',
-  'chA',
-  'chB',
-  'chC',
-  'chD',
-])
-
-const denormalizeNativeParamValue = (
-  paramId: string,
-  value: number | string | boolean,
-): number | string | boolean => {
-  if (typeof value === 'number') {
-    if (paramId === 'slope' && value <= 1) {
-      return value >= 1 ? 24 : 12
-    }
-    if (paramId === 'type' || paramId === 'shape') {
-      if (value === 1) return 'triangle'
-      if (value === 2) return 'sawtooth'
-      if (value === 3) return 'square'
-      return 'sine'
-    }
-    if (paramId === 'noiseType') {
-      if (value === 1) return 'pink'
-      if (value === 2) return 'brown'
-      return 'white'
-    }
-    if (paramId === 'mode') {
-      if (value === 1) return 'hp'
-      if (value === 2) return 'bp'
-      if (value === 3) return 'notch'
-      return 'lp'
-    }
-    if (paramId === 'model') {
-      return value >= 1 ? 'ladder' : 'svf'
-    }
-    if (paramId === 'cvMode') {
-      return value >= 1 ? 'unipolar' : 'bipolar'
-    }
-  }
-  if (typeof value === 'number' && BOOLEAN_PARAMS.has(paramId)) {
-    return value >= 0.5
-  }
-  return value
-}
-
-const normalizeGraphFromVst = (graph: GraphState): GraphState => ({
-  ...graph,
-  modules: graph.modules.map((module) => ({
-    ...module,
-    params: Object.fromEntries(
-      Object.entries(module.params).map(([paramId, value]) => [
-        paramId,
-        denormalizeNativeParamValue(paramId, value),
-      ]),
-    ),
-  })),
-})
-
-const MACRO_COUNT = 8
-
-const clamp01 = (value: number) => Math.min(1, Math.max(0, value))
-
-const buildMacroSpecs = (macros?: MacroSpec[]): MacroSpec[] => {
-  const byId = new Map<number, MacroSpec>()
-  for (const macro of macros ?? []) {
-    if (macro.id < 1 || macro.id > MACRO_COUNT) {
-      continue
-    }
-    byId.set(macro.id, macro)
-  }
-  const result: MacroSpec[] = []
-  for (let id = 1; id <= MACRO_COUNT; id += 1) {
-    const existing = byId.get(id)
-    if (existing) {
-      result.push({
-        ...existing,
-        targets: existing.targets ?? [],
-      })
-    } else {
-      result.push({ id, name: `Macro ${id}`, targets: [] })
-    }
-  }
-  return result
-}
-
-const normalizeMacroValues = (values?: number[] | null) => {
-  const normalized = Array.from({ length: MACRO_COUNT }, (_, index) => clamp01(values?.[index] ?? 0))
-  return normalized
-}
-
-const areMacroValuesEqual = (left: number[] | null, right: number[] | null) => {
-  if (!left || !right) return false
-  if (left.length !== right.length) return false
-  for (let i = 0; i < left.length; i += 1) {
-    if (Math.abs(left[i] - right[i]) > 1e-6) {
-      return false
-    }
-  }
-  return true
-}
-
-const createDefaultMacroTarget = (modules: ModuleSpec[]): MacroTarget => {
-  for (const module of modules) {
-    for (const [paramId, value] of Object.entries(module.params)) {
-      if (typeof value === 'number' && Number.isFinite(value)) {
-        return {
-          moduleId: module.id,
-          paramId,
-          min: 0,
-          max: 1,
-        }
-      }
-    }
-  }
-  return {
-    moduleId: '',
-    paramId: '',
-    min: 0,
-    max: 1,
-  }
 }
 
 const isDev = import.meta.env.DEV
@@ -381,8 +226,6 @@ function App() {
   const [tauriNativeBooting, setTauriNativeBooting] = useState(false)
   const [tauriSelectedOutput, setTauriSelectedOutput] = useState<string>('')
   const [tauriSelectedInput, setTauriSelectedInput] = useState<string>('')
-  const [macroValues, setMacroValues] = useState<number[]>(() => normalizeMacroValues())
-  const [macroOverride, setMacroOverride] = useState(false)
   const [rackCollapsed, setRackCollapsed] = useState(false)
   const [gridMetrics, setGridMetrics] = useState<GridMetrics>(DEFAULT_GRID_METRICS)
   const [cablesVisible, setCablesVisible] = useState(true)
@@ -412,15 +255,6 @@ function App() {
     timer: ReturnType<typeof setTimeout> | null
     lastSignature: string | null
   }>({ timer: null, lastSignature: null })
-  const vstGraphSyncRef = useRef<{
-    timer: ReturnType<typeof setTimeout> | null
-    lastSignature: string | null
-    suppressUntil: number
-    skipNext: boolean
-  }>({ timer: null, lastSignature: null, suppressUntil: 0, skipNext: false })
-  const lastVstGraphJsonRef = useRef<string | null>(null)
-  const macroValuesRef = useRef(macroValues)
-  const lastVstMacrosRef = useRef<number[] | null>(null)
   const {
     connectedInputs,
     dragTargets,
@@ -452,12 +286,6 @@ function App() {
     }
     return Boolean(scopedWindow.__TAURI__ || scopedWindow.__TAURI_INTERNALS__ || scopedWindow.isTauri)
   }, [])
-  // VST mode is detected dynamically
-  const [isVst, setIsVst] = useState(false)
-  const [vstConnected, setVstConnected] = useState(false)
-  const [vstError, setVstError] = useState<string | null>(null)
-  const [vstSampleRate, setVstSampleRate] = useState<number | null>(null)
-  const vstConnectedRef = useRef(false)
   const buildNativeGraphJson = useCallback((nextGraph: GraphState) => {
     const taps = buildScopeTaps(nextGraph.modules)
     nativeScopeTapsRef.current = taps
@@ -465,7 +293,6 @@ function App() {
       modules: nextGraph.modules,
       connections: nextGraph.connections,
       taps,
-      macros: nextGraph.macros ?? [],
     })
   }, [])
   const scheduleNativeGraphSync = useCallback(
@@ -508,100 +335,10 @@ function App() {
     },
     [buildNativeGraphJson, isTauri, tauriNativeRunning],
   )
-  const buildVstGraphJson = useCallback(
-    (nextGraph: GraphState) =>
-      JSON.stringify({
-        modules: nextGraph.modules,
-        connections: nextGraph.connections,
-        macros: nextGraph.macros ?? [],
-      }),
-    [],
-  )
-  const scheduleVstGraphSync = useCallback(
-    (nextGraph: GraphState, signature: string, options?: { immediate?: boolean }) => {
-      if (!isVst || !vstConnected) {
-        return
-      }
-      if (vstGraphSyncRef.current.skipNext) {
-        vstGraphSyncRef.current.skipNext = false
-        vstGraphSyncRef.current.lastSignature = signature
-        return
-      }
-      // Skip signature check when immediate (preset load) - params may differ with same structure
-      if (!options?.immediate && vstGraphSyncRef.current.lastSignature === signature) {
-        return
-      }
-      const runSync = () => {
-        const graphJson = buildVstGraphJson(nextGraph)
-        vstGraphSyncRef.current.suppressUntil = Date.now() + 800
-        void invokeTauri('vst_set_graph', { graphJson })
-          .then(() => {
-            vstGraphSyncRef.current.lastSignature = signature
-            lastVstGraphJsonRef.current = graphJson
-          })
-          .catch((error) => {
-            console.error(error)
-            setVstError('Failed to sync graph to VST.')
-          })
-      }
-      if (options?.immediate) {
-        if (vstGraphSyncRef.current.timer) {
-          clearTimeout(vstGraphSyncRef.current.timer)
-          vstGraphSyncRef.current.timer = null
-        }
-        runSync()
-        return
-      }
-      if (vstGraphSyncRef.current.timer) {
-        clearTimeout(vstGraphSyncRef.current.timer)
-      }
-      vstGraphSyncRef.current.timer = window.setTimeout(() => {
-        vstGraphSyncRef.current.timer = null
-        runSync()
-      }, 160)
-    },
-    [buildVstGraphJson, isVst, vstConnected],
-  )
   const graphStructureSignature = useMemo(
     () => buildGraphSignature(graph),
-    [graph.modules, graph.connections, graph.macros],
+    [graph.modules, graph.connections],
   )
-  // Check for VST mode via Tauri command (most reliable method)
-  useEffect(() => {
-    console.log('[VST] Checking VST mode, isTauri:', isTauri)
-    if (!isTauri) return
-
-    // Check local detection first (URL params, global flag)
-    if (isVstMode()) {
-      console.log('[VST] VST mode detected locally')
-      setIsVst(true)
-      return
-    }
-
-    // Ask Tauri if we're in VST mode
-    let active = true
-    const checkVstMode = async () => {
-      try {
-        console.log('[VST] Calling is_vst_mode command...')
-        const vstModeEnabled = await invokeTauri<boolean>('is_vst_mode')
-        console.log('[VST] is_vst_mode result:', vstModeEnabled)
-        if (active && vstModeEnabled) {
-          setIsVst(true)
-        }
-      } catch (err) {
-        console.error('[VST] is_vst_mode command failed:', err)
-      }
-    }
-    void checkVstMode()
-    return () => { active = false }
-  }, [isTauri])
-
-  useEffect(() => {
-    if (!isVst || !vstConnected) {
-      setMacroOverride(false)
-    }
-  }, [isVst, vstConnected])
-
   const {
     devResizeEnabled,
     setDevResizeEnabled,
@@ -784,32 +521,8 @@ function App() {
   }, [graphStructureSignature, isTauri, scheduleNativeGraphSync, tauriNativeRunning])
 
   useEffect(() => {
-    if (isVst && vstConnected) {
-      return
-    }
-    if (vstGraphSyncRef.current.timer) {
-      clearTimeout(vstGraphSyncRef.current.timer)
-      vstGraphSyncRef.current.timer = null
-    }
-    vstGraphSyncRef.current.lastSignature = null
-    vstGraphSyncRef.current.suppressUntil = 0
-    vstGraphSyncRef.current.skipNext = false
-  }, [isVst, vstConnected])
-
-  useEffect(() => {
-    if (!isVst || !vstConnected) {
-      return
-    }
-    scheduleVstGraphSync(graphRef.current, graphStructureSignature)
-  }, [graphStructureSignature, isVst, scheduleVstGraphSync, vstConnected])
-
-  useEffect(() => {
     statusRef.current = status
   }, [status])
-
-  useEffect(() => {
-    macroValuesRef.current = macroValues
-  }, [macroValues])
 
   useEffect(() => {
     if (status === 'running') {
@@ -828,7 +541,6 @@ function App() {
     () => graph.modules.find((module) => module.type === 'control'),
     [graph.modules],
   )
-  const macroSpecs = useMemo(() => buildMacroSpecs(graph.macros), [graph.macros])
   const controlModuleId = controlModule?.id ?? null
   const seqOn = Boolean(controlModule?.params.seqOn)
   const seqTempo = Math.max(30, Number(controlModule?.params.seqTempo ?? 120))
@@ -919,119 +631,8 @@ function App() {
           }
         }
       }
-      // VST mode param updates
-      if (isVst && vstConnected && !options?.skipEngine) {
-        const numeric = normalizeNativeParamValue(paramId, value)
-        if (!Number.isNaN(numeric)) {
-          void invokeTauri('vst_set_param', { moduleId, paramId, value: numeric })
-        }
-      }
     },
-    [currentPresetId, engine, isTauri, isVst, status, tauriNativeRunning, vstConnected],
-  )
-
-  const applyMacroSpecs = useCallback(
-    (nextMacros: MacroSpec[]) => {
-      const nextGraph = {
-        ...graphRef.current,
-        macros: nextMacros,
-      }
-      graphRef.current = nextGraph
-      setGraph(nextGraph)
-      if (isVst && vstConnected) {
-        const graphJson = JSON.stringify({
-          modules: nextGraph.modules,
-          connections: nextGraph.connections,
-          macros: nextMacros,
-        })
-        lastVstGraphJsonRef.current = graphJson
-        void invokeTauri('vst_set_graph', { graphJson }).catch((error) => {
-          console.error(error)
-          setVstError('Failed to sync macros to VST.')
-        })
-      }
-    },
-    [isVst, vstConnected],
-  )
-
-  const updateMacroSpec = useCallback(
-    (macroId: number, updater: (macro: MacroSpec) => MacroSpec) => {
-      const current = buildMacroSpecs(graphRef.current.macros)
-      const next = current.map((macro) => (macro.id === macroId ? updater(macro) : macro))
-      applyMacroSpecs(next)
-    },
-    [applyMacroSpecs],
-  )
-
-  const handleMacroNameChange = useCallback(
-    (macroId: number, name: string) => {
-      updateMacroSpec(macroId, (macro) => ({
-        ...macro,
-        name: name.trim() ? name : undefined,
-      }))
-    },
-    [updateMacroSpec],
-  )
-
-  const handleMacroTargetChange = useCallback(
-    (macroId: number, targetIndex: number, patch: Partial<MacroTarget>) => {
-      updateMacroSpec(macroId, (macro) => {
-        const targets = macro.targets.map((target, index) => {
-          if (index !== targetIndex) {
-            return target
-          }
-          const next = { ...target, ...patch }
-          if (next.min > next.max) {
-            const swap = next.min
-            next.min = next.max
-            next.max = swap
-          }
-          return next
-        })
-        return { ...macro, targets }
-      })
-    },
-    [updateMacroSpec],
-  )
-
-  const handleMacroAddTarget = useCallback(
-    (macroId: number, patch?: Partial<MacroTarget>) => {
-      const defaultTarget = createDefaultMacroTarget(graphRef.current.modules)
-      const nextTarget = { ...defaultTarget, ...patch }
-      updateMacroSpec(macroId, (macro) => ({
-        ...macro,
-        targets: [...macro.targets, nextTarget],
-      }))
-    },
-    [updateMacroSpec],
-  )
-
-  const handleMacroRemoveTarget = useCallback(
-    (macroId: number, targetIndex: number) => {
-      updateMacroSpec(macroId, (macro) => ({
-        ...macro,
-        targets: macro.targets.filter((_, index) => index !== targetIndex),
-      }))
-    },
-    [updateMacroSpec],
-  )
-
-  const handleMacroValueChange = useCallback(
-    (macroIndex: number, value: number) => {
-      const next = normalizeMacroValues(macroValuesRef.current)
-      next[macroIndex] = clamp01(value)
-      macroValuesRef.current = next
-      setMacroValues(next)
-      if (isVst && vstConnected) {
-        setMacroOverride(true)
-        lastVstMacrosRef.current = next
-        void invokeTauri('vst_set_macros', { macros: next }).catch((error) => {
-          console.error(error)
-          setVstError('Failed to sync macros to VST.')
-        })
-      }
-    },
-    [isVst, vstConnected],
+    [currentPresetId, engine, isTauri, status, tauriNativeRunning],
   )
 
   const getNativeScopeBuffer = useCallback((moduleId: string, portId: string) => {
@@ -1186,169 +787,6 @@ function App() {
     }
   }, [isTauri, tauriNativeRunning])
 
-  // VST mode auto-connect effect
-  useEffect(() => {
-    if (!isVst) return
-    let active = true
-    const connectToVst = async () => {
-      try {
-        const status = await invokeTauri<VstStatus>('vst_connect')
-        if (!active) return
-        if (status.connected && !vstConnectedRef.current) {
-          vstGraphSyncRef.current.skipNext = true
-        }
-        setVstConnected(status.connected)
-        setVstSampleRate(status.sampleRate || null)
-        vstConnectedRef.current = status.connected
-        if (!status.vstConnected) {
-          setVstError('Waiting for VST plugin...')
-        } else {
-          setVstError(null)
-        }
-      } catch (err) {
-        if (!active) return
-        const errorMsg = err instanceof Error ? err.message : String(err)
-        console.error('[VST] Connection error:', errorMsg)
-        setVstError(`VST error: ${errorMsg}`)
-        setVstConnected(false)
-        vstConnectedRef.current = false
-      }
-    }
-    void connectToVst()
-    // Poll for VST status updates
-    const interval = window.setInterval(async () => {
-      if (!active) return
-      try {
-        const status = await invokeTauri<VstStatus>('vst_status')
-        if (!active) return
-        if (status.connected && !vstConnectedRef.current) {
-          vstGraphSyncRef.current.skipNext = true
-        }
-        setVstConnected(status.connected)
-        setVstSampleRate(status.sampleRate || null)
-        vstConnectedRef.current = status.connected
-        if (status.connected && !status.vstConnected) {
-          setVstError('Waiting for VST plugin...')
-        } else if (status.connected && status.vstConnected) {
-          setVstError(null)
-        }
-      } catch {
-        // Ignore poll errors
-      }
-    }, 2000)
-    return () => {
-      active = false
-      window.clearInterval(interval)
-    }
-  }, [isVst])
-
-  // Update VST connected ref
-  useEffect(() => {
-    vstConnectedRef.current = vstConnected
-  }, [vstConnected])
-
-  // Sync or pull graph when VST connects
-  useEffect(() => {
-    if (!isVst || !vstConnected) return
-    let active = true
-    const sync = async () => {
-      try {
-        const graphJson = await invokeTauri<string | null>('vst_pull_graph')
-        if (!active) return
-        if (graphJson && graphJson.trim().length > 0) {
-          const parsed = JSON.parse(graphJson) as unknown
-          if (isGraphState(parsed)) {
-            lastVstGraphJsonRef.current = graphJson
-            applyPreset(normalizeGraphFromVst(parsed), { skipVstSync: true })
-            return
-          }
-        }
-      } catch (error) {
-        console.error('Failed to pull graph from VST:', error)
-      }
-      const fallbackJson = JSON.stringify({
-        modules: graphRef.current.modules,
-        connections: graphRef.current.connections,
-        macros: graphRef.current.macros ?? [],
-      })
-      lastVstGraphJsonRef.current = fallbackJson
-      vstGraphSyncRef.current.lastSignature = buildGraphSignature(graphRef.current)
-      vstGraphSyncRef.current.suppressUntil = Date.now() + 800
-      void invokeTauri('vst_set_graph', { graphJson: fallbackJson }).catch((error) => {
-        console.error('Failed to sync initial graph to VST:', error)
-      })
-    }
-    void sync()
-    return () => {
-      active = false
-    }
-  }, [isVst, vstConnected])
-
-  useEffect(() => {
-    if (!isVst || !vstConnected) return
-    let active = true
-    const poll = async () => {
-      try {
-        if (Date.now() < vstGraphSyncRef.current.suppressUntil) {
-          return
-        }
-        const graphJson = await invokeTauri<string | null>('vst_pull_graph')
-        if (!active || !graphJson || !graphJson.trim()) {
-          return
-        }
-        if (graphJson === lastVstGraphJsonRef.current) {
-          return
-        }
-        const parsed = JSON.parse(graphJson) as unknown
-        if (isGraphState(parsed)) {
-          lastVstGraphJsonRef.current = graphJson
-          applyPreset(normalizeGraphFromVst(parsed), { skipVstSync: true })
-        }
-      } catch (error) {
-        if (active) {
-          console.error('Failed to poll graph from VST:', error)
-        }
-      }
-    }
-    void poll()
-    const interval = window.setInterval(poll, 500)
-    return () => {
-      active = false
-      window.clearInterval(interval)
-    }
-  }, [isVst, vstConnected])
-
-  useEffect(() => {
-    if (!isVst || !vstConnected) return
-    let active = true
-    const poll = async () => {
-      try {
-        const macros = await invokeTauri<number[] | null>('vst_pull_macros')
-        if (!active || !macros) {
-          return
-        }
-        const next = normalizeMacroValues(macros)
-        if (areMacroValuesEqual(lastVstMacrosRef.current, next)) {
-          return
-        }
-        lastVstMacrosRef.current = next
-        macroValuesRef.current = next
-        setMacroValues(next)
-        setMacroOverride(false)
-      } catch (error) {
-        if (active) {
-          console.error('Failed to poll macros from VST:', error)
-        }
-      }
-    }
-    void poll()
-    const interval = window.setInterval(poll, 400)
-    return () => {
-      active = false
-      window.clearInterval(interval)
-    }
-  }, [isVst, vstConnected])
-
   const nativeControlBridge = useMemo(() => {
     if (!isTauri) {
       return null
@@ -1414,71 +852,7 @@ function App() {
     }
   }, [isTauri, tauriNativeRunning])
 
-  // VST control bridge - similar to native but uses vst_* commands
-  const vstControlBridge = useMemo(() => {
-    if (!isVst) {
-      return null
-    }
-    const shouldSend = () => vstConnectedRef.current
-    return {
-      setControlVoiceCv: (moduleId: string, voiceIndex: number, value: number) => {
-        if (!shouldSend()) return
-        void invokeTauri('vst_set_control_voice_cv', {
-          moduleId,
-          voice: voiceIndex,
-          value,
-        })
-      },
-      setControlVoiceGate: (
-        moduleId: string,
-        voiceIndex: number,
-        value: number | boolean,
-      ) => {
-        if (!shouldSend()) return
-        // VST uses trigger/release pattern
-        const numeric = typeof value === 'boolean' ? (value ? 1 : 0) : value
-        if (numeric > 0) {
-          void invokeTauri('vst_trigger_control_voice_gate', { moduleId, voice: voiceIndex })
-        } else {
-          void invokeTauri('vst_release_control_voice_gate', { moduleId, voice: voiceIndex })
-        }
-      },
-      triggerControlVoiceGate: (moduleId: string, voiceIndex: number) => {
-        if (!shouldSend()) return
-        void invokeTauri('vst_trigger_control_voice_gate', { moduleId, voice: voiceIndex })
-      },
-      triggerControlVoiceSync: (_moduleId: string, _voiceIndex: number) => {
-        // VST doesn't have sync command - gate trigger also syncs
-      },
-      setControlVoiceVelocity: (
-        moduleId: string,
-        voiceIndex: number,
-        value: number,
-        slewSeconds = 0,
-      ) => {
-        if (!shouldSend()) return
-        void invokeTauri('vst_set_control_voice_velocity', {
-          moduleId,
-          voice: voiceIndex,
-          value,
-          slew: slewSeconds,
-        })
-      },
-      setMarioChannelCv: (_moduleId: string, _channel: 1 | 2 | 3 | 4 | 5, _value: number) => {
-        // Mario channel not yet supported in VST mode
-      },
-      setMarioChannelGate: (
-        _moduleId: string,
-        _channel: 1 | 2 | 3 | 4 | 5,
-        _value: number | boolean,
-      ) => {
-        // Mario channel not yet supported in VST mode
-      },
-    }
-  }, [isVst])
-
-  // Select the appropriate control bridge based on mode
-  const activeControlBridge = isVst ? vstControlBridge : nativeControlBridge
+  const activeControlBridge = nativeControlBridge
 
 
   const {
@@ -1575,7 +949,7 @@ function App() {
           // Also restart Tauri native engine if running
           if (isTauri && tauriNativeRunning) {
             const combined = buildCombinedGraph(graphRef.current)
-            const graphJson = JSON.stringify({ modules: combined.modules, connections: combined.connections, taps: nativeScopeTapsRef.current, macros: [] })
+            const graphJson = JSON.stringify({ modules: combined.modules, connections: combined.connections, taps: nativeScopeTapsRef.current })
             void invokeTauri('native_set_graph', { graphJson }).catch(() => {})
             void invokeTauri('native_set_transport_tempo', { tempo: masterTempoRef.current }).catch(() => {})
           }
@@ -1592,7 +966,7 @@ function App() {
     void run()
   }
 
-  const applyPreset = (nextGraph: GraphState, options?: { skipVstSync?: boolean; presetId?: string }) => {
+  const applyPreset = (nextGraph: GraphState, options?: { presetId?: string }) => {
     const cloned = cloneGraph(nextGraph)
     // Force sequencer OFF when loading presets (prevents auto-start from preset data)
     const controlModule = cloned.modules.find((m) => m.type === 'control')
@@ -1601,10 +975,6 @@ function App() {
     }
     const layouted = layoutGraph(cloned, moduleSizes, gridMetricsRef.current, { getModuleSize })
     const signature = buildGraphSignature(layouted)
-    if (isVst && options?.skipVstSync) {
-      vstGraphSyncRef.current.skipNext = true
-      vstGraphSyncRef.current.lastSignature = signature
-    }
     resetPatching()
     setGridError(null)
     setGraph(layouted, { skipHistory: true })
@@ -1624,19 +994,6 @@ function App() {
     }
     if (isTauri && tauriNativeRunning) {
       scheduleNativeGraphSync(buildCombinedGraph(layouted), signature, { immediate: true })
-    }
-    // Sync to VST when in VST mode
-    if (isVst && vstConnected) {
-      if (!options?.skipVstSync) {
-        const graphJson = buildVstGraphJson(layouted)
-        lastVstGraphJsonRef.current = graphJson
-        vstGraphSyncRef.current.lastSignature = signature
-        vstGraphSyncRef.current.suppressUntil = Date.now() + 800
-        void invokeTauri('vst_set_graph', { graphJson }).catch((error) => {
-          console.error(error)
-          setVstError('Failed to sync graph to VST.')
-        })
-      }
     }
   }
 
@@ -1936,7 +1293,6 @@ function App() {
         modules: combined.modules,
         connections: combined.connections,
         taps,
-        macros: graphRef.current.macros ?? [],
       })
       await invokeTauri('native_set_graph', { graphJson })
       await invokeTauri('native_set_transport_tempo', { tempo: masterTempoRef.current }).catch(() => {})
@@ -1962,7 +1318,6 @@ function App() {
         modules: combined.modules,
         connections: combined.connections,
         taps,
-        macros: graphRef.current.macros ?? [],
       })
       await invokeTauri('native_start_graph', {
         graphJson,
@@ -2269,65 +1624,34 @@ function App() {
     }
   }, [runPresetBatchExport])
 
-  const vstInstanceId = isVst ? getVstInstanceId() : null
-  const vstInstanceLabel = vstInstanceId ? ` • instance ${vstInstanceId}` : ''
-  const audioMode: 'web' | 'native' | 'vst' = isVst ? 'vst' : isTauri ? 'native' : 'web'
-  const audioRunning = audioMode === 'vst'
-    ? vstConnected
-    : audioMode === 'native'
-      ? tauriNativeRunning
-      : status === 'running'
-  const audioError = audioMode === 'vst'
-    ? Boolean(vstError && !vstError.includes('Waiting'))
-    : audioMode === 'native'
-      ? Boolean(tauriNativeError)
-      : status === 'error'
+  const audioMode: 'web' | 'native' = isTauri ? 'native' : 'web'
+  const audioRunning = audioMode === 'native'
+    ? tauriNativeRunning
+    : status === 'running'
+  const audioError = audioMode === 'native'
+    ? Boolean(tauriNativeError)
+    : status === 'error'
   const audioStatus: 'idle' | 'running' | 'error' = audioError
     ? 'error'
     : audioRunning
       ? 'running'
       : 'idle'
   const statusLabel = audioStatus === 'running'
-    ? audioMode === 'vst' ? 'VST Connected' : 'Live'
+    ? 'Live'
     : audioStatus === 'error'
       ? 'Error'
-      : audioMode === 'vst'
-        ? 'VST Waiting'
-        : 'Standby'
-  // Debug info for VST mode troubleshooting
-  const vstDebugInfo = `[isTauri:${isTauri}, isVst:${isVst}, vstConnected:${vstConnected}]`
+      : 'Standby'
 
   const statusDetail =
-    audioMode === 'vst'
-      ? (vstError
-          ? `${vstError}${vstInstanceLabel}`
-          : vstConnected
-            ? `VST mode active${vstSampleRate ? ` @ ${vstSampleRate}Hz` : ''}${vstInstanceLabel}`
-            : `Connecting to VST...${vstInstanceLabel}`)
-      : audioMode === 'native'
-        ? tauriNativeError ?? (audioRunning ? 'Native DSP graph running.' : 'Native DSP ready.')
-        : status === 'error'
-          ? 'Audio init failed. Check console.'
-          : isTauri
-            ? `Native DSP ready. ${vstDebugInfo}`
-            : 'AudioWorklet graph ready for patching.'
-  const modeLabel = audioMode === 'vst' ? 'VST Mode' : audioMode === 'native' ? 'Native Audio' : 'Web Audio'
+    audioMode === 'native'
+      ? tauriNativeError ?? (audioRunning ? 'Native DSP graph running.' : 'Native DSP ready.')
+      : status === 'error'
+        ? 'Audio init failed. Check console.'
+        : 'AudioWorklet graph ready for patching.'
+  const modeLabel = audioMode === 'native' ? 'Native Audio' : 'Web Audio'
   const unifiedBooting = audioMode === 'native' ? tauriNativeBooting : isBooting
 
   const handleUnifiedStart = async () => {
-    if (audioMode === 'vst') {
-      // In VST mode, just sync the graph - audio is handled by DAW
-      if (vstConnected) {
-        const graphJson = JSON.stringify({
-          modules: graphRef.current.modules,
-          connections: graphRef.current.connections,
-          macros: graphRef.current.macros ?? [],
-        })
-        await invokeTauri('vst_set_graph', { graphJson })
-        lastVstGraphJsonRef.current = graphJson
-      }
-      return
-    }
     if (audioMode === 'native') {
       if (status === 'running') {
         await handleStop()
@@ -2342,10 +1666,6 @@ function App() {
     // Stop any active recording before stopping the engine
     if (wavRecorderNodeRef.current) {
       handleToggleRecording() // triggers stop + WAV download
-    }
-    if (audioMode === 'vst') {
-      // In VST mode, can't stop audio from here - it's controlled by DAW
-      return
     }
     if (audioMode === 'native') {
       await handleTauriStop()
@@ -2910,7 +2230,7 @@ function App() {
               }
               if (isTauri && tauriNativeRunning) {
                 const c = buildCombinedGraph(graphRef.current)
-                const graphJson = JSON.stringify({ modules: c.modules, connections: c.connections, taps: nativeScopeTapsRef.current, macros: [] })
+                const graphJson = JSON.stringify({ modules: c.modules, connections: c.connections, taps: nativeScopeTapsRef.current })
                 void invokeTauri('native_set_graph', { graphJson }).catch(() => {})
               }
             }}
@@ -2988,18 +2308,6 @@ function App() {
           onApplyPreset={(g, presetId) => applyPreset(g, { presetId })}
           projects={projects}
           onApplyProject={handleApplyProject}
-          macros={macroSpecs}
-          macroValues={macroValues}
-          macroOverride={macroOverride}
-          macroModules={graph.modules}
-          isVst={isVst}
-          vstConnected={vstConnected}
-          vstInstanceId={vstInstanceId}
-            onMacroValueChange={handleMacroValueChange}
-            onMacroNameChange={handleMacroNameChange}
-            onMacroTargetChange={handleMacroTargetChange}
-            onAddMacroTarget={handleMacroAddTarget}
-            onRemoveMacroTarget={handleMacroRemoveTarget}
             tauriAvailable={isTauri}
             tauriStatus={tauriStatus}
             tauriError={tauriError}

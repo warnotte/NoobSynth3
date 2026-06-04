@@ -1,6 +1,6 @@
 # Architecture
 
-NoobSynth3 est un synthétiseur modulaire avec une architecture hybride permettant 3 modes d'exécution.
+NoobSynth3 est un synthétiseur modulaire avec une architecture hybride permettant 2 modes d'exécution.
 
 ## Vue d'ensemble
 
@@ -24,7 +24,7 @@ NoobSynth3 est un synthétiseur modulaire avec une architecture hybride permetta
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-## Les 3 cibles
+## Les 2 cibles
 
 ```
                       ┌─────────────────────┐
@@ -32,18 +32,18 @@ NoobSynth3 est un synthétiseur modulaire avec une architecture hybride permetta
                       │   Code DSP partagé  │
                       └──────────┬──────────┘
                                  │
-        ┌────────────────────────┼────────────────────────┐
-        │                        │                        │
-        ▼                        ▼                        ▼
- ┌─────────────┐         ┌─────────────┐         ┌─────────────┐
- │  dsp-wasm   │         │dsp-standalone│        │  dsp-plugin │
- │ (AudioWorklet)│        │   (Tauri)    │        │  (VST/CLAP) │
- └──────┬──────┘         └──────┬───────┘        └──────┬──────┘
-        │                       │                       │
-        ▼                       ▼                       ▼
- ┌─────────────┐         ┌─────────────┐         ┌─────────────┐
- │    WEB      │         │  STANDALONE │         │     DAW     │
- └─────────────┘         └─────────────┘         └─────────────┘
+              ┌──────────────────┴──────────────────┐
+              │                                     │
+              ▼                                     ▼
+       ┌─────────────┐                       ┌─────────────┐
+       │  dsp-wasm   │                       │dsp-standalone│
+       │ (AudioWorklet)│                      │   (Tauri)    │
+       └──────┬──────┘                       └──────┬───────┘
+              │                                     │
+              ▼                                     ▼
+       ┌─────────────┐                       ┌─────────────┐
+       │    WEB      │                       │  STANDALONE │
+       └─────────────┘                       └─────────────┘
 ```
 
 ## Mode Web (Navigateur)
@@ -99,44 +99,6 @@ L'UI reste identique mais le DSP tourne nativement via Tauri.
 - Sélection du périphérique audio
 - Pas de limitations du navigateur
 
-## Mode VST/CLAP (Plugin DAW)
-
-Architecture hybride : DSP natif dans le DAW, UI via Tauri + IPC.
-
-```
-┌──────────────────────────────────────────────────────────┐
-│                       DAW HOST                           │
-├──────────────────────────────────────────────────────────┤
-│                                                          │
-│   ┌────────────────────────────────────────────────┐    │
-│   │            NoobSynth Plugin (nih-plug)         │    │
-│   │                                                │    │
-│   │  ┌─────────────┐      ┌─────────────────────┐ │    │
-│   │  │ Mini Editor │      │   DSP (dsp-core)    │ │    │
-│   │  │   (egui)    │      │   natif dans le DAW │ │    │
-│   │  └──────┬──────┘      └──────────┬──────────┘ │    │
-│   │         │                        │            │    │
-│   └─────────┼────────────────────────┼────────────┘    │
-│             │                        │                  │
-└─────────────┼────────────────────────┼──────────────────┘
-              │                        │
-              │    Shared Memory IPC   │
-              │    (dsp-ipc crate)     │
-              ▼                        ▼
-       ┌─────────────────────────────────────┐
-       │         Tauri UI (externe)          │
-       │   - Affiche les paramètres          │
-       │   - Envoie les changements via IPC  │
-       │   - Reçoit les notes MIDI du DAW    │
-       └─────────────────────────────────────┘
-```
-
-**Flux IPC :**
-1. Le plugin VST crée une zone mémoire partagée
-2. Le mini-editor egui lance `noobsynth3.exe --vst-mode`
-3. L'UI Tauri se connecte à la mémoire partagée
-4. Sync bidirectionnelle : paramètres, notes MIDI, graphe
-
 ## Structure des dossiers
 
 ```
@@ -171,9 +133,7 @@ NoobSynth3/
 │   │   ├── state.rs        # Structs d'état
 │   │   └── ports.rs        # Ports I/O
 │   ├── dsp-wasm/           # Bindings WASM
-│   ├── dsp-standalone/     # Host audio natif
-│   ├── dsp-plugin/         # Plugin VST3/CLAP
-│   └── dsp-ipc/            # IPC mémoire partagée
+│   └── dsp-standalone/     # Host audio natif
 │
 ├── public/
 │   └── presets/            # Fichiers preset JSON
@@ -189,7 +149,6 @@ Le graphe est représenté en JSON avec deux parties :
 interface GraphState {
   modules: ModuleSpec[];      // Liste des modules instanciés
   connections: Connection[];  // Câbles entre modules
-  macros?: MacroSpec[];       // Macros DAW (optionnel)
 }
 
 interface ModuleSpec {
@@ -229,5 +188,3 @@ interface Connection {
 | Audio Natif | cpal (cross-platform audio) |
 | DSP | Rust (dsp-core) |
 | Desktop | Tauri 2.0 |
-| Plugin | nih-plug (VST3/CLAP) |
-| IPC | Shared memory (dsp-ipc) |

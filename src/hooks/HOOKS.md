@@ -106,7 +106,7 @@ useUndoableState<T>(initialState: T, config?: { maxHistory?: number })
 ```typescript
 {
   engine: AudioEngine        // Instance du moteur audio
-  nativeControl?: Bridge     // Bridge pour mode Tauri/VST
+  nativeControl?: Bridge     // Bridge pour mode Tauri
   controlModuleId: string    // ID du module control actif
   voiceCount: number         // Nombre de voix (1/2/4/8)
   midiRoot: number           // Note MIDI de base
@@ -241,7 +241,7 @@ Extra haute:                     I O P
 ```typescript
 {
   engine: AudioEngine        // Moteur audio
-  nativeControl?: Bridge     // Bridge Tauri/VST
+  nativeControl?: Bridge     // Bridge Tauri
   status: 'idle'|'running'|'error'
   marioModuleId: string      // ID du module Mario
   marioRunning: boolean      // Lecture active?
@@ -334,5 +334,5 @@ User Input ──────►  │  Hooks                    │ │
 
 3. **Cleanup:** Tous les hooks nettoient leurs timers/listeners dans le return de `useEffect`
 
-4. **Bridge pattern:** Les hooks supportent un bridge optionnel pour Tauri/VST mode,
+4. **Bridge pattern:** Les hooks supportent un bridge optionnel pour Tauri mode,
    permettant la même logique avec différents backends audio

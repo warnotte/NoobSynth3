@@ -7,7 +7,7 @@ Bibliothèque DSP (Digital Signal Processing) pure Rust, sans dépendances exter
 - **Minimal dependencies** : Seulement `std` (pas de crates audio externes)
 - **Sample rate agnostic** : Fonctionne à n'importe quelle fréquence
 - **Anti-aliasing** : polyBLEP sur les oscillateurs
-- **Portable** : Utilisé par WASM, Tauri et VST
+- **Portable** : Utilisé par WASM et Tauri
 
 ## Structure des fichiers
 
