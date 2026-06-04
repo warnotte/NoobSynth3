@@ -11,6 +11,7 @@
     "test:presets": "cargo test -p dsp-graph --test presets -- --nocapture",
     "module-ref": "node scripts/gen-module-reference.mjs",
     "check:modules": "node scripts/check-modules.mjs",
+    "check:ui-audio": "node scripts/check-ui-audio.mjs",
     "lint": "eslint .",
     "preview": "vite preview",
     "tauri": "tauri",

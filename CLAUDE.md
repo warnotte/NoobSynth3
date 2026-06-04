@@ -187,6 +187,7 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 
 ### Vérification (après ajout/modif de module)
 - [ ] `npm run check:modules` - **Cohérence TS↔Rust** : vérifie que chaque port déclaré dans `portCatalog` est résolu par `ports.rs`, et que le type est mappé dans `normalize_module_type`. Attrape le bug silencieux « câble branché mais moteur ignore ».
+- [ ] `npm run check:ui-audio` - **Parité Web↔Tauri** : si le module a un playhead/état visualisé (`engine.watch*`), vérifie qu'il a aussi un chemin natif Tauri. Attrape le bug récurrent « feature livrée Web-only, oubliée en Tauri » (Game of Life, Meter…).
 - [ ] `npm run module-ref` - Régénère `docs/MODULE_REFERENCE.md` (référence auto : ports + params + defaults de tous les modules — **le truc à consulter** pour construire un patch/preset).
 - [ ] `npm run build:wasm` - Rebuild WASM après modifs Rust
 
@@ -230,9 +231,12 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 | MIDI Sequencer | Playhead + seek | ✅ | ✅ `NativeSequencerBridge` |
 | Granular | Position + buffer load | ✅ | ✅ `NativeGranularBridge` |
 | CPU Meter | DSP load avg + peak | ✅ | ✅ `native_get_cpu_load` |
-| Game of Life | Grid state + playhead | ✅ | ❌ (Web-only for now) |
+| Game of Life | Grid state + playhead | ✅ | ✅ `NativeGameOfLifeBridge` |
+| Meter | Peak L/R level | ✅ | ✅ `NativeMeterBridge` |
+| Theremin | Pad position | ✅ | ⚠️ bridge créé mais **non threadé** dans `controls/index.tsx` (silently dropped — à corriger) |
+| Particle Cloud | Grain positions | ✅ | ⚠️ idem (bridge déclaré dans `ControlProps`, jamais câblé — à corriger) |
 
-**⚠️ RÈGLE:** Toute nouvelle feature UI↔Audio DOIT être implémentée pour Tauri en même temps que Web. Ne jamais merger une feature Web-only.
+**⚠️ RÈGLE:** Toute nouvelle feature UI↔Audio DOIT être implémentée pour Tauri en même temps que Web. Ne jamais merger une feature Web-only. **Garde-fou auto:** `npm run check:ui-audio` échoue si un contrôle utilise `engine.watch*` sans chemin natif (le bug récurrent type Game-of-Life/Meter).
 
 ## Module Types (93 total)
 
