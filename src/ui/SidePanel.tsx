@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import type { GraphState, MacroSpec, MacroTarget, ModuleSpec, ModuleType, TemplateSpec } from '../shared/graph'
+import type { GraphState, ModuleType, TemplateSpec } from '../shared/graph'
 import type { PresetSpec, ProjectSpec } from '../state/presets'
 import {
   moduleCatalog,
@@ -7,7 +7,6 @@ import {
   moduleCategoryOrder,
   type ModuleCategory,
 } from '../state/moduleRegistry'
-import { MacroPanel } from './MacroPanel'
 import { PanelSection } from './PanelSection'
 
 type SidePanelProps = {
@@ -26,18 +25,6 @@ type SidePanelProps = {
   onApplyPreset: (graph: GraphState, presetId?: string) => void
   projects: ProjectSpec[]
   onApplyProject: (file: string) => void
-  macros: MacroSpec[]
-  macroValues: number[]
-  macroOverride: boolean
-  macroModules: ModuleSpec[]
-  isVst: boolean
-  vstConnected: boolean
-  vstInstanceId: string | null
-  onMacroValueChange: (macroIndex: number, value: number) => void
-  onMacroNameChange: (macroId: number, name: string) => void
-  onMacroTargetChange: (macroId: number, targetIndex: number, patch: Partial<MacroTarget>) => void
-  onAddMacroTarget: (macroId: number, target?: Partial<MacroTarget>) => void
-  onRemoveMacroTarget: (macroId: number, targetIndex: number) => void
   tauriAvailable: boolean
   tauriStatus: 'idle' | 'loading' | 'ready' | 'error'
   tauriError: string | null
@@ -83,18 +70,6 @@ export const SidePanel = ({
   onApplyPreset,
   projects,
   onApplyProject,
-  macros,
-  macroValues,
-  macroOverride,
-  macroModules,
-  isVst,
-  vstConnected,
-  vstInstanceId,
-  onMacroValueChange,
-  onMacroNameChange,
-  onMacroTargetChange,
-  onAddMacroTarget,
-  onRemoveMacroTarget,
   tauriAvailable,
   tauriStatus,
   tauriError,
@@ -132,7 +107,6 @@ export const SidePanel = ({
     templates: true,
     presets: true,
     projects: true,
-    macros: true,
     tauri: true,
   })
   const [moduleQuery, setModuleQuery] = useState('')
@@ -575,25 +549,6 @@ export const SidePanel = ({
         )}
       </PanelSection>
       <PanelSection
-        title="Macros"
-        collapsed={collapsedSections.macros}
-        onToggle={() => toggleSection('macros')}
-      >
-        <MacroPanel
-              macros={macros}
-              macroValues={macroValues}
-              macroOverride={macroOverride}
-              modules={macroModules}
-              isVst={isVst}
-              vstConnected={vstConnected}
-              onMacroValueChange={onMacroValueChange}
-              onMacroNameChange={onMacroNameChange}
-              onMacroTargetChange={onMacroTargetChange}
-              onAddMacroTarget={onAddMacroTarget}
-              onRemoveMacroTarget={onRemoveMacroTarget}
-            />
-      </PanelSection>
-      <PanelSection
         title="Tauri Bridge"
         collapsed={collapsedSections.tauri}
         onToggle={() => toggleSection('tauri')}
@@ -671,12 +626,6 @@ export const SidePanel = ({
                 </div>
                 {tauriStatus === 'ready' && (
                   <div className="tauri-list">
-                    {isVst && (
-                      <div className="tauri-item">
-                        <span className="tauri-label">VST Instance</span>
-                        <span className="tauri-value">{vstInstanceId ?? 'n/a'}</span>
-                      </div>
-                    )}
                     <div className="tauri-item">
                       <span className="tauri-label">Ping</span>
                       <span className="tauri-value">{tauriPing ?? 'n/a'}</span>
