@@ -233,8 +233,8 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 | CPU Meter | DSP load avg + peak | ✅ | ✅ `native_get_cpu_load` |
 | Game of Life | Grid state + playhead | ✅ | ✅ `NativeGameOfLifeBridge` |
 | Meter | Peak L/R level | ✅ | ✅ `NativeMeterBridge` |
-| Theremin | Pad position | ✅ | ⚠️ bridge créé mais **non threadé** dans `controls/index.tsx` (silently dropped — à corriger) |
-| Particle Cloud | Grain positions | ✅ | ⚠️ idem (bridge déclaré dans `ControlProps`, jamais câblé — à corriger) |
+| Theremin | Pad position | ✅ | ✅ `NativeThereminBridge` |
+| Particle Cloud | Grain positions | ✅ | ✅ `NativeParticleBridge` |
 
 **⚠️ RÈGLE:** Toute nouvelle feature UI↔Audio DOIT être implémentée pour Tauri en même temps que Web. Ne jamais merger une feature Web-only. **Garde-fou auto:** `npm run check:ui-audio` échoue si un contrôle utilise `engine.watch*` sans chemin natif (le bug récurrent type Game-of-Life/Meter).
 

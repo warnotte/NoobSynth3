@@ -49,17 +49,35 @@ for (const file of walk(CONTROLS_DIR)) {
   if (!hasNativePath && !ALLOWLIST.has(rel)) offenders.push(rel)
 }
 
+// Check 2: every nativeXxx field on ControlProps must be threaded through
+// controls/index.tsx INTO the `props` object, or the bridge is silently dropped
+// (moduleControls is typed Omit<ModuleControlsProps,'module'> so extras don't
+// error). This is the Theremin/Particle blind spot that Check 1 misses — the
+// control LOOKS wired (it references the bridge) but never receives it.
+const typesSrc = readFileSync(join(CONTROLS_DIR, 'types.ts'), 'utf8')
+const indexSrc = readFileSync(join(CONTROLS_DIR, 'index.tsx'), 'utf8')
+const cpStart = typesSrc.indexOf('export type ControlProps')
+const cpBlock = cpStart >= 0 ? typesSrc.slice(cpStart) : ''
+const bridgeFields = [...new Set([...cpBlock.matchAll(/^\s*(native[A-Z]\w*)\?:/gm)].map((m) => m[1]))]
+const propsMatch = indexSrc.match(/const props: ControlProps = \{([\s\S]*?)\n {2}\}/)
+const propsBlock = propsMatch ? propsMatch[1] : ''
+const threadingGaps = bridgeFields.filter((f) => !new RegExp(`\\b${f}\\b`).test(propsBlock))
+
+let failed = false
 if (offenders.length) {
-  console.error('✗ UI↔Audio parity check failed — these controls poll engine.watch* (Web) with NO native (Tauri) path:\n')
+  failed = true
+  console.error('✗ Controls that poll engine.watch* (Web) with NO native (Tauri) path:\n')
   for (const o of offenders) console.error('  - ' + o)
-  console.error('\nEach must also work in Tauri standalone. Add a native bridge end-to-end:')
-  console.error('  1. src-tauri: a native_* command (+ AudioCommand variant + handler)')
-  console.error('  2. types.ts: a NativeXxxBridge type + field on ControlProps')
-  console.error('  3. App.tsx: build the bridge + add it to moduleControls')
-  console.error('  4. controls/index.tsx: thread the field through ModuleControlsProps + the props object')
-  console.error('  5. the control: an `audioMode === \'native\'` polling branch')
+  console.error("\nAdd a native bridge end-to-end (src-tauri command -> types.ts -> App.tsx -> controls/index.tsx -> an audioMode === 'native' branch in the control), or allowlist it here with a reason.\n")
+}
+if (threadingGaps.length) {
+  failed = true
+  console.error('✗ ControlProps bridge fields declared but NOT threaded into controls/index.tsx props object (silently dropped — the control never receives them):\n')
+  for (const f of threadingGaps) console.error('  - ' + f)
+  console.error('\nAdd each to ModuleControlsProps + the destructure + the `const props: ControlProps` object in src/ui/controls/index.tsx.\n')
+}
+if (failed) {
   console.error('See CLAUDE.md "UI ↔ Audio Communication Checklist".')
-  console.error('If a control is genuinely Web-only, add it to ALLOWLIST in scripts/check-ui-audio.mjs with a reason.')
   process.exit(1)
 }
-console.log('✓ UI↔Audio parity OK — every engine.watch* control has a native (Tauri) path (or is allowlisted).')
+console.log('✓ UI↔Audio parity OK — every engine.watch* control has a native path, and all ControlProps bridges are threaded through index.tsx.')
