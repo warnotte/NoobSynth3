@@ -10,7 +10,7 @@
 import { useComputerKeyboard } from '../../hooks/useComputerKeyboard'
 import type { AudioEngine } from '../../engine/WasmGraphEngine'
 import type { Connection, ModuleSpec } from '../../shared/graph'
-import type { ControlProps, NativeScopeBridge, NativeChiptuneBridge, NativeSequencerBridge, NativeGranularBridge } from './types'
+import type { ControlProps, NativeScopeBridge, NativeChiptuneBridge, NativeSequencerBridge, NativeGranularBridge, NativeGameOfLifeBridge, NativeMeterBridge } from './types'
 
 import { renderSourceControls } from './sources'
 import { renderFilterControls } from './FilterControls'
@@ -31,6 +31,8 @@ export type ModuleControlsProps = {
   nativeChiptune?: NativeChiptuneBridge | null
   nativeSequencer?: NativeSequencerBridge | null
   nativeGranular?: NativeGranularBridge | null
+  nativeGameOfLife?: NativeGameOfLifeBridge | null
+  nativeMeter?: NativeMeterBridge | null
   updateParam: (
     moduleId: string,
     paramId: string,
@@ -67,6 +69,8 @@ export const ModuleControls = ({
   nativeChiptune,
   nativeSequencer,
   nativeGranular,
+  nativeGameOfLife,
+  nativeMeter,
   updateParam,
   setManualGate,
   triggerManualSync,
@@ -128,6 +132,8 @@ export const ModuleControls = ({
     nativeChiptune,
     nativeSequencer,
     nativeGranular,
+    nativeGameOfLife,
+    nativeMeter,
     updateParam,
     setManualGate,
     triggerManualSync,
@@ -161,4 +167,4 @@ export const ModuleControls = ({
 }
 
 // Re-export types for external use
-export type { ControlProps, NativeScopeBridge, NativeChiptuneBridge, NativeSequencerBridge, NativeGranularBridge } from './types'
+export type { ControlProps, NativeScopeBridge, NativeChiptuneBridge, NativeSequencerBridge, NativeGranularBridge, NativeGameOfLifeBridge, NativeMeterBridge } from './types'

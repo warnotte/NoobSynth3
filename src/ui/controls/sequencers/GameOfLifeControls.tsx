@@ -18,7 +18,7 @@ const ROWS = 16
 const CELL_SIZE = 14
 const CELL_GAP = 1
 
-export function GameOfLifeControls({ module, updateParam, engine, status }: ControlProps) {
+export function GameOfLifeControls({ module, updateParam, engine, status, audioMode, nativeGameOfLife }: ControlProps) {
   const evolveRate = Number(module.params.evolveRate ?? 4)
   const range = Number(module.params.range ?? 2)
   const scale = Number(module.params.scale ?? 0)
@@ -47,15 +47,40 @@ export function GameOfLifeControls({ module, updateParam, engine, status }: Cont
 
   const [playhead, setPlayhead] = useState(-1)
 
-  // Subscribe to GOL grid updates from DSP engine
+  const isNativeMode = audioMode === 'native' && nativeGameOfLife?.isActive
+
+  // Web mode: subscribe to GOL grid updates from the WASM engine
   useEffect(() => {
+    if (isNativeMode) return
     if (status !== 'running') return
     const unsub = engine.watchGolGrid(module.id, (newGrid, step) => {
       setGrid(newGrid)
       setPlayhead(step)
     })
     return unsub
-  }, [engine, module.id, status])
+  }, [engine, module.id, status, isNativeMode])
+
+  // Native (Tauri) mode: poll grid + playhead from the native engine
+  useEffect(() => {
+    if (!isNativeMode || !nativeGameOfLife) return
+    if (status !== 'running') return
+    let active = true
+    const poll = async () => {
+      while (active) {
+        try {
+          const { grid: newGrid, step } = await nativeGameOfLife.getGolGrid(module.id)
+          if (!active) break
+          if (newGrid.length > 0) setGrid(newGrid)
+          setPlayhead(step)
+        } catch (err) {
+          console.error('Failed to poll Game of Life state:', err)
+        }
+        await new Promise((resolve) => setTimeout(resolve, 30))
+      }
+    }
+    void poll()
+    return () => { active = false }
+  }, [isNativeMode, nativeGameOfLife, module.id, status])
 
   const isPainting = useRef(false)
   const paintValue = useRef(false)
