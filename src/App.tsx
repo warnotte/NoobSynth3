@@ -766,6 +766,28 @@ function App() {
     }
   }, [isTauri, tauriNativeRunning])
 
+  // Native particle cloud bridge for Tauri standalone mode
+  const nativeParticleBridge = useMemo(() => {
+    if (!isTauri) {
+      return null
+    }
+    return {
+      isActive: tauriNativeRunning,
+      getParticlePositions: async (moduleId: string): Promise<Float32Array> => {
+        const result = await invokeTauri<number[]>('native_get_particle_positions', {
+          moduleId: tauriMapId(moduleId),
+        })
+        return new Float32Array(result)
+      },
+      loadParticleBuffer: async (moduleId: string, data: Float32Array): Promise<number> => {
+        return invokeTauri<number>('native_load_particle_buffer', {
+          moduleId: tauriMapId(moduleId),
+          data: Array.from(data),
+        })
+      },
+    }
+  }, [isTauri, tauriNativeRunning])
+
   useEffect(() => {
     if (!isTauri || !tauriNativeRunning) {
       nativeScopeRef.current = null
@@ -2135,6 +2157,7 @@ function App() {
     nativeSequencer: nativeSequencerBridge,
     nativeTheremin: nativeThereminBridge,
     nativeGranular: nativeGranularBridge,
+    nativeParticle: nativeParticleBridge,
     nativeGameOfLife: nativeGameOfLifeBridge,
     nativeMeter: nativeMeterBridge,
     updateParam,
