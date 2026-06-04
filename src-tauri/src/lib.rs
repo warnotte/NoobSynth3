@@ -424,7 +424,16 @@ impl NativeAudioState {
     let thread_scope = Arc::clone(&scope);
     let cpu_load = Arc::new(CpuLoadMetrics::new());
     let thread_cpu = Arc::clone(&cpu_load);
-    thread::spawn(move || audio_thread(rx, thread_scope, thread_cpu));
+    // Build the DSP graph (poly voices, SID 64KB RAM, etc.) on the audio
+    // thread, which can use a lot of stack in debug builds — the default ~2 MB
+    // thread stack overflows when GraphEngine::new constructs a polyphonic
+    // graph. Reserve a large stack (virtual, only committed as used). Mirrors
+    // the 8 MB test threads used by the preset integration tests.
+    thread::Builder::new()
+      .name("noobsynth-audio".to_string())
+      .stack_size(64 * 1024 * 1024)
+      .spawn(move || audio_thread(rx, thread_scope, thread_cpu))
+      .expect("failed to spawn audio thread");
     Self { tx, scope, cpu_load }
   }
 }
