@@ -7,9 +7,7 @@ crates/
 ├── dsp-core/       # Bibliothèque DSP partagée
 ├── dsp-graph/      # Moteur d'exécution du graphe
 ├── dsp-wasm/       # Bindings WebAssembly
-├── dsp-standalone/ # Host audio natif (Tauri)
-├── dsp-plugin/     # Plugin VST3/CLAP
-└── dsp-ipc/        # IPC mémoire partagée
+└── dsp-standalone/ # Host audio natif (Tauri)
 ```
 
 ## Architecture
@@ -23,18 +21,13 @@ crates/
          │  dsp-graph   │  ← Exécution du graphe
          └──────┬───────┘
                 │
-    ┌───────────┼───────────┐
-    │           │           │
-    ▼           ▼           ▼
-┌────────┐ ┌─────────┐ ┌─────────┐
-│dsp-wasm│ │dsp-stand│ │dsp-plug │
-│  WASM  │ │  Tauri  │ │  VST    │
-└────────┘ └─────────┘ └────┬────┘
-                            │
-                       ┌────┴────┐
-                       │ dsp-ipc │
-                       │  IPC    │
-                       └─────────┘
+    ┌───────────┴───────────┐
+    │                       │
+    ▼                       ▼
+┌────────┐             ┌─────────┐
+│dsp-wasm│             │dsp-stand│
+│  WASM  │             │  Tauri  │
+└────────┘             └─────────┘
 ```
 
 ## dsp-core
@@ -96,28 +89,6 @@ Host audio natif pour Tauri.
 
 [Voir dsp-standalone/README.md](dsp-standalone/README.md)
 
-## dsp-plugin
-
-Plugin VST3/CLAP via `nih-plug`.
-
-- Traitement audio dans le DAW
-- Mini-éditeur egui
-- Lance Tauri UI à la demande
-- State: graphe JSON complet
-
-[Voir dsp-plugin/README.md](dsp-plugin/README.md)
-
-## dsp-ipc
-
-IPC mémoire partagée entre VST et Tauri.
-
-- Ring buffer lock-free
-- Sync des paramètres
-- Transmission des notes MIDI
-- Multi-instance (scoped par ID)
-
-[Voir dsp-ipc/README.md](dsp-ipc/README.md)
-
 ## Build
 
 ```bash
@@ -126,9 +97,6 @@ cargo build --release --workspace
 
 # WASM uniquement
 npm run build:wasm
-
-# VST uniquement
-cargo build --release -p noobsynth_vst
 ```
 
 ## Tests

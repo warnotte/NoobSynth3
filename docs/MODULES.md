@@ -1077,7 +1077,6 @@ Entrée micro/système pour alimenter le rack.
 Notes :
 - **Web** : active le micro via `getUserMedia`
 - **Standalone** : utilise l'input choisi dans Tauri Bridge
-- **VST** : input non disponible (plugin instrument)
 
 ### VCA (Voltage Controlled Amplifier)
 

@@ -88,7 +88,6 @@ build.bat
 Construit tout :
 1. Frontend Vite (`dist/`)
 2. App Tauri (`target/release/noobsynth3.exe`)
-3. Plugin VST (`target/release/noobsynth_vst.dll`)
 
 ### Builds individuels
 
@@ -98,9 +97,6 @@ npm run build
 
 # Tauri uniquement
 npm run tauri:build
-
-# VST uniquement
-cargo build --release -p noobsynth_vst
 ```
 
 ### Clean rebuild
@@ -150,9 +146,7 @@ crates/
 ├── dsp-core/        # Modules DSP (oscillateurs, filtres, effets)
 ├── dsp-graph/       # Moteur d'exécution du graphe
 ├── dsp-wasm/        # Bindings WebAssembly
-├── dsp-standalone/  # Host audio natif (cpal)
-├── dsp-plugin/      # Plugin VST3/CLAP (nih-plug)
-└── dsp-ipc/         # IPC mémoire partagée (VST <-> Tauri)
+└── dsp-standalone/  # Host audio natif (cpal)
 ```
 
 ## Workflow de développement
@@ -232,13 +226,6 @@ cargo clippy --workspace
 ```
 
 ## Debug
-
-### Logs VST
-
-Le plugin écrit des logs dans le même dossier que le DLL :
-```
-noobsynth_vst_debug.log
-```
 
 ### Console navigateur
 

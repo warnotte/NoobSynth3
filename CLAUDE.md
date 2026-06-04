@@ -33,25 +33,24 @@ public/midi-presets/    # MIDI files + manifest.json
 ```
 App.tsx                          # Root component, state management, undo/redo
 ├── TopBar.tsx                   # Header + sticky toolbar (transport, undo/redo, export/import, view)
-├── SidePanel.tsx                # Module library + Presets + Macros (drawer on mobile)
-├── RackView.tsx                 # Main rack container
-│   ├── ModuleCard.tsx           # Single module frame (header, ports, body)
-│   │   └── controls/            # Module-specific controls
-│   │       ├── index.tsx        # Router → category files
-│   │       ├── sources/         # Source modules (18 files)
-│   │       │   └── ... (18 modules)
-│   │       ├── sequencers/      # Sequencer modules (16 files)
-│   │       │   └── ... (15 modules)
-│   │       ├── io/              # I/O modules (9 files)
-│   │       │   └── ... (9 modules)
-│   │       ├── effects/         # Effect modules (23 files)
-│   │       │   └── ... (22 modules)
-│   │       ├── FilterControls.tsx
-│   │       ├── AmplifierControls.tsx
-│   │       ├── ModulatorControls.tsx
-│   │       └── DrumControls.tsx
-│   └── PatchLayer.tsx           # SVG cable rendering
-└── MacroPanel.tsx               # VST macro controls (optional)
+├── SidePanel.tsx                # Module library + Presets (drawer on mobile)
+└── RackView.tsx                 # Main rack container
+    ├── ModuleCard.tsx           # Single module frame (header, ports, body)
+    │   └── controls/            # Module-specific controls
+    │       ├── index.tsx        # Router → category files
+    │       ├── sources/         # Source modules (18 files)
+    │       │   └── ... (18 modules)
+    │       ├── sequencers/      # Sequencer modules (16 files)
+    │       │   └── ... (15 modules)
+    │       ├── io/              # I/O modules (9 files)
+    │       │   └── ... (9 modules)
+    │       ├── effects/         # Effect modules (23 files)
+    │       │   └── ... (22 modules)
+    │       ├── FilterControls.tsx
+    │       ├── AmplifierControls.tsx
+    │       ├── ModulatorControls.tsx
+    │       └── DrumControls.tsx
+    └── PatchLayer.tsx           # SVG cable rendering
 
 Shared UI components:
 ├── RotaryKnob.tsx               # Rotary knob with drag
@@ -404,13 +403,12 @@ Presets dans `public/presets/`, structure `{ id, name, description, group, graph
 ### Documentation principale
 | Document | Description |
 |----------|-------------|
-| [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) | Vue d'ensemble des 3 modes (Web, Tauri, VST) |
+| [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) | Vue d'ensemble des 2 modes (Web, Tauri) |
 | [docs/DEVELOPMENT.md](./docs/DEVELOPMENT.md) | Guide de build, workflow, contribution |
 | [docs/MODULES.md](./docs/MODULES.md) | Référence complète des modules DSP (prose) |
 | [docs/MODULE_REFERENCE.md](./docs/MODULE_REFERENCE.md) | **Auto-généré** (`npm run module-ref`) : ports + params + defaults de chaque module. À consulter pour construire patchs/presets. |
 | [docs/FEATURES.md](./docs/FEATURES.md) | Notes d'implémentation détaillées par feature/module (extrait de CLAUDE.md) |
 | [docs/PRESETS.md](./docs/PRESETS.md) | Format preset complet, checklist, exemples, référence port IDs |
-| [docs/VST.md](./docs/VST.md) | Documentation plugin DAW |
 | [PERFORMANCE_OPTIMIZATION.md](./PERFORMANCE_OPTIMIZATION.md) | Guide d'optimisation |
 
 ### Documentation locale (dans le code)
@@ -436,7 +434,6 @@ Les plans/analyses de features déjà implémentées sont conservés dans [docs/
 | [crates/README.md](./crates/README.md) | Vue d'ensemble du workspace Rust |
 | [crates/dsp-core/README.md](./crates/dsp-core/README.md) | Modules DSP |
 | [crates/dsp-graph/README.md](./crates/dsp-graph/README.md) | Moteur de graphe |
-| [crates/dsp-ipc/README.md](./crates/dsp-ipc/README.md) | IPC pour VST |
 
 ---
 
@@ -447,9 +444,6 @@ Les plans/analyses de features déjà implémentées sont conservés dans [docs/
 | VCF 24dB | Peut distordre à résonance extrême |
 | VCF Ladder | LP uniquement; HP/BP/Notch basculent vers SVF |
 | Voice count | Changer rapidement le nombre de voix peut causer instabilité |
-| VST Scope | Oscilloscope non fonctionnel (taps non connectés via IPC) |
-| VST UI | L'éditeur est un launcher; UI complète dans fenêtre Tauri externe |
-| VST Macros | Les édits UI ne modifient pas l'automation DAW |
 | WASM | `wasm-opt` actif avec `-O2 --enable-bulk-memory --enable-nontrapping-float-to-int` (~15% plus petit) |
 | **Mixers Gain Staging** | Tous les mixers (2ch, 6ch, 8ch) divisent par `√N` (N = entrées connectées). Formule standard DAW (sommation de puissance). Ancien comportement: 2ch divisait toujours par 2, multi-ch par N. |
 | **RSID partiellement supporté** | Certains fichiers RSID (Great Giana Sisters, RoboCop) ne jouent pas correctement. L'émulation CPU 6502/CIA/VIC n'est pas assez précise pour les tunes RSID les plus exigeantes (timer modulation dynamique, échantillons digi). Les PSID fonctionnent tous. |
