@@ -24,6 +24,9 @@ export function SidPlayerControls({ module, engine, audioMode, nativeChiptune, u
   ])
   const [elapsed, setElapsed] = useState(0)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  // Remember the loaded file so native audio can (re)load it on Start — it may
+  // have been loaded into the WASM engine before Tauri native audio was running.
+  const loadedDataRef = useRef<Uint8Array | null>(null)
   const [sidPresets, setSidPresets] = useState<SidPresetEntry[]>([])
 
   const isNativeMode = audioMode === 'native' && nativeChiptune?.isActive
@@ -83,6 +86,14 @@ export function SidPlayerControls({ module, engine, audioMode, nativeChiptune, u
     return () => { active = false }
   }, [module.id, playing, isNativeMode, nativeChiptune])
 
+  // When Tauri native audio becomes active, (re)load the current SID file into
+  // the native engine (it may have been loaded into WASM before Start).
+  useEffect(() => {
+    if (isNativeMode && nativeChiptune && loadedDataRef.current) {
+      void nativeChiptune.loadSidFile(module.id, loadedDataRef.current)
+    }
+  }, [isNativeMode, nativeChiptune, module.id])
+
   const chipModelOptions = [
     { id: 0, label: '6581' },
     { id: 1, label: '8580' },
@@ -104,6 +115,8 @@ export function SidPlayerControls({ module, engine, audioMode, nativeChiptune, u
         updateParam(module.id, 'song', startSong || 1)
         setSidInfo({ name, author, songs, isRsid: magic === 'RSID' })
 
+        // Remember the data so native audio can (re)load it on Start.
+        loadedDataRef.current = data
         // Load into appropriate engine based on mode
         if (isNativeMode && nativeChiptune) {
           void nativeChiptune.loadSidFile(module.id, data)

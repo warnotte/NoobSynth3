@@ -24,6 +24,9 @@ export function AyPlayerControls({ module, engine, audioMode, nativeChiptune, up
   ])
   const [elapsed, setElapsed] = useState(0)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  // Remember the loaded file so native audio can (re)load it on Start — it may
+  // have been loaded into the WASM engine before Tauri native audio was running.
+  const loadedDataRef = useRef<Uint8Array | null>(null)
   const [ayPresets, setAyPresets] = useState<AyPresetEntry[]>([])
   const [loadError, setLoadError] = useState<string | null>(null)
 
@@ -84,6 +87,14 @@ export function AyPlayerControls({ module, engine, audioMode, nativeChiptune, up
     return () => { active = false }
   }, [module.id, playing, isNativeMode, nativeChiptune])
 
+  // When Tauri native audio becomes active, (re)load the current YM/AY file into
+  // the native engine (it may have been loaded into WASM before Start).
+  useEffect(() => {
+    if (isNativeMode && nativeChiptune && loadedDataRef.current) {
+      void nativeChiptune.loadYmFile(module.id, loadedDataRef.current)
+    }
+  }, [isNativeMode, nativeChiptune, module.id])
+
   // Load YM/VTX/PSG data into engine
   const loadYmData = useCallback((rawData: Uint8Array) => {
     setLoadError(null)
@@ -91,6 +102,7 @@ export function AyPlayerControls({ module, engine, audioMode, nativeChiptune, up
 
     // Helper to load into appropriate engine
     const loadIntoEngine = (d: Uint8Array) => {
+      loadedDataRef.current = d
       if (isNativeMode && nativeChiptune) {
         void nativeChiptune.loadYmFile(module.id, d)
       } else {
@@ -187,6 +199,8 @@ export function AyPlayerControls({ module, engine, audioMode, nativeChiptune, up
         frames: 0,
         format
       })
+      // Remember the data so native audio can (re)load it on Start.
+      loadedDataRef.current = data
       // Load into appropriate engine based on mode
       if (isNativeMode && nativeChiptune) {
         void nativeChiptune.loadYmFile(module.id, data)
