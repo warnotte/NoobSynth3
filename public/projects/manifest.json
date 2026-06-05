@@ -42,6 +42,13 @@
       "description": "Song d'après l'esprit de \"Monument\" (Röyksopp), ré mineur, 96 BPM. Une MÉLODIE LONGUE de 32 mesures (MIDI File Sequencer, ~80s, jamais une boucle) sur une nappe Dm7–Bb–F–C–Gm–A7 + groove 808 downtempo. 3 racks.",
       "file": "monolithe.json",
       "group": "Songs"
+    },
+    {
+      "id": "vesper",
+      "name": "Vesper ⛪",
+      "description": "Orgue cinématique : une MÉLODIE LONGUE de 32 mesures (do mineur, ~96s) jouée par un Pipe Organ à travers un Leslie — le \"test ultime\" du synth transformé en musique. Nappe Cm7–Ab–Eb–Bb–Fm–G7 + battement très épars. 80 BPM, 3 racks.",
+      "file": "vesper.json",
+      "group": "Songs"
     }
   ]
 }

@@ -1,0 +1,882 @@
+{
+  "version": 2,
+  "type": "project",
+  "masterTempo": 80,
+  "masterVolume": 0.8,
+  "activeRackId": "rack-1",
+  "racks": [
+    {
+      "id": "rack-1",
+      "name": "Orgue",
+      "graph": {
+        "modules": [
+          {
+            "id": "midiseq",
+            "type": "midi-file-sequencer",
+            "name": "Mélodie longue",
+            "position": {
+              "x": 40,
+              "y": 60
+            },
+            "params": {
+              "enabled": true,
+              "tempo": 80,
+              "gateLength": 94,
+              "loop": true,
+              "voices": 1,
+              "midiData": "{\"ticksPerBeat\":480,\"totalTicks\":61440,\"tempo\":80,\"tracks\":[{\"name\":\"Organ\",\"notes\":[{\"tick\":0,\"note\":67,\"velocity\":62,\"duration\":1900},{\"tick\":1920,\"note\":68,\"velocity\":64,\"duration\":940},{\"tick\":2880,\"note\":67,\"velocity\":62,\"duration\":940},{\"tick\":3840,\"note\":65,\"velocity\":60,\"duration\":1420},{\"tick\":5280,\"note\":63,\"velocity\":58,\"duration\":460},{\"tick\":5760,\"note\":67,\"velocity\":64,\"duration\":1900},{\"tick\":7680,\"note\":72,\"velocity\":70,\"duration\":940},{\"tick\":8640,\"note\":70,\"velocity\":66,\"duration\":460},{\"tick\":9120,\"note\":68,\"velocity\":64,\"duration\":460},{\"tick\":9600,\"note\":67,\"velocity\":68,\"duration\":1900},{\"tick\":11520,\"note\":68,\"velocity\":68,\"duration\":940},{\"tick\":12480,\"note\":70,\"velocity\":72,\"duration\":940},{\"tick\":13440,\"note\":72,\"velocity\":76,\"duration\":1900},{\"tick\":15360,\"note\":75,\"velocity\":80,\"duration\":940},{\"tick\":16320,\"note\":74,\"velocity\":74,\"duration\":460},{\"tick\":16800,\"note\":72,\"velocity\":72,\"duration\":460},{\"tick\":17280,\"note\":74,\"velocity\":78,\"duration\":1900},{\"tick\":19200,\"note\":72,\"velocity\":72,\"duration\":940},{\"tick\":20160,\"note\":70,\"velocity\":68,\"duration\":460},{\"tick\":20640,\"note\":68,\"velocity\":66,\"duration\":460},{\"tick\":21120,\"note\":67,\"velocity\":68,\"duration\":1900},{\"tick\":23040,\"note\":65,\"velocity\":64,\"duration\":940},{\"tick\":24000,\"note\":67,\"velocity\":66,\"duration\":940},{\"tick\":24960,\"note\":68,\"velocity\":68,\"duration\":1420},{\"tick\":26400,\"note\":67,\"velocity\":64,\"duration\":460},{\"tick\":26880,\"note\":65,\"velocity\":62,\"duration\":940},{\"tick\":27840,\"note\":63,\"velocity\":60,\"duration\":940},{\"tick\":28800,\"note\":62,\"velocity\":58,\"duration\":1900},{\"tick\":30720,\"note\":67,\"velocity\":72,\"duration\":940},{\"tick\":31680,\"note\":72,\"velocity\":78,\"duration\":940},{\"tick\":32640,\"note\":74,\"velocity\":82,\"duration\":940},{\"tick\":33600,\"note\":75,\"velocity\":86,\"duration\":940},{\"tick\":34560,\"note\":77,\"velocity\":90,\"duration\":940},{\"tick\":35520,\"note\":75,\"velocity\":84,\"duration\":940},{\"tick\":36480,\"note\":74,\"velocity\":80,\"duration\":1900},{\"tick\":38400,\"note\":79,\"velocity\":96,\"duration\":1900},{\"tick\":40320,\"note\":77,\"velocity\":90,\"duration\":940},{\"tick\":41280,\"note\":75,\"velocity\":88,\"duration\":940},{\"tick\":42240,\"note\":77,\"velocity\":92,\"duration\":940},{\"tick\":43200,\"note\":79,\"velocity\":98,\"duration\":940},{\"tick\":44160,\"note\":80,\"velocity\":100,\"duration\":1900},{\"tick\":46080,\"note\":79,\"velocity\":92,\"duration\":940},{\"tick\":47040,\"note\":77,\"velocity\":88,\"duration\":940},{\"tick\":48000,\"note\":75,\"velocity\":84,\"duration\":940},{\"tick\":48960,\"note\":74,\"velocity\":82,\"duration\":940},{\"tick\":49920,\"note\":72,\"velocity\":76,\"duration\":1900},{\"tick\":51840,\"note\":70,\"velocity\":72,\"duration\":940},{\"tick\":52800,\"note\":68,\"velocity\":70,\"duration\":940},{\"tick\":53760,\"note\":67,\"velocity\":68,\"duration\":1900},{\"tick\":55680,\"note\":65,\"velocity\":64,\"duration\":940},{\"tick\":56640,\"note\":63,\"velocity\":62,\"duration\":940},{\"tick\":57600,\"note\":62,\"velocity\":58,\"duration\":940},{\"tick\":58560,\"note\":63,\"velocity\":58,\"duration\":940},{\"tick\":59520,\"note\":60,\"velocity\":54,\"duration\":1900}]}]}",
+              "selectedFile": ""
+            }
+          },
+          {
+            "id": "organ",
+            "type": "pipe-organ",
+            "name": "Pipe Organ",
+            "position": {
+              "x": 460,
+              "y": 60
+            },
+            "params": {
+              "frequency": 440,
+              "drawbar16": 0.6,
+              "drawbar8": 0.85,
+              "drawbar4": 0.55,
+              "drawbar223": 0.35,
+              "drawbar2": 0.28,
+              "drawbar135": 0.18,
+              "drawbar113": 0.1,
+              "drawbar1": 0.08,
+              "voicing": 0,
+              "chiff": 0.06,
+              "tremulant": 0,
+              "tremRate": 6,
+              "wind": 0.05,
+              "brightness": 0.6
+            }
+          },
+          {
+            "id": "orgvca",
+            "type": "gain",
+            "name": "Safety VCA",
+            "position": {
+              "x": 720,
+              "y": 60
+            },
+            "params": {
+              "gain": 0.2
+            }
+          },
+          {
+            "id": "leslie",
+            "type": "leslie",
+            "name": "Leslie 122",
+            "position": {
+              "x": 980,
+              "y": 60
+            },
+            "params": {
+              "speed": 0,
+              "brake": 0,
+              "drive": 0.12,
+              "depth": 0.7,
+              "mix": 1
+            }
+          },
+          {
+            "id": "orgverb",
+            "type": "reverb",
+            "name": "Cathedral",
+            "position": {
+              "x": 1240,
+              "y": 60
+            },
+            "params": {
+              "time": 3.6,
+              "damp": 0.4,
+              "preDelay": 40,
+              "mix": 0.4
+            }
+          },
+          {
+            "id": "out-1",
+            "type": "output",
+            "name": "Out Orgue",
+            "position": {
+              "x": 1500,
+              "y": 60
+            },
+            "params": {
+              "level": 1
+            }
+          },
+          {
+            "id": "notes-1",
+            "type": "notes",
+            "name": "Info",
+            "position": {
+              "x": 460,
+              "y": 360
+            },
+            "params": {
+              "text": "VESPER — orgue cinématique (esprit Röyksopp + cathédrale).\n\nLa MÉLODIE LONGUE (32 mesures, do mineur) est jouée par un PIPE ORGAN à travers un LESLIE — le \"test ultime\" du synth transformé en musique.\n\n1. ORGUE — la ligne mélodique (MIDI File Sequencer → orgue → Leslie chorale → réverb cathédrale).\n2. HARMONIE — nappe Cm7–Ab–Eb–Bb–Fm–G7 + sub.\n3. RYTHME — battement très épars (à muter pour du pur ambient).\n\n80 BPM. Laisse l’orgue chanter, monte la réverb."
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": {
+              "moduleId": "midiseq",
+              "portId": "cv-1"
+            },
+            "to": {
+              "moduleId": "organ",
+              "portId": "pitch"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "midiseq",
+              "portId": "gate-1"
+            },
+            "to": {
+              "moduleId": "organ",
+              "portId": "gate"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "organ",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "orgvca",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "orgvca",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "leslie",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "leslie",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "orgverb",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "orgverb",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "out-1",
+              "portId": "in"
+            },
+            "kind": "audio"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rack-2",
+      "name": "Harmonie",
+      "graph": {
+        "modules": [
+          {
+            "id": "chord",
+            "type": "chord-sequencer",
+            "name": "Accords",
+            "position": {
+              "x": 40,
+              "y": 60
+            },
+            "params": {
+              "enabled": true,
+              "tempo": 80,
+              "rate": 0,
+              "gateLength": 96,
+              "swing": 0,
+              "length": 8,
+              "strumSpeed": 0,
+              "strumDirection": 0,
+              "voicing": 1,
+              "stepData": "[{\"root\":48,\"chordType\":3,\"inversion\":0,\"gate\":true},{\"root\":44,\"chordType\":4,\"inversion\":0,\"gate\":true},{\"root\":51,\"chordType\":4,\"inversion\":0,\"gate\":true},{\"root\":46,\"chordType\":0,\"inversion\":0,\"gate\":true},{\"root\":53,\"chordType\":3,\"inversion\":0,\"gate\":true},{\"root\":48,\"chordType\":3,\"inversion\":0,\"gate\":true},{\"root\":55,\"chordType\":2,\"inversion\":0,\"gate\":true},{\"root\":55,\"chordType\":2,\"inversion\":0,\"gate\":true}]"
+            }
+          },
+          {
+            "id": "saw1",
+            "type": "supersaw",
+            "name": "Pad 1",
+            "position": {
+              "x": 460,
+              "y": 40
+            },
+            "params": {
+              "frequency": 220,
+              "detune": 13,
+              "mix": 0.65
+            }
+          },
+          {
+            "id": "saw2",
+            "type": "supersaw",
+            "name": "Pad 2",
+            "position": {
+              "x": 460,
+              "y": 180
+            },
+            "params": {
+              "frequency": 220,
+              "detune": 15,
+              "mix": 0.65
+            }
+          },
+          {
+            "id": "saw3",
+            "type": "supersaw",
+            "name": "Pad 3",
+            "position": {
+              "x": 460,
+              "y": 320
+            },
+            "params": {
+              "frequency": 220,
+              "detune": 17,
+              "mix": 0.65
+            }
+          },
+          {
+            "id": "saw4",
+            "type": "supersaw",
+            "name": "Pad 4",
+            "position": {
+              "x": 460,
+              "y": 460
+            },
+            "params": {
+              "frequency": 220,
+              "detune": 19,
+              "mix": 0.65
+            }
+          },
+          {
+            "id": "padmix",
+            "type": "mixer-8",
+            "name": "Pad Mix",
+            "position": {
+              "x": 720,
+              "y": 60
+            },
+            "params": {
+              "level1": 0.5,
+              "level2": 0.5,
+              "level3": 0.5,
+              "level4": 0.5,
+              "level5": 0,
+              "level6": 0,
+              "level7": 0,
+              "level8": 0
+            }
+          },
+          {
+            "id": "padenv",
+            "type": "adsr",
+            "name": "Pad Env",
+            "position": {
+              "x": 720,
+              "y": 360
+            },
+            "params": {
+              "attack": 2,
+              "decay": 1.5,
+              "sustain": 0.8,
+              "release": 3.5
+            }
+          },
+          {
+            "id": "padvca",
+            "type": "gain",
+            "name": "Pad VCA",
+            "position": {
+              "x": 980,
+              "y": 60
+            },
+            "params": {
+              "gain": 0.55
+            }
+          },
+          {
+            "id": "lfofilt",
+            "type": "lfo",
+            "name": "LFO Filtre",
+            "position": {
+              "x": 980,
+              "y": 360
+            },
+            "params": {
+              "rate": 0.03,
+              "depth": 0.3,
+              "offset": 0.08,
+              "shape": "sine",
+              "bipolar": false
+            }
+          },
+          {
+            "id": "padfilt",
+            "type": "vcf",
+            "name": "Pad Filter",
+            "position": {
+              "x": 1240,
+              "y": 60
+            },
+            "params": {
+              "cutoff": 680,
+              "resonance": 0.16,
+              "drive": 0.06,
+              "envAmount": 0,
+              "modAmount": 0.55,
+              "keyTrack": 0,
+              "model": "svf",
+              "mode": "lp",
+              "slope": 12
+            }
+          },
+          {
+            "id": "sub",
+            "type": "oscillator",
+            "name": "Sub",
+            "position": {
+              "x": 460,
+              "y": 600
+            },
+            "params": {
+              "frequency": 110,
+              "type": "triangle",
+              "pwm": 0.5,
+              "unison": 1,
+              "detune": 0,
+              "fmLin": 0,
+              "fmExp": 0,
+              "subMix": 0.7,
+              "subOct": 1
+            }
+          },
+          {
+            "id": "subfilt",
+            "type": "vcf",
+            "name": "Sub Filter",
+            "position": {
+              "x": 720,
+              "y": 600
+            },
+            "params": {
+              "cutoff": 150,
+              "resonance": 0.1,
+              "drive": 0.05,
+              "envAmount": 0,
+              "modAmount": 0,
+              "keyTrack": 0,
+              "model": "svf",
+              "mode": "lp",
+              "slope": 24
+            }
+          },
+          {
+            "id": "harmmix",
+            "type": "mixer-8",
+            "name": "Harm Mix",
+            "position": {
+              "x": 1500,
+              "y": 60
+            },
+            "params": {
+              "level1": 0.4,
+              "level2": 0.42,
+              "level3": 0,
+              "level4": 0,
+              "level5": 0,
+              "level6": 0,
+              "level7": 0,
+              "level8": 0
+            }
+          },
+          {
+            "id": "harmverb",
+            "type": "reverb",
+            "name": "Reverb",
+            "position": {
+              "x": 1760,
+              "y": 60
+            },
+            "params": {
+              "time": 3.2,
+              "damp": 0.5,
+              "preDelay": 35,
+              "mix": 0.32
+            }
+          },
+          {
+            "id": "out-2",
+            "type": "output",
+            "name": "Out Harmonie",
+            "position": {
+              "x": 2020,
+              "y": 60
+            },
+            "params": {
+              "level": 1
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": {
+              "moduleId": "chord",
+              "portId": "cv-1"
+            },
+            "to": {
+              "moduleId": "saw1",
+              "portId": "pitch"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "saw1",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "padmix",
+              "portId": "in-1"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "chord",
+              "portId": "cv-2"
+            },
+            "to": {
+              "moduleId": "saw2",
+              "portId": "pitch"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "saw2",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "padmix",
+              "portId": "in-2"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "chord",
+              "portId": "cv-3"
+            },
+            "to": {
+              "moduleId": "saw3",
+              "portId": "pitch"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "saw3",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "padmix",
+              "portId": "in-3"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "chord",
+              "portId": "cv-4"
+            },
+            "to": {
+              "moduleId": "saw4",
+              "portId": "pitch"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "saw4",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "padmix",
+              "portId": "in-4"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "chord",
+              "portId": "gate-1"
+            },
+            "to": {
+              "moduleId": "padenv",
+              "portId": "gate"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "padmix",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "padvca",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "padenv",
+              "portId": "env"
+            },
+            "to": {
+              "moduleId": "padvca",
+              "portId": "cv"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "padvca",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "padfilt",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "lfofilt",
+              "portId": "cv-out"
+            },
+            "to": {
+              "moduleId": "padfilt",
+              "portId": "mod"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "padfilt",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "harmmix",
+              "portId": "in-1"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "chord",
+              "portId": "root-cv"
+            },
+            "to": {
+              "moduleId": "sub",
+              "portId": "pitch"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "sub",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "subfilt",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "subfilt",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "harmmix",
+              "portId": "in-2"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "harmmix",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "harmverb",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "harmverb",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "out-2",
+              "portId": "in"
+            },
+            "kind": "audio"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rack-3",
+      "name": "Rythme",
+      "graph": {
+        "modules": [
+          {
+            "id": "drumseq",
+            "type": "drum-sequencer",
+            "name": "Drum Seq",
+            "position": {
+              "x": 40,
+              "y": 60
+            },
+            "params": {
+              "enabled": true,
+              "tempo": 80,
+              "rate": 4,
+              "gateLength": 50,
+              "swing": 0,
+              "length": 16,
+              "drumData": "{\"tracks\":[[{\"g\":1,\"a\":0},{\"g\":0,\"a\":1},{\"g\":0,\"a\":2},{\"g\":0,\"a\":3},{\"g\":0,\"a\":4},{\"g\":0,\"a\":5},{\"g\":0,\"a\":6},{\"g\":0,\"a\":7},{\"g\":1,\"a\":8},{\"g\":0,\"a\":9},{\"g\":0,\"a\":10},{\"g\":0,\"a\":11},{\"g\":0,\"a\":12},{\"g\":0,\"a\":13},{\"g\":1,\"a\":14},{\"g\":0,\"a\":15}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":1},{\"g\":0,\"a\":2},{\"g\":0,\"a\":3},{\"g\":0,\"a\":4},{\"g\":0,\"a\":5},{\"g\":0,\"a\":6},{\"g\":0,\"a\":7},{\"g\":1,\"a\":8},{\"g\":0,\"a\":9},{\"g\":0,\"a\":10},{\"g\":0,\"a\":11},{\"g\":0,\"a\":12},{\"g\":0,\"a\":13},{\"g\":0,\"a\":14},{\"g\":0,\"a\":15}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":1},{\"g\":1,\"a\":2},{\"g\":0,\"a\":3},{\"g\":0,\"a\":4},{\"g\":0,\"a\":5},{\"g\":1,\"a\":6},{\"g\":0,\"a\":7},{\"g\":0,\"a\":8},{\"g\":0,\"a\":9},{\"g\":1,\"a\":10},{\"g\":0,\"a\":11},{\"g\":0,\"a\":12},{\"g\":0,\"a\":13},{\"g\":1,\"a\":14},{\"g\":0,\"a\":15}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":1},{\"g\":0,\"a\":2},{\"g\":0,\"a\":3},{\"g\":0,\"a\":4},{\"g\":0,\"a\":5},{\"g\":0,\"a\":6},{\"g\":0,\"a\":7},{\"g\":0,\"a\":8},{\"g\":0,\"a\":9},{\"g\":0,\"a\":10},{\"g\":0,\"a\":11},{\"g\":0,\"a\":12},{\"g\":0,\"a\":13},{\"g\":0,\"a\":14},{\"g\":0,\"a\":15}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":1},{\"g\":0,\"a\":2},{\"g\":0,\"a\":3},{\"g\":0,\"a\":4},{\"g\":0,\"a\":5},{\"g\":0,\"a\":6},{\"g\":0,\"a\":7},{\"g\":0,\"a\":8},{\"g\":0,\"a\":9},{\"g\":0,\"a\":10},{\"g\":0,\"a\":11},{\"g\":0,\"a\":12},{\"g\":0,\"a\":13},{\"g\":0,\"a\":14},{\"g\":0,\"a\":15}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":1},{\"g\":0,\"a\":2},{\"g\":0,\"a\":3},{\"g\":0,\"a\":4},{\"g\":0,\"a\":5},{\"g\":0,\"a\":6},{\"g\":0,\"a\":7},{\"g\":0,\"a\":8},{\"g\":0,\"a\":9},{\"g\":0,\"a\":10},{\"g\":0,\"a\":11},{\"g\":0,\"a\":12},{\"g\":0,\"a\":13},{\"g\":0,\"a\":14},{\"g\":0,\"a\":15}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":1},{\"g\":0,\"a\":2},{\"g\":0,\"a\":3},{\"g\":0,\"a\":4},{\"g\":0,\"a\":5},{\"g\":0,\"a\":6},{\"g\":0,\"a\":7},{\"g\":0,\"a\":8},{\"g\":0,\"a\":9},{\"g\":0,\"a\":10},{\"g\":0,\"a\":11},{\"g\":0,\"a\":12},{\"g\":0,\"a\":13},{\"g\":0,\"a\":14},{\"g\":0,\"a\":15}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":1},{\"g\":0,\"a\":2},{\"g\":0,\"a\":3},{\"g\":0,\"a\":4},{\"g\":0,\"a\":5},{\"g\":0,\"a\":6},{\"g\":0,\"a\":7},{\"g\":0,\"a\":8},{\"g\":0,\"a\":9},{\"g\":0,\"a\":10},{\"g\":0,\"a\":11},{\"g\":0,\"a\":12},{\"g\":0,\"a\":13},{\"g\":0,\"a\":14},{\"g\":0,\"a\":15}]]}"
+            }
+          },
+          {
+            "id": "kick",
+            "type": "808-kick",
+            "name": "808 Kick",
+            "position": {
+              "x": 460,
+              "y": 40
+            },
+            "params": {
+              "tune": 42,
+              "decay": 1.7,
+              "tone": 0.28,
+              "click": 0.14
+            }
+          },
+          {
+            "id": "snare",
+            "type": "808-snare",
+            "name": "808 Snare",
+            "position": {
+              "x": 460,
+              "y": 200
+            },
+            "params": {
+              "tune": 170,
+              "tone": 0.4,
+              "snappy": 0.35,
+              "decay": 0.4
+            }
+          },
+          {
+            "id": "hh",
+            "type": "808-hihat",
+            "name": "808 HiHat",
+            "position": {
+              "x": 460,
+              "y": 360
+            },
+            "params": {
+              "tune": 1,
+              "decay": 0.08,
+              "tone": 0.55,
+              "snap": 0.35
+            }
+          },
+          {
+            "id": "drummix",
+            "type": "mixer-1x2",
+            "name": "Drum Mix",
+            "position": {
+              "x": 720,
+              "y": 60
+            },
+            "params": {
+              "levelA": 0.78,
+              "levelB": 0.42,
+              "levelC": 0.28,
+              "levelD": 0,
+              "levelE": 0,
+              "levelF": 0
+            }
+          },
+          {
+            "id": "drumverb",
+            "type": "reverb",
+            "name": "Reverb",
+            "position": {
+              "x": 980,
+              "y": 60
+            },
+            "params": {
+              "time": 1.4,
+              "damp": 0.55,
+              "preDelay": 18,
+              "mix": 0.22
+            }
+          },
+          {
+            "id": "out-3",
+            "type": "output",
+            "name": "Out Rythme",
+            "position": {
+              "x": 1240,
+              "y": 60
+            },
+            "params": {
+              "level": 1
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": {
+              "moduleId": "drumseq",
+              "portId": "gate-kick"
+            },
+            "to": {
+              "moduleId": "kick",
+              "portId": "trigger"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "drumseq",
+              "portId": "gate-snare"
+            },
+            "to": {
+              "moduleId": "snare",
+              "portId": "trigger"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "drumseq",
+              "portId": "gate-hhc"
+            },
+            "to": {
+              "moduleId": "hh",
+              "portId": "trigger"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "kick",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "drummix",
+              "portId": "in-a"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "snare",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "drummix",
+              "portId": "in-b"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "hh",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "drummix",
+              "portId": "in-c"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "drummix",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "drumverb",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "drumverb",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "out-3",
+              "portId": "in"
+            },
+            "kind": "audio"
+          }
+        ]
+      }
+    }
+  ],
+  "mixer": {
+    "rack-1": {
+      "volume": 0.8,
+      "mute": false,
+      "solo": false
+    },
+    "rack-2": {
+      "volume": 0.46,
+      "mute": false,
+      "solo": false
+    },
+    "rack-3": {
+      "volume": 0.4,
+      "mute": false,
+      "solo": false
+    }
+  }
+}
