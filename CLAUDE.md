@@ -450,6 +450,8 @@ Les plans/analyses de features déjà implémentées sont conservés dans [docs/
 | [crates/README.md](./crates/README.md) | Vue d'ensemble du workspace Rust |
 | [crates/dsp-core/README.md](./crates/dsp-core/README.md) | Modules DSP |
 | [crates/dsp-graph/README.md](./crates/dsp-graph/README.md) | Moteur de graphe |
+| [crates/dsp-wasm/README.md](./crates/dsp-wasm/README.md) | Bindings WASM (mode Web) |
+| [crates/dsp-standalone/README.md](./crates/dsp-standalone/README.md) | Host audio natif cpal (mode Tauri standalone) |
 
 ---
 
