@@ -1,0 +1,1102 @@
+{
+  "version": 2,
+  "type": "project",
+  "masterTempo": 112,
+  "masterVolume": 0.8,
+  "activeRackId": "rack-1",
+  "racks": [
+    {
+      "id": "rack-1",
+      "name": "Mélodie",
+      "graph": {
+        "modules": [
+          {
+            "id": "midiseq",
+            "type": "midi-file-sequencer",
+            "name": "Lead + Arp",
+            "position": {
+              "x": 40,
+              "y": 60
+            },
+            "params": {
+              "enabled": true,
+              "tempo": 112,
+              "gateLength": 80,
+              "loop": true,
+              "voices": 1,
+              "midiData": "{\"ticksPerBeat\":480,\"totalTicks\":61440,\"tempo\":112,\"tracks\":[{\"name\":\"Lead\",\"notes\":[{\"tick\":0,\"note\":76,\"velocity\":68,\"duration\":946},{\"tick\":960,\"note\":78,\"velocity\":66,\"duration\":466},{\"tick\":1440,\"note\":76,\"velocity\":66,\"duration\":466},{\"tick\":1920,\"note\":73,\"velocity\":70,\"duration\":946},{\"tick\":2880,\"note\":76,\"velocity\":74,\"duration\":946},{\"tick\":3840,\"note\":81,\"velocity\":80,\"duration\":946},{\"tick\":4800,\"note\":80,\"velocity\":74,\"duration\":466},{\"tick\":5280,\"note\":78,\"velocity\":72,\"duration\":466},{\"tick\":5760,\"note\":76,\"velocity\":70,\"duration\":1906},{\"tick\":7680,\"note\":73,\"velocity\":68,\"duration\":946},{\"tick\":8640,\"note\":76,\"velocity\":70,\"duration\":466},{\"tick\":9120,\"note\":78,\"velocity\":74,\"duration\":466},{\"tick\":9600,\"note\":80,\"velocity\":80,\"duration\":946},{\"tick\":10560,\"note\":78,\"velocity\":74,\"duration\":466},{\"tick\":11040,\"note\":76,\"velocity\":72,\"duration\":466},{\"tick\":11520,\"note\":74,\"velocity\":70,\"duration\":946},{\"tick\":12480,\"note\":73,\"velocity\":68,\"duration\":946},{\"tick\":13440,\"note\":76,\"velocity\":72,\"duration\":1906},{\"tick\":15360,\"note\":81,\"velocity\":82,\"duration\":946},{\"tick\":16320,\"note\":80,\"velocity\":76,\"duration\":466},{\"tick\":16800,\"note\":78,\"velocity\":74,\"duration\":466},{\"tick\":17280,\"note\":76,\"velocity\":76,\"duration\":946},{\"tick\":18240,\"note\":78,\"velocity\":78,\"duration\":946},{\"tick\":19200,\"note\":81,\"velocity\":84,\"duration\":946},{\"tick\":20160,\"note\":83,\"velocity\":88,\"duration\":946},{\"tick\":21120,\"note\":81,\"velocity\":82,\"duration\":1906},{\"tick\":23040,\"note\":78,\"velocity\":74,\"duration\":946},{\"tick\":24000,\"note\":76,\"velocity\":70,\"duration\":466},{\"tick\":24480,\"note\":74,\"velocity\":68,\"duration\":466},{\"tick\":24960,\"note\":73,\"velocity\":70,\"duration\":946},{\"tick\":25920,\"note\":76,\"velocity\":74,\"duration\":946},{\"tick\":26880,\"note\":78,\"velocity\":72,\"duration\":466},{\"tick\":27360,\"note\":76,\"velocity\":70,\"duration\":466},{\"tick\":27840,\"note\":73,\"velocity\":68,\"duration\":946},{\"tick\":28800,\"note\":69,\"velocity\":64,\"duration\":1906},{\"tick\":30720,\"note\":76,\"velocity\":72,\"duration\":466},{\"tick\":31200,\"note\":78,\"velocity\":74,\"duration\":466},{\"tick\":31680,\"note\":80,\"velocity\":78,\"duration\":466},{\"tick\":32160,\"note\":81,\"velocity\":82,\"duration\":466},{\"tick\":32640,\"note\":83,\"velocity\":86,\"duration\":946},{\"tick\":33600,\"note\":81,\"velocity\":82,\"duration\":946},{\"tick\":34560,\"note\":80,\"velocity\":80,\"duration\":466},{\"tick\":35040,\"note\":78,\"velocity\":76,\"duration\":466},{\"tick\":35520,\"note\":76,\"velocity\":76,\"duration\":946},{\"tick\":36480,\"note\":78,\"velocity\":74,\"duration\":1906},{\"tick\":38400,\"note\":85,\"velocity\":92,\"duration\":946},{\"tick\":39360,\"note\":83,\"velocity\":86,\"duration\":466},{\"tick\":39840,\"note\":81,\"velocity\":84,\"duration\":466},{\"tick\":40320,\"note\":83,\"velocity\":90,\"duration\":946},{\"tick\":41280,\"note\":85,\"velocity\":94,\"duration\":946},{\"tick\":42240,\"note\":88,\"velocity\":100,\"duration\":1906},{\"tick\":44160,\"note\":85,\"velocity\":90,\"duration\":946},{\"tick\":45120,\"note\":83,\"velocity\":86,\"duration\":946},{\"tick\":46080,\"note\":81,\"velocity\":84,\"duration\":946},{\"tick\":47040,\"note\":80,\"velocity\":80,\"duration\":466},{\"tick\":47520,\"note\":78,\"velocity\":78,\"duration\":466},{\"tick\":48000,\"note\":81,\"velocity\":82,\"duration\":946},{\"tick\":48960,\"note\":80,\"velocity\":80,\"duration\":946},{\"tick\":49920,\"note\":78,\"velocity\":76,\"duration\":946},{\"tick\":50880,\"note\":76,\"velocity\":72,\"duration\":466},{\"tick\":51360,\"note\":74,\"velocity\":70,\"duration\":466},{\"tick\":51840,\"note\":76,\"velocity\":74,\"duration\":946},{\"tick\":52800,\"note\":73,\"velocity\":70,\"duration\":946},{\"tick\":53760,\"note\":74,\"velocity\":68,\"duration\":946},{\"tick\":54720,\"note\":76,\"velocity\":68,\"duration\":466},{\"tick\":55200,\"note\":78,\"velocity\":70,\"duration\":466},{\"tick\":55680,\"note\":76,\"velocity\":66,\"duration\":946},{\"tick\":56640,\"note\":73,\"velocity\":64,\"duration\":946},{\"tick\":57600,\"note\":69,\"velocity\":60,\"duration\":1906},{\"tick\":59520,\"note\":76,\"velocity\":56,\"duration\":946},{\"tick\":60480,\"note\":69,\"velocity\":52,\"duration\":946}]},{\"name\":\"Arp\",\"notes\":[{\"tick\":0,\"note\":69,\"velocity\":78,\"duration\":106},{\"tick\":120,\"note\":73,\"velocity\":56,\"duration\":106},{\"tick\":240,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":360,\"note\":81,\"velocity\":56,\"duration\":106},{\"tick\":480,\"note\":69,\"velocity\":78,\"duration\":106},{\"tick\":600,\"note\":73,\"velocity\":56,\"duration\":106},{\"tick\":720,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":840,\"note\":81,\"velocity\":56,\"duration\":106},{\"tick\":960,\"note\":69,\"velocity\":78,\"duration\":106},{\"tick\":1080,\"note\":73,\"velocity\":56,\"duration\":106},{\"tick\":1200,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":1320,\"note\":81,\"velocity\":56,\"duration\":106},{\"tick\":1440,\"note\":69,\"velocity\":78,\"duration\":106},{\"tick\":1560,\"note\":73,\"velocity\":56,\"duration\":106},{\"tick\":1680,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":1800,\"note\":81,\"velocity\":56,\"duration\":106},{\"tick\":1920,\"note\":69,\"velocity\":78,\"duration\":106},{\"tick\":2040,\"note\":73,\"velocity\":56,\"duration\":106},{\"tick\":2160,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":2280,\"note\":81,\"velocity\":56,\"duration\":106},{\"tick\":2400,\"note\":69,\"velocity\":78,\"duration\":106},{\"tick\":2520,\"note\":73,\"velocity\":56,\"duration\":106},{\"tick\":2640,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":2760,\"note\":81,\"velocity\":56,\"duration\":106},{\"tick\":2880,\"note\":69,\"velocity\":78,\"duration\":106},{\"tick\":3000,\"note\":73,\"velocity\":56,\"duration\":106},{\"tick\":3120,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":3240,\"note\":81,\"velocity\":56,\"duration\":106},{\"tick\":3360,\"note\":69,\"velocity\":78,\"duration\":106},{\"tick\":3480,\"note\":73,\"velocity\":56,\"duration\":106},{\"tick\":3600,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":3720,\"note\":81,\"velocity\":56,\"duration\":106},{\"tick\":3840,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":3960,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":4080,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":4200,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":4320,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":4440,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":4560,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":4680,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":4800,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":4920,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":5040,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":5160,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":5280,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":5400,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":5520,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":5640,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":5760,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":5880,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":6000,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":6120,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":6240,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":6360,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":6480,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":6600,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":6720,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":6840,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":6960,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":7080,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":7200,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":7320,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":7440,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":7560,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":7680,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":7800,\"note\":69,\"velocity\":56,\"duration\":106},{\"tick\":7920,\"note\":73,\"velocity\":64,\"duration\":106},{\"tick\":8040,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":8160,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":8280,\"note\":69,\"velocity\":56,\"duration\":106},{\"tick\":8400,\"note\":73,\"velocity\":64,\"duration\":106},{\"tick\":8520,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":8640,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":8760,\"note\":69,\"velocity\":56,\"duration\":106},{\"tick\":8880,\"note\":73,\"velocity\":64,\"duration\":106},{\"tick\":9000,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":9120,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":9240,\"note\":69,\"velocity\":56,\"duration\":106},{\"tick\":9360,\"note\":73,\"velocity\":64,\"duration\":106},{\"tick\":9480,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":9600,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":9720,\"note\":69,\"velocity\":56,\"duration\":106},{\"tick\":9840,\"note\":73,\"velocity\":64,\"duration\":106},{\"tick\":9960,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":10080,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":10200,\"note\":69,\"velocity\":56,\"duration\":106},{\"tick\":10320,\"note\":73,\"velocity\":64,\"duration\":106},{\"tick\":10440,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":10560,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":10680,\"note\":69,\"velocity\":56,\"duration\":106},{\"tick\":10800,\"note\":73,\"velocity\":64,\"duration\":106},{\"tick\":10920,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":11040,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":11160,\"note\":69,\"velocity\":56,\"duration\":106},{\"tick\":11280,\"note\":73,\"velocity\":64,\"duration\":106},{\"tick\":11400,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":11520,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":11640,\"note\":69,\"velocity\":56,\"duration\":106},{\"tick\":11760,\"note\":74,\"velocity\":64,\"duration\":106},{\"tick\":11880,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":12000,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":12120,\"note\":69,\"velocity\":56,\"duration\":106},{\"tick\":12240,\"note\":74,\"velocity\":64,\"duration\":106},{\"tick\":12360,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":12480,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":12600,\"note\":69,\"velocity\":56,\"duration\":106},{\"tick\":12720,\"note\":74,\"velocity\":64,\"duration\":106},{\"tick\":12840,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":12960,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":13080,\"note\":69,\"velocity\":56,\"duration\":106},{\"tick\":13200,\"note\":74,\"velocity\":64,\"duration\":106},{\"tick\":13320,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":13440,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":13560,\"note\":69,\"velocity\":56,\"duration\":106},{\"tick\":13680,\"note\":74,\"velocity\":64,\"duration\":106},{\"tick\":13800,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":13920,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":14040,\"note\":69,\"velocity\":56,\"duration\":106},{\"tick\":14160,\"note\":74,\"velocity\":64,\"duration\":106},{\"tick\":14280,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":14400,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":14520,\"note\":69,\"velocity\":56,\"duration\":106},{\"tick\":14640,\"note\":74,\"velocity\":64,\"duration\":106},{\"tick\":14760,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":14880,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":15000,\"note\":69,\"velocity\":56,\"duration\":106},{\"tick\":15120,\"note\":74,\"velocity\":64,\"duration\":106},{\"tick\":15240,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":15360,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":15480,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":15600,\"note\":74,\"velocity\":64,\"duration\":106},{\"tick\":15720,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":15840,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":15960,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":16080,\"note\":74,\"velocity\":64,\"duration\":106},{\"tick\":16200,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":16320,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":16440,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":16560,\"note\":74,\"velocity\":64,\"duration\":106},{\"tick\":16680,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":16800,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":16920,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":17040,\"note\":74,\"velocity\":64,\"duration\":106},{\"tick\":17160,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":17280,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":17400,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":17520,\"note\":74,\"velocity\":64,\"duration\":106},{\"tick\":17640,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":17760,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":17880,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":18000,\"note\":74,\"velocity\":64,\"duration\":106},{\"tick\":18120,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":18240,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":18360,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":18480,\"note\":74,\"velocity\":64,\"duration\":106},{\"tick\":18600,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":18720,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":18840,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":18960,\"note\":74,\"velocity\":64,\"duration\":106},{\"tick\":19080,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":19200,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":19320,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":19440,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":19560,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":19680,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":19800,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":19920,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":20040,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":20160,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":20280,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":20400,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":20520,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":20640,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":20760,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":20880,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":21000,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":21120,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":21240,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":21360,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":21480,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":21600,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":21720,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":21840,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":21960,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":22080,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":22200,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":22320,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":22440,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":22560,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":22680,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":22800,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":22920,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":23040,\"note\":69,\"velocity\":78,\"duration\":106},{\"tick\":23160,\"note\":73,\"velocity\":56,\"duration\":106},{\"tick\":23280,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":23400,\"note\":81,\"velocity\":56,\"duration\":106},{\"tick\":23520,\"note\":69,\"velocity\":78,\"duration\":106},{\"tick\":23640,\"note\":73,\"velocity\":56,\"duration\":106},{\"tick\":23760,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":23880,\"note\":81,\"velocity\":56,\"duration\":106},{\"tick\":24000,\"note\":69,\"velocity\":78,\"duration\":106},{\"tick\":24120,\"note\":73,\"velocity\":56,\"duration\":106},{\"tick\":24240,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":24360,\"note\":81,\"velocity\":56,\"duration\":106},{\"tick\":24480,\"note\":69,\"velocity\":78,\"duration\":106},{\"tick\":24600,\"note\":73,\"velocity\":56,\"duration\":106},{\"tick\":24720,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":24840,\"note\":81,\"velocity\":56,\"duration\":106},{\"tick\":24960,\"note\":69,\"velocity\":78,\"duration\":106},{\"tick\":25080,\"note\":73,\"velocity\":56,\"duration\":106},{\"tick\":25200,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":25320,\"note\":81,\"velocity\":56,\"duration\":106},{\"tick\":25440,\"note\":69,\"velocity\":78,\"duration\":106},{\"tick\":25560,\"note\":73,\"velocity\":56,\"duration\":106},{\"tick\":25680,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":25800,\"note\":81,\"velocity\":56,\"duration\":106},{\"tick\":25920,\"note\":69,\"velocity\":78,\"duration\":106},{\"tick\":26040,\"note\":73,\"velocity\":56,\"duration\":106},{\"tick\":26160,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":26280,\"note\":81,\"velocity\":56,\"duration\":106},{\"tick\":26400,\"note\":69,\"velocity\":78,\"duration\":106},{\"tick\":26520,\"note\":73,\"velocity\":56,\"duration\":106},{\"tick\":26640,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":26760,\"note\":81,\"velocity\":56,\"duration\":106},{\"tick\":26880,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":27000,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":27120,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":27240,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":27360,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":27480,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":27600,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":27720,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":27840,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":27960,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":28080,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":28200,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":28320,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":28440,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":28560,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":28680,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":28800,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":28920,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":29040,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":29160,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":29280,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":29400,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":29520,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":29640,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":29760,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":29880,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":30000,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":30120,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":30240,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":30360,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":30480,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":30600,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":30720,\"note\":69,\"velocity\":78,\"duration\":106},{\"tick\":30840,\"note\":73,\"velocity\":56,\"duration\":106},{\"tick\":30960,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":31080,\"note\":81,\"velocity\":56,\"duration\":106},{\"tick\":31200,\"note\":69,\"velocity\":78,\"duration\":106},{\"tick\":31320,\"note\":73,\"velocity\":56,\"duration\":106},{\"tick\":31440,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":31560,\"note\":81,\"velocity\":56,\"duration\":106},{\"tick\":31680,\"note\":69,\"velocity\":78,\"duration\":106},{\"tick\":31800,\"note\":73,\"velocity\":56,\"duration\":106},{\"tick\":31920,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":32040,\"note\":81,\"velocity\":56,\"duration\":106},{\"tick\":32160,\"note\":69,\"velocity\":78,\"duration\":106},{\"tick\":32280,\"note\":73,\"velocity\":56,\"duration\":106},{\"tick\":32400,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":32520,\"note\":81,\"velocity\":56,\"duration\":106},{\"tick\":32640,\"note\":69,\"velocity\":78,\"duration\":106},{\"tick\":32760,\"note\":73,\"velocity\":56,\"duration\":106},{\"tick\":32880,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":33000,\"note\":81,\"velocity\":56,\"duration\":106},{\"tick\":33120,\"note\":69,\"velocity\":78,\"duration\":106},{\"tick\":33240,\"note\":73,\"velocity\":56,\"duration\":106},{\"tick\":33360,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":33480,\"note\":81,\"velocity\":56,\"duration\":106},{\"tick\":33600,\"note\":69,\"velocity\":78,\"duration\":106},{\"tick\":33720,\"note\":73,\"velocity\":56,\"duration\":106},{\"tick\":33840,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":33960,\"note\":81,\"velocity\":56,\"duration\":106},{\"tick\":34080,\"note\":69,\"velocity\":78,\"duration\":106},{\"tick\":34200,\"note\":73,\"velocity\":56,\"duration\":106},{\"tick\":34320,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":34440,\"note\":81,\"velocity\":56,\"duration\":106},{\"tick\":34560,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":34680,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":34800,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":34920,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":35040,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":35160,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":35280,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":35400,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":35520,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":35640,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":35760,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":35880,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":36000,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":36120,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":36240,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":36360,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":36480,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":36600,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":36720,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":36840,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":36960,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":37080,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":37200,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":37320,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":37440,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":37560,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":37680,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":37800,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":37920,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":38040,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":38160,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":38280,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":38400,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":38520,\"note\":69,\"velocity\":56,\"duration\":106},{\"tick\":38640,\"note\":73,\"velocity\":64,\"duration\":106},{\"tick\":38760,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":38880,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":39000,\"note\":69,\"velocity\":56,\"duration\":106},{\"tick\":39120,\"note\":73,\"velocity\":64,\"duration\":106},{\"tick\":39240,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":39360,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":39480,\"note\":69,\"velocity\":56,\"duration\":106},{\"tick\":39600,\"note\":73,\"velocity\":64,\"duration\":106},{\"tick\":39720,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":39840,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":39960,\"note\":69,\"velocity\":56,\"duration\":106},{\"tick\":40080,\"note\":73,\"velocity\":64,\"duration\":106},{\"tick\":40200,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":40320,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":40440,\"note\":69,\"velocity\":56,\"duration\":106},{\"tick\":40560,\"note\":73,\"velocity\":64,\"duration\":106},{\"tick\":40680,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":40800,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":40920,\"note\":69,\"velocity\":56,\"duration\":106},{\"tick\":41040,\"note\":73,\"velocity\":64,\"duration\":106},{\"tick\":41160,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":41280,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":41400,\"note\":69,\"velocity\":56,\"duration\":106},{\"tick\":41520,\"note\":73,\"velocity\":64,\"duration\":106},{\"tick\":41640,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":41760,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":41880,\"note\":69,\"velocity\":56,\"duration\":106},{\"tick\":42000,\"note\":73,\"velocity\":64,\"duration\":106},{\"tick\":42120,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":42240,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":42360,\"note\":69,\"velocity\":56,\"duration\":106},{\"tick\":42480,\"note\":74,\"velocity\":64,\"duration\":106},{\"tick\":42600,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":42720,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":42840,\"note\":69,\"velocity\":56,\"duration\":106},{\"tick\":42960,\"note\":74,\"velocity\":64,\"duration\":106},{\"tick\":43080,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":43200,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":43320,\"note\":69,\"velocity\":56,\"duration\":106},{\"tick\":43440,\"note\":74,\"velocity\":64,\"duration\":106},{\"tick\":43560,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":43680,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":43800,\"note\":69,\"velocity\":56,\"duration\":106},{\"tick\":43920,\"note\":74,\"velocity\":64,\"duration\":106},{\"tick\":44040,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":44160,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":44280,\"note\":69,\"velocity\":56,\"duration\":106},{\"tick\":44400,\"note\":74,\"velocity\":64,\"duration\":106},{\"tick\":44520,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":44640,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":44760,\"note\":69,\"velocity\":56,\"duration\":106},{\"tick\":44880,\"note\":74,\"velocity\":64,\"duration\":106},{\"tick\":45000,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":45120,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":45240,\"note\":69,\"velocity\":56,\"duration\":106},{\"tick\":45360,\"note\":74,\"velocity\":64,\"duration\":106},{\"tick\":45480,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":45600,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":45720,\"note\":69,\"velocity\":56,\"duration\":106},{\"tick\":45840,\"note\":74,\"velocity\":64,\"duration\":106},{\"tick\":45960,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":46080,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":46200,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":46320,\"note\":74,\"velocity\":64,\"duration\":106},{\"tick\":46440,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":46560,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":46680,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":46800,\"note\":74,\"velocity\":64,\"duration\":106},{\"tick\":46920,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":47040,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":47160,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":47280,\"note\":74,\"velocity\":64,\"duration\":106},{\"tick\":47400,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":47520,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":47640,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":47760,\"note\":74,\"velocity\":64,\"duration\":106},{\"tick\":47880,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":48000,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":48120,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":48240,\"note\":74,\"velocity\":64,\"duration\":106},{\"tick\":48360,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":48480,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":48600,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":48720,\"note\":74,\"velocity\":64,\"duration\":106},{\"tick\":48840,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":48960,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":49080,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":49200,\"note\":74,\"velocity\":64,\"duration\":106},{\"tick\":49320,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":49440,\"note\":66,\"velocity\":78,\"duration\":106},{\"tick\":49560,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":49680,\"note\":74,\"velocity\":64,\"duration\":106},{\"tick\":49800,\"note\":78,\"velocity\":56,\"duration\":106},{\"tick\":49920,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":50040,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":50160,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":50280,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":50400,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":50520,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":50640,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":50760,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":50880,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":51000,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":51120,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":51240,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":51360,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":51480,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":51600,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":51720,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":51840,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":51960,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":52080,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":52200,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":52320,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":52440,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":52560,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":52680,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":52800,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":52920,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":53040,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":53160,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":53280,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":53400,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":53520,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":53640,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":53760,\"note\":69,\"velocity\":78,\"duration\":106},{\"tick\":53880,\"note\":73,\"velocity\":56,\"duration\":106},{\"tick\":54000,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":54120,\"note\":81,\"velocity\":56,\"duration\":106},{\"tick\":54240,\"note\":69,\"velocity\":78,\"duration\":106},{\"tick\":54360,\"note\":73,\"velocity\":56,\"duration\":106},{\"tick\":54480,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":54600,\"note\":81,\"velocity\":56,\"duration\":106},{\"tick\":54720,\"note\":69,\"velocity\":78,\"duration\":106},{\"tick\":54840,\"note\":73,\"velocity\":56,\"duration\":106},{\"tick\":54960,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":55080,\"note\":81,\"velocity\":56,\"duration\":106},{\"tick\":55200,\"note\":69,\"velocity\":78,\"duration\":106},{\"tick\":55320,\"note\":73,\"velocity\":56,\"duration\":106},{\"tick\":55440,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":55560,\"note\":81,\"velocity\":56,\"duration\":106},{\"tick\":55680,\"note\":69,\"velocity\":78,\"duration\":106},{\"tick\":55800,\"note\":73,\"velocity\":56,\"duration\":106},{\"tick\":55920,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":56040,\"note\":81,\"velocity\":56,\"duration\":106},{\"tick\":56160,\"note\":69,\"velocity\":78,\"duration\":106},{\"tick\":56280,\"note\":73,\"velocity\":56,\"duration\":106},{\"tick\":56400,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":56520,\"note\":81,\"velocity\":56,\"duration\":106},{\"tick\":56640,\"note\":69,\"velocity\":78,\"duration\":106},{\"tick\":56760,\"note\":73,\"velocity\":56,\"duration\":106},{\"tick\":56880,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":57000,\"note\":81,\"velocity\":56,\"duration\":106},{\"tick\":57120,\"note\":69,\"velocity\":78,\"duration\":106},{\"tick\":57240,\"note\":73,\"velocity\":56,\"duration\":106},{\"tick\":57360,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":57480,\"note\":81,\"velocity\":56,\"duration\":106},{\"tick\":57600,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":57720,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":57840,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":57960,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":58080,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":58200,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":58320,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":58440,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":58560,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":58680,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":58800,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":58920,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":59040,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":59160,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":59280,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":59400,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":59520,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":59640,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":59760,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":59880,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":60000,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":60120,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":60240,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":60360,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":60480,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":60600,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":60720,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":60840,\"note\":80,\"velocity\":56,\"duration\":106},{\"tick\":60960,\"note\":68,\"velocity\":78,\"duration\":106},{\"tick\":61080,\"note\":71,\"velocity\":56,\"duration\":106},{\"tick\":61200,\"note\":76,\"velocity\":64,\"duration\":106},{\"tick\":61320,\"note\":80,\"velocity\":56,\"duration\":106}]}]}",
+              "selectedFile": ""
+            }
+          },
+          {
+            "id": "leadsaw",
+            "type": "supersaw",
+            "name": "Lead",
+            "position": {
+              "x": 460,
+              "y": 40
+            },
+            "params": {
+              "frequency": 440,
+              "detune": 8,
+              "mix": 0.5
+            }
+          },
+          {
+            "id": "leadenv",
+            "type": "adsr",
+            "name": "Lead Env",
+            "position": {
+              "x": 460,
+              "y": 200
+            },
+            "params": {
+              "attack": 0.03,
+              "decay": 0.4,
+              "sustain": 0.7,
+              "release": 0.5
+            }
+          },
+          {
+            "id": "leadvca",
+            "type": "gain",
+            "name": "Lead VCA",
+            "position": {
+              "x": 720,
+              "y": 40
+            },
+            "params": {
+              "gain": 0.85
+            }
+          },
+          {
+            "id": "leadfilt",
+            "type": "vcf",
+            "name": "Lead Filter",
+            "position": {
+              "x": 980,
+              "y": 40
+            },
+            "params": {
+              "cutoff": 1700,
+              "resonance": 0.16,
+              "drive": 0.08,
+              "envAmount": 0,
+              "modAmount": 0.5,
+              "keyTrack": 0,
+              "model": "svf",
+              "mode": "lp",
+              "slope": 24
+            }
+          },
+          {
+            "id": "arposc",
+            "type": "oscillator",
+            "name": "Arp",
+            "position": {
+              "x": 460,
+              "y": 360
+            },
+            "params": {
+              "frequency": 440,
+              "type": "square",
+              "pwm": 0.35,
+              "unison": 1,
+              "detune": 0,
+              "fmLin": 0,
+              "fmExp": 0,
+              "subMix": 0,
+              "subOct": 1
+            }
+          },
+          {
+            "id": "arpenv",
+            "type": "adsr",
+            "name": "Arp Env",
+            "position": {
+              "x": 460,
+              "y": 520
+            },
+            "params": {
+              "attack": 0.002,
+              "decay": 0.14,
+              "sustain": 0,
+              "release": 0.08
+            }
+          },
+          {
+            "id": "arpvca",
+            "type": "gain",
+            "name": "Arp VCA",
+            "position": {
+              "x": 720,
+              "y": 360
+            },
+            "params": {
+              "gain": 0.5
+            }
+          },
+          {
+            "id": "arpfilt",
+            "type": "vcf",
+            "name": "Arp Filter",
+            "position": {
+              "x": 980,
+              "y": 360
+            },
+            "params": {
+              "cutoff": 2600,
+              "resonance": 0.22,
+              "drive": 0.05,
+              "envAmount": 0,
+              "modAmount": 0,
+              "keyTrack": 0,
+              "model": "svf",
+              "mode": "lp",
+              "slope": 12
+            }
+          },
+          {
+            "id": "arpdelay",
+            "type": "tape-delay",
+            "name": "Arp Delay",
+            "position": {
+              "x": 1240,
+              "y": 360
+            },
+            "params": {
+              "time": 268,
+              "feedback": 0.36,
+              "mix": 0.32,
+              "tone": 0.6,
+              "wow": 0.1,
+              "flutter": 0.08,
+              "drive": 0.04
+            }
+          },
+          {
+            "id": "melmix",
+            "type": "mixer-1x2",
+            "name": "Mel Mix",
+            "position": {
+              "x": 1500,
+              "y": 60
+            },
+            "params": {
+              "levelA": 0.5,
+              "levelB": 0.32,
+              "levelC": 0,
+              "levelD": 0,
+              "levelE": 0,
+              "levelF": 0
+            }
+          },
+          {
+            "id": "leaddelay",
+            "type": "tape-delay",
+            "name": "Lead Delay",
+            "position": {
+              "x": 1240,
+              "y": 40
+            },
+            "params": {
+              "time": 321,
+              "feedback": 0.28,
+              "mix": 0.22,
+              "tone": 0.55,
+              "wow": 0.12,
+              "flutter": 0.1,
+              "drive": 0.04
+            }
+          },
+          {
+            "id": "melverb",
+            "type": "reverb",
+            "name": "Reverb",
+            "position": {
+              "x": 1760,
+              "y": 60
+            },
+            "params": {
+              "time": 2.4,
+              "damp": 0.4,
+              "preDelay": 24,
+              "mix": 0.3
+            }
+          },
+          {
+            "id": "out-1",
+            "type": "output",
+            "name": "Out Mélodie",
+            "position": {
+              "x": 2020,
+              "y": 60
+            },
+            "params": {
+              "level": 1
+            }
+          },
+          {
+            "id": "notes-1",
+            "type": "notes",
+            "name": "Info",
+            "position": {
+              "x": 460,
+              "y": 700
+            },
+            "params": {
+              "text": "LUMIÈRE — lumineux, la majeur, 112 BPM (esprit \"Eple\"/\"Poor Leno\", Röyksopp).\n\nUN SEUL MIDI File Sequencer joue DEUX pistes en même temps :\n• Piste 1 = la MÉLODIE LONGUE (lead, 32 mesures).\n• Piste 2 = un ARPÈGE hypnotique en doubles-croches qui tourne sur les accords.\n(Le CV ne traverse pas les racks → lead + arp partagent le rack 1, sommés par un mixer interne.)\n\n2. HARMONIE — A–E–F#m–D–Bm–E + basse.\n3. RYTHME — beat clair et entraînant."
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": {
+              "moduleId": "midiseq",
+              "portId": "cv-1"
+            },
+            "to": {
+              "moduleId": "leadsaw",
+              "portId": "pitch"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "midiseq",
+              "portId": "gate-1"
+            },
+            "to": {
+              "moduleId": "leadenv",
+              "portId": "gate"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "midiseq",
+              "portId": "vel-1"
+            },
+            "to": {
+              "moduleId": "leadfilt",
+              "portId": "mod"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "leadsaw",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "leadvca",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "leadenv",
+              "portId": "env"
+            },
+            "to": {
+              "moduleId": "leadvca",
+              "portId": "cv"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "leadvca",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "leadfilt",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "leadfilt",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "leaddelay",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "leaddelay",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "melmix",
+              "portId": "in-a"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "midiseq",
+              "portId": "cv-2"
+            },
+            "to": {
+              "moduleId": "arposc",
+              "portId": "pitch"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "midiseq",
+              "portId": "gate-2"
+            },
+            "to": {
+              "moduleId": "arpenv",
+              "portId": "gate"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "arposc",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "arpvca",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "arpenv",
+              "portId": "env"
+            },
+            "to": {
+              "moduleId": "arpvca",
+              "portId": "cv"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "arpvca",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "arpfilt",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "arpfilt",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "arpdelay",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "arpdelay",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "melmix",
+              "portId": "in-b"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "melmix",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "melverb",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "melverb",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "out-1",
+              "portId": "in"
+            },
+            "kind": "audio"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rack-2",
+      "name": "Harmonie",
+      "graph": {
+        "modules": [
+          {
+            "id": "chord",
+            "type": "chord-sequencer",
+            "name": "Accords",
+            "position": {
+              "x": 40,
+              "y": 60
+            },
+            "params": {
+              "enabled": true,
+              "tempo": 112,
+              "rate": 0,
+              "gateLength": 88,
+              "swing": 0,
+              "length": 8,
+              "strumSpeed": 0,
+              "strumDirection": 0,
+              "voicing": 1,
+              "stepData": "[{\"root\":57,\"chordType\":0,\"inversion\":0,\"gate\":true},{\"root\":52,\"chordType\":0,\"inversion\":0,\"gate\":true},{\"root\":54,\"chordType\":1,\"inversion\":0,\"gate\":true},{\"root\":50,\"chordType\":0,\"inversion\":0,\"gate\":true},{\"root\":47,\"chordType\":1,\"inversion\":0,\"gate\":true},{\"root\":52,\"chordType\":0,\"inversion\":0,\"gate\":true},{\"root\":57,\"chordType\":0,\"inversion\":0,\"gate\":true},{\"root\":52,\"chordType\":0,\"inversion\":0,\"gate\":true}]"
+            }
+          },
+          {
+            "id": "saw1",
+            "type": "supersaw",
+            "name": "Pad 1",
+            "position": {
+              "x": 460,
+              "y": 40
+            },
+            "params": {
+              "frequency": 220,
+              "detune": 12,
+              "mix": 0.6
+            }
+          },
+          {
+            "id": "saw2",
+            "type": "supersaw",
+            "name": "Pad 2",
+            "position": {
+              "x": 460,
+              "y": 180
+            },
+            "params": {
+              "frequency": 220,
+              "detune": 14,
+              "mix": 0.6
+            }
+          },
+          {
+            "id": "saw3",
+            "type": "supersaw",
+            "name": "Pad 3",
+            "position": {
+              "x": 460,
+              "y": 320
+            },
+            "params": {
+              "frequency": 220,
+              "detune": 16,
+              "mix": 0.6
+            }
+          },
+          {
+            "id": "saw4",
+            "type": "supersaw",
+            "name": "Pad 4",
+            "position": {
+              "x": 460,
+              "y": 460
+            },
+            "params": {
+              "frequency": 220,
+              "detune": 18,
+              "mix": 0.6
+            }
+          },
+          {
+            "id": "padmix",
+            "type": "mixer-8",
+            "name": "Pad Mix",
+            "position": {
+              "x": 720,
+              "y": 60
+            },
+            "params": {
+              "level1": 0.5,
+              "level2": 0.5,
+              "level3": 0.5,
+              "level4": 0.5,
+              "level5": 0,
+              "level6": 0,
+              "level7": 0,
+              "level8": 0
+            }
+          },
+          {
+            "id": "padenv",
+            "type": "adsr",
+            "name": "Pad Env",
+            "position": {
+              "x": 720,
+              "y": 360
+            },
+            "params": {
+              "attack": 0.6,
+              "decay": 1.2,
+              "sustain": 0.7,
+              "release": 1.8
+            }
+          },
+          {
+            "id": "padvca",
+            "type": "gain",
+            "name": "Pad VCA",
+            "position": {
+              "x": 980,
+              "y": 60
+            },
+            "params": {
+              "gain": 0.7
+            }
+          },
+          {
+            "id": "padfilt",
+            "type": "vcf",
+            "name": "Pad Filter",
+            "position": {
+              "x": 1240,
+              "y": 60
+            },
+            "params": {
+              "cutoff": 1400,
+              "resonance": 0.14,
+              "drive": 0.06,
+              "envAmount": 0,
+              "modAmount": 0,
+              "keyTrack": 0,
+              "model": "svf",
+              "mode": "lp",
+              "slope": 12
+            }
+          },
+          {
+            "id": "bass",
+            "type": "oscillator",
+            "name": "Bass",
+            "position": {
+              "x": 460,
+              "y": 600
+            },
+            "params": {
+              "frequency": 110,
+              "type": "sawtooth",
+              "pwm": 0.5,
+              "unison": 1,
+              "detune": 0,
+              "fmLin": 0,
+              "fmExp": 0,
+              "subMix": 0.5,
+              "subOct": 1
+            }
+          },
+          {
+            "id": "bassfilt",
+            "type": "vcf",
+            "name": "Bass Filter",
+            "position": {
+              "x": 720,
+              "y": 600
+            },
+            "params": {
+              "cutoff": 300,
+              "resonance": 0.18,
+              "drive": 0.08,
+              "envAmount": 0,
+              "modAmount": 0,
+              "keyTrack": 0,
+              "model": "svf",
+              "mode": "lp",
+              "slope": 24
+            }
+          },
+          {
+            "id": "harmmix",
+            "type": "mixer-8",
+            "name": "Harm Mix",
+            "position": {
+              "x": 1500,
+              "y": 60
+            },
+            "params": {
+              "level1": 0.4,
+              "level2": 0.4,
+              "level3": 0,
+              "level4": 0,
+              "level5": 0,
+              "level6": 0,
+              "level7": 0,
+              "level8": 0
+            }
+          },
+          {
+            "id": "harmverb",
+            "type": "reverb",
+            "name": "Reverb",
+            "position": {
+              "x": 1760,
+              "y": 60
+            },
+            "params": {
+              "time": 1.8,
+              "damp": 0.5,
+              "preDelay": 20,
+              "mix": 0.24
+            }
+          },
+          {
+            "id": "out-2",
+            "type": "output",
+            "name": "Out Harmonie",
+            "position": {
+              "x": 2020,
+              "y": 60
+            },
+            "params": {
+              "level": 1
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": {
+              "moduleId": "chord",
+              "portId": "cv-1"
+            },
+            "to": {
+              "moduleId": "saw1",
+              "portId": "pitch"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "saw1",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "padmix",
+              "portId": "in-1"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "chord",
+              "portId": "cv-2"
+            },
+            "to": {
+              "moduleId": "saw2",
+              "portId": "pitch"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "saw2",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "padmix",
+              "portId": "in-2"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "chord",
+              "portId": "cv-3"
+            },
+            "to": {
+              "moduleId": "saw3",
+              "portId": "pitch"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "saw3",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "padmix",
+              "portId": "in-3"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "chord",
+              "portId": "cv-4"
+            },
+            "to": {
+              "moduleId": "saw4",
+              "portId": "pitch"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "saw4",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "padmix",
+              "portId": "in-4"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "chord",
+              "portId": "gate-1"
+            },
+            "to": {
+              "moduleId": "padenv",
+              "portId": "gate"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "padmix",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "padvca",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "padenv",
+              "portId": "env"
+            },
+            "to": {
+              "moduleId": "padvca",
+              "portId": "cv"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "padvca",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "padfilt",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "padfilt",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "harmmix",
+              "portId": "in-1"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "chord",
+              "portId": "root-cv"
+            },
+            "to": {
+              "moduleId": "bass",
+              "portId": "pitch"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "bass",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "bassfilt",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "bassfilt",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "harmmix",
+              "portId": "in-2"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "harmmix",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "harmverb",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "harmverb",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "out-2",
+              "portId": "in"
+            },
+            "kind": "audio"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rack-3",
+      "name": "Rythme",
+      "graph": {
+        "modules": [
+          {
+            "id": "drumseq",
+            "type": "drum-sequencer",
+            "name": "Drum Seq",
+            "position": {
+              "x": 40,
+              "y": 60
+            },
+            "params": {
+              "enabled": true,
+              "tempo": 112,
+              "rate": 4,
+              "gateLength": 50,
+              "swing": 8,
+              "length": 16,
+              "drumData": "{\"tracks\":[[{\"g\":1,\"a\":0},{\"g\":0,\"a\":1},{\"g\":0,\"a\":2},{\"g\":0,\"a\":3},{\"g\":1,\"a\":4},{\"g\":0,\"a\":5},{\"g\":0,\"a\":6},{\"g\":0,\"a\":7},{\"g\":1,\"a\":8},{\"g\":0,\"a\":9},{\"g\":0,\"a\":10},{\"g\":0,\"a\":11},{\"g\":1,\"a\":12},{\"g\":0,\"a\":13},{\"g\":1,\"a\":14},{\"g\":0,\"a\":15}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":1},{\"g\":0,\"a\":2},{\"g\":0,\"a\":3},{\"g\":1,\"a\":4},{\"g\":0,\"a\":5},{\"g\":0,\"a\":6},{\"g\":0,\"a\":7},{\"g\":0,\"a\":8},{\"g\":0,\"a\":9},{\"g\":0,\"a\":10},{\"g\":0,\"a\":11},{\"g\":1,\"a\":12},{\"g\":0,\"a\":13},{\"g\":0,\"a\":14},{\"g\":0,\"a\":15}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":1},{\"g\":1,\"a\":2},{\"g\":0,\"a\":3},{\"g\":0,\"a\":4},{\"g\":0,\"a\":5},{\"g\":1,\"a\":6},{\"g\":0,\"a\":7},{\"g\":0,\"a\":8},{\"g\":0,\"a\":9},{\"g\":1,\"a\":10},{\"g\":0,\"a\":11},{\"g\":0,\"a\":12},{\"g\":0,\"a\":13},{\"g\":1,\"a\":14},{\"g\":1,\"a\":15}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":1},{\"g\":0,\"a\":2},{\"g\":0,\"a\":3},{\"g\":0,\"a\":4},{\"g\":0,\"a\":5},{\"g\":0,\"a\":6},{\"g\":0,\"a\":7},{\"g\":0,\"a\":8},{\"g\":0,\"a\":9},{\"g\":0,\"a\":10},{\"g\":0,\"a\":11},{\"g\":0,\"a\":12},{\"g\":0,\"a\":13},{\"g\":0,\"a\":14},{\"g\":0,\"a\":15}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":1},{\"g\":0,\"a\":2},{\"g\":0,\"a\":3},{\"g\":0,\"a\":4},{\"g\":0,\"a\":5},{\"g\":0,\"a\":6},{\"g\":0,\"a\":7},{\"g\":0,\"a\":8},{\"g\":0,\"a\":9},{\"g\":0,\"a\":10},{\"g\":0,\"a\":11},{\"g\":0,\"a\":12},{\"g\":0,\"a\":13},{\"g\":0,\"a\":14},{\"g\":0,\"a\":15}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":1},{\"g\":0,\"a\":2},{\"g\":0,\"a\":3},{\"g\":0,\"a\":4},{\"g\":0,\"a\":5},{\"g\":0,\"a\":6},{\"g\":0,\"a\":7},{\"g\":0,\"a\":8},{\"g\":0,\"a\":9},{\"g\":0,\"a\":10},{\"g\":0,\"a\":11},{\"g\":0,\"a\":12},{\"g\":0,\"a\":13},{\"g\":0,\"a\":14},{\"g\":0,\"a\":15}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":1},{\"g\":0,\"a\":2},{\"g\":0,\"a\":3},{\"g\":0,\"a\":4},{\"g\":0,\"a\":5},{\"g\":0,\"a\":6},{\"g\":0,\"a\":7},{\"g\":0,\"a\":8},{\"g\":0,\"a\":9},{\"g\":0,\"a\":10},{\"g\":0,\"a\":11},{\"g\":0,\"a\":12},{\"g\":0,\"a\":13},{\"g\":0,\"a\":14},{\"g\":0,\"a\":15}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":1},{\"g\":0,\"a\":2},{\"g\":0,\"a\":3},{\"g\":0,\"a\":4},{\"g\":0,\"a\":5},{\"g\":0,\"a\":6},{\"g\":0,\"a\":7},{\"g\":0,\"a\":8},{\"g\":0,\"a\":9},{\"g\":0,\"a\":10},{\"g\":0,\"a\":11},{\"g\":0,\"a\":12},{\"g\":0,\"a\":13},{\"g\":0,\"a\":14},{\"g\":0,\"a\":15}]]}"
+            }
+          },
+          {
+            "id": "kick",
+            "type": "808-kick",
+            "name": "808 Kick",
+            "position": {
+              "x": 460,
+              "y": 40
+            },
+            "params": {
+              "tune": 46,
+              "decay": 1.1,
+              "tone": 0.35,
+              "click": 0.25
+            }
+          },
+          {
+            "id": "clap",
+            "type": "808-clap",
+            "name": "808 Clap",
+            "position": {
+              "x": 460,
+              "y": 200
+            },
+            "params": {
+              "tone": 0.6,
+              "decay": 0.4,
+              "spread": 0.5
+            }
+          },
+          {
+            "id": "hh",
+            "type": "808-hihat",
+            "name": "808 HiHat",
+            "position": {
+              "x": 460,
+              "y": 360
+            },
+            "params": {
+              "tune": 1,
+              "decay": 0.09,
+              "tone": 0.7,
+              "snap": 0.5
+            }
+          },
+          {
+            "id": "drummix",
+            "type": "mixer-1x2",
+            "name": "Drum Mix",
+            "position": {
+              "x": 720,
+              "y": 60
+            },
+            "params": {
+              "levelA": 0.82,
+              "levelB": 0.45,
+              "levelC": 0.42,
+              "levelD": 0,
+              "levelE": 0,
+              "levelF": 0
+            }
+          },
+          {
+            "id": "drumverb",
+            "type": "reverb",
+            "name": "Reverb",
+            "position": {
+              "x": 980,
+              "y": 60
+            },
+            "params": {
+              "time": 0.6,
+              "damp": 0.6,
+              "preDelay": 10,
+              "mix": 0.1
+            }
+          },
+          {
+            "id": "out-3",
+            "type": "output",
+            "name": "Out Rythme",
+            "position": {
+              "x": 1240,
+              "y": 60
+            },
+            "params": {
+              "level": 1
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": {
+              "moduleId": "drumseq",
+              "portId": "gate-kick"
+            },
+            "to": {
+              "moduleId": "kick",
+              "portId": "trigger"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "drumseq",
+              "portId": "gate-snare"
+            },
+            "to": {
+              "moduleId": "clap",
+              "portId": "trigger"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "drumseq",
+              "portId": "gate-hhc"
+            },
+            "to": {
+              "moduleId": "hh",
+              "portId": "trigger"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "kick",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "drummix",
+              "portId": "in-a"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "clap",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "drummix",
+              "portId": "in-b"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "hh",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "drummix",
+              "portId": "in-c"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "drummix",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "drumverb",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "drumverb",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "out-3",
+              "portId": "in"
+            },
+            "kind": "audio"
+          }
+        ]
+      }
+    }
+  ],
+  "mixer": {
+    "rack-1": {
+      "volume": 0.72,
+      "mute": false,
+      "solo": false
+    },
+    "rack-2": {
+      "volume": 0.58,
+      "mute": false,
+      "solo": false
+    },
+    "rack-3": {
+      "volume": 0.5,
+      "mute": false,
+      "solo": false
+    }
+  }
+}

@@ -49,6 +49,13 @@
       "description": "Orgue cinématique : une MÉLODIE LONGUE de 32 mesures (do mineur, ~96s) jouée par un Pipe Organ à travers un Leslie — le \"test ultime\" du synth transformé en musique. Nappe Cm7–Ab–Eb–Bb–Fm–G7 + battement très épars. 80 BPM, 3 racks.",
       "file": "vesper.json",
       "group": "Songs"
+    },
+    {
+      "id": "lumiere",
+      "name": "Lumière ✨",
+      "description": "Lumineux, la majeur, 112 BPM (esprit \"Eple\"/\"Poor Leno\", Röyksopp). UN SEUL MIDI File Sequencer joue DEUX pistes : une MÉLODIE LONGUE (lead, 32 mesures) + un ARPÈGE hypnotique en doubles-croches. + nappe A–E–F#m–D–Bm + basse + beat entraînant. 3 racks.",
+      "file": "lumiere.json",
+      "group": "Songs"
     }
   ]
 }
