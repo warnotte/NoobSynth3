@@ -648,7 +648,11 @@ function App() {
     if (!snapshot) {
       return null
     }
-    return snapshot.buffers.get(`${moduleId}:${portId}`) ?? null
+    // Buffers are keyed by the rack-PREFIXED id (taps come from the flattened combined
+    // graph), so prefix the lookup id too — same as tauriMapId / WasmGraphEngine.mapId.
+    // Without this the bare UI id ("scope-1") misses the key ("rack-1/scope-1") → flat line.
+    const mappedId = `${activeRackIdRef.current}/${moduleId}`
+    return snapshot.buffers.get(`${mappedId}:${portId}`) ?? null
   }, [])
 
   const nativeScopeBridge = useMemo(() => {

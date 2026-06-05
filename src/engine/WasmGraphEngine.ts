@@ -153,7 +153,10 @@ export class AudioEngine {
   }
 
   getAnalyserNode(moduleId: string, inputId?: string): AnalyserNode | null {
-    const entry = this.scopeAnalysers.get(moduleId)
+    // scopeAnalysers is keyed by the rack-PREFIXED id (buildScopeAnalysers keys by
+    // the flattened tap.moduleId), so map the bare UI id through mapId() like every
+    // other accessor — otherwise the lookup misses and the scope draws a flat line.
+    const entry = this.scopeAnalysers.get(this.mapId(moduleId))
     if (!entry) {
       return null
     }
