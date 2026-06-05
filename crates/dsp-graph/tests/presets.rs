@@ -198,3 +198,78 @@ fn engine_single_oscillator() {
     }
     assert!(has_nonzero, "oscillator should produce non-zero output");
 }
+
+#[test]
+fn engine_nes_osc() {
+    // A bare NES oscillator -> output should produce a continuous tone (no gate).
+    let payload = serde_json::json!({
+        "modules": [
+            { "id": "nes-1", "type": "nes-osc", "params": { "frequency": 220.0, "volume": 1.0, "mode": 0, "duty": 1 } },
+            { "id": "out-1", "type": "output", "params": { "level": 1.0 } }
+        ],
+        "connections": [
+            { "from": { "moduleId": "nes-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+        ],
+        "taps": []
+    });
+    let mut engine = GraphEngine::new(SAMPLE_RATE);
+    engine.set_graph_json(&payload.to_string()).expect("should load");
+
+    let mut max_abs = 0.0f32;
+    for _ in 0..400 {
+        let output = engine.render(FRAMES);
+        for &sample in output {
+            let a = sample.abs();
+            if a > max_abs {
+                max_abs = a;
+            }
+        }
+    }
+    assert!(max_abs > 1e-6, "nes-osc should produce non-zero output (got {max_abs})");
+}
+
+#[test]
+fn engine_sid_player() {
+    // SidPlayer carries 64KB of C64 RAM inline → needs a big stack to construct
+    // (same reason the Tauri audio thread uses a large stack). Run on a 64MB thread.
+    std::thread::Builder::new()
+        .stack_size(64 * 1024 * 1024)
+        .spawn(|| {
+            // A SID player with a real .sid loaded and playing should produce audio
+            // through the NATIVE GraphEngine (mirrors the Tauri standalone path).
+            let payload = serde_json::json!({
+                "modules": [
+                    { "id": "sid-1", "type": "sid-player", "params": { "playing": 1, "song": 1, "volume": 1.0 } },
+                    { "id": "out-1", "type": "output", "params": { "level": 1.0 } }
+                ],
+                "connections": [
+                    { "from": { "moduleId": "sid-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+                ],
+                "taps": []
+            });
+            let mut engine = GraphEngine::new(SAMPLE_RATE);
+            engine.set_graph_json(&payload.to_string()).expect("should load graph");
+
+            let sid_path = presets_dir().join("..").join("sid").join("Commando.sid");
+            let data = std::fs::read(&sid_path).unwrap_or_else(|e| panic!("read {sid_path:?}: {e}"));
+            eprintln!("[SID TEST] loaded {} bytes", data.len());
+            engine.load_sid_file("sid-1", &data);
+
+            let mut max_abs = 0.0f32;
+            // Render ~8s (SID runs an init routine, then a play routine each PAL frame).
+            for _ in 0..3000 {
+                let output = engine.render(FRAMES);
+                for &sample in output {
+                    let a = sample.abs();
+                    if a > max_abs {
+                        max_abs = a;
+                    }
+                }
+            }
+            eprintln!("[SID TEST] peak amplitude = {max_abs:.6}");
+            assert!(max_abs > 1e-6, "sid-player should produce non-zero output (got {max_abs})");
+        })
+        .unwrap()
+        .join()
+        .unwrap();
+}
