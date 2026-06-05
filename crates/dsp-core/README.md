@@ -44,8 +44,9 @@ src/
 │   ├── sample_hold.rs  # Sample & Hold / Track & Hold
 │   ├── slew.rs         # Slew limiter (portamento)
 │   ├── quantizer.rs    # Quantification de notes
-│   └── chaos.rs        # Chaos generator (Lorenz)
-├── effects/            # Effets audio (23 modules)
+│   ├── chaos.rs        # Chaos generator (Lorenz)
+│   └── envelope_follower.rs # Envelope follower (audio → CV)
+├── effects/            # Effets audio (23 fichiers ; ring_mod classé Amplifier → 22 effets)
 │   ├── chorus.rs       # Chorus stéréo BBD-style
 │   ├── ensemble.rs     # Chorus large (strings)
 │   ├── choir.rs        # Formant filter (voyelles)
@@ -108,7 +109,7 @@ src/
 
 ## Modules
 
-### Oscillateurs (16)
+### Oscillateurs (18)
 
 | Struct | Description |
 |--------|-------------|
@@ -128,6 +129,8 @@ src/
 | `Wavetable` | Synthèse wavetable |
 | `Granular` | Synthèse granulaire |
 | `ParticleCloud` | Nuage de particules audio |
+| `SpeechSynth` | Synthèse vocale à formants |
+| `Theremin` | Theremin (pitch/volume CV, monophonique) |
 
 ### Filtres (2)
 
@@ -136,7 +139,7 @@ src/
 | `Vcf` | VCF multi-mode (SVF/Ladder, LP/HP/BP/Notch, 12/24dB) |
 | `Hpf` | High-pass simple 1-pole |
 
-### Modulation (6)
+### Modulation (7)
 
 | Struct | Description |
 |--------|-------------|
@@ -146,8 +149,9 @@ src/
 | `SlewLimiter` | Limiteur de pente (portamento) |
 | `Quantizer` | Quantification de notes (12 gammes) |
 | `Chaos` | Générateur chaotique (Lorenz) |
+| `EnvelopeFollower` | Suiveur d'enveloppe (audio → CV) |
 
-### Effets (15)
+### Effets (22)
 
 | Struct | Description |
 |--------|-------------|
@@ -166,6 +170,14 @@ src/
 | `PitchShifter` | Pitch shifter granulaire (-24 à +24 semitones) |
 | `RingMod` | Multiplication de signaux (ring modulation) |
 | `Compressor` | Compresseur dynamique |
+| `BitCrusher` | Réduction de bits / sample rate |
+| `Flanger` | Flanger (LFO + feedback) |
+| `FreqShifter` | Frequency shifter (Bode/SSB) |
+| `Eq3` | Égaliseur 3 bandes |
+| `Glitch` | Glitch / stutter / buffer repeat |
+| `Leslie` | Cabine Leslie (rotary horn/drum) |
+| `Wah` | Wah-wah (auto/pédale) |
+| `TubeAmp` | Ampli à lampes (saturation) |
 
 ### TR-909 Drums (6)
 
@@ -189,7 +201,7 @@ src/
 | `Cowbell808` | Cowbell avec tune/decay |
 | `Tom808` | Tom avec tune/decay |
 
-### Séquenceurs (10)
+### Séquenceurs (15)
 
 | Struct | Description |
 |--------|-------------|
@@ -203,6 +215,11 @@ src/
 | `SidPlayer` | Lecteur de fichiers SID (C64) |
 | `AyPlayer` | Lecteur de fichiers YM/VTX (Spectrum/CPC/Atari) |
 | `Turing` | Machine de Turing (séquences pseudo-aléatoires) |
+| `ClockDivider` | Diviseur d'horloge (sous-divisions tempo) |
+| `ChordSequencer` | Séquenceur d'accords |
+| `PolyrhythmSequencer` | Séquenceur polyrythmique (pistes multi-tempo) |
+| `GameOfLife` | Jeu de la vie (Conway) → notes/gates |
+| `GravitySequencer` | Gravity sequencer (gravité/rebonds) |
 
 ## Utilisation
 

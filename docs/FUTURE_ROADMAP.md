@@ -1,5 +1,7 @@
 # NoobSynth3 - Future Development Roadmap
 
+> Revu contre v0.5.x — plusieurs items ci-dessous sont désormais livrés (voir docs/ROADMAP.md).
+
 Ce document détaille les améliorations planifiées pour NoobSynth3, organisées par priorité et domaine.
 
 ---
@@ -509,10 +511,11 @@ export function MidiStatusPanel({
 pub struct ArpeggiatorState {
     // ... existing fields ...
 
+    // Ratcheting : implémenté (DONE) — params lus + timing actif dans process()
+
     // PREPARED BUT NOT ACTIVE:
     pub direction: i32,           // For ping-pong mode
     pub ping_pong_forward: bool,  // Direction tracking
-    pub ratchet_phase: f32,       // For ratcheting
     pub strum_index: usize,       // For strumming
     pub strum_delay: f32,
     pub strum_counter: f32,
@@ -759,16 +762,16 @@ const [viewState, setViewState] = useState({
 
 | Module | Type | Description | Complexité |
 |--------|------|-------------|------------|
-| **Compressor** | Effect | Dynamics processing | Moyenne |
-| **EQ (3-band)** | Filter | Parametric EQ | Moyenne |
+| ~~**Compressor**~~ | Effect | Dynamics processing | ✅ FAIT |
+| ~~**EQ (3-band)**~~ | Filter | Parametric EQ | ✅ FAIT (id `eq3`) |
 | **Stereo Width** | Effect | M/S processing | Basse |
 | **CV Recorder** | Utility | Record/playback CV | Haute |
-| **Macro Controller** | Utility | Map 1 knob → multiple params | Haute |
+| **Macro Controller** | Utility | Map 1 knob → multiple params (note : la feature Macros a été retirée en v0.4.0 ; à ne réintroduire que volontairement) | Haute |
 | **Random S&H** | Modulator | Better sample & hold | Basse |
 | **Multi-LFO** | Modulator | 4 LFOs synced | Moyenne |
 | **Matrix Mixer** | Amplifier | 4x4 routing matrix | Moyenne |
 | **Tape Saturation** | Effect | Analog warmth | Basse |
-| **Bit Crusher** | Effect | Lo-fi effect | Basse |
+| ~~**Bit Crusher**~~ | Effect | Lo-fi effect | ✅ FAIT |
 
 ### 6.2 Détail: Compressor
 
@@ -949,9 +952,9 @@ jobs:
 - [ ] Tooltips
 
 ### Phase 5: Nouveaux Modules (ongoing)
-- [ ] Compressor
-- [ ] EQ 3-band
-- [ ] Bit Crusher
+- [x] Compressor ✅
+- [x] EQ 3-band ✅
+- [x] Bit Crusher ✅
 
 ---
 

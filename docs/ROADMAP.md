@@ -87,10 +87,13 @@
 - [x] Channel & master FX OFF by default (no idle CPU until a section is enabled)
 - [x] Fixed: per-rack & master volume faders had no effect in single-rack mode (stale `length <= 1` guard + unprefixed engine ID after always-prefix change)
 
+### Oscilloscope Fix (tag v0.5.1)
+- [x] Scope affiche à nouveau le signal (Web + Tauri) : `getAnalyserNode` (Web) et `getNativeScopeBuffer` (Tauri) mappent l'ID UI nu vers la clé rack-préfixée. Cause racine : flattenRacks préfixe toujours ; 65e682c (master bus FX) avait été soupçonné à tort. (dd88ad3)
+
 ### Code Quality
 - [x] Zero TypeScript errors (strict tsc -b mode)
 - [x] Zero Rust warnings across workspace
-- [x] 211+ presets render without NaN/panic
+- [x] 250+ presets render without NaN/panic
 
 ---
 

@@ -61,7 +61,12 @@ Le menu Presets manipule fondamentalement **un seul `GraphState`** :
 
 ---
 
-## État actuel des livrables (à la fin de la session)
+## État actuel des livrables (à la fin de la session) — _HISTORIQUE (obsolète)_
+
+> _Snapshot de fin de session conservé pour l'historique. Tous les fichiers ci-dessous
+> ont depuis été commités, et le chargement des projets depuis le menu (Option A) est
+> livré — voir le bandeau **STATUS : DONE** plus bas. Les lignes « à faire demain »
+> ci-dessous ne sont plus d'actualité._
 
 | Fichier | Quoi | Commité ? |
 |---|---|---|
@@ -71,9 +76,8 @@ Le menu Presets manipule fondamentalement **un seul `GraphState`** :
 | Theremin Attack/Release (DSP+UI), Le Graal/Berceuse swells | enveloppe de gate réglable | ✅ commité + pushé (`9aaed25`) |
 | Outillage `module-ref` / `check:modules` | référence auto + check TS↔Rust | ✅ commité + pushé (`bf30d17`) |
 
-**⚠️ À faire en priorité demain : commiter les 3 fichiers non commités** (preset +
-manifest + projet) pour ne pas perdre le travail. Suggestion de commit :
-`feat: ambient presets "Élégie" (1-rack) + "Élégie multitrack" (3 racks + 808)`.
+**⚠️ ~~À faire en priorité demain : commiter les 3 fichiers non commités~~** _(FAIT —
+obsolète)_ : les 3 fichiers (preset + manifest + projet) ont été commités.
 
 `public/projects/` est un **nouveau dossier** créé pour héberger les projets
 importables (il n'existait pas avant — aucune autre logique ne le référence encore).
@@ -81,6 +85,8 @@ importables (il n'existait pas avant — aucune autre logique ne le référence 
 ---
 
 ## Décision à prendre : faut-il charger les projets multi-rack depuis le menu ?
+
+> **STATUS : DONE** — l'Option A (section « Projects » dans la SidePanel, manifest `public/projects/manifest.json`, chargement via `loadProjects` dans `usePresetLibrary` / `state/presets.ts`) est implémentée et livrée. Le texte ci-dessous est conservé pour l'historique de conception.
 
 ### Option 0 — Ne rien changer (statu quo)
 Les projets se chargent via Import. Zéro code. Mais flow peu découvrable.

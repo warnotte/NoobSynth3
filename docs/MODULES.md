@@ -2095,12 +2095,14 @@ Tom 808 avec enveloppe de pitch.
 ## Polyphonie
 
 Les modules suivants sont dupliqués par voix :
-- VCO, Supersaw, NES Osc, SNES Osc, Noise
+- VCO, Supersaw, Karplus, NES Osc, SNES Osc, Noise, Pipe Organ, FM Matrix, Speech Synth
 - VCF, HPF
 - LFO, ADSR, Sample & Hold, Slew, Quantizer
-- Mod Router, Ring Mod
+- Mod Router, Ring Mod, Chaos, Turing Machine
 - VCA, Mod VCA, Gain
 - Distortion, Wavefolder
+- Mixer 2ch, Mixer 6ch
+- Control, MIDI File Sequencer
 
-Les effets (Chorus, Ensemble, Choir, Delay, Tape Delay, Granular Delay, Spring Reverb, Reverb, Phaser)
+La plupart des effets (Chorus, Ensemble, Choir, Delay, Tape Delay, Granular Delay, Spring Reverb, Reverb, Phaser, etc.)
 sont globaux et traitent la somme des voix.

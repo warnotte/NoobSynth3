@@ -24,7 +24,7 @@ Synthétiseur modulaire inspiré de VCV Rack, construit avec React + Rust/WASM.
 
 ### Workflow
 - **Module Templates** : sauvegarder/charger des groupes de modules pré-câblés
-- **190+ presets** : Jupiter, Juno, Moog, Prophet, Jarre, Acid, Moroder, TR-909, Shepard, MIDI Organ, Vocal Synthesis...
+- **250+ presets** : Jupiter, Juno, Moog, Prophet, Jarre, Acid, Moroder, TR-909, Shepard, MIDI Organ, Vocal Synthesis...
 - **Export/Import projet** : sauvegarder tous les racks + mixer + FX + tempo en un fichier
 - **MIDI** : entrée Web MIDI avec vélocité
 - **Undo/Redo** : historique avec transactions (knobs, modules)
@@ -56,8 +56,12 @@ Ouvrir l'app, cliquer **Play**, puis jouer avec le clavier ou charger un preset.
 | `npm run build` | Build production web |
 | `npm run build:wasm` | Compiler Rust → WASM |
 | `npm test` | Tests Rust (unit + presets) |
+| `npm run check:modules` | Cohérence ports TS↔Rust |
+| `npm run check:ui-audio` | Garde-fou parité Web↔Tauri |
+| `npm run module-ref` | Régénère docs/MODULE_REFERENCE.md |
 | `npm run tauri:dev` | App standalone (dev) |
-| `build.bat` | Build complet (web + Tauri) |
+| `npm run tauri:build` | Build app standalone (release) |
+| `build.bat` | Build web + Tauri (`npm run build` puis `tauri build` ; nécessite `npm run build:wasm` au préalable) |
 
 ## Multi-Rack : Guide rapide
 

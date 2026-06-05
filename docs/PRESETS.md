@@ -17,7 +17,7 @@ Presets stockés dans `public/presets/` avec structure:
 }
 ```
 
-Groupes existants: Basics, Leads, Bass, Pads, FX, Drums, 8-Bit, Experimental, Shepard, Drones, Wavetable, Vocal Synthesis, Chord Sequencer, Polyrhythm, Showcase, Glitch, Leslie
+**Groupes existants** (source de vérité : `public/presets/manifest.json`) — ex. Module Tests, Shepard, Turing Machine, Chiptune, Wavetable, Lorenz Experiment, Drones, Leslie, Atelier Signal, Pads & Strings… (~40 groupes).
 
 ### Connection Format (IMPORTANT)
 
@@ -75,7 +75,7 @@ Chaque preset doit inclure un module `notes` qui explique le patch à l'utilisat
   "id": "notes-1",
   "type": "notes",
   "name": "Info",
-  "position": { "x": 0, "y": 10 },
+  "position": { "col": 0, "row": 10 },
   "params": {
     "text": "NOM DU PRESET\n\nDescription courte.\n\n- Point 1: explication\n- Point 2: explication\n\nConseils d'utilisation."
   }

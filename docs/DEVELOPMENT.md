@@ -158,7 +158,7 @@ crates/
    - `src/types.rs` : Ajouter variante à l'enum `ModuleType`
    - `src/module_type.rs` : Ajouter `"module-name" => ModuleType::...` dans `normalize_module_type()`
    - `src/state/<catégorie>.rs` : Créer struct `*State` (+ variante dans `state/mod.rs`)
-   - `src/instantiate/{create_state,apply_param}.rs` : Ajouter `create_state()` + `apply_param()`
+   - `src/instantiate/{create_state,apply_param,apply_param_str}.rs` : `create_state()` + `apply_param()` (params numériques) + `apply_param_str()` (params string : shape, model…)
    - `src/process/<catégorie>.rs` : Ajouter traitement DSP dans le `match` de la catégorie
    - `src/ports/{input_ports,output_ports,...}.rs` : Définir les ports I/O
 3. **WASM** : Rebuild avec `npm run build:wasm`
@@ -167,6 +167,12 @@ crates/
    - `src/state/moduleRegistry.ts` : Ajouter taille/labels/défauts
    - `src/ui/portCatalog.ts` : Déclarer les ports
    - `src/ui/controls/[Category]Controls.tsx` : Ajouter le rendu UI
+
+> **Vérification** : après ajout/modif d'un module, lancer ces garde-fous :
+> - `npm run check:modules` — parité ports TS↔Rust
+> - `npm run check:ui-audio` — parité Web↔Tauri (si playhead/viz)
+> - `npm run module-ref` — régénère `docs/MODULE_REFERENCE.md`
+> - `npm run build:wasm` — rebuild après modif Rust
 
 ### Ajouter un preset
 
@@ -215,7 +221,7 @@ Sections principales :
 ### TypeScript (types)
 
 ```bash
-npx tsc -p tsconfig.app.json --noEmit
+npx tsc -b   # build mode, identique à `npm run build` (tsc -b && vite build)
 ```
 
 ### Rust

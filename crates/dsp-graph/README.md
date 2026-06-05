@@ -30,7 +30,7 @@ src/
 |---------|----------------|
 | `lib.rs` | Point d'entrée, GraphEngine, tri topologique, routage |
 | `module_type.rs` | `normalize_module_type()` - mapping string → ModuleType |
-| `types.rs` | Enums `ModuleType`, `PortKind`, `ConnectionEdge` |
+| `types.rs` | `ModuleType` (enum), `PortInfo`, `ConnectionEdge`, `TransportContext`, `ParamBuffer` (structs) |
 | `buffer.rs` | `Buffer`, `mix_buffers()`, `downmix_to_mono()` |
 | `state/` | Structs `*State` par catégorie (oscillators, effects…) + enum `ModuleState` |
 | `ports/` | `input_ports`/`output_ports`/`input_port_index`/`output_port_index` (un fichier par fonction) |

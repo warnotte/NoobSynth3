@@ -20,7 +20,8 @@ src/                    # React frontend
 crates/
   dsp-core/             # Rust DSP modules (oscillators, filters, effects)
   dsp-graph/            # Graph engine, module routing
-  dsp-wasm/             # WASM bindings
+  dsp-wasm/             # WASM bindings (Web mode)
+  dsp-standalone/       # Native cpal audio host (Tauri standalone mode)
 
 public/presets/         # Preset JSON files
 public/sid/             # SID files + manifest.json
@@ -134,7 +135,8 @@ Voir `src/hooks/HOOKS.md` pour la documentation détaillée.
 | File | Description |
 |------|-------------|
 | `crates/dsp-core/src/lib.rs` | All DSP module implementations |
-| `crates/dsp-graph/src/lib.rs` | Graph engine, ModuleType enum, routing |
+| `crates/dsp-graph/src/lib.rs` | Graph engine (`GraphEngine` struct/impl), routing |
+| `crates/dsp-graph/src/types.rs` | `ModuleType` enum + core types (PortInfo, ConnectionEdge, TransportContext, ParamBuffer) |
 | `crates/dsp-graph/src/process/` | DSP processing for all module types (split by category) |
 | `crates/dsp-graph/src/instantiate/` | Module creation and parameter updates (per function) |
 | `crates/dsp-graph/src/state/` | State structs for each module type (split by category) |
@@ -178,7 +180,7 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 - [ ] `crates/dsp-graph/src/types.rs` - Ajouter variante à `ModuleType` enum
 - [ ] `crates/dsp-graph/src/module_type.rs` - **CRITIQUE:** Ajouter `"module-name" => ModuleType::...` dans `normalize_module_type()`
 - [ ] `crates/dsp-graph/src/state/<catégorie>.rs` - Struct d'état (+ variante dans `state/mod.rs` enum `ModuleState`)
-- [ ] `crates/dsp-graph/src/instantiate/{create_state,apply_param}.rs` - `create_state()` + `apply_param()`
+- [ ] `crates/dsp-graph/src/instantiate/{create_state,apply_param,apply_param_str}.rs` - `create_state()` + `apply_param()` (params numériques) + `apply_param_str()` (params string)
 - [ ] `crates/dsp-graph/src/process/<catégorie>.rs` - Logique DSP (bras du `match` de la catégorie)
 - [ ] `crates/dsp-graph/src/ports/{input_ports,output_ports,input_port_index,output_port_index}.rs` - Ports I/O
 - [ ] `src/shared/graph.ts` - Type TypeScript
@@ -240,7 +242,7 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 | Game of Life | Grid state + playhead | ✅ | ✅ `NativeGameOfLifeBridge` |
 | Meter | Peak L/R level | ✅ | ✅ `NativeMeterBridge` |
 | Theremin | Pad position | ✅ | ✅ `NativeThereminBridge` |
-| Particle Cloud | Grain positions | ⚠️ flaky | ⚠️ câblage OK (`NativeParticleBridge`, parité Web atteinte) mais la viz n'anime pas de façon fiable — **en Web AUSSI** → bug du module, pas du câblage (voir Known Limitations) |
+| Particle Cloud | Grain positions | ✅ | ✅ `NativeParticleBridge` (parité Web atteinte ; viz lente ~10 px/s par design, figée transport arrêté — voir Known Limitations) |
 
 **⚠️ RÈGLE:** Toute nouvelle feature UI↔Audio DOIT être implémentée pour Tauri en même temps que Web. Ne jamais merger une feature Web-only. **Garde-fou auto:** `npm run check:ui-audio` échoue si un contrôle utilise `engine.watch*` sans chemin natif (le bug récurrent type Game-of-Life/Meter).
 
@@ -389,6 +391,7 @@ Presets dans `public/presets/`, structure `{ id, name, description, group, graph
 
 | Bug | Cause | Fix |
 |-----|-------|-----|
+| Scope sans signal (ligne plate) | `getAnalyserNode` (Web) / `getNativeScopeBuffer` (Tauri) cherchaient l'ID UI nu (`scope-1`) alors que les maps de taps sont keyées par l'ID rack-préfixé (`rack-1/scope-1`, flattenRacks préfixe toujours) → lookup raté → null → tracé plat | Mapper l'ID au lookup : `getAnalyserNode` via `mapId(...)`, `getNativeScopeBuffer` préfixe avec le rack actif. Même classe de bug que `tauriMapId`. (dd88ad3, tag v0.5.1) |
 | Clap909 auto-trigger | `clap_stage: 0` causait re-trigger | Init `clap_stage: 3` |
 | Accent non audible | CV lu en continu, pas latché | Ajout `latched_accent` |
 | Playhead UI désync | JS setInterval indépendant | Polling WASM `get_sequencer_step()` |
@@ -397,7 +400,7 @@ Presets dans `public/presets/`, structure `{ id, name, description, group, graph
 | RSID timer écrasement | `call_irq` restaurait CIA timers après exécution 6502 | Ne plus restaurer `timer_a`/`timer_b` — laisser les modifications du code persister |
 | RSID stack pointer reset | SP forcé à 0xFF à chaque IRQ, détruisant les données stack | SP persistant (`irq_sp`) dans la struct SidPlayer |
 | SID elapsed timer overflow | `playStartRef` null → `Date.now() - null` = epoch | Ref toujours `number`, reset via `loadGen` counter |
-| WASAPI buffer overflow | `&[0.0; 128][..frames]` trop petit pour WASAPI (480-4096 frames) | `const ZERO_BUFFER: [f32; 4096]` dans `process.rs` |
+| WASAPI buffer overflow | `&[0.0; 128][..frames]` trop petit pour WASAPI (480-4096 frames) | `const ZERO_BUFFER: [f32; 4096]` dans `process/mod.rs` |
 | Octave ne change pas le pitch | CV calculé comme `(note - midiRoot) / 12` → toujours relatif | CV fixe: `(note - 60) / 12` (MIDI 60 = C4 = référence) |
 | Mixers perdent la stéréo | Mixers ne traitaient que `channel(0)` | Méthodes `process_block_stereo` + `channels_mut_2()` pour L/R |
 | Mixer gain staging trop faible | Mixer 2ch: toujours `÷2`. Multi-ch: `÷N`. Perte de volume excessive | Tous les mixers: `÷√N` (sommation de puissance, standard DAW) |
@@ -465,7 +468,7 @@ Les plans/analyses de features déjà implémentées sont conservés dans [docs/
 | WASM | `wasm-opt` actif avec `-O2 --enable-bulk-memory --enable-nontrapping-float-to-int` (~15% plus petit) |
 | **Mixers Gain Staging** | Tous les mixers (2ch, 6ch, 8ch) divisent par `√N` (N = entrées connectées). Formule standard DAW (sommation de puissance). Ancien comportement: 2ch divisait toujours par 2, multi-ch par N. |
 | **RSID partiellement supporté** | Certains fichiers RSID (Great Giana Sisters, RoboCop) ne jouent pas correctement. L'émulation CPU 6502/CIA/VIC n'est pas assez précise pour les tunes RSID les plus exigeantes (timer modulation dynamique, échantillons digi). Les PSID fonctionnent tous. |
-| **Particle Cloud viz (À DÉBUGGER)** | Les particules n'animent pas de façon fiable — **en Web ET en Tauri**. Le câblage UI↔Audio est correct et identique à Theremin/Meter (qui marchent) : `native_get_particle_positions` → `get_particle_positions`, parité Web/Tauri atteinte. Le souci est donc **dans le module lui-même** (DSP `crates/dsp-core/src/oscillators/particle_cloud.rs` ou le rendu canvas de `ParticleCloudControls.tsx`), pas dans le pont Tauri. **À débugger en Web d'abord** (source de vérité) : vérifier que `process_block` met bien à jour les positions et que `get_positions`/`active_count_cache` reflètent le mouvement (les particules bougent par physique dès que le moteur tourne, ≥1 active par défaut — donc si rien ne bouge, regarder pourquoi `process_block` ne tourne pas ou pourquoi les positions restent figées). |
+| **Particle Cloud viz (lente par design)** | La viz fonctionne (Web ET Tauri) : `process_block` met à jour les positions chaque bloc (`crates/dsp-core/src/oscillators/particle_cloud.rs` ~l.570, physique vélocité/gravité/turbulence) → `get_positions`. Le mouvement est juste **très lent (~10 px/s, voulu)** et **figé tant que le transport est arrêté** (`process_block` ne tourne pas). Ce n'est PAS un bug : démarrer le transport et observer plusieurs secondes. Le pipe de données est correct et id-symétrique (mapId/unmapId), ce n'est PAS le bug d'id du scope. |
 
 ---
 
