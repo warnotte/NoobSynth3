@@ -203,9 +203,16 @@ function App() {
   const racksRef = useRef(racks)
   const activeRackIdRef = useRef(activeRackId)
 
-  /** Map a UI module ID to the engine-side ID for Tauri calls */
+  /**
+   * Map a UI module ID to the engine-side ID for Tauri calls. `flattenRacks`
+   * ALWAYS prefixes module IDs with `${rackId}/` (even in single-rack mode — see
+   * rackFlatten.ts), so this MUST always prefix too. Otherwise per-module native
+   * commands (file load, control-voice gates, state polling) target a
+   * non-existent ID and are silently dropped — SID/AY stay silent, played notes
+   * never trigger, etc.
+   */
   const tauriMapId = (moduleId: string) =>
-    racksRef.current.length > 1 ? `${activeRackIdRef.current}/${moduleId}` : moduleId
+    `${activeRackIdRef.current}/${moduleId}`
 
   const [importError, setImportError] = useState<string | null>(null)
   const [gridError, setGridError] = useState<string | null>(null)
