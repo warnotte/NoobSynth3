@@ -35,6 +35,13 @@
       "description": "Un organisme à rétroaction qui se joue tout seul : le son EST la boucle de feedback, accordée pour chanter, qui dérive via un attracteur de Lorenz. + voix FM générative + orgue grave. 3 racks.",
       "file": "larsen.json",
       "group": "Ambient"
+    },
+    {
+      "id": "monolithe",
+      "name": "Monolithe 🗿",
+      "description": "Song d'après l'esprit de \"Monument\" (Röyksopp), ré mineur, 96 BPM. Une MÉLODIE LONGUE de 32 mesures (MIDI File Sequencer, ~80s, jamais une boucle) sur une nappe Dm7–Bb–F–C–Gm–A7 + groove 808 downtempo. 3 racks.",
+      "file": "monolithe.json",
+      "group": "Songs"
     }
   ]
 }
