@@ -84,13 +84,13 @@ Câbles et jacks sont colorés par type de signal :
 ## UI Dev Tools
 
 - Dev Resize toggle lives in `src/ui/TopBar.tsx` (dev builds only). It enables the resize handle on `ModuleCard` and the resize preview ghost in `RackView`.
-- Resize overrides are kept in `moduleSizeOverrides` in `src/App.tsx` and only applied by `getModuleSize` while Dev Resize is enabled.
+- Resize overrides are kept in `moduleSizeOverrides` inside the `useModuleResize` hook (`src/hooks/useModuleResize.ts`, wired from `src/App.tsx`) and only applied by `getModuleSize` while Dev Resize is enabled.
 - Rack grid overlay is always on via `.rack-grid-overlay` in `src/ui/RackView.tsx`, driven by `--rack-unit-x/y`, `--rack-gap`, `--rack-pad-y` in `src/styles.css`.
 - Lab Panel (`module.type === 'lab'`) renders a full layout stress test (Osc/Env/Mod/Util) in `src/ui/controls/IOControls.tsx`, using `updateParam(..., { skipEngine: true })`.
 
 ### Remove Dev Resize (rollback checklist)
 
-1. `src/App.tsx`: remove `devResizeEnabled`, `moduleSizeOverrides`, `moduleResizePreview`, and the resize pointer handler; stop passing `showResizeHandles`.
+1. `src/hooks/useModuleResize.ts`: la logique Dev Resize (overrides, preview, pointer handler) y est extraite. La supprimer, et dans `src/App.tsx` retirer l'appel à `useModuleResize` + le passage de `devResizeEnabled`/`showResizeHandles`/`moduleResizePreview` (garder `getModuleSize`, ou le remplacer par `moduleSizes`).
 2. `src/ui/ModuleCard.tsx`: remove the resize handle and related props; `src/ui/RackView.tsx`: remove the resize ghost.
 3. `src/ui/TopBar.tsx`: remove the Dev Resize button and its styles; `src/styles.css`: remove `.dev-tools`, `.dev-toggles`, `.dev-toggle`, `.module-resize-handle`, `.module-resize-ghost`.
 
@@ -107,6 +107,9 @@ Câbles et jacks sont colorés par type de signal :
 | `useComputerKeyboard` | Clavier AZERTY/QWERTY | `hooks/useComputerKeyboard.ts` |
 | `useMarioSequencer` | Séquenceur module Mario | `hooks/useMarioSequencer.ts` |
 | `useUrlPreset` | Chargement preset/patch depuis l'URL (`?preset` / `?patch`, liens partageables) | `hooks/useUrlPreset.ts` |
+| `useModuleResize` | Outil Dev Resize : overrides de taille, preview, drag de redimensionnement + `getModuleSize` (source de vérité du span grille) | `hooks/useModuleResize.ts` |
+| `usePresetLibrary` | Chargement des bibliothèques presets / projets multi-rack / templates (data only) | `hooks/usePresetLibrary.ts` |
+| `useNativeBridges` | Construit les 7 ponts natifs Tauri (chiptune, sequencer, theremin, granular, Game of Life, meter, particle cloud) — `invokeTauri('native_*')` | `hooks/useNativeBridges.ts` |
 
 Voir `src/hooks/HOOKS.md` pour la documentation détaillée.
 
@@ -162,6 +165,9 @@ npm run test:presets  # Run preset integration tests (load + render all presets)
 | Script | Usage | Description |
 |--------|-------|-------------|
 | `scripts/validate-preset-notes.mjs` | `node scripts/validate-preset-notes.mjs [preset-file]` | Valide les notes d'un preset. Lit le JSON, convertit les pitch des step sequencers en noms de notes réels (en tenant compte de la fréquence de base de l'oscillateur cible), et compare avec une mélodie de référence si disponible. Défaut : `public/presets/take-on-me.json`. |
+| `scripts/check-modules.mjs` | `npm run check:modules` | Cohérence TS↔Rust : chaque port de `portCatalog` est résolu par `ports.rs` et le type est mappé dans `normalize_module_type`. |
+| `scripts/check-ui-audio.mjs` | `npm run check:ui-audio` | Garde-fou parité Web↔Tauri : échoue si un contrôle poll `engine.watch*` sans chemin natif Tauri, ou si un pont `nativeXxx` (ControlProps) n'est pas câblé via `controls/index.tsx`. |
+| `scripts/gen-module-reference.mjs` | `npm run module-ref` | Régénère `docs/MODULE_REFERENCE.md` (ports + params + defaults de tous les modules). |
 
 ## New Module Checklist
 
@@ -316,6 +322,8 @@ Ces features ont les structures de données en place mais la logique n'est pas c
 | `all_presets_render_without_nan` | Renders 750 blocks (~2s) per preset, checks NaN/Inf/panic/amplitude |
 | `engine_basic_render` | Empty graph renders silence |
 | `engine_single_oscillator` | Single oscillator produces non-zero, non-NaN output |
+| `engine_nes_osc` | NES oscillator → output produces a continuous non-zero tone (chip DSP regression) |
+| `engine_sid_player` | SID player with a real `.sid` loaded produces audio via the native `GraphEngine` (64 MB thread; mirrors the Tauri path) |
 
 ```bash
 npm test              # All workspace tests
@@ -399,6 +407,10 @@ Presets dans `public/presets/`, structure `{ id, name, description, group, graph
 | Ajout module = full restart | `applyGraphUpdate()` appelait `queueEngineRestart()` pour tout changement | Update incrémental (`set_graph` preserve state), full restart uniquement pour presets (`set_graph_fresh`) |
 | Turing Machine panic | `1u16 << length` overflow quand `length == 16` | Guard `if length >= 16 { 0xFFFF }` |
 | Channel/Master FX reset au restart transport | Valeurs FX envoyées au moteur en direct, jamais stockées → graphe reconstruit avec valeurs neutres au stop/start | Persister `channelFx`/`masterFx` dans l'état App ; `channelFx` injecté via `flattenRacks`, `masterFx` ré-appliqué dans `handleStart`/`queueEngineRestart` |
+| Pas d'audio natif (Tauri) pour SID/AY + notes jouées | `tauriMapId` ne préfixait pas l'ID en mono-rack, alors que `flattenRacks` préfixe TOUJOURS `${rackId}/` → les commandes `native_*` par module ciblaient un ID introuvable, silencieusement ignorées | `tauriMapId` préfixe TOUJOURS `${activeRackId}/` (mono-rack inclus) — `src/App.tsx` |
+| STATUS_STACK_OVERFLOW au boot natif (debug) | Thread audio natif sur stack ~2 MB par défaut ; `GraphEngine::new` (graphe poly, SID 64 KB RAM) déborde | Spawn du thread `noobsynth-audio` avec `stack_size(64 MB)` — `src-tauri/src/lib.rs` |
+| wasm-bindgen CLI ≠ crate Cargo.lock | Le step bindgen échoue si la CLI installée et la crate `wasm-bindgen` (pinnée) divergent | Garde-fou dans `scripts/build-wasm.ps1` : compare les versions, indique `cargo install -f wasm-bindgen-cli --version <crate>` |
+| SID/AY muets après (re)start audio natif | Le fichier chargé en UI n'était pas présent dans le moteur natif recréé au start | Re-upload du fichier SID/AY dans le moteur natif au démarrage audio (`loadSidFile`/`loadYmFile` du `nativeChiptuneBridge`) |
 
 ---
 

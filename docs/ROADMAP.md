@@ -41,16 +41,28 @@
 - [x] Backward compatible with version 1 (single patch)
 - [x] FX fields merge over neutral defaults (older v2 files without FX still load)
 
+### Tauri Standalone (Native Audio) — now functional (tag v0.5.0)
+- [x] cpal native audio produces sound for everything (verified: SID plays, notes trigger)
+- [x] **Root-cause fix:** `tauriMapId` now ALWAYS rack-prefixes module IDs (flattenRacks prefixes even single-rack). In single-rack mode the bare IDs meant per-module native commands (SID/AY file load, control-voice gates / played notes, state polling) targeted a non-existent module and were silently dropped — so chip players were silent and notes never triggered.
+- [x] Native audio thread spawned with a 64MB stack (was STATUS_STACK_OVERFLOW in debug)
+- [x] SID/AY re-load their file into the native engine on audio start
+- [x] Tauri crate bumped to 2.11 (matches `@tauri-apps/api`)
+- [x] `engine_nes_osc` + `engine_sid_player` render tests pin the chip DSP working natively
+
 ### Tauri Parity
 - [x] All graph syncs send combined (flattened) graph
-- [x] tauriMapId helper for module ID prefixing in multi-rack
-- [x] All native bridges use prefixed IDs (control, chiptune, sequencer, granular)
+- [x] tauriMapId helper for module ID prefixing (always prefixes, single-rack too)
+- [x] All native bridges use prefixed IDs (control, chiptune, sequencer, granular, theremin, particle, game-of-life, meter)
 - [x] native_set_graph_fresh command for clean preset loading
 - [x] Transport tempo synced to Tauri on change and after start
 - [x] Mixer levels sent to Tauri native engine
 - [x] VU meters via native_get_meter_level polling
 - [x] Resync sends native_reset_transport
 - [x] native_set_master_fx_param command
+- [x] Channel-strip FX + volume faders verified in native mode
+- [x] Theremin native audio + CV control + `native_get_theremin_state` cursor polling
+- [x] UI↔Audio parity extended to Game of Life, Meter, Theremin, Particle Cloud (one NativeXxxBridge each)
+- [x] `npm run check:ui-audio` guard (scripts/check-ui-audio.mjs): fails if a control polls `engine.watch*` without a native Tauri path, or a `nativeXxx` ControlProps bridge isn't threaded through controls/index.tsx
 
 ### Master Bus & Channel Strip FX
 - [x] Master bus EQ3 + Compressor in GraphEngine::render()
@@ -82,15 +94,6 @@
 
 ---
 
-## To Verify
-
-### Standalone (Tauri) runtime after recent changes (BUILDS OK, RUN UNTESTED)
-- The mixer redesign, Theremin module, and Theremin CV-control all compile for
-  every target (`cargo check` passes for `dsp-graph`, `dsp-wasm`, `src-tauri`).
-- **Not yet run:** Tauri standalone (cpal native audio). To check: theremin audio
-  + CV control, the `native_get_theremin_state` cursor polling, channel-strip FX,
-  and the volume faders in native mode.
-
 ## Known Issues
 
 ### Multi-Rack: inactive rack with a Control sequencer goes silent (DIAGNOSED, not yet fixed)
@@ -103,10 +106,11 @@
 - **Root cause:** `flattenRacks` overwrites the `output` module's `level` param with the mixer channel volume (default 0.8) on every flatten (rackFlatten.ts ~L96-99). A preset's custom output level is clobbered on rebuild.
 - **Proposed fix (more involved):** reconcile output-`level` ↔ mixer-volume — e.g. initialize the mixer channel volume from the output level on load, or apply mixer volume via a separate gain stage instead of overwriting the param.
 
-### File-Loading Modules Lose Data on Engine Restart
-- SID Player, AY Player, Granular Sampler lose their loaded file data on Stop→Play
+### File-Loading Modules Lose Data on Engine Restart (Web mode)
+- SID Player, AY Player, Granular Sampler lose their loaded file data on Stop→Play in **Web Audio** mode
 - **Workaround:** Reload the file manually after restart
 - MIDI File Sequencer is NOT affected (data stored in midiData param)
+- **Tauri:** no longer an issue — SID/AY re-load their file into the native engine automatically when native audio starts (the control keeps the loaded bytes in a ref)
 
 ### Playhead Visual Reset on Resync
 - Transport position (Bar:Beat) resets correctly

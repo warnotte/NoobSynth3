@@ -12,10 +12,13 @@ App.tsx
 ├── useUndoableState()   → Undo/Redo avec historique (useReducer)
 ├── usePatching()        → Gestion des câbles (drag & drop)
 ├── useModuleDrag()      → Déplacement des modules dans le rack
+├── useModuleResize()    → Dev Resize (overrides de taille + getModuleSize)
 ├── useControlVoices()   → Polyphonie, voice stealing, séquenceur interne
 ├── useMidi()            → Web MIDI input
 ├── useMarioSequencer()  → Séquenceur dédié au module Mario
 ├── useComputerKeyboard() → Clavier AZERTY/QWERTY comme input
+├── usePresetLibrary()   → Chargement presets / projets / templates
+├── useNativeBridges()   → Bridges natifs Tauri (data modules)
 └── useUrlPreset()       → Chargement preset/patch depuis l'URL (?preset / ?patch)
 
 Context:
@@ -199,6 +202,36 @@ useUndoableState<T>(initialState: T, config?: { maxHistory?: number })
 
 ---
 
+## useModuleResize
+
+**Fichier:** `useModuleResize.ts`
+
+**Rôle:** Gère l'outil **Dev Resize** : les overrides de taille par module, le preview
+de redimensionnement, et le drag pointer qui redimensionne un module sur la grille.
+Expose aussi `getModuleSize` — la source unique de vérité pour le span grille d'un
+module (override si Dev Resize actif, sinon la taille du registry).
+
+**Feature dev-only** (état initial `enabled` = `import.meta.env.DEV`). Voir la checklist
+"Remove Dev Resize" dans `CLAUDE.md`.
+
+**Params:**
+```typescript
+{
+  graphRef: MutableRefObject<GraphState>   // Ref vers le graphe
+  gridMetricsRef: MutableRefObject         // Métriques de la grille
+  modulesRef: RefObject                    // Ref conteneur modules
+}
+```
+
+**Retourne:**
+- `devResizeEnabled` - Outil Dev Resize actif?
+- `setDevResizeEnabled(bool)` - Toggle de l'outil
+- `getModuleSize(module)` - Taille grille effective (override ou registry)
+- `handleModuleResizePointerDown(moduleId, event)` - Démarre le redimensionnement
+- `moduleResizePreview` - Preview du span en cours (col/row/span/valid)
+
+---
+
 ## useComputerKeyboard
 
 **Fichier:** `useComputerKeyboard.ts`
@@ -295,6 +328,63 @@ Retourne un graph à appliquer (le cas échéant), qu'`App.tsx` applique ensuite
 **Note:** L'URL est parsée une seule fois au niveau module (avant tout render), via
 `parseUrlShare()` / `clearUrlShareParams()` de `utils/urlSharing`. Pour retirer la
 feature : supprimer le fichier et son import dans `App.tsx`.
+
+---
+
+## usePresetLibrary
+
+**Fichier:** `usePresetLibrary.ts`
+
+**Rôle:** Charge au montage les bibliothèques de presets, de projets multi-rack et de
+templates, puis expose leurs listes + statut de chargement. Chargement de données pur,
+sans couplage graphe/moteur. Consommé par `applyPreset` et la SidePanel.
+
+**Params:** aucun.
+
+**Retourne:**
+- `presets` - Liste des presets (`PresetSpec[]`)
+- `projects` - Liste des projets multi-rack (`ProjectSpec[]`)
+- `presetStatus` - `'loading' | 'ready' | 'error'`
+- `presetError` - Message d'erreur éventuel (`string | null`)
+- `builtinTemplates` - Templates intégrés (`TemplateSpec[]`)
+- `userTemplates` - Templates utilisateur (localStorage)
+- `setUserTemplates(...)` - Setter pour les templates utilisateur
+- `templateStatus` - `'loading' | 'ready' | 'error'`
+- `allTemplates` - Concat builtin + user (mémoïsé)
+
+---
+
+## useNativeBridges
+
+**Fichier:** `useNativeBridges.ts`
+
+**Rôle:** Construit les bridges "natifs" Tauri standalone pour les modules de données
+pures (SID/AY chiptune, séquenceurs, theremin, granular, Game of Life, meter, particle
+cloud). Chaque bridge est un petit objet d'appels `invokeTauri('native_*')`, gated sur
+`isTauri` et actif uniquement quand le moteur natif tourne. Consommé par les module
+controls (via `moduleControls` d'App).
+
+Le scope bridge et le control-voice bridge restent dans `App.tsx` (dépendances plus
+lourdes : ref scope / voices).
+
+**Params:**
+```typescript
+{
+  isTauri: boolean                          // Mode Tauri standalone?
+  tauriNativeRunning: boolean               // Moteur natif en cours?
+  tauriMapId: (moduleId) => string          // Mappe vers l'ID rack-préfixé
+  invokeTauri: InvokeTauri                  // Helper d'invocation de commande
+}
+```
+
+**Retourne (chacun `null` hors Tauri):**
+- `nativeChiptuneBridge` - SID/AY : load file, voice states, elapsed
+- `nativeSequencerBridge` - Step position + seek MIDI
+- `nativeThereminBridge` - setParam + getState
+- `nativeGranularBridge` - Position + load buffer
+- `nativeGameOfLifeBridge` - Grid + step
+- `nativeMeterBridge` - Niveau du meter
+- `nativeParticleBridge` - Positions + load buffer
 
 ---
 

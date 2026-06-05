@@ -209,17 +209,23 @@ Le mode Tauri utilise `cpal` (WASAPI/CoreAudio/ALSA) au lieu de Web Audio. Les f
 | Bridge | Fonctionnalités |
 |--------|-----------------|
 | `NativeScopeBridge` | Oscilloscope data polling |
-| `NativeChiptuneBridge` | SID/AY voice states + elapsed time |
+| `NativeChiptuneBridge` | SID/AY voice states + elapsed time + file (re)load |
 | `NativeSequencerBridge` | Playhead position (Step, Drum, MIDI) + MIDI seek |
+| `NativeThereminBridge` | Live param control + cursor position polling |
 | `NativeGranularBridge` | Position polling + buffer loading |
+| `NativeParticleBridge` | Particle positions polling + buffer loading |
+| `NativeGameOfLifeBridge` | Grid + playhead polling |
+| `NativeMeterBridge` | Packed peak L/R level polling |
 
 **Pattern d'implémentation:**
 1. Mode Web: `engine.watchXxx()` (subscription via AudioWorklet messages)
 2. Mode Native: Polling dans `useEffect` avec `invokeTauri()` (~20-50ms interval)
 
+**Garde de cohérence:** `npm run check:ui-audio` (`scripts/check-ui-audio.mjs`) échoue si un control poll `engine.watch*` sans chemin natif Tauri, ou si un bridge `nativeXxx` de `ControlProps` n'est pas relayé via `controls/index.tsx`. À lancer après toute feature UI↔Audio.
+
 **Fichiers clés:**
 - `src-tauri/src/lib.rs` - Commandes Tauri + AudioCommand variants
-- `src/App.tsx` - Création des bridges (`useMemo`)
+- `src/hooks/useNativeBridges.ts` - Création des bridges natifs (extrait d'App.tsx)
 - `src/ui/controls/*.tsx` - Detection `isNativeMode` + polling
 
 ### Delay Tempo Sync

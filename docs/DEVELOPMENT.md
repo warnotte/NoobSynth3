@@ -156,10 +156,11 @@ crates/
 1. **Rust DSP** : Créer le module dans `crates/dsp-core/src/`
 2. **Rust Graph** (dsp-graph) :
    - `src/types.rs` : Ajouter variante à l'enum `ModuleType`
-   - `src/state.rs` : Créer struct `*State` pour le module
-   - `src/instantiate.rs` : Ajouter création dans `create_state()` + `apply_param()`
-   - `src/process.rs` : Ajouter traitement DSP dans `process_module()`
-   - `src/ports.rs` : Définir les ports dans `module_ports()`
+   - `src/module_type.rs` : Ajouter `"module-name" => ModuleType::...` dans `normalize_module_type()`
+   - `src/state/<catégorie>.rs` : Créer struct `*State` (+ variante dans `state/mod.rs`)
+   - `src/instantiate/{create_state,apply_param}.rs` : Ajouter `create_state()` + `apply_param()`
+   - `src/process/<catégorie>.rs` : Ajouter traitement DSP dans le `match` de la catégorie
+   - `src/ports/{input_ports,output_ports,...}.rs` : Définir les ports I/O
 3. **WASM** : Rebuild avec `npm run build:wasm`
 4. **TypeScript** :
    - `src/shared/graph.ts` : Déclarer le type
@@ -172,19 +173,24 @@ crates/
 1. Créer `public/presets/mon-preset.json`
 2. L'ajouter à `public/presets/manifest.json`
 
-Format preset :
+Format preset (format `graph` — voir [PRESETS.md](./PRESETS.md) pour le détail complet) :
 ```json
 {
-  "version": 1,
   "id": "mon-preset",
   "name": "Mon Preset",
   "description": "Description courte",
-  "updates": {
-    "osc-1": { "type": "sawtooth", "detune": 5 },
-    "vcf-1": { "cutoff": 1200, "resonance": 0.3 }
+  "group": "Basics",
+  "graph": {
+    "modules": [ /* { id, type, name, params, position } */ ],
+    "connections": [
+      { "from": { "moduleId": "osc-1", "portId": "out" },
+        "to": { "moduleId": "vcf-1", "portId": "in" }, "kind": "audio" }
+    ]
   }
 }
 ```
+
+> **Note** : l'ancien format plat `updates` est déprécié et ne se charge plus.
 
 ### Modifier le style
 

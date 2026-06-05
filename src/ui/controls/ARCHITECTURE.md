@@ -94,8 +94,8 @@ src/ui/controls/
 │   └── TubeAmpControls.tsx
 │
 ├── FilterControls.tsx       # vcf, hpf
-├── AmplifierControls.tsx    # gain, cv-vca, mixer, mixer-1x2, ring-mod
-├── ModulatorControls.tsx    # adsr, lfo, mod-router, sample-hold, slew, quantizer, chaos
+├── AmplifierControls.tsx    # gain, cv-vca, mixer, mixer-1x2, mixer-8, crossfader, ring-mod
+├── ModulatorControls.tsx    # adsr, lfo, mod-router, sample-hold, slew, quantizer, envelope-follower, chaos
 ├── DrumControls.tsx         # 909-*, 808-*
 └── GranularControls.tsx     # granular (extrait car complexe)
 ```
@@ -184,7 +184,11 @@ export type ControlProps = {
   nativeScope?: NativeScopeBridge | null
   nativeChiptune?: NativeChiptuneBridge | null
   nativeSequencer?: NativeSequencerBridge | null
+  nativeTheremin?: NativeThereminBridge | null
   nativeGranular?: NativeGranularBridge | null
+  nativeParticle?: NativeParticleBridge | null
+  nativeGameOfLife?: NativeGameOfLifeBridge | null
+  nativeMeter?: NativeMeterBridge | null
   updateParam: (moduleId: string, paramId: string, value: number | string | boolean, options?: { skipEngine?: boolean }) => void
   // ... autres props (voir types.ts pour la liste complète)
 }

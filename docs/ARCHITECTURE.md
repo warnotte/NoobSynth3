@@ -128,10 +128,13 @@ NoobSynth3/
 │   │   └── sequencers/     # Clock, Arp, Step, Drum, Euclidean
 │   ├── dsp-graph/          # Moteur de graphe (modulaire)
 │   │   ├── lib.rs          # GraphEngine, routing
-│   │   ├── process.rs      # Traitement DSP
-│   │   ├── instantiate.rs  # Création modules
-│   │   ├── state.rs        # Structs d'état
-│   │   └── ports.rs        # Ports I/O
+│   │   ├── types.rs        # ModuleType enum
+│   │   ├── module_type.rs  # normalize_module_type()
+│   │   ├── buffer.rs       # Buffers audio
+│   │   ├── process/        # Traitement DSP (par catégorie)
+│   │   ├── instantiate/    # Création modules + apply_param
+│   │   ├── state/          # Structs d'état (par catégorie)
+│   │   └── ports/          # Ports I/O (par fonction)
 │   ├── dsp-wasm/           # Bindings WASM
 │   └── dsp-standalone/     # Host audio natif
 │
@@ -187,4 +190,4 @@ interface Connection {
 | Audio Web | AudioWorklet, WebAssembly |
 | Audio Natif | cpal (cross-platform audio) |
 | DSP | Rust (dsp-core) |
-| Desktop | Tauri 2.0 |
+| Desktop | Tauri 2.11 |

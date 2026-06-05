@@ -263,9 +263,14 @@ src/ui/controls/
 
 ### 2.2 Extraction de App.tsx (Priorité: Moyenne)
 
-**Problème:** App.tsx = 2279 lignes, trop de responsabilités
+**Problème:** App.tsx ~2175 lignes, trop de responsabilités
 
-**Solution:** Custom hooks extraits
+**Déjà extraits** (App.tsx est passé de ~3168 → ~2168 lignes) :
+- `src/hooks/useModuleResize.ts` — état/handlers du Dev Resize
+- `src/hooks/usePresetLibrary.ts` — chargement de la bibliothèque de presets/projets
+- `src/hooks/useNativeBridges.ts` — les 7 bridges de données natives Tauri (chiptune, sequencer, theremin, granular, particle, game-of-life, meter) — le scope bridge reste dans App.tsx
+
+**Solution (suite):** Custom hooks restants à extraire
 
 ```typescript
 // src/hooks/useGraphState.ts
