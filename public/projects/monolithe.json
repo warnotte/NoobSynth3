@@ -1098,7 +1098,7 @@
               "y": 60
             },
             "params": {
-              "gain": 5
+              "gain": 1.4
             }
           },
           {
@@ -1332,6 +1332,17 @@
             "to": {
               "moduleId": "drummix",
               "portId": "in-7"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "drummix",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "drumglue",
+              "portId": "in"
             },
             "kind": "audio"
           },
