@@ -63,6 +63,7 @@ export const moduleSizes: Record<ModuleType, string> = {
   '909-rimshot': '1x2',
   '909-crash': '1x2',
   '909-ride': '1x2',
+  'drum-machine-909': '6x6',
   // TR-808 Drums
   '808-kick': '1x2',
   '808-snare': '1x2',
@@ -156,6 +157,7 @@ export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>>
   '909-rimshot': 'strip',
   '909-crash': 'strip',
   '909-ride': 'strip',
+  'drum-machine-909': 'strip',
   // TR-808 Drums
   '808-kick': 'strip',
   '808-snare': 'strip',
@@ -320,6 +322,7 @@ export const moduleCatalog: { type: ModuleType; label: string; category: ModuleC
   { type: '909-rimshot', label: '909 Rim', category: 'drums' },
   { type: '909-crash', label: '909 Crash', category: 'drums' },
   { type: '909-ride', label: '909 Ride', category: 'drums' },
+  { type: 'drum-machine-909', label: 'TR-909 Machine', category: 'sequencers' },
   // TR-808 Drums
   { type: '808-kick', label: '808 Kick', category: 'drums' },
   { type: '808-snare', label: '808 Snare', category: 'drums' },
@@ -402,6 +405,7 @@ export const modulePrefixes: Record<ModuleType, string> = {
   '909-rimshot': 'rim9',
   '909-crash': 'crs9',
   '909-ride': 'rid9',
+  'drum-machine-909': '909m',
   // TR-808 Drums
   '808-kick': 'kick8',
   '808-snare': 'snare8',
@@ -509,6 +513,7 @@ export const moduleLabels: Record<ModuleType, string> = {
   '909-rimshot': '909 Rim',
   '909-crash': '909 Crash',
   '909-ride': '909 Ride',
+  'drum-machine-909': 'TR-909 Drum Machine',
   // TR-808 Drums
   '808-kick': '808 Kick',
   '808-snare': '808 Snare',
@@ -946,6 +951,26 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     tune: 1.0,          // Frequency multiplier 0.5-2.0
     decay: 2.0,         // Shimmer decay seconds 0.5-4.0
     bell: 0.6,          // Bell/ping prominence 0-1
+  },
+  'drum-machine-909': {
+    enabled: 1,
+    rate: 4,
+    swing: 8,
+    length: 16,
+    pattern: 0,
+    fill: 0,
+    'bd-tune': 55, 'bd-decay': 0.4, 'bd-level': 0.9,
+    'sd-tune': 200, 'sd-snappy': 0.6, 'sd-decay': 0.3, 'sd-level': 0.75,
+    'lt-tune': 90, 'lt-decay': 0.5, 'lt-level': 0.7,
+    'mt-tune': 150, 'mt-decay': 0.45, 'mt-level': 0.7,
+    'ht-tune': 220, 'ht-decay': 0.4, 'ht-level': 0.7,
+    'rs-tune': 400, 'rs-level': 0.6,
+    'cp-tone': 0.5, 'cp-decay': 0.4, 'cp-level': 0.7,
+    'ch-tune': 1.0, 'ch-decay': 0.1, 'ch-level': 0.55,
+    'oh-tune': 1.0, 'oh-decay': 0.5, 'oh-level': 0.5,
+    'cr-tune': 1.0, 'cr-decay': 1.5, 'cr-tone': 0.6, 'cr-level': 0.45,
+    'rd-tune': 1.0, 'rd-decay': 2.0, 'rd-bell': 0.6, 'rd-level': 0.45,
+    patternData: "{\"length\":16,\"pattern\":0,\"banks\":[[[120,0,0,0,100,0,0,0,120,0,0,0,100,0,0,0],[0,0,0,0,100,0,0,0,0,0,0,0,100,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,90,0,0,0,0,0,0,0,90,0,0,0],[60,0,85,0,60,0,85,0,60,0,85,0,60,0,85,0],[0,0,0,0,0,0,90,0,0,0,0,0,0,0,90,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]],[[120,0,0,0,100,0,0,0,120,0,0,0,100,0,110,0],[0,0,0,0,100,0,0,0,0,0,0,0,100,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,90,0,0,0,0,0,0,0,90,0,0,0],[60,0,85,0,60,0,85,0,60,0,85,0,60,0,85,0],[0,0,0,0,0,0,90,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]],[[120,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,100,0,0,0,90,0,95,0,100,105,110,120],[0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0],[0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]]}",
   },
   // TR-808 Drums
   '808-kick': {

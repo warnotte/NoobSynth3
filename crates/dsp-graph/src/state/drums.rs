@@ -60,6 +60,43 @@ pub struct Ride909State {
     pub bell: ParamBuffer,
 }
 
+/// All-in-one TR-909 drum machine: 11 embedded voices + internal Seq909.
+pub struct DrumMachine909State {
+    // 11 voices (lane order: bd sd lt mt ht rs cp ch oh cr rd)
+    pub bd: Kick909,
+    pub sd: Snare909,
+    pub lt: Tom909,
+    pub mt: Tom909,
+    pub ht: Tom909,
+    pub rs: Rimshot909,
+    pub cp: Clap909,
+    pub ch: HiHat909,
+    pub oh: HiHat909,
+    pub cr: Crash909,
+    pub rd: Ride909,
+    pub seq: Seq909,
+    pub oh_muted: bool, // CH→OH choke state
+    // global params
+    pub enabled: ParamBuffer,
+    pub rate: ParamBuffer,
+    pub swing: ParamBuffer,
+    pub length: ParamBuffer,
+    pub pattern: ParamBuffer,
+    pub fill: ParamBuffer,
+    // per-voice live params (other voice params use fixed defaults at construction)
+    pub bd_tune: ParamBuffer, pub bd_decay: ParamBuffer, pub bd_level: ParamBuffer,
+    pub sd_tune: ParamBuffer, pub sd_snappy: ParamBuffer, pub sd_decay: ParamBuffer, pub sd_level: ParamBuffer,
+    pub lt_tune: ParamBuffer, pub lt_decay: ParamBuffer, pub lt_level: ParamBuffer,
+    pub mt_tune: ParamBuffer, pub mt_decay: ParamBuffer, pub mt_level: ParamBuffer,
+    pub ht_tune: ParamBuffer, pub ht_decay: ParamBuffer, pub ht_level: ParamBuffer,
+    pub rs_tune: ParamBuffer, pub rs_level: ParamBuffer,
+    pub cp_tone: ParamBuffer, pub cp_decay: ParamBuffer, pub cp_level: ParamBuffer,
+    pub ch_tune: ParamBuffer, pub ch_decay: ParamBuffer, pub ch_level: ParamBuffer,
+    pub oh_tune: ParamBuffer, pub oh_decay: ParamBuffer, pub oh_level: ParamBuffer,
+    pub cr_tune: ParamBuffer, pub cr_decay: ParamBuffer, pub cr_tone: ParamBuffer, pub cr_level: ParamBuffer,
+    pub rd_tune: ParamBuffer, pub rd_decay: ParamBuffer, pub rd_bell: ParamBuffer, pub rd_level: ParamBuffer,
+}
+
 // TR-808
 
 pub struct Kick808State {

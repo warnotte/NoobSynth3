@@ -1771,6 +1771,13 @@
       "description": "Test des cymbales 909 (Crash + Ride). À supprimer après.",
       "file": "debug-909-cymbals.json",
       "group": "Module Tests"
+    },
+    {
+      "id": "debug-tr909-machine",
+      "name": "DEBUG — TR-909 Machine",
+      "description": "Test du module TR-909 tout-en-un. À supprimer.",
+      "file": "debug-tr909-machine.json",
+      "group": "Module Tests"
     }
   ]
 }

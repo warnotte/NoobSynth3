@@ -212,7 +212,7 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
       _ => None,
     },
     // Drum Sequencer
-    ModuleType::DrumSequencer => match port_id {
+    ModuleType::DrumSequencer | ModuleType::DrumMachine909 => match port_id {
       "clock" => Some(0),
       "reset" => Some(1),
       _ => None,

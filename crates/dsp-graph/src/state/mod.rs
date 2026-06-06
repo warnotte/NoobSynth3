@@ -120,6 +120,7 @@ pub enum ModuleState {
     Rimshot909(Rimshot909State),
     Crash909(Crash909State),
     Ride909(Ride909State),
+    DrumMachine909(DrumMachine909State),
 
     // TR-808 Drums
     Kick808(Kick808State),

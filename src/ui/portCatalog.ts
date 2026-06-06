@@ -429,6 +429,28 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
   '909-rimshot': drum909Ports(),
   '909-crash': drum909Ports(),
   '909-ride': drum909Ports(),
+  'drum-machine-909': {
+    inputs: [
+      { id: 'clock', label: 'Clk', kind: 'sync', direction: 'in' },
+      { id: 'reset', label: 'Rst', kind: 'sync', direction: 'in' },
+    ],
+    outputs: [
+      { id: 'mix-l', label: 'L', kind: 'audio', direction: 'out' },
+      { id: 'mix-r', label: 'R', kind: 'audio', direction: 'out' },
+      { id: 'out-bd', label: 'BD', kind: 'audio', direction: 'out' },
+      { id: 'out-sd', label: 'SD', kind: 'audio', direction: 'out' },
+      { id: 'out-lt', label: 'LT', kind: 'audio', direction: 'out' },
+      { id: 'out-mt', label: 'MT', kind: 'audio', direction: 'out' },
+      { id: 'out-ht', label: 'HT', kind: 'audio', direction: 'out' },
+      { id: 'out-rs', label: 'RS', kind: 'audio', direction: 'out' },
+      { id: 'out-cp', label: 'CP', kind: 'audio', direction: 'out' },
+      { id: 'out-ch', label: 'CH', kind: 'audio', direction: 'out' },
+      { id: 'out-oh', label: 'OH', kind: 'audio', direction: 'out' },
+      { id: 'out-cr', label: 'CR', kind: 'audio', direction: 'out' },
+      { id: 'out-rd', label: 'RD', kind: 'audio', direction: 'out' },
+      { id: 'step-out', label: 'Step', kind: 'cv', direction: 'out' },
+    ],
+  },
   // TR-808 Drums (same port layout as 909)
   '808-kick': drum909Ports(),
   '808-snare': drum909Ports(),

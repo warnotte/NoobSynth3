@@ -98,6 +98,7 @@ pub enum ModuleType {
     Rimshot909,
     Crash909,
     Ride909,
+    DrumMachine909,
 
     // TR-808 Drums
     Kick808,

@@ -73,6 +73,7 @@ pub(crate) fn normalize_module_type(raw: &str) -> ModuleType {
     "909-rimshot" => ModuleType::Rimshot909,
     "909-crash" => ModuleType::Crash909,
     "909-ride" => ModuleType::Ride909,
+    "drum-machine-909" => ModuleType::DrumMachine909,
     // TR-808 Drums
     "808-kick" => ModuleType::Kick808,
     "808-snare" => ModuleType::Snare808,

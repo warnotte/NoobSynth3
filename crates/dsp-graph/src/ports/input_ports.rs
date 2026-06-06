@@ -147,7 +147,7 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // accent
     ],
     // Drum Sequencer - 2 inputs (clock, reset)
-    ModuleType::DrumSequencer => vec![
+    ModuleType::DrumSequencer | ModuleType::DrumMachine909 => vec![
       PortInfo { channels: 1 },  // clock
       PortInfo { channels: 1 },  // reset
     ],

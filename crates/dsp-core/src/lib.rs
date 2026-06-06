@@ -110,6 +110,8 @@ pub use sequencers::{
     SeqStep,
     DrumSequencer, DrumSequencerParams, DrumSequencerInputs, DrumSequencerOutputs,
     DrumStep, DRUM_TRACKS, DRUM_STEPS, DRUM_TRACK_NAMES,
+    Seq909, Seq909Inputs, Seq909Params, Step909,
+    DM_VOICES, DM_MAX_STEPS, DM_BANKS, BANK_A, BANK_B, BANK_FILL,
     EuclideanSequencer, EuclideanParams, EuclideanInputs,
     EUCLIDEAN_MAX_STEPS,
     Mario, MarioOutputs, MARIO_CHANNELS,

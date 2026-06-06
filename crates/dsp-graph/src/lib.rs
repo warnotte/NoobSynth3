@@ -299,6 +299,7 @@ impl GraphEngine {
         match &module.state {
           ModuleState::StepSequencer(state) => return state.seq.current_step() as i32,
           ModuleState::DrumSequencer(state) => return state.seq.current_step() as i32,
+          ModuleState::DrumMachine909(state) => return state.seq.current_step() as i32,
           ModuleState::MidiFileSequencer(state) => return state.seq.current_tick() as i32,
           ModuleState::ChordSequencer(state) => return state.seq.current_step() as i32,
           ModuleState::PolyrhythmSequencer(state) => return state.seq.current_step() as i32,

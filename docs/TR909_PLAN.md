@@ -92,7 +92,8 @@ The riskiest logic, built + verified OFFLINE before the container consumes it.
 - [x] **M1** — Crash909 + Ride909 DSP (cargo tests green)
 - [x] **M2** — standalone `909-crash` / `909-ride` modules (check:modules ✓ 95 modules, tsc ✓, build:wasm ✓, preset suite ✓)
 - [x] **M3** — Seq909 internal sequencer (11 voices, graded velocity, length 16/32/64, A/B+FILL, swing, transport-synced; 4 cargo tests green). patternData JSON parsing deferred to M4 (serde lives in dsp-graph; Seq909 exposes setters).
-- [ ] M4 — DrumMachine909 container · [ ] M5 — React panel · [ ] M6 — preset+docs
+- [x] **M4** — DrumMachine909 container: 11 embedded voices + Seq909 → stereo mix + 11 per-voice outs + step; CH→OH choke; serde `patternData` parse; bus headroom trim. Verified: cargo build, `check:modules` ✓ 96 modules / **14-port parity**, `tsc -b` ✓, `build:wasm` ✓, fixture renders the groove (peak ~0.68, ~3137 transients), preset suite 6/6. UI category = sequencers (panel comes in M5; for now the module is loadable + plays via a preset).
+- [ ] M5 — React panel · [ ] M6 — preset+docs
 
 > **KNOWN — cymbal SOUND is rough (user-confirmed "dégueulasse").** Crash909/Ride909 are *functional*
 > (trigger/accent/decay verified) but the synthesized character is poor: too few partials + too tonal/buzzy,

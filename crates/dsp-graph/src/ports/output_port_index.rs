@@ -215,6 +215,24 @@ pub fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize
       "env-out" => Some(1),
       _ => None,
     },
+    // TR-909 Drum Machine - 14 outputs
+    ModuleType::DrumMachine909 => match port_id {
+      "mix-l" => Some(0),
+      "mix-r" => Some(1),
+      "out-bd" => Some(2),
+      "out-sd" => Some(3),
+      "out-lt" => Some(4),
+      "out-mt" => Some(5),
+      "out-ht" => Some(6),
+      "out-rs" => Some(7),
+      "out-cp" => Some(8),
+      "out-ch" => Some(9),
+      "out-oh" => Some(10),
+      "out-cr" => Some(11),
+      "out-rd" => Some(12),
+      "step-out" => Some(13),
+      _ => None,
+    },
     // TR-909 Drums
     ModuleType::Kick909 | ModuleType::Snare909 | ModuleType::HiHat909 |
     ModuleType::Clap909 | ModuleType::Tom909 | ModuleType::Rimshot909 |

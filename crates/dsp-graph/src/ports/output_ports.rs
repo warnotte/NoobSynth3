@@ -118,6 +118,23 @@ pub fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // out
       PortInfo { channels: 1 },  // env-out
     ],
+    // TR-909 Drum Machine - 14 outputs (stereo mix + 11 per-voice + step)
+    ModuleType::DrumMachine909 => vec![
+      PortInfo { channels: 1 },  // mix-l
+      PortInfo { channels: 1 },  // mix-r
+      PortInfo { channels: 1 },  // out-bd
+      PortInfo { channels: 1 },  // out-sd
+      PortInfo { channels: 1 },  // out-lt
+      PortInfo { channels: 1 },  // out-mt
+      PortInfo { channels: 1 },  // out-ht
+      PortInfo { channels: 1 },  // out-rs
+      PortInfo { channels: 1 },  // out-cp
+      PortInfo { channels: 1 },  // out-ch
+      PortInfo { channels: 1 },  // out-oh
+      PortInfo { channels: 1 },  // out-cr
+      PortInfo { channels: 1 },  // out-rd
+      PortInfo { channels: 1 },  // step-out
+    ],
     // TR-909 Drums - all have single audio output
     ModuleType::Kick909 | ModuleType::Snare909 | ModuleType::HiHat909 |
     ModuleType::Clap909 | ModuleType::Tom909 | ModuleType::Rimshot909 |
