@@ -39,14 +39,14 @@
     {
       "id": "monolithe",
       "name": "Monolithe 🗿",
-      "description": "Song d'après l'esprit de \"Monument\" (Röyksopp), ré mineur, 96 BPM. Une MÉLODIE LONGUE de 32 mesures (MIDI File Sequencer, ~80s, jamais une boucle) sur une nappe Dm7–Bb–F–C–Gm–A7 + groove 808 downtempo. 3 racks.",
+      "description": "Song anthémique lumineux (ré MAJEUR, 100 BPM, esprit Röyksopp). MÉLODIE LONGUE de 32 mesures (supersaw soaring) + ARPÈGE hypnotique, joués par UN SEUL MIDI File Sequencer (2 pistes). Nappe D–A–Bm–G–Em–A + basse + beat grand. Mélodie aussi dispo en .mid (preset MIDI). 3 racks.",
       "file": "monolithe.json",
       "group": "Songs"
     },
     {
       "id": "vesper",
       "name": "Vesper ⛪",
-      "description": "Orgue cinématique : une MÉLODIE LONGUE de 32 mesures (do mineur, ~96s) jouée par un Pipe Organ à travers un Leslie — le \"test ultime\" du synth transformé en musique. Nappe Cm7–Ab–Eb–Bb–Fm–G7 + battement très épars. 80 BPM, 3 racks.",
+      "description": "Lueur chaleureuse de fin de journée (sol MAJEUR, 96 BPM, esprit Röyksopp). MÉLODIE LONGUE de 32 mesures (lead supersaw doux) + ARPÈGE léger, joués par UN SEUL MIDI File Sequencer (2 pistes). Nappe G–D–Em–C–Am–D + basse + groove du soir (kick serré). Mélodie aussi dispo en .mid. 3 racks.",
       "file": "vesper.json",
       "group": "Songs"
     },

@@ -80,6 +80,21 @@
       "id": "all-blues",
       "name": "Miles Davis - All Blues",
       "file": "all-blues.mid"
+    },
+    {
+      "id": "noobsynth-monolithe",
+      "name": "NoobSynth - Monolithe (Lead + Arp)",
+      "file": "monolithe.mid"
+    },
+    {
+      "id": "noobsynth-vesper",
+      "name": "NoobSynth - Vesper (Lead + Arp)",
+      "file": "vesper.mid"
+    },
+    {
+      "id": "noobsynth-lumiere",
+      "name": "NoobSynth - Lumière (Lead + Arp)",
+      "file": "lumiere.mid"
     }
   ]
 }

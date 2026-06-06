@@ -88,8 +88,10 @@ Classé par impact. Les points P1 sont ce qui sépare « belle boucle de 80 s »
 
 | Projet | Esprit | Mélodie longue | Démontre |
 |--------|--------|----------------|----------|
-| **Monolithe 🗿** | *Monument*, ré mineur, 96 BPM | 85 notes / 32 mes. / ~80 s, saw lead | MIDI seq embarqué + crescendo vélo→filtre |
-| **Vesper ⛪** | cinématique, do mineur, 80 BPM | 54 notes / 32 mes. / ~96 s, **Pipe Organ + Leslie** | le « test ultime » du synth en musique |
+| **Monolithe 🗿** | anthémique lumineux, **ré majeur**, 100 BPM | lead 72 + **arpège 512** notes | supersaw soaring + arp, crescendo vélo→filtre |
+| **Vesper ✨** | chaleureux du soir, **sol majeur**, 96 BPM | lead 72 + **arpège 512** notes | lead supersaw doux + arp (ex-orgue, retravaillé) |
 | **Lumière ✨** | *Eple/Poor Leno*, la majeur, 112 BPM | lead 71 notes + **arpège 512 notes** | **1 MIDI seq → 2 pistes** (lead + arp) |
 
 Tous : 3 racks (Lead/Harmonie/Rythme), équilibrés au Mixer, vérifiés sans clip/silence/NaN.
+
+> Les 3 mélodies sont **aussi exportées en vrais fichiers `.mid`** (`public/midi-presets/{monolithe,vesper,lumiere}.mid`, via `@tonejs/midi`) — chargeables dans n'importe quel MIDI File Sequencer (bouton Load / preset) et éditables dans un DAW. Premier pas vers le manque n°2 (un piano-roll *dans* l'app).
