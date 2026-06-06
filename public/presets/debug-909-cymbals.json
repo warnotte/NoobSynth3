@@ -1,0 +1,177 @@
+{
+  "version": 1,
+  "id": "debug-909-cymbals",
+  "name": "DEBUG — 909 Cymbals",
+  "description": "Test des nouvelles cymbales 909 (Crash + Ride). Le drum-seq déclenche le Crash (accentué, début de mesure) et le Ride (doubles-croches). Play et écoute. À SUPPRIMER après test.",
+  "group": "Module Tests",
+  "graph": {
+    "modules": [
+      {
+        "id": "drumseq",
+        "type": "drum-sequencer",
+        "name": "Trig",
+        "position": {
+          "col": 0,
+          "row": 0
+        },
+        "params": {
+          "enabled": true,
+          "tempo": 100,
+          "rate": 4,
+          "gateLength": 50,
+          "swing": 0,
+          "length": 16,
+          "drumData": "{\"tracks\":[[{\"g\":2,\"a\":0},{\"g\":0,\"a\":1},{\"g\":0,\"a\":2},{\"g\":0,\"a\":3},{\"g\":0,\"a\":4},{\"g\":0,\"a\":5},{\"g\":0,\"a\":6},{\"g\":0,\"a\":7},{\"g\":1,\"a\":8},{\"g\":0,\"a\":9},{\"g\":0,\"a\":10},{\"g\":0,\"a\":11},{\"g\":0,\"a\":12},{\"g\":0,\"a\":13},{\"g\":0,\"a\":14},{\"g\":0,\"a\":15}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":1},{\"g\":0,\"a\":2},{\"g\":0,\"a\":3},{\"g\":0,\"a\":4},{\"g\":0,\"a\":5},{\"g\":0,\"a\":6},{\"g\":0,\"a\":7},{\"g\":0,\"a\":8},{\"g\":0,\"a\":9},{\"g\":0,\"a\":10},{\"g\":0,\"a\":11},{\"g\":0,\"a\":12},{\"g\":0,\"a\":13},{\"g\":0,\"a\":14},{\"g\":0,\"a\":15}],[{\"g\":2,\"a\":0},{\"g\":0,\"a\":1},{\"g\":1,\"a\":2},{\"g\":0,\"a\":3},{\"g\":1,\"a\":4},{\"g\":0,\"a\":5},{\"g\":1,\"a\":6},{\"g\":0,\"a\":7},{\"g\":2,\"a\":8},{\"g\":0,\"a\":9},{\"g\":1,\"a\":10},{\"g\":0,\"a\":11},{\"g\":1,\"a\":12},{\"g\":0,\"a\":13},{\"g\":1,\"a\":14},{\"g\":0,\"a\":15}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":1},{\"g\":0,\"a\":2},{\"g\":0,\"a\":3},{\"g\":0,\"a\":4},{\"g\":0,\"a\":5},{\"g\":0,\"a\":6},{\"g\":0,\"a\":7},{\"g\":0,\"a\":8},{\"g\":0,\"a\":9},{\"g\":0,\"a\":10},{\"g\":0,\"a\":11},{\"g\":0,\"a\":12},{\"g\":0,\"a\":13},{\"g\":0,\"a\":14},{\"g\":0,\"a\":15}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":1},{\"g\":0,\"a\":2},{\"g\":0,\"a\":3},{\"g\":0,\"a\":4},{\"g\":0,\"a\":5},{\"g\":0,\"a\":6},{\"g\":0,\"a\":7},{\"g\":0,\"a\":8},{\"g\":0,\"a\":9},{\"g\":0,\"a\":10},{\"g\":0,\"a\":11},{\"g\":0,\"a\":12},{\"g\":0,\"a\":13},{\"g\":0,\"a\":14},{\"g\":0,\"a\":15}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":1},{\"g\":0,\"a\":2},{\"g\":0,\"a\":3},{\"g\":0,\"a\":4},{\"g\":0,\"a\":5},{\"g\":0,\"a\":6},{\"g\":0,\"a\":7},{\"g\":0,\"a\":8},{\"g\":0,\"a\":9},{\"g\":0,\"a\":10},{\"g\":0,\"a\":11},{\"g\":0,\"a\":12},{\"g\":0,\"a\":13},{\"g\":0,\"a\":14},{\"g\":0,\"a\":15}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":1},{\"g\":0,\"a\":2},{\"g\":0,\"a\":3},{\"g\":0,\"a\":4},{\"g\":0,\"a\":5},{\"g\":0,\"a\":6},{\"g\":0,\"a\":7},{\"g\":0,\"a\":8},{\"g\":0,\"a\":9},{\"g\":0,\"a\":10},{\"g\":0,\"a\":11},{\"g\":0,\"a\":12},{\"g\":0,\"a\":13},{\"g\":0,\"a\":14},{\"g\":0,\"a\":15}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":1},{\"g\":0,\"a\":2},{\"g\":0,\"a\":3},{\"g\":0,\"a\":4},{\"g\":0,\"a\":5},{\"g\":0,\"a\":6},{\"g\":0,\"a\":7},{\"g\":0,\"a\":8},{\"g\":0,\"a\":9},{\"g\":0,\"a\":10},{\"g\":0,\"a\":11},{\"g\":0,\"a\":12},{\"g\":0,\"a\":13},{\"g\":0,\"a\":14},{\"g\":0,\"a\":15}]]}"
+        }
+      },
+      {
+        "id": "crash",
+        "type": "909-crash",
+        "name": "909 Crash",
+        "position": {
+          "col": 4,
+          "row": 0
+        },
+        "params": {
+          "tune": 1,
+          "decay": 2.5,
+          "tone": 0.7
+        }
+      },
+      {
+        "id": "ride",
+        "type": "909-ride",
+        "name": "909 Ride",
+        "position": {
+          "col": 4,
+          "row": 3
+        },
+        "params": {
+          "tune": 1,
+          "decay": 3,
+          "bell": 0.7
+        }
+      },
+      {
+        "id": "mix",
+        "type": "mixer-1x2",
+        "name": "Mix",
+        "position": {
+          "col": 8,
+          "row": 0
+        },
+        "params": {
+          "levelA": 0.6,
+          "levelB": 0.55,
+          "levelC": 0,
+          "levelD": 0,
+          "levelE": 0,
+          "levelF": 0
+        }
+      },
+      {
+        "id": "out",
+        "type": "output",
+        "name": "Out",
+        "position": {
+          "col": 11,
+          "row": 0
+        },
+        "params": {
+          "level": 0.85
+        }
+      },
+      {
+        "id": "notes",
+        "type": "notes",
+        "name": "Info",
+        "position": {
+          "col": 0,
+          "row": 4
+        },
+        "params": {
+          "text": "DEBUG — 909 CYMBALS\n\nPlay. Le Crash sonne (accentué) au début de chaque mesure, le Ride tape en doubles-croches.\n\nCrash : Tune / Decay / Tone.\nRide : Tune / Decay / Bell.\n\nDis-moi si le son te plaît (crash brillant ? ride ping ?). Preset à supprimer après."
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": {
+          "moduleId": "drumseq",
+          "portId": "gate-kick"
+        },
+        "to": {
+          "moduleId": "crash",
+          "portId": "trigger"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "drumseq",
+          "portId": "acc-kick"
+        },
+        "to": {
+          "moduleId": "crash",
+          "portId": "accent"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "drumseq",
+          "portId": "gate-hhc"
+        },
+        "to": {
+          "moduleId": "ride",
+          "portId": "trigger"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "drumseq",
+          "portId": "acc-hhc"
+        },
+        "to": {
+          "moduleId": "ride",
+          "portId": "accent"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "crash",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mix",
+          "portId": "in-a"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "ride",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mix",
+          "portId": "in-b"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "mix",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "out",
+          "portId": "in"
+        },
+        "kind": "audio"
+      }
+    ]
+  }
+}

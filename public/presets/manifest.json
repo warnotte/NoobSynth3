@@ -1764,6 +1764,13 @@
       "description": "6 bodies with maximum chaos — unpredictable rhythmic mayhem.",
       "file": "gravity-chaos.json",
       "group": "Generative"
+    },
+    {
+      "id": "debug-909-cymbals",
+      "name": "DEBUG — 909 Cymbals",
+      "description": "Test des cymbales 909 (Crash + Ride). À supprimer après.",
+      "file": "debug-909-cymbals.json",
+      "group": "Module Tests"
     }
   ]
 }
