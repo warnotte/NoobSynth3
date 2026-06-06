@@ -91,4 +91,11 @@ The riskiest logic, built + verified OFFLINE before the container consumes it.
 ## Status
 - [x] **M1** — Crash909 + Ride909 DSP (cargo tests green)
 - [x] **M2** — standalone `909-crash` / `909-ride` modules (check:modules ✓ 95 modules, tsc ✓, build:wasm ✓, preset suite ✓)
-- [ ] M3 — Seq909 internal sequencer · [ ] M4 — DrumMachine909 container · [ ] M5 — React panel · [ ] M6 — preset+docs
+- [x] **M3** — Seq909 internal sequencer (11 voices, graded velocity, length 16/32/64, A/B+FILL, swing, transport-synced; 4 cargo tests green). patternData JSON parsing deferred to M4 (serde lives in dsp-graph; Seq909 exposes setters).
+- [ ] M4 — DrumMachine909 container · [ ] M5 — React panel · [ ] M6 — preset+docs
+
+> **KNOWN — cymbal SOUND is rough (user-confirmed "dégueulasse").** Crash909/Ride909 are *functional*
+> (trigger/accent/decay verified) but the synthesized character is poor: too few partials + too tonal/buzzy,
+> ride "bell" is a beepy sine. The REAL TR-909 crash/ride were 6-bit **samples**, not synthesis — that's why
+> they sound real. Decision: do NOT block the machine on this. Cymbals stay rough placeholders (and are
+> per-voice mutable in the machine). **Revisit later, ideally via sample playback**, not more synthesis.

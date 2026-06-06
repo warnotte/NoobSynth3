@@ -61,6 +61,7 @@ pub mod clock;
 pub mod arpeggiator;
 pub mod step_sequencer;
 pub mod drum_sequencer;
+pub mod drum909_seq;
 pub mod euclidean;
 pub mod mario;
 pub mod midi_file_sequencer;
@@ -155,6 +156,10 @@ pub use step_sequencer::{
 pub use drum_sequencer::{
     DrumSequencer, DrumSequencerInputs, DrumSequencerParams, DrumSequencerOutputs,
     DrumStep, DRUM_TRACKS, DRUM_STEPS, DRUM_TRACK_NAMES,
+};
+pub use drum909_seq::{
+    Seq909, Seq909Inputs, Seq909Params, Step909,
+    DM_VOICES, DM_MAX_STEPS, DM_BANKS, BANK_A, BANK_B, BANK_FILL, DM_VOICE_NAMES,
 };
 pub use euclidean::{
     EuclideanSequencer, EuclideanInputs, EuclideanParams,
