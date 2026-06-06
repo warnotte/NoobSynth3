@@ -59,6 +59,8 @@ export type ModuleType =
   | '909-clap'
   | '909-tom'
   | '909-rimshot'
+  | '909-crash'
+  | '909-ride'
   // TR-808 Drums
   | '808-kick'
   | '808-snare'

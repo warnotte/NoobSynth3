@@ -427,6 +427,8 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
   '909-clap': drum909Ports(),
   '909-tom': drum909Ports(),
   '909-rimshot': drum909Ports(),
+  '909-crash': drum909Ports(),
+  '909-ride': drum909Ports(),
   // TR-808 Drums (same port layout as 909)
   '808-kick': drum909Ports(),
   '808-snare': drum909Ports(),

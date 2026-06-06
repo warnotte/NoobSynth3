@@ -11,6 +11,8 @@
 //! - [`Clap909`] - Hand clap with multi-trigger envelope
 //! - [`Tom909`] - Tom-tom with pitch envelope
 //! - [`Rimshot909`] - Short metallic rimshot
+//! - [`Crash909`] - Bright explosive crash cymbal (synthesized)
+//! - [`Ride909`] - Defined ride cymbal with bell/ping (synthesized)
 //!
 //! ## TR-808 Drums
 //!
@@ -51,6 +53,8 @@ pub mod hihat;
 pub mod clap;
 pub mod tom;
 pub mod rimshot;
+pub mod crash;
+pub mod ride;
 
 // TR-808
 pub mod kick808;
@@ -67,6 +71,8 @@ pub use hihat::{HiHat909, HiHat909Params, HiHat909Inputs};
 pub use clap::{Clap909, Clap909Params, Clap909Inputs};
 pub use tom::{Tom909, Tom909Params, Tom909Inputs};
 pub use rimshot::{Rimshot909, Rimshot909Params, Rimshot909Inputs};
+pub use crash::{Crash909, Crash909Params, Crash909Inputs};
+pub use ride::{Ride909, Ride909Params, Ride909Inputs};
 
 // TR-808 exports
 pub use kick808::{Kick808, Kick808Params, Kick808Inputs};

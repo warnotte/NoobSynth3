@@ -46,6 +46,20 @@ pub struct Rimshot909State {
     pub tune: ParamBuffer,
 }
 
+pub struct Crash909State {
+    pub crash: Crash909,
+    pub tune: ParamBuffer,
+    pub decay: ParamBuffer,
+    pub tone: ParamBuffer,
+}
+
+pub struct Ride909State {
+    pub ride: Ride909,
+    pub tune: ParamBuffer,
+    pub decay: ParamBuffer,
+    pub bell: ParamBuffer,
+}
+
 // TR-808
 
 pub struct Kick808State {

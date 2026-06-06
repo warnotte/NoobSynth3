@@ -135,7 +135,8 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
     ],
     // TR-909 Drums - all have trigger + accent inputs
     ModuleType::Kick909 | ModuleType::Snare909 | ModuleType::HiHat909 |
-    ModuleType::Clap909 | ModuleType::Tom909 | ModuleType::Rimshot909 => vec![
+    ModuleType::Clap909 | ModuleType::Tom909 | ModuleType::Rimshot909 |
+    ModuleType::Crash909 | ModuleType::Ride909 => vec![
       PortInfo { channels: 1 },  // trigger
       PortInfo { channels: 1 },  // accent
     ],

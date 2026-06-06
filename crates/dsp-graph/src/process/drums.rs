@@ -36,6 +36,7 @@ use dsp_core::{
     ResonatorInputs, ResonatorParams,
     ReverbInputs, ReverbParams, RingMod, RingModParams,
     Rimshot909Inputs, Rimshot909Params, Sample,
+    Crash909Inputs, Crash909Params, Ride909Inputs, Ride909Params,
     SampleHoldInputs, SampleHoldParams, ShepardInputs, ShepardParams,
     SidPlayerInputs, SidPlayerOutputs, SidPlayerParams,
     SpeechSynthInputs, SpeechSynthParams,
@@ -148,6 +149,30 @@ pub(crate) fn process(
                 tune: state.tune.slice(frames),
             };
             state.rimshot.process_block(out, rim_inputs, params);
+        }
+        ModuleState::Crash909(state) => {
+            let trigger = if connections[0].is_empty() { None } else { Some(inputs[0].channel(0)) };
+            let accent = if connections[1].is_empty() { None } else { Some(inputs[1].channel(0)) };
+            let out = outputs[0].channel_mut(0);
+            let crash_inputs = Crash909Inputs { trigger, accent };
+            let params = Crash909Params {
+                tune: state.tune.slice(frames),
+                decay: state.decay.slice(frames),
+                tone: state.tone.slice(frames),
+            };
+            state.crash.process_block(out, crash_inputs, params);
+        }
+        ModuleState::Ride909(state) => {
+            let trigger = if connections[0].is_empty() { None } else { Some(inputs[0].channel(0)) };
+            let accent = if connections[1].is_empty() { None } else { Some(inputs[1].channel(0)) };
+            let out = outputs[0].channel_mut(0);
+            let ride_inputs = Ride909Inputs { trigger, accent };
+            let params = Ride909Params {
+                tune: state.tune.slice(frames),
+                decay: state.decay.slice(frames),
+                bell: state.bell.slice(frames),
+            };
+            state.ride.process_block(out, ride_inputs, params);
         }
         // TR-808 Drums
         ModuleState::Kick808(state) => {

@@ -385,6 +385,18 @@ pub(crate) fn create_state(
       rimshot: Rimshot909::new(sample_rate),
       tune: ParamBuffer::new(param_number(params, "tune", 400.0)),
     }),
+    ModuleType::Crash909 => ModuleState::Crash909(Crash909State {
+      crash: Crash909::new(sample_rate),
+      tune: ParamBuffer::new(param_number(params, "tune", 1.0)),
+      decay: ParamBuffer::new(param_number(params, "decay", 1.5)),
+      tone: ParamBuffer::new(param_number(params, "tone", 0.6)),
+    }),
+    ModuleType::Ride909 => ModuleState::Ride909(Ride909State {
+      ride: Ride909::new(sample_rate),
+      tune: ParamBuffer::new(param_number(params, "tune", 1.0)),
+      decay: ParamBuffer::new(param_number(params, "decay", 2.0)),
+      bell: ParamBuffer::new(param_number(params, "bell", 0.6)),
+    }),
     // TR-808 Drums
     ModuleType::Kick808 => ModuleState::Kick808(Kick808State {
       kick: Kick808::new(sample_rate),

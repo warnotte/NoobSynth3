@@ -61,6 +61,8 @@ export const moduleSizes: Record<ModuleType, string> = {
   '909-clap': '1x2',
   '909-tom': '1x2',
   '909-rimshot': '1x2',
+  '909-crash': '1x2',
+  '909-ride': '1x2',
   // TR-808 Drums
   '808-kick': '1x2',
   '808-snare': '1x2',
@@ -152,6 +154,8 @@ export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>>
   '909-clap': 'strip',
   '909-tom': 'strip',
   '909-rimshot': 'strip',
+  '909-crash': 'strip',
+  '909-ride': 'strip',
   // TR-808 Drums
   '808-kick': 'strip',
   '808-snare': 'strip',
@@ -314,6 +318,8 @@ export const moduleCatalog: { type: ModuleType; label: string; category: ModuleC
   { type: '909-clap', label: '909 Clap', category: 'drums' },
   { type: '909-tom', label: '909 Tom', category: 'drums' },
   { type: '909-rimshot', label: '909 Rim', category: 'drums' },
+  { type: '909-crash', label: '909 Crash', category: 'drums' },
+  { type: '909-ride', label: '909 Ride', category: 'drums' },
   // TR-808 Drums
   { type: '808-kick', label: '808 Kick', category: 'drums' },
   { type: '808-snare', label: '808 Snare', category: 'drums' },
@@ -394,6 +400,8 @@ export const modulePrefixes: Record<ModuleType, string> = {
   '909-clap': 'clap9',
   '909-tom': 'tom9',
   '909-rimshot': 'rim9',
+  '909-crash': 'crs9',
+  '909-ride': 'rid9',
   // TR-808 Drums
   '808-kick': 'kick8',
   '808-snare': 'snare8',
@@ -499,6 +507,8 @@ export const moduleLabels: Record<ModuleType, string> = {
   '909-clap': '909 Clap',
   '909-tom': '909 Tom',
   '909-rimshot': '909 Rim',
+  '909-crash': '909 Crash',
+  '909-ride': '909 Ride',
   // TR-808 Drums
   '808-kick': '808 Kick',
   '808-snare': '808 Snare',
@@ -926,6 +936,16 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     tune: 500,          // Base frequency Hz
     tone: 0.6,          // Brightness 0-1
     decay: 0.2,         // Decay time 0-1
+  },
+  '909-crash': {
+    tune: 1.0,          // Frequency multiplier 0.5-2.0
+    decay: 1.5,         // Tail decay seconds 0.3-4.0
+    tone: 0.6,          // Brightness 0-1
+  },
+  '909-ride': {
+    tune: 1.0,          // Frequency multiplier 0.5-2.0
+    decay: 2.0,         // Shimmer decay seconds 0.5-4.0
+    bell: 0.6,          // Bell/ping prominence 0-1
   },
   // TR-808 Drums
   '808-kick': {

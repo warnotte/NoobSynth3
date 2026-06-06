@@ -138,6 +138,8 @@ pub use drums::{
     Clap909, Clap909Params, Clap909Inputs,
     Tom909, Tom909Params, Tom909Inputs,
     Rimshot909, Rimshot909Params, Rimshot909Inputs,
+    Crash909, Crash909Params, Crash909Inputs,
+    Ride909, Ride909Params, Ride909Inputs,
 };
 
 // Re-export drums (TR-808)

@@ -391,6 +391,18 @@ pub(crate) fn apply_param(state: &mut ModuleState, param: &str, value: f32) {
       "tune" => state.tune.set(value),
       _ => {}
     },
+    ModuleState::Crash909(state) => match param {
+      "tune" => state.tune.set(value),
+      "decay" => state.decay.set(value),
+      "tone" => state.tone.set(value),
+      _ => {}
+    },
+    ModuleState::Ride909(state) => match param {
+      "tune" => state.tune.set(value),
+      "decay" => state.decay.set(value),
+      "bell" => state.bell.set(value),
+      _ => {}
+    },
     // TR-808 Drums
     ModuleState::Kick808(state) => match param {
       "tune" => state.tune.set(value),

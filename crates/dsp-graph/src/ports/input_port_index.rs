@@ -198,7 +198,8 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
     },
     // TR-909 Drums
     ModuleType::Kick909 | ModuleType::Snare909 | ModuleType::HiHat909 |
-    ModuleType::Clap909 | ModuleType::Tom909 | ModuleType::Rimshot909 => match port_id {
+    ModuleType::Clap909 | ModuleType::Tom909 | ModuleType::Rimshot909 |
+    ModuleType::Crash909 | ModuleType::Ride909 => match port_id {
       "trigger" | "trig" => Some(0),
       "accent" | "acc" => Some(1),
       _ => None,

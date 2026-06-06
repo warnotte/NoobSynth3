@@ -81,6 +81,16 @@ const drumConfigs: Record<string, DrumKnobConfig[]> = {
     { label: 'Tone', param: 'tone', min: 0, max: 1, step: 0.01, defaultVal: 0.6, format: formatPercent },
     { label: 'Decay', param: 'decay', min: 0, max: 1, step: 0.01, defaultVal: 0.2, format: formatPercent },
   ],
+  '909-crash': [
+    { label: 'Tune', param: 'tune', min: 0.5, max: 2, step: 0.01, defaultVal: 1.0, format: (v) => `×${v.toFixed(2)}` },
+    { label: 'Decay', param: 'decay', min: 0.3, max: 4, step: 0.05, defaultVal: 1.5, unit: 's', format: (v) => v.toFixed(2) },
+    { label: 'Tone', param: 'tone', min: 0, max: 1, step: 0.01, defaultVal: 0.6, format: formatPercent },
+  ],
+  '909-ride': [
+    { label: 'Tune', param: 'tune', min: 0.5, max: 2, step: 0.01, defaultVal: 1.0, format: (v) => `×${v.toFixed(2)}` },
+    { label: 'Decay', param: 'decay', min: 0.5, max: 4, step: 0.05, defaultVal: 2.0, unit: 's', format: (v) => v.toFixed(2) },
+    { label: 'Bell', param: 'bell', min: 0, max: 1, step: 0.01, defaultVal: 0.6, format: formatPercent },
+  ],
 }
 
 export function renderDrumControls(props: ControlProps): React.ReactElement | null {
