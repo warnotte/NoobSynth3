@@ -71,6 +71,37 @@ Classé par impact. Les points P1 sont ce qui sépare « belle boucle de 80 s »
 
 ---
 
+## Batterie — investigation (ce qui était cassé, ce qui manque)
+
+Le retour « la batterie est trop sommaire, pas pro » était juste. **Cause racine #1 (vérifiée
+dans le code) : les accents n'étaient jamais câblés.** Le drum-sequencer a des sorties CV `acc-<piste>`
+qu'il faut patcher dans l'entrée `accent` de chaque voix ; non connectée, l'entrée vaut 0.5 → un pas
+accentué (`a:1`) sonne **identique** à un pas normal. + seulement 3 pistes sur 8 utilisées, pas de swing,
+kick boomy.
+
+**Corrigé (tout exprimable avec l'existant) :** câblage `acc-*→voix.accent` (le plus gros gain « pro »),
+accents placés (kick sur les temps, ghost hats off-beat), **open + closed hats** (2e hihat sur `gate-hho`),
+**kicks superposés** (808 sub + 909 click), clap/perc, **swing** 10–16 %, kick serré (decay ~0.55, plus de
+click), et un **bus batterie** : `mixer-8 → compresseur de glue → sortie` + une **réverb parallèle sur
+caisse/clap uniquement** (pas sur le kick — c'est ce qui « muddait » le mix).
+
+**Limites dures restantes (à améliorer pour du vrai studio) :**
+- **Accent binaire seulement** (2 niveaux, ~+2–3 dB) — pas de vraie vélocité par pas, pas de dynamique de
+  ghost notes graduée. *Contournement :* patcher un CV externe (sample-hold/chaos/LFO 0..1) dans `accent`.
+- **Pas de flam / ratchet / roulements de sous-pas** (hats trap impossibles).
+- **Pas de probabilité / humanize** par pas — chaque mesure est identique, parfaitement quantifiée.
+- **Pas de micro-timing par pas** — seul le swing global (pairs/impairs, plafonné à 45 %).
+- **Max 16 pas = 1 mesure** — pas de patterns 32/64, pas de **song-mode / fills A-B** intégrés (la variation
+  demande un 2e drum-seq + gating, bricolé).
+- **Pas de choke group** hhc/hho ; **pas de pan/stéréo par voix** ni de room batterie intégrée.
+- **Bug UI 909-hihat** : les boutons Open/Closed/Mix sont ignorés par le moteur (`apply_param.rs`) — n'utiliser
+  que `tone` + le param JSON `open`.
+- **Format `drumData` non extensible** (le parser ne lit que `g`/`a`) — un champ vélocité `v` serait ignoré
+  sans modif Rust.
+
+→ Roadmap drums : vélocité par pas (au moins étendre `drumData` + le parser), fills/song-mode (lié au point
+P1 timeline), choke group hhc/hho, pan par voix. *Le bug UI 909-hat est un quick-win à corriger.*
+
 ## Feuille de route proposée (vers le studio)
 
 1. **Arrangement timeline** (P1) — une piste maître « sections » : par mesure/section, état de chaque
