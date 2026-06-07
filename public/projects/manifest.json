@@ -56,6 +56,13 @@
       "description": "Lumineux, la majeur, 112 BPM (esprit \"Eple\"/\"Poor Leno\", Röyksopp). UN SEUL MIDI File Sequencer joue DEUX pistes : une MÉLODIE LONGUE (lead, 32 mesures) + un ARPÈGE hypnotique en doubles-croches. + nappe A–E–F#m–D–Bm + basse + beat entraînant. 3 racks.",
       "file": "lumiere.json",
       "group": "Songs"
+    },
+    {
+      "id": "capitulation",
+      "name": "Capitulation 📉",
+      "description": "Génératif apocalyptique : un krach boursier sans fin (drone, ticker Turing/chaos, puces qui lâchent, alarmes). 4 racks, zéro MIDI, LFOs à périodes premières → jamais répétitif.",
+      "file": "capitulation.json",
+      "group": "Ambient"
     }
   ]
 }

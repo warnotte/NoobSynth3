@@ -1,0 +1,1697 @@
+{
+  "version": 2,
+  "type": "project",
+  "masterTempo": 60,
+  "masterVolume": 0.8,
+  "activeRackId": "rack-1",
+  "racks": [
+    {
+      "id": "rack-1",
+      "name": "Substrate / Dread",
+      "graph": {
+        "modules": [
+          {
+            "id": "overview",
+            "type": "notes",
+            "name": "CAPITULATION",
+            "position": {
+              "x": 40,
+              "y": 40
+            },
+            "params": {
+              "text": "CAPITULATION — pièce générative infinie (4 racks, ZÉRO MIDI)\n\nAppuie sur PLAY et laisse tourner. Rien n'est enregistré : tout est CALCULÉ en direct.\n- Hauteurs : Chaos (Lorenz) + Turing Machine → Quantizer (l'harmonie tient… puis se brise).\n- Rythmes : Euclidiens clairsemés, jamais un beat régulier.\n- Dérive : 4 LFOs très lents à périodes PREMIÈRES (127, 83, 167, 211 s) → la combinaison ne se répète qu'au bout de ~8 ans. En pratique : jamais à l'identique.\n\nL'ARC (chaque rack le suit à sa vitesse) :\naube fragile → euphorie de l'IPO → les puces lâchent → krach / coupe-circuit → capitulation → vide… puis une autre aube, différente.\n\nRacks : 1) Substrate/Dread (drone)  2) Le Marché/Ticker  3) Silicium (puces)  4) Alarmes/Coupe-circuit.\nLaisse jouer longtemps : ça descend l'escalier de la panique, sans fin."
+            }
+          },
+          {
+            "id": "arc-lfo",
+            "type": "lfo",
+            "name": "ARC (tres lent)",
+            "position": {
+              "x": 40,
+              "y": 160
+            },
+            "params": {
+              "rate": 0.007874,
+              "depth": 0.85,
+              "offset": 0.15,
+              "shape": "sine",
+              "bipolar": false
+            }
+          },
+          {
+            "id": "gate-hold",
+            "type": "lfo",
+            "name": "Gate tenu (always-on)",
+            "position": {
+              "x": 40,
+              "y": 394
+            },
+            "params": {
+              "rate": 0.1,
+              "depth": 0,
+              "offset": 1,
+              "shape": "sine",
+              "bipolar": false
+            }
+          },
+          {
+            "id": "drift",
+            "type": "chaos",
+            "name": "Derive (Lorenz lent)",
+            "position": {
+              "x": 40,
+              "y": 628
+            },
+            "params": {
+              "speed": 0.04,
+              "rho": 28,
+              "sigma": 10,
+              "beta": 2.66,
+              "scale": 0,
+              "root": 0
+            }
+          },
+          {
+            "id": "swarm",
+            "type": "spectral-swarm",
+            "name": "Nappe abyssale",
+            "position": {
+              "x": 325,
+              "y": 160
+            },
+            "params": {
+              "frequency": 55,
+              "partials": 24,
+              "detune": 18,
+              "drift": 0.4,
+              "density": 0.85,
+              "evolution": 7,
+              "inharmonic": 0.08,
+              "tilt": -4,
+              "spread": 0.8,
+              "shimmer": 0.15,
+              "attack": 6,
+              "release": 8,
+              "waveform": 0,
+              "oddEven": 0,
+              "fundamentalMix": 0.6,
+              "formantFreq": 0,
+              "formantQ": 2,
+              "freeze": 0,
+              "chorus": 0.35,
+              "attackLow": 1,
+              "attackHigh": 1,
+              "releaseLow": 1,
+              "releaseHigh": 1
+            }
+          },
+          {
+            "id": "organ",
+            "type": "pipe-organ",
+            "name": "Orgue grave (souffle)",
+            "position": {
+              "x": 325,
+              "y": 472
+            },
+            "params": {
+              "frequency": 55,
+              "drawbar16": 0.7,
+              "drawbar8": 0.45,
+              "drawbar4": 0.12,
+              "drawbar223": 0,
+              "drawbar2": 0.05,
+              "drawbar135": 0,
+              "drawbar113": 0,
+              "drawbar1": 0,
+              "voicing": 1,
+              "chiff": 0,
+              "percussion": 0,
+              "percHarmonic": 0,
+              "percDecay": 0,
+              "percVolume": 0,
+              "chorusVibrato": 0.3,
+              "tremulant": 0.15,
+              "tremRate": 3.8,
+              "wind": 0.15,
+              "brightness": 0.4
+            }
+          },
+          {
+            "id": "sub",
+            "type": "oscillator",
+            "name": "Sub detune",
+            "position": {
+              "x": 325,
+              "y": 784
+            },
+            "params": {
+              "frequency": 41.2,
+              "type": "triangle",
+              "pwm": 0.5,
+              "unison": 3,
+              "detune": 8,
+              "fmLin": 0,
+              "fmExp": 0,
+              "subMix": 0.25,
+              "subOct": 1
+            }
+          },
+          {
+            "id": "swarmlvl",
+            "type": "gain",
+            "name": "Niv. Nappe",
+            "position": {
+              "x": 610,
+              "y": 160
+            },
+            "params": {
+              "gain": 0.32
+            }
+          },
+          {
+            "id": "organlvl",
+            "type": "gain",
+            "name": "Niv. Orgue",
+            "position": {
+              "x": 610,
+              "y": 472
+            },
+            "params": {
+              "gain": 0.34
+            }
+          },
+          {
+            "id": "sublvl",
+            "type": "gain",
+            "name": "Niv. Sub",
+            "position": {
+              "x": 610,
+              "y": 784
+            },
+            "params": {
+              "gain": 0.3
+            }
+          },
+          {
+            "id": "premix",
+            "type": "mixer-1x2",
+            "name": "Pre-VCF 3ch",
+            "position": {
+              "x": 895,
+              "y": 472
+            },
+            "params": {
+              "levelA": 0.6,
+              "levelB": 0.6,
+              "levelC": 0.55,
+              "levelD": 0,
+              "levelE": 0,
+              "levelF": 0
+            }
+          },
+          {
+            "id": "vcf",
+            "type": "vcf",
+            "name": "Voile (LP qui s'ouvre)",
+            "position": {
+              "x": 1180,
+              "y": 160
+            },
+            "params": {
+              "cutoff": 140,
+              "resonance": 0.22,
+              "drive": 0.1,
+              "envAmount": 0,
+              "modAmount": 0.9,
+              "keyTrack": 0,
+              "model": "svf",
+              "mode": "lp",
+              "slope": 24
+            }
+          },
+          {
+            "id": "rev",
+            "type": "reverb",
+            "name": "Abime (grande reverb)",
+            "position": {
+              "x": 1465,
+              "y": 160
+            },
+            "params": {
+              "time": 4.5,
+              "damp": 0.5,
+              "preDelay": 45,
+              "mix": 0.42
+            }
+          },
+          {
+            "id": "out",
+            "type": "output",
+            "name": "Out Substrate",
+            "position": {
+              "x": 1750,
+              "y": 160
+            },
+            "params": {
+              "level": 0.4
+            }
+          },
+          {
+            "id": "notes-1",
+            "type": "notes",
+            "name": "Info",
+            "position": {
+              "x": 1180,
+              "y": 550
+            },
+            "params": {
+              "text": "CAPITULATION — LAYER A : SUBSTRATE / DREAD\n\nLe sol emotionnel du morceau : un drone grave qui evolue sans fin.\n\nSOURCES (toutes tenues, sans clavier) :\n- NAPPE ABYSSALE (Spectral Swarm, 55 Hz, 24 partiels) = le corps vivant qui derive.\n- ORGUE GRAVE (Pipe Organ, 16' lourd, 55 Hz) = la chaleur, l'espoir fragile de l'aube.\n- SUB DETUNE (oscillateur triangle 41 Hz, unison 3) = le poids apocalyptique du bas.\nLes deux premiers sont maintenus ouverts par le GATE TENU (LFO offset=1, depth=0).\n\nGENERATIF :\n- DERIVE (Lorenz lent) micro-deplace le pitch de la nappe (X) et le detune du sub (Z) -> jamais de boucle exacte, dissonance qui s'accumule.\n\nARC (dawn -> crash -> void) :\n- L'ARC LFO (tres lent, ~2 min) ouvre lentement le VCF (LP 24 dB).\n- Aube : cutoff ~140 Hz, etouffe, chaud, plein d'espoir.\n- Capitulation : filtre grand ouvert, le bas-medium se revele -> meltdown grave + reverb abyssale.\n\nNiveaux volontairement bas : cette couche s'empile sous les autres. Laisser de la place."
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": {
+              "moduleId": "gate-hold",
+              "portId": "cv-out"
+            },
+            "to": {
+              "moduleId": "swarm",
+              "portId": "gate"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "gate-hold",
+              "portId": "cv-out"
+            },
+            "to": {
+              "moduleId": "organ",
+              "portId": "gate"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "drift",
+              "portId": "x"
+            },
+            "to": {
+              "moduleId": "swarm",
+              "portId": "pitch"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "drift",
+              "portId": "z"
+            },
+            "to": {
+              "moduleId": "sub",
+              "portId": "pitch"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "swarm",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "swarmlvl",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "organ",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "organlvl",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "sub",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "sublvl",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "swarmlvl",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "premix",
+              "portId": "in-a"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "organlvl",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "premix",
+              "portId": "in-b"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "sublvl",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "premix",
+              "portId": "in-c"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "premix",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "vcf",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "arc-lfo",
+              "portId": "cv-out"
+            },
+            "to": {
+              "moduleId": "vcf",
+              "portId": "mod"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "vcf",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "rev",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "rev",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "out",
+              "portId": "in"
+            },
+            "kind": "audio"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rack-2",
+      "name": "Le Marché / Ticker",
+      "graph": {
+        "modules": [
+          {
+            "id": "clk",
+            "type": "clock",
+            "name": "Horloge (tempo libre)",
+            "position": {
+              "x": 40,
+              "y": 40
+            },
+            "params": {
+              "running": true,
+              "tempo": 60,
+              "rate": 4,
+              "swing": 0
+            }
+          },
+          {
+            "id": "turing",
+            "type": "turing-machine",
+            "name": "Le Ticker (générateur)",
+            "position": {
+              "x": 40,
+              "y": 274
+            },
+            "params": {
+              "probability": 0.35,
+              "length": 12,
+              "range": 2,
+              "scale": 0,
+              "root": 0
+            }
+          },
+          {
+            "id": "arpgate",
+            "type": "lfo",
+            "name": "Densité (gate ET)",
+            "position": {
+              "x": 40,
+              "y": 586
+            },
+            "params": {
+              "rate": 0.6,
+              "depth": 1,
+              "offset": 0,
+              "shape": "square",
+              "bipolar": false
+            }
+          },
+          {
+            "id": "gatevca",
+            "type": "cv-vca",
+            "name": "Vanne de densité",
+            "position": {
+              "x": 230,
+              "y": 586
+            },
+            "params": {
+              "gain": 1
+            }
+          },
+          {
+            "id": "quant",
+            "type": "quantizer",
+            "name": "Cours coté (gamme)",
+            "position": {
+              "x": 230,
+              "y": 40
+            },
+            "params": {
+              "root": 0,
+              "scale": 6
+            }
+          },
+          {
+            "id": "arc",
+            "type": "lfo",
+            "name": "L'ARC (très lent)",
+            "position": {
+              "x": 230,
+              "y": 274
+            },
+            "params": {
+              "rate": 0.012048,
+              "depth": 0.55,
+              "offset": 0,
+              "shape": "sawtooth",
+              "bipolar": true
+            }
+          },
+          {
+            "id": "chaos",
+            "type": "chaos",
+            "name": "Volatilité (Lorenz)",
+            "position": {
+              "x": 230,
+              "y": 430
+            },
+            "params": {
+              "speed": 0.18,
+              "rho": 28,
+              "sigma": 10,
+              "beta": 2.66,
+              "scale": 0,
+              "root": 0
+            }
+          },
+          {
+            "id": "osc",
+            "type": "oscillator",
+            "name": "Voix du ticker",
+            "position": {
+              "x": 420,
+              "y": 40
+            },
+            "params": {
+              "frequency": 440,
+              "type": "triangle",
+              "pwm": 0.5,
+              "unison": 1,
+              "detune": 0,
+              "fmLin": 0,
+              "fmExp": 0.15,
+              "subMix": 0,
+              "subOct": 1
+            }
+          },
+          {
+            "id": "env",
+            "type": "adsr",
+            "name": "Pluck",
+            "position": {
+              "x": 420,
+              "y": 274
+            },
+            "params": {
+              "attack": 0.004,
+              "decay": 0.28,
+              "sustain": 0,
+              "release": 0.22
+            }
+          },
+          {
+            "id": "vca",
+            "type": "gain",
+            "name": "Ampli note",
+            "position": {
+              "x": 610,
+              "y": 40
+            },
+            "params": {
+              "gain": 0.32
+            }
+          },
+          {
+            "id": "vcf",
+            "type": "vcf",
+            "name": "Filtre (éclat)",
+            "position": {
+              "x": 610,
+              "y": 274
+            },
+            "params": {
+              "cutoff": 2600,
+              "resonance": 0.18,
+              "drive": 0.08,
+              "envAmount": 0,
+              "modAmount": 0.4,
+              "keyTrack": 0,
+              "model": "svf",
+              "mode": "lp",
+              "slope": 12
+            }
+          },
+          {
+            "id": "dly",
+            "type": "tape-delay",
+            "name": "Echo du marché",
+            "position": {
+              "x": 800,
+              "y": 40
+            },
+            "params": {
+              "time": 375,
+              "feedback": 0.42,
+              "mix": 0.38,
+              "tone": 0.55,
+              "wow": 0.22,
+              "flutter": 0.18,
+              "drive": 0.05
+            }
+          },
+          {
+            "id": "rev",
+            "type": "reverb",
+            "name": "Salle des marchés",
+            "position": {
+              "x": 990,
+              "y": 40
+            },
+            "params": {
+              "time": 2.6,
+              "damp": 0.5,
+              "preDelay": 28,
+              "mix": 0.3
+            }
+          },
+          {
+            "id": "out",
+            "type": "output",
+            "name": "Out Marché",
+            "position": {
+              "x": 1180,
+              "y": 40
+            },
+            "params": {
+              "level": 0.58
+            }
+          },
+          {
+            "id": "notes-1",
+            "type": "notes",
+            "name": "Info",
+            "position": {
+              "x": 420,
+              "y": 508
+            },
+            "params": {
+              "text": "CAPITULATION — Couche B : LE MARCHE / TICKER\n\nLa voix melodique generative de la piece — les chiffres verts qui virent au rouge.\n\nCOMMENT CA SE JOUE TOUT SEUL :\n- Une Horloge bat le tempo. Une TURING MACHINE genere une melodie en boucle qui se reecrit lentement (probability 0.35) — jamais exactement la meme.\n- Les notes passent par un QUANTIZER (gamme penta majeure = espoir fragile a l'ouverture), puis un oscillateur triangle, puis un tape-delay (la bande du ticker).\n- Chaque note est un PLUCK (ADSR sustain 0) -> des 'ticks' discrets que le delay etire en flux.\n- Une LFO carre + Mod-VCA 'ouvre les vannes' : peu de notes au debut (rares, espacees), de plus en plus denses ensuite.\n- Le LORENZ (volatilite) injecte un fm-exp inharmonique croissant = la decomposition numerique.\n\nL'ARC (1 LFO tres lent, ~83 s) :\n- pousse le pitch de l'oscillateur VERS LE BAS sur la duree -> le rally devient une chute (panic selling descendant).\n- ferme le filtre (modAmount) -> la lumiere s'eteint sur les ecrans.\n- ouvre la densite -> de plus en plus frenetique.\n\nEVOLUTION MANUELLE / AUTOMATION : faire deriver le SCALE du Quantizer 6 (penta maj) -> 1 (maj) -> 2 (min) -> 7 (penta min) -> 0 (chromatique). C'est la consonance qui se dissout en dissonance : l'aube -> la capitulation.\n\nA explorer : probability de la Turing (densite/mutation), feedback du delay (blur de panique), speed du Lorenz (volatilite), scale du Quantizer (le vert->rouge)."
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": {
+              "moduleId": "clk",
+              "portId": "clock"
+            },
+            "to": {
+              "moduleId": "turing",
+              "portId": "clock"
+            },
+            "kind": "sync"
+          },
+          {
+            "from": {
+              "moduleId": "turing",
+              "portId": "cv"
+            },
+            "to": {
+              "moduleId": "quant",
+              "portId": "in"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "quant",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "osc",
+              "portId": "pitch"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "arc",
+              "portId": "cv-out"
+            },
+            "to": {
+              "moduleId": "osc",
+              "portId": "pitch"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "chaos",
+              "portId": "x"
+            },
+            "to": {
+              "moduleId": "osc",
+              "portId": "fm-exp"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "turing",
+              "portId": "gate"
+            },
+            "to": {
+              "moduleId": "gatevca",
+              "portId": "in"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "arpgate",
+              "portId": "cv-out"
+            },
+            "to": {
+              "moduleId": "gatevca",
+              "portId": "cv"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "gatevca",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "env",
+              "portId": "gate"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "env",
+              "portId": "env"
+            },
+            "to": {
+              "moduleId": "vca",
+              "portId": "cv"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "osc",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "vca",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "vca",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "vcf",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "arc",
+              "portId": "cv-out"
+            },
+            "to": {
+              "moduleId": "vcf",
+              "portId": "mod"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "vcf",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "dly",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "dly",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "rev",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "rev",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "out",
+              "portId": "in"
+            },
+            "kind": "audio"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rack-3",
+      "name": "Silicium (les puces lâchent)",
+      "graph": {
+        "modules": [
+          {
+            "id": "clk",
+            "type": "clock",
+            "name": "Horloge puces",
+            "position": {
+              "x": 40,
+              "y": 40
+            },
+            "params": {
+              "running": true,
+              "tempo": 60,
+              "rate": 4,
+              "swing": 0
+            }
+          },
+          {
+            "id": "euclid",
+            "type": "euclidean",
+            "name": "Blips clairsemés",
+            "position": {
+              "x": 40,
+              "y": 274
+            },
+            "params": {
+              "enabled": true,
+              "tempo": 60,
+              "rate": 1,
+              "steps": 16,
+              "pulses": 3,
+              "rotation": 5,
+              "gateLength": 18,
+              "swing": 0
+            }
+          },
+          {
+            "id": "turing",
+            "type": "turing-machine",
+            "name": "Registre (pitch qui dérive)",
+            "position": {
+              "x": 40,
+              "y": 508
+            },
+            "params": {
+              "probability": 0.35,
+              "length": 12,
+              "range": 2,
+              "scale": 7,
+              "root": 0
+            }
+          },
+          {
+            "id": "drift",
+            "type": "chaos",
+            "name": "Dérive (Lorenz timbre)",
+            "position": {
+              "x": 325,
+              "y": 508
+            },
+            "params": {
+              "speed": 0.05,
+              "rho": 28,
+              "sigma": 10,
+              "beta": 2.66,
+              "scale": 0,
+              "root": 0
+            }
+          },
+          {
+            "id": "nes",
+            "type": "nes-osc",
+            "name": "Voix chiptune (NES)",
+            "position": {
+              "x": 325,
+              "y": 40
+            },
+            "params": {
+              "frequency": 330,
+              "fine": 0,
+              "volume": 0.9,
+              "mode": 0,
+              "duty": 1,
+              "noiseMode": 0,
+              "bitcrush": 0.85
+            }
+          },
+          {
+            "id": "vca",
+            "type": "gain",
+            "name": "Porte blip",
+            "position": {
+              "x": 610,
+              "y": 40
+            },
+            "params": {
+              "gain": 0
+            }
+          },
+          {
+            "id": "crush",
+            "type": "bit-crusher",
+            "name": "Bit Crusher",
+            "position": {
+              "x": 895,
+              "y": 40
+            },
+            "params": {
+              "bits": 10,
+              "downsample": 2,
+              "mix": 0.6
+            }
+          },
+          {
+            "id": "glitch",
+            "type": "glitch",
+            "name": "Glitch / Stutter",
+            "position": {
+              "x": 1180,
+              "y": 40
+            },
+            "params": {
+              "probability": 0.12,
+              "sliceMs": 120,
+              "repeats": 3,
+              "reverseChance": 0.4,
+              "pitchRange": 2,
+              "mix": 0.4
+            }
+          },
+          {
+            "id": "vcf",
+            "type": "vcf",
+            "name": "Effondrement (filtre)",
+            "position": {
+              "x": 895,
+              "y": 274
+            },
+            "params": {
+              "cutoff": 2600,
+              "resonance": 0.25,
+              "drive": 0.08,
+              "envAmount": 0,
+              "modAmount": 0.7,
+              "keyTrack": 0,
+              "model": "svf",
+              "mode": "lp",
+              "slope": 12
+            }
+          },
+          {
+            "id": "slowlfo",
+            "type": "lfo",
+            "name": "Arc (LFO très lent)",
+            "position": {
+              "x": 610,
+              "y": 274
+            },
+            "params": {
+              "rate": 0.005988,
+              "depth": 0.6,
+              "offset": -0.4,
+              "shape": "triangle",
+              "bipolar": true
+            }
+          },
+          {
+            "id": "dly",
+            "type": "delay",
+            "name": "Echo numérique",
+            "position": {
+              "x": 1465,
+              "y": 40
+            },
+            "params": {
+              "time": 375,
+              "feedback": 0.42,
+              "mix": 0.3,
+              "tone": 0.45,
+              "pingPong": true
+            }
+          },
+          {
+            "id": "rev",
+            "type": "reverb",
+            "name": "Vide (reverb)",
+            "position": {
+              "x": 1750,
+              "y": 40
+            },
+            "params": {
+              "time": 3.4,
+              "damp": 0.55,
+              "preDelay": 40,
+              "mix": 0.32
+            }
+          },
+          {
+            "id": "out",
+            "type": "output",
+            "name": "Out Silicium",
+            "position": {
+              "x": 2035,
+              "y": 40
+            },
+            "params": {
+              "level": 0.52
+            }
+          },
+          {
+            "id": "notes-1",
+            "type": "notes",
+            "name": "Info",
+            "position": {
+              "x": 325,
+              "y": 274
+            },
+            "params": {
+              "text": "SILICIUM — la couche 'les puces lâchent' de CAPITULATION (multi-rack, génératif).\n\nUne voix chiptune (NES Osc) qui se joue toute seule : un Euclidean très clairsemé (3 pulses/16) ouvre un VCA → on n'entend que de rares blips, jamais un drone. Le pitch vient d'une Turing Machine (registre à décalage, 35% de mutation) → la mélodie se réécrit sans jamais boucler ; sa longueur (12) est déphasée du cycle Euclidean (16) pour ne jamais se réaligner.\n\nDÉCLIN NUMÉRIQUE : NES → Bit Crusher → Glitch → Delay → Reverb. Tôt = presque propre (bitcrush léger). Plus on avance dans l'ARC, plus c'est écrasé/saccadé : un LFO TRÈS lent (~2.7 min) ferme le filtre (clair → étouffé/mort) et un Chaos lent tord le timbre (wave-cv) du NES → la techno qui agonise.\n\nÀ explorer : les PULSES de l'Euclidean (densité des blips), les BITS du Bit Crusher (profondeur du crush), la PROBABILITY du Glitch (saccades), la vitesse du Chaos (dérive du timbre)."
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": {
+              "moduleId": "clk",
+              "portId": "clock"
+            },
+            "to": {
+              "moduleId": "euclid",
+              "portId": "clock"
+            },
+            "kind": "sync"
+          },
+          {
+            "from": {
+              "moduleId": "clk",
+              "portId": "clock"
+            },
+            "to": {
+              "moduleId": "turing",
+              "portId": "clock"
+            },
+            "kind": "sync"
+          },
+          {
+            "from": {
+              "moduleId": "clk",
+              "portId": "clock"
+            },
+            "to": {
+              "moduleId": "glitch",
+              "portId": "clock"
+            },
+            "kind": "sync"
+          },
+          {
+            "from": {
+              "moduleId": "turing",
+              "portId": "cv"
+            },
+            "to": {
+              "moduleId": "nes",
+              "portId": "pitch"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "drift",
+              "portId": "x"
+            },
+            "to": {
+              "moduleId": "nes",
+              "portId": "wave-cv"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "nes",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "vca",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "euclid",
+              "portId": "gate"
+            },
+            "to": {
+              "moduleId": "vca",
+              "portId": "cv"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "vca",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "crush",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "crush",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "glitch",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "glitch",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "vcf",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "slowlfo",
+              "portId": "cv-out"
+            },
+            "to": {
+              "moduleId": "vcf",
+              "portId": "mod"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "vcf",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "dly",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "dly",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "rev",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "rev",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "out",
+              "portId": "in"
+            },
+            "kind": "audio"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rack-4",
+      "name": "Alarmes / Coupe-Circuit",
+      "graph": {
+        "modules": [
+          {
+            "id": "clk-d",
+            "type": "clock",
+            "name": "Horloge",
+            "position": {
+              "x": 40,
+              "y": 40
+            },
+            "params": {
+              "running": true,
+              "tempo": 60,
+              "rate": 2,
+              "swing": 0
+            }
+          },
+          {
+            "id": "euclid-d",
+            "type": "euclidean",
+            "name": "Pouls de panique",
+            "position": {
+              "x": 40,
+              "y": 274
+            },
+            "params": {
+              "enabled": true,
+              "tempo": 60,
+              "rate": 2,
+              "steps": 16,
+              "pulses": 3,
+              "rotation": 5,
+              "gateLength": 35,
+              "swing": 0
+            }
+          },
+          {
+            "id": "breaker-d",
+            "type": "909-kick",
+            "name": "Coupe-circuit (thud)",
+            "position": {
+              "x": 40,
+              "y": 508
+            },
+            "params": {
+              "tune": 38,
+              "attack": 0.2,
+              "decay": 0.7,
+              "drive": 0.45
+            }
+          },
+          {
+            "id": "siren-osc",
+            "type": "oscillator",
+            "name": "Sirène (alarme)",
+            "position": {
+              "x": 325,
+              "y": 40
+            },
+            "params": {
+              "frequency": 660,
+              "type": "square",
+              "pwm": 0.5,
+              "unison": 1,
+              "detune": 0,
+              "fmLin": 0,
+              "fmExp": 0,
+              "subMix": 0,
+              "subOct": 1
+            }
+          },
+          {
+            "id": "siren-sweep",
+            "type": "lfo",
+            "name": "Balayage sirène",
+            "position": {
+              "x": 325,
+              "y": 274
+            },
+            "params": {
+              "rate": 0.25,
+              "depth": 0.35,
+              "offset": 0,
+              "shape": "triangle",
+              "bipolar": true
+            }
+          },
+          {
+            "id": "siren-trem",
+            "type": "lfo",
+            "name": "Tremolo sirène",
+            "position": {
+              "x": 325,
+              "y": 508
+            },
+            "params": {
+              "rate": 6.5,
+              "depth": 0.5,
+              "offset": 0.5,
+              "shape": "sine",
+              "bipolar": false
+            }
+          },
+          {
+            "id": "siren-vca",
+            "type": "gain",
+            "name": "VCA sirène",
+            "position": {
+              "x": 515,
+              "y": 40
+            },
+            "params": {
+              "gain": 0
+            }
+          },
+          {
+            "id": "siren-vcf",
+            "type": "vcf",
+            "name": "Filtre sirène",
+            "position": {
+              "x": 515,
+              "y": 274
+            },
+            "params": {
+              "cutoff": 1800,
+              "resonance": 0.45,
+              "drive": 0.15,
+              "envAmount": 0,
+              "modAmount": 0,
+              "keyTrack": 0,
+              "model": "svf",
+              "mode": "bp",
+              "slope": 12
+            }
+          },
+          {
+            "id": "noise-d",
+            "type": "noise",
+            "name": "Bruit (panne)",
+            "position": {
+              "x": 325,
+              "y": 742
+            },
+            "params": {
+              "level": 0.4,
+              "noiseType": "white",
+              "stereo": 1,
+              "pan": 0
+            }
+          },
+          {
+            "id": "noise-swell-lfo",
+            "type": "lfo",
+            "name": "Houle bruit",
+            "position": {
+              "x": 325,
+              "y": 976
+            },
+            "params": {
+              "rate": 0.08,
+              "depth": 0.5,
+              "offset": 0.4,
+              "shape": "sine",
+              "bipolar": false
+            }
+          },
+          {
+            "id": "noise-vca",
+            "type": "gain",
+            "name": "VCA bruit",
+            "position": {
+              "x": 515,
+              "y": 742
+            },
+            "params": {
+              "gain": 0
+            }
+          },
+          {
+            "id": "noise-vcf",
+            "type": "vcf",
+            "name": "Filtre bruit",
+            "position": {
+              "x": 515,
+              "y": 976
+            },
+            "params": {
+              "cutoff": 1200,
+              "resonance": 0.2,
+              "drive": 0.1,
+              "envAmount": 0,
+              "modAmount": 0.6,
+              "keyTrack": 0,
+              "model": "svf",
+              "mode": "bp",
+              "slope": 12
+            }
+          },
+          {
+            "id": "alarm-mix",
+            "type": "mixer-8",
+            "name": "Bus alarme",
+            "position": {
+              "x": 800,
+              "y": 40
+            },
+            "params": {
+              "level1": 0.5,
+              "level2": 0.45,
+              "level3": 0.4,
+              "level4": 0.6,
+              "level5": 0.6,
+              "level6": 0.6,
+              "level7": 0.6,
+              "level8": 0.6
+            }
+          },
+          {
+            "id": "arc-vca",
+            "type": "gain",
+            "name": "Montée du krach (arc)",
+            "position": {
+              "x": 990,
+              "y": 40
+            },
+            "params": {
+              "gain": 0.15
+            }
+          },
+          {
+            "id": "arc-lfo",
+            "type": "lfo",
+            "name": "ARC (très lent)",
+            "position": {
+              "x": 990,
+              "y": 274
+            },
+            "params": {
+              "rate": 0.004739,
+              "depth": 0.85,
+              "offset": 0.15,
+              "shape": "triangle",
+              "bipolar": false
+            }
+          },
+          {
+            "id": "alarm-rev",
+            "type": "reverb",
+            "name": "Espace (écho de salle)",
+            "position": {
+              "x": 1180,
+              "y": 40
+            },
+            "params": {
+              "time": 2.4,
+              "damp": 0.5,
+              "preDelay": 30,
+              "mix": 0.3
+            }
+          },
+          {
+            "id": "out-d",
+            "type": "output",
+            "name": "Sortie Alarmes",
+            "position": {
+              "x": 1370,
+              "y": 40
+            },
+            "params": {
+              "level": 0.5
+            }
+          },
+          {
+            "id": "notes-d",
+            "type": "notes",
+            "name": "Info",
+            "position": {
+              "x": 800,
+              "y": 508
+            },
+            "params": {
+              "text": "CAPITULATION — LAYER D : ALARMES / COUPE-CIRCUIT\n\nLa tension rythmique et l'alarme du krach. Se joue tout seul, sans clavier.\n\n- POULS DE PANIQUE : Horloge -> Euclidean tres clairsemé (3/16, tourné) -> un 909-kick grave et long = le 'coupe-circuit' qui saute. Irrégulier, jamais un beat régulier.\n- SIRENE : un oscillateur carré balayé en hauteur par un LFO lent (le wail montant/descendant) et tremolé par un LFO rapide (le 'whoop-whoop'), à travers un filtre passe-bande.\n- BRUIT : du bruit blanc en houles lentes (semi-conducteurs qui lâchent / statique), filtré, qui gonfle au moment du krach.\n\nARC (l'évolution) : tout le bus alarme passe par un VCA maître piloté par un LFO TRES lent (~2,8 min/cycle). La couche monte de presque-silence (aube) jusqu'au hurlement (Coupe-Circuit / Capitulation) puis retombe vers le vide (after-hours), et recommence — décalée à chaque fois.\n\nÀ explorer : les PULSES de l'Euclidean (densité de la panique), le RATE du LFO ARC (durée du cycle), le tremolo de la sirène, la houle du bruit."
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": {
+              "moduleId": "clk-d",
+              "portId": "clock"
+            },
+            "to": {
+              "moduleId": "euclid-d",
+              "portId": "clock"
+            },
+            "kind": "sync"
+          },
+          {
+            "from": {
+              "moduleId": "euclid-d",
+              "portId": "gate"
+            },
+            "to": {
+              "moduleId": "breaker-d",
+              "portId": "trigger"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "siren-sweep",
+              "portId": "cv-out"
+            },
+            "to": {
+              "moduleId": "siren-osc",
+              "portId": "pitch"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "siren-osc",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "siren-vca",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "siren-trem",
+              "portId": "cv-out"
+            },
+            "to": {
+              "moduleId": "siren-vca",
+              "portId": "cv"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "siren-vca",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "siren-vcf",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "noise-d",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "noise-vca",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "noise-swell-lfo",
+              "portId": "cv-out"
+            },
+            "to": {
+              "moduleId": "noise-vca",
+              "portId": "cv"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "noise-vca",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "noise-vcf",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "noise-swell-lfo",
+              "portId": "cv-out"
+            },
+            "to": {
+              "moduleId": "noise-vcf",
+              "portId": "mod"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "breaker-d",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "alarm-mix",
+              "portId": "in-1"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "siren-vcf",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "alarm-mix",
+              "portId": "in-2"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "noise-vcf",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "alarm-mix",
+              "portId": "in-3"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "alarm-mix",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "arc-vca",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "arc-lfo",
+              "portId": "cv-out"
+            },
+            "to": {
+              "moduleId": "arc-vca",
+              "portId": "cv"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "arc-vca",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "alarm-rev",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "alarm-rev",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "out-d",
+              "portId": "in"
+            },
+            "kind": "audio"
+          }
+        ]
+      }
+    }
+  ]
+}
