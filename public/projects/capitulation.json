@@ -19,7 +19,7 @@
               "y": 40
             },
             "params": {
-              "text": "CAPITULATION — pièce générative infinie (4 racks, ZÉRO MIDI)\n\nAppuie sur PLAY et laisse tourner. Rien n'est enregistré : tout est CALCULÉ en direct.\n- Hauteurs : Chaos (Lorenz) + Turing Machine → Quantizer (l'harmonie tient… puis se brise).\n- Rythmes : Euclidiens clairsemés, jamais un beat régulier.\n- Dérive : 4 LFOs très lents à périodes PREMIÈRES (127, 83, 167, 211 s) → la combinaison ne se répète qu'au bout de ~8 ans. En pratique : jamais à l'identique.\n\nL'ARC (chaque rack le suit à sa vitesse) :\naube fragile → euphorie de l'IPO → les puces lâchent → krach / coupe-circuit → capitulation → vide… puis une autre aube, différente.\n\nRacks : 1) Substrate/Dread (drone)  2) Le Marché/Ticker  3) Silicium (puces)  4) Alarmes/Coupe-circuit.\nLaisse jouer longtemps : ça descend l'escalier de la panique, sans fin."
+              "text": "CAPITULATION — pièce générative infinie (4 racks, ZÉRO MIDI)\n\nAppuie sur PLAY et laisse tourner. Rien n'est enregistré : tout est CALCULÉ en direct.\n- Hauteurs : Chaos (Lorenz) + Turing Machine → Quantizer (l'harmonie tient… puis se brise).\n- Rythmes : Euclidiens clairsemés, jamais un beat régulier.\n- Dérive : 4 LFOs très lents à périodes PREMIÈRES (127, 83, 167, 71 s) → la combinaison ne se répète qu'au bout de des années. En pratique : jamais à l'identique.\n\nL'ARC (chaque rack le suit à sa vitesse) :\naube fragile → euphorie de l'IPO → les puces lâchent → krach / coupe-circuit → capitulation → vide… puis une autre aube, différente.\n\nL'alarme/coupe-circuit enfle puis retombe (~71 s) → un groove (kick + charley) qui monte puis s'efface : le moment entraînant, récurrent mais jamais identique.\n\nRacks : 1) Substrate/Dread (drone)  2) Le Marché/Ticker  3) Silicium (puces)  4) Alarmes/Coupe-circuit.\nLaisse jouer longtemps : ça descend l'escalier de la panique, sans fin."
             }
           },
           {
@@ -253,7 +253,7 @@
               "y": 160
             },
             "params": {
-              "level": 0.4
+              "level": 0.28
             }
           },
           {
@@ -646,7 +646,7 @@
               "y": 40
             },
             "params": {
-              "level": 0.58
+              "level": 0.4
             }
           },
           {
@@ -862,11 +862,11 @@
             "params": {
               "enabled": true,
               "tempo": 60,
-              "rate": 1,
+              "rate": 3,
               "steps": 16,
-              "pulses": 3,
+              "pulses": 5,
               "rotation": 5,
-              "gateLength": 18,
+              "gateLength": 28,
               "swing": 0
             }
           },
@@ -930,7 +930,7 @@
               "y": 40
             },
             "params": {
-              "gain": 0
+              "gain": 0.95
             }
           },
           {
@@ -1040,7 +1040,7 @@
               "y": 40
             },
             "params": {
-              "level": 0.52
+              "level": 0.36
             }
           },
           {
@@ -1245,11 +1245,11 @@
             "params": {
               "enabled": true,
               "tempo": 60,
-              "rate": 2,
+              "rate": 3,
               "steps": 16,
-              "pulses": 3,
+              "pulses": 4,
               "rotation": 5,
-              "gateLength": 35,
+              "gateLength": 30,
               "swing": 0
             }
           },
@@ -1329,7 +1329,7 @@
               "y": 40
             },
             "params": {
-              "gain": 0
+              "gain": 0.9
             }
           },
           {
@@ -1392,7 +1392,7 @@
               "y": 742
             },
             "params": {
-              "gain": 0
+              "gain": 0.9
             }
           },
           {
@@ -1424,10 +1424,10 @@
               "y": 40
             },
             "params": {
-              "level1": 0.5,
+              "level1": 0.72,
               "level2": 0.45,
               "level3": 0.4,
-              "level4": 0.6,
+              "level4": 0.66,
               "level5": 0.6,
               "level6": 0.6,
               "level7": 0.6,
@@ -1443,7 +1443,7 @@
               "y": 40
             },
             "params": {
-              "gain": 0.15
+              "gain": 0.6
             }
           },
           {
@@ -1455,7 +1455,7 @@
               "y": 274
             },
             "params": {
-              "rate": 0.004739,
+              "rate": 0.014085,
               "depth": 0.85,
               "offset": 0.15,
               "shape": "triangle",
@@ -1486,7 +1486,7 @@
               "y": 40
             },
             "params": {
-              "level": 0.5
+              "level": 0.3
             }
           },
           {
@@ -1499,6 +1499,40 @@
             },
             "params": {
               "text": "CAPITULATION — LAYER D : ALARMES / COUPE-CIRCUIT\n\nLa tension rythmique et l'alarme du krach. Se joue tout seul, sans clavier.\n\n- POULS DE PANIQUE : Horloge -> Euclidean tres clairsemé (3/16, tourné) -> un 909-kick grave et long = le 'coupe-circuit' qui saute. Irrégulier, jamais un beat régulier.\n- SIRENE : un oscillateur carré balayé en hauteur par un LFO lent (le wail montant/descendant) et tremolé par un LFO rapide (le 'whoop-whoop'), à travers un filtre passe-bande.\n- BRUIT : du bruit blanc en houles lentes (semi-conducteurs qui lâchent / statique), filtré, qui gonfle au moment du krach.\n\nARC (l'évolution) : tout le bus alarme passe par un VCA maître piloté par un LFO TRES lent (~2,8 min/cycle). La couche monte de presque-silence (aube) jusqu'au hurlement (Coupe-Circuit / Capitulation) puis retombe vers le vide (after-hours), et recommence — décalée à chaque fois.\n\nÀ explorer : les PULSES de l'Euclidean (densité de la panique), le RATE du LFO ARC (durée du cycle), le tremolo de la sirène, la houle du bruit."
+            }
+          },
+          {
+            "id": "hat-euclid",
+            "type": "euclidean",
+            "name": "Hats (groove)",
+            "position": {
+              "x": 300,
+              "y": 1240
+            },
+            "params": {
+              "enabled": true,
+              "tempo": 60,
+              "rate": 4,
+              "steps": 16,
+              "pulses": 11,
+              "rotation": 0,
+              "gateLength": 22,
+              "swing": 0
+            }
+          },
+          {
+            "id": "hat",
+            "type": "808-hihat",
+            "name": "Charley",
+            "position": {
+              "x": 540,
+              "y": 1240
+            },
+            "params": {
+              "tune": 1,
+              "decay": 0.1,
+              "tone": 0.7,
+              "snap": 0.6
             }
           }
         ],
@@ -1687,6 +1721,39 @@
             "to": {
               "moduleId": "out-d",
               "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "clk-d",
+              "portId": "clock"
+            },
+            "to": {
+              "moduleId": "hat-euclid",
+              "portId": "clock"
+            },
+            "kind": "sync"
+          },
+          {
+            "from": {
+              "moduleId": "hat-euclid",
+              "portId": "gate"
+            },
+            "to": {
+              "moduleId": "hat",
+              "portId": "trigger"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "hat",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "alarm-mix",
+              "portId": "in-4"
             },
             "kind": "audio"
           }
