@@ -170,6 +170,7 @@ npm run test:presets  # Run preset integration tests (load + render all presets)
 | `scripts/check-modules.mjs` | `npm run check:modules` | Cohérence TS↔Rust : chaque port de `portCatalog` est résolu par `ports.rs` et le type est mappé dans `normalize_module_type`. |
 | `scripts/check-ui-audio.mjs` | `npm run check:ui-audio` | Garde-fou parité Web↔Tauri : échoue si un contrôle poll `engine.watch*` sans chemin natif Tauri, ou si un pont `nativeXxx` (ControlProps) n'est pas câblé via `controls/index.tsx`. |
 | `scripts/gen-module-reference.mjs` | `npm run module-ref` | Régénère `docs/MODULE_REFERENCE.md` (ports + params + defaults de tous les modules). |
+| `scripts/spectrogram.mjs` | `node scripts/spectrogram.mjs <in.f32> <out.png> "<label>"` | **Banc de test son** : transforme des samples f32 bruts en spectrogramme PNG log-fréquence + métriques de timbre (platitude spectrale = tonal↔bruité, centroïde = brillance, énergie par bande). Permet de « voir » un son qu'on ne peut pas entendre et de le régler sur des chiffres. PNG via `zlib` natif (zéro dépendance). Renderer associé : `cargo run -p dsp-core --example dump_cymbals`. |
 
 ## New Module Checklist
 

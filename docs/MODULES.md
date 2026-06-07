@@ -2025,7 +2025,7 @@ Cymbale ride : shimmer (6 partiels) + ping de cloche résonante (sinus). Module 
 | `decay` | 0.5-4 s | Durée |
 | `bell` | 0-1 | Présence de la cloche/ping |
 
-> ⚠️ Crash et Ride sont synthétisés (la vraie TR-909 utilisait des **samples 6-bit**) ; leur timbre reste rudimentaire. À retravailler idéalement via lecture d'échantillons.
+> ℹ️ Crash et Ride sont **synthétisés** par synthèse additive dense : 32 (crash) / 24 (ride) partiels **sinus inharmoniques** (pas de repliement), chacun avec sa propre décroissance → shimmer, plus un bruit filtré et un transitoire d'attaque ; le ride ajoute une **cloche** accordée. Timbre réglé non à l'oreille mais au **spectrogramme** (`cargo run -p dsp-core --example dump_cymbals` + `scripts/spectrogram.mjs` — crash : large/bruité « trash » ; ride : brillant ~3.7 kHz, cloche définie). La vraie TR-909 utilisait des **samples 6-bit** : pour l'authenticité absolue, un chargement de `.wav` reste une option future.
 
 ---
 
