@@ -1,0 +1,101 @@
+{
+  "version": 1,
+  "id": "tr909-machine",
+  "name": "TR-909 Machine",
+  "description": "Boîte à rythmes 909 complète en un seul module : 11 voix + séquenceur interne. Bank A = house classique, B = variation (ghost kicks + rimshot), FILL = roll de toms. Vélocité graduée sur chaque pas.",
+  "group": "TR-909",
+  "graph": {
+    "modules": [
+      {
+        "id": "dm",
+        "type": "drum-machine-909",
+        "name": "TR-909",
+        "position": {
+          "col": 0,
+          "row": 0
+        },
+        "params": {
+          "enabled": 1,
+          "rate": 4,
+          "swing": 12,
+          "length": 16,
+          "pattern": 0,
+          "fill": 0,
+          "bd-tune": 50,
+          "bd-decay": 0.5,
+          "bd-level": 0.95,
+          "sd-tune": 200,
+          "sd-snappy": 0.65,
+          "sd-decay": 0.28,
+          "sd-level": 0.72,
+          "lt-tune": 90,
+          "lt-decay": 0.5,
+          "lt-level": 0.7,
+          "mt-tune": 150,
+          "mt-decay": 0.45,
+          "mt-level": 0.7,
+          "ht-tune": 220,
+          "ht-decay": 0.4,
+          "ht-level": 0.7,
+          "rs-tune": 400,
+          "rs-level": 0.6,
+          "cp-tone": 0.5,
+          "cp-decay": 0.4,
+          "cp-level": 0.68,
+          "ch-tune": 1,
+          "ch-decay": 0.1,
+          "ch-level": 0.55,
+          "oh-tune": 1,
+          "oh-decay": 0.45,
+          "oh-level": 0.5,
+          "cr-tune": 1,
+          "cr-decay": 1.5,
+          "cr-tone": 0.6,
+          "cr-level": 0.4,
+          "rd-tune": 1,
+          "rd-decay": 2,
+          "rd-bell": 0.6,
+          "rd-level": 0.4,
+          "patternData": "{\"length\":16,\"pattern\":0,\"banks\":[[[110,0,0,0,100,0,0,0,110,0,0,0,100,0,0,0],[0,0,0,0,100,0,0,0,0,0,0,0,100,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,80,0,0,0,0,0,0,0,80,0,0,0],[60,70,95,70,60,70,95,70,60,70,95,70,60,70,95,70],[0,0,0,0,0,0,90,0,0,0,0,0,0,0,90,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]],[[110,0,0,0,100,0,0,70,110,0,0,0,100,0,90,0],[0,0,0,0,100,0,0,0,0,0,0,0,100,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,90,0,0,0,0,0,0,0,90,0,0,0,0,0],[0,0,0,0,80,0,0,0,0,0,0,0,80,0,0,0],[60,70,95,70,60,70,95,70,60,70,95,70,60,70,95,70],[0,0,0,0,0,0,90,0,0,0,0,0,0,0,90,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]],[[110,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,100,0,0,0,90,0,95,0,100,105,110,120],[0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0],[0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,110,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[60,70,95,70,60,70,95,70,60,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]]}"
+        }
+      },
+      {
+        "id": "out",
+        "type": "output",
+        "name": "Out",
+        "position": {
+          "col": 7,
+          "row": 0
+        },
+        "params": {
+          "level": 0.85
+        }
+      },
+      {
+        "id": "notes",
+        "type": "notes",
+        "name": "Info",
+        "position": {
+          "col": 0,
+          "row": 7
+        },
+        "params": {
+          "text": "TR-909 MACHINE\n\nUn seul module = boîte à rythmes 909 complète (11 voix + séquenceur interne, comme une ReBirth).\n\n• Play (transport global) lance le groove (Bank A, house).\n• Clique les pas pour éditer ; Shift+clic = vélocité (ghost / normal / accent).\n• Bank A / B = deux patterns ; ⚡FILL = roll d'un mesure puis retour.\n• Steps 16/32/64 ; clique un nom de voix (BASS, SNARE…) pour régler son son.\n\nSync au tempo global du transport. Sorties : mix stéréo + 11 sorties par voix + step."
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": {
+          "moduleId": "dm",
+          "portId": "mix-l"
+        },
+        "to": {
+          "moduleId": "out",
+          "portId": "in"
+        },
+        "kind": "audio"
+      }
+    ]
+  }
+}

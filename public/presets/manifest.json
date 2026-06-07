@@ -1778,6 +1778,13 @@
       "description": "Test du module TR-909 tout-en-un. À supprimer.",
       "file": "debug-tr909-machine.json",
       "group": "Module Tests"
+    },
+    {
+      "id": "tr909-machine",
+      "name": "TR-909 Machine",
+      "description": "Boîte à rythmes 909 tout-en-un : 11 voix + séquenceur (A/B/FILL, vélocité graduée).",
+      "file": "tr909-machine.json",
+      "group": "TR-909"
     }
   ]
 }

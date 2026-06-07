@@ -243,10 +243,11 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 | Meter | Peak L/R level | ✅ | ✅ `NativeMeterBridge` |
 | Theremin | Pad position | ✅ | ✅ `NativeThereminBridge` |
 | Particle Cloud | Grain positions | ✅ | ✅ `NativeParticleBridge` (parité Web atteinte ; viz lente ~10 px/s par design, figée transport arrêté — voir Known Limitations) |
+| TR-909 Machine | Playhead position | ✅ | ✅ `NativeSequencerBridge` (`get_sequencer_step` arm) |
 
 **⚠️ RÈGLE:** Toute nouvelle feature UI↔Audio DOIT être implémentée pour Tauri en même temps que Web. Ne jamais merger une feature Web-only. **Garde-fou auto:** `npm run check:ui-audio` échoue si un contrôle utilise `engine.watch*` sans chemin natif (le bug récurrent type Game-of-Life/Meter).
 
-## Module Types (93 total)
+## Module Types (96 total)
 
 ### Sources (18)
 oscillator, supersaw, karplus, fm-op, fm-matrix, nes-osc, snes-osc, noise, tb-303, shepard, pipe-organ, spectral-swarm, resonator, wavetable, granular, particle-cloud, speech-synth, theremin
@@ -263,11 +264,13 @@ chorus, ensemble, choir, vocoder, delay, granular-delay, tape-delay, spring-reve
 ### Modulators (8)
 adsr, lfo, mod-router, sample-hold, slew, quantizer, chaos, envelope-follower
 
-### Sequencers (15)
-clock, clock-divider, arpeggiator, step-sequencer, euclidean, drum-sequencer, midi-file-sequencer, turing-machine, mario, sid-player, ay-player, chord-sequencer, polyrhythm-sequencer, game-of-life, gravity-sequencer
+### Sequencers (16)
+clock, clock-divider, arpeggiator, step-sequencer, euclidean, drum-sequencer, midi-file-sequencer, turing-machine, mario, sid-player, ay-player, chord-sequencer, polyrhythm-sequencer, game-of-life, gravity-sequencer, drum-machine-909
 
-### TR-909 Drums (6)
-909-kick, 909-snare, 909-hihat, 909-clap, 909-tom, 909-rimshot
+### TR-909 Drums (8)
+909-kick, 909-snare, 909-hihat, 909-clap, 909-tom, 909-rimshot, 909-crash, 909-ride
+
+**TR-909 Machine** (`drum-machine-909`, dans Sequencers) : boîte à rythmes 909 tout-en-un — 11 voix (les 8 ci-dessus + 3 toms distincts) + séquenceur interne (A/B/FILL, vélocité graduée, 16/32/64). Voir `docs/TR909_PLAN.md`.
 
 ### TR-808 Drums (6)
 808-kick, 808-snare, 808-hihat, 808-cowbell, 808-clap, 808-tom

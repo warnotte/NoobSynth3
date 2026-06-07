@@ -4,7 +4,7 @@
 > Do not edit by hand — re-run the script. This is the single place to look up a
 > module's ports and parameters when building patches or presets.
 
-_93 modules._
+_96 modules._
 
 ## sources
 
@@ -102,11 +102,12 @@ _93 modules._
 | **SID Player** | `sid-player` | 3x5 | `reset` (sync) | `out` (audio), `gate-1` (gate), `gate-2` (gate), `gate-3` (gate), `cv-1` (cv), `cv-2` (cv), `cv-3` (cv), `wf-1` (cv), `wf-2` (cv), `wf-3` (cv) | `playing`=0, `song`=1, `chipModel`=0 |
 | **AY Player** | `ay-player` | 3x5 | `reset` (sync) | `out` (audio), `gate-a` (gate), `gate-b` (gate), `gate-c` (gate), `cv-a` (cv), `cv-b` (cv), `cv-c` (cv) | `playing`=0, `loop`=1 |
 | **Chord Seq** | `chord-sequencer` | 3x5 | `clock` (sync), `reset` (sync) | `cv-1` (cv), `gate-1` (gate), `cv-2` (cv), `gate-2` (gate), `cv-3` (cv), `gate-3` (gate), `cv-4` (cv), `gate-4` (gate), `step-out` (cv), `root-cv` (cv) | `enabled`=true, `tempo`=120, `rate`=2, `gateLength`=50, `swing`=0, `length`=4, `strumSpeed`=0, `strumDirection`=0, `voicing`=0, `stepData`="[{"root":60,"chordType":0,"inversion"…" |
-| **Polyrhythm** | `polyrhythm-sequencer` | 3x5 | `clock` (sync), `reset` (sync) | `cv-1` (cv), `gate-1` (gate), `cv-2` (cv), `gate-2` (gate), `cv-3` (cv), `gate-3` (gate), `cv-4` (cv), `gate-4` (gate), `step-out` (cv) | `enabled`=true, `tempo`=120, `rate`=3, `gateLength`=50, `swing`=0, `track1Length`=8, `track2Length`=12, `track3Length`=16, `track4Length`=7, `track1Mute`=false, `track2Mute`=false, `track3Mute`=false, `track4Mute`=false, `stepData`="[{"track":0,"step":0,"pitch":5,"gate"…" |
+| **Polyrhythm** | `polyrhythm-sequencer` | 3x5 | `clock` (sync), `reset` (sync) | `cv-1` (cv), `gate-1` (gate), `cv-2` (cv), `gate-2` (gate), `cv-3` (cv), `gate-3` (gate), `cv-4` (cv), `gate-4` (gate), `step-out` (cv) | `enabled`=true, `tempo`=120, `rate`=3, `gateLength`=50, `swing`=0, `track1Length`=8, `track2Length`=12, `track3Length`=16, `track4Length`=7, `track1Mute`=false, `track2Mute`=false, `track3Mute`=false, `track4Mute`=false, `stepData`="[{"track":0,"step":0,"pitch":-4,"gate…" |
 | **Clock Div** | `clock-divider` | 1x2 | `clock` (sync), `reset` (sync) | `div-2` (sync), `div-4` (sync), `div-8` (sync), `div-16` (sync) | — |
 | **Game of Life** | `game-of-life` | 4x4 | `clock` (sync), `reset` (sync) | `cv` (cv), `gate` (gate), `pulse` (sync), `density` (cv) | `evolveRate`=4, `range`=2, `scale`=0, `root`=0, `wrap`=1 |
 | **Gravity Seq** | `gravity-sequencer` | 2x4 | `reset` (sync) | `cv` (cv), `gate` (gate), `pulse` (sync), `x` (cv), `y` (cv) | `speed`=1, `bodies`=4, `eccentricity`=0.3, `spread`=1, `range`=2, `scale`=0, `root`=0, `chaos`=0 |
 | **Mario IO** | `mario` | 2x4 | — | `cv-1` (cv), `gate-1` (gate), `cv-2` (cv), `gate-2` (gate), `cv-3` (cv), `gate-3` (gate), `cv-4` (cv), `gate-4` (gate), `cv-5` (cv), `gate-5` (gate) | `running`=false, `tempo`=180, `song`="smb" |
+| **TR-909 Machine** | `drum-machine-909` | 6x6 | `clock` (sync), `reset` (sync) | `mix-l` (audio), `mix-r` (audio), `out-bd` (audio), `out-sd` (audio), `out-lt` (audio), `out-mt` (audio), `out-ht` (audio), `out-rs` (audio), `out-cp` (audio), `out-ch` (audio), `out-oh` (audio), `out-cr` (audio), `out-rd` (audio), `step-out` (cv) | `enabled`=1, `rate`=4, `swing`=8, `length`=16, `pattern`=0, `fill`=0, `bd-tune`=55, `bd-decay`=0.4, `bd-level`=0.9, `sd-tune`=200, `sd-snappy`=0.6, `sd-decay`=0.3, `sd-level`=0.75, `lt-tune`=90, `lt-decay`=0.5, `lt-level`=0.7, `mt-tune`=150, `mt-decay`=0.45, `mt-level`=0.7, `ht-tune`=220, `ht-decay`=0.4, `ht-level`=0.7, `rs-tune`=400, `rs-level`=0.6, `cp-tone`=0.5, `cp-decay`=0.4, `cp-level`=0.7, `ch-tune`=1, `ch-decay`=0.1, `ch-level`=0.55, `oh-tune`=1, `oh-decay`=0.5, `oh-level`=0.5, `cr-tune`=1, `cr-decay`=1.5, `cr-tone`=0.6, `cr-level`=0.45, `rd-tune`=1, `rd-decay`=2, `rd-bell`=0.6, `rd-level`=0.45, `patternData`="{"length":16,"pattern":0,"banks":[[[1…" |
 
 ## io
 
@@ -132,6 +133,8 @@ _93 modules._
 | **909 Clap** | `909-clap` | 1x2 | `trigger` (gate), `accent` (cv) | `out` (audio) | `tone`=0.5, `decay`=0.4, `spread`=0.5 |
 | **909 Tom** | `909-tom` | 1x2 | `trigger` (gate), `accent` (cv) | `out` (audio) | `tune`=150, `decay`=0.4, `pitch`=0.5 |
 | **909 Rim** | `909-rimshot` | 1x2 | `trigger` (gate), `accent` (cv) | `out` (audio) | `tune`=500, `tone`=0.6, `decay`=0.2 |
+| **909 Crash** | `909-crash` | 1x2 | `trigger` (gate), `accent` (cv) | `out` (audio) | `tune`=1, `decay`=1.5, `tone`=0.6 |
+| **909 Ride** | `909-ride` | 1x2 | `trigger` (gate), `accent` (cv) | `out` (audio) | `tune`=1, `decay`=2, `bell`=0.6 |
 | **808 Kick** | `808-kick` | 1x2 | `trigger` (gate), `accent` (cv) | `out` (audio) | `tune`=45, `decay`=1.5, `tone`=0.3, `click`=0.2 |
 | **808 Snare** | `808-snare` | 1x2 | `trigger` (gate), `accent` (cv) | `out` (audio) | `tune`=180, `tone`=0.5, `snappy`=0.6, `decay`=0.3 |
 | **808 HiHat** | `808-hihat` | 1x2 | `trigger` (gate), `accent` (cv) | `out` (audio) | `tune`=1, `decay`=0.15, `tone`=0.6, `snap`=0.5 |

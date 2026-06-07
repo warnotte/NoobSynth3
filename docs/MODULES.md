@@ -2005,6 +2005,48 @@ Rimshot/cross-stick.
 | `decay` | 0-1 | Durée |
 | `snap` | 0-1 | Attaque claquante |
 
+### 909 Crash (`909-crash`)
+
+Cymbale crash : nappe métallique inharmonique (8 partiels) + souffle de bruit blanc, bandpass brillant, enveloppe à deux stages. Module autonome (trigger/accent), comme les autres drums.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `tune` | ×0.5-2 | Multiplicateur de hauteur des partiels |
+| `decay` | 0.3-4 s | Durée de la traîne |
+| `tone` | 0-1 | Brillance (ouverture du bandpass) |
+
+### 909 Ride (`909-ride`)
+
+Cymbale ride : shimmer (6 partiels) + ping de cloche résonante (sinus). Module autonome.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `tune` | ×0.5-2 | Multiplicateur de hauteur |
+| `decay` | 0.5-4 s | Durée |
+| `bell` | 0-1 | Présence de la cloche/ping |
+
+> ⚠️ Crash et Ride sont synthétisés (la vraie TR-909 utilisait des **samples 6-bit**) ; leur timbre reste rudimentaire. À retravailler idéalement via lecture d'échantillons.
+
+---
+
+## TR-909 Machine (`drum-machine-909`)
+
+Boîte à rythmes TR-909 **tout-en-un** : un seul module contient les **11 voix** (kick, snare, 3 toms distincts lo/mid/hi, rimshot, clap, closed + open hat avec **choke CH→OH**, crash, ride) **et** un séquenceur interne — l'esprit d'une ReBirth (Propellerheads). Catégorie : Sequencers.
+
+**Séquenceur interne :** synchronisé au transport global, avec en plus (vs le Drum Sequencer classique) : **vélocité graduée** par pas (0-127, pas seulement accent binaire), longueur **16/32/64**, banks **A/B + FILL** (FILL = roll d'une mesure puis retour auto), swing.
+
+**Édition (panneau) :** clic = pas on/off, **Shift+clic** = vélocité (ghost/normal/accent) ; clic sur un nom de voix (BASS, SNARE…) ouvre ses réglages dans la barre du bas ; boutons Bank A/B/FILL ; ⚡FILL momentané ; Steps 16/32/64.
+
+**I/O :**
+- **Entrées** : `clock`, `reset` (drive modulaire optionnel ; sinon suit le transport)
+- **Sorties** : `mix-l`, `mix-r` (mix stéréo, **saturation tanh douce** au bus), `out-bd`…`out-rd` (11 sorties par voix, propres, pour traitement externe), `step-out` (CV du pas courant)
+
+**Persistance :** toute la grille est sérialisée dans un seul param string `patternData` = `{ length, pattern, banks:[A,B,FILL] }` (chaque bank = `[11 voix][jusqu'à 64 pas]` de vélocité). Presets auto-suffisants.
+
+**Paramètres par voix** (préfixes `bd-`/`sd-`/`lt-`/`mt-`/`ht-`/`rs-`/`cp-`/`ch-`/`oh-`/`cr-`/`rd-`) : `*-tune`, `*-level`, et selon la voix `*-decay` (en **secondes**), `sd-snappy`, `cp-tone`, `cr-tone`, `rd-bell`. Plus les globaux `enabled`, `rate`, `swing`, `length`, `pattern` (0=A,1=B), `fill`.
+
+Preset démo : **TR-909 Machine** (groupe « TR-909 »).
+
 ---
 
 ## TR-808 Drums
