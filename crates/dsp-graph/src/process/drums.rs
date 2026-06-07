@@ -315,11 +315,11 @@ pub(crate) fn process(
             // Mix → L/R (mono dup; pan is v2) + step-out
             {
                 let o = outputs[0].channel_mut(0);
-                for i in 0..safe { o[i] = (mix[i] * 0.6).clamp(-1.0, 1.0); }
+                for i in 0..safe { o[i] = (mix[i] * 0.65).tanh(); } // soft bus saturation (analog glue) — peaks round off instead of hard-clipping
             }
             {
                 let o = outputs[1].channel_mut(0);
-                for i in 0..safe { o[i] = (mix[i] * 0.6).clamp(-1.0, 1.0); }
+                for i in 0..safe { o[i] = (mix[i] * 0.65).tanh(); } // soft bus saturation (analog glue) — peaks round off instead of hard-clipping
             }
             {
                 let o = outputs[13].channel_mut(0);

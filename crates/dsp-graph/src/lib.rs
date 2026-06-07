@@ -766,7 +766,12 @@ impl GraphEngine {
           self.sample_rate,
         );
 
-        // Restore state if same module id + same type still exists
+        // Restore state if same module id + same type still exists.
+        // NOTE: this deliberately discards the freshly-parsed state from ModuleNode::new
+        // (including any string param like patternData/stepData/midiData re-parsed from
+        // `params`). In preserve mode the live DSP state wins, so after updateGraph the
+        // caller MUST re-send string params via set_param_string to apply edits — see
+        // App.tsx STRING_PARAMS / the undo-sync loop.
         if let Some((saved_type, saved_state)) = saved_states.remove(&(module.id.clone(), voice)) {
           if saved_type == module_type {
             node.state = saved_state;

@@ -147,6 +147,12 @@ const normalizeNativeParamValue = (paramId: string, value: number | string | boo
 
 const isDev = import.meta.env.DEV
 
+// Params whose VALUE is a JSON/string payload (not a number) and must be routed through
+// setParamString / native_set_param_string. Anything not listed here is normalized to a
+// number and DROPPED if it isn't one — so every string-serialized module (sequencer grids,
+// text, etc.) MUST appear here, or its live edits silently never reach the engine.
+const STRING_PARAMS = new Set(['stepData', 'drumData', 'midiData', 'speechText', 'cellData', 'patternData'])
+
 function App() {
   const engine = useMemo(() => new AudioEngine(), [])
   const {
@@ -471,7 +477,6 @@ function App() {
     redo()
     pendingUndoSyncRef.current = true
   }, [redo])
-  const STRING_PARAMS = new Set(['stepData', 'drumData', 'midiData', 'speechText', 'cellData'])
   useEffect(() => {
     if (!pendingUndoSyncRef.current) return
     pendingUndoSyncRef.current = false
@@ -620,17 +625,17 @@ function App() {
       }
 
       if (status === 'running' && !options?.skipEngine) {
-        // String params like stepData/drumData/midiData go through setParamString
-        if (typeof value === 'string' && (paramId === 'stepData' || paramId === 'drumData' || paramId === 'midiData' || paramId === 'speechText' || paramId === 'cellData')) {
+        // String params (stepData/drumData/midiData/patternData/…) go through setParamString
+        if (typeof value === 'string' && STRING_PARAMS.has(paramId)) {
           engine.setParamString(moduleId, paramId, value)
         } else {
           engine.setParam(moduleId, paramId, value)
         }
       }
       if (isTauri && tauriNativeRunning && !options?.skipEngine) {
-        // String params like stepData/drumData/midiData need special handling
+        // String params (stepData/drumData/midiData/patternData/…) need special handling
         const mappedId = tauriMapId(moduleId)
-        if (typeof value === 'string' && (paramId === 'stepData' || paramId === 'drumData' || paramId === 'midiData' || paramId === 'speechText' || paramId === 'cellData')) {
+        if (typeof value === 'string' && STRING_PARAMS.has(paramId)) {
           void invokeTauri('native_set_param_string', { moduleId: mappedId, paramId, value })
         } else {
           const numeric = normalizeNativeParamValue(paramId, value)

@@ -10,6 +10,7 @@ import type { ControlProps } from '../types'
 import { ArpeggiatorControls } from './ArpeggiatorControls'
 import { StepSequencerControls } from './StepSequencerControls'
 import { DrumSequencerControls } from './DrumSequencerControls'
+import { DrumMachine909Controls } from './DrumMachine909Controls'
 import { EuclideanControls } from './EuclideanControls'
 import { ClockControls } from './ClockControls'
 import { MarioControls } from './MarioControls'
@@ -33,6 +34,8 @@ export function renderSequencerControls(props: ControlProps): React.ReactElement
       return <StepSequencerControls {...props} />
     case 'drum-sequencer':
       return <DrumSequencerControls {...props} />
+    case 'drum-machine-909':
+      return <DrumMachine909Controls {...props} />
     case 'euclidean':
       return <EuclideanControls {...props} />
     case 'clock':
