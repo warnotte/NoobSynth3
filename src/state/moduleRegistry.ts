@@ -922,25 +922,21 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     decay: 0.3,         // Decay time 0-1
   },
   '909-hihat': {
-    openDecay: 0.4,     // Open hat decay 0-1
-    closedDecay: 0.1,   // Closed hat decay 0-1
-    tone: 0.6,          // Brightness 0-1
-    mix: 0.5,           // Tone/noise mix 0-1
+    tune: 1.0,          // Frequency multiplier 0.5-2.0
+    decay: 0.2,         // Decay seconds 0.02-1.5
+    tone: 0.5,          // Brightness 0-1
+    open: 0.0,          // Closed (0) ↔ open (1)
   },
   '909-clap': {
     tone: 0.5,          // Brightness 0-1
-    decay: 0.4,         // Decay time 0-1
-    spread: 0.5,        // Multi-clap spread 0-1
+    decay: 0.4,         // Decay seconds 0.1-1.0
   },
   '909-tom': {
-    tune: 150,          // Base frequency Hz
-    decay: 0.4,         // Decay time 0-1
-    pitch: 0.5,         // Pitch envelope 0-1
+    tune: 120,          // Base frequency Hz
+    decay: 0.4,         // Decay seconds 0.1-1.5
   },
   '909-rimshot': {
-    tune: 500,          // Base frequency Hz
-    tone: 0.6,          // Brightness 0-1
-    decay: 0.2,         // Decay time 0-1
+    tune: 400,          // Base frequency Hz
   },
   '909-crash': {
     tune: 1.0,          // Frequency multiplier 0.5-2.0
