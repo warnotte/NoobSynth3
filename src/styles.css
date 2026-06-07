@@ -4832,12 +4832,41 @@
 }
 
 .dm909-voice-edit-title {
-  font-size: 10px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  margin-bottom: 8px;
+}
+
+.dm909-edit-badge {
+  font-size: 9px;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
+  color: #06121f;
+  background: var(--accent-cool);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+}
+
+.dm909-edit-voice {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--accent-cool);
-  margin-bottom: 8px;
+}
+
+.dm909-edit-hint {
+  font-size: 9px;
+  font-weight: 500;
+  color: rgba(150, 170, 190, 0.65);
+}
+
+/* pencil on the selected lane links it to the RÉGLAGES strip */
+.dm909-voice-label.sel::after {
+  content: ' ✎';
+  font-size: 8px;
 }
 
 /* ============================================

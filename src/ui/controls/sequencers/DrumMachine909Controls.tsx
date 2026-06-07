@@ -407,7 +407,11 @@ export function DrumMachine909Controls({ module, engine, status, audioMode, nati
       </div>
 
       <div className="dm909-voice-edit">
-        <div className="dm909-voice-edit-title">{sel.label}</div>
+        <div className="dm909-voice-edit-title">
+          <span className="dm909-edit-badge">RÉGLAGES</span>
+          <span className="dm909-edit-voice">{sel.label}</span>
+          <span className="dm909-edit-hint">clique un nom d'instrument à gauche (BASS, SNARE, CL HAT…) pour régler une autre voix</span>
+        </div>
         <div className="drum-knobs-grid">
           {sel.knobs.map(k => (
             <RotaryKnob
