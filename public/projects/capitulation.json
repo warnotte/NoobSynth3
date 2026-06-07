@@ -19,7 +19,7 @@
               "y": 40
             },
             "params": {
-              "text": "CAPITULATION — pièce générative infinie (4 racks, ZÉRO MIDI)\n\nAppuie sur PLAY et laisse tourner. Rien n'est enregistré : tout est CALCULÉ en direct.\n- Hauteurs : Chaos (Lorenz) + Turing Machine → Quantizer (l'harmonie tient… puis se brise).\n- Rythmes : Euclidiens clairsemés, jamais un beat régulier.\n- Dérive : 4 LFOs très lents à périodes PREMIÈRES (127, 83, 167, 71 s) → la combinaison ne se répète qu'au bout de des années. En pratique : jamais à l'identique.\n\nL'ARC (chaque rack le suit à sa vitesse) :\naube fragile → euphorie de l'IPO → les puces lâchent → krach / coupe-circuit → capitulation → vide… puis une autre aube, différente.\n\nL'alarme/coupe-circuit enfle puis retombe (~71 s) → un groove (kick + charley) qui monte puis s'efface : le moment entraînant, récurrent mais jamais identique.\n\nRacks : 1) Substrate/Dread (drone)  2) Le Marché/Ticker  3) Silicium (puces)  4) Alarmes/Coupe-circuit.\nLaisse jouer longtemps : ça descend l'escalier de la panique, sans fin."
+              "text": "CAPITULATION — pièce générative infinie (4 racks, ZÉRO MIDI)\n\nAppuie sur PLAY et laisse tourner. Rien n'est enregistré : tout est CALCULÉ en direct.\n- Hauteurs : Chaos (Lorenz) + Turing Machine → Quantizer (l'harmonie tient… puis se brise).\n- Rythmes : Euclidiens clairsemés, jamais un beat régulier.\n- Dérive : 4 LFOs très lents à périodes PREMIÈRES (127, 83, 167, 71 s) → la combinaison ne se répète qu'au bout de des années. En pratique : jamais à l'identique.\n\nL'ARC (chaque rack le suit à sa vitesse) :\naube fragile → euphorie de l'IPO → les puces lâchent → krach / coupe-circuit → capitulation → vide… puis une autre aube, différente.\n\nL'alarme/coupe-circuit enfle puis retombe (~71 s) → un groove (kick + charley) qui monte puis s'efface : le moment entraînant, récurrent mais jamais identique.\n\nRacks : 1) Substrate/Dread (drone)  2) Le Marché/Ticker  3) Silicium (puces)  4) Alarmes/Coupe-circuit.\nLaisse jouer longtemps : ça descend l'escalier de la panique, sans fin.\n\n★ Après ~1-2 min : LE KRACH (rack 5) — un beat punchy ARRIVE (kick 4/4 + snare + charley + basse acid TB-303 générative), enfle puis se retire. Le 'drop' récurrent du morceau."
             }
           },
           {
@@ -1754,6 +1754,524 @@
             "to": {
               "moduleId": "alarm-mix",
               "portId": "in-4"
+            },
+            "kind": "audio"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rack-5",
+      "name": "Le Krach (Panic Floor)",
+      "graph": {
+        "modules": [
+          {
+            "id": "clk5",
+            "type": "clock",
+            "name": "Horloge krach",
+            "position": {
+              "x": 40,
+              "y": 40
+            },
+            "params": {
+              "running": true,
+              "tempo": 60,
+              "rate": 4,
+              "swing": 0
+            }
+          },
+          {
+            "id": "kick-eu",
+            "type": "euclidean",
+            "name": "Kick 4/4",
+            "position": {
+              "x": 40,
+              "y": 170
+            },
+            "params": {
+              "enabled": true,
+              "tempo": 60,
+              "rate": 4,
+              "steps": 16,
+              "pulses": 4,
+              "rotation": 0,
+              "gateLength": 30,
+              "swing": 0
+            }
+          },
+          {
+            "id": "kick5",
+            "type": "909-kick",
+            "name": "Kick",
+            "position": {
+              "x": 280,
+              "y": 170
+            },
+            "params": {
+              "tune": 48,
+              "attack": 0.4,
+              "decay": 0.45,
+              "drive": 0.55
+            }
+          },
+          {
+            "id": "snr-eu",
+            "type": "euclidean",
+            "name": "Snare backbeat",
+            "position": {
+              "x": 40,
+              "y": 310
+            },
+            "params": {
+              "enabled": true,
+              "tempo": 60,
+              "rate": 4,
+              "steps": 16,
+              "pulses": 2,
+              "rotation": 4,
+              "gateLength": 25,
+              "swing": 0
+            }
+          },
+          {
+            "id": "snr5",
+            "type": "909-snare",
+            "name": "Snare",
+            "position": {
+              "x": 280,
+              "y": 310
+            },
+            "params": {
+              "tune": 210,
+              "tone": 0.5,
+              "snappy": 0.65,
+              "decay": 0.22
+            }
+          },
+          {
+            "id": "hat-eu",
+            "type": "euclidean",
+            "name": "Hats 16th",
+            "position": {
+              "x": 40,
+              "y": 450
+            },
+            "params": {
+              "enabled": true,
+              "tempo": 60,
+              "rate": 4,
+              "steps": 16,
+              "pulses": 11,
+              "rotation": 0,
+              "gateLength": 16,
+              "swing": 0
+            }
+          },
+          {
+            "id": "hat5",
+            "type": "808-hihat",
+            "name": "Charley",
+            "position": {
+              "x": 280,
+              "y": 450
+            },
+            "params": {
+              "tune": 1,
+              "decay": 0.1,
+              "tone": 0.7,
+              "snap": 0.6
+            }
+          },
+          {
+            "id": "bass-eu",
+            "type": "euclidean",
+            "name": "Bass rythme",
+            "position": {
+              "x": 40,
+              "y": 590
+            },
+            "params": {
+              "enabled": true,
+              "tempo": 60,
+              "rate": 4,
+              "steps": 16,
+              "pulses": 7,
+              "rotation": 2,
+              "gateLength": 40,
+              "swing": 0
+            }
+          },
+          {
+            "id": "bass-chaos",
+            "type": "chaos",
+            "name": "Acid mvt (Lorenz)",
+            "position": {
+              "x": 280,
+              "y": 590
+            },
+            "params": {
+              "speed": 0.3,
+              "rho": 28,
+              "sigma": 10,
+              "beta": 2.66,
+              "scale": 0,
+              "root": 0
+            }
+          },
+          {
+            "id": "bass-turing",
+            "type": "turing-machine",
+            "name": "Bass notes",
+            "position": {
+              "x": 40,
+              "y": 730
+            },
+            "params": {
+              "probability": 0.3,
+              "length": 8,
+              "range": 1,
+              "scale": 7,
+              "root": 0
+            }
+          },
+          {
+            "id": "bass-quant",
+            "type": "quantizer",
+            "name": "Gamme basse",
+            "position": {
+              "x": 280,
+              "y": 730
+            },
+            "params": {
+              "root": 0,
+              "scale": 7
+            }
+          },
+          {
+            "id": "tb303",
+            "type": "tb-303",
+            "name": "Acid 303",
+            "position": {
+              "x": 520,
+              "y": 660
+            },
+            "params": {
+              "waveform": 1,
+              "cutoff": 380,
+              "resonance": 0.72,
+              "decay": 0.4,
+              "envmod": 0.65,
+              "accent": 0.75,
+              "glide": 0.08
+            }
+          },
+          {
+            "id": "drumbus",
+            "type": "mixer-8",
+            "name": "Bus krach",
+            "position": {
+              "x": 760,
+              "y": 310
+            },
+            "params": {
+              "level1": 0.72,
+              "level2": 0.55,
+              "level3": 0.42,
+              "level4": 0.6,
+              "level5": 0.6,
+              "level6": 0.6,
+              "level7": 0.6,
+              "level8": 0.6
+            }
+          },
+          {
+            "id": "drive5",
+            "type": "tube-amp",
+            "name": "Punch (tube)",
+            "position": {
+              "x": 1000,
+              "y": 310
+            },
+            "params": {
+              "gain": 0.6,
+              "stages": 2,
+              "tone": 0.55,
+              "bias": 0.3,
+              "sag": 0.2,
+              "mix": 0.5
+            }
+          },
+          {
+            "id": "swell-vca5",
+            "type": "gain",
+            "name": "Entree du beat (swell)",
+            "position": {
+              "x": 1240,
+              "y": 310
+            },
+            "params": {
+              "gain": 0.95
+            }
+          },
+          {
+            "id": "arc5-lfo",
+            "type": "lfo",
+            "name": "Arrivee (~149s)",
+            "position": {
+              "x": 1240,
+              "y": 450
+            },
+            "params": {
+              "rate": 0.006711,
+              "depth": 0.9,
+              "offset": 0.1,
+              "shape": "triangle",
+              "bipolar": false
+            }
+          },
+          {
+            "id": "out5",
+            "type": "output",
+            "name": "Sortie krach",
+            "position": {
+              "x": 1480,
+              "y": 310
+            },
+            "params": {
+              "level": 0.9
+            }
+          },
+          {
+            "id": "notes5",
+            "type": "notes",
+            "name": "Info",
+            "position": {
+              "x": 520,
+              "y": 300
+            },
+            "params": {
+              "text": "LE KRACH — section rythmique (le PUNCH).\n\nUn beat qui ARRIVE apres ~1 min puis s'efface, en boucle (jamais identique) :\n- Kick 4/4 (909), snare backbeat (909), charley 16e (808) — rythmes generes par des Euclidiens.\n- Basse ACID TB-303 : notes Turing -> Quantizer, filtre resonant balaye par le Chaos = le squelch acid.\n- Tout passe par un tube (punch/chaleur) puis un VCA de montee pilote par un LFO ~149s : le groove enfle, drive, puis se retire. Le 'drop' recurrent de Capitulation."
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": {
+              "moduleId": "clk5",
+              "portId": "clock"
+            },
+            "to": {
+              "moduleId": "kick-eu",
+              "portId": "clock"
+            },
+            "kind": "sync"
+          },
+          {
+            "from": {
+              "moduleId": "clk5",
+              "portId": "clock"
+            },
+            "to": {
+              "moduleId": "snr-eu",
+              "portId": "clock"
+            },
+            "kind": "sync"
+          },
+          {
+            "from": {
+              "moduleId": "clk5",
+              "portId": "clock"
+            },
+            "to": {
+              "moduleId": "hat-eu",
+              "portId": "clock"
+            },
+            "kind": "sync"
+          },
+          {
+            "from": {
+              "moduleId": "clk5",
+              "portId": "clock"
+            },
+            "to": {
+              "moduleId": "bass-eu",
+              "portId": "clock"
+            },
+            "kind": "sync"
+          },
+          {
+            "from": {
+              "moduleId": "clk5",
+              "portId": "clock"
+            },
+            "to": {
+              "moduleId": "bass-turing",
+              "portId": "clock"
+            },
+            "kind": "sync"
+          },
+          {
+            "from": {
+              "moduleId": "kick-eu",
+              "portId": "gate"
+            },
+            "to": {
+              "moduleId": "kick5",
+              "portId": "trigger"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "snr-eu",
+              "portId": "gate"
+            },
+            "to": {
+              "moduleId": "snr5",
+              "portId": "trigger"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "hat-eu",
+              "portId": "gate"
+            },
+            "to": {
+              "moduleId": "hat5",
+              "portId": "trigger"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "bass-turing",
+              "portId": "cv"
+            },
+            "to": {
+              "moduleId": "bass-quant",
+              "portId": "in"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "bass-quant",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "tb303",
+              "portId": "pitch"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "bass-eu",
+              "portId": "gate"
+            },
+            "to": {
+              "moduleId": "tb303",
+              "portId": "gate"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "bass-chaos",
+              "portId": "x"
+            },
+            "to": {
+              "moduleId": "tb303",
+              "portId": "cutoff-cv"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "kick5",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "drumbus",
+              "portId": "in-1"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "snr5",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "drumbus",
+              "portId": "in-2"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "hat5",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "drumbus",
+              "portId": "in-3"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "tb303",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "drumbus",
+              "portId": "in-4"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "drumbus",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "drive5",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "drive5",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "swell-vca5",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "arc5-lfo",
+              "portId": "cv-out"
+            },
+            "to": {
+              "moduleId": "swell-vca5",
+              "portId": "cv"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "swell-vca5",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "out5",
+              "portId": "in"
             },
             "kind": "audio"
           }
