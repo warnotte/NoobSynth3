@@ -63,6 +63,13 @@
       "description": "Génératif apocalyptique : un krach boursier sans fin (drone, ticker Turing/chaos, puces qui lâchent, alarmes + un beat acid TB-303 qui arrive après ~1-2 min). 5 racks, zéro MIDI, LFOs à périodes premières → jamais répétitif.",
       "file": "capitulation.json",
       "group": "Ambient"
+    },
+    {
+      "id": "migrations",
+      "name": "Migrations 🕊️",
+      "description": "Vitrine du Harmonist : une harmonie générative AUTONOME (cadences + modulations) qui fait voyager ensemble basse, nappe et mélodie de clé en clé. Contemplatif, jamais répétitif.",
+      "file": "migrations.json",
+      "group": "Ambient"
     }
   ]
 }

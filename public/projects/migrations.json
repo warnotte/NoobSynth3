@@ -1,0 +1,615 @@
+{
+  "version": 2,
+  "type": "project",
+  "masterTempo": 68,
+  "masterVolume": 0.85,
+  "activeRackId": "rack-1",
+  "racks": [
+    {
+      "id": "rack-1",
+      "name": "Migrations",
+      "graph": {
+        "modules": [
+          {
+            "id": "clk",
+            "type": "clock",
+            "name": "clk",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "running": true,
+              "tempo": 68,
+              "rate": 4,
+              "swing": 0
+            }
+          },
+          {
+            "id": "harm",
+            "type": "harmonist",
+            "name": "harm",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "root": 0,
+              "mode": 0,
+              "rate": 24,
+              "restlessness": 0.35,
+              "brightness": 0.6,
+              "modChance": 0.22
+            }
+          },
+          {
+            "id": "hold",
+            "type": "lfo",
+            "name": "hold",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "rate": 0.1,
+              "depth": 0,
+              "offset": 1,
+              "shape": "sine",
+              "bipolar": false
+            }
+          },
+          {
+            "id": "notes",
+            "type": "notes",
+            "name": "notes",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "text": "MIGRATIONS - vitrine du HARMONIST (harmonie generative autonome).\n\nLe HARMONIST est le chef : il promene la tonalite par cadences + modulations (jamais repetitif). Sa fondamentale (root) pilote la BASSE et la NAPPE (elles suivent l'accord) ; root + gamme (scale) pilotent un QUANTIZER pour la MELODIE (qui erre dans la gamme de la cle du moment).\n\nAppuie sur Play et laisse migrer - toutes les voix changent de cle ENSEMBLE, toutes seules. Regle restless / bright / modul. sur le Harmonist pour changer le voyage."
+            }
+          },
+          {
+            "id": "bscale",
+            "type": "gain",
+            "name": "bscale",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "gain": 0.0833
+            }
+          },
+          {
+            "id": "bosc",
+            "type": "oscillator",
+            "name": "bosc",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "frequency": 55,
+              "type": "triangle",
+              "pwm": 0.5,
+              "unison": 2,
+              "detune": 6,
+              "fmLin": 0,
+              "fmExp": 0,
+              "subMix": 0.25,
+              "subOct": 1
+            }
+          },
+          {
+            "id": "benv",
+            "type": "adsr",
+            "name": "benv",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "attack": 0.4,
+              "decay": 1.6,
+              "sustain": 0.45,
+              "release": 2.2
+            }
+          },
+          {
+            "id": "bvca",
+            "type": "gain",
+            "name": "bvca",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "gain": 0.9
+            }
+          },
+          {
+            "id": "pscale",
+            "type": "gain",
+            "name": "pscale",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "gain": 0.0833
+            }
+          },
+          {
+            "id": "pad",
+            "type": "spectral-swarm",
+            "name": "pad",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "frequency": 220,
+              "partials": 16,
+              "detune": 14,
+              "drift": 0.3,
+              "density": 0.8,
+              "evolution": 5,
+              "inharmonic": 0.04,
+              "tilt": -3,
+              "spread": 0.7,
+              "shimmer": 0.2,
+              "attack": 3,
+              "release": 4,
+              "waveform": 0,
+              "oddEven": 0,
+              "fundamentalMix": 0.5,
+              "formantFreq": 0,
+              "formantQ": 2,
+              "freeze": 0,
+              "chorus": 0.3,
+              "attackLow": 1,
+              "attackHigh": 1,
+              "releaseLow": 1,
+              "releaseHigh": 1
+            }
+          },
+          {
+            "id": "padlvl",
+            "type": "gain",
+            "name": "padlvl",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "gain": 0.4
+            }
+          },
+          {
+            "id": "euc",
+            "type": "euclidean",
+            "name": "euc",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "enabled": true,
+              "tempo": 68,
+              "rate": 4,
+              "steps": 16,
+              "pulses": 6,
+              "rotation": 2,
+              "gateLength": 28,
+              "swing": 0
+            }
+          },
+          {
+            "id": "mlfo",
+            "type": "lfo",
+            "name": "mlfo",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "rate": 0.13,
+              "depth": 0.7,
+              "offset": 0.2,
+              "shape": "triangle",
+              "bipolar": true
+            }
+          },
+          {
+            "id": "mq",
+            "type": "quantizer",
+            "name": "mq",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "root": 0,
+              "scale": 6
+            }
+          },
+          {
+            "id": "mosc",
+            "type": "oscillator",
+            "name": "mosc",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "frequency": 440,
+              "type": "triangle",
+              "pwm": 0.5,
+              "unison": 1,
+              "detune": 0,
+              "fmLin": 0,
+              "fmExp": 0,
+              "subMix": 0,
+              "subOct": 1
+            }
+          },
+          {
+            "id": "menv",
+            "type": "adsr",
+            "name": "menv",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "attack": 0.005,
+              "decay": 0.45,
+              "sustain": 0,
+              "release": 0.6
+            }
+          },
+          {
+            "id": "mvca",
+            "type": "gain",
+            "name": "mvca",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "gain": 0.9
+            }
+          },
+          {
+            "id": "mdelay",
+            "type": "delay",
+            "name": "mdelay",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "time": 420,
+              "feedback": 0.38,
+              "mix": 0.32,
+              "tone": 0.55,
+              "pingPong": true
+            }
+          },
+          {
+            "id": "mix",
+            "type": "mixer-1x2",
+            "name": "mix",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "levelA": 0.6,
+              "levelB": 0.55,
+              "levelC": 0.5,
+              "levelD": 0,
+              "levelE": 0,
+              "levelF": 0
+            }
+          },
+          {
+            "id": "rev",
+            "type": "reverb",
+            "name": "rev",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "time": 3.6,
+              "damp": 0.5,
+              "preDelay": 32,
+              "mix": 0.4
+            }
+          },
+          {
+            "id": "out",
+            "type": "output",
+            "name": "out",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "level": 0.5
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": {
+              "moduleId": "clk",
+              "portId": "clock"
+            },
+            "to": {
+              "moduleId": "harm",
+              "portId": "clock"
+            },
+            "kind": "sync"
+          },
+          {
+            "from": {
+              "moduleId": "clk",
+              "portId": "clock"
+            },
+            "to": {
+              "moduleId": "euc",
+              "portId": "clock"
+            },
+            "kind": "sync"
+          },
+          {
+            "from": {
+              "moduleId": "harm",
+              "portId": "root"
+            },
+            "to": {
+              "moduleId": "bscale",
+              "portId": "in"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "bscale",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "bosc",
+              "portId": "pitch"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "harm",
+              "portId": "gate"
+            },
+            "to": {
+              "moduleId": "benv",
+              "portId": "gate"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "bosc",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "bvca",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "benv",
+              "portId": "env"
+            },
+            "to": {
+              "moduleId": "bvca",
+              "portId": "cv"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "bvca",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "mix",
+              "portId": "in-a"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "harm",
+              "portId": "root"
+            },
+            "to": {
+              "moduleId": "pscale",
+              "portId": "in"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "pscale",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "pad",
+              "portId": "pitch"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "hold",
+              "portId": "cv-out"
+            },
+            "to": {
+              "moduleId": "pad",
+              "portId": "gate"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "pad",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "padlvl",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "padlvl",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "mix",
+              "portId": "in-b"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "euc",
+              "portId": "gate"
+            },
+            "to": {
+              "moduleId": "menv",
+              "portId": "gate"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "mlfo",
+              "portId": "cv-out"
+            },
+            "to": {
+              "moduleId": "mq",
+              "portId": "in"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "harm",
+              "portId": "root"
+            },
+            "to": {
+              "moduleId": "mq",
+              "portId": "root-cv"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "harm",
+              "portId": "scale"
+            },
+            "to": {
+              "moduleId": "mq",
+              "portId": "scale-cv"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "mq",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "mosc",
+              "portId": "pitch"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "mosc",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "mvca",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "menv",
+              "portId": "env"
+            },
+            "to": {
+              "moduleId": "mvca",
+              "portId": "cv"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "mvca",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "mdelay",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "mdelay",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "mix",
+              "portId": "in-c"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "mix",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "rev",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "rev",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "out",
+              "portId": "in"
+            },
+            "kind": "audio"
+          }
+        ]
+      }
+    }
+  ]
+}
