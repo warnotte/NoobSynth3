@@ -165,11 +165,13 @@ pub(crate) fn process(
             } else {
                 Some(inputs[0].channel(0))
             };
+            let root_cv = if connections[1].is_empty() { None } else { Some(inputs[1].channel(0)) };
+            let scale_cv = if connections[2].is_empty() { None } else { Some(inputs[2].channel(0)) };
             let params = QuantizerParams {
                 root: state.root.slice(frames),
                 scale: state.scale.slice(frames),
             };
-            let q_inputs = QuantizerInputs { input };
+            let q_inputs = QuantizerInputs { input, root_cv, scale_cv };
             let output = outputs[0].channel_mut(0);
             Quantizer::process_block(output, q_inputs, params);
         }

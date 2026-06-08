@@ -78,7 +78,14 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
     outputs: [{ id: 'out', label: 'Out', kind: 'cv', direction: 'out' }],
   },
   slew: simpleCvProcessor(),
-  quantizer: simpleCvProcessor(),
+  quantizer: {
+    inputs: [
+      { id: 'in', label: 'In', kind: 'cv', direction: 'in' },
+      { id: 'root-cv', label: 'Root', kind: 'cv', direction: 'in' },
+      { id: 'scale-cv', label: 'Scale', kind: 'cv', direction: 'in' },
+    ],
+    outputs: [{ id: 'out', label: 'Out', kind: 'cv', direction: 'out' }],
+  },
   chaos: {
     inputs: [{ id: 'speed', label: 'Speed', kind: 'cv', direction: 'in' }],
     outputs: [

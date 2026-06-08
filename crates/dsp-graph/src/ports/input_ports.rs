@@ -18,7 +18,7 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
     ModuleType::SampleHold => vec![PortInfo { channels: 1 }, PortInfo { channels: 1 }],
     ModuleType::Slew => vec![PortInfo { channels: 1 }],
     ModuleType::EnvelopeFollower => vec![PortInfo { channels: 1 }],
-    ModuleType::Quantizer => vec![PortInfo { channels: 1 }],
+    ModuleType::Quantizer => vec![PortInfo { channels: 1 }, PortInfo { channels: 1 }, PortInfo { channels: 1 }],
     ModuleType::RingMod => vec![PortInfo { channels: 1 }, PortInfo { channels: 1 }],
     ModuleType::Gain => vec![PortInfo { channels: 2 }, PortInfo { channels: 1 }],
     ModuleType::CvVca => vec![PortInfo { channels: 1 }, PortInfo { channels: 1 }],

@@ -33,6 +33,8 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
     },
     ModuleType::Quantizer => match port_id {
       "in" => Some(0),
+      "root-cv" => Some(1),
+      "scale-cv" => Some(2),
       _ => None,
     },
     ModuleType::RingMod => match port_id {

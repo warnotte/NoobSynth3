@@ -56,6 +56,10 @@ pub struct Quantizer;
 pub struct QuantizerInputs<'a> {
     /// Pitch CV input (V/octave)
     pub input: Option<&'a [Sample]>,
+    /// Root CV (0-11) — overrides the `root` param when connected (e.g. from a Harmonist).
+    pub root_cv: Option<&'a [Sample]>,
+    /// Scale-index CV (0-7) — overrides the `scale` param when connected.
+    pub scale_cv: Option<&'a [Sample]>,
 }
 
 /// Parameters for Quantizer.
@@ -79,8 +83,18 @@ impl Quantizer {
 
         for i in 0..output.len() {
             let input = input_at(inputs.input, i);
-            let root = sample_at(params.root, i, 0.0).round().clamp(0.0, 11.0) as i32;
-            let scale_index = sample_at(params.scale, i, 0.0).round();
+            // root / scale follow the live CV input when patched, else the param.
+            let root = match inputs.root_cv {
+                Some(c) => input_at(Some(c), i),
+                None => sample_at(params.root, i, 0.0),
+            }
+            .round()
+            .clamp(0.0, 11.0) as i32;
+            let scale_index = match inputs.scale_cv {
+                Some(c) => input_at(Some(c), i),
+                None => sample_at(params.scale, i, 0.0),
+            }
+            .round();
             let scale_index = if scale_index.is_finite() {
                 scale_index as i32
             } else {
