@@ -38,8 +38,8 @@
               "mode": 0,
               "rate": 12,
               "restlessness": 0.3,
-              "brightness": 0.55,
-              "modChance": 0.35
+              "brightness": 0.6,
+              "modChance": 0.32
             }
           },
           {
@@ -59,6 +59,19 @@
             }
           },
           {
+            "id": "rslew",
+            "type": "slew",
+            "name": "rslew",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "rise": 0.06,
+              "fall": 0.06
+            }
+          },
+          {
             "id": "notes",
             "type": "notes",
             "name": "notes",
@@ -67,7 +80,7 @@
               "y": 0
             },
             "params": {
-              "text": "CLOITRE - 2e vitrine du HARMONIST, en orgue + cordes pincees.\n\nLe HARMONIST conduit tout. Sa fondamentale fait chanter un ORGUE soutenu + une BASSE (l'harmonie qui change d'accord). Sa fondamentale + sa gamme pilotent des Quantizers pour les CORDES (Karplus) et les CLOCHES (Resonator) qui arpegent la cle du moment.\n\nOrgue/basse tenus (l'harmonie) + plucks organiques transitoires (la melodie) = registres complementaires, esprit neo-classique sacre. Tout migre de cle en cle, tout seul. Regle le voyage sur le Harmonist (Rate / Modul. / Restless / Bright)."
+              "text": "CLOITRE - 2e vitrine du HARMONIST (orgue + cordes pincees).\n\nLe HARMONIST conduit tout. Sa fondamentale (lissee par un Slew = ca GLISSE au lieu de sauter) fait chanter un ORGUE chaud + une basse. Sa fondamentale + sa gamme pilotent des Quantizers pour les CORDES (Karplus) et les CLOCHES (Resonator) qui arpegent la cle.\n\nOrgue/basse tenus = l'harmonie ; plucks transitoires = la melodie. Tout migre de cle en cle, tout seul. Regle le voyage sur le Harmonist (Rate / Modul. / Restless / Bright)."
             }
           },
           {
@@ -92,25 +105,25 @@
             },
             "params": {
               "frequency": 110,
-              "drawbar16": 0.5,
+              "drawbar16": 0.6,
               "drawbar8": 0.85,
-              "drawbar4": 0.5,
-              "drawbar223": 0.4,
-              "drawbar2": 0.25,
-              "drawbar135": 0.3,
+              "drawbar4": 0.4,
+              "drawbar223": 0,
+              "drawbar2": 0.1,
+              "drawbar135": 0,
               "drawbar113": 0,
-              "drawbar1": 0.12,
+              "drawbar1": 0.1,
               "voicing": 0,
               "chiff": 0,
               "percussion": 0,
               "percHarmonic": 0,
               "percDecay": 0,
               "percVolume": 0,
-              "chorusVibrato": 0.25,
-              "tremulant": 0.2,
+              "chorusVibrato": 0.3,
+              "tremulant": 0.18,
               "tremRate": 4.5,
-              "wind": 0.14,
-              "brightness": 0.5
+              "wind": 0.15,
+              "brightness": 0.38
             }
           },
           {
@@ -122,7 +135,7 @@
               "y": 0
             },
             "params": {
-              "gain": 0.28
+              "gain": 0.3
             }
           },
           {
@@ -146,14 +159,14 @@
               "y": 0
             },
             "params": {
-              "frequency": 41,
+              "frequency": 82,
               "type": "triangle",
               "pwm": 0.5,
               "unison": 1,
               "detune": 0,
               "fmLin": 0,
               "fmExp": 0,
-              "subMix": 0.3,
+              "subMix": 0,
               "subOct": 1
             }
           },
@@ -197,8 +210,8 @@
               "y": 0
             },
             "params": {
-              "rate": 0.25,
-              "depth": 0.55,
+              "rate": 0.22,
+              "depth": 0.4,
               "offset": 0.25,
               "shape": "triangle",
               "bipolar": true
@@ -227,9 +240,9 @@
             },
             "params": {
               "frequency": 220,
-              "damping": 0.35,
-              "decay": 0.992,
-              "brightness": 0.55,
+              "damping": 0.5,
+              "decay": 0.985,
+              "brightness": 0.45,
               "pluckPos": 0.4
             }
           },
@@ -255,8 +268,8 @@
             },
             "params": {
               "time": 300,
-              "feedback": 0.32,
-              "mix": 0.3,
+              "feedback": 0.3,
+              "mix": 0.28,
               "tone": 0.5,
               "pingPong": true
             }
@@ -274,7 +287,7 @@
               "tempo": 64,
               "rate": 4,
               "steps": 16,
-              "pulses": 4,
+              "pulses": 3,
               "rotation": 5,
               "gateLength": 30,
               "swing": 0
@@ -289,9 +302,9 @@
               "y": 0
             },
             "params": {
-              "rate": 0.17,
-              "depth": 0.45,
-              "offset": 0.7,
+              "rate": 0.15,
+              "depth": 0.32,
+              "offset": 0.65,
               "shape": "triangle",
               "bipolar": true
             }
@@ -319,14 +332,14 @@
             },
             "params": {
               "frequency": 440,
-              "structure": 0.5,
-              "brightness": 0.7,
-              "damping": 0.6,
+              "structure": 0.3,
+              "brightness": 0.45,
+              "damping": 0.85,
               "position": 0.4,
               "mode": 0,
               "polyphony": 1,
-              "internalExc": 0.8,
-              "chorus": 0.15
+              "internalExc": 0.7,
+              "chorus": 0.1
             }
           },
           {
@@ -338,7 +351,7 @@
               "y": 0
             },
             "params": {
-              "gain": 0.42
+              "gain": 0.3
             }
           },
           {
@@ -350,10 +363,10 @@
               "y": 0
             },
             "params": {
-              "levelA": 0.6,
+              "levelA": 0.65,
               "levelB": 0.6,
-              "levelC": 0.65,
-              "levelD": 0.55,
+              "levelC": 0.6,
+              "levelD": 0.5,
               "levelE": 0,
               "levelF": 0
             }
@@ -370,7 +383,7 @@
               "time": 4,
               "damp": 0.55,
               "preDelay": 35,
-              "mix": 0.42
+              "mix": 0.4
             }
           },
           {
@@ -382,7 +395,7 @@
               "y": 0
             },
             "params": {
-              "level": 0.6
+              "level": 0.62
             }
           }
         ],
@@ -424,6 +437,17 @@
             "from": {
               "moduleId": "harm",
               "portId": "root"
+            },
+            "to": {
+              "moduleId": "rslew",
+              "portId": "in"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "rslew",
+              "portId": "out"
             },
             "to": {
               "moduleId": "oscale",
@@ -477,8 +501,8 @@
           },
           {
             "from": {
-              "moduleId": "harm",
-              "portId": "root"
+              "moduleId": "rslew",
+              "portId": "out"
             },
             "to": {
               "moduleId": "bscale",
