@@ -276,6 +276,9 @@ pub fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
     ModuleType::Granular => vec![
       PortInfo { channels: 2 },  // stereo out
     ],
+    ModuleType::Sampler => vec![
+      PortInfo { channels: 2 },  // stereo out
+    ],
     // ParticleCloud - 1 stereo output
     ModuleType::ParticleCloud => vec![
       PortInfo { channels: 2 },  // stereo out

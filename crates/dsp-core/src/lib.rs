@@ -50,6 +50,7 @@ pub use oscillators::{
     Resonator, ResonatorParams, ResonatorInputs,
     Wavetable, WavetableParams, WavetableInputs,
     Granular, GranularParams, GranularInputs, GrainShape,
+    Sampler, SamplerParams, SamplerInputs,
     ParticleCloud, ParticleCloudParams, ParticleCloudInputs, ParticleMode, OscShape,
     SpeechSynth, SpeechSynthParams, SpeechSynthInputs,
     Theremin, ThereminParams, ThereminInputs, ThereminOutputs,

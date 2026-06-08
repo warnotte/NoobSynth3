@@ -28,6 +28,7 @@ type WasmGraphEngineCtor = new (sampleRate: number) => {
   seek_midi_sequencer(moduleId: string, tick: number): void
   drain_midi_events(moduleId: string): Uint8Array
   load_granular_buffer(moduleId: string, data: Float32Array): void
+  load_sampler_buffer(moduleId: string, data: Float32Array, fileSr: number): void
   get_granular_buffer_length(moduleId: string): number
   get_granular_position(moduleId: string): number
   get_granular_waveform(moduleId: string, maxPoints: number): Float32Array

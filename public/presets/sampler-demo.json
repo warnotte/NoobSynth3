@@ -1,0 +1,94 @@
+{
+  "version": 1,
+  "id": "sampler-demo",
+  "name": "Sampler — Load Your Own",
+  "description": "Pitched one-shot .wav player triggered by a step sequencer. Load any sample (a drum hit, a vocal, a stab) and it plays in rhythm.",
+  "group": "Sampler",
+  "graph": {
+    "modules": [
+      {
+        "id": "seq-1",
+        "type": "step-sequencer",
+        "name": "Trigger Seq",
+        "position": { "x": 0, "y": 0 },
+        "params": {
+          "enabled": true,
+          "tempo": 110,
+          "rate": 4,
+          "gateLength": 60,
+          "swing": 8,
+          "slideTime": 0,
+          "length": 16,
+          "direction": 0,
+          "stepData": "[{\"pitch\":0,\"gate\":true,\"velocity\":100,\"slide\":false},{\"pitch\":0,\"gate\":true,\"velocity\":55,\"slide\":false},{\"pitch\":0,\"gate\":true,\"velocity\":80,\"slide\":false},{\"pitch\":0,\"gate\":true,\"velocity\":50,\"slide\":false},{\"pitch\":0,\"gate\":true,\"velocity\":100,\"slide\":false},{\"pitch\":0,\"gate\":false,\"velocity\":100,\"slide\":false},{\"pitch\":0,\"gate\":true,\"velocity\":75,\"slide\":false},{\"pitch\":0,\"gate\":true,\"velocity\":60,\"slide\":false},{\"pitch\":0,\"gate\":true,\"velocity\":100,\"slide\":false},{\"pitch\":0,\"gate\":true,\"velocity\":55,\"slide\":false},{\"pitch\":0,\"gate\":true,\"velocity\":85,\"slide\":false},{\"pitch\":0,\"gate\":true,\"velocity\":50,\"slide\":false},{\"pitch\":0,\"gate\":true,\"velocity\":100,\"slide\":false},{\"pitch\":0,\"gate\":false,\"velocity\":100,\"slide\":false},{\"pitch\":0,\"gate\":true,\"velocity\":90,\"slide\":false},{\"pitch\":0,\"gate\":true,\"velocity\":65,\"slide\":false}]"
+        }
+      },
+      {
+        "id": "sampler-1",
+        "type": "sampler",
+        "name": "Sampler",
+        "position": { "x": 3, "y": 0 },
+        "params": {
+          "pitch": 1.0,
+          "level": 0.85,
+          "attack": 0.003,
+          "release": 0.05,
+          "loopMode": 0,
+          "loopStart": 0,
+          "loopEnd": 1,
+          "enabled": 1
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": { "x": 6, "y": 0 },
+        "params": {
+          "time": 0.55,
+          "damp": 0.45,
+          "preDelay": 12,
+          "mix": 0.22
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Main Out",
+        "position": { "x": 8, "y": 0 },
+        "params": { "level": 1 }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 0, "y": 3 },
+        "params": {
+          "text": "SAMPLER — LOAD YOUR OWN\n\nA pitched one-shot .wav player. No sample is bundled — load your own.\n\n1. Click 'Load .wav' on the Sampler and pick a short file (a drum hit, a vocal phrase, a synth stab). It is decoded, mono-mixed and resampled to the engine rate.\n2. Press Play. The Step Sequencer fires the Sampler's Trigger on each active step (a 16-step groove with gaps + velocity accents).\n3. 'Preview' auditions the loaded file locally without the engine.\n\nSignal: Step Sequencer (gate) -> Sampler -> Reverb -> Output\n\nTIPS\n- All step pitches are 0, so any percussion sample plays untransposed. Edit the step pitches (relative semitones) to play a MELODY — the sequencer's CV is patched to the Sampler's Pitch input (V/oct, +12 = one octave up).\n- Switch the Sampler to Loop mode for sustained, droning textures.\n- Pitch / Level / Attack / Release knobs shape each hit; short Release = tight, long Release = a tail.\n\nLICENSE: commercial packs (e.g. AudioRealism 909) are usable but NOT redistributable — load them locally, don't commit them. CC0 / public-domain samples can be bundled later."
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": { "moduleId": "seq-1", "portId": "gate-out" },
+        "to": { "moduleId": "sampler-1", "portId": "trigger" },
+        "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "seq-1", "portId": "cv-out" },
+        "to": { "moduleId": "sampler-1", "portId": "pitch" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "sampler-1", "portId": "out" },
+        "to": { "moduleId": "reverb-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "reverb-1", "portId": "out" },
+        "to": { "moduleId": "out-1", "portId": "in" },
+        "kind": "audio"
+      }
+    ]
+  }
+}

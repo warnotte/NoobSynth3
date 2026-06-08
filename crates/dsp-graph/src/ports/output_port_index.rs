@@ -392,6 +392,10 @@ pub fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize
       "out" | "output" => Some(0),
       _ => None,
     },
+    ModuleType::Sampler => match port_id {
+      "out" | "output" => Some(0),
+      _ => None,
+    },
     // ParticleCloud - 1 stereo output
     ModuleType::ParticleCloud => match port_id {
       "out" | "output" => Some(0),

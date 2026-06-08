@@ -59,6 +59,11 @@ export type NativeGranularBridge = {
   loadGranularBuffer: (moduleId: string, data: Float32Array) => Promise<number>
 }
 
+export type NativeSamplerBridge = {
+  isActive: boolean
+  loadSamplerBuffer: (moduleId: string, data: Float32Array, fileSr: number) => Promise<number>
+}
+
 /**
  * Bridge for native particle cloud operations (Tauri mode)
  */
@@ -109,6 +114,8 @@ export type ControlProps = {
   nativeTheremin?: NativeThereminBridge | null
   /** Native granular bridge (Tauri mode) */
   nativeGranular?: NativeGranularBridge | null
+  /** Native sampler bridge (Tauri mode) */
+  nativeSampler?: NativeSamplerBridge | null
   /** Native particle cloud bridge (Tauri mode) */
   nativeParticle?: NativeParticleBridge | null
   /** Native Game of Life bridge (Tauri mode) */

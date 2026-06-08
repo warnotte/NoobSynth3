@@ -132,6 +132,16 @@ impl WasmGraphEngine {
     self.engine.get_granular_buffer_length(module_id)
   }
 
+  /// Load a sample buffer into a Sampler module
+  pub fn load_sampler_buffer(&mut self, module_id: &str, data: &[f32], file_sr: f32) {
+    self.engine.load_sampler_buffer(module_id, data, file_sr);
+  }
+
+  /// Get the buffer length of a Sampler module in samples
+  pub fn get_sampler_buffer_length(&self, module_id: &str) -> usize {
+    self.engine.get_sampler_buffer_length(module_id)
+  }
+
   /// Get effective position for a Granular module (after CV modulation)
   /// Returns -1.0 if module not found or not a granular
   pub fn get_granular_position(&self, module_id: &str) -> f32 {

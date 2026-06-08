@@ -13,6 +13,7 @@ export type ModuleType =
   | 'resonator'
   | 'wavetable'
   | 'granular'
+  | 'sampler'
   | 'particle-cloud'
   | 'mod-router'
   | 'sample-hold'

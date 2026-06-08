@@ -13,6 +13,7 @@ export const moduleSizes: Record<ModuleType, string> = {
   'resonator': '2x3',
   'wavetable': '2x3',
   'granular': '3x4',
+  sampler: '2x3',
   'particle-cloud': '2x3',
   'speech-synth': '3x3',
   theremin: '4x3',
@@ -131,6 +132,7 @@ export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>>
   'resonator': 'strip',
   'wavetable': 'strip',
   'granular': 'strip',
+  sampler: 'strip',
   'particle-cloud': 'strip',
   'speech-synth': 'strip',
   theremin: 'strip',
@@ -250,6 +252,7 @@ export const moduleCatalog: { type: ModuleType; label: string; category: ModuleC
   { type: 'resonator', label: 'Resonator', category: 'sources' },
   { type: 'wavetable', label: 'Wavetable', category: 'sources' },
   { type: 'granular', label: 'Granular', category: 'sources' },
+  { type: 'sampler', label: 'Sampler', category: 'sources' },
   { type: 'particle-cloud', label: 'Particle Cloud', category: 'sources' },
   { type: 'speech-synth', label: 'Speech Synth', category: 'sources' },
   { type: 'theremin', label: 'Theremin', category: 'sources' },
@@ -356,6 +359,7 @@ export const modulePrefixes: Record<ModuleType, string> = {
   'resonator': 'res',
   'wavetable': 'wt',
   'granular': 'gran',
+  sampler: 'smp',
   'particle-cloud': 'pcloud',
   'speech-synth': 'speech',
   theremin: 'theremin',
@@ -465,6 +469,7 @@ export const moduleLabels: Record<ModuleType, string> = {
   'resonator': 'Resonator',
   'wavetable': 'Wavetable',
   'granular': 'Granular',
+  sampler: 'Sampler',
   'particle-cloud': 'Particle Cloud',
   'speech-synth': 'Speech Synth',
   theremin: 'Theremin',
@@ -673,6 +678,16 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     panSpread: 0.5,       // Stereo spread (0-1)
     shape: 1,             // 0=Triangle, 1=Hann, 2=Tukey, 3=Gauss
     level: 0.8,           // Output level (0-1)
+    enabled: 1,           // Playback enabled (0 or 1)
+  },
+  sampler: {
+    pitch: 1.0,           // Playback rate (0.25-4.0; 1=original)
+    level: 0.85,          // Output level (0-1)
+    attack: 0.003,        // Attack fade-in seconds (anti-click)
+    release: 0.01,        // End fade-out seconds (anti-click)
+    loopMode: 0,          // 0=one-shot, 1=loop
+    loopStart: 0,         // Loop start (0-1)
+    loopEnd: 1,           // Loop end (0-1)
     enabled: 1,           // Playback enabled (0 or 1)
   },
   'particle-cloud': {

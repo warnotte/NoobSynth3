@@ -51,6 +51,7 @@ export class AudioEngine {
   private midiEventCallback: ((events: Array<{track: number, note: number, velocity: number, isNoteOn: boolean}>) => void) | null = null
   private watchedMidiSeq: string | null = null
   private granularLoadCallbacks: Map<string, (length: number) => void> = new Map()
+  private samplerLoadCallbacks: Map<string, (length: number) => void> = new Map()
   private granularPositionCallbacks: Map<string, (position: number) => void> = new Map()
   private watchedGranulars: Set<string> = new Set()
   private sidVoiceCallbacks: Map<string, (voices: Array<{freq: number, gate: boolean, waveform: number}>, elapsed: number) => void> = new Map()
@@ -547,6 +548,20 @@ export class AudioEngine {
     })
   }
 
+  loadSamplerBuffer(moduleId: string, data: Float32Array, fileSr: number): Promise<number> {
+    return new Promise((resolve, reject) => {
+      if (!this.graphNode) {
+        reject(new Error('Audio engine not initialized'))
+        return
+      }
+      this.samplerLoadCallbacks.set(moduleId, resolve)
+      this.graphNode.port.postMessage(
+        { type: 'loadSamplerBuffer', moduleId: this.mapId(moduleId), data, fileSr },
+        [data.buffer]
+      )
+    })
+  }
+
   loadSidFile(moduleId: string, data: Uint8Array): void {
     if (!this.graphNode) {
       console.error('Audio engine not initialized')
@@ -694,6 +709,13 @@ export class AudioEngine {
         if (callback) {
           callback(length)
           this.granularLoadCallbacks.delete(this.unmapId(moduleId))
+        }
+      } else if (data.type === 'samplerBufferLoaded') {
+        const { moduleId, length } = data as { type: string; moduleId: string; length: number }
+        const callback = this.samplerLoadCallbacks.get(this.unmapId(moduleId))
+        if (callback) {
+          callback(length)
+          this.samplerLoadCallbacks.delete(this.unmapId(moduleId))
         }
       } else if (data.type === 'granularPositions' && data.positions) {
         const posMap = data.positions as Record<string, number>

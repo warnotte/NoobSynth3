@@ -21,6 +21,7 @@ pub enum ModuleType {
     Resonator,
     Wavetable,
     Granular,
+    Sampler,
     ParticleCloud,
     SpeechSynth,
     Theremin,

@@ -486,6 +486,29 @@ impl GraphEngine {
     0
   }
 
+  /// Load a sample buffer into a Sampler module (mono, at engine SR via the UI's decodeAudioData).
+  pub fn load_sampler_buffer(&mut self, module_id: &str, data: &[Sample], file_sr: f32) {
+    if let Some(index) = self.module_map.get(module_id).and_then(|list| list.first().copied()) {
+      if let Some(module) = self.modules.get_mut(index) {
+        if let ModuleState::Sampler(ref mut state) = module.state {
+          state.sampler.load_buffer(data, file_sr);
+        }
+      }
+    }
+  }
+
+  /// Get the buffer length of a Sampler module in samples.
+  pub fn get_sampler_buffer_length(&self, module_id: &str) -> usize {
+    if let Some(index) = self.module_map.get(module_id).and_then(|list| list.first()) {
+      if let Some(module) = self.modules.get(*index) {
+        if let ModuleState::Sampler(ref state) = module.state {
+          return state.sampler.buffer_length();
+        }
+      }
+    }
+    0
+  }
+
   /// Get waveform data from a Granular module for visualization
   /// Returns downsampled data (max 512 points) for efficient display
   pub fn get_granular_waveform(&self, module_id: &str, max_points: usize) -> Vec<Sample> {

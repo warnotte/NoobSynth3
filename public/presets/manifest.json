@@ -1785,6 +1785,13 @@
       "description": "Boîte à rythmes 909 tout-en-un : 11 voix + séquenceur (A/B/FILL, vélocité graduée).",
       "file": "tr909-machine.json",
       "group": "TR-909"
+    },
+    {
+      "id": "sampler-demo",
+      "name": "Sampler — Load Your Own",
+      "description": "Lecteur de sample .wav one-shot pitché, déclenché par un step sequencer. Charge ton propre fichier (aucun sample fourni).",
+      "file": "sampler-demo.json",
+      "group": "Sampler"
     }
   ]
 }

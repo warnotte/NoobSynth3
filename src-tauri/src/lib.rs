@@ -158,6 +158,13 @@ enum AudioCommand {
     data: Vec<f32>,
     reply: mpsc::Sender<Result<usize, String>>,
   },
+  // Sampler commands
+  LoadSamplerBuffer {
+    module_id: String,
+    data: Vec<f32>,
+    file_sr: f32,
+    reply: mpsc::Sender<Result<usize, String>>,
+  },
   // Meter
   GetMeterLevel {
     module_id: String,
@@ -729,6 +736,20 @@ fn audio_thread(rx: mpsc::Receiver<AudioCommand>, scope: Arc<Mutex<ScopeSnapshot
             Ok(mut engine) => {
               engine.load_granular_buffer(&module_id, &data);
               Ok(engine.get_granular_buffer_length(&module_id))
+            }
+            Err(_) => Err("graph engine unavailable".to_string()),
+          }
+        } else {
+          Err("no graph".to_string())
+        };
+        let _ = reply.send(result);
+      }
+      AudioCommand::LoadSamplerBuffer { module_id, data, file_sr, reply } => {
+        let result = if let Some(graph) = &state.graph {
+          match graph.lock() {
+            Ok(mut engine) => {
+              engine.load_sampler_buffer(&module_id, &data, file_sr);
+              Ok(engine.get_sampler_buffer_length(&module_id))
             }
             Err(_) => Err("graph engine unavailable".to_string()),
           }
@@ -1723,6 +1744,28 @@ fn native_load_granular_buffer(
 }
 
 #[tauri::command]
+fn native_load_sampler_buffer(
+  state: State<NativeAudioState>,
+  module_id: String,
+  data: Vec<f32>,
+  file_sr: f32,
+) -> Result<usize, String> {
+  let (reply_tx, reply_rx) = mpsc::channel();
+  state
+    .tx
+    .send(AudioCommand::LoadSamplerBuffer {
+      module_id,
+      data,
+      file_sr,
+      reply: reply_tx,
+    })
+    .map_err(|_| "native audio thread unavailable".to_string())?;
+  reply_rx
+    .recv()
+    .map_err(|_| "native audio thread unavailable".to_string())?
+}
+
+#[tauri::command]
 fn native_get_meter_level(
   state: State<NativeAudioState>,
   module_id: String,
@@ -1858,6 +1901,7 @@ pub fn run() {
       // Granular commands
       native_get_granular_position,
       native_load_granular_buffer,
+      native_load_sampler_buffer,
       // Meter
       native_get_meter_level,
       native_get_theremin_state,

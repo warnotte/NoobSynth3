@@ -27,3 +27,7 @@ target
 # Build artifacts (WASM)
 src/engine/worklets/wasm/*.wasm
 src/engine/worklets/wasm/*.js
+
+# Local sample imports (e.g. AudioRealism TR-909 pack — license forbids redistribution; load at runtime only)
+sample_import/
+sample-import/

@@ -43,6 +43,7 @@ pub enum ModuleState {
     Resonator(ResonatorState),
     Wavetable(WavetableState),
     Granular(GranularState),
+    Sampler(SamplerState),
     ParticleCloud(ParticleCloudState),
     SpeechSynth(SpeechSynthState),
     Theremin(ThereminState),

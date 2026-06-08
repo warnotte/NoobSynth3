@@ -21,6 +21,7 @@ use dsp_core::{
     FmMatrixParams, FmOperatorInputs, FmOperatorParams, OpParams,
     GranularDelayInputs, GranularDelayParams,
     GranularInputs, GranularParams,
+    SamplerInputs, SamplerParams,
     HiHat808Inputs, HiHat808Params,
     HiHat909Inputs, HiHat909Params, HpfInputs, HpfParams,
     KarplusInputs, KarplusParams,
@@ -652,6 +653,27 @@ pub(crate) fn process(
             // Stereo output
             let (out_l, out_r) = outputs[0].channels_mut_2();
             state.granular.process_block(out_l, out_r, granular_inputs, params);
+        }
+        ModuleState::Sampler(state) => {
+            // Input 0: trigger, Input 1: pitch CV
+            let trigger = if !connections[0].is_empty() { Some(inputs[0].channel(0)) } else { None };
+            let pitch_cv = if connections.len() > 1 && !connections[1].is_empty() {
+                Some(inputs[1].channel(0))
+            } else {
+                None
+            };
+            let sampler_inputs = SamplerInputs { trigger, pitch_cv };
+            let params = SamplerParams {
+                pitch: state.pitch.slice(frames),
+                level: state.level.slice(frames),
+                attack: state.attack.slice(frames),
+                release: state.release.slice(frames),
+                loop_mode: state.loop_mode.slice(frames),
+                loop_start: state.loop_start.slice(frames),
+                loop_end: state.loop_end.slice(frames),
+            };
+            let (out_l, out_r) = outputs[0].channels_mut_2();
+            state.sampler.process_block(out_l, out_r, sampler_inputs, params);
         }
         ModuleState::ParticleCloud(state) => {
             // Input 0: audio in (for Input mode), Input 1: trigger

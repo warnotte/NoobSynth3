@@ -119,6 +119,24 @@ export function useNativeBridges({
     }
   }, [isTauri, tauriNativeRunning])
 
+  // Native sampler bridge for Tauri standalone mode
+  const nativeSamplerBridge = useMemo(() => {
+    if (!isTauri) {
+      return null
+    }
+    return {
+      isActive: tauriNativeRunning,
+      loadSamplerBuffer: async (moduleId: string, data: Float32Array, fileSr: number): Promise<number> => {
+        const result = await invokeTauri<number>('native_load_sampler_buffer', {
+          moduleId: tauriMapId(moduleId),
+          data: Array.from(data),
+          fileSr,
+        })
+        return result
+      },
+    }
+  }, [isTauri, tauriNativeRunning])
+
   // Native Game of Life bridge for Tauri standalone mode
   const nativeGameOfLifeBridge = useMemo(() => {
     if (!isTauri) {
@@ -174,6 +192,7 @@ export function useNativeBridges({
     nativeSequencerBridge,
     nativeThereminBridge,
     nativeGranularBridge,
+    nativeSamplerBridge,
     nativeGameOfLifeBridge,
     nativeMeterBridge,
     nativeParticleBridge,

@@ -10,7 +10,7 @@
 import { useComputerKeyboard } from '../../hooks/useComputerKeyboard'
 import type { AudioEngine } from '../../engine/WasmGraphEngine'
 import type { Connection, ModuleSpec } from '../../shared/graph'
-import type { ControlProps, NativeScopeBridge, NativeChiptuneBridge, NativeSequencerBridge, NativeGranularBridge, NativeThereminBridge, NativeParticleBridge, NativeGameOfLifeBridge, NativeMeterBridge } from './types'
+import type { ControlProps, NativeScopeBridge, NativeChiptuneBridge, NativeSequencerBridge, NativeGranularBridge, NativeSamplerBridge, NativeThereminBridge, NativeParticleBridge, NativeGameOfLifeBridge, NativeMeterBridge } from './types'
 
 import { renderSourceControls } from './sources'
 import { renderFilterControls } from './FilterControls'
@@ -31,6 +31,7 @@ export type ModuleControlsProps = {
   nativeChiptune?: NativeChiptuneBridge | null
   nativeSequencer?: NativeSequencerBridge | null
   nativeGranular?: NativeGranularBridge | null
+  nativeSampler?: NativeSamplerBridge | null
   nativeTheremin?: NativeThereminBridge | null
   nativeParticle?: NativeParticleBridge | null
   nativeGameOfLife?: NativeGameOfLifeBridge | null
@@ -71,6 +72,7 @@ export const ModuleControls = ({
   nativeChiptune,
   nativeSequencer,
   nativeGranular,
+  nativeSampler,
   nativeTheremin,
   nativeParticle,
   nativeGameOfLife,
@@ -136,6 +138,7 @@ export const ModuleControls = ({
     nativeChiptune,
     nativeSequencer,
     nativeGranular,
+    nativeSampler,
     nativeTheremin,
     nativeParticle,
     nativeGameOfLife,
@@ -173,4 +176,4 @@ export const ModuleControls = ({
 }
 
 // Re-export types for external use
-export type { ControlProps, NativeScopeBridge, NativeChiptuneBridge, NativeSequencerBridge, NativeGranularBridge, NativeThereminBridge, NativeParticleBridge, NativeGameOfLifeBridge, NativeMeterBridge } from './types'
+export type { ControlProps, NativeScopeBridge, NativeChiptuneBridge, NativeSequencerBridge, NativeGranularBridge, NativeSamplerBridge, NativeThereminBridge, NativeParticleBridge, NativeGameOfLifeBridge, NativeMeterBridge } from './types'

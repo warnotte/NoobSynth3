@@ -250,6 +250,10 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // position CV
       PortInfo { channels: 1 },  // pitch CV
     ],
+    ModuleType::Sampler => vec![
+      PortInfo { channels: 1 },  // trigger
+      PortInfo { channels: 1 },  // pitch CV
+    ],
     // ParticleCloud - 2 inputs (audio in for Input mode, trigger)
     ModuleType::ParticleCloud => vec![
       PortInfo { channels: 1 },  // audio in (for Input mode)

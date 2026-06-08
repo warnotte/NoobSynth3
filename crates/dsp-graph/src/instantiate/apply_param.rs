@@ -694,6 +694,17 @@ pub(crate) fn apply_param(state: &mut ModuleState, param: &str, value: f32) {
       "enabled" => state.granular.set_enabled(value > 0.5),
       _ => {}
     },
+    ModuleState::Sampler(state) => match param {
+      "pitch" => state.pitch.set(value),
+      "level" => state.level.set(value),
+      "attack" => state.attack.set(value),
+      "release" => state.release.set(value),
+      "loopMode" => state.loop_mode.set(value),
+      "loopStart" => state.loop_start.set(value),
+      "loopEnd" => state.loop_end.set(value),
+      "enabled" => state.sampler.set_enabled(value > 0.5),
+      _ => {}
+    },
     ModuleState::ParticleCloud(state) => match param {
       "count" => state.count.set(value),
       "gravity" => state.gravity.set(value),

@@ -62,6 +62,7 @@ type GraphMessage =
   | { type: 'watchMidiSeq'; moduleId: string | null }
   | { type: 'seekMidiSeq'; moduleId: string; tick: number }
   | { type: 'loadGranularBuffer'; moduleId: string; data: Float32Array }
+  | { type: 'loadSamplerBuffer'; moduleId: string; data: Float32Array; fileSr: number }
   | { type: 'watchGranulars'; moduleIds: string[] }
   | { type: 'loadSidFile'; moduleId: string; data: Uint8Array }
   | { type: 'watchSids'; moduleIds: string[] }
@@ -242,6 +243,14 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
         this.engine!.load_granular_buffer(message.moduleId, message.data)
         this.port.postMessage({
           type: 'granularBufferLoaded',
+          moduleId: message.moduleId,
+          length: message.data.length,
+        })
+        break
+      case 'loadSamplerBuffer':
+        this.engine!.load_sampler_buffer(message.moduleId, message.data, message.fileSr)
+        this.port.postMessage({
+          type: 'samplerBufferLoaded',
           moduleId: message.moduleId,
           length: message.data.length,
         })

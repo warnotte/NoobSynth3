@@ -29,6 +29,7 @@ import { ThereminControls } from './ThereminControls'
 
 // Granular is already extracted to its own file
 import { GranularControls } from '../GranularControls'
+import { SamplerControls } from '../SamplerControls'
 
 /**
  * Render controls for source modules (oscillators, noise generators, etc.)
@@ -88,6 +89,16 @@ export function renderSourceControls(props: ControlProps): React.ReactElement | 
           engine={props.engine}
           audioMode={props.audioMode}
           nativeGranular={props.nativeGranular}
+          updateParam={props.updateParam}
+        />
+      )
+    case 'sampler':
+      return (
+        <SamplerControls
+          module={module}
+          engine={props.engine}
+          audioMode={props.audioMode}
+          nativeSampler={props.nativeSampler}
           updateParam={props.updateParam}
         />
       )

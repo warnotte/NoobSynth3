@@ -729,6 +729,16 @@ pub(crate) fn create_state(
       shape: ParamBuffer::new(param_number(params, "shape", 1.0)),
       level: ParamBuffer::new(param_number(params, "level", 0.8)),
     }),
+    ModuleType::Sampler => ModuleState::Sampler(SamplerState {
+      sampler: Sampler::new(sample_rate),
+      pitch: ParamBuffer::new(param_number(params, "pitch", 1.0)),
+      level: ParamBuffer::new(param_number(params, "level", 0.85)),
+      attack: ParamBuffer::new(param_number(params, "attack", 0.003)),
+      release: ParamBuffer::new(param_number(params, "release", 0.01)),
+      loop_mode: ParamBuffer::new(param_number(params, "loopMode", 0.0)),
+      loop_start: ParamBuffer::new(param_number(params, "loopStart", 0.0)),
+      loop_end: ParamBuffer::new(param_number(params, "loopEnd", 1.0)),
+    }),
     ModuleType::ParticleCloud => ModuleState::ParticleCloud(ParticleCloudState {
       cloud: ParticleCloud::new(sample_rate),
       count: ParamBuffer::new(param_number(params, "count", 16.0)),

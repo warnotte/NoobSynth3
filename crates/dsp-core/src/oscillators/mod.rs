@@ -35,6 +35,7 @@ mod spectral_swarm;
 mod resonator;
 mod wavetable;
 mod granular;
+mod sampler;
 mod particle_cloud;
 mod speech_synth;
 mod theremin;
@@ -55,6 +56,7 @@ pub use spectral_swarm::{SpectralSwarm, SpectralSwarmParams, SpectralSwarmInputs
 pub use resonator::{Resonator, ResonatorParams, ResonatorInputs};
 pub use wavetable::{Wavetable, WavetableParams, WavetableInputs};
 pub use granular::{Granular, GranularParams, GranularInputs, GrainShape};
+pub use sampler::{Sampler, SamplerParams, SamplerInputs};
 pub use particle_cloud::{ParticleCloud, ParticleCloudParams, ParticleCloudInputs, ParticleMode, OscShape};
 pub use speech_synth::{SpeechSynth, SpeechSynthParams, SpeechSynthInputs};
 pub use theremin::{Theremin, ThereminParams, ThereminInputs, ThereminOutputs};

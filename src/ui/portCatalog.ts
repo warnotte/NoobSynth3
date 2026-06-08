@@ -600,6 +600,15 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
       { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
     ],
   },
+  sampler: {
+    inputs: [
+      { id: 'trigger', label: 'Trig', kind: 'gate', direction: 'in' },
+      { id: 'pitch', label: 'Pitch', kind: 'cv', direction: 'in' },
+    ],
+    outputs: [
+      { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
+    ],
+  },
   'particle-cloud': {
     inputs: [
       { id: 'in', label: 'In', kind: 'audio', direction: 'in' },

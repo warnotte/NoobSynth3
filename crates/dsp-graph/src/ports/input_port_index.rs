@@ -331,6 +331,11 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
       "pitch" | "pitch-cv" => Some(3),
       _ => None,
     },
+    ModuleType::Sampler => match port_id {
+      "trigger" | "trig" => Some(0),
+      "pitch" | "pitch-cv" => Some(1),
+      _ => None,
+    },
     // ParticleCloud - 2 inputs
     ModuleType::ParticleCloud => match port_id {
       "in" | "audio" | "audio-in" => Some(0),

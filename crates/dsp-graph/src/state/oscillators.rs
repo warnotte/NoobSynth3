@@ -238,6 +238,17 @@ pub struct GranularState {
     pub level: ParamBuffer,
 }
 
+pub struct SamplerState {
+    pub sampler: Sampler,
+    pub pitch: ParamBuffer,
+    pub level: ParamBuffer,
+    pub attack: ParamBuffer,
+    pub release: ParamBuffer,
+    pub loop_mode: ParamBuffer,
+    pub loop_start: ParamBuffer,
+    pub loop_end: ParamBuffer,
+}
+
 pub struct ParticleCloudState {
     pub cloud: ParticleCloud,
     pub count: ParamBuffer,

@@ -95,6 +95,7 @@ pub(crate) fn normalize_module_type(raw: &str) -> ModuleType {
     "resonator" => ModuleType::Resonator,
     "wavetable" => ModuleType::Wavetable,
     "granular" => ModuleType::Granular,
+    "sampler" => ModuleType::Sampler,
     "particle-cloud" => ModuleType::ParticleCloud,
     // Documentation
     "notes" => ModuleType::Notes,
