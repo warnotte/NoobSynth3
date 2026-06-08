@@ -85,3 +85,12 @@ Ouvrir l'app, cliquer **Play**, puis jouer avec le clavier ou charger un preset.
 ## Licence
 
 Pas de licence définie pour le moment. Tous droits réservés.
+
+### Samples groupés (crédits)
+
+Les samples audio dans `public/samples/` sont redistribués sous licence **Creative Commons Attribution 4.0 (CC BY 4.0)** — détails et crédits complets dans [`public/samples/CREDITS.md`](public/samples/CREDITS.md) :
+
+- `crash.wav` — *Basic-Crash* par **Alex_The_Amature** ([freesound](https://freesound.org/s/361380/))
+- `ride.wav` — *S-Tek-Ride-01* par **s-tek** ([freesound](https://freesound.org/s/85149/))
+
+Le pack AudioRealism TR-909 (utilisé pour les tests) n'est **pas** redistribuable et est exclu du dépôt (`sample_import/` gitignore).

@@ -1789,7 +1789,7 @@
     {
       "id": "sampler-demo",
       "name": "Sampler — Load Your Own",
-      "description": "Lecteur de sample .wav one-shot pitché, déclenché par un step sequencer. Charge ton propre fichier (aucun sample fourni).",
+      "description": "Lecteur de sample .wav one-shot pitché, déclenché par un step sequencer. Charge automatiquement une cymbale ride CC-BY ; choisis-en une autre dans le picker ou charge ton propre fichier.",
       "file": "sampler-demo.json",
       "group": "Sampler"
     }

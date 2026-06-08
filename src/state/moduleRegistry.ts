@@ -689,6 +689,7 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     loopStart: 0,         // Loop start (0-1)
     loopEnd: 1,           // Loop end (0-1)
     enabled: 1,           // Playback enabled (0 or 1)
+    samplePath: '',       // Bundled sample to auto-load on preset open ('' = none; e.g. 'crash.wav')
   },
   'particle-cloud': {
     count: 16,            // Number of particles (1-32)

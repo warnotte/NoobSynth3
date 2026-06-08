@@ -536,7 +536,7 @@ L'UI permet de charger/enregistrer un buffer et affiche la position de lecture (
 
 ### Sampler
 
-Lecteur de sample `.wav` one-shot, pitché et déclenché par gate. Charge un fichier audio (décodé et ré-échantillonné au SR du moteur via `decodeAudioData`, mixé en mono), puis le rejoue à chaque front montant du trigger. Idéal pour des samples de batterie (kick/snare/cymbales 909 réelles), des hits, des boucles courtes. Réutilise toute la plomberie de chargement de buffer du Granular (Web + Tauri), avec sa propre pile de chargement côté moteur.
+Lecteur de sample `.wav` one-shot, pitché et déclenché par gate. Charge un fichier audio (décodé et ré-échantillonné au SR du moteur via `decodeAudioData`, mixé en mono), puis le rejoue à chaque front montant du trigger. Idéal pour des samples de batterie (cymbales 909 réelles, kick/snare), des hits, des boucles courtes. Réutilise toute la plomberie de chargement de buffer du Granular (Web + Tauri), avec sa propre pile de chargement côté moteur.
 
 | Paramètre | Range | Description |
 |-----------|-------|-------------|
@@ -548,13 +548,16 @@ Lecteur de sample `.wav` one-shot, pitché et déclenché par gate. Charge un fi
 | `loopStart` | 0-1 | Début de boucle (fraction du buffer) |
 | `loopEnd` | 0-1 | Fin de boucle (fraction du buffer) |
 | `enabled` | 0/1 | Active le lecteur |
+| `samplePath` | string | Sample groupé à auto-charger à l'ouverture du preset (`''` = aucun ; ex. `"ride.wav"`) — param **string**, présent dans `STRING_PARAMS` |
 
 **Entrées** : trigger (gate), pitch (CV, V/oct)
 **Sorties** : out (audio, stéréo)
 
-Le pitch CV est en V/oct (`2^cv`), s'ajoute au paramètre `pitch`. La lecture s'incrémente de `pitch × 2^pitchCV × (file_sr / engine_sr)`. En mode one-shot, la lecture s'arrête en fin de buffer ; en mode loop, elle reboucle entre `loopStart` et `loopEnd`. L'UI fournit un bouton de chargement `.wav` + un Preview local (sans passer par le moteur).
+Le pitch CV est en V/oct (`2^cv`), s'ajoute au paramètre `pitch`. La lecture s'incrémente de `pitch × 2^pitchCV × (file_sr / engine_sr)`. En mode one-shot, la lecture s'arrête en fin de buffer ; en mode loop, elle reboucle entre `loopStart` et `loopEnd`.
 
-> **Note licence** : aucun sample n'est fourni avec le projet. Charge tes propres fichiers `.wav` (les packs commerciaux comme l'AudioRealism 909 sont utilisables mais **non redistribuables** — ne pas les committer). Des samples CC0/domaine public pourront être ajoutés comme démo plus tard.
+**UI :** un *picker* déroulant des samples groupés (lu depuis `public/samples/manifest.json`), un bouton `Load .wav` (n'importe quel fichier local), un **Preview** local (sans passer par le moteur), un **affichage de la forme d'onde** (avec la région de boucle surlignée en mode Loop), les knobs Pitch/Level/Attack/Release, et les knobs Loop Start/End en mode Loop. Sélectionner un sample dans le picker (ou ouvrir un preset avec `samplePath`) déclenche un `fetch` + décodage + chargement automatique — même chemin de code pour Web et Tauri (l'asset `public/samples/` est bundlé dans les deux).
+
+> **Note licence** : les samples groupés dans `public/samples/` sont **CC BY 4.0** (voir `public/samples/CREDITS.md` — crédits Alex_The_Amature & s-tek via freesound). Les packs commerciaux (ex. AudioRealism 909) sont utilisables localement mais **non redistribuables** (`sample_import/` est gitignore — ne jamais committer).
 
 ---
 

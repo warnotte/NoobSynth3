@@ -2308,6 +2308,35 @@
   width: 100%;
 }
 
+/* Sampler — bundled-sample picker dropdown */
+.sampler-picker {
+  width: 100%;
+  margin: 4px 0 2px;
+  padding: 4px 6px;
+  font-size: 10px;
+  color: var(--text, #cfe0f0);
+  background: rgba(18, 26, 36, 0.85);
+  border: 1px solid rgba(91, 182, 255, 0.35);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.sampler-picker:hover {
+  border-color: rgba(91, 182, 255, 0.6);
+}
+
+/* Sampler — waveform preview canvas */
+.sampler-waveform {
+  width: 100%;
+  height: 48px;
+  display: block;
+  margin: 2px 0;
+  border: 1px solid rgba(91, 182, 255, 0.25);
+  border-radius: 4px;
+  background: rgba(18, 26, 36, 0.7);
+  image-rendering: pixelated;
+}
+
 /* Granular load button row */
 .granular-load-row {
   grid-column: 1 / -1;

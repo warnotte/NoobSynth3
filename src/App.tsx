@@ -151,7 +151,7 @@ const isDev = import.meta.env.DEV
 // setParamString / native_set_param_string. Anything not listed here is normalized to a
 // number and DROPPED if it isn't one — so every string-serialized module (sequencer grids,
 // text, etc.) MUST appear here, or its live edits silently never reach the engine.
-const STRING_PARAMS = new Set(['stepData', 'drumData', 'midiData', 'speechText', 'cellData', 'patternData'])
+const STRING_PARAMS = new Set(['stepData', 'drumData', 'midiData', 'speechText', 'cellData', 'patternData', 'samplePath'])
 
 function App() {
   const engine = useMemo(() => new AudioEngine(), [])

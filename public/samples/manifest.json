@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "samples": [
+    {
+      "id": "crash",
+      "name": "Crash Cymbal",
+      "file": "crash.wav",
+      "author": "Alex_The_Amature",
+      "source": "https://freesound.org/s/361380/",
+      "license": "CC BY 4.0"
+    },
+    {
+      "id": "ride",
+      "name": "Ride Cymbal",
+      "file": "ride.wav",
+      "author": "s-tek",
+      "source": "https://freesound.org/s/85149/",
+      "license": "CC BY 4.0"
+    }
+  ]
+}
