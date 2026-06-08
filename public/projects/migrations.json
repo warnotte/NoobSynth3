@@ -1,7 +1,7 @@
 {
   "version": 2,
   "type": "project",
-  "masterTempo": 68,
+  "masterTempo": 72,
   "masterVolume": 0.85,
   "activeRackId": "rack-1",
   "racks": [
@@ -20,7 +20,7 @@
             },
             "params": {
               "running": true,
-              "tempo": 68,
+              "tempo": 72,
               "rate": 4,
               "swing": 0
             }
@@ -36,10 +36,10 @@
             "params": {
               "root": 0,
               "mode": 0,
-              "rate": 24,
-              "restlessness": 0.35,
+              "rate": 9,
+              "restlessness": 0.25,
               "brightness": 0.6,
-              "modChance": 0.22
+              "modChance": 0.45
             }
           },
           {
@@ -67,7 +67,7 @@
               "y": 0
             },
             "params": {
-              "text": "MIGRATIONS - vitrine du HARMONIST (harmonie generative autonome).\n\nLe HARMONIST est le chef : il promene la tonalite par cadences + modulations (jamais repetitif). Sa fondamentale (root) pilote la BASSE et la NAPPE (elles suivent l'accord) ; root + gamme (scale) pilotent un QUANTIZER pour la MELODIE (qui erre dans la gamme de la cle du moment).\n\nAppuie sur Play et laisse migrer - toutes les voix changent de cle ENSEMBLE, toutes seules. Regle restless / bright / modul. sur le Harmonist pour changer le voyage."
+              "text": "MIGRATIONS - vitrine du HARMONIST.\n\nLe HARMONIST conduit toute l'harmonie : accords toutes les ~3s, modulations frequentes -> la tonalite VOYAGE et tu l'ENTENDS. Sa fondamentale pilote la BASSE (1 note par accord) et la NAPPE (qui ENFLE a chaque changement d'accord) ; root + gamme pilotent un QUANTIZER pour la MELODIE qui arpege la cle du moment. Tout migre ENSEMBLE, tout seul.\n\nRegle sur le Harmonist : Rate (vitesse des accords), Modul. (frequence des changements de cle), Restless, Bright, Key/Mode."
             }
           },
           {
@@ -95,10 +95,10 @@
               "type": "triangle",
               "pwm": 0.5,
               "unison": 2,
-              "detune": 6,
+              "detune": 5,
               "fmLin": 0,
               "fmExp": 0,
-              "subMix": 0.25,
+              "subMix": 0.3,
               "subOct": 1
             }
           },
@@ -111,10 +111,10 @@
               "y": 0
             },
             "params": {
-              "attack": 0.4,
-              "decay": 1.6,
-              "sustain": 0.45,
-              "release": 2.2
+              "attack": 0.02,
+              "decay": 0.6,
+              "sustain": 0.7,
+              "release": 0.9
             }
           },
           {
@@ -151,20 +151,20 @@
             },
             "params": {
               "frequency": 220,
-              "partials": 16,
-              "detune": 14,
-              "drift": 0.3,
-              "density": 0.8,
-              "evolution": 5,
-              "inharmonic": 0.04,
+              "partials": 14,
+              "detune": 12,
+              "drift": 0.2,
+              "density": 0.85,
+              "evolution": 4,
+              "inharmonic": 0.03,
               "tilt": -3,
               "spread": 0.7,
-              "shimmer": 0.2,
-              "attack": 3,
-              "release": 4,
+              "shimmer": 0.15,
+              "attack": 0.4,
+              "release": 2,
               "waveform": 0,
               "oddEven": 0,
-              "fundamentalMix": 0.5,
+              "fundamentalMix": 0.6,
               "formantFreq": 0,
               "formantQ": 2,
               "freeze": 0,
@@ -176,15 +176,30 @@
             }
           },
           {
-            "id": "padlvl",
-            "type": "gain",
-            "name": "padlvl",
+            "id": "padenv",
+            "type": "adsr",
+            "name": "padenv",
             "position": {
               "x": 0,
               "y": 0
             },
             "params": {
-              "gain": 0.4
+              "attack": 0.35,
+              "decay": 1.2,
+              "sustain": 0.5,
+              "release": 1.8
+            }
+          },
+          {
+            "id": "padvca",
+            "type": "gain",
+            "name": "padvca",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "gain": 0.9
             }
           },
           {
@@ -197,12 +212,12 @@
             },
             "params": {
               "enabled": true,
-              "tempo": 68,
+              "tempo": 72,
               "rate": 4,
               "steps": 16,
-              "pulses": 6,
-              "rotation": 2,
-              "gateLength": 28,
+              "pulses": 8,
+              "rotation": 0,
+              "gateLength": 24,
               "swing": 0
             }
           },
@@ -215,9 +230,9 @@
               "y": 0
             },
             "params": {
-              "rate": 0.13,
-              "depth": 0.7,
-              "offset": 0.2,
+              "rate": 0.4,
+              "depth": 0.5,
+              "offset": 0.3,
               "shape": "triangle",
               "bipolar": true
             }
@@ -265,9 +280,9 @@
             },
             "params": {
               "attack": 0.005,
-              "decay": 0.45,
+              "decay": 0.32,
               "sustain": 0,
-              "release": 0.6
+              "release": 0.35
             }
           },
           {
@@ -279,7 +294,7 @@
               "y": 0
             },
             "params": {
-              "gain": 0.9
+              "gain": 0.85
             }
           },
           {
@@ -291,9 +306,9 @@
               "y": 0
             },
             "params": {
-              "time": 420,
-              "feedback": 0.38,
-              "mix": 0.32,
+              "time": 340,
+              "feedback": 0.34,
+              "mix": 0.3,
               "tone": 0.55,
               "pingPong": true
             }
@@ -307,9 +322,9 @@
               "y": 0
             },
             "params": {
-              "levelA": 0.6,
-              "levelB": 0.55,
-              "levelC": 0.5,
+              "levelA": 0.72,
+              "levelB": 0.62,
+              "levelC": 0.42,
               "levelD": 0,
               "levelE": 0,
               "levelF": 0
@@ -324,10 +339,10 @@
               "y": 0
             },
             "params": {
-              "time": 3.6,
+              "time": 2.8,
               "damp": 0.5,
-              "preDelay": 32,
-              "mix": 0.4
+              "preDelay": 26,
+              "mix": 0.32
             }
           },
           {
@@ -339,7 +354,7 @@
               "y": 0
             },
             "params": {
-              "level": 0.5
+              "level": 0.48
             }
           }
         ],
@@ -471,14 +486,36 @@
               "portId": "out"
             },
             "to": {
-              "moduleId": "padlvl",
+              "moduleId": "padvca",
               "portId": "in"
             },
             "kind": "audio"
           },
           {
             "from": {
-              "moduleId": "padlvl",
+              "moduleId": "harm",
+              "portId": "gate"
+            },
+            "to": {
+              "moduleId": "padenv",
+              "portId": "gate"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "padenv",
+              "portId": "env"
+            },
+            "to": {
+              "moduleId": "padvca",
+              "portId": "cv"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "padvca",
               "portId": "out"
             },
             "to": {
