@@ -790,6 +790,18 @@ pub(crate) fn create_state(
       scale: ParamBuffer::new(param_number(params, "scale", 0.0)),
       root: ParamBuffer::new(param_number(params, "root", 0.0)),
     }),
+    ModuleType::Harmonist => ModuleState::Harmonist(HarmonistState {
+      harmonist: Harmonist::new(
+        sample_rate,
+        param_number(params, "root", 0.0) as i32,
+        param_number(params, "mode", 0.0) >= 0.5,
+        param_number(params, "seed", 0.0) as u32,
+      ),
+      rate: ParamBuffer::new(param_number(params, "rate", 16.0)),
+      restlessness: ParamBuffer::new(param_number(params, "restlessness", 0.4)),
+      brightness: ParamBuffer::new(param_number(params, "brightness", 0.5)),
+      mod_chance: ParamBuffer::new(param_number(params, "modChance", 0.15)),
+    }),
     ModuleType::GameOfLife => {
       let mut gol = GameOfLife::new(sample_rate);
       if let Some(cell_data) = params.get("cellData") {

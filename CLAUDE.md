@@ -250,7 +250,7 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 
 **⚠️ RÈGLE:** Toute nouvelle feature UI↔Audio DOIT être implémentée pour Tauri en même temps que Web. Ne jamais merger une feature Web-only. **Garde-fou auto:** `npm run check:ui-audio` échoue si un contrôle utilise `engine.watch*` sans chemin natif (le bug récurrent type Game-of-Life/Meter).
 
-## Module Types (96 total)
+## Module Types (97 total)
 
 ### Sources (18)
 oscillator, supersaw, karplus, fm-op, fm-matrix, nes-osc, snes-osc, noise, tb-303, shepard, pipe-organ, spectral-swarm, resonator, wavetable, granular, particle-cloud, speech-synth, theremin
@@ -267,8 +267,10 @@ chorus, ensemble, choir, vocoder, delay, granular-delay, tape-delay, spring-reve
 ### Modulators (8)
 adsr, lfo, mod-router, sample-hold, slew, quantizer, chaos, envelope-follower
 
-### Sequencers (16)
-clock, clock-divider, arpeggiator, step-sequencer, euclidean, drum-sequencer, midi-file-sequencer, turing-machine, mario, sid-player, ay-player, chord-sequencer, polyrhythm-sequencer, game-of-life, gravity-sequencer, drum-machine-909
+### Sequencers (17)
+clock, clock-divider, arpeggiator, step-sequencer, euclidean, drum-sequencer, midi-file-sequencer, turing-machine, harmonist, mario, sid-player, ay-player, chord-sequencer, polyrhythm-sequencer, game-of-life, gravity-sequencer, drum-machine-909
+
+**Harmonist** (`harmonist`) : moteur d'harmonie fonctionnelle autonome — marche cadentielle (T→S→D→T) + modulations de clé rares ; sort `root` + `scale` CV → à patcher dans les entrées `root-cv`/`scale-cv` du Quantizer pour que toutes les voix suivent la tonalité qui évolue. Clocké, déterministe (seed). Params : root/mode/seed (clé de départ), rate, restlessness, brightness, modChance.
 
 ### TR-909 Drums (8)
 909-kick, 909-snare, 909-hihat, 909-clap, 909-tom, 909-rimshot, 909-crash, 909-ride

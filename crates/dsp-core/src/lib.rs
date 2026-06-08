@@ -118,6 +118,7 @@ pub use sequencers::{
     MidiFileSequencer, MidiFileSequencerParams, MidiFileSequencerInputs, MidiFileSequencerOutputs,
     MidiNote, MidiTrack, MIDI_TRACKS, MAX_NOTES_PER_TRACK,
     TuringMachine, TuringParams, TuringInputs,
+    Harmonist, HarmonistParams, HarmonistInputs,
     GameOfLife, GameOfLifeParams, GameOfLifeInputs,
     GravitySequencer, GravityParams, GravityInputs,
     SidPlayer, SidPlayerParams, SidPlayerInputs, SidPlayerOutputs, SidHeader,

@@ -104,6 +104,7 @@ pub(crate) fn normalize_module_type(raw: &str) -> ModuleType {
     "chaos" => ModuleType::Chaos,
     "envelope-follower" => ModuleType::EnvelopeFollower,
     "turing-machine" | "turing" => ModuleType::TuringMachine,
+    "harmonist" => ModuleType::Harmonist,
     // SID Player
     "sid-player" => ModuleType::SidPlayer,
     // AY Player

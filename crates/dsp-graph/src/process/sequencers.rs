@@ -28,6 +28,7 @@ use dsp_core::{
     Kick909Inputs, Kick909Params,
     LfoInputs, LfoParams,
     MasterClockInputs, MasterClockOutputs, MasterClockParams,
+    Harmonist, HarmonistInputs, HarmonistParams,
     MidiFileSequencerInputs, MidiFileSequencerOutputs, MidiFileSequencerParams,
     Mixer, Crossfader, NesOscInputs, NesOscParams, NoiseParams,
     ParticleCloudInputs, ParticleCloudParams,
@@ -440,6 +441,27 @@ pub(crate) fn process(
             let pulse_out = pulse_group[0].channel_mut(0);
 
             state.turing.process_block(cv_out, gate_out, pulse_out, turing_inputs, params);
+        }
+        ModuleState::Harmonist(state) => {
+            let clock = if !connections[0].is_empty() { Some(inputs[0].channel(0)) } else { None };
+            let reset = if connections.len() > 1 && !connections[1].is_empty() {
+                Some(inputs[1].channel(0))
+            } else {
+                None
+            };
+            let h_inputs = HarmonistInputs { clock, reset };
+            let params = HarmonistParams {
+                rate: state.rate.slice(frames),
+                restlessness: state.restlessness.slice(frames),
+                brightness: state.brightness.slice(frames),
+                mod_chance: state.mod_chance.slice(frames),
+            };
+            let (root_group, rest) = outputs.split_at_mut(1);
+            let (scale_group, gate_group) = rest.split_at_mut(1);
+            let root_out = root_group[0].channel_mut(0);
+            let scale_out = scale_group[0].channel_mut(0);
+            let gate_out = gate_group[0].channel_mut(0);
+            state.harmonist.process_block(root_out, scale_out, gate_out, h_inputs, params);
         }
         ModuleState::GameOfLife(state) => {
             let clock = if !connections[0].is_empty() { Some(inputs[0].channel(0)) } else { None };

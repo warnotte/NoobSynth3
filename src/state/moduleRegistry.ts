@@ -89,6 +89,7 @@ export const moduleSizes: Record<ModuleType, string> = {
   'midi-file-sequencer': '2x5',
   // Turing Machine
   'turing-machine': '2x4',
+  harmonist: '3x3',
   // SID Player
   'sid-player': '3x5',
   // AY Player
@@ -180,6 +181,7 @@ export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>>
   'midi-file-sequencer': 'strip',
   // Turing Machine
   'turing-machine': 'strip',
+  harmonist: 'strip',
   // SID Player
   'sid-player': 'strip',
   'ay-player': 'strip',
@@ -302,6 +304,7 @@ export const moduleCatalog: { type: ModuleType; label: string; category: ModuleC
   { type: 'drum-sequencer', label: 'Drum Seq', category: 'sequencers' },
   { type: 'midi-file-sequencer', label: 'MIDI File', category: 'sequencers' },
   { type: 'turing-machine', label: 'Turing Machine', category: 'sequencers' },
+  { type: 'harmonist', label: 'Harmonist', category: 'sequencers' },
   { type: 'sid-player', label: 'SID Player', category: 'sequencers' },
   { type: 'ay-player', label: 'AY Player', category: 'sequencers' },
   { type: 'chord-sequencer', label: 'Chord Seq', category: 'sequencers' },
@@ -428,6 +431,7 @@ export const modulePrefixes: Record<ModuleType, string> = {
   'midi-file-sequencer': 'midiseq',
   // Turing Machine
   'turing-machine': 'turing',
+  harmonist: 'harm',
   'sid-player': 'sid',
   'ay-player': 'ay',
   'chord-sequencer': 'chordseq',
@@ -536,6 +540,7 @@ export const moduleLabels: Record<ModuleType, string> = {
   'midi-file-sequencer': 'MIDI File Seq',
   // Turing Machine
   'turing-machine': 'Turing Machine',
+  harmonist: 'Harmonist',
   'sid-player': 'SID Player',
   'ay-player': 'AY Player',
   'chord-sequencer': 'Chord Seq',
@@ -1129,6 +1134,15 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     range: 2,           // Output range in octaves (1-5)
     scale: 0,           // Scale index (0=chromatic)
     root: 0,            // Root note (0-11)
+  },
+  harmonist: {
+    root: 0,            // Starting key root (0-11; set-on-create)
+    mode: 0,            // Starting mode (0=major, 1=minor; set-on-create)
+    seed: 0,            // RNG seed (0=default; set-on-create)
+    rate: 16,           // Clocks per chord (2-64)
+    restlessness: 0.4,  // 0=stable cadences .. 1=wandering
+    brightness: 0.5,    // 0=darker/minor .. 1=brighter/major bias
+    modChance: 0.15,    // Key-modulation probability at cadences (0-1)
   },
   // SID Player
   'sid-player': {

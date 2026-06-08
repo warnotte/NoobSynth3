@@ -713,6 +713,17 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
       { id: 'pulse', label: 'Pulse', kind: 'sync', direction: 'out' },
     ],
   },
+  harmonist: {
+    inputs: [
+      { id: 'clock', label: 'Clk', kind: 'sync', direction: 'in' },
+      { id: 'reset', label: 'Rst', kind: 'sync', direction: 'in' },
+    ],
+    outputs: [
+      { id: 'root', label: 'Root', kind: 'cv', direction: 'out' },
+      { id: 'scale', label: 'Scale', kind: 'cv', direction: 'out' },
+      { id: 'gate', label: 'Chord', kind: 'gate', direction: 'out' },
+    ],
+  },
   'sid-player': {
     inputs: [
       { id: 'reset', label: 'Rst', kind: 'sync', direction: 'in' },

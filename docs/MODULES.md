@@ -1646,6 +1646,20 @@ Turing Machine (cv) → VCO (pitch)
 - **Resonator Swarm** - Textures otherworldly (4 Resonators + Swarm + Shepard + Euclidean)
 - **The Lorenz Machine** - Organisme sonique auto-évolutif (Chaos contrôle tout)
 
+### Harmonist (`harmonist`)
+
+Moteur d'**harmonie fonctionnelle autonome**. Au lieu de générer des notes, il génère la **tonalité** : il promène un centre de clé à travers des cadences pondérées (Tonique → Sous-dominante → Dominante → Tonique, les V→I qui résolvent) avec, de temps en temps, des **modulations de clé** lisses (dominante / sous-dominante / relative / parallèle) sur des minutes. Déterministe (même seed → même voyage).
+
+**I/O :**
+- **Entrées** : `clock` (avance d'un accord tous les `rate` tops), `reset`.
+- **Sorties** : `root` (CV 0-11, fondamentale de l'accord), `scale` (CV, index de gamme : pentatonique maj/min selon la qualité de l'accord), `gate` (impulsion à chaque changement d'accord).
+
+**Usage clé :** patcher `root` → entrée `root-cv` du **Quantizer** et `scale` → `scale-cv`, puis envoyer n'importe quelle source (Chaos, LFO, Turing…) dans le Quantizer → **toutes les voix suivent la tonalité qui évolue toute seule**. C'est le chaînon pour du génératif qui voyage harmoniquement sur des heures sans se répéter (esprit Röyksopp/Eno).
+
+**Paramètres :** `root`/`mode`/`seed` (clé + mode de départ, modifiables en direct), `rate` (tops par accord, 2-64), `restlessness` (0-1 : cadences stables ↔ errance), `brightness` (0-1 : biais mineur ↔ majeur sur les modulations parallèles), `modChance` (0-1 : probabilité de modulation aux cadences).
+
+> Le **Quantizer** a gagné pour l'occasion deux entrées CV `root-cv` / `scale-cv` qui surchargent ses params quand elles sont branchées (rétro-compatible : non branché = comportement inchangé).
+
 ### SID Player
 
 Lecteur de fichiers .sid du Commodore 64. Émule la puce sonore MOS 6581/8580 (SID) en exécutant le code 6502 original des musiques C64.

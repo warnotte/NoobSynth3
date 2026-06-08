@@ -309,6 +309,11 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
       "reset" | "rst" => Some(1),
       _ => None,
     },
+    ModuleType::Harmonist => match port_id {
+      "clock" | "clk" => Some(0),
+      "reset" | "rst" => Some(1),
+      _ => None,
+    },
     ModuleType::GameOfLife => match port_id {
       "clock" | "clk" => Some(0),
       "reset" | "rst" => Some(1),

@@ -252,6 +252,11 @@ pub fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // gate
       PortInfo { channels: 1 },  // pulse
     ],
+    ModuleType::Harmonist => vec![
+      PortInfo { channels: 1 },  // root
+      PortInfo { channels: 1 },  // scale
+      PortInfo { channels: 1 },  // gate (chord change)
+    ],
     // Game of Life - 4 outputs (cv, gate, pulse, density)
     ModuleType::GameOfLife => vec![
       PortInfo { channels: 1 },  // cv

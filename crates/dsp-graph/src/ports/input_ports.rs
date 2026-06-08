@@ -230,6 +230,10 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // clock
       PortInfo { channels: 1 },  // reset
     ],
+    ModuleType::Harmonist => vec![
+      PortInfo { channels: 1 },  // clock
+      PortInfo { channels: 1 },  // reset
+    ],
     // Game of Life - 2 inputs (clock, reset)
     ModuleType::GameOfLife => vec![
       PortInfo { channels: 1 },  // clock

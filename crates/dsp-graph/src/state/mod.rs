@@ -103,6 +103,7 @@ pub enum ModuleState {
     Mario(MarioState),
     MidiFileSequencer(MidiFileSequencerState),
     TuringMachine(TuringState),
+    Harmonist(HarmonistState),
     GameOfLife(GameOfLifeState),
     GravitySequencer(GravityState),
     SidPlayer(SidPlayerState),

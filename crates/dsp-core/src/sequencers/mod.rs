@@ -63,6 +63,7 @@ pub mod step_sequencer;
 pub mod drum_sequencer;
 pub mod drum909_seq;
 pub mod euclidean;
+pub mod harmonist;
 pub mod mario;
 pub mod midi_file_sequencer;
 pub mod turing;
@@ -171,6 +172,7 @@ pub use midi_file_sequencer::{
     MidiNote, MidiTrack, MIDI_TRACKS, MAX_NOTES_PER_TRACK,
 };
 pub use turing::{TuringMachine, TuringInputs, TuringParams};
+pub use harmonist::{Harmonist, HarmonistInputs, HarmonistParams};
 pub use sid_player::{SidPlayer, SidPlayerParams, SidPlayerInputs, SidPlayerOutputs, SidHeader};
 pub use ay_player::{AyPlayer, AyPlayerParams, AyPlayerInputs, AyPlayerOutputs, YmHeader};
 pub use chord_sequencer::{

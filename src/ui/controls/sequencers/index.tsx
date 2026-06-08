@@ -16,6 +16,7 @@ import { ClockControls } from './ClockControls'
 import { MarioControls } from './MarioControls'
 import { MidiFileSequencerControls } from './MidiFileSequencerControls'
 import { TuringMachineControls } from './TuringMachineControls'
+import { HarmonistControls } from './HarmonistControls'
 import { SidPlayerControls } from './SidPlayerControls'
 import { AyPlayerControls } from './AyPlayerControls'
 import { ChordSequencerControls } from './ChordSequencerControls'
@@ -46,6 +47,8 @@ export function renderSequencerControls(props: ControlProps): React.ReactElement
       return <MidiFileSequencerControls {...props} />
     case 'turing-machine':
       return <TuringMachineControls {...props} />
+    case 'harmonist':
+      return <HarmonistControls {...props} />
     case 'sid-player':
       return <SidPlayerControls {...props} />
     case 'ay-player':

@@ -366,6 +366,12 @@ pub fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize
       "pulse" | "trig" => Some(2),
       _ => None,
     },
+    ModuleType::Harmonist => match port_id {
+      "root" | "root-cv" => Some(0),
+      "scale" | "scale-cv" => Some(1),
+      "gate" | "gate-out" => Some(2),
+      _ => None,
+    },
     ModuleType::GameOfLife => match port_id {
       "cv" | "cv-out" => Some(0),
       "gate" | "gate-out" => Some(1),

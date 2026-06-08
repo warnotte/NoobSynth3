@@ -99,6 +99,14 @@ pub struct TuringState {
     pub root: ParamBuffer,
 }
 
+pub struct HarmonistState {
+    pub harmonist: Harmonist,
+    pub rate: ParamBuffer,
+    pub restlessness: ParamBuffer,
+    pub brightness: ParamBuffer,
+    pub mod_chance: ParamBuffer,
+}
+
 pub struct GameOfLifeState {
     pub gol: GameOfLife,
     pub evolve_rate: ParamBuffer,

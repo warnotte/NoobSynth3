@@ -741,6 +741,15 @@ pub(crate) fn apply_param(state: &mut ModuleState, param: &str, value: f32) {
       "root" => state.root.set(value),
       _ => {}
     },
+    ModuleState::Harmonist(state) => match param {
+      "root" => { let m = state.harmonist.is_minor(); state.harmonist.set_key(value as i32, m); }
+      "mode" => { let r = state.harmonist.key_root(); state.harmonist.set_key(r, value >= 0.5); }
+      "rate" => state.rate.set(value),
+      "restlessness" => state.restlessness.set(value),
+      "brightness" => state.brightness.set(value),
+      "modChance" => state.mod_chance.set(value),
+      _ => {}
+    },
     ModuleState::GameOfLife(state) => match param {
       "evolveRate" => state.evolve_rate.set(value),
       "range" => state.range.set(value),

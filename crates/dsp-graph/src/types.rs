@@ -81,6 +81,7 @@ pub enum ModuleType {
     Mario,
     MidiFileSequencer,
     TuringMachine,
+    Harmonist,
     SidPlayer,
     AyPlayer,
     ChordSequencer,

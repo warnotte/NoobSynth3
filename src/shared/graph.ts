@@ -87,6 +87,7 @@ export type ModuleType =
   | 'clock'
   // Turing Machine
   | 'turing-machine'
+  | 'harmonist'
   // SID Player
   | 'sid-player'
   // AY Player (ZX Spectrum, Amstrad CPC, MSX, Atari ST)
