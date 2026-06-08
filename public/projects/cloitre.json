@@ -1,0 +1,713 @@
+{
+  "version": 2,
+  "type": "project",
+  "masterTempo": 64,
+  "masterVolume": 0.85,
+  "activeRackId": "rack-1",
+  "racks": [
+    {
+      "id": "rack-1",
+      "name": "Cloître",
+      "graph": {
+        "modules": [
+          {
+            "id": "clk",
+            "type": "clock",
+            "name": "clk",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "running": true,
+              "tempo": 64,
+              "rate": 4,
+              "swing": 0
+            }
+          },
+          {
+            "id": "harm",
+            "type": "harmonist",
+            "name": "harm",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "root": 0,
+              "mode": 0,
+              "rate": 12,
+              "restlessness": 0.3,
+              "brightness": 0.55,
+              "modChance": 0.35
+            }
+          },
+          {
+            "id": "hold",
+            "type": "lfo",
+            "name": "hold",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "rate": 0.1,
+              "depth": 0,
+              "offset": 1,
+              "shape": "sine",
+              "bipolar": false
+            }
+          },
+          {
+            "id": "notes",
+            "type": "notes",
+            "name": "notes",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "text": "CLOITRE - 2e vitrine du HARMONIST, en orgue + cordes pincees.\n\nLe HARMONIST conduit tout. Sa fondamentale fait chanter un ORGUE soutenu + une BASSE (l'harmonie qui change d'accord). Sa fondamentale + sa gamme pilotent des Quantizers pour les CORDES (Karplus) et les CLOCHES (Resonator) qui arpegent la cle du moment.\n\nOrgue/basse tenus (l'harmonie) + plucks organiques transitoires (la melodie) = registres complementaires, esprit neo-classique sacre. Tout migre de cle en cle, tout seul. Regle le voyage sur le Harmonist (Rate / Modul. / Restless / Bright)."
+            }
+          },
+          {
+            "id": "oscale",
+            "type": "gain",
+            "name": "oscale",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "gain": 0.0833
+            }
+          },
+          {
+            "id": "organ",
+            "type": "pipe-organ",
+            "name": "organ",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "frequency": 110,
+              "drawbar16": 0.5,
+              "drawbar8": 0.85,
+              "drawbar4": 0.5,
+              "drawbar223": 0.4,
+              "drawbar2": 0.25,
+              "drawbar135": 0.3,
+              "drawbar113": 0,
+              "drawbar1": 0.12,
+              "voicing": 0,
+              "chiff": 0,
+              "percussion": 0,
+              "percHarmonic": 0,
+              "percDecay": 0,
+              "percVolume": 0,
+              "chorusVibrato": 0.25,
+              "tremulant": 0.2,
+              "tremRate": 4.5,
+              "wind": 0.14,
+              "brightness": 0.5
+            }
+          },
+          {
+            "id": "organvca",
+            "type": "gain",
+            "name": "organvca",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "gain": 0.28
+            }
+          },
+          {
+            "id": "bscale",
+            "type": "gain",
+            "name": "bscale",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "gain": 0.0833
+            }
+          },
+          {
+            "id": "bosc",
+            "type": "oscillator",
+            "name": "bosc",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "frequency": 41,
+              "type": "triangle",
+              "pwm": 0.5,
+              "unison": 1,
+              "detune": 0,
+              "fmLin": 0,
+              "fmExp": 0,
+              "subMix": 0.3,
+              "subOct": 1
+            }
+          },
+          {
+            "id": "bvca",
+            "type": "gain",
+            "name": "bvca",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "gain": 0.3
+            }
+          },
+          {
+            "id": "euc1",
+            "type": "euclidean",
+            "name": "euc1",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "enabled": true,
+              "tempo": 64,
+              "rate": 4,
+              "steps": 16,
+              "pulses": 7,
+              "rotation": 1,
+              "gateLength": 20,
+              "swing": 0
+            }
+          },
+          {
+            "id": "plfo",
+            "type": "lfo",
+            "name": "plfo",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "rate": 0.25,
+              "depth": 0.55,
+              "offset": 0.25,
+              "shape": "triangle",
+              "bipolar": true
+            }
+          },
+          {
+            "id": "kq",
+            "type": "quantizer",
+            "name": "kq",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "root": 0,
+              "scale": 6
+            }
+          },
+          {
+            "id": "karp",
+            "type": "karplus",
+            "name": "karp",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "frequency": 220,
+              "damping": 0.35,
+              "decay": 0.992,
+              "brightness": 0.55,
+              "pluckPos": 0.4
+            }
+          },
+          {
+            "id": "kvca",
+            "type": "gain",
+            "name": "kvca",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "gain": 0.55
+            }
+          },
+          {
+            "id": "kdelay",
+            "type": "delay",
+            "name": "kdelay",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "time": 300,
+              "feedback": 0.32,
+              "mix": 0.3,
+              "tone": 0.5,
+              "pingPong": true
+            }
+          },
+          {
+            "id": "euc2",
+            "type": "euclidean",
+            "name": "euc2",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "enabled": true,
+              "tempo": 64,
+              "rate": 4,
+              "steps": 16,
+              "pulses": 4,
+              "rotation": 5,
+              "gateLength": 30,
+              "swing": 0
+            }
+          },
+          {
+            "id": "rlfo",
+            "type": "lfo",
+            "name": "rlfo",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "rate": 0.17,
+              "depth": 0.45,
+              "offset": 0.7,
+              "shape": "triangle",
+              "bipolar": true
+            }
+          },
+          {
+            "id": "rq",
+            "type": "quantizer",
+            "name": "rq",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "root": 0,
+              "scale": 6
+            }
+          },
+          {
+            "id": "reso",
+            "type": "resonator",
+            "name": "reso",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "frequency": 440,
+              "structure": 0.5,
+              "brightness": 0.7,
+              "damping": 0.6,
+              "position": 0.4,
+              "mode": 0,
+              "polyphony": 1,
+              "internalExc": 0.8,
+              "chorus": 0.15
+            }
+          },
+          {
+            "id": "rvca",
+            "type": "gain",
+            "name": "rvca",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "gain": 0.42
+            }
+          },
+          {
+            "id": "mix",
+            "type": "mixer-1x2",
+            "name": "mix",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "levelA": 0.6,
+              "levelB": 0.6,
+              "levelC": 0.65,
+              "levelD": 0.55,
+              "levelE": 0,
+              "levelF": 0
+            }
+          },
+          {
+            "id": "rev",
+            "type": "reverb",
+            "name": "rev",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "time": 4,
+              "damp": 0.55,
+              "preDelay": 35,
+              "mix": 0.42
+            }
+          },
+          {
+            "id": "out",
+            "type": "output",
+            "name": "out",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "params": {
+              "level": 0.6
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": {
+              "moduleId": "clk",
+              "portId": "clock"
+            },
+            "to": {
+              "moduleId": "harm",
+              "portId": "clock"
+            },
+            "kind": "sync"
+          },
+          {
+            "from": {
+              "moduleId": "clk",
+              "portId": "clock"
+            },
+            "to": {
+              "moduleId": "euc1",
+              "portId": "clock"
+            },
+            "kind": "sync"
+          },
+          {
+            "from": {
+              "moduleId": "clk",
+              "portId": "clock"
+            },
+            "to": {
+              "moduleId": "euc2",
+              "portId": "clock"
+            },
+            "kind": "sync"
+          },
+          {
+            "from": {
+              "moduleId": "harm",
+              "portId": "root"
+            },
+            "to": {
+              "moduleId": "oscale",
+              "portId": "in"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "oscale",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "organ",
+              "portId": "pitch"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "hold",
+              "portId": "cv-out"
+            },
+            "to": {
+              "moduleId": "organ",
+              "portId": "gate"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "organ",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "organvca",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "organvca",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "mix",
+              "portId": "in-a"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "harm",
+              "portId": "root"
+            },
+            "to": {
+              "moduleId": "bscale",
+              "portId": "in"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "bscale",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "bosc",
+              "portId": "pitch"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "bosc",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "bvca",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "bvca",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "mix",
+              "portId": "in-b"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "euc1",
+              "portId": "gate"
+            },
+            "to": {
+              "moduleId": "karp",
+              "portId": "gate"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "plfo",
+              "portId": "cv-out"
+            },
+            "to": {
+              "moduleId": "kq",
+              "portId": "in"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "harm",
+              "portId": "root"
+            },
+            "to": {
+              "moduleId": "kq",
+              "portId": "root-cv"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "harm",
+              "portId": "scale"
+            },
+            "to": {
+              "moduleId": "kq",
+              "portId": "scale-cv"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "kq",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "karp",
+              "portId": "pitch"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "karp",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "kvca",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "kvca",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "kdelay",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "kdelay",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "mix",
+              "portId": "in-c"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "euc2",
+              "portId": "gate"
+            },
+            "to": {
+              "moduleId": "reso",
+              "portId": "gate"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "rlfo",
+              "portId": "cv-out"
+            },
+            "to": {
+              "moduleId": "rq",
+              "portId": "in"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "harm",
+              "portId": "root"
+            },
+            "to": {
+              "moduleId": "rq",
+              "portId": "root-cv"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "harm",
+              "portId": "scale"
+            },
+            "to": {
+              "moduleId": "rq",
+              "portId": "scale-cv"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "rq",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "reso",
+              "portId": "pitch"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "reso",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "rvca",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "rvca",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "mix",
+              "portId": "in-d"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "mix",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "rev",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "rev",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "out",
+              "portId": "in"
+            },
+            "kind": "audio"
+          }
+        ]
+      }
+    }
+  ]
+}

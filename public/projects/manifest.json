@@ -70,6 +70,13 @@
       "description": "Vitrine du Harmonist : une harmonie générative AUTONOME (cadences + modulations) qui fait voyager ensemble basse, nappe et mélodie de clé en clé. Contemplatif, jamais répétitif.",
       "file": "migrations.json",
       "group": "Ambient"
+    },
+    {
+      "id": "cloitre",
+      "name": "Cloître 🕯️",
+      "description": "2e vitrine du Harmonist, en orgue + cordes pincées : un lit d'orgue (harmonie qui enfle à chaque accord) sous des plucks Karplus + cloches Resonator. Néo-classique sacré, génératif, jamais répétitif.",
+      "file": "cloitre.json",
+      "group": "Ambient"
     }
   ]
 }
