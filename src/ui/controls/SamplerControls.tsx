@@ -15,12 +15,12 @@ import { ControlButtons } from '../ControlButtons'
 import { formatDecimal2, formatPercent } from '../formatters'
 import { loadSampleManifest, sampleFileUrl, type SampleEntry } from '../../utils/sampleLibrary'
 
-type SamplerControlsProps = Pick<ControlProps, 'module' | 'engine' | 'audioMode' | 'nativeSampler' | 'updateParam'>
+type SamplerControlsProps = Pick<ControlProps, 'module' | 'engine' | 'audioMode' | 'status' | 'nativeSampler' | 'updateParam'>
 
 const WAVE_W = 220
 const WAVE_H = 48
 
-export function SamplerControls({ module, engine, audioMode, nativeSampler, updateParam }: SamplerControlsProps) {
+export function SamplerControls({ module, engine, audioMode, status, nativeSampler, updateParam }: SamplerControlsProps) {
   const [hasBuffer, setHasBuffer] = useState(false)
   const [fileName, setFileName] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -37,7 +37,12 @@ export function SamplerControls({ module, engine, audioMode, nativeSampler, upda
   // native engine after a Tauri Start (same class as SID/AY restart re-upload).
   const loadedDataRef = useRef<{ data: Float32Array; fileSr: number } | null>(null)
   const mountedRef = useRef(true)
-  useEffect(() => () => { mountedRef.current = false }, [])
+  // Set true on setup too: StrictMode (dev) mount→unmount→remount would otherwise
+  // leave it stuck false after the cleanup, freezing every later setState.
+  useEffect(() => {
+    mountedRef.current = true
+    return () => { mountedRef.current = false }
+  }, [])
 
   const isNativeMode = audioMode === 'native' && nativeSampler?.isActive
 
@@ -129,7 +134,12 @@ export function SamplerControls({ module, engine, audioMode, nativeSampler, upda
   }, [engine, module.id, isNativeMode, nativeSampler])
 
   // Shared: mono-mix a decoded AudioBuffer, cache it, push it to the engine.
-  const loadDecodedBuffer = useCallback(async (audioBuffer: AudioBuffer, label: string) => {
+  // The UI reflects the LOCAL decode immediately; the engine upload is fired
+  // best-effort and never awaited — otherwise a not-yet-ready worklet (e.g.
+  // auto-load on preset open, before transport starts) would block/hang the
+  // load and freeze the buttons. The cached buffer is (re)uploaded by the
+  // ready effect below once audio is actually running.
+  const loadDecodedBuffer = useCallback((audioBuffer: AudioBuffer, label: string) => {
     audioBufferRef.current = audioBuffer
     let samples: Float32Array
     if (audioBuffer.numberOfChannels === 1) {
@@ -143,21 +153,24 @@ export function SamplerControls({ module, engine, audioMode, nativeSampler, upda
     const maxSamples = 48000 * 10
     if (samples.length > maxSamples) samples = samples.slice(0, maxSamples)
     const fileSr = audioBuffer.sampleRate
-    loadedDataRef.current = { data: new Float32Array(samples), fileSr } // cache for native re-upload
-    await uploadBuffer(loadedDataRef.current.data, fileSr)
-    if (!mountedRef.current) return
-    setHasBuffer(true)
-    setBufferVersion((v) => v + 1)
-    setFileName(label)
+    loadedDataRef.current = { data: new Float32Array(samples), fileSr } // cache for (re)upload
+    if (mountedRef.current) {
+      setHasBuffer(true)
+      setBufferVersion((v) => v + 1)
+      setFileName(label)
+    }
+    void uploadBuffer(loadedDataRef.current.data, fileSr).catch(() => {}) // best-effort
   }, [uploadBuffer])
 
-  // Re-upload the cached buffer when native audio (re)starts — the Tauri engine
-  // is recreated on Start without sampler buffers (cf. SID/AY restart re-upload).
+  // (Re)upload the cached buffer whenever the engine becomes ready — Web engine
+  // restart on preset load, or the Tauri native engine recreated on Start (the
+  // same class as the SID/AY restart re-upload). Idempotent; harmless if no buffer.
   useEffect(() => {
-    if (isNativeMode && nativeSampler && loadedDataRef.current) {
-      void uploadBuffer(loadedDataRef.current.data, loadedDataRef.current.fileSr)
+    const ready = isNativeMode || status === 'running'
+    if (ready && loadedDataRef.current) {
+      void uploadBuffer(loadedDataRef.current.data, loadedDataRef.current.fileSr).catch(() => {})
     }
-  }, [isNativeMode, nativeSampler, module.id, uploadBuffer])
+  }, [isNativeMode, nativeSampler, status, module.id, uploadBuffer])
 
   // Shared: fetch a URL, decode it, load it.
   const loadFromUrl = useCallback(async (url: string, label: string) => {
@@ -168,7 +181,7 @@ export function SamplerControls({ module, engine, audioMode, nativeSampler, upda
       if (!response.ok) throw new Error(`fetch ${url}: ${response.status}`)
       const arrayBuffer = await response.arrayBuffer()
       const audioBuffer = await audioContext.decodeAudioData(arrayBuffer)
-      await loadDecodedBuffer(audioBuffer, label)
+      loadDecodedBuffer(audioBuffer, label)
     } catch (error) {
       console.error('Failed to load bundled sample:', error)
       loadedPathRef.current = '' // allow a retry
@@ -217,7 +230,7 @@ export function SamplerControls({ module, engine, audioMode, nativeSampler, upda
       const audioContext = ensureAudioContext()
       const arrayBuffer = await file.arrayBuffer()
       const audioBuffer = await audioContext.decodeAudioData(arrayBuffer)
-      await loadDecodedBuffer(audioBuffer, file.name)
+      loadDecodedBuffer(audioBuffer, file.name)
       // A custom file overrides any bundled path so it won't be re-fetched.
       loadedPathRef.current = ''
       if (samplePath) updateParam(module.id, 'samplePath', '')
@@ -230,41 +243,34 @@ export function SamplerControls({ module, engine, audioMode, nativeSampler, upda
   }, [ensureAudioContext, loadDecodedBuffer, module.id, samplePath, updateParam])
 
   return (
-    <>
-      <select
-        className="sampler-picker"
-        value={sampleList.some((s) => s.file === samplePath) ? samplePath : ''}
-        onChange={(e) => updateParam(module.id, 'samplePath', e.target.value)}
-        title="Load a bundled sample"
-      >
-        <option value="">— bundled sample —</option>
-        {sampleList.map((s) => (
-          <option key={s.id} value={s.file}>{s.name}</option>
-        ))}
-      </select>
-
-      <div className="granular-load-row">
+    // One full-width cell in the parent .module-controls grid; lay out internally with flex.
+    <div className="sampler-body">
+      <div className="sampler-row">
+        <select
+          className="sampler-picker"
+          value={sampleList.some((s) => s.file === samplePath) ? samplePath : ''}
+          onChange={(e) => updateParam(module.id, 'samplePath', e.target.value)}
+          title="Load a bundled sample"
+        >
+          <option value="">— bundled sample —</option>
+          {sampleList.map((s) => (
+            <option key={s.id} value={s.file}>{s.name}</option>
+          ))}
+        </select>
         <input ref={fileInputRef} type="file" accept="audio/*" style={{ display: 'none' }} onChange={handleFileChange} />
-        <button className="granular-load-btn" onClick={handleLoadClick} disabled={isLoading}>
+        <button className="sampler-load-btn" onClick={handleLoadClick} disabled={isLoading}>
           {isLoading ? 'Loading…' : hasBuffer ? 'Replace' : 'Load .wav'}
         </button>
-        <button className={`granular-test-btn ${isPreviewing ? 'active' : ''}`} onClick={handlePreviewClick} disabled={!hasBuffer}>
+        <button className={`sampler-preview-btn ${isPreviewing ? 'active' : ''}`} onClick={handlePreviewClick} disabled={!hasBuffer}>
           {isPreviewing ? 'Stop' : 'Preview'}
         </button>
       </div>
 
       <canvas ref={canvasRef} className="sampler-waveform" width={WAVE_W} height={WAVE_H} />
 
-      {fileName && (
-        <div
-          title={fileName}
-          style={{ fontSize: '9px', color: 'rgba(150,170,190,0.75)', textAlign: 'center', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', padding: '1px 6px' }}
-        >
-          {fileName}
-        </div>
-      )}
+      {fileName && <div className="sampler-filename" title={fileName}>{fileName}</div>}
 
-      <div className="granular-controls-grid">
+      <div className="sampler-knobs">
         <RotaryKnob label="Pitch" min={0.25} max={4} step={0.01} value={pitch} onChange={(v) => updateParam(module.id, 'pitch', v)} format={formatDecimal2} />
         <RotaryKnob label="Level" min={0} max={1} step={0.01} value={level} onChange={(v) => updateParam(module.id, 'level', v)} format={formatPercent} />
         <RotaryKnob label="Attack" min={0.0005} max={0.2} step={0.0005} unit="s" value={attack} onChange={(v) => updateParam(module.id, 'attack', v)} format={(x) => x.toFixed(3)} />
@@ -280,11 +286,11 @@ export function SamplerControls({ module, engine, audioMode, nativeSampler, upda
       </ControlBox>
 
       {loopMode === 1 && (
-        <div className="granular-controls-grid">
+        <div className="sampler-knobs">
           <RotaryKnob label="Loop Start" min={0} max={1} step={0.001} value={loopStart} onChange={(v) => updateParam(module.id, 'loopStart', Math.min(v, loopEnd - 0.001))} format={formatPercent} />
           <RotaryKnob label="Loop End" min={0} max={1} step={0.001} value={loopEnd} onChange={(v) => updateParam(module.id, 'loopEnd', Math.max(v, loopStart + 0.001))} format={formatPercent} />
         </div>
       )}
-    </>
+    </div>
   )
 }

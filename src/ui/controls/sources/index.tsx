@@ -98,6 +98,7 @@ export function renderSourceControls(props: ControlProps): React.ReactElement | 
           module={module}
           engine={props.engine}
           audioMode={props.audioMode}
+          status={props.status}
           nativeSampler={props.nativeSampler}
           updateParam={props.updateParam}
         />

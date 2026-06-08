@@ -2308,11 +2308,72 @@
   width: 100%;
 }
 
+/* Sampler — self-contained layout (one full-width cell in .module-controls). */
+.sampler-body {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+  padding: 2px;
+  box-sizing: border-box;
+}
+
+/* Picker + Load + Preview on one wrapping row */
+.sampler-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Sampler — its own buttons (audio-blue identity, not a Granular hand-me-down) */
+.sampler-load-btn,
+.sampler-preview-btn {
+  flex: 0 0 auto;
+  padding: 6px 14px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: border-color 0.12s ease, background 0.12s ease, transform 0.06s ease;
+}
+
+.sampler-load-btn {
+  border: 1px solid rgba(91, 182, 255, 0.45);
+  background: linear-gradient(180deg, rgba(47, 127, 190, 0.45), rgba(30, 90, 140, 0.6));
+  color: #cfe6ff;
+}
+.sampler-load-btn:hover:not(:disabled) {
+  border-color: rgba(91, 182, 255, 0.85);
+  background: linear-gradient(180deg, rgba(57, 147, 220, 0.6), rgba(40, 110, 170, 0.72));
+}
+.sampler-load-btn:active:not(:disabled) { transform: translateY(1px); }
+.sampler-load-btn:disabled { opacity: 0.5; cursor: default; }
+
+.sampler-preview-btn {
+  border: 1px solid rgba(120, 140, 160, 0.35);
+  background: rgba(30, 40, 52, 0.7);
+  color: #b8c8da;
+}
+.sampler-preview-btn:hover:not(:disabled) {
+  border-color: rgba(91, 182, 255, 0.6);
+  color: #e6f1ff;
+}
+.sampler-preview-btn.active {
+  border-color: rgba(91, 182, 255, 0.8);
+  background: linear-gradient(180deg, rgba(47, 127, 190, 0.5), rgba(30, 90, 140, 0.65));
+  color: #fff;
+}
+.sampler-preview-btn:disabled { opacity: 0.45; cursor: default; }
+
 /* Sampler — bundled-sample picker dropdown */
 .sampler-picker {
-  width: 100%;
-  margin: 4px 0 2px;
-  padding: 4px 6px;
+  flex: 1 1 90px;
+  min-width: 0;
+  padding: 5px 6px;
   font-size: 10px;
   color: var(--text, #cfe0f0);
   background: rgba(18, 26, 36, 0.85);
@@ -2328,13 +2389,31 @@
 /* Sampler — waveform preview canvas */
 .sampler-waveform {
   width: 100%;
-  height: 48px;
+  height: 52px;
   display: block;
-  margin: 2px 0;
   border: 1px solid rgba(91, 182, 255, 0.25);
   border-radius: 4px;
   background: rgba(18, 26, 36, 0.7);
-  image-rendering: pixelated;
+}
+
+/* Sampler — loaded file name */
+.sampler-filename {
+  font-size: 9px;
+  color: rgba(150, 170, 190, 0.75);
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Sampler — knob row (flex, wraps on narrow modules) */
+.sampler-knobs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: flex-start;
+  gap: 8px 6px;
+  width: 100%;
 }
 
 /* Granular load button row */

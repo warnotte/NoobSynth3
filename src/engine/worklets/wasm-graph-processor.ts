@@ -248,7 +248,12 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
         })
         break
       case 'loadSamplerBuffer':
-        this.engine!.load_sampler_buffer(message.moduleId, message.data, message.fileSr)
+        // Guard: the engine may not be instantiated yet (e.g. auto-load before
+        // transport starts). Always reply so the load Promise never hangs; the
+        // control re-uploads the cached buffer once audio is running.
+        if (this.engine) {
+          this.engine.load_sampler_buffer(message.moduleId, message.data, message.fileSr)
+        }
         this.port.postMessage({
           type: 'samplerBufferLoaded',
           moduleId: message.moduleId,
