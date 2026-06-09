@@ -245,7 +245,6 @@ function App() {
   const [gridMetrics, setGridMetrics] = useState<GridMetrics>(DEFAULT_GRID_METRICS)
   const [cablesVisible, setCablesVisible] = useState(true)
   const [isRecording, setIsRecording] = useState(false)
-  const [showCpuMeter, setShowCpuMeter] = useState(false)
   const [cpuLoad, setCpuLoad] = useState<{ avg: number; peak: number } | null>(null)
   const [transportBeats, setTransportBeats] = useState(0)
   const [contextMenu, setContextMenu] = useState<{
@@ -376,9 +375,9 @@ function App() {
 
   useEffect(() => () => engine.dispose(), [engine])
 
-  // CPU load monitoring — re-subscribe when engine starts (status changes)
+  // CPU load monitoring — always on while the engine runs (the transport
+  // console has a permanent DSP section)
   useEffect(() => {
-    if (!showCpuMeter) return
     if (isTauri) {
       if (!tauriNativeRunning) return
       const interval = setInterval(async () => {
@@ -401,7 +400,7 @@ function App() {
       unsub()
       setCpuLoad(null)
     }
-  }, [engine, showCpuMeter, isTauri, status, tauriNativeRunning])
+  }, [engine, isTauri, status, tauriNativeRunning])
 
   // Subscribe to transport position updates
   useEffect(() => {
@@ -2278,8 +2277,6 @@ function App() {
         onMasterTempoChange={handleMasterTempoChange}
         transportBeats={transportBeats}
         cpuLoad={cpuLoad}
-        showCpuMeter={showCpuMeter}
-        onToggleCpuMeter={() => setShowCpuMeter((prev) => !prev)}
         undoCount={undoCount}
         redoCount={redoCount}
         onUndo={handleUndo}

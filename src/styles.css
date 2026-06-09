@@ -6299,7 +6299,7 @@ body {
   font-family: var(--font-engrave); font-size: 8px; font-weight: 600;
   letter-spacing: 0.3em; color: #3e657f; margin-top: 2px;
 }
-.tc-vu-btn { display: flex; gap: 10px; align-items: center; background: none; border: none; cursor: pointer; padding: 0; }
+.tc-vu-group { display: flex; gap: 10px; align-items: center; }
 .tc-vu { display: flex; gap: 3px; align-items: flex-end; height: 36px; }
 .tc-vu i {
   width: 6px; border-radius: 1px; background: #1d2127;
@@ -6330,4 +6330,70 @@ body {
   font-family: var(--font-lcd); font-size: 13px; letter-spacing: 0.2em;
   color: #ff6a52; text-shadow: 0 0 10px rgba(224, 73, 47, 0.8);
   animation: tc-rec-pulse 1.2s ease-in-out infinite;
+}
+
+
+/* ── Console Steel: mobile pass ── */
+@media (max-width: 960px) {
+  .app {
+    height: 100dvh;
+    grid-template-rows: 40px auto minmax(0, 1fr) 72px;
+  }
+  .brand-rail { padding: 0 12px; gap: 10px; }
+  .brand-rail-sub, .brand-rail-serial, .rail-toggle span { display: none; }
+  .brand-rail-name { font-size: 16px; }
+
+  /* single column: the drawer goes back to a fixed overlay (FAB-opened) */
+  .workbench { grid-template-columns: minmax(0, 1fr); }
+  .workbench > .rack,
+  .workbench > .mixer-console { grid-column: 1; }
+  .side-panel {
+    position: fixed;
+    top: 0; right: 0; bottom: 0;
+    width: min(320px, 85vw);
+    z-index: 2500;
+    background: linear-gradient(180deg, #1b1f25 0%, #101216 100%);
+    border-left: 1px solid rgba(196, 216, 240, 0.12);
+    border-right: none;
+    box-shadow: -8px 0 32px rgba(0, 0, 0, 0.6);
+    padding: 48px 16px 24px;
+    transform: translateX(100%);
+    transition: transform 0.22s ease;
+  }
+  .side-panel.open { transform: translateX(0); }
+  /* keep the FAB clear of the transport console */
+  .side-panel-fab { bottom: 86px; right: 14px; }
+
+  .rack { margin: 4px 10px 8px; }
+  .rack-tabs { padding: 8px 12px 4px; }
+  .rack-tabs-view-switch { margin-right: 10px; }
+  .rack-tabs-view-btn { padding: 6px 12px 5px; font-size: 11px; }
+
+  /* compact transport console */
+  .transport-console { gap: 12px; padding: 0 12px; overflow-x: auto; }
+  .tc-label { display: none; }
+  .tc-section { gap: 8px; }
+  .tc-play { width: 46px; height: 46px; }
+  .tc-glyph-play { border-left-width: 13px; border-top-width: 8px; border-bottom-width: 8px; }
+  .tc-glyph-stop { width: 13px; height: 13px; }
+  .tc-small { width: 34px; height: 34px; }
+  .tc-lcd-input { width: 64px; font-size: 20px; }
+  .tc-lcd--small { min-width: 54px; padding: 3px 8px 2px; }
+  .tc-lcd-value { font-size: 14px; }
+  .tc-vu { height: 28px; }
+  .tc-vu i:nth-child(1) { height: 8px; }
+  .tc-vu i:nth-child(2) { height: 11px; }
+  .tc-vu i:nth-child(3) { height: 13px; }
+  .tc-vu i:nth-child(4) { height: 16px; }
+  .tc-vu i:nth-child(5) { height: 19px; }
+  .tc-vu i:nth-child(6) { height: 22px; }
+  .tc-vu i:nth-child(7) { height: 25px; }
+  .tc-vu i:nth-child(8) { height: 28px; }
+  .tc-pill { padding: 6px 9px 5px; font-size: 10px; letter-spacing: 0.12em; }
+}
+
+@media (max-width: 520px) {
+  .brand-rail-status { display: none; }
+  .transport-console { gap: 9px; }
+  .tc-pill { padding: 6px 7px 5px; }
 }

@@ -16,8 +16,6 @@ type TransportConsoleProps = {
   onMasterTempoChange?: (bpm: number) => void
   transportBeats?: number
   cpuLoad?: { avg: number; peak: number } | null
-  showCpuMeter?: boolean
-  onToggleCpuMeter?: () => void
   undoCount?: number
   redoCount?: number
   onUndo?: () => void
@@ -38,15 +36,13 @@ export const TransportConsole = ({
   onMasterTempoChange = () => {},
   transportBeats = 0,
   cpuLoad = null,
-  showCpuMeter = false,
-  onToggleCpuMeter = () => {},
   undoCount = 0,
   redoCount = 0,
   onUndo = () => {},
   onRedo = () => {},
 }: TransportConsoleProps) => {
   const avg = cpuLoad?.avg ?? 0
-  const litSegments = showCpuMeter ? Math.round((Math.min(avg, 100) / 100) * VU_SEGMENTS) : 0
+  const litSegments = cpuLoad ? Math.round((Math.min(avg, 100) / 100) * VU_SEGMENTS) : 0
   const bar = Math.floor(transportBeats / 4) + 1
   const beat = Math.floor(transportBeats % 4) + 1
 
@@ -107,17 +103,12 @@ export const TransportConsole = ({
 
       <section className="tc-section">
         <div className="tc-label">DSP</div>
-        <button
-          type="button"
-          className="tc-vu-btn"
-          onClick={onToggleCpuMeter}
-          aria-pressed={showCpuMeter}
+        <div
+          className="tc-vu-group"
           title={
-            showCpuMeter
-              ? cpuLoad
-                ? `DSP load — avg ${cpuLoad.avg.toFixed(1)}% · peak ${cpuLoad.peak.toFixed(1)}% (click to hide)`
-                : 'Waiting for data… (click to hide)'
-              : 'Click to monitor DSP load'
+            cpuLoad
+              ? `DSP load — avg ${cpuLoad.avg.toFixed(1)}% · peak ${cpuLoad.peak.toFixed(1)}%`
+              : 'DSP load (engine stopped)'
           }
         >
           <span className="tc-vu">
@@ -129,10 +120,10 @@ export const TransportConsole = ({
             ))}
           </span>
           <span className="tc-lcd tc-lcd--small">
-            <span className="tc-lcd-value">{showCpuMeter && cpuLoad ? `${Math.round(avg)}%` : '--'}</span>
+            <span className="tc-lcd-value">{cpuLoad ? `${Math.round(avg)}%` : '--'}</span>
             <span className="tc-lcd-caption">LOAD</span>
           </span>
-        </button>
+        </div>
       </section>
 
       <section className="tc-section">
