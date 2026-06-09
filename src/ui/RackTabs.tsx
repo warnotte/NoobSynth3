@@ -56,7 +56,7 @@ export const RackTabs = ({
           className={`rack-tabs-view-btn ${viewMode === 'rack' ? 'active' : ''}`}
           onClick={() => onViewModeChange('rack')}
         >
-          Rack
+          Racks
         </button>
         <button
           type="button"

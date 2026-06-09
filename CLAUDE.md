@@ -33,9 +33,11 @@ public/midi-presets/    # MIDI files + manifest.json
 
 ```
 App.tsx                          # Root component, state management, undo/redo
-├── TopBar.tsx                   # Header + sticky toolbar (transport, undo/redo, export/import, view)
-├── SidePanel.tsx                # Module library + Presets (drawer on mobile)
-└── RackView.tsx                 # Main rack container
+├── BrandRail.tsx                # Top rail (brand, status LED, cables/dev toggles, export/import)
+├── RackTabs.tsx                 # View rocker RACKS|MIXER + rack tabs (scribble strips)
+├── TransportConsole.tsx         # Bottom console (play/stop/rec/resync, BPM LCD, DSP load, undo/redo)
+├── SidePanel.tsx                # Module library + Presets — left drawer (mobile: overlay drawer)
+└── RackView.tsx                 # Main rack container (scrolls internally; page is fixed 100vh)
     ├── ModuleCard.tsx           # Single module frame (header, ports, body)
     │   └── controls/            # Module-specific controls
     │       ├── index.tsx        # Router → category files
@@ -84,7 +86,7 @@ Câbles et jacks sont colorés par type de signal :
 
 ## UI Dev Tools
 
-- Dev Resize toggle lives in `src/ui/TopBar.tsx` (dev builds only). It enables the resize handle on `ModuleCard` and the resize preview ghost in `RackView`.
+- Dev Resize toggle lives in `src/ui/BrandRail.tsx` (dev builds only). It enables the resize handle on `ModuleCard` and the resize preview ghost in `RackView`.
 - Resize overrides are kept in `moduleSizeOverrides` inside the `useModuleResize` hook (`src/hooks/useModuleResize.ts`, wired from `src/App.tsx`) and only applied by `getModuleSize` while Dev Resize is enabled.
 - Rack grid overlay is always on via `.rack-grid-overlay` in `src/ui/RackView.tsx`, driven by `--rack-unit-x/y`, `--rack-gap`, `--rack-pad-y` in `src/styles.css`.
 - Lab Panel (`module.type === 'lab'`) renders a full layout stress test (Osc/Env/Mod/Util) in `src/ui/controls/IOControls.tsx`, using `updateParam(..., { skipEngine: true })`.
@@ -93,7 +95,7 @@ Câbles et jacks sont colorés par type de signal :
 
 1. `src/hooks/useModuleResize.ts`: la logique Dev Resize (overrides, preview, pointer handler) y est extraite. La supprimer, et dans `src/App.tsx` retirer l'appel à `useModuleResize` + le passage de `devResizeEnabled`/`showResizeHandles`/`moduleResizePreview` (garder `getModuleSize`, ou le remplacer par `moduleSizes`).
 2. `src/ui/ModuleCard.tsx`: remove the resize handle and related props; `src/ui/RackView.tsx`: remove the resize ghost.
-3. `src/ui/TopBar.tsx`: remove the Dev Resize button and its styles; `src/styles.css`: remove `.dev-tools`, `.dev-toggles`, `.dev-toggle`, `.module-resize-handle`, `.module-resize-ghost`.
+3. `src/ui/BrandRail.tsx`: remove the Dev Resize toggle; `src/styles.css`: remove `.module-resize-handle`, `.module-resize-ghost`.
 
 ## React Hooks
 

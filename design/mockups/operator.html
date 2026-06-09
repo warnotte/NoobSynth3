@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>NoobSynth — Direction C : OPERATOR</title>
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@500;700;800&family=Red+Hat+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #07090d;
+    --bg-tile: #0b0f15;
+    --bg-tile-hi: #10161f;
+    --edge: #1b2531;
+    --edge-hi: #2a3a4d;
+    --txt: #aebfce;
+    --txt-dim: #51637a;
+    --audio: #3ed3ff;
+    --cv: #46ffb0;
+    --gate: #ffb648;
+    --alarm: #ff5d5d;
+    --glow-audio: rgba(62, 211, 255, 0.55);
+    --glow-cv: rgba(70, 255, 176, 0.5);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--txt);
+    font-family: 'Red Hat Mono', monospace;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 66px 1fr;
+    grid-template-rows: 30px 1fr 46px;
+    grid-template-areas: "spine ticker" "spine main" "spine cmd";
+    height: 100vh;
+  }
+  body::before {
+    content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 50;
+    background: repeating-linear-gradient(0deg, rgba(255,255,255,0.012) 0 1px, transparent 1px 3px);
+  }
+
+  /* ── Spine ────────────────────────────── */
+  .spine {
+    grid-area: spine;
+    background: linear-gradient(180deg, #0a0e14, #07090d);
+    border-right: 1px solid var(--edge);
+    display: flex; flex-direction: column; align-items: center;
+    padding: 10px 0 12px; gap: 14px;
+  }
+  .glyph {
+    width: 38px; height: 38px; border: 1.5px solid var(--audio); border-radius: 4px;
+    display: grid; place-items: center;
+    font-family: 'Oxanium'; font-weight: 800; font-size: 17px; color: var(--audio);
+    box-shadow: 0 0 14px rgba(62,211,255,0.25), inset 0 0 8px rgba(62,211,255,0.12);
+  }
+  .spine .sep { width: 26px; height: 1px; background: var(--edge); }
+  .s-btn {
+    width: 40px; height: 40px; border: 1px solid var(--edge-hi); border-radius: 4px;
+    background: var(--bg-tile); display: grid; place-items: center; cursor: pointer;
+    color: var(--txt-dim); font-size: 14px;
+  }
+  .s-btn.play { color: var(--cv); border-color: var(--cv); box-shadow: 0 0 12px rgba(70,255,176,0.3), inset 0 0 8px rgba(70,255,176,0.1); }
+  .s-btn.rec { color: var(--alarm); }
+  .s-btn .tri { width: 0; height: 0; border-left: 12px solid currentColor; border-top: 8px solid transparent; border-bottom: 8px solid transparent; margin-left: 3px; }
+  .s-btn .sq { width: 11px; height: 11px; background: currentColor; }
+  .s-btn .ci { width: 11px; height: 11px; background: currentColor; border-radius: 50%; box-shadow: 0 0 8px currentColor; }
+  .v-data { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+  .v-data .v { font-family: 'Oxanium'; font-weight: 700; font-size: 16px; color: var(--txt); }
+  .v-data label { font-size: 7.5px; letter-spacing: 0.22em; color: var(--txt-dim); }
+  .cpu-col { width: 8px; height: 64px; border: 1px solid var(--edge-hi); border-radius: 2px; position: relative; background: var(--bg-tile); }
+  .cpu-col::after { content: ''; position: absolute; left: 1px; right: 1px; bottom: 1px; height: 31%; background: linear-gradient(0deg, var(--cv), #b8ff5e); border-radius: 1px; box-shadow: 0 0 8px var(--glow-cv); }
+  .rk { display: flex; flex-direction: column; gap: 6px; margin-top: auto; }
+  .rk button {
+    width: 40px; height: 30px; border: 1px solid var(--edge-hi); border-radius: 3px; background: var(--bg-tile);
+    color: var(--txt-dim); font-family: 'Red Hat Mono'; font-size: 11px; cursor: pointer;
+  }
+  .rk button.on { color: var(--bg); background: var(--audio); border-color: var(--audio); font-weight: 600; box-shadow: 0 0 12px var(--glow-audio); }
+
+  /* ── Ticker ───────────────────────────── */
+  .ticker {
+    grid-area: ticker; display: flex; align-items: center; gap: 22px; padding: 0 18px;
+    border-bottom: 1px solid var(--edge); font-size: 10.5px; color: var(--txt-dim);
+    letter-spacing: 0.08em; white-space: nowrap; overflow: hidden;
+  }
+  .ticker b { color: var(--txt); font-weight: 500; }
+  .ticker .ok { color: var(--cv); }
+  .ticker .brand { font-family: 'Oxanium'; font-weight: 800; letter-spacing: 0.28em; color: var(--txt); font-size: 11px; }
+  .ticker .right { margin-left: auto; display: flex; gap: 22px; }
+
+  /* ── Main grid ────────────────────────── */
+  .main { grid-area: main; position: relative; padding: 16px 18px; overflow: hidden; }
+  .rack-line {
+    display: flex; align-items: baseline; gap: 14px; margin-bottom: 12px;
+    font-family: 'Oxanium'; letter-spacing: 0.14em;
+  }
+  .rack-line .cur { font-weight: 800; font-size: 15px; color: var(--audio); text-shadow: 0 0 12px var(--glow-audio); }
+  .rack-line .oth { font-weight: 500; font-size: 11.5px; color: var(--txt-dim); }
+  .rack-line .meta { margin-left: auto; font-family: 'Red Hat Mono'; font-size: 10px; color: var(--txt-dim); letter-spacing: 0.05em; }
+
+  .grid { position: relative; height: calc(100% - 34px); }
+  .grid::before {
+    content: ''; position: absolute; inset: 0;
+    background:
+      linear-gradient(0deg, rgba(62,211,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(62,211,255,0.03) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  .tile {
+    position: absolute; background: linear-gradient(180deg, var(--bg-tile-hi), var(--bg-tile));
+    border: 1px solid var(--edge-hi); border-radius: 3px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.5);
+  }
+  .tile header {
+    display: flex; align-items: center; gap: 8px; padding: 6px 9px;
+    border-bottom: 1px solid var(--edge);
+  }
+  .tile header h4 { font-family: 'Oxanium'; font-weight: 700; font-size: 11.5px; letter-spacing: 0.16em; color: var(--txt); }
+  .tile header .id { font-size: 9px; color: var(--txt-dim); }
+  .tile header .act { margin-left: auto; display: flex; align-items: flex-end; gap: 1.5px; height: 10px; }
+  .tile header .act i { width: 2.5px; background: var(--audio); box-shadow: 0 0 4px var(--glow-audio); }
+  .tile header .act i:nth-child(1){height:4px}.tile header .act i:nth-child(2){height:8px}
+  .tile header .act i:nth-child(3){height:6px}.tile header .act i:nth-child(4){height:10px}
+  .tile header .act i:nth-child(5){height:5px}
+  .tile header .act.quiet i { background: var(--txt-dim); box-shadow: none; height: 2px; }
+  .params { padding: 7px 9px; display: grid; grid-template-columns: 1fr 1fr; gap: 5px 12px; }
+  .pr { display: flex; flex-direction: column; gap: 2px; }
+  .pr .l { display: flex; justify-content: space-between; font-size: 9px; color: var(--txt-dim); letter-spacing: 0.06em; }
+  .pr .l b { color: var(--txt); font-weight: 500; }
+  .pr .bar { height: 3px; background: var(--edge); border-radius: 2px; position: relative; }
+  .pr .bar::after { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: var(--w, 50%); background: var(--audio); border-radius: 2px; box-shadow: 0 0 6px var(--glow-audio); }
+  .pr.cv .bar::after { background: var(--cv); box-shadow: 0 0 6px var(--glow-cv); }
+  .pads { display: flex; gap: 3px; padding: 2px 9px 8px; }
+  .pads i { flex: 1; height: 14px; border: 1px solid var(--edge-hi); border-radius: 2px; background: var(--bg-tile); }
+  .pads i.on { background: rgba(255,182,72,0.2); border-color: var(--gate); }
+  .pads i.cur { background: var(--gate); box-shadow: 0 0 10px rgba(255,182,72,0.6); }
+
+  .pin { position: absolute; width: 8px; height: 8px; border-radius: 1px; background: var(--bg); border: 1.5px solid; }
+  .pin.audio { border-color: var(--audio); }
+  .pin.cv { border-color: var(--cv); }
+  .pin.gate { border-color: var(--gate); }
+  .pin.out::after { content: ''; position: absolute; inset: 1.5px; background: currentColor; }
+  .pin.audio.out::after { background: var(--audio); box-shadow: 0 0 6px var(--glow-audio); }
+  .pin.cv.out::after { background: var(--cv); box-shadow: 0 0 6px var(--glow-cv); }
+  .pin.gate.out::after { background: var(--gate); }
+
+  svg.traces { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  svg.traces path { fill: none; stroke-width: 1.6; stroke-linejoin: round; }
+  svg.traces path.halo { stroke-width: 5; opacity: 0.16; }
+
+  /* ── Command bar ──────────────────────── */
+  .cmd {
+    grid-area: cmd; display: flex; align-items: center; gap: 14px; padding: 0 18px;
+    border-top: 1px solid var(--edge); background: #090c11;
+    font-size: 12.5px;
+  }
+  .cmd .prompt { color: var(--cv); font-weight: 600; }
+  .cmd .input { color: var(--txt); }
+  .cmd .input b { color: var(--audio); font-weight: 500; }
+  .cmd .caret { display: inline-block; width: 7px; height: 15px; background: var(--cv); vertical-align: text-bottom; box-shadow: 0 0 8px var(--glow-cv); animation: blink 1.1s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .cmd .hints { margin-left: auto; display: flex; gap: 18px; font-size: 10px; color: var(--txt-dim); letter-spacing: 0.06em; }
+  .cmd .hints kbd {
+    font-family: inherit; border: 1px solid var(--edge-hi); border-radius: 3px; padding: 1px 5px;
+    color: var(--txt); background: var(--bg-tile); font-size: 9.5px;
+  }
+</style>
+</head>
+<body>
+
+  <nav class="spine">
+    <div class="glyph">N3</div>
+    <div class="sep"></div>
+    <button class="s-btn play"><span class="tri"></span></button>
+    <button class="s-btn"><span class="sq"></span></button>
+    <button class="s-btn rec"><span class="ci"></span></button>
+    <div class="sep"></div>
+    <div class="v-data"><span class="v">120</span><label>BPM</label></div>
+    <div class="v-data"><span class="v">17:3</span><label>BAR</label></div>
+    <div class="sep"></div>
+    <div class="cpu-col" title="DSP 31%"></div>
+    <div class="v-data"><label>DSP</label></div>
+    <div class="rk">
+      <button class="on">01</button>
+      <button>02</button>
+      <button>03</button>
+      <button>+</button>
+    </div>
+  </nav>
+
+  <header class="ticker">
+    <span class="brand">NOOBSYNTH·3</span>
+    <span>MOTEUR <b class="ok">ACTIF</b></span>
+    <span>SORTIE <b>WASAPI · 48 kHz · 128 smp</b></span>
+    <span>XRUNS <b class="ok">0</b></span>
+    <span>GRAPHE <b>6 modules · 6 liaisons</b></span>
+    <div class="right">
+      <span>PROJET <b>CAPITULATION</b></span>
+      <span>REC <b>—</b></span>
+      <span><b>17:24:09</b></span>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="rack-line">
+      <span class="cur">▣ 01 LEAD</span>
+      <span class="oth">02 PAD</span>
+      <span class="oth">03 DRUMS</span>
+      <span class="meta">snap: grille 28px · zoom 100 · sel: osc-1</span>
+    </div>
+
+    <div class="grid">
+
+      <div class="tile" style="left:30px; top:8px; width:240px;">
+        <header><h4>OSC</h4><span class="id">osc-1</span><span class="act"><i></i><i></i><i></i><i></i><i></i></span></header>
+        <div class="params">
+          <div class="pr"><span class="l">freq <b>440 Hz</b></span><span class="bar" style="--w:46%"></span></div>
+          <div class="pr"><span class="l">forme <b>saw</b></span><span class="bar" style="--w:75%"></span></div>
+          <div class="pr"><span class="l">fin <b>+0 ct</b></span><span class="bar" style="--w:50%"></span></div>
+          <div class="pr cv"><span class="l">pwm <b>0.31</b></span><span class="bar" style="--w:31%"></span></div>
+        </div>
+        <span class="pin cv"    style="left:-5px; top:20px;"></span>
+        <span class="pin cv"    style="left:-5px; top:38px;"></span>
+        <span class="pin gate"  style="left:-5px; top:56px;"></span>
+        <span class="pin audio out" style="right:-5px; top:46px;"></span>
+      </div>
+
+      <div class="tile" style="left:342px; top:8px; width:240px;">
+        <header><h4>VCF</h4><span class="id">vcf-1</span><span class="act"><i></i><i></i><i></i><i></i><i></i></span></header>
+        <div class="params">
+          <div class="pr"><span class="l">cutoff <b>840 Hz</b></span><span class="bar" style="--w:38%"></span></div>
+          <div class="pr"><span class="l">réso <b>0.42</b></span><span class="bar" style="--w:42%"></span></div>
+          <div class="pr"><span class="l">pente <b>24 dB</b></span><span class="bar" style="--w:100%"></span></div>
+          <div class="pr cv"><span class="l">mod <b>+0.6</b></span><span class="bar" style="--w:62%"></span></div>
+        </div>
+        <span class="pin audio" style="left:-5px; top:46px;"></span>
+        <span class="pin cv"    style="left:-5px; top:64px;"></span>
+        <span class="pin audio out" style="right:-5px; top:46px;"></span>
+      </div>
+
+      <div class="tile" style="left:654px; top:8px; width:200px;">
+        <header><h4>ADSR</h4><span class="id">env-1</span><span class="act quiet"><i></i><i></i><i></i><i></i><i></i></span></header>
+        <div class="params">
+          <div class="pr cv"><span class="l">A <b>8 ms</b></span><span class="bar" style="--w:8%"></span></div>
+          <div class="pr cv"><span class="l">D <b>240 ms</b></span><span class="bar" style="--w:34%"></span></div>
+          <div class="pr cv"><span class="l">S <b>0.55</b></span><span class="bar" style="--w:55%"></span></div>
+          <div class="pr cv"><span class="l">R <b>1.2 s</b></span><span class="bar" style="--w:60%"></span></div>
+        </div>
+        <span class="pin gate" style="left:-5px; top:52px;"></span>
+        <span class="pin cv out" style="right:-5px; top:52px;"></span>
+      </div>
+
+      <div class="tile" style="left:926px; top:8px; width:170px;">
+        <header><h4>OUT</h4><span class="id">out-1</span><span class="act"><i></i><i></i><i></i><i></i><i></i></span></header>
+        <div class="params" style="grid-template-columns:1fr;">
+          <div class="pr"><span class="l">niveau <b>0.90</b></span><span class="bar" style="--w:90%"></span></div>
+          <div class="pr"><span class="l">peak <b>−6.2 dB</b></span><span class="bar" style="--w:70%"></span></div>
+        </div>
+        <span class="pin audio" style="left:-5px; top:46px;"></span>
+      </div>
+
+      <div class="tile" style="left:30px; top:208px; width:200px;">
+        <header><h4>LFO</h4><span class="id">lfo-1</span><span class="act quiet"><i></i><i></i><i></i><i></i><i></i></span></header>
+        <div class="params">
+          <div class="pr cv"><span class="l">vitesse <b>0.8 Hz</b></span><span class="bar" style="--w:22%"></span></div>
+          <div class="pr cv"><span class="l">ampl <b>0.7</b></span><span class="bar" style="--w:70%"></span></div>
+        </div>
+        <span class="pin cv out" style="right:-5px; top:46px;"></span>
+      </div>
+
+      <div class="tile" style="left:302px; top:208px; width:420px;">
+        <header><h4>SEQ·16</h4><span class="id">seq-1</span><span class="act"><i></i><i></i><i></i><i></i><i></i></span></header>
+        <div class="pads">
+          <i class="on"></i><i></i><i class="cur"></i><i></i><i class="on"></i><i></i><i></i><i class="on"></i>
+          <i></i><i class="on"></i><i></i><i></i><i class="on"></i><i></i><i class="on"></i><i></i>
+        </div>
+        <div class="params" style="grid-template-columns:1fr 1fr 1fr;">
+          <div class="pr"><span class="l">div <b>1/16</b></span><span class="bar" style="--w:25%"></span></div>
+          <div class="pr"><span class="l">swing <b>12%</b></span><span class="bar" style="--w:12%"></span></div>
+          <div class="pr cv"><span class="l">octave <b>+1</b></span><span class="bar" style="--w:66%"></span></div>
+        </div>
+        <span class="pin gate" style="left:-5px; top:40px;"></span>
+        <span class="pin cv out" style="right:-5px; top:34px;"></span>
+        <span class="pin gate out" style="right:-5px; top:52px;"></span>
+      </div>
+
+      <div class="tile" style="left:926px; top:208px; width:170px;">
+        <header><h4>SCOPE</h4><span class="id">scope-1</span><span class="act"><i></i><i></i><i></i><i></i><i></i></span></header>
+        <div style="padding:8px 9px;">
+          <svg width="150" height="44" style="display:block;">
+            <rect x="0" y="0" width="150" height="44" fill="rgba(62,211,255,0.04)"/>
+            <path d="M0 22 Q 9 2, 19 22 T 38 22 T 57 22 T 76 22 T 95 22 T 114 22 T 133 22 T 152 22"
+                  fill="none" stroke="#3ed3ff" stroke-width="1.6" style="filter:drop-shadow(0 0 4px rgba(62,211,255,0.7))"/>
+          </svg>
+        </div>
+        <span class="pin audio" style="left:-5px; top:38px;"></span>
+      </div>
+
+      <svg class="traces">
+        <!-- osc.out → vcf.in -->
+        <path class="halo" d="M 271 58 H 341" stroke="#3ed3ff"/>
+        <path d="M 271 58 H 341" stroke="#3ed3ff"/>
+        <!-- vcf.out → out.in (corridor between rows) -->
+        <path class="halo" d="M 583 58 H 604 V 185 H 898 V 58 H 925" stroke="#3ed3ff"/>
+        <path d="M 583 58 H 604 V 185 H 898 V 58 H 925" stroke="#3ed3ff"/>
+        <!-- tap → scope -->
+        <path class="halo" d="M 880 185 V 250 H 925" stroke="#3ed3ff"/>
+        <path d="M 880 185 V 250 H 925" stroke="#3ed3ff"/>
+        <circle cx="880" cy="185" r="3" fill="#3ed3ff"/>
+        <!-- adsr.env → vcf.mod -->
+        <path class="halo" d="M 855 64 H 875 V 193 H 322 V 76 H 341" stroke="#46ffb0"/>
+        <path d="M 855 64 H 875 V 193 H 322 V 76 H 341" stroke="#46ffb0"/>
+        <!-- seq.cv → osc.pitch -->
+        <path class="halo" d="M 723 246 H 745 V 201 H 14 V 50 H 29" stroke="#46ffb0"/>
+        <path d="M 723 246 H 745 V 201 H 14 V 50 H 29" stroke="#46ffb0"/>
+        <!-- lfo.out → osc.pwm -->
+        <path class="halo" d="M 231 258 H 252 V 169 H 22 V 32 H 29" stroke="#46ffb0"/>
+        <path d="M 231 258 H 252 V 169 H 22 V 32 H 29" stroke="#46ffb0"/>
+        <!-- seq.gate → adsr.gate -->
+        <path class="halo" d="M 723 264 H 760 V 177 H 634 V 64 H 653" stroke="#ffb648"/>
+        <path d="M 723 264 H 760 V 177 H 634 V 64 H 653" stroke="#ffb648"/>
+      </svg>
+    </div>
+  </main>
+
+  <footer class="cmd">
+    <span class="prompt">❯</span>
+    <span class="input">add <b>osc</b> &gt; <b>vcf</b> &gt; <b>out</b></span>
+    <span class="caret"></span>
+    <div class="hints">
+      <span><kbd>⌘K</kbd> palette</span>
+      <span><kbd>1–9</kbd> rack</span>
+      <span><kbd>espace</kbd> lecture</span>
+      <span><kbd>R</kbd> rec</span>
+    </div>
+  </footer>
+
+</body>
+</html>

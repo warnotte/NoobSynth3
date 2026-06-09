@@ -52,7 +52,8 @@ import { RackView } from './ui/RackView'
 import { MixerConsole, type MixerChannelState } from './ui/MixerConsole'
 import { RackTabs, type ViewMode } from './ui/RackTabs'
 import { SidePanel } from './ui/SidePanel'
-import { TopBar } from './ui/TopBar'
+import { BrandRail } from './ui/BrandRail'
+import { TransportConsole } from './ui/TransportConsole'
 import { ContextMenu, type ContextMenuAction } from './ui/ContextMenu'
 import './styles.css'
 
@@ -2081,37 +2082,19 @@ function App() {
       canRedo={canRedo}
     >
     <div className="app">
-        <TopBar
-          status={audioStatus}
-          statusLabel={statusLabel}
-          statusDetail={statusDetail}
-          modeLabel={modeLabel}
-          isBooting={unifiedBooting}
-          isRunning={audioRunning}
-          onStart={handleUnifiedStart}
-          onStop={handleUnifiedStop}
-          showCables={cablesVisible}
-          onToggleCables={() => setCablesVisible((prev) => !prev)}
-          showDevTools={isDev}
-          devResizeEnabled={devResizeEnabled}
-          onToggleDevResize={() => setDevResizeEnabled((prev) => !prev)}
-          undoCount={undoCount}
-          redoCount={redoCount}
-          onUndo={handleUndo}
-          onRedo={handleRedo}
-          onExportPreset={handleExportPreset}
-          onImportPreset={handleImportPreset}
-          isRecording={isRecording}
-          onToggleRecording={handleToggleRecording}
-          cpuLoad={cpuLoad}
-          showCpuMeter={showCpuMeter}
-          onToggleCpuMeter={() => setShowCpuMeter((prev) => !prev)}
-          rackCount={racks.length}
-          onResync={handleResync}
-          masterTempo={masterTempo}
-          onMasterTempoChange={handleMasterTempoChange}
-          transportBeats={transportBeats}
-        />
+      <BrandRail
+        status={audioStatus}
+        statusLabel={statusLabel}
+        statusDetail={statusDetail}
+        modeLabel={modeLabel}
+        showCables={cablesVisible}
+        onToggleCables={() => setCablesVisible((prev) => !prev)}
+        showDevTools={isDev}
+        devResizeEnabled={devResizeEnabled}
+        onToggleDevResize={() => setDevResizeEnabled((prev) => !prev)}
+        onExportPreset={handleExportPreset}
+        onImportPreset={handleImportPreset}
+      />
       <RackTabs
         racks={racks}
         activeRackId={activeRackId}
@@ -2283,10 +2266,30 @@ function App() {
           onExportTemplate={handleExportTemplate}
         />
       </main>
+      <TransportConsole
+        isBooting={unifiedBooting}
+        isRunning={audioRunning}
+        onStart={handleUnifiedStart}
+        onStop={handleUnifiedStop}
+        isRecording={isRecording}
+        onToggleRecording={handleToggleRecording}
+        onResync={handleResync}
+        masterTempo={masterTempo}
+        onMasterTempoChange={handleMasterTempoChange}
+        transportBeats={transportBeats}
+        cpuLoad={cpuLoad}
+        showCpuMeter={showCpuMeter}
+        onToggleCpuMeter={() => setShowCpuMeter((prev) => !prev)}
+        undoCount={undoCount}
+        redoCount={redoCount}
+        onUndo={handleUndo}
+        onRedo={handleRedo}
+      />
       <PatchLayer
         connections={cablesVisible && viewMode === 'rack' ? graph.connections : []}
         renderCable={renderCable}
         renderGhostCable={renderGhostCable}
+        clipRef={rackRef}
       />
       <input
         ref={presetFileRef}
