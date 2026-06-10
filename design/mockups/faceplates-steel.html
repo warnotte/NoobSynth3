@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>NoobSynth — Phase 3 : Faceplates Console Steel</title>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;600;700&family=Share+Tech+Mono&family=Sora:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* ── shipped Console Steel tokens (src/index.css) ── */
+    --bg-0: #0a0c10;
+    --bg-1: #0f1319;
+    --steel-0: #161c23;
+    --steel-1: #1f2832;
+    --steel-2: #2a3644;
+    --border-soft: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.18);
+    --text-strong: #f2f6fb;
+    --text-muted: rgba(214, 224, 238, 0.72);
+    --text-dim: rgba(214, 224, 238, 0.45);
+    --accent-cool: #5bb6ff;
+    --accent-mint: #42e2b1;
+    --accent-warm: #f0b06b;
+    --accent-rose: #ff6fae;
+
+    /* ── phase 3 : category accents ── */
+    --cat-sources: #5bb6ff;
+    --cat-filters: #9d8cff;
+    --cat-amplifiers: #4fd8c8;
+    --cat-effects: #d98cff;
+    --cat-modulators: #42e2b1;
+    --cat-sequencers: #f0b06b;
+    --cat-drums: #ff7a66;
+    --cat-io: #9fb2c8;
+
+    --font-ui: 'Sora', sans-serif;
+    --font-name: 'Big Shoulders Display', sans-serif;
+    --font-mono: 'Share Tech Mono', monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background:
+      radial-gradient(circle at 18% 12%, rgba(86, 140, 200, 0.24), transparent 42%),
+      radial-gradient(circle at 90% 8%, rgba(64, 175, 140, 0.2), transparent 38%),
+      linear-gradient(155deg, #0b0e12 0%, #0a0c10 50%, #06070a 100%);
+    color: var(--text-strong);
+    font-family: var(--font-ui);
+    min-height: 100vh;
+    padding: 26px 30px;
+  }
+  body::before {
+    content: ''; position: fixed; inset: 0; z-index: -1; opacity: 0.32; pointer-events: none;
+    background-image:
+      repeating-linear-gradient(120deg, rgba(255,255,255,0.05) 0 1px, transparent 1px 6px),
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.025) 0 1px, transparent 1px 4px);
+  }
+  h1 { font-family: var(--font-name); font-size: 20px; letter-spacing: 0.18em; font-weight: 600; margin-bottom: 4px; }
+  h1 em { font-style: normal; color: var(--accent-warm); }
+  .sub { font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); margin-bottom: 20px; }
+
+  .rack { display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap; }
+
+  /* ════════════════════════════════════════════
+     MODULE FACEPLATE v2
+     ════════════════════════════════════════════ */
+  .module {
+    --cat: var(--cat-sources);
+    position: relative;
+    border-radius: 8px;
+    background:
+      linear-gradient(160deg, rgba(255,255,255,0.045), transparent 38%),
+      repeating-linear-gradient(95deg, rgba(255,255,255,0.013) 0 1px, transparent 1px 3px),
+      linear-gradient(180deg, var(--steel-1) 0%, var(--steel-0) 78%, #11161d 100%);
+    border: 1px solid rgba(0,0,0,0.85);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.10),
+      inset 0 -1px 0 rgba(0,0,0,0.6),
+      0 14px 28px rgba(0,0,0,0.5);
+    display: flex; flex-direction: column;
+    width: 264px;
+  }
+  .module.w2 { width: 396px; }
+
+  /* header = scribble strip + liseré catégorie */
+  .mod-header {
+    display: flex; align-items: stretch; gap: 0;
+    border-bottom: 1px solid rgba(0,0,0,0.7);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.06);
+    height: 30px;
+    border-radius: 8px 8px 0 0;
+    overflow: hidden;
+    background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(0,0,0,0.22));
+  }
+  .mod-cat-bar {
+    width: 5px; flex: none;
+    background: linear-gradient(180deg, var(--cat), color-mix(in srgb, var(--cat) 55%, #000));
+    box-shadow: 0 0 8px color-mix(in srgb, var(--cat) 60%, transparent), inset -1px 0 0 rgba(0,0,0,0.5);
+  }
+  .mod-name {
+    font-family: var(--font-name); font-weight: 600; font-size: 15px; letter-spacing: 0.14em;
+    display: flex; align-items: center; padding: 0 10px; color: var(--text-strong);
+    text-shadow: 0 1px 0 rgba(0,0,0,0.8);
+    flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .mod-type {
+    font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.08em;
+    color: color-mix(in srgb, var(--cat) 80%, #fff);
+    display: flex; align-items: center; padding: 0 10px;
+    opacity: 0.85;
+  }
+
+  .mod-body { display: flex; min-height: 0; flex: 1; }
+
+  /* ── port rails ── */
+  .rail { display: flex; flex-direction: column; gap: 7px; padding: 10px 7px; width: 56px; flex: none; }
+  .rail.right { align-items: flex-end; }
+  .rail-item { display: flex; flex-direction: column; align-items: center; gap: 2px; width: 100%; }
+  .rail-label {
+    font-size: 8px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--text-muted); text-align: center; line-height: 1.1;
+  }
+  .jack {
+    --jc: var(--accent-cool);
+    width: 22px; height: 22px; border-radius: 50%;
+    background:
+      radial-gradient(circle at 50% 50%, #05070a 0 34%, #182029 36% 52%, transparent 54%),
+      radial-gradient(circle at 35% 30%, rgba(255,255,255,0.25), transparent 45%),
+      radial-gradient(circle, color-mix(in srgb, var(--jc) 75%, #222) 0 100%);
+    border: 1px solid rgba(0,0,0,0.9);
+    box-shadow:
+      inset 0 1px 1px rgba(255,255,255,0.25),
+      inset 0 0 4px rgba(0,0,0,0.6),
+      0 1px 2px rgba(0,0,0,0.7);
+  }
+  .jack.cv   { --jc: var(--accent-mint); }
+  .jack.gate { --jc: var(--accent-warm); }
+  .jack.sync { --jc: var(--accent-rose); }
+  .jack.connected { box-shadow: 0 0 7px color-mix(in srgb, var(--jc) 70%, transparent), inset 0 1px 1px rgba(255,255,255,0.25); }
+
+  /* ── controls zone ── */
+  .ctl { flex: 1; min-width: 0; padding: 10px 8px; display: flex; flex-direction: column; gap: 8px; }
+
+  /* section = ControlBox v2 : label gravé + filet */
+  .sect {
+    border: 1px solid rgba(0,0,0,0.55);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), inset 0 0 10px rgba(0,0,0,0.25);
+    background: linear-gradient(180deg, rgba(0,0,0,0.18), rgba(0,0,0,0.08));
+    border-radius: 6px;
+    padding: 6px 7px 7px;
+  }
+  .sect-label {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 8px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 5px;
+  }
+  .sect-label::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border-soft), transparent); }
+  .row { display: flex; gap: 8px; justify-content: space-around; align-items: flex-start; }
+
+  /* ── knob v2 ── */
+  .knob { display: grid; justify-items: center; gap: 3px; min-width: 48px; }
+  .knob-label {
+    font-size: 8px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .knob-dial {
+    --val: 0.62;           /* 0..1 */
+    --kc: var(--cat);
+    width: 38px; height: 38px; border-radius: 50%; position: relative;
+    background:
+      /* arc de valeur */
+      conic-gradient(from 225deg,
+        var(--kc) calc(var(--val) * 270deg),
+        rgba(255,255,255,0.07) calc(var(--val) * 270deg) 270deg,
+        transparent 270deg);
+  }
+  .knob-dial::before {
+    /* corps acier */
+    content: ''; position: absolute; inset: 4px; border-radius: 50%;
+    background:
+      radial-gradient(circle at 32% 26%, rgba(255,255,255,0.28), transparent 48%),
+      conic-gradient(from 90deg, #39444f, #232b34, #39444f, #1d242c, #39444f);
+    border: 1px solid rgba(0,0,0,0.85);
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.18), 0 2px 4px rgba(0,0,0,0.65);
+  }
+  .knob-dial::after {
+    /* indicateur */
+    content: ''; position: absolute; left: 50%; top: 50%;
+    width: 2.5px; height: 12px; border-radius: 2px;
+    background: var(--kc);
+    box-shadow: 0 0 5px color-mix(in srgb, var(--kc) 80%, transparent);
+    transform-origin: 50% 0%;
+    /* val=0 → 7h30 (-135°), val=1 → 4h30 (+135°) ; la barre pend vers le bas (origine en haut) donc +45° à val=0 */
+    transform: translateX(-50%) rotate(calc(45deg + var(--val) * 270deg));
+  }
+  .knob-value {
+    font-family: var(--font-mono); font-size: 10px; line-height: 1.25;
+    color: var(--text-strong);
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(0,0,0,0.6);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.05);
+    border-radius: 3px; padding: 1px 5px; min-width: 40px; text-align: center;
+  }
+
+  /* ── boutons v2 : LED + plastique ── */
+  .btns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+  .btn {
+    font-family: var(--font-ui); font-size: 9px; font-weight: 500; letter-spacing: 0.04em;
+    color: var(--text-muted);
+    background: linear-gradient(180deg, #29333e, #1b222b);
+    border: 1px solid rgba(0,0,0,0.8);
+    border-radius: 4px; padding: 4px 2px 3px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.10), 0 2px 3px rgba(0,0,0,0.5);
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    cursor: pointer; text-align: center;
+  }
+  .btn i {
+    width: 14px; height: 3px; border-radius: 2px; display: block;
+    background: #0a0e12; box-shadow: inset 0 1px 1px rgba(0,0,0,0.9);
+  }
+  .btn.on { color: var(--text-strong); }
+  .btn.on i {
+    background: var(--cat);
+    box-shadow: 0 0 6px color-mix(in srgb, var(--cat) 85%, transparent), inset 0 0 2px rgba(255,255,255,0.5);
+  }
+  .btn:active, .btn.pressed { transform: translateY(1px); box-shadow: inset 0 1px 3px rgba(0,0,0,0.6); }
+
+  /* toggle v2 */
+  .toggle { display: inline-flex; align-items: center; gap: 6px; font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); }
+  .tg {
+    width: 26px; height: 13px; border-radius: 7px; position: relative;
+    background: #0a0e12; border: 1px solid rgba(0,0,0,0.9);
+    box-shadow: inset 0 2px 3px rgba(0,0,0,0.85);
+  }
+  .tg::after {
+    content: ''; position: absolute; top: 1px; left: 1px; width: 10px; height: 9px; border-radius: 5px;
+    background: linear-gradient(180deg, #5a6875, #333d48);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.8);
+  }
+  .tg.on::after { left: 13px; background: linear-gradient(180deg, color-mix(in srgb, var(--cat) 80%, #fff), var(--cat)); box-shadow: 0 0 6px color-mix(in srgb, var(--cat) 70%, transparent); }
+
+  /* sélecteur de waveform */
+  .waves { display: flex; gap: 4px; }
+  .wave {
+    flex: 1; height: 26px; border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(180deg, #29333e, #1b222b);
+    border: 1px solid rgba(0,0,0,0.8);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.10), 0 2px 3px rgba(0,0,0,0.5);
+    color: var(--text-dim);
+  }
+  .wave svg { width: 18px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.6; }
+  .wave.on {
+    color: var(--cat);
+    border-color: color-mix(in srgb, var(--cat) 45%, #000);
+    box-shadow: inset 0 0 8px color-mix(in srgb, var(--cat) 22%, transparent), inset 0 1px 0 rgba(255,255,255,0.08);
+  }
+
+  /* ════════════════════════════════════════════
+     LCD — langage display unifié (séquenceurs, scope, chiptune…)
+     ════════════════════════════════════════════ */
+  .lcd {
+    --lcd-glow: var(--cat);
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.04), transparent 30%),
+      repeating-linear-gradient(0deg, rgba(0,0,0,0.22) 0 1px, transparent 1px 3px),
+      radial-gradient(120% 130% at 50% 0%, #10171c 0%, #0a0f13 70%);
+    border: 1px solid rgba(0,0,0,0.9);
+    border-radius: 5px;
+    box-shadow:
+      inset 0 2px 8px rgba(0,0,0,0.8),
+      inset 0 0 24px color-mix(in srgb, var(--lcd-glow) 7%, transparent),
+      0 1px 0 rgba(255,255,255,0.06);
+    padding: 7px;
+  }
+  .lcd-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.1em;
+    color: color-mix(in srgb, var(--lcd-glow) 75%, #fff);
+    text-shadow: 0 0 6px color-mix(in srgb, var(--lcd-glow) 55%, transparent);
+    margin-bottom: 6px;
+  }
+  .lcd-head .dim { color: var(--text-dim); text-shadow: none; }
+
+  /* step grid */
+  .steps { display: grid; grid-template-columns: repeat(16, 1fr); gap: 3px; }
+  .step {
+    height: 26px; border-radius: 2px;
+    background: rgba(255,255,255,0.045);
+    border: 1px solid rgba(0,0,0,0.6);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.5);
+    position: relative;
+  }
+  .step.q { background: rgba(255,255,255,0.085); }     /* repère temps fort */
+  .step.on {
+    background: color-mix(in srgb, var(--cat) 38%, #0c1116);
+    border-color: color-mix(in srgb, var(--cat) 45%, #000);
+    box-shadow: inset 0 0 6px color-mix(in srgb, var(--cat) 30%, transparent);
+  }
+  .step.on::after {
+    content: ''; position: absolute; inset: auto 3px 3px 3px; height: 3px; border-radius: 1px;
+    background: var(--cat); box-shadow: 0 0 5px color-mix(in srgb, var(--cat) 80%, transparent);
+  }
+  .step.ph { outline: 1.5px solid color-mix(in srgb, var(--cat) 85%, #fff); outline-offset: 0; }
+
+  .lcd svg.trace { display: block; width: 100%; }
+
+  /* mini transport sous lcd */
+  .seq-foot { display: flex; gap: 8px; align-items: center; }
+  .seq-foot .knob { min-width: 44px; }
+  .seq-foot .knob-dial { width: 32px; height: 32px; }
+
+  /* ════════════════════════════════════════════
+     Légende design system
+     ════════════════════════════════════════════ */
+  .legend {
+    margin-top: 22px; padding: 14px 18px; border-radius: 8px;
+    background: linear-gradient(180deg, rgba(20,26,34,0.8), rgba(13,17,22,0.8));
+    border: 1px solid var(--border-soft);
+    display: flex; gap: 28px; align-items: center; flex-wrap: wrap;
+  }
+  .legend h3 { font-family: var(--font-mono); font-size: 10px; color: var(--text-dim); letter-spacing: 0.2em; width: 100%; }
+  .cat-chip { display: flex; align-items: center; gap: 7px; font-size: 10px; color: var(--text-muted); letter-spacing: 0.08em; text-transform: uppercase; }
+  .cat-chip i { width: 14px; height: 5px; border-radius: 2px; display: block; }
+</style>
+</head>
+<body>
+
+<h1>NOOB<em>SYNTH</em> — PHASE 3 · FACEPLATES</h1>
+<div class="sub">steel neutre uniforme · liseré catégorie · knobs à arc de valeur · readouts mono · langage LCD unifié pour les displays</div>
+
+<div class="rack">
+
+  <!-- ═══ VCO (sources) ═══ -->
+  <div class="module" style="--cat: var(--cat-sources)">
+    <div class="mod-header">
+      <div class="mod-cat-bar"></div>
+      <div class="mod-name">VCO-1</div>
+      <div class="mod-type">oscillator</div>
+    </div>
+    <div class="mod-body">
+      <div class="rail">
+        <div class="rail-item"><button class="jack cv connected"></button><span class="rail-label">pitch</span></div>
+        <div class="rail-item"><button class="jack cv"></button><span class="rail-label">fm</span></div>
+        <div class="rail-item"><button class="jack gate"></button><span class="rail-label">sync</span></div>
+      </div>
+      <div class="ctl">
+        <div class="sect">
+          <div class="sect-label">Pitch</div>
+          <div class="row">
+            <div class="knob"><span class="knob-label">Freq</span><div class="knob-dial" style="--val:0.55"></div><span class="knob-value">220 Hz</span></div>
+            <div class="knob"><span class="knob-label">Detune</span><div class="knob-dial" style="--val:0.5"></div><span class="knob-value">+0 ct</span></div>
+            <div class="knob"><span class="knob-label">Oct</span><div class="knob-dial" style="--val:0.5"></div><span class="knob-value">0</span></div>
+          </div>
+        </div>
+        <div class="sect">
+          <div class="sect-label">Wave</div>
+          <div class="waves">
+            <div class="wave"><svg viewBox="0 0 20 14"><path d="M1 7 Q5.5 0 10 7 T19 7"/></svg></div>
+            <div class="wave on"><svg viewBox="0 0 20 14"><path d="M1 12 L10 2 L19 12"/></svg></div>
+            <div class="wave"><svg viewBox="0 0 20 14"><path d="M1 12 L10 2 L10 12 L19 2"/></svg></div>
+            <div class="wave"><svg viewBox="0 0 20 14"><path d="M1 12 L1 2 L10 2 L10 12 L19 12 L19 2"/></svg></div>
+          </div>
+        </div>
+        <div class="sect">
+          <div class="sect-label">Out</div>
+          <div class="row">
+            <div class="knob"><span class="knob-label">Level</span><div class="knob-dial" style="--val:0.8"></div><span class="knob-value">0.80</span></div>
+            <div style="display:flex;flex-direction:column;gap:8px;justify-content:center">
+              <span class="toggle"><span class="tg on"></span>Track</span>
+              <span class="toggle"><span class="tg"></span>LFO</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rail right">
+        <div class="rail-item"><span class="rail-label">out</span><button class="jack connected"></button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ VCF (filters) ═══ -->
+  <div class="module" style="--cat: var(--cat-filters)">
+    <div class="mod-header">
+      <div class="mod-cat-bar"></div>
+      <div class="mod-name">LADDER</div>
+      <div class="mod-type">vcf</div>
+    </div>
+    <div class="mod-body">
+      <div class="rail">
+        <div class="rail-item"><button class="jack connected"></button><span class="rail-label">in</span></div>
+        <div class="rail-item"><button class="jack cv connected"></button><span class="rail-label">mod</span></div>
+      </div>
+      <div class="ctl">
+        <div class="sect">
+          <div class="sect-label">Cutoff</div>
+          <div class="row">
+            <div class="knob"><span class="knob-label">Freq</span><div class="knob-dial" style="--val:0.68;width:46px;height:46px"></div><span class="knob-value">2.4 kHz</span></div>
+            <div class="knob"><span class="knob-label">Reso</span><div class="knob-dial" style="--val:0.35"></div><span class="knob-value">0.35</span></div>
+          </div>
+        </div>
+        <div class="sect">
+          <div class="sect-label">Mode</div>
+          <div class="btns">
+            <div class="btn on"><i></i>LP</div>
+            <div class="btn"><i></i>HP</div>
+            <div class="btn"><i></i>BP</div>
+            <div class="btn"><i></i>NOTCH</div>
+          </div>
+        </div>
+        <div class="sect">
+          <div class="sect-label">Drive · Slope</div>
+          <div class="row">
+            <div class="knob"><span class="knob-label">Drive</span><div class="knob-dial" style="--val:0.2"></div><span class="knob-value">0.20</span></div>
+            <div style="display:flex;flex-direction:column;gap:6px;justify-content:center">
+              <span class="toggle"><span class="tg on"></span>24 dB</span>
+              <span class="toggle"><span class="tg"></span>Ladder</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rail right">
+        <div class="rail-item"><span class="rail-label">out</span><button class="jack connected"></button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ ADSR (modulators) ═══ -->
+  <div class="module" style="--cat: var(--cat-modulators)">
+    <div class="mod-header">
+      <div class="mod-cat-bar"></div>
+      <div class="mod-name">ADSR</div>
+      <div class="mod-type">adsr</div>
+    </div>
+    <div class="mod-body">
+      <div class="rail">
+        <div class="rail-item"><button class="jack gate connected"></button><span class="rail-label">gate</span></div>
+      </div>
+      <div class="ctl">
+        <div class="sect">
+          <div class="sect-label">Envelope</div>
+          <div class="row">
+            <div class="knob"><span class="knob-label">A</span><div class="knob-dial" style="--val:0.15"></div><span class="knob-value">12 ms</span></div>
+            <div class="knob"><span class="knob-label">D</span><div class="knob-dial" style="--val:0.4"></div><span class="knob-value">240 ms</span></div>
+          </div>
+          <div class="row" style="margin-top:6px">
+            <div class="knob"><span class="knob-label">S</span><div class="knob-dial" style="--val:0.7"></div><span class="knob-value">0.70</span></div>
+            <div class="knob"><span class="knob-label">R</span><div class="knob-dial" style="--val:0.3"></div><span class="knob-value">480 ms</span></div>
+          </div>
+        </div>
+        <div class="lcd" style="margin-top:2px">
+          <svg class="trace" viewBox="0 0 120 30" height="34">
+            <path d="M2 28 L18 4 L36 14 L78 14 L118 28" fill="none" stroke="var(--cat-modulators)" stroke-width="1.5" opacity="0.9"/>
+            <path d="M2 28 L18 4 L36 14 L78 14 L118 28 V28 H2 Z" fill="var(--cat-modulators)" opacity="0.12"/>
+          </svg>
+        </div>
+      </div>
+      <div class="rail right">
+        <div class="rail-item"><span class="rail-label">env</span><button class="jack cv connected"></button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ DELAY (effects) ═══ -->
+  <div class="module" style="--cat: var(--cat-effects)">
+    <div class="mod-header">
+      <div class="mod-cat-bar"></div>
+      <div class="mod-name">TAPE ECHO</div>
+      <div class="mod-type">delay</div>
+    </div>
+    <div class="mod-body">
+      <div class="rail">
+        <div class="rail-item"><button class="jack connected"></button><span class="rail-label">in</span></div>
+        <div class="rail-item"><button class="jack cv"></button><span class="rail-label">time</span></div>
+        <div class="rail-item"><button class="jack sync connected"></button><span class="rail-label">clock</span></div>
+      </div>
+      <div class="ctl">
+        <div class="sect">
+          <div class="sect-label">Time</div>
+          <div class="row">
+            <div class="knob"><span class="knob-label">Time</span><div class="knob-dial" style="--val:0.45"></div><span class="knob-value">3/16</span></div>
+            <div class="knob"><span class="knob-label">Feedback</span><div class="knob-dial" style="--val:0.55"></div><span class="knob-value">0.55</span></div>
+          </div>
+        </div>
+        <div class="sect">
+          <div class="sect-label">Sync</div>
+          <div class="btns" style="grid-template-columns: repeat(4,1fr)">
+            <div class="btn"><i></i>1/4</div>
+            <div class="btn on"><i></i>3/16</div>
+            <div class="btn"><i></i>1/8</div>
+            <div class="btn"><i></i>1/16</div>
+          </div>
+        </div>
+        <div class="sect">
+          <div class="sect-label">Mix</div>
+          <div class="row">
+            <div class="knob"><span class="knob-label">Wet</span><div class="knob-dial" style="--val:0.4"></div><span class="knob-value">0.40</span></div>
+            <div class="knob"><span class="knob-label">Wow</span><div class="knob-dial" style="--val:0.25"></div><span class="knob-value">0.25</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="rail right">
+        <div class="rail-item"><span class="rail-label">out</span><button class="jack connected"></button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ STEP SEQ (sequencers, module large) ═══ -->
+  <div class="module w2" style="--cat: var(--cat-sequencers)">
+    <div class="mod-header">
+      <div class="mod-cat-bar"></div>
+      <div class="mod-name">STEP SEQ</div>
+      <div class="mod-type">step-sequencer</div>
+    </div>
+    <div class="mod-body">
+      <div class="rail">
+        <div class="rail-item"><button class="jack sync connected"></button><span class="rail-label">clock</span></div>
+        <div class="rail-item"><button class="jack gate"></button><span class="rail-label">reset</span></div>
+      </div>
+      <div class="ctl">
+        <div class="lcd">
+          <div class="lcd-head"><span>PATTERN A · 16 STEPS</span><span class="dim">STEP 06</span></div>
+          <div class="steps">
+            <div class="step on q"></div><div class="step"></div><div class="step on"></div><div class="step"></div>
+            <div class="step on q"></div><div class="step ph on"></div><div class="step"></div><div class="step on"></div>
+            <div class="step q"></div><div class="step on"></div><div class="step"></div><div class="step on"></div>
+            <div class="step on q"></div><div class="step"></div><div class="step on"></div><div class="step"></div>
+          </div>
+          <div class="steps" style="margin-top:3px">
+            <div class="step on q" style="height:14px"></div><div class="step" style="height:14px"></div><div class="step on" style="height:14px"></div><div class="step" style="height:14px"></div>
+            <div class="step q" style="height:14px"></div><div class="step on ph" style="height:14px"></div><div class="step" style="height:14px"></div><div class="step" style="height:14px"></div>
+            <div class="step on q" style="height:14px"></div><div class="step" style="height:14px"></div><div class="step on" style="height:14px"></div><div class="step" style="height:14px"></div>
+            <div class="step q" style="height:14px"></div><div class="step on" style="height:14px"></div><div class="step" style="height:14px"></div><div class="step on" style="height:14px"></div>
+          </div>
+        </div>
+        <div class="seq-foot">
+          <div class="knob"><span class="knob-label">Rate</span><div class="knob-dial" style="--val:0.5"></div><span class="knob-value">1/16</span></div>
+          <div class="knob"><span class="knob-label">Gate</span><div class="knob-dial" style="--val:0.6"></div><span class="knob-value">60%</span></div>
+          <div class="knob"><span class="knob-label">Swing</span><div class="knob-dial" style="--val:0.3"></div><span class="knob-value">12%</span></div>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-left:auto">
+            <span class="toggle"><span class="tg on"></span>Loop</span>
+            <span class="toggle"><span class="tg"></span>Ping-Pong</span>
+          </div>
+        </div>
+      </div>
+      <div class="rail right">
+        <div class="rail-item"><span class="rail-label">cv</span><button class="jack cv connected"></button></div>
+        <div class="rail-item"><span class="rail-label">gate</span><button class="jack gate connected"></button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SCOPE (io, display pur) ═══ -->
+  <div class="module" style="--cat: var(--cat-io)">
+    <div class="mod-header">
+      <div class="mod-cat-bar"></div>
+      <div class="mod-name">SCOPE</div>
+      <div class="mod-type">scope</div>
+    </div>
+    <div class="mod-body">
+      <div class="rail">
+        <div class="rail-item"><button class="jack connected"></button><span class="rail-label">in 1</span></div>
+        <div class="rail-item"><button class="jack"></button><span class="rail-label">in 2</span></div>
+      </div>
+      <div class="ctl">
+        <div class="lcd" style="--lcd-glow: var(--accent-mint); flex:1">
+          <div class="lcd-head"><span style="color:var(--accent-mint)">CH1 · 5ms</span><span class="dim">±1.0</span></div>
+          <svg class="trace" viewBox="0 0 140 64" height="84">
+            <g stroke="rgba(255,255,255,0.07)" stroke-width="0.5">
+              <line x1="0" y1="32" x2="140" y2="32"/><line x1="0" y1="16" x2="140" y2="16"/><line x1="0" y1="48" x2="140" y2="48"/>
+              <line x1="35" y1="0" x2="35" y2="64"/><line x1="70" y1="0" x2="70" y2="64"/><line x1="105" y1="0" x2="105" y2="64"/>
+            </g>
+            <path d="M0 32 C8 6 18 6 26 32 S 44 58 52 32 S 70 6 78 32 S 96 58 104 32 S 122 6 130 32 L140 32"
+              fill="none" stroke="var(--accent-mint)" stroke-width="1.5"
+              style="filter: drop-shadow(0 0 3px rgba(66,226,177,0.7))"/>
+          </svg>
+        </div>
+        <div class="btns" style="grid-template-columns: repeat(3,1fr)">
+          <div class="btn on"><i></i>SCOPE</div>
+          <div class="btn"><i></i>FFT</div>
+          <div class="btn"><i></i>SPECT</div>
+        </div>
+      </div>
+      <div class="rail right">
+        <div class="rail-item"><span class="rail-label">thru</span><button class="jack"></button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 909 KICK (drums, compact) ═══ -->
+  <div class="module" style="--cat: var(--cat-drums); width: 196px">
+    <div class="mod-header">
+      <div class="mod-cat-bar"></div>
+      <div class="mod-name">909 KICK</div>
+      <div class="mod-type">909-kick</div>
+    </div>
+    <div class="mod-body">
+      <div class="rail">
+        <div class="rail-item"><button class="jack gate connected"></button><span class="rail-label">trig</span></div>
+        <div class="rail-item"><button class="jack cv"></button><span class="rail-label">acc</span></div>
+      </div>
+      <div class="ctl">
+        <div class="sect">
+          <div class="sect-label">Tone</div>
+          <div class="row">
+            <div class="knob"><span class="knob-label">Tune</span><div class="knob-dial" style="--val:0.4"></div><span class="knob-value">0.40</span></div>
+            <div class="knob"><span class="knob-label">Decay</span><div class="knob-dial" style="--val:0.65"></div><span class="knob-value">0.65</span></div>
+          </div>
+          <div class="row" style="margin-top:6px">
+            <div class="knob"><span class="knob-label">Attack</span><div class="knob-dial" style="--val:0.5"></div><span class="knob-value">0.50</span></div>
+            <div class="knob"><span class="knob-label">Level</span><div class="knob-dial" style="--val:0.85"></div><span class="knob-value">0.85</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="rail right">
+        <div class="rail-item"><span class="rail-label">out</span><button class="jack connected"></button></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="legend">
+  <h3>CATEGORY ACCENTS — liseré header + arc des knobs + LED des displays</h3>
+  <span class="cat-chip"><i style="background:var(--cat-sources)"></i>Sources</span>
+  <span class="cat-chip"><i style="background:var(--cat-filters)"></i>Filters</span>
+  <span class="cat-chip"><i style="background:var(--cat-amplifiers)"></i>Amplifiers</span>
+  <span class="cat-chip"><i style="background:var(--cat-effects)"></i>Effects</span>
+  <span class="cat-chip"><i style="background:var(--cat-modulators)"></i>Modulators</span>
+  <span class="cat-chip"><i style="background:var(--cat-sequencers)"></i>Sequencers</span>
+  <span class="cat-chip"><i style="background:var(--cat-drums)"></i>Drums</span>
+  <span class="cat-chip"><i style="background:var(--cat-io)"></i>I/O</span>
+</div>
+
+</body>
+</html>
