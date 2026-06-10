@@ -53,6 +53,7 @@ import { MixerConsole, type MixerChannelState } from './ui/MixerConsole'
 import { RackTabs, type ViewMode } from './ui/RackTabs'
 import { SidePanel } from './ui/SidePanel'
 import { BrandRail } from './ui/BrandRail'
+import { IoPanel } from './ui/IoPanel'
 import { TransportConsole } from './ui/TransportConsole'
 import { ContextMenu, type ContextMenuAction } from './ui/ContextMenu'
 import './styles.css'
@@ -2093,6 +2094,33 @@ function App() {
         onToggleDevResize={() => setDevResizeEnabled((prev) => !prev)}
         onExportPreset={handleExportPreset}
         onImportPreset={handleImportPreset}
+        ioPanel={
+          isTauri ? (
+            <IoPanel
+              tauriStatus={tauriStatus}
+              tauriError={tauriError}
+              tauriPing={tauriPing}
+              tauriAudioOutputs={tauriAudioOutputs}
+              tauriAudioInputs={tauriAudioInputs}
+              tauriMidiInputs={tauriMidiInputs}
+              tauriNativeRunning={tauriNativeRunning}
+              tauriNativeError={tauriNativeError}
+              tauriNativeSampleRate={tauriNativeSampleRate}
+              tauriNativeChannels={tauriNativeChannels}
+              tauriNativeDeviceName={tauriNativeDeviceName}
+              tauriNativeInputDeviceName={tauriNativeInputDeviceName}
+              tauriNativeInputSampleRate={tauriNativeInputSampleRate}
+              tauriNativeInputChannels={tauriNativeInputChannels}
+              tauriNativeInputError={tauriNativeInputError}
+              tauriSelectedOutput={tauriSelectedOutput}
+              tauriSelectedInput={tauriSelectedInput}
+              onRefreshTauri={refreshTauriStatus}
+              onTauriOutputChange={handleTauriOutputChange}
+              onTauriInputChange={handleTauriInputChange}
+              onTauriSyncGraph={handleTauriSyncGraph}
+            />
+          ) : undefined
+        }
       />
       <RackTabs
         racks={racks}
@@ -2236,28 +2264,6 @@ function App() {
           onApplyPreset={(g, presetId) => applyPreset(g, { presetId })}
           projects={projects}
           onApplyProject={handleApplyProject}
-            tauriAvailable={isTauri}
-            tauriStatus={tauriStatus}
-            tauriError={tauriError}
-          tauriPing={tauriPing}
-          tauriAudioOutputs={tauriAudioOutputs}
-          tauriAudioInputs={tauriAudioInputs}
-          tauriMidiInputs={tauriMidiInputs}
-          tauriNativeRunning={tauriNativeRunning}
-          tauriNativeError={tauriNativeError}
-          tauriNativeSampleRate={tauriNativeSampleRate}
-          tauriNativeChannels={tauriNativeChannels}
-          tauriNativeDeviceName={tauriNativeDeviceName}
-          tauriNativeInputDeviceName={tauriNativeInputDeviceName}
-          tauriNativeInputSampleRate={tauriNativeInputSampleRate}
-          tauriNativeInputChannels={tauriNativeInputChannels}
-          tauriNativeInputError={tauriNativeInputError}
-          tauriSelectedOutput={tauriSelectedOutput}
-          tauriSelectedInput={tauriSelectedInput}
-          onRefreshTauri={refreshTauriStatus}
-          onTauriOutputChange={handleTauriOutputChange}
-          onTauriInputChange={handleTauriInputChange}
-          onTauriSyncGraph={handleTauriSyncGraph}
           templates={allTemplates}
           templateStatus={templateStatus}
           onInsertTemplate={handleInsertTemplate}

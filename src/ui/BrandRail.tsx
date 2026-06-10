@@ -1,8 +1,12 @@
 /**
  * BrandRail — top rail of the Console Steel shell.
  * Brand, engine status LED, and the quiet utilities (cables/dev toggles,
- * export/import). Transport lives in the TransportConsole at the bottom.
+ * export/import, native I/O popover). Transport lives in the
+ * TransportConsole at the bottom.
  */
+
+import { useEffect, useRef, useState } from 'react'
+import type { ReactNode } from 'react'
 
 type BrandRailProps = {
   status: 'idle' | 'running' | 'error'
@@ -16,6 +20,8 @@ type BrandRailProps = {
   onToggleDevResize?: () => void
   onExportPreset?: () => void
   onImportPreset?: () => void
+  /** Native audio/MIDI config panel (desktop mode only) — shown in a popover */
+  ioPanel?: ReactNode
 }
 
 const ExportIcon = () => (
@@ -41,7 +47,34 @@ export const BrandRail = ({
   onToggleDevResize = () => {},
   onExportPreset,
   onImportPreset,
-}: BrandRailProps) => (
+  ioPanel,
+}: BrandRailProps) => {
+  const [ioOpen, setIoOpen] = useState(false)
+  const ioRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    if (!ioOpen) {
+      return
+    }
+    const handlePointerDown = (event: PointerEvent) => {
+      if (!ioRef.current?.contains(event.target as Node)) {
+        setIoOpen(false)
+      }
+    }
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIoOpen(false)
+      }
+    }
+    document.addEventListener('pointerdown', handlePointerDown)
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown)
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [ioOpen])
+
+  return (
   <header className="brand-rail">
     <div className="brand-rail-name">
       NOOB<em>SYNTH</em>
@@ -83,7 +116,22 @@ export const BrandRail = ({
           <ImportIcon />
         </button>
       </div>
+      {ioPanel && (
+        <div className="rail-io" ref={ioRef}>
+          <button
+            type="button"
+            className={`rail-btn rail-btn--io ${ioOpen ? 'active' : ''}`}
+            onClick={() => setIoOpen((prev) => !prev)}
+            aria-expanded={ioOpen}
+            title="Native audio/MIDI configuration"
+          >
+            ⚙ I/O
+          </button>
+          {ioOpen && <div className="io-popover">{ioPanel}</div>}
+        </div>
+      )}
       <div className="brand-rail-serial">Nº 0098-RW · {statusDetail}</div>
     </div>
   </header>
-)
+  )
+}
