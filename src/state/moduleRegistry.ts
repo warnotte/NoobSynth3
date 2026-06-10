@@ -346,6 +346,10 @@ export const moduleCatalog: { type: ModuleType; label: string; category: ModuleC
   { type: 'notes', label: 'Notes', category: 'io' },
 ]
 
+export const moduleCategoryByType = Object.fromEntries(
+  moduleCatalog.map((entry) => [entry.type, entry.category]),
+) as Record<ModuleType, ModuleCategory>
+
 export const modulePrefixes: Record<ModuleType, string> = {
   oscillator: 'osc',
   supersaw: 'ssaw',

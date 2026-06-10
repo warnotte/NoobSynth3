@@ -1401,7 +1401,7 @@
    ============================================ */
 
 .module-card {
-  --panel-color: #1a1f2e;
+  --cat: var(--cat-io);
   --control-min: 44px;
   --dial-size: 28px;
   --dial-center-inset: 7px;
@@ -1416,35 +1416,24 @@
   container-name: module-card;
   position: relative;
   z-index: 1;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-lg);
+  /* Console Steel faceplate : acier uniforme, l'identité vient du liseré catégorie */
   background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.045), transparent 38%),
     repeating-linear-gradient(
-      0deg,
-      rgba(255, 255, 255, 0.015) 0px,
-      rgba(255, 255, 255, 0.015) 1px,
+      95deg,
+      rgba(255, 255, 255, 0.013) 0px,
+      rgba(255, 255, 255, 0.013) 1px,
       transparent 1px,
       transparent 3px
     ),
-    linear-gradient(180deg,
-      rgba(255, 255, 255, 0.1) 0%,
-      transparent 3%,
-      transparent 97%,
-      rgba(0, 0, 0, 0.2) 100%
-    ),
-    linear-gradient(90deg,
-      rgba(255, 255, 255, 0.05) 0%,
-      transparent 2%,
-      transparent 98%,
-      rgba(0, 0, 0, 0.1) 100%
-    ),
-    var(--panel-color);
-  border: none;
+    linear-gradient(180deg, var(--steel-1) 0%, var(--steel-0) 78%, #11161d 100%);
+  border: 1px solid rgba(0, 0, 0, 0.85);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    inset 0 -1px 0 var(--glass-overlay),
-    2px 0 4px var(--glass-overlay),
-    -2px 0 4px var(--glass-overlay);
-  padding: 4px 4px 6px;
+    inset 0 -1px 0 rgba(0, 0, 0, 0.6),
+    0 6px 14px rgba(0, 0, 0, 0.4);
+  padding: 0 4px 6px;
   gap: 4px;
   backdrop-filter: none;
   display: flex;
@@ -1540,19 +1529,15 @@
   box-shadow: inset 0 0 0 1px rgba(255, 120, 120, 0.35);
 }
 
-/* Module type colors */
-.module-card[data-module-type="oscillator"] { --panel-color: #1a1f2e; }
-.module-card[data-module-type="vcf"] { --panel-color: #1e2a1f; }
-.module-card[data-module-type="gain"] { --panel-color: #2a1f1e; }
-.module-card[data-module-type="adsr"] { --panel-color: #2a2a1e; }
-.module-card[data-module-type="lfo"] { --panel-color: #1e1e2a; }
-.module-card[data-module-type="mixer"] { --panel-color: #1f2a2a; }
-.module-card[data-module-type="chorus"] { --panel-color: #251e2a; }
-.module-card[data-module-type="delay"] { --panel-color: #1e2528; }
-.module-card[data-module-type="reverb"] { --panel-color: #1e2025; }
-.module-card[data-module-type="output"] { --panel-color: #2a1e2a; }
-.module-card[data-module-type="control"] { --panel-color: #1a2025; }
-.module-card[data-module-type="scope"] { --panel-color: #1a2320; }
+/* Accent par catégorie — data-category vient de moduleRegistry (les 98 types couverts) */
+.module-card[data-category="sources"] { --cat: var(--cat-sources); }
+.module-card[data-category="filters"] { --cat: var(--cat-filters); }
+.module-card[data-category="amplifiers"] { --cat: var(--cat-amplifiers); }
+.module-card[data-category="effects"] { --cat: var(--cat-effects); }
+.module-card[data-category="modulators"] { --cat: var(--cat-modulators); }
+.module-card[data-category="sequencers"] { --cat: var(--cat-sequencers); }
+.module-card[data-category="drums"] { --cat: var(--cat-drums); }
+.module-card[data-category="io"] { --cat: var(--cat-io); }
 
 /* ============================================
    SECTION 5: MODULE HEADER & BODY
@@ -1560,28 +1545,51 @@
 
 .module-header {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-bottom: 2px;
-  margin-bottom: 0;
-  border-bottom: 1px solid var(--border-soft);
-  gap: 2px;
+  align-items: stretch;
+  margin: 0 -4px;
+  height: 20px;
+  flex: none;
+  gap: 6px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.7);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.22));
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  overflow: hidden;
   cursor: grab;
+}
+
+.module-cat-bar {
+  width: 4px;
+  flex: none;
+  background: linear-gradient(180deg, var(--cat), color-mix(in srgb, var(--cat) 55%, #000));
+  box-shadow: 0 0 8px color-mix(in srgb, var(--cat) 60%, transparent);
+}
+
+.module-title {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
 }
 
 .module-actions {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
+  padding-right: 4px;
 }
 
 .module-name {
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
+  font-family: var(--font-engrave);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.9);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  color: var(--text-strong);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.8);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .module-subtitle {
@@ -1589,11 +1597,22 @@
 }
 
 .module-badge {
-  font-size: 7px;
-  padding: 3px 6px;
-  border-radius: var(--radius-sm);
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-family: var(--font-lcd);
+  font-size: 8px;
+  letter-spacing: 0.06em;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: color-mix(in srgb, var(--cat) 80%, #fff);
+  opacity: 0.85;
+  white-space: nowrap;
+}
+
+/* modules étroits : pas la place pour le badge type */
+@container module-card (max-width: 170px) {
+  .module-badge {
+    display: none;
+  }
 }
 
 .module-body {
@@ -1660,7 +1679,7 @@
 .ports-side--right .port-side-item { flex-direction: row; }
 
 .port-side-label {
-  font-size: 6px;
+  font-size: 7px;
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -1691,12 +1710,15 @@
   min-width: 18px;
   min-height: 18px;
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #555, #2a2a2a 50%, #1a1a1a 100%);
-  border: none;
+  /* bague métal teintée par le type de signal, trou sombre au centre */
+  background:
+    radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.28), transparent 46%),
+    radial-gradient(circle, color-mix(in srgb, var(--jack-color) 72%, #1c242c) 0 100%);
+  border: 1px solid rgba(0, 0, 0, 0.9);
   box-shadow:
-    inset 0 1px 3px rgba(255, 255, 255, 0.15),
-    inset 0 -1px 3px rgba(0, 0, 0, 0.5),
-    0 1px 4px rgba(0, 0, 0, 0.4);
+    inset 0 1px 1px rgba(255, 255, 255, 0.25),
+    inset 0 0 4px rgba(0, 0, 0, 0.6),
+    0 1px 2px rgba(0, 0, 0, 0.7);
   position: relative;
   flex-shrink: 0;
   touch-action: none;
@@ -1705,23 +1727,20 @@
 .jack::before {
   content: '';
   position: absolute;
-  inset: 2px;
+  inset: 4px;
   border-radius: 50%;
-  background: linear-gradient(145deg, #2a2a2a, #0a0a0a);
+  background: linear-gradient(145deg, #232a32, #05070a);
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 .jack::after {
   content: '';
   position: absolute;
-  inset: 4px;
+  inset: 5px;
   border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #1a1a1a, #000);
-  box-shadow:
-    inset 0 1px 1px rgba(0, 0, 0, 0.9),
-    0 0 0 1px var(--jack-color),
-    0 0 4px var(--jack-color);
-  opacity: 0.7;
+  background: radial-gradient(circle at 30% 30%, #11161c, #000);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.9);
+  opacity: 1;
 }
 
 .jack.kind-audio { --jack-color: var(--accent-cool); }
@@ -3612,7 +3631,6 @@
    ============================================ */
 
 .module-card[data-module-type="mario"] {
-  --panel-color: #1a0a0a;
   background:
     repeating-linear-gradient(
       0deg,

@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactNode } from 'react'
 import type { ModuleSpec } from '../shared/graph'
+import { moduleCategoryByType } from '../state/moduleRegistry'
 import type { PortDefinition } from './portCatalog'
 
 type ModuleCardProps = {
@@ -56,6 +57,7 @@ export const ModuleCard = ({
   <div
     className={`module-card module-size-${size} layout-${portLayout}`}
     data-module-type={module.type}
+    data-category={moduleCategoryByType[module.type] ?? 'io'}
     style={style}
     onContextMenu={(e) => {
       if (onContextMenu) {
@@ -65,7 +67,8 @@ export const ModuleCard = ({
     }}
   >
     <div className="module-header" onPointerDown={(event) => onHeaderPointerDown?.(module.id, event)}>
-      <div>
+      <span className="module-cat-bar" aria-hidden="true" />
+      <div className="module-title">
         <div className="module-name">{module.name}</div>
         <div className="module-subtitle">{module.id}</div>
       </div>

@@ -72,6 +72,16 @@
   --jack-gate: var(--accent-warm);
   --jack-sync: var(--accent-rose);
 
+  /* Module category accents (phase 3 faceplates — liseré header, etc.) */
+  --cat-sources: #5bb6ff;
+  --cat-filters: #9d8cff;
+  --cat-amplifiers: #4fd8c8;
+  --cat-effects: #d98cff;
+  --cat-modulators: #42e2b1;
+  --cat-sequencers: #f0b06b;
+  --cat-drums: #ff7a66;
+  --cat-io: #9fb2c8;
+
   /* Knob default color */
   --knob-color: var(--accent-mint);
 
