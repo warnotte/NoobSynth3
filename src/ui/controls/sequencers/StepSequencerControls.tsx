@@ -348,7 +348,8 @@ export function StepSequencerControls({ module, engine, status, audioMode, nativ
             {/* colonne de labels — réutilise la structure d'un step pour l'alignement */}
             <div className="seq-step seq-step-labels" aria-hidden="true">
               <div className="seq-step-led" />
-              <div className="seq-step-num" />
+              {/* contenu factice : un num vide aurait une hauteur 0 et tout remonterait */}
+              <div className="seq-step-num">0</div>
               <span className="seq-label seq-label-gate">Gate</span>
               <span className="seq-label seq-label-note">Note</span>
               <span className="seq-label seq-label-vel">Vel</span>
