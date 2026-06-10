@@ -265,7 +265,7 @@ export const MixerConsole = ({
   return (
     <div className="mixer-console">
       <div className="mixer-strips">
-        {racks.map((rack) => {
+        {racks.map((rack, index) => {
           const ch = mixerState[rack.id] ?? { volume: 0.8, mute: false, solo: false }
           const isActive = rack.id === activeRackId
           const isMuted = ch.mute || (hasSolo && !ch.solo)
@@ -275,14 +275,36 @@ export const MixerConsole = ({
               key={rack.id}
               className={`mixer-strip ${isActive ? 'active' : ''} ${isMuted ? 'muted' : ''}`}
             >
-              <button
-                type="button"
-                className="mixer-strip-name"
-                onClick={() => onSwitchRack(rack.id)}
-                title={`Switch to ${rack.name}`}
-              >
-                {rack.name}
-              </button>
+              <span className="mixer-strip-src">CH {index + 1}</span>
+
+              {channelFxIds[rack.id] && (
+                <ChannelFx
+                  rackId={rack.id}
+                  fxIds={channelFxIds[rack.id]}
+                  values={channelFx[rack.id] ?? NEUTRAL_CHANNEL_FX}
+                  onChange={onChannelFxChange}
+                  onToggleSection={onChannelFxToggle}
+                />
+              )}
+
+              <div className="mixer-strip-controls">
+                <button
+                  type="button"
+                  className={`mixer-btn mixer-solo ${ch.solo ? 'on' : ''}`}
+                  onClick={() => onSoloToggle(rack.id)}
+                  title="Solo"
+                >
+                  SOLO
+                </button>
+                <button
+                  type="button"
+                  className={`mixer-btn mixer-mute ${ch.mute ? 'on' : ''}`}
+                  onClick={() => onMuteToggle(rack.id)}
+                  title="Mute"
+                >
+                  MUTE
+                </button>
+              </div>
 
               <div className="mixer-strip-body">
                 <VuMeter
@@ -307,47 +329,28 @@ export const MixerConsole = ({
 
               <span className="mixer-strip-db">{dbDisplay(ch.volume)} dB</span>
 
-              {channelFxIds[rack.id] && (
-                <ChannelFx
-                  rackId={rack.id}
-                  fxIds={channelFxIds[rack.id]}
-                  values={channelFx[rack.id] ?? NEUTRAL_CHANNEL_FX}
-                  onChange={onChannelFxChange}
-                  onToggleSection={onChannelFxToggle}
-                />
-              )}
-
-              <div className="mixer-strip-controls">
-                <button
-                  type="button"
-                  className={`mixer-btn mixer-mute ${ch.mute ? 'on' : ''}`}
-                  onClick={() => onMuteToggle(rack.id)}
-                  title="Mute"
-                >
-                  M
-                </button>
-                <button
-                  type="button"
-                  className={`mixer-btn mixer-solo ${ch.solo ? 'on' : ''}`}
-                  onClick={() => onSoloToggle(rack.id)}
-                  title="Solo"
-                >
-                  S
-                </button>
-              </div>
+              <button
+                type="button"
+                className="mixer-strip-scribble"
+                onClick={() => onSwitchRack(rack.id)}
+                title={`Open ${rack.name} in the rack view`}
+              >
+                {rack.name}
+              </button>
             </div>
           )
         })}
 
         {/* Master strip */}
         <div className="mixer-strip mixer-strip-master">
-          <span className="mixer-strip-name mixer-strip-name-master">Master</span>
+          <span className="mixer-strip-src">MASTER BUS</span>
+          <MasterFx values={masterFx} onChange={onMasterFxChange} onToggleSection={onMasterFxToggle} />
           <div className="mixer-strip-body">
             <div className="mixer-strip-fader">
               <FaderScale />
               <input
                 type="range"
-                className="mixer-fader-vertical"
+                className="mixer-fader-vertical mixer-fader-master"
                 min={0}
                 max={1.5}
                 step={0.01}
@@ -357,7 +360,7 @@ export const MixerConsole = ({
             </div>
           </div>
           <span className="mixer-strip-db">{dbDisplay(masterVolume)} dB</span>
-          <MasterFx values={masterFx} onChange={onMasterFxChange} onToggleSection={onMasterFxToggle} />
+          <span className="mixer-strip-scribble mixer-strip-scribble-master">MASTER</span>
         </div>
       </div>
     </div>

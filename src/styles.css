@@ -6474,3 +6474,175 @@ body {
   .io-popover { position: fixed; top: 46px; right: 8px; }
   .io-popover::before { display: none; }
 }
+
+
+/* ── Console Steel: mixer view (phase 2) ── */
+.mixer-console {
+  padding: 14px 24px 12px;
+  background: none;
+  overflow: auto;
+}
+.mixer-strips {
+  align-items: stretch;
+  justify-content: center;
+  gap: 0;
+  padding: 0;
+  flex: 1;
+  min-height: 0;
+  filter: drop-shadow(0 18px 30px rgba(0, 0, 0, 0.55));
+}
+/* wood end-cheeks */
+.mixer-strips::before,
+.mixer-strips::after {
+  content: '';
+  width: 34px;
+  flex-shrink: 0;
+  background:
+    repeating-linear-gradient(95deg, rgba(0, 0, 0, 0.22) 0 3px, transparent 3px 7px),
+    linear-gradient(180deg, #4b341f, #2a1c10);
+  border: 1px solid #0a0502;
+}
+.mixer-strips::before { border-radius: 10px 0 0 10px; }
+.mixer-strips::after { border-radius: 0 10px 10px 0; }
+
+.mixer-strip {
+  width: 178px;
+  gap: 10px;
+  padding: 12px 12px 14px;
+  border-radius: 0;
+  border: none;
+  border-right: 2px solid #0b0d10;
+  border-top: 1px solid rgba(196, 216, 240, 0.12);
+  background: linear-gradient(180deg, #262b33 0%, #1b1f25 100%);
+  box-shadow: none;
+  transition: none;
+}
+.mixer-strip.active {
+  background: linear-gradient(180deg, #2a3039 0%, #1d2229 100%);
+  border-color: #0b0d10;
+  border-top-color: rgba(196, 216, 240, 0.12);
+}
+.mixer-strip.active::before {
+  inset: 0 0 auto 0;
+  height: 3px;
+  border: none;
+  border-radius: 0;
+  background: var(--cs-led);
+  box-shadow: 0 0 10px var(--cs-led);
+}
+.mixer-strip-master {
+  width: 202px;
+  background: linear-gradient(180deg, #2c323c 0%, #20252d 100%);
+  border-right: none;
+}
+
+.mixer-strip-src {
+  font-family: var(--font-lcd);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--cs-engrave-dim);
+  width: 100%;
+  text-align: center;
+}
+
+.mixer-strip-body { flex: 1; min-height: 220px; height: auto; }
+.mixer-fader-vertical { width: 200px; }
+.mixer-fader-master::-webkit-slider-thumb {
+  background:
+    linear-gradient(180deg, transparent 45%, #ffd2a4 45%, #ffd2a4 55%, transparent 55%),
+    repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0 1px, transparent 1px 4px),
+    linear-gradient(90deg, #8c3b2a 0%, #5e2317 50%, #3a130b 100%);
+}
+
+.mixer-strip-db {
+  font-family: var(--font-lcd);
+  font-size: 11px;
+  color: var(--cs-led);
+  text-shadow: 0 0 6px var(--cs-led-glow);
+  background: var(--cs-led-glass);
+  border: 1px solid #04070c;
+  border-radius: 3px;
+  padding: 3px 4px 2px;
+  box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.9);
+}
+
+.mixer-strip-scribble {
+  width: 100%;
+  font-family: var(--font-lcd);
+  font-size: 11.5px;
+  letter-spacing: 0.12em;
+  color: #161a20;
+  background: linear-gradient(180deg, #d8e3f0, #aebdcf);
+  border: none;
+  border-radius: 2px;
+  padding: 5px 4px 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  transform: rotate(-0.4deg);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mixer-strip:nth-child(even) .mixer-strip-scribble { transform: rotate(0.5deg); }
+.mixer-strip-scribble:hover { background: linear-gradient(180deg, #e6eef8, #bccadb); }
+.mixer-strip-scribble-master {
+  background: linear-gradient(180deg, #e8b08a, #c08458);
+  font-weight: 600;
+  cursor: default;
+  transform: rotate(0.4deg);
+  text-align: center;
+}
+.mixer-strip-scribble-master:hover { background: linear-gradient(180deg, #e8b08a, #c08458); }
+
+.mixer-strip-controls { display: flex; width: 100%; gap: 8px; }
+.mixer-btn {
+  font-family: var(--font-engrave);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  height: 26px;
+  border-radius: 3px;
+  border: 1px solid #0a0c10;
+  background: linear-gradient(180deg, #303641, #1d2026);
+  color: var(--cs-engrave-dim);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(196, 216, 240, 0.12);
+}
+.mixer-btn:hover { color: var(--cs-engrave); }
+.mixer-btn.mixer-solo.on {
+  color: #2a1c05;
+  background: linear-gradient(180deg, #ffc561, #c98f2e);
+  border-color: #4d3208;
+  box-shadow: 0 0 12px rgba(255, 174, 66, 0.5), inset 0 1px 1px rgba(255, 240, 205, 0.6);
+}
+.mixer-btn.mixer-mute.on {
+  color: #fff;
+  background: linear-gradient(180deg, #e0654d, #a33621);
+  border-color: #4d130b;
+  box-shadow: 0 0 12px rgba(224, 73, 47, 0.5), inset 0 1px 1px rgba(255, 220, 210, 0.4);
+}
+
+.channel-fx { border-top: 1px solid var(--cs-line); padding-top: 8px; }
+.fx-section-toggle { font-family: var(--font-engrave); letter-spacing: 0.2em; font-size: 10px; }
+
+@media (max-width: 960px) {
+  .mixer-strips { justify-content: flex-start; overflow-x: auto; }
+  .mixer-strips::before, .mixer-strips::after { display: none; }
+  .mixer-strip { width: 156px; }
+  .mixer-strip-master { width: 172px; }
+}
+
+/* Long-throw fader: fixed 380px travel zone, centered in the strip; the
+   dB scale lives inside the same box so it always matches the travel. */
+.mixer-strip-body {
+  flex: 1;
+  min-height: 0;
+  align-items: center;
+  justify-content: center;
+}
+.vu-meter { height: 380px; max-height: 100%; align-self: center; }
+.mixer-strip-fader { height: 380px; max-height: 100%; align-self: center; }
+.mixer-fader-vertical { width: 360px; }
+
+/* The rotated range input pivots around its center: a 360px travel needs
+   right = -(W/2 - 30) to keep the visual track at the same x as before. */
+.mixer-fader-vertical { right: -150px; }
