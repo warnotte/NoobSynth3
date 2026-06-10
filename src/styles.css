@@ -1407,9 +1407,9 @@
   --dial-center-inset: 7px;
   --dial-indicator-height: 6px;
   --dial-indicator-offset: -9px;
-  --rotary-label-size: 6px;
-  --rotary-readout-size: 6px;
-  --rotary-readout-pad-x: 2px;
+  --rotary-label-size: 8px;
+  --rotary-readout-size: 8px;
+  --rotary-readout-pad-x: 3px;
   --rotary-readout-pad-y: 1px;
   --rotary-input-width: 40px;
   container-type: inline-size;
@@ -1441,15 +1441,30 @@
   height: 100%;
 }
 
+/* Paliers responsive des contrôles.
+   IMPORTANT : un @container ne peut pas matcher le container lui-même —
+   cibler .module-card ici est une règle MORTE (bug historique, paliers
+   jamais appliqués). On cible .module-body : les custom properties héritent
+   vers tous les contrôles. */
+
+/* Modules 1 colonne (~200px) : la zone contrôles ne fait que ~90px de large,
+   --control-min 44px y interdit la 2e colonne de knobs (ADSR/909 restaient
+   empilés et débordaient). 40px permet le 2×2 du design validé. */
+@container module-card (max-width: 210px) {
+  .module-body {
+    --control-min: 40px;
+  }
+}
+
 @container module-card (max-width: 170px) {
-  .module-card {
+  .module-body {
     --control-min: 40px;
     --dial-size: 24px;
     --dial-center-inset: 6px;
     --dial-indicator-height: 5px;
     --dial-indicator-offset: -8px;
-    --rotary-label-size: 5px;
-    --rotary-readout-size: 5px;
+    --rotary-label-size: 7px;
+    --rotary-readout-size: 7px;
     --rotary-readout-pad-x: 2px;
     --rotary-readout-pad-y: 1px;
     --rotary-input-width: 36px;
@@ -1457,16 +1472,12 @@
 }
 
 @container module-card (min-width: 260px) {
-  .module-card {
-    --control-min: 52px;
-    --dial-size: 30px;
-    --dial-center-inset: 8px;
-    --dial-indicator-height: 7px;
-    --dial-indicator-offset: -10px;
-    --rotary-label-size: 7px;
-    --rotary-readout-size: 7px;
-    --rotary-readout-pad-x: 3px;
-    --rotary-readout-pad-y: 1px;
+  .module-body {
+    /* Palier volontairement minimal : dial 30px / labels 9px coûtent
+       ~3px par rangée et font déborder les modules larges DENSES
+       (oscillator, organ). À réactiver module par module en étape 4
+       quand leurs layouts seront revus. control-min reste 44px (52px
+       ferait perdre une colonne de knobs). */
     --rotary-input-width: 46px;
   }
 }
@@ -1888,6 +1899,60 @@
   text-align: center;
 }
 
+/* ── Knob v2 (phase 3, Console Steel) — scopé .module-card :
+     le mixer réutilise .rotary-dial et garde son rendu phase 2.
+     L'anneau extérieur est un arc de valeur (--ratio, posé par RotaryKnob),
+     teinté par la catégorie du module (--cat). ── */
+.module-card .rotary-dial {
+  --knob-color: var(--cat);
+  background: conic-gradient(
+    from 225deg,
+    var(--knob-color) calc(var(--ratio, 0) * 270deg),
+    rgba(255, 255, 255, 0.07) calc(var(--ratio, 0) * 270deg) 270deg,
+    transparent 270deg
+  );
+  box-shadow: none;
+}
+
+.module-card .rotary-dial::before {
+  inset: 3px;
+  background:
+    radial-gradient(circle at 32% 26%, rgba(255, 255, 255, 0.28), transparent 48%),
+    conic-gradient(from 90deg, #39444f, #232b34, #39444f, #1d242c, #39444f);
+  border: 1px solid rgba(0, 0, 0, 0.85);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.18),
+    0 2px 4px rgba(0, 0, 0, 0.65);
+}
+
+.module-card .rotary-center {
+  inset: calc(var(--dial-center-inset, 7px) + 1px);
+  background: radial-gradient(circle at 40% 35%, #2c343d, #14191f 70%);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.7);
+}
+
+.module-card .rotary-indicator::before {
+  background: var(--knob-color);
+  box-shadow: 0 0 5px var(--knob-color);
+}
+
+.module-card .rotary-label {
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+}
+
+.module-card .rotary-readout {
+  font-family: var(--font-lcd);
+  font-weight: 400;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(0, 0, 0, 0.6);
+  border-radius: var(--radius-sm);
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.6),
+    0 1px 0 rgba(255, 255, 255, 0.05);
+  color: var(--text-strong);
+}
+
 /* ============================================
    SECTION 10: MODULE CONTROLS GRID
    ============================================ */
@@ -2008,6 +2073,29 @@
   box-shadow: var(--btn-active-shadow);
 }
 
+/* ── Waveform v2 (phase 3) : même langage que les control-btn ── */
+.module-card .wave-button {
+  background: linear-gradient(180deg, #29333e, #1b222b);
+  border-color: rgba(0, 0, 0, 0.8);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 2px 3px rgba(0, 0, 0, 0.5);
+}
+
+.module-card .wave-button:hover {
+  background: linear-gradient(180deg, #33404d, #232c37);
+  border-color: rgba(0, 0, 0, 0.8);
+}
+
+.module-card .wave-button.active {
+  background: color-mix(in srgb, var(--cat) 18%, #11161c);
+  border-color: color-mix(in srgb, var(--cat) 45%, #000);
+  color: color-mix(in srgb, var(--cat) 90%, #fff);
+  box-shadow:
+    inset 0 0 8px color-mix(in srgb, var(--cat) 22%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
 /* Compact waveform in module controls */
 .module-controls .waveform { grid-column: 1 / -1; gap: var(--btn-compact-gap); }
 .module-controls .waveform-label { font-size: 6px; }
@@ -2064,6 +2152,18 @@
   --ui-btn-letter: 0.18em;
   --ui-btn-text: var(--btn-inactive-text);
   --ui-btn-bg: var(--btn-inactive-bg);
+}
+
+/* ── Toggle v2 (phase 3) : actif lit par la catégorie, via les hooks ui-btn ── */
+.module-card .toggle-btn {
+  --ui-btn-bg: linear-gradient(180deg, #29333e, #1b222b);
+  --ui-btn-border: rgba(0, 0, 0, 0.8);
+  --ui-btn-active-text: color-mix(in srgb, var(--cat) 88%, #fff);
+  --ui-btn-active-bg: color-mix(in srgb, var(--cat) 22%, #11161c);
+  --ui-btn-active-border: color-mix(in srgb, var(--cat) 50%, #000);
+  --ui-btn-active-shadow:
+    inset 0 0 8px color-mix(in srgb, var(--cat) 25%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .meter-row {
@@ -4217,10 +4317,13 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
-  padding: 8px;
-  background: var(--glass-overlay);
+  padding: 6px 7px 7px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.08));
   border-radius: var(--radius-lg);
-  border: 1px solid rgba(60, 80, 100, 0.25);
+  border: 1px solid rgba(0, 0, 0, 0.55);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    inset 0 0 10px rgba(0, 0, 0, 0.25);
 }
 
 /* Compact variant: keep border, reduce padding and font */
@@ -4244,13 +4347,24 @@
   grid-column: 1 / -1;
 }
 
-/* Label at top of box */
+/* Label at top of box — gravé + filet */
 .control-box-label {
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.15em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: rgba(198, 212, 228, 0.7);
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.control-box-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--border-soft), transparent);
 }
 
 /* Content container inside box */
@@ -4329,6 +4443,29 @@
   border-color: var(--accent-mint);
   color: #0a0a0a;
   box-shadow: var(--btn-active-shadow);
+}
+
+/* ── Boutons v2 (phase 3) : plastique sombre, actif = lit par la catégorie ── */
+.module-card .control-btn {
+  background: linear-gradient(180deg, #29333e, #1b222b);
+  border-color: rgba(0, 0, 0, 0.8);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 2px 3px rgba(0, 0, 0, 0.5);
+}
+
+.module-card .control-btn:hover {
+  background: linear-gradient(180deg, #33404d, #232c37);
+  border-color: rgba(0, 0, 0, 0.8);
+}
+
+.module-card .control-btn.active {
+  background: color-mix(in srgb, var(--cat) 22%, #11161c);
+  border-color: color-mix(in srgb, var(--cat) 50%, #000);
+  color: color-mix(in srgb, var(--cat) 88%, #fff);
+  box-shadow:
+    inset 0 0 8px color-mix(in srgb, var(--cat) 25%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 /* CV-controlled button highlight (cyan glow for SID waveform etc) */
