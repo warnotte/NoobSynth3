@@ -2154,7 +2154,9 @@
   --ui-btn-bg: var(--btn-inactive-bg);
 }
 
-/* ── Toggle v2 (phase 3) : actif lit par la catégorie, via les hooks ui-btn ── */
+/* ── Toggle v2 (phase 3) : actif lit par la catégorie, via les hooks ui-btn ──
+   Aussi les boutons du scope, SAUF les canaux (.scope-ch garde sa couleur) */
+.module-card .scope-btn:not(.scope-ch),
 .module-card .toggle-btn {
   --ui-btn-bg: linear-gradient(180deg, #29333e, #1b222b);
   --ui-btn-border: rgba(0, 0, 0, 0.8);
@@ -2219,16 +2221,19 @@
    SECTION 14: SCOPE / DATA MODULE
    ============================================ */
 
+/* Bezel LCD (langage phase 3) — la trace reste mint (couleur du signal) */
 .scope-view {
   position: relative;
-  background: radial-gradient(circle at 30% 30%, #0a1210, #050808);
-  border-radius: var(--radius-md);
-  border: 2px solid #1a1a1a;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 30%),
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.22) 0 1px, transparent 1px 3px),
+    radial-gradient(120% 130% at 50% 0%, #0c1512 0%, #070d0b 70%);
+  border-radius: 5px;
+  border: 1px solid rgba(0, 0, 0, 0.9);
   box-shadow:
-    inset 0 0 20px rgba(0, 0, 0, 0.8),
-    inset 0 0 4px rgba(80, 255, 160, 0.05),
-    0 2px 8px rgba(0, 0, 0, 0.5),
-    0 0 0 1px var(--glass-overlay);
+    inset 0 2px 8px rgba(0, 0, 0, 0.8),
+    inset 0 0 24px rgba(66, 226, 177, 0.06),
+    0 1px 0 rgba(255, 255, 255, 0.06);
   overflow: hidden;
   flex: 1;
   min-height: 80px;
@@ -2364,14 +2369,19 @@
 }
 
 /* Granular Waveform Visualization */
+/* Bezel LCD (langage phase 3) */
 .granular-waveform {
   position: relative;
-  background: radial-gradient(circle at 30% 30%, #0c1210, #060a08);
-  border-radius: var(--radius-md);
-  border: 2px solid #1a2420;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 30%),
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.22) 0 1px, transparent 1px 3px),
+    radial-gradient(120% 130% at 50% 0%, #10171c 0%, #0a0f13 70%);
+  border-radius: 5px;
+  border: 1px solid rgba(0, 0, 0, 0.9);
   box-shadow:
-    inset 0 0 20px rgba(0, 0, 0, 0.5),
-    0 2px 8px rgba(0, 0, 0, 0.3);
+    inset 0 2px 8px rgba(0, 0, 0, 0.8),
+    inset 0 0 24px color-mix(in srgb, var(--cat, var(--accent-cool)) 7%, transparent),
+    0 1px 0 rgba(255, 255, 255, 0.06);
   overflow: hidden;
   width: 100%;
   height: 100px;
@@ -2506,13 +2516,21 @@
 }
 
 /* Sampler — waveform preview canvas */
+/* Bezel LCD (langage phase 3) */
 .sampler-waveform {
   width: 100%;
   height: 52px;
   display: block;
-  border: 1px solid rgba(91, 182, 255, 0.25);
-  border-radius: 4px;
-  background: rgba(18, 26, 36, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.9);
+  border-radius: 5px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 30%),
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.22) 0 1px, transparent 1px 3px),
+    radial-gradient(120% 130% at 50% 0%, #10171c 0%, #0a0f13 70%);
+  box-shadow:
+    inset 0 2px 8px rgba(0, 0, 0, 0.8),
+    inset 0 0 24px color-mix(in srgb, var(--cat, var(--accent-cool)) 7%, transparent),
+    0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 /* Sampler — loaded file name */
@@ -2634,10 +2652,14 @@
   padding: 8px 0;
 }
 
+/* Bezel LCD (langage phase 3) */
 .particle-cloud-viz canvas {
+  border: 1px solid rgba(0, 0, 0, 0.9);
+  border-radius: 5px;
   box-shadow:
-    inset 0 2px 8px rgba(0, 0, 0, 0.4),
-    0 1px 0 rgba(255, 255, 255, 0.05);
+    inset 0 2px 8px rgba(0, 0, 0, 0.8),
+    inset 0 0 24px color-mix(in srgb, var(--cat, var(--accent-cool)) 7%, transparent),
+    0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 /* ============================================
