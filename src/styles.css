@@ -6646,3 +6646,43 @@ body {
 /* The rotated range input pivots around its center: a 360px travel needs
    right = -(W/2 - 30) to keep the visual track at the same x as before. */
 .mixer-fader-vertical { right: -150px; }
+
+/* ── Mixer strip layout v2: scribble on top, FX at the bottom ──
+   The fader zone is FIXED (the fader must never move or overflow); the FX
+   area at the bottom takes the remaining height and scrolls internally
+   when sections are expanded. */
+.mixer-strip-body {
+  flex: none;
+  height: 340px;
+  min-height: 0;
+  align-items: center;
+  justify-content: center;
+}
+.vu-meter { height: 340px; max-height: none; align-self: center; }
+.mixer-strip-fader { height: 340px; max-height: none; align-self: center; }
+.mixer-fader-vertical { width: 320px; right: -130px; }
+
+.channel-fx {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+}
+
+.mixer-strip-scribble { flex-shrink: 0; }
+
+/* dB scale marks: absolutely positioned at their true fader position
+   (inline top%), inset by half the cap height so they track the cap center */
+.mixer-fader-scale {
+  top: 21px;
+  bottom: 21px;
+  padding: 0;
+  justify-content: flex-start;
+}
+.mixer-fader-scale span {
+  position: absolute;
+  right: 0;
+  transform: translateY(-50%);
+  padding-right: 9px;
+}
