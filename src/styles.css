@@ -6696,3 +6696,6 @@ body {
   border-radius: 3px;
   border: 1px solid #0a0c10;
 }
+
+/* Ghost controls row on the master strip — layout only, never visible */
+.mixer-strip-controls--ghost { visibility: hidden; pointer-events: none; }

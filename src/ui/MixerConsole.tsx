@@ -375,6 +375,13 @@ export const MixerConsole = ({
         <div className="mixer-strip mixer-strip-master">
           <span className="mixer-strip-scribble mixer-strip-scribble-master">MASTER</span>
           <span className="mixer-strip-src">MASTER BUS</span>
+          {/* Ghost SOLO/MUTE row: invisible but takes the exact same layout
+              space as the channel strips' controls, so the master fader sits
+              at the same vertical position as the channel faders */}
+          <div className="mixer-strip-controls mixer-strip-controls--ghost" aria-hidden="true">
+            <button type="button" className="mixer-btn" tabIndex={-1}>SOLO</button>
+            <button type="button" className="mixer-btn" tabIndex={-1}>MUTE</button>
+          </div>
           <div className="mixer-strip-body">
             <div className="mixer-strip-fader">
               <FaderScale />
