@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>NoobSynth — Phase 3 : Faceplates Console Steel</title>
+<title>NoobSynth — Phase 3 : Faceplates Console Steel (grille réelle)</title>
 <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;600;700&family=Share+Tech+Mono&family=Sora:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -21,6 +21,11 @@
     --accent-mint: #42e2b1;
     --accent-warm: #f0b06b;
     --accent-rose: #ff6fae;
+
+    /* ── real rack grid (src/styles.css) ── */
+    --rack-unit-x: 200px;
+    --rack-unit-y: 120px;
+    --rack-gap: 4px;
 
     /* ── phase 3 : category accents ── */
     --cat-sources: #5bb6ff;
@@ -45,7 +50,7 @@
     color: var(--text-strong);
     font-family: var(--font-ui);
     min-height: 100vh;
-    padding: 26px 30px;
+    padding: 22px 24px;
   }
   body::before {
     content: ''; position: fixed; inset: 0; z-index: -1; opacity: 0.32; pointer-events: none;
@@ -55,16 +60,31 @@
   }
   h1 { font-family: var(--font-name); font-size: 20px; letter-spacing: 0.18em; font-weight: 600; margin-bottom: 4px; }
   h1 em { font-style: normal; color: var(--accent-warm); }
-  .sub { font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); margin-bottom: 20px; }
+  .sub { font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); margin-bottom: 18px; }
 
-  .rack { display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap; }
+  /* ════ rack = la VRAIE grille (200×120, gap 4) + overlay ════ */
+  .rack {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(8, var(--rack-unit-x));
+    grid-auto-rows: var(--rack-unit-y);
+    gap: var(--rack-gap);
+    width: calc(8 * var(--rack-unit-x) + 7 * var(--rack-gap));
+  }
+  .rack::before {
+    content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+    background-image:
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.05) 0 1px, transparent 1px calc(var(--rack-unit-x) + var(--rack-gap))),
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.05) 0 1px, transparent 1px calc(var(--rack-unit-y) + var(--rack-gap)));
+  }
 
   /* ════════════════════════════════════════════
-     MODULE FACEPLATE v2
+     MODULE FACEPLATE v2 — remplit sa cellule de grille
      ════════════════════════════════════════════ */
   .module {
     --cat: var(--cat-sources);
-    position: relative;
+    position: relative; z-index: 1;
+    width: 100%; height: 100%;
     border-radius: 8px;
     background:
       linear-gradient(160deg, rgba(255,255,255,0.045), transparent 38%),
@@ -76,18 +96,20 @@
       inset 0 -1px 0 rgba(0,0,0,0.6),
       0 14px 28px rgba(0,0,0,0.5);
     display: flex; flex-direction: column;
-    width: 264px;
+    overflow: hidden;
   }
-  .module.w2 { width: 396px; }
+  /* spans = tailles réelles de moduleRegistry */
+  .s2x2 { grid-column: span 2; grid-row: span 2; }
+  .s1x2 { grid-column: span 1; grid-row: span 2; }
+  .s2x3 { grid-column: span 2; grid-row: span 3; }
+  .s3x5 { grid-column: span 3; grid-row: span 5; }
 
   /* header = scribble strip + liseré catégorie */
   .mod-header {
-    display: flex; align-items: stretch; gap: 0;
+    display: flex; align-items: stretch; flex: none;
     border-bottom: 1px solid rgba(0,0,0,0.7);
     box-shadow: 0 1px 0 rgba(255,255,255,0.06);
-    height: 30px;
-    border-radius: 8px 8px 0 0;
-    overflow: hidden;
+    height: 28px;
     background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(0,0,0,0.22));
   }
   .mod-cat-bar {
@@ -97,30 +119,31 @@
   }
   .mod-name {
     font-family: var(--font-name); font-weight: 600; font-size: 15px; letter-spacing: 0.14em;
-    display: flex; align-items: center; padding: 0 10px; color: var(--text-strong);
+    display: flex; align-items: center; padding: 0 9px; color: var(--text-strong);
     text-shadow: 0 1px 0 rgba(0,0,0,0.8);
     flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
   .mod-type {
-    font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.08em;
+    font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.06em;
     color: color-mix(in srgb, var(--cat) 80%, #fff);
-    display: flex; align-items: center; padding: 0 10px;
-    opacity: 0.85;
+    display: flex; align-items: center; padding: 0 8px;
+    opacity: 0.85; white-space: nowrap;
   }
+  .narrow .mod-type { display: none; }   /* modules 1 colonne : pas la place */
 
   .mod-body { display: flex; min-height: 0; flex: 1; }
 
   /* ── port rails ── */
-  .rail { display: flex; flex-direction: column; gap: 7px; padding: 10px 7px; width: 56px; flex: none; }
+  .rail { display: flex; flex-direction: column; gap: 7px; padding: 9px 6px; width: 52px; flex: none; }
   .rail.right { align-items: flex-end; }
   .rail-item { display: flex; flex-direction: column; align-items: center; gap: 2px; width: 100%; }
   .rail-label {
-    font-size: 8px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase;
+    font-size: 8px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase;
     color: var(--text-muted); text-align: center; line-height: 1.1;
   }
   .jack {
     --jc: var(--accent-cool);
-    width: 22px; height: 22px; border-radius: 50%;
+    width: 21px; height: 21px; border-radius: 50%;
     background:
       radial-gradient(circle at 50% 50%, #05070a 0 34%, #182029 36% 52%, transparent 54%),
       radial-gradient(circle at 35% 30%, rgba(255,255,255,0.25), transparent 45%),
@@ -136,8 +159,13 @@
   .jack.sync { --jc: var(--accent-rose); }
   .jack.connected { box-shadow: 0 0 7px color-mix(in srgb, var(--jc) 70%, transparent), inset 0 1px 1px rgba(255,255,255,0.25); }
 
+  /* modules 1 colonne : rails étroits (≈ container query dans l'app) */
+  .narrow .rail { width: 34px; padding: 8px 4px; }
+  .narrow .jack { width: 17px; height: 17px; }
+  .narrow .rail-label { font-size: 7px; letter-spacing: 0; }
+
   /* ── controls zone ── */
-  .ctl { flex: 1; min-width: 0; padding: 10px 8px; display: flex; flex-direction: column; gap: 8px; }
+  .ctl { flex: 1; min-width: 0; min-height: 0; padding: 8px 7px; display: flex; flex-direction: column; gap: 7px; }
 
   /* section = ControlBox v2 : label gravé + filet */
   .sect {
@@ -145,36 +173,35 @@
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), inset 0 0 10px rgba(0,0,0,0.25);
     background: linear-gradient(180deg, rgba(0,0,0,0.18), rgba(0,0,0,0.08));
     border-radius: 6px;
-    padding: 6px 7px 7px;
+    padding: 5px 6px 6px;
+    min-width: 0;
   }
   .sect-label {
     display: flex; align-items: center; gap: 6px;
     font-size: 8px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase;
     color: var(--text-dim);
-    margin-bottom: 5px;
+    margin-bottom: 4px; white-space: nowrap;
   }
   .sect-label::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border-soft), transparent); }
-  .row { display: flex; gap: 8px; justify-content: space-around; align-items: flex-start; }
+  .row { display: flex; gap: 6px; justify-content: space-around; align-items: flex-start; min-width: 0; }
 
   /* ── knob v2 ── */
-  .knob { display: grid; justify-items: center; gap: 3px; min-width: 48px; }
+  .knob { display: grid; justify-items: center; gap: 2px; min-width: 0; flex: 1; }
   .knob-label {
-    font-size: 8px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
-    color: var(--text-muted);
+    font-size: 8px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--text-muted); white-space: nowrap;
   }
   .knob-dial {
-    --val: 0.62;           /* 0..1 */
+    --val: 0.62;
     --kc: var(--cat);
-    width: 38px; height: 38px; border-radius: 50%; position: relative;
+    width: 34px; height: 34px; border-radius: 50%; position: relative;
     background:
-      /* arc de valeur */
       conic-gradient(from 225deg,
         var(--kc) calc(var(--val) * 270deg),
         rgba(255,255,255,0.07) calc(var(--val) * 270deg) 270deg,
         transparent 270deg);
   }
   .knob-dial::before {
-    /* corps acier */
     content: ''; position: absolute; inset: 4px; border-radius: 50%;
     background:
       radial-gradient(circle at 32% 26%, rgba(255,255,255,0.28), transparent 48%),
@@ -183,38 +210,47 @@
     box-shadow: inset 0 1px 1px rgba(255,255,255,0.18), 0 2px 4px rgba(0,0,0,0.65);
   }
   .knob-dial::after {
-    /* indicateur */
     content: ''; position: absolute; left: 50%; top: 50%;
-    width: 2.5px; height: 12px; border-radius: 2px;
+    width: 2.5px; height: 11px; border-radius: 2px;
     background: var(--kc);
     box-shadow: 0 0 5px color-mix(in srgb, var(--kc) 80%, transparent);
     transform-origin: 50% 0%;
-    /* val=0 → 7h30 (-135°), val=1 → 4h30 (+135°) ; la barre pend vers le bas (origine en haut) donc +45° à val=0 */
+    /* val=0 → 7h30, val=1 → 4h30 ; la barre pend vers le bas (origine au centre) donc +45° à val=0 */
     transform: translateX(-50%) rotate(calc(45deg + var(--val) * 270deg));
   }
+  .knob-dial.lg { width: 44px; height: 44px; }
   .knob-value {
-    font-family: var(--font-mono); font-size: 10px; line-height: 1.25;
+    font-family: var(--font-mono); font-size: 9.5px; line-height: 1.3;
     color: var(--text-strong);
     background: rgba(0,0,0,0.4);
     border: 1px solid rgba(0,0,0,0.6);
     box-shadow: inset 0 1px 2px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.05);
-    border-radius: 3px; padding: 1px 5px; min-width: 40px; text-align: center;
+    border-radius: 3px; padding: 0 4px; max-width: 100%;
+    text-align: center; white-space: nowrap; overflow: hidden;
   }
+  /* compact (modules 1 colonne) */
+  .narrow .knob-dial { width: 26px; height: 26px; }
+  .narrow .knob-dial::after { height: 8px; width: 2px; }
+  .narrow .knob-dial::before { inset: 3px; }
+  .narrow .knob-label { font-size: 7px; }
+  .narrow .knob-value { font-size: 8.5px; }
+  .narrow .ctl { padding: 7px 5px; gap: 6px; }
+  .narrow .sect { padding: 4px 5px 5px; }
 
   /* ── boutons v2 : LED + plastique ── */
-  .btns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+  .btns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; min-width: 0; }
   .btn {
-    font-family: var(--font-ui); font-size: 9px; font-weight: 500; letter-spacing: 0.04em;
+    font-family: var(--font-ui); font-size: 9px; font-weight: 500; letter-spacing: 0.03em;
     color: var(--text-muted);
     background: linear-gradient(180deg, #29333e, #1b222b);
     border: 1px solid rgba(0,0,0,0.8);
-    border-radius: 4px; padding: 4px 2px 3px;
+    border-radius: 4px; padding: 3px 2px;
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.10), 0 2px 3px rgba(0,0,0,0.5);
     display: flex; flex-direction: column; align-items: center; gap: 2px;
-    cursor: pointer; text-align: center;
+    cursor: pointer; text-align: center; min-width: 0;
   }
   .btn i {
-    width: 14px; height: 3px; border-radius: 2px; display: block;
+    width: 13px; height: 3px; border-radius: 2px; display: block;
     background: #0a0e12; box-shadow: inset 0 1px 1px rgba(0,0,0,0.9);
   }
   .btn.on { color: var(--text-strong); }
@@ -222,42 +258,39 @@
     background: var(--cat);
     box-shadow: 0 0 6px color-mix(in srgb, var(--cat) 85%, transparent), inset 0 0 2px rgba(255,255,255,0.5);
   }
-  .btn:active, .btn.pressed { transform: translateY(1px); box-shadow: inset 0 1px 3px rgba(0,0,0,0.6); }
 
   /* toggle v2 */
-  .toggle { display: inline-flex; align-items: center; gap: 6px; font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); }
+  .toggle { display: inline-flex; align-items: center; gap: 5px; font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); white-space: nowrap; }
   .tg {
-    width: 26px; height: 13px; border-radius: 7px; position: relative;
+    width: 24px; height: 12px; border-radius: 6px; position: relative; flex: none;
     background: #0a0e12; border: 1px solid rgba(0,0,0,0.9);
     box-shadow: inset 0 2px 3px rgba(0,0,0,0.85);
   }
   .tg::after {
-    content: ''; position: absolute; top: 1px; left: 1px; width: 10px; height: 9px; border-radius: 5px;
+    content: ''; position: absolute; top: 1px; left: 1px; width: 9px; height: 8px; border-radius: 4px;
     background: linear-gradient(180deg, #5a6875, #333d48);
     box-shadow: 0 1px 2px rgba(0,0,0,0.8);
   }
-  .tg.on::after { left: 13px; background: linear-gradient(180deg, color-mix(in srgb, var(--cat) 80%, #fff), var(--cat)); box-shadow: 0 0 6px color-mix(in srgb, var(--cat) 70%, transparent); }
+  .tg.on::after { left: 12px; background: linear-gradient(180deg, color-mix(in srgb, var(--cat) 80%, #fff), var(--cat)); box-shadow: 0 0 6px color-mix(in srgb, var(--cat) 70%, transparent); }
 
   /* sélecteur de waveform */
-  .waves { display: flex; gap: 4px; }
+  .waves { display: flex; gap: 4px; min-width: 0; }
   .wave {
-    flex: 1; height: 26px; border-radius: 4px;
+    flex: 1; height: 24px; border-radius: 4px;
     display: flex; align-items: center; justify-content: center;
     background: linear-gradient(180deg, #29333e, #1b222b);
     border: 1px solid rgba(0,0,0,0.8);
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.10), 0 2px 3px rgba(0,0,0,0.5);
-    color: var(--text-dim);
+    color: var(--text-dim); min-width: 0;
   }
-  .wave svg { width: 18px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.6; }
+  .wave svg { width: 17px; height: 13px; stroke: currentColor; fill: none; stroke-width: 1.6; }
   .wave.on {
     color: var(--cat);
     border-color: color-mix(in srgb, var(--cat) 45%, #000);
     box-shadow: inset 0 0 8px color-mix(in srgb, var(--cat) 22%, transparent), inset 0 1px 0 rgba(255,255,255,0.08);
   }
 
-  /* ════════════════════════════════════════════
-     LCD — langage display unifié (séquenceurs, scope, chiptune…)
-     ════════════════════════════════════════════ */
+  /* ════ LCD — langage display unifié ════ */
   .lcd {
     --lcd-glow: var(--cat);
     background:
@@ -270,27 +303,27 @@
       inset 0 2px 8px rgba(0,0,0,0.8),
       inset 0 0 24px color-mix(in srgb, var(--lcd-glow) 7%, transparent),
       0 1px 0 rgba(255,255,255,0.06);
-    padding: 7px;
+    padding: 6px 7px;
+    min-width: 0;
   }
   .lcd-head {
-    display: flex; justify-content: space-between; align-items: baseline;
-    font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.1em;
+    display: flex; justify-content: space-between; align-items: baseline; gap: 8px;
+    font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.08em;
     color: color-mix(in srgb, var(--lcd-glow) 75%, #fff);
     text-shadow: 0 0 6px color-mix(in srgb, var(--lcd-glow) 55%, transparent);
-    margin-bottom: 6px;
+    margin-bottom: 5px; white-space: nowrap;
   }
   .lcd-head .dim { color: var(--text-dim); text-shadow: none; }
 
-  /* step grid */
   .steps { display: grid; grid-template-columns: repeat(16, 1fr); gap: 3px; }
   .step {
     height: 26px; border-radius: 2px;
     background: rgba(255,255,255,0.045);
     border: 1px solid rgba(0,0,0,0.6);
     box-shadow: inset 0 1px 2px rgba(0,0,0,0.5);
-    position: relative;
+    position: relative; min-width: 0;
   }
-  .step.q { background: rgba(255,255,255,0.085); }     /* repère temps fort */
+  .step.q { background: rgba(255,255,255,0.085); }
   .step.on {
     background: color-mix(in srgb, var(--cat) 38%, #0c1116);
     border-color: color-mix(in srgb, var(--cat) 45%, #000);
@@ -302,21 +335,29 @@
   }
   .step.ph { outline: 1.5px solid color-mix(in srgb, var(--cat) 85%, #fff); outline-offset: 0; }
 
+  /* sliders de pitch par step (style vrai step-seq) */
+  .pbars { display: grid; grid-template-columns: repeat(16, 1fr); gap: 3px; }
+  .pbar {
+    border-radius: 2px; background: rgba(255,255,255,0.045);
+    border: 1px solid rgba(0,0,0,0.6);
+    display: flex; align-items: flex-end; min-width: 0;
+  }
+  .pbar i {
+    display: block; width: 100%; border-radius: 1px;
+    background: linear-gradient(180deg, color-mix(in srgb, var(--cat) 85%, #fff), color-mix(in srgb, var(--cat) 55%, #000));
+    box-shadow: 0 0 4px color-mix(in srgb, var(--cat) 50%, transparent);
+  }
+  .pbar.ph { outline: 1.5px solid color-mix(in srgb, var(--cat) 85%, #fff); }
+
   .lcd svg.trace { display: block; width: 100%; }
 
-  /* mini transport sous lcd */
-  .seq-foot { display: flex; gap: 8px; align-items: center; }
-  .seq-foot .knob { min-width: 44px; }
-  .seq-foot .knob-dial { width: 32px; height: 32px; }
-
-  /* ════════════════════════════════════════════
-     Légende design system
-     ════════════════════════════════════════════ */
+  /* ════ légende ════ */
   .legend {
-    margin-top: 22px; padding: 14px 18px; border-radius: 8px;
+    margin-top: 18px; padding: 12px 16px; border-radius: 8px;
     background: linear-gradient(180deg, rgba(20,26,34,0.8), rgba(13,17,22,0.8));
     border: 1px solid var(--border-soft);
-    display: flex; gap: 28px; align-items: center; flex-wrap: wrap;
+    display: flex; gap: 24px; align-items: center; flex-wrap: wrap;
+    width: calc(8 * var(--rack-unit-x) + 7 * var(--rack-gap));
   }
   .legend h3 { font-family: var(--font-mono); font-size: 10px; color: var(--text-dim); letter-spacing: 0.2em; width: 100%; }
   .cat-chip { display: flex; align-items: center; gap: 7px; font-size: 10px; color: var(--text-muted); letter-spacing: 0.08em; text-transform: uppercase; }
@@ -325,13 +366,13 @@
 </head>
 <body>
 
-<h1>NOOB<em>SYNTH</em> — PHASE 3 · FACEPLATES</h1>
-<div class="sub">steel neutre uniforme · liseré catégorie · knobs à arc de valeur · readouts mono · langage LCD unifié pour les displays</div>
+<h1>NOOB<em>SYNTH</em> — PHASE 3 · FACEPLATES <span style="color:var(--text-dim);font-size:13px">/ grille réelle 200×120</span></h1>
+<div class="sub">tailles réelles de moduleRegistry · VCO 2x2 · VCF 2x2 · ADSR 1x2 · TAPE 2x2 · 909 1x2 · STEP SEQ 3x5 · SCOPE 2x3 — lignes = grille du rack</div>
 
 <div class="rack">
 
-  <!-- ═══ VCO (sources) ═══ -->
-  <div class="module" style="--cat: var(--cat-sources)">
+  <!-- ═══ VCO (sources, 2x2 réel) ═══ -->
+  <div class="module s2x2" style="--cat: var(--cat-sources)">
     <div class="mod-header">
       <div class="mod-cat-bar"></div>
       <div class="mod-name">VCO-1</div>
@@ -345,27 +386,24 @@
       </div>
       <div class="ctl">
         <div class="sect">
-          <div class="sect-label">Pitch</div>
+          <div class="sect-label">Pitch · Out</div>
           <div class="row">
             <div class="knob"><span class="knob-label">Freq</span><div class="knob-dial" style="--val:0.55"></div><span class="knob-value">220 Hz</span></div>
             <div class="knob"><span class="knob-label">Detune</span><div class="knob-dial" style="--val:0.5"></div><span class="knob-value">+0 ct</span></div>
             <div class="knob"><span class="knob-label">Oct</span><div class="knob-dial" style="--val:0.5"></div><span class="knob-value">0</span></div>
+            <div class="knob"><span class="knob-label">Level</span><div class="knob-dial" style="--val:0.8"></div><span class="knob-value">0.80</span></div>
           </div>
         </div>
         <div class="sect">
           <div class="sect-label">Wave</div>
-          <div class="waves">
-            <div class="wave"><svg viewBox="0 0 20 14"><path d="M1 7 Q5.5 0 10 7 T19 7"/></svg></div>
-            <div class="wave on"><svg viewBox="0 0 20 14"><path d="M1 12 L10 2 L19 12"/></svg></div>
-            <div class="wave"><svg viewBox="0 0 20 14"><path d="M1 12 L10 2 L10 12 L19 2"/></svg></div>
-            <div class="wave"><svg viewBox="0 0 20 14"><path d="M1 12 L1 2 L10 2 L10 12 L19 12 L19 2"/></svg></div>
-          </div>
-        </div>
-        <div class="sect">
-          <div class="sect-label">Out</div>
-          <div class="row">
-            <div class="knob"><span class="knob-label">Level</span><div class="knob-dial" style="--val:0.8"></div><span class="knob-value">0.80</span></div>
-            <div style="display:flex;flex-direction:column;gap:8px;justify-content:center">
+          <div class="row" style="align-items:center">
+            <div class="waves" style="flex:2">
+              <div class="wave"><svg viewBox="0 0 20 14"><path d="M1 7 Q5.5 0 10 7 T19 7"/></svg></div>
+              <div class="wave on"><svg viewBox="0 0 20 14"><path d="M1 12 L10 2 L19 12"/></svg></div>
+              <div class="wave"><svg viewBox="0 0 20 14"><path d="M1 12 L10 2 L10 12 L19 2"/></svg></div>
+              <div class="wave"><svg viewBox="0 0 20 14"><path d="M1 12 L1 2 L10 2 L10 12 L19 12 L19 2"/></svg></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:5px;flex:1;align-items:flex-start">
               <span class="toggle"><span class="tg on"></span>Track</span>
               <span class="toggle"><span class="tg"></span>LFO</span>
             </div>
@@ -378,8 +416,8 @@
     </div>
   </div>
 
-  <!-- ═══ VCF (filters) ═══ -->
-  <div class="module" style="--cat: var(--cat-filters)">
+  <!-- ═══ VCF (filters, 2x2 réel) ═══ -->
+  <div class="module s2x2" style="--cat: var(--cat-filters)">
     <div class="mod-header">
       <div class="mod-cat-bar"></div>
       <div class="mod-name">LADDER</div>
@@ -393,25 +431,22 @@
       <div class="ctl">
         <div class="sect">
           <div class="sect-label">Cutoff</div>
-          <div class="row">
-            <div class="knob"><span class="knob-label">Freq</span><div class="knob-dial" style="--val:0.68;width:46px;height:46px"></div><span class="knob-value">2.4 kHz</span></div>
+          <div class="row" style="align-items:center">
+            <div class="knob"><span class="knob-label">Freq</span><div class="knob-dial lg" style="--val:0.68"></div><span class="knob-value">2.4 kHz</span></div>
             <div class="knob"><span class="knob-label">Reso</span><div class="knob-dial" style="--val:0.35"></div><span class="knob-value">0.35</span></div>
+            <div class="knob"><span class="knob-label">Drive</span><div class="knob-dial" style="--val:0.2"></div><span class="knob-value">0.20</span></div>
           </div>
         </div>
         <div class="sect">
           <div class="sect-label">Mode</div>
-          <div class="btns">
-            <div class="btn on"><i></i>LP</div>
-            <div class="btn"><i></i>HP</div>
-            <div class="btn"><i></i>BP</div>
-            <div class="btn"><i></i>NOTCH</div>
-          </div>
-        </div>
-        <div class="sect">
-          <div class="sect-label">Drive · Slope</div>
-          <div class="row">
-            <div class="knob"><span class="knob-label">Drive</span><div class="knob-dial" style="--val:0.2"></div><span class="knob-value">0.20</span></div>
-            <div style="display:flex;flex-direction:column;gap:6px;justify-content:center">
+          <div class="row" style="align-items:center">
+            <div class="btns" style="flex:2.2">
+              <div class="btn on"><i></i>LP</div>
+              <div class="btn"><i></i>HP</div>
+              <div class="btn"><i></i>BP</div>
+              <div class="btn"><i></i>NTC</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:5px;flex:1;align-items:flex-start">
               <span class="toggle"><span class="tg on"></span>24 dB</span>
               <span class="toggle"><span class="tg"></span>Ladder</span>
             </div>
@@ -424,12 +459,11 @@
     </div>
   </div>
 
-  <!-- ═══ ADSR (modulators) ═══ -->
-  <div class="module" style="--cat: var(--cat-modulators)">
+  <!-- ═══ ADSR (modulators, 1x2 réel → compact) ═══ -->
+  <div class="module s1x2 narrow" style="--cat: var(--cat-modulators)">
     <div class="mod-header">
       <div class="mod-cat-bar"></div>
       <div class="mod-name">ADSR</div>
-      <div class="mod-type">adsr</div>
     </div>
     <div class="mod-body">
       <div class="rail">
@@ -437,20 +471,20 @@
       </div>
       <div class="ctl">
         <div class="sect">
-          <div class="sect-label">Envelope</div>
+          <div class="sect-label">Env</div>
           <div class="row">
-            <div class="knob"><span class="knob-label">A</span><div class="knob-dial" style="--val:0.15"></div><span class="knob-value">12 ms</span></div>
-            <div class="knob"><span class="knob-label">D</span><div class="knob-dial" style="--val:0.4"></div><span class="knob-value">240 ms</span></div>
+            <div class="knob"><span class="knob-label">A</span><div class="knob-dial" style="--val:0.15"></div><span class="knob-value">12ms</span></div>
+            <div class="knob"><span class="knob-label">D</span><div class="knob-dial" style="--val:0.4"></div><span class="knob-value">240ms</span></div>
           </div>
-          <div class="row" style="margin-top:6px">
+          <div class="row" style="margin-top:4px">
             <div class="knob"><span class="knob-label">S</span><div class="knob-dial" style="--val:0.7"></div><span class="knob-value">0.70</span></div>
-            <div class="knob"><span class="knob-label">R</span><div class="knob-dial" style="--val:0.3"></div><span class="knob-value">480 ms</span></div>
+            <div class="knob"><span class="knob-label">R</span><div class="knob-dial" style="--val:0.3"></div><span class="knob-value">480ms</span></div>
           </div>
         </div>
-        <div class="lcd" style="margin-top:2px">
-          <svg class="trace" viewBox="0 0 120 30" height="34">
-            <path d="M2 28 L18 4 L36 14 L78 14 L118 28" fill="none" stroke="var(--cat-modulators)" stroke-width="1.5" opacity="0.9"/>
-            <path d="M2 28 L18 4 L36 14 L78 14 L118 28 V28 H2 Z" fill="var(--cat-modulators)" opacity="0.12"/>
+        <div class="lcd">
+          <svg class="trace" viewBox="0 0 120 26" height="26">
+            <path d="M2 24 L18 3 L36 12 L78 12 L118 24" fill="none" stroke="var(--cat-modulators)" stroke-width="1.5" opacity="0.9"/>
+            <path d="M2 24 L18 3 L36 12 L78 12 L118 24 H2 Z" fill="var(--cat-modulators)" opacity="0.12"/>
           </svg>
         </div>
       </div>
@@ -460,12 +494,12 @@
     </div>
   </div>
 
-  <!-- ═══ DELAY (effects) ═══ -->
-  <div class="module" style="--cat: var(--cat-effects)">
+  <!-- ═══ TAPE DELAY (effects, 2x2 réel) ═══ -->
+  <div class="module s2x2" style="--cat: var(--cat-effects)">
     <div class="mod-header">
       <div class="mod-cat-bar"></div>
       <div class="mod-name">TAPE ECHO</div>
-      <div class="mod-type">delay</div>
+      <div class="mod-type">tape-delay</div>
     </div>
     <div class="mod-body">
       <div class="rail">
@@ -475,26 +509,26 @@
       </div>
       <div class="ctl">
         <div class="sect">
-          <div class="sect-label">Time</div>
+          <div class="sect-label">Time · Mix</div>
           <div class="row">
             <div class="knob"><span class="knob-label">Time</span><div class="knob-dial" style="--val:0.45"></div><span class="knob-value">3/16</span></div>
-            <div class="knob"><span class="knob-label">Feedback</span><div class="knob-dial" style="--val:0.55"></div><span class="knob-value">0.55</span></div>
+            <div class="knob"><span class="knob-label">Fdbk</span><div class="knob-dial" style="--val:0.55"></div><span class="knob-value">0.55</span></div>
+            <div class="knob"><span class="knob-label">Wet</span><div class="knob-dial" style="--val:0.4"></div><span class="knob-value">0.40</span></div>
+            <div class="knob"><span class="knob-label">Wow</span><div class="knob-dial" style="--val:0.25"></div><span class="knob-value">0.25</span></div>
           </div>
         </div>
         <div class="sect">
           <div class="sect-label">Sync</div>
-          <div class="btns" style="grid-template-columns: repeat(4,1fr)">
-            <div class="btn"><i></i>1/4</div>
-            <div class="btn on"><i></i>3/16</div>
-            <div class="btn"><i></i>1/8</div>
-            <div class="btn"><i></i>1/16</div>
-          </div>
-        </div>
-        <div class="sect">
-          <div class="sect-label">Mix</div>
-          <div class="row">
-            <div class="knob"><span class="knob-label">Wet</span><div class="knob-dial" style="--val:0.4"></div><span class="knob-value">0.40</span></div>
-            <div class="knob"><span class="knob-label">Wow</span><div class="knob-dial" style="--val:0.25"></div><span class="knob-value">0.25</span></div>
+          <div class="row" style="align-items:center">
+            <div class="btns" style="flex:2.2">
+              <div class="btn"><i></i>1/4</div>
+              <div class="btn on"><i></i>3/16</div>
+              <div class="btn"><i></i>1/8</div>
+              <div class="btn"><i></i>1/16</div>
+            </div>
+            <div style="flex:1;display:flex;justify-content:flex-start">
+              <span class="toggle"><span class="tg on"></span>Sync</span>
+            </div>
           </div>
         </div>
       </div>
@@ -504,94 +538,11 @@
     </div>
   </div>
 
-  <!-- ═══ STEP SEQ (sequencers, module large) ═══ -->
-  <div class="module w2" style="--cat: var(--cat-sequencers)">
-    <div class="mod-header">
-      <div class="mod-cat-bar"></div>
-      <div class="mod-name">STEP SEQ</div>
-      <div class="mod-type">step-sequencer</div>
-    </div>
-    <div class="mod-body">
-      <div class="rail">
-        <div class="rail-item"><button class="jack sync connected"></button><span class="rail-label">clock</span></div>
-        <div class="rail-item"><button class="jack gate"></button><span class="rail-label">reset</span></div>
-      </div>
-      <div class="ctl">
-        <div class="lcd">
-          <div class="lcd-head"><span>PATTERN A · 16 STEPS</span><span class="dim">STEP 06</span></div>
-          <div class="steps">
-            <div class="step on q"></div><div class="step"></div><div class="step on"></div><div class="step"></div>
-            <div class="step on q"></div><div class="step ph on"></div><div class="step"></div><div class="step on"></div>
-            <div class="step q"></div><div class="step on"></div><div class="step"></div><div class="step on"></div>
-            <div class="step on q"></div><div class="step"></div><div class="step on"></div><div class="step"></div>
-          </div>
-          <div class="steps" style="margin-top:3px">
-            <div class="step on q" style="height:14px"></div><div class="step" style="height:14px"></div><div class="step on" style="height:14px"></div><div class="step" style="height:14px"></div>
-            <div class="step q" style="height:14px"></div><div class="step on ph" style="height:14px"></div><div class="step" style="height:14px"></div><div class="step" style="height:14px"></div>
-            <div class="step on q" style="height:14px"></div><div class="step" style="height:14px"></div><div class="step on" style="height:14px"></div><div class="step" style="height:14px"></div>
-            <div class="step q" style="height:14px"></div><div class="step on" style="height:14px"></div><div class="step" style="height:14px"></div><div class="step on" style="height:14px"></div>
-          </div>
-        </div>
-        <div class="seq-foot">
-          <div class="knob"><span class="knob-label">Rate</span><div class="knob-dial" style="--val:0.5"></div><span class="knob-value">1/16</span></div>
-          <div class="knob"><span class="knob-label">Gate</span><div class="knob-dial" style="--val:0.6"></div><span class="knob-value">60%</span></div>
-          <div class="knob"><span class="knob-label">Swing</span><div class="knob-dial" style="--val:0.3"></div><span class="knob-value">12%</span></div>
-          <div style="display:flex;flex-direction:column;gap:6px;margin-left:auto">
-            <span class="toggle"><span class="tg on"></span>Loop</span>
-            <span class="toggle"><span class="tg"></span>Ping-Pong</span>
-          </div>
-        </div>
-      </div>
-      <div class="rail right">
-        <div class="rail-item"><span class="rail-label">cv</span><button class="jack cv connected"></button></div>
-        <div class="rail-item"><span class="rail-label">gate</span><button class="jack gate connected"></button></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ═══ SCOPE (io, display pur) ═══ -->
-  <div class="module" style="--cat: var(--cat-io)">
-    <div class="mod-header">
-      <div class="mod-cat-bar"></div>
-      <div class="mod-name">SCOPE</div>
-      <div class="mod-type">scope</div>
-    </div>
-    <div class="mod-body">
-      <div class="rail">
-        <div class="rail-item"><button class="jack connected"></button><span class="rail-label">in 1</span></div>
-        <div class="rail-item"><button class="jack"></button><span class="rail-label">in 2</span></div>
-      </div>
-      <div class="ctl">
-        <div class="lcd" style="--lcd-glow: var(--accent-mint); flex:1">
-          <div class="lcd-head"><span style="color:var(--accent-mint)">CH1 · 5ms</span><span class="dim">±1.0</span></div>
-          <svg class="trace" viewBox="0 0 140 64" height="84">
-            <g stroke="rgba(255,255,255,0.07)" stroke-width="0.5">
-              <line x1="0" y1="32" x2="140" y2="32"/><line x1="0" y1="16" x2="140" y2="16"/><line x1="0" y1="48" x2="140" y2="48"/>
-              <line x1="35" y1="0" x2="35" y2="64"/><line x1="70" y1="0" x2="70" y2="64"/><line x1="105" y1="0" x2="105" y2="64"/>
-            </g>
-            <path d="M0 32 C8 6 18 6 26 32 S 44 58 52 32 S 70 6 78 32 S 96 58 104 32 S 122 6 130 32 L140 32"
-              fill="none" stroke="var(--accent-mint)" stroke-width="1.5"
-              style="filter: drop-shadow(0 0 3px rgba(66,226,177,0.7))"/>
-          </svg>
-        </div>
-        <div class="btns" style="grid-template-columns: repeat(3,1fr)">
-          <div class="btn on"><i></i>SCOPE</div>
-          <div class="btn"><i></i>FFT</div>
-          <div class="btn"><i></i>SPECT</div>
-        </div>
-      </div>
-      <div class="rail right">
-        <div class="rail-item"><span class="rail-label">thru</span><button class="jack"></button></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ═══ 909 KICK (drums, compact) ═══ -->
-  <div class="module" style="--cat: var(--cat-drums); width: 196px">
+  <!-- ═══ 909 KICK (drums, 1x2 réel → compact) ═══ -->
+  <div class="module s1x2 narrow" style="--cat: var(--cat-drums)">
     <div class="mod-header">
       <div class="mod-cat-bar"></div>
       <div class="mod-name">909 KICK</div>
-      <div class="mod-type">909-kick</div>
     </div>
     <div class="mod-body">
       <div class="rail">
@@ -605,7 +556,7 @@
             <div class="knob"><span class="knob-label">Tune</span><div class="knob-dial" style="--val:0.4"></div><span class="knob-value">0.40</span></div>
             <div class="knob"><span class="knob-label">Decay</span><div class="knob-dial" style="--val:0.65"></div><span class="knob-value">0.65</span></div>
           </div>
-          <div class="row" style="margin-top:6px">
+          <div class="row" style="margin-top:4px">
             <div class="knob"><span class="knob-label">Attack</span><div class="knob-dial" style="--val:0.5"></div><span class="knob-value">0.50</span></div>
             <div class="knob"><span class="knob-label">Level</span><div class="knob-dial" style="--val:0.85"></div><span class="knob-value">0.85</span></div>
           </div>
@@ -613,6 +564,132 @@
       </div>
       <div class="rail right">
         <div class="rail-item"><span class="rail-label">out</span><button class="jack connected"></button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ STEP SEQ (sequencers, 3x5 réel) ═══ -->
+  <div class="module s3x5" style="--cat: var(--cat-sequencers)">
+    <div class="mod-header">
+      <div class="mod-cat-bar"></div>
+      <div class="mod-name">STEP SEQ</div>
+      <div class="mod-type">step-sequencer</div>
+    </div>
+    <div class="mod-body">
+      <div class="rail">
+        <div class="rail-item"><button class="jack sync connected"></button><span class="rail-label">clock</span></div>
+        <div class="rail-item"><button class="jack gate"></button><span class="rail-label">reset</span></div>
+      </div>
+      <div class="ctl">
+        <div class="lcd" style="flex:1;display:flex;flex-direction:column">
+          <div class="lcd-head"><span>PATTERN A · STEPS 01-16 / 64</span><span class="dim">STEP 06 · C#3</span></div>
+          <!-- pitch par step (sliders) -->
+          <div class="pbars" style="flex:1;margin-bottom:5px">
+            <div class="pbar"><i style="height:45%"></i></div>
+            <div class="pbar"><i style="height:30%"></i></div>
+            <div class="pbar"><i style="height:60%"></i></div>
+            <div class="pbar"><i style="height:30%"></i></div>
+            <div class="pbar"><i style="height:75%"></i></div>
+            <div class="pbar ph"><i style="height:52%"></i></div>
+            <div class="pbar"><i style="height:30%"></i></div>
+            <div class="pbar"><i style="height:60%"></i></div>
+            <div class="pbar"><i style="height:22%"></i></div>
+            <div class="pbar"><i style="height:45%"></i></div>
+            <div class="pbar"><i style="height:30%"></i></div>
+            <div class="pbar"><i style="height:68%"></i></div>
+            <div class="pbar"><i style="height:45%"></i></div>
+            <div class="pbar"><i style="height:30%"></i></div>
+            <div class="pbar"><i style="height:82%"></i></div>
+            <div class="pbar"><i style="height:38%"></i></div>
+          </div>
+          <!-- gates -->
+          <div class="steps">
+            <div class="step on q"></div><div class="step"></div><div class="step on"></div><div class="step"></div>
+            <div class="step on q"></div><div class="step ph on"></div><div class="step"></div><div class="step on"></div>
+            <div class="step q"></div><div class="step on"></div><div class="step"></div><div class="step on"></div>
+            <div class="step on q"></div><div class="step"></div><div class="step on"></div><div class="step"></div>
+          </div>
+          <!-- accents -->
+          <div class="steps" style="margin-top:3px">
+            <div class="step on q" style="height:10px"></div><div class="step" style="height:10px"></div><div class="step" style="height:10px"></div><div class="step" style="height:10px"></div>
+            <div class="step on q" style="height:10px"></div><div class="step ph" style="height:10px"></div><div class="step" style="height:10px"></div><div class="step" style="height:10px"></div>
+            <div class="step q" style="height:10px"></div><div class="step" style="height:10px"></div><div class="step" style="height:10px"></div><div class="step on" style="height:10px"></div>
+            <div class="step q" style="height:10px"></div><div class="step" style="height:10px"></div><div class="step on" style="height:10px"></div><div class="step" style="height:10px"></div>
+          </div>
+        </div>
+        <div class="sect">
+          <div class="sect-label">Pattern · Page</div>
+          <div class="row" style="align-items:center">
+            <div class="btns" style="flex:1.6">
+              <div class="btn on"><i></i>A</div>
+              <div class="btn"><i></i>B</div>
+              <div class="btn"><i></i>C</div>
+              <div class="btn"><i></i>D</div>
+            </div>
+            <div class="btns" style="flex:1.6">
+              <div class="btn on"><i></i>1-16</div>
+              <div class="btn"><i></i>17-32</div>
+              <div class="btn"><i></i>33-48</div>
+              <div class="btn"><i></i>49-64</div>
+            </div>
+          </div>
+        </div>
+        <div class="sect">
+          <div class="sect-label">Clock</div>
+          <div class="row" style="align-items:center">
+            <div class="knob"><span class="knob-label">Rate</span><div class="knob-dial" style="--val:0.5"></div><span class="knob-value">1/16</span></div>
+            <div class="knob"><span class="knob-label">Gate</span><div class="knob-dial" style="--val:0.6"></div><span class="knob-value">60%</span></div>
+            <div class="knob"><span class="knob-label">Swing</span><div class="knob-dial" style="--val:0.3"></div><span class="knob-value">12%</span></div>
+            <div style="display:flex;flex-direction:column;gap:5px">
+              <span class="toggle"><span class="tg on"></span>Loop</span>
+              <span class="toggle"><span class="tg"></span>Ping-Pong</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rail right">
+        <div class="rail-item"><span class="rail-label">cv</span><button class="jack cv connected"></button></div>
+        <div class="rail-item"><span class="rail-label">gate</span><button class="jack gate connected"></button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SCOPE (io, 2x3 réel) ═══ -->
+  <div class="module s2x3" style="--cat: var(--cat-io)">
+    <div class="mod-header">
+      <div class="mod-cat-bar"></div>
+      <div class="mod-name">SCOPE</div>
+      <div class="mod-type">scope</div>
+    </div>
+    <div class="mod-body">
+      <div class="rail">
+        <div class="rail-item"><button class="jack connected"></button><span class="rail-label">in 1</span></div>
+        <div class="rail-item"><button class="jack"></button><span class="rail-label">in 2</span></div>
+      </div>
+      <div class="ctl">
+        <div class="lcd" style="--lcd-glow: var(--accent-mint); flex:1; display:flex; flex-direction:column">
+          <div class="lcd-head"><span style="color:var(--accent-mint)">CH1 · 5ms</span><span class="dim">±1.0</span></div>
+          <svg class="trace" viewBox="0 0 140 64" preserveAspectRatio="none" style="flex:1">
+            <g stroke="rgba(255,255,255,0.07)" stroke-width="0.5">
+              <line x1="0" y1="32" x2="140" y2="32"/><line x1="0" y1="16" x2="140" y2="16"/><line x1="0" y1="48" x2="140" y2="48"/>
+              <line x1="35" y1="0" x2="35" y2="64"/><line x1="70" y1="0" x2="70" y2="64"/><line x1="105" y1="0" x2="105" y2="64"/>
+            </g>
+            <path d="M0 32 C8 6 18 6 26 32 S 44 58 52 32 S 70 6 78 32 S 96 58 104 32 S 122 6 130 32 L140 32"
+              fill="none" stroke="var(--accent-mint)" stroke-width="1.5" vector-effect="non-scaling-stroke"
+              style="filter: drop-shadow(0 0 3px rgba(66,226,177,0.7))"/>
+          </svg>
+        </div>
+        <div class="row" style="align-items:center">
+          <div class="btns" style="grid-template-columns: repeat(3,1fr); flex:1.6">
+            <div class="btn on"><i></i>SCOPE</div>
+            <div class="btn"><i></i>FFT</div>
+            <div class="btn"><i></i>SPECT</div>
+          </div>
+          <div class="knob" style="flex:.7"><span class="knob-label">Time</span><div class="knob-dial" style="--val:0.5;width:28px;height:28px"></div><span class="knob-value">5ms</span></div>
+        </div>
+      </div>
+      <div class="rail right">
+        <div class="rail-item"><span class="rail-label">thru</span><button class="jack"></button></div>
       </div>
     </div>
   </div>
