@@ -4252,6 +4252,31 @@
   cursor: ns-resize;
   user-select: none;
   transition: background 0.1s;
+  position: relative;
+  overflow: hidden;
+}
+
+.seq-step-pitch-num {
+  position: relative;
+  z-index: 1;
+}
+
+/* bargraph de pitch derrière le chiffre (look du mockup, précision conservée) */
+.seq-step-pitch::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(var(--pitch-ratio, 0.5) * 100%);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--cat, var(--accent-warm)) 30%, transparent),
+    color-mix(in srgb, var(--cat, var(--accent-warm)) 14%, transparent)
+  );
+  border-top: 1px solid color-mix(in srgb, var(--cat, var(--accent-warm)) 55%, transparent);
+  pointer-events: none;
+  transition: height 0.05s;
 }
 
 .seq-step-pitch:hover {

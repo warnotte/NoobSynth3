@@ -325,6 +325,7 @@ export function StepSequencerControls({ module, engine, status, audioMode, nativ
                   </button>
                   <div
                     className="seq-step-pitch"
+                    style={{ '--pitch-ratio': (step.pitch + 24) / 48 } as React.CSSProperties}
                     onWheel={(e) => {
                       e.preventDefault()
                       const delta = e.deltaY > 0 ? -1 : 1
@@ -343,7 +344,7 @@ export function StepSequencerControls({ module, engine, status, audioMode, nativ
                     onContextMenu={(e) => e.preventDefault()}
                     title="Scroll or click to change, right-click to decrease"
                   >
-                    {formatPitch(step.pitch)}
+                    <span className="seq-step-pitch-num">{formatPitch(step.pitch)}</span>
                   </div>
                   <div
                     className="seq-step-vel"
