@@ -6699,3 +6699,8 @@ body {
 
 /* Ghost controls row on the master strip — layout only, never visible */
 .mixer-strip-controls--ghost { visibility: hidden; pointer-events: none; }
+
+/* Scribbles: explicit line-height — the channel scribble is a <button>
+   (UA line-height ~normal) while MASTER is a <span> inheriting the global
+   1.45, which made the master tape a few px taller and shifted the strip */
+.mixer-strip-scribble { line-height: 1.2; }
