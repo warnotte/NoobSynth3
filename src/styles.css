@@ -6686,3 +6686,13 @@ body {
   transform: translateY(-50%);
   padding-right: 9px;
 }
+
+/* Visible thin scrollbar on the FX zone (fallback when even one expanded
+   section does not fit on short screens) */
+.channel-fx::-webkit-scrollbar { width: 6px; }
+.channel-fx::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.3); border-radius: 3px; }
+.channel-fx::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #3a414e, #252a32);
+  border-radius: 3px;
+  border: 1px solid #0a0c10;
+}

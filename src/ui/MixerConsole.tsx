@@ -174,8 +174,11 @@ const ChannelFx = ({ rackId, fxIds, values, onChange, onToggleSection }: {
   onChange: (rackId: string, engineModuleId: string, section: 'eq' | 'comp' | 'reverb', paramId: string, value: number) => void
   onToggleSection: (rackId: string, fxIds: ChannelFxIds, section: 'eq' | 'comp' | 'reverb') => void
 }) => {
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({ eq: false, comp: false, rev: false })
-  const toggle = (key: string) => setExpanded((prev) => ({ ...prev, [key]: !prev[key] }))
+  // Accordion: one section open at a time — bounds the worst-case height
+  // so the strip survives "everything expanded" on small screens
+  const [expandedKey, setExpandedKey] = useState<string | null>(null)
+  const toggle = (key: string) => setExpandedKey((prev) => (prev === key ? null : key))
+  const expanded = { eq: expandedKey === 'eq', comp: expandedKey === 'comp', rev: expandedKey === 'rev' }
 
   const setEq = (param: keyof ChannelFxParams['eq'], v: number) => onChange(rackId, fxIds.eq, 'eq', param, v)
   const setComp = (param: keyof ChannelFxParams['comp'], v: number) => onChange(rackId, fxIds.comp, 'comp', param, v)
@@ -214,8 +217,10 @@ const MasterFx = ({ values, onChange, onToggleSection }: {
   onChange: (param: keyof MasterFxParams, value: number) => void
   onToggleSection: (section: 'eq' | 'comp') => void
 }) => {
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({ eq: false, comp: false })
-  const toggle = (key: string) => setExpanded((prev) => ({ ...prev, [key]: !prev[key] }))
+  // Accordion — same rule as the channel strips
+  const [expandedKey, setExpandedKey] = useState<string | null>(null)
+  const toggle = (key: string) => setExpandedKey((prev) => (prev === key ? null : key))
+  const expanded = { eq: expandedKey === 'eq', comp: expandedKey === 'comp' }
 
   return (
     <div className="channel-fx">
