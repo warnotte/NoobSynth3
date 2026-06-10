@@ -4251,6 +4251,7 @@
   text-shadow: 0 0 5px color-mix(in srgb, var(--cat, var(--accent-warm)) 40%, transparent);
   cursor: ns-resize;
   user-select: none;
+  touch-action: none;
   transition: background 0.1s;
   position: relative;
   overflow: hidden;
@@ -4296,7 +4297,8 @@
   border: 1px solid rgba(0, 0, 0, 0.6);
   border-radius: var(--radius-sm);
   position: relative;
-  cursor: pointer;
+  cursor: ns-resize;
+  touch-action: none;
   overflow: hidden;
 }
 
