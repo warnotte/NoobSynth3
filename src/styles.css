@@ -4317,8 +4317,10 @@
   z-index: 1;
 }
 
-/* bargraph de pitch derrière le chiffre (look du mockup, précision conservée) */
-.seq-step-pitch::before {
+/* bargraph de pitch derrière le chiffre (look du mockup, précision conservée).
+   Scopé au step-sequencer : chord/polyrhythm réutilisent .seq-step-pitch
+   sans poser --pitch-ratio (le fallback 0.5 leur peindrait un faux niveau) */
+.module-card[data-module-type='step-sequencer'] .seq-step-pitch::before {
   content: '';
   position: absolute;
   left: 0;
@@ -7046,6 +7048,38 @@ body {
   text-shadow: none;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* Game of Life : module large (4x4) → canvas à gauche, contrôles à droite */
+.gol-panel {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.gol-canvas-col {
+  flex: none;
+}
+
+.gol-controls-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+/* Canvas dans un bezel LCD (GoL, Gravity… le canvas peint son propre fond) */
+.lcd-canvas {
+  border: 1px solid rgba(0, 0, 0, 0.9);
+  border-radius: 5px;
+  background: radial-gradient(120% 130% at 50% 0%, #10171c 0%, #0a0f13 70%);
+  box-shadow:
+    inset 0 2px 8px rgba(0, 0, 0, 0.8),
+    inset 0 0 24px color-mix(in srgb, var(--cat, var(--accent-warm)) 7%, transparent),
+    0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 /* ── Drawbars (Hammond) ── */
