@@ -94,6 +94,10 @@ pub struct GraphEngine {
   master_comp_attack: f32,
   master_comp_release: f32,
   master_fx_enabled: bool,
+  // Master bus peak levels (post-FX, i.e. the final output) for the mixer's
+  // master VU — queried via get_meter_level("__master__")
+  master_peak_l: f32,
+  master_peak_r: f32,
 }
 
 impl GraphEngine {
@@ -125,6 +129,8 @@ impl GraphEngine {
       master_comp_attack: 10.0,
       master_comp_release: 100.0,
       master_fx_enabled: true,
+      master_peak_l: 0.0,
+      master_peak_r: 0.0,
     }
   }
 
@@ -327,6 +333,15 @@ impl GraphEngine {
   /// Get meter peak levels as [peak_l, peak_r] encoded in a single u32.
   /// High 16 bits = left (0..10000 = 0.0..1.0), low 16 bits = right.
   pub fn get_meter_level(&self, module_id: &str) -> u32 {
+    // Reserved ID: the master bus (post-FX engine output). Lets the master
+    // VU reuse the whole meter pipeline (worklet poll + native command)
+    // without any new plumbing. Leading '_' also exempts it from the
+    // rack-prefix id mapping on the JS side.
+    if module_id == "__master__" {
+      let l = (self.master_peak_l.clamp(0.0, 2.0) * 10000.0) as u32;
+      let r = (self.master_peak_r.clamp(0.0, 2.0) * 10000.0) as u32;
+      return (l << 16) | r;
+    }
     if let Some(index) = self.module_map.get(module_id).and_then(|list| list.first()) {
       if let Some(module) = self.modules.get(*index) {
         if let ModuleState::Meter(state) = &module.state {
@@ -716,6 +731,22 @@ impl GraphEngine {
           None, None,
         );
       }
+    }
+
+    // Master bus peak (post-FX = final output) — same decay law as the
+    // Meter module (process/io.rs)
+    if frames > 0 {
+      let left = self.main_buffer.channel(0);
+      let right = self.main_buffer.channel(1);
+      let mut peak_l = 0.0_f32;
+      let mut peak_r = 0.0_f32;
+      for i in 0..frames {
+        peak_l = peak_l.max(left[i].abs());
+        peak_r = peak_r.max(right[i].abs());
+      }
+      let decay = 0.95_f32;
+      self.master_peak_l = (self.master_peak_l * decay).max(peak_l);
+      self.master_peak_r = (self.master_peak_r * decay).max(peak_r);
     }
 
     self.ensure_output(frames);

@@ -246,6 +246,7 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 | CPU Meter | DSP load avg + peak | ✅ | ✅ `native_get_cpu_load` |
 | Game of Life | Grid state + playhead | ✅ | ✅ `NativeGameOfLifeBridge` |
 | Meter | Peak L/R level | ✅ | ✅ `NativeMeterBridge` |
+| Mixer Master VU | Master bus peak (post-FX) | ✅ `watchMeter('__master__')` | ✅ `native_get_meter_level('__master__')` — id sentinelle réservé dans `get_meter_level()`, exempt du mapping rack (`_` initial) |
 | Theremin | Pad position | ✅ | ✅ `NativeThereminBridge` |
 | Particle Cloud | Grain positions | ✅ | ✅ `NativeParticleBridge` (parité Web atteinte ; viz lente ~10 px/s par design, figée transport arrêté — voir Known Limitations) |
 | TR-909 Machine | Playhead position | ✅ | ✅ `NativeSequencerBridge` (`get_sequencer_step` arm) |

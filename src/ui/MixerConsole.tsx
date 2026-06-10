@@ -45,6 +45,10 @@ const dbDisplay = (v: number) => v > 0 ? `${(20 * Math.log10(v)).toFixed(1)}` : 
 // Audio fader taper: slider position p (0..1) ↔ gain, quadratic law with
 // +6 dB at the top (gain 2). Gives the classic console feel (fine control
 // around 0 dB) and lets the dB scale marks sit at their TRUE positions.
+// Reserved engine-side meter ID for the master bus (post-FX output peak).
+// The leading '_' exempts it from rack-prefix id mapping in WasmGraphEngine.
+const MASTER_METER_ID = '__master__'
+
 const FADER_MAX_GAIN = 2 // +6 dB
 const gainToPos = (gain: number) => Math.sqrt(Math.max(0, gain) / FADER_MAX_GAIN)
 const posToGain = (p: number) => FADER_MAX_GAIN * p * p
@@ -383,6 +387,12 @@ export const MixerConsole = ({
             <button type="button" className="mixer-btn" tabIndex={-1}>MUTE</button>
           </div>
           <div className="mixer-strip-body">
+            <VuMeter
+              engine={engine}
+              meterId={MASTER_METER_ID}
+              running={engineRunning}
+              nativeMode={nativeMode}
+            />
             <div className="mixer-strip-fader">
               <FaderScale />
               <input
