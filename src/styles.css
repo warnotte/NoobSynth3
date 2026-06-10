@@ -6215,7 +6215,7 @@ textarea:focus-visible,
   --thm-orange: #ff7a45;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
   padding: 4px;
 }
@@ -6259,7 +6259,8 @@ textarea:focus-visible,
 .theremin-pad {
   position: relative;
   flex: 1;
-  min-height: 200px;
+  /* 200px + labels knobs v2 (+2px) faisaient déborder les readouts du bas */
+  min-height: 172px;
   border-radius: 8px;
   background:
     radial-gradient(120% 100% at 50% 0%, rgba(176, 107, 255, 0.10), transparent 60%),
