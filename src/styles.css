@@ -5000,18 +5000,20 @@
   align-items: center;
   gap: 6px;
   padding: 6px 10px;
-  background: rgba(20, 30, 40, 0.6);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.08));
   border-radius: var(--radius-lg);
-  border: 1px solid rgba(60, 80, 100, 0.3);
+  border: 1px solid rgba(0, 0, 0, 0.55);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .dm909-bank-btn {
   position: relative;
   min-width: 34px;
   padding: 6px 10px;
-  border: 1px solid rgba(80, 100, 130, 0.5);
+  border: 1px solid rgba(0, 0, 0, 0.8);
   border-radius: var(--radius-md);
-  background: var(--glass-5);
+  background: linear-gradient(180deg, #29333e, #1b222b);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 2px 3px rgba(0, 0, 0, 0.5);
   color: rgba(198, 212, 228, 0.85);
   font-size: 11px;
   font-weight: 700;
@@ -5021,8 +5023,8 @@
 }
 
 .dm909-bank-btn:hover {
-  background: var(--glass-panel);
-  border-color: rgba(100, 130, 170, 0.6);
+  background: linear-gradient(180deg, #33404d, #232c37);
+  border-color: rgba(0, 0, 0, 0.8);
 }
 
 .dm909-bank-btn.sel {
@@ -5084,14 +5086,22 @@
   width: 100%;
 }
 
-/* Step grid */
+/* Step grid = display LCD (langage phase 3) — états/couleurs fonctionnels intacts */
 .dm909-grid {
   grid-column: 1 / -1;
   display: flex;
   flex-direction: column;
   gap: 2px;
-  background: rgba(0, 0, 0, 0.35);
-  border-radius: var(--radius-xl);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 30%),
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.22) 0 1px, transparent 1px 3px),
+    radial-gradient(120% 130% at 50% 0%, #10171c 0%, #0a0f13 70%);
+  border: 1px solid rgba(0, 0, 0, 0.9);
+  border-radius: 5px;
+  box-shadow:
+    inset 0 2px 8px rgba(0, 0, 0, 0.8),
+    inset 0 0 24px color-mix(in srgb, var(--cat, var(--accent-warm)) 7%, transparent),
+    0 1px 0 rgba(255, 255, 255, 0.06);
   padding: 8px;
 }
 
@@ -5105,9 +5115,10 @@
   width: 56px;
   flex-shrink: 0;
   padding: 4px 4px;
-  border: 1px solid rgba(80, 100, 130, 0.35);
+  border: 1px solid rgba(0, 0, 0, 0.7);
   border-radius: var(--radius-sm);
-  background: rgba(30, 40, 55, 0.5);
+  background: linear-gradient(180deg, #29333e, #1b222b);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
   color: rgba(198, 212, 228, 0.85);
   font-size: 9px;
   font-weight: 700;
@@ -5140,9 +5151,10 @@
   flex: 1;
   height: 22px;
   min-width: 14px;
-  border: 1px solid rgba(80, 100, 130, 0.4);
+  border: 1px solid rgba(0, 0, 0, 0.6);
   border-radius: var(--radius-sm);
-  background: rgba(30, 40, 55, 0.6);
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
   cursor: pointer;
   transition: var(--transition-fast);
   padding: 0;
@@ -5199,9 +5211,10 @@
 
 .dm909-page-btn {
   padding: 3px 8px;
-  border: 1px solid rgba(80, 100, 130, 0.4);
+  border: 1px solid rgba(0, 0, 0, 0.8);
   border-radius: var(--radius-sm);
-  background: var(--glass-4);
+  background: linear-gradient(180deg, #29333e, #1b222b);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 2px 3px rgba(0, 0, 0, 0.5);
   color: rgba(198, 212, 228, 0.85);
   font-size: 9px;
   font-weight: 600;
