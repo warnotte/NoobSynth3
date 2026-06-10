@@ -52,7 +52,9 @@ import { RackView } from './ui/RackView'
 import { MixerConsole, type MixerChannelState } from './ui/MixerConsole'
 import { RackTabs, type ViewMode } from './ui/RackTabs'
 import { SidePanel } from './ui/SidePanel'
-import { TopBar } from './ui/TopBar'
+import { BrandRail } from './ui/BrandRail'
+import { IoPanel } from './ui/IoPanel'
+import { TransportConsole } from './ui/TransportConsole'
 import { ContextMenu, type ContextMenuAction } from './ui/ContextMenu'
 import './styles.css'
 
@@ -244,7 +246,6 @@ function App() {
   const [gridMetrics, setGridMetrics] = useState<GridMetrics>(DEFAULT_GRID_METRICS)
   const [cablesVisible, setCablesVisible] = useState(true)
   const [isRecording, setIsRecording] = useState(false)
-  const [showCpuMeter, setShowCpuMeter] = useState(false)
   const [cpuLoad, setCpuLoad] = useState<{ avg: number; peak: number } | null>(null)
   const [transportBeats, setTransportBeats] = useState(0)
   const [contextMenu, setContextMenu] = useState<{
@@ -375,9 +376,9 @@ function App() {
 
   useEffect(() => () => engine.dispose(), [engine])
 
-  // CPU load monitoring — re-subscribe when engine starts (status changes)
+  // CPU load monitoring — always on while the engine runs (the transport
+  // console has a permanent DSP section)
   useEffect(() => {
-    if (!showCpuMeter) return
     if (isTauri) {
       if (!tauriNativeRunning) return
       const interval = setInterval(async () => {
@@ -400,7 +401,7 @@ function App() {
       unsub()
       setCpuLoad(null)
     }
-  }, [engine, showCpuMeter, isTauri, status, tauriNativeRunning])
+  }, [engine, isTauri, status, tauriNativeRunning])
 
   // Subscribe to transport position updates
   useEffect(() => {
@@ -2081,37 +2082,47 @@ function App() {
       canRedo={canRedo}
     >
     <div className="app">
-        <TopBar
-          status={audioStatus}
-          statusLabel={statusLabel}
-          statusDetail={statusDetail}
-          modeLabel={modeLabel}
-          isBooting={unifiedBooting}
-          isRunning={audioRunning}
-          onStart={handleUnifiedStart}
-          onStop={handleUnifiedStop}
-          showCables={cablesVisible}
-          onToggleCables={() => setCablesVisible((prev) => !prev)}
-          showDevTools={isDev}
-          devResizeEnabled={devResizeEnabled}
-          onToggleDevResize={() => setDevResizeEnabled((prev) => !prev)}
-          undoCount={undoCount}
-          redoCount={redoCount}
-          onUndo={handleUndo}
-          onRedo={handleRedo}
-          onExportPreset={handleExportPreset}
-          onImportPreset={handleImportPreset}
-          isRecording={isRecording}
-          onToggleRecording={handleToggleRecording}
-          cpuLoad={cpuLoad}
-          showCpuMeter={showCpuMeter}
-          onToggleCpuMeter={() => setShowCpuMeter((prev) => !prev)}
-          rackCount={racks.length}
-          onResync={handleResync}
-          masterTempo={masterTempo}
-          onMasterTempoChange={handleMasterTempoChange}
-          transportBeats={transportBeats}
-        />
+      <BrandRail
+        status={audioStatus}
+        statusLabel={statusLabel}
+        statusDetail={statusDetail}
+        modeLabel={modeLabel}
+        showCables={cablesVisible}
+        onToggleCables={() => setCablesVisible((prev) => !prev)}
+        showDevTools={isDev}
+        devResizeEnabled={devResizeEnabled}
+        onToggleDevResize={() => setDevResizeEnabled((prev) => !prev)}
+        onExportPreset={handleExportPreset}
+        onImportPreset={handleImportPreset}
+        rackCount={racks.length}
+        ioPanel={
+          isTauri ? (
+            <IoPanel
+              tauriStatus={tauriStatus}
+              tauriError={tauriError}
+              tauriPing={tauriPing}
+              tauriAudioOutputs={tauriAudioOutputs}
+              tauriAudioInputs={tauriAudioInputs}
+              tauriMidiInputs={tauriMidiInputs}
+              tauriNativeRunning={tauriNativeRunning}
+              tauriNativeError={tauriNativeError}
+              tauriNativeSampleRate={tauriNativeSampleRate}
+              tauriNativeChannels={tauriNativeChannels}
+              tauriNativeDeviceName={tauriNativeDeviceName}
+              tauriNativeInputDeviceName={tauriNativeInputDeviceName}
+              tauriNativeInputSampleRate={tauriNativeInputSampleRate}
+              tauriNativeInputChannels={tauriNativeInputChannels}
+              tauriNativeInputError={tauriNativeInputError}
+              tauriSelectedOutput={tauriSelectedOutput}
+              tauriSelectedInput={tauriSelectedInput}
+              onRefreshTauri={refreshTauriStatus}
+              onTauriOutputChange={handleTauriOutputChange}
+              onTauriInputChange={handleTauriInputChange}
+              onTauriSyncGraph={handleTauriSyncGraph}
+            />
+          ) : undefined
+        }
+      />
       <RackTabs
         racks={racks}
         activeRackId={activeRackId}
@@ -2254,28 +2265,6 @@ function App() {
           onApplyPreset={(g, presetId) => applyPreset(g, { presetId })}
           projects={projects}
           onApplyProject={handleApplyProject}
-            tauriAvailable={isTauri}
-            tauriStatus={tauriStatus}
-            tauriError={tauriError}
-          tauriPing={tauriPing}
-          tauriAudioOutputs={tauriAudioOutputs}
-          tauriAudioInputs={tauriAudioInputs}
-          tauriMidiInputs={tauriMidiInputs}
-          tauriNativeRunning={tauriNativeRunning}
-          tauriNativeError={tauriNativeError}
-          tauriNativeSampleRate={tauriNativeSampleRate}
-          tauriNativeChannels={tauriNativeChannels}
-          tauriNativeDeviceName={tauriNativeDeviceName}
-          tauriNativeInputDeviceName={tauriNativeInputDeviceName}
-          tauriNativeInputSampleRate={tauriNativeInputSampleRate}
-          tauriNativeInputChannels={tauriNativeInputChannels}
-          tauriNativeInputError={tauriNativeInputError}
-          tauriSelectedOutput={tauriSelectedOutput}
-          tauriSelectedInput={tauriSelectedInput}
-          onRefreshTauri={refreshTauriStatus}
-          onTauriOutputChange={handleTauriOutputChange}
-          onTauriInputChange={handleTauriInputChange}
-          onTauriSyncGraph={handleTauriSyncGraph}
           templates={allTemplates}
           templateStatus={templateStatus}
           onInsertTemplate={handleInsertTemplate}
@@ -2283,10 +2272,28 @@ function App() {
           onExportTemplate={handleExportTemplate}
         />
       </main>
+      <TransportConsole
+        isBooting={unifiedBooting}
+        isRunning={audioRunning}
+        onStart={handleUnifiedStart}
+        onStop={handleUnifiedStop}
+        isRecording={isRecording}
+        onToggleRecording={handleToggleRecording}
+        onResync={handleResync}
+        masterTempo={masterTempo}
+        onMasterTempoChange={handleMasterTempoChange}
+        transportBeats={transportBeats}
+        cpuLoad={cpuLoad}
+        undoCount={undoCount}
+        redoCount={redoCount}
+        onUndo={handleUndo}
+        onRedo={handleRedo}
+      />
       <PatchLayer
         connections={cablesVisible && viewMode === 'rack' ? graph.connections : []}
         renderCable={renderCable}
         renderGhostCable={renderGhostCable}
+        clipRef={rackRef}
       />
       <input
         ref={presetFileRef}

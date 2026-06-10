@@ -42,6 +42,17 @@ type MixerConsoleProps = {
 
 const dbDisplay = (v: number) => v > 0 ? `${(20 * Math.log10(v)).toFixed(1)}` : '-inf'
 
+// Audio fader taper: slider position p (0..1) ↔ gain, quadratic law with
+// +6 dB at the top (gain 2). Gives the classic console feel (fine control
+// around 0 dB) and lets the dB scale marks sit at their TRUE positions.
+// Reserved engine-side meter ID for the master bus (post-FX output peak).
+// The leading '_' exempts it from rack-prefix id mapping in WasmGraphEngine.
+const MASTER_METER_ID = '__master__'
+
+const FADER_MAX_GAIN = 2 // +6 dB
+const gainToPos = (gain: number) => Math.sqrt(Math.max(0, gain) / FADER_MAX_GAIN)
+const posToGain = (p: number) => FADER_MAX_GAIN * p * p
+
 const callTauri = async <T,>(command: string, payload?: Record<string, unknown>): Promise<T> => {
   const { invoke } = await import('@tauri-apps/api/core')
   return invoke<T>(command, payload)
@@ -167,8 +178,11 @@ const ChannelFx = ({ rackId, fxIds, values, onChange, onToggleSection }: {
   onChange: (rackId: string, engineModuleId: string, section: 'eq' | 'comp' | 'reverb', paramId: string, value: number) => void
   onToggleSection: (rackId: string, fxIds: ChannelFxIds, section: 'eq' | 'comp' | 'reverb') => void
 }) => {
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({ eq: false, comp: false, rev: false })
-  const toggle = (key: string) => setExpanded((prev) => ({ ...prev, [key]: !prev[key] }))
+  // Accordion: one section open at a time — bounds the worst-case height
+  // so the strip survives "everything expanded" on small screens
+  const [expandedKey, setExpandedKey] = useState<string | null>(null)
+  const toggle = (key: string) => setExpandedKey((prev) => (prev === key ? null : key))
+  const expanded = { eq: expandedKey === 'eq', comp: expandedKey === 'comp', rev: expandedKey === 'rev' }
 
   const setEq = (param: keyof ChannelFxParams['eq'], v: number) => onChange(rackId, fxIds.eq, 'eq', param, v)
   const setComp = (param: keyof ChannelFxParams['comp'], v: number) => onChange(rackId, fxIds.comp, 'comp', param, v)
@@ -207,8 +221,10 @@ const MasterFx = ({ values, onChange, onToggleSection }: {
   onChange: (param: keyof MasterFxParams, value: number) => void
   onToggleSection: (section: 'eq' | 'comp') => void
 }) => {
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({ eq: false, comp: false })
-  const toggle = (key: string) => setExpanded((prev) => ({ ...prev, [key]: !prev[key] }))
+  // Accordion — same rule as the channel strips
+  const [expandedKey, setExpandedKey] = useState<string | null>(null)
+  const toggle = (key: string) => setExpandedKey((prev) => (prev === key ? null : key))
+  const expanded = { eq: expandedKey === 'eq', comp: expandedKey === 'comp' }
 
   return (
     <div className="channel-fx">
@@ -227,14 +243,32 @@ const MasterFx = ({ values, onChange, onToggleSection }: {
   )
 }
 
+// Scale marks placed at the REAL slider position of each dB value
+// (top% = (1 − gainToPos(gain)) × 100), so the printed scale always matches
+// the cap position and the dB readout.
+const SCALE_MARKS: Array<{ label: string; db: number | null }> = [
+  { label: '+6', db: 6 },
+  { label: '0', db: 0 },
+  { label: '-6', db: -6 },
+  { label: '-12', db: -12 },
+  { label: '-24', db: -24 },
+  { label: '-inf', db: null },
+]
+
 const FaderScale = () => (
   <div className="mixer-fader-scale">
-    <span>+6</span>
-    <span className="major">0</span>
-    <span>-6</span>
-    <span>-12</span>
-    <span>-24</span>
-    <span>-inf</span>
+    {SCALE_MARKS.map(({ label, db }) => {
+      const pos = db === null ? 0 : gainToPos(Math.pow(10, db / 20))
+      return (
+        <span
+          key={label}
+          className={db === 0 ? 'major' : ''}
+          style={{ top: `${(1 - pos) * 100}%` }}
+        >
+          {label}
+        </span>
+      )
+    })}
   </div>
 )
 
@@ -265,7 +299,7 @@ export const MixerConsole = ({
   return (
     <div className="mixer-console">
       <div className="mixer-strips">
-        {racks.map((rack) => {
+        {racks.map((rack, index) => {
           const ch = mixerState[rack.id] ?? { volume: 0.8, mute: false, solo: false }
           const isActive = rack.id === activeRackId
           const isMuted = ch.mute || (hasSolo && !ch.solo)
@@ -277,12 +311,33 @@ export const MixerConsole = ({
             >
               <button
                 type="button"
-                className="mixer-strip-name"
+                className="mixer-strip-scribble"
                 onClick={() => onSwitchRack(rack.id)}
-                title={`Switch to ${rack.name}`}
+                title={`Open ${rack.name} in the rack view`}
               >
                 {rack.name}
               </button>
+
+              <span className="mixer-strip-src">CH {index + 1}</span>
+
+              <div className="mixer-strip-controls">
+                <button
+                  type="button"
+                  className={`mixer-btn mixer-solo ${ch.solo ? 'on' : ''}`}
+                  onClick={() => onSoloToggle(rack.id)}
+                  title="Solo"
+                >
+                  SOLO
+                </button>
+                <button
+                  type="button"
+                  className={`mixer-btn mixer-mute ${ch.mute ? 'on' : ''}`}
+                  onClick={() => onMuteToggle(rack.id)}
+                  title="Mute"
+                >
+                  MUTE
+                </button>
+              </div>
 
               <div className="mixer-strip-body">
                 <VuMeter
@@ -297,10 +352,10 @@ export const MixerConsole = ({
                     type="range"
                     className="mixer-fader-vertical"
                     min={0}
-                    max={1.5} // Allow some gain boost up to +6dB approx
-                    step={0.01}
-                    value={ch.volume}
-                    onChange={(e) => onVolumeChange(rack.id, Number(e.target.value))}
+                    max={1}
+                    step={0.002}
+                    value={gainToPos(ch.volume)}
+                    onChange={(e) => onVolumeChange(rack.id, posToGain(Number(e.target.value)))}
                   />
                 </div>
               </div>
@@ -316,43 +371,38 @@ export const MixerConsole = ({
                   onToggleSection={onChannelFxToggle}
                 />
               )}
-
-              <div className="mixer-strip-controls">
-                <button
-                  type="button"
-                  className={`mixer-btn mixer-mute ${ch.mute ? 'on' : ''}`}
-                  onClick={() => onMuteToggle(rack.id)}
-                  title="Mute"
-                >
-                  M
-                </button>
-                <button
-                  type="button"
-                  className={`mixer-btn mixer-solo ${ch.solo ? 'on' : ''}`}
-                  onClick={() => onSoloToggle(rack.id)}
-                  title="Solo"
-                >
-                  S
-                </button>
-              </div>
             </div>
           )
         })}
 
         {/* Master strip */}
         <div className="mixer-strip mixer-strip-master">
-          <span className="mixer-strip-name mixer-strip-name-master">Master</span>
+          <span className="mixer-strip-scribble mixer-strip-scribble-master">MASTER</span>
+          <span className="mixer-strip-src">MASTER BUS</span>
+          {/* Ghost SOLO/MUTE row: invisible but takes the exact same layout
+              space as the channel strips' controls, so the master fader sits
+              at the same vertical position as the channel faders */}
+          <div className="mixer-strip-controls mixer-strip-controls--ghost" aria-hidden="true">
+            <button type="button" className="mixer-btn" tabIndex={-1}>SOLO</button>
+            <button type="button" className="mixer-btn" tabIndex={-1}>MUTE</button>
+          </div>
           <div className="mixer-strip-body">
+            <VuMeter
+              engine={engine}
+              meterId={MASTER_METER_ID}
+              running={engineRunning}
+              nativeMode={nativeMode}
+            />
             <div className="mixer-strip-fader">
               <FaderScale />
               <input
                 type="range"
-                className="mixer-fader-vertical"
+                className="mixer-fader-vertical mixer-fader-master"
                 min={0}
-                max={1.5}
-                step={0.01}
-                value={masterVolume}
-                onChange={(e) => onMasterVolumeChange(Number(e.target.value))}
+                max={1}
+                step={0.002}
+                value={gainToPos(masterVolume)}
+                onChange={(e) => onMasterVolumeChange(posToGain(Number(e.target.value)))}
               />
             </div>
           </div>

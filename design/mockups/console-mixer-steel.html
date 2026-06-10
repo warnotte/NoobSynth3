@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>NoobSynth — Direction A : CONSOLE — Vue Mixeur</title>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #14100d;
+    --panel-hi: #2c251d;
+    --panel-lo: #1a1511;
+    --line: rgba(255, 226, 178, 0.14);
+    --engrave: #d8c9a8;
+    --engrave-dim: #8d7f63;
+    --brass: #c9a35c;
+    --led-amber: #ffae42;
+    --led-glass: #1c0d05;
+    --mute-red: #e0492f;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    background:
+      radial-gradient(1200px 500px at 50% -10%, rgba(255,190,110,0.07), transparent 60%),
+      linear-gradient(180deg, #181310 0%, #0e0b09 100%);
+    color: var(--engrave);
+    font-family: 'Big Shoulders Display', sans-serif;
+    overflow: hidden;
+    display: grid;
+    grid-template-rows: 46px 1fr 116px;
+    height: 100vh;
+  }
+  body::after {
+    content: ''; position: fixed; inset: 0; pointer-events: none; opacity: 0.5; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+  }
+
+  /* ── Brand rail ── */
+  .brand-rail {
+    display: flex; align-items: center; gap: 22px; padding: 0 26px;
+    background: linear-gradient(180deg, var(--panel-hi), var(--panel-lo));
+    border-bottom: 1px solid #000;
+    box-shadow: inset 0 1px 0 rgba(255,226,178,0.10);
+  }
+  .brand-name { font-weight: 700; font-size: 21px; letter-spacing: 0.22em;
+    text-shadow: 0 1px 0 rgba(0,0,0,0.9), 0 -1px 0 rgba(255,235,200,0.12); }
+  .brand-name em { font-style: normal; color: var(--brass); }
+  .brand-sub { font-size: 12px; letter-spacing: 0.3em; color: var(--engrave-dim); }
+  .rail-right { margin-left: auto; font-family: 'Share Tech Mono', monospace; font-size: 11px; color: var(--engrave-dim); letter-spacing: 0.1em; }
+
+  /* ── Mixer zone ── */
+  .mix-zone { display: flex; flex-direction: column; min-height: 0; padding: 12px 26px 10px; }
+  .strips-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-end; }
+  .tape {
+    font-family: 'Share Tech Mono', monospace; font-size: 12px; letter-spacing: 0.14em;
+    padding: 5px 16px 4px; color: #221a10;
+    background: linear-gradient(180deg, #d9cba6, #b5a67e);
+    border-radius: 2px 6px 2px 2px; box-shadow: 0 3px 5px rgba(0,0,0,0.5);
+    transform: rotate(-0.6deg); opacity: 0.75; position: relative;
+  }
+  .tape.active {
+    background: linear-gradient(180deg, #efe3c0, #cdbd93); opacity: 1; transform: rotate(0.5deg);
+  }
+  .tape.active::after {
+    content: ''; position: absolute; left: 8px; right: 8px; bottom: -6px; height: 3px;
+    background: var(--led-amber); border-radius: 2px; box-shadow: 0 0 8px var(--led-amber);
+  }
+
+  /* view rocker: RACKS / MIXEUR — same place on both screens */
+  .view-switch {
+    display: flex; border: 1px solid #0a0705; border-radius: 5px; overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,226,178,0.1);
+    margin-right: 16px; align-self: center;
+  }
+  .view-btn {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.2em; padding: 7px 16px 6px;
+    color: var(--engrave-dim); background: linear-gradient(180deg, #2b241d, #1a1410);
+    border: none; cursor: pointer; font-family: 'Big Shoulders Display', sans-serif;
+  }
+  .view-btn + .view-btn { border-left: 1px solid #0a0705; }
+  .view-btn.on {
+    color: #241803;
+    background: linear-gradient(180deg, #e6cf9a, #b78f4a);
+    box-shadow: inset 0 1px 1px rgba(255,240,205,0.6);
+  }
+  .strips-sep { width: 1px; height: 22px; background: var(--line); align-self: center; margin-right: 12px; }
+  .mix-title { font-size: 13px; font-weight: 600; letter-spacing: 0.3em; color: var(--engrave-dim); align-self: center; }
+
+  .desk {
+    flex: 1; min-height: 0; display: flex; align-items: stretch; justify-content: center;
+    filter: drop-shadow(0 18px 30px rgba(0,0,0,0.6));
+  }
+  .cheek {
+    width: 38px;
+    background:
+      repeating-linear-gradient(95deg, rgba(0,0,0,0.22) 0 3px, transparent 3px 7px),
+      linear-gradient(180deg, #4b341f, #2a1c10);
+    border: 1px solid #0a0502;
+  }
+  .cheek.l { border-radius: 10px 0 0 10px; }
+  .cheek.r { border-radius: 0 10px 10px 0; }
+
+  .strip-ch {
+    width: 158px; display: flex; flex-direction: column; align-items: center;
+    background: linear-gradient(180deg, #2b241d 0%, #1d1712 100%);
+    border-right: 2px solid #0b0805; border-top: 1px solid rgba(255,226,178,0.12);
+    padding: 12px 10px 14px; gap: 9px; position: relative;
+  }
+  .strip-ch.master {
+    width: 196px;
+    background: linear-gradient(180deg, #332a20 0%, #221a13 100%);
+  }
+  .strip-ch .src {
+    font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 0.18em;
+    color: var(--engrave-dim);
+  }
+  .sec { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .sec-title {
+    width: 100%; text-align: center; font-size: 9.5px; font-weight: 600; letter-spacing: 0.3em;
+    color: var(--engrave-dim); display: flex; align-items: center; gap: 6px;
+  }
+  .sec-title::before, .sec-title::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+
+  .krow { display: flex; gap: 10px; justify-content: center; }
+  .knob { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .knob .cap {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: radial-gradient(circle at 32% 28%, #4e443a, #161109 75%);
+    border: 1px solid #050302;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.7), inset 0 1px 1px rgba(255,226,178,0.18);
+    position: relative;
+  }
+  .knob .cap::after {
+    content: ''; position: absolute; left: 50%; top: 3px; width: 2.5px; height: 10px; border-radius: 2px;
+    background: var(--led-amber); box-shadow: 0 0 5px var(--led-amber);
+    transform-origin: 50% 12px;
+  }
+  .knob.r1 .cap::after { transform: translateX(-50%) rotate(-52deg); }
+  .knob.r2 .cap::after { transform: translateX(-50%) rotate(8deg); }
+  .knob.r3 .cap::after { transform: translateX(-50%) rotate(66deg); }
+  .knob.r4 .cap::after { transform: translateX(-50%) rotate(-18deg); }
+  .knob label { font-size: 9px; font-weight: 600; letter-spacing: 0.16em; color: var(--engrave-dim); }
+  .knob.big .cap { width: 38px; height: 38px; }
+  .knob.big .cap::after { height: 13px; transform-origin: 50% 16px; }
+
+  .sw-row { display: flex; gap: 8px; }
+  .sw {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.14em; padding: 5px 12px 4px;
+    border-radius: 3px; border: 1px solid #0a0705; color: var(--engrave-dim);
+    background: linear-gradient(180deg, #322a21, #1d1711);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,226,178,0.12);
+    cursor: pointer;
+  }
+  .sw.solo.on { color: #2a1c05; background: linear-gradient(180deg, #ffc561, #c98f2e); box-shadow: 0 0 12px rgba(255,174,66,0.5); }
+  .sw.mute.on { color: #fff; background: linear-gradient(180deg, #e0654d, #a33621); box-shadow: 0 0 12px rgba(224,73,47,0.5); }
+
+  /* VU vertical */
+  .vu-v { display: flex; flex-direction: column-reverse; gap: 2.5px; height: 86px; justify-content: flex-start; }
+  .vu-pair { display: flex; gap: 5px; }
+  .vu-v i, .vu-col i { width: 9px; height: 5px; border-radius: 1px; background: #241d14; box-shadow: inset 0 1px 2px rgba(0,0,0,0.8); display: block; }
+  .vu-col { display: flex; flex-direction: column-reverse; gap: 2.5px; }
+  i.g { background: #76c043; box-shadow: 0 0 5px rgba(118,192,67,0.55); }
+  i.a { background: var(--led-amber); box-shadow: 0 0 5px rgba(255,174,66,0.55); }
+  i.r { background: var(--mute-red); box-shadow: 0 0 5px rgba(224,73,47,0.6); }
+
+  /* Fader */
+  .fader { position: relative; height: 100%; min-height: 150px; flex: 1; width: 56px; display: flex; justify-content: center; }
+  .fader .slot {
+    width: 7px; height: 100%; border-radius: 4px;
+    background: linear-gradient(180deg, #050302, #120d09);
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.95), 0 1px 0 rgba(255,226,178,0.08);
+  }
+  .fader .scale { position: absolute; left: 2px; top: 0; bottom: 0; display: flex; flex-direction: column; justify-content: space-between; }
+  .fader .scale i { width: 8px; height: 1px; background: var(--line); display: block; }
+  .fader .scale.right { left: auto; right: 2px; }
+  .fader .cap {
+    position: absolute; left: 50%; transform: translateX(-50%); top: var(--p, 30%);
+    width: 38px; height: 24px; border-radius: 3px;
+    background: linear-gradient(180deg, #57healthy4a3a, #2a221a);
+    background: linear-gradient(180deg, #574a3a 0%, #3a2f24 45%, #241c14 100%);
+    border: 1px solid #050302;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.8), inset 0 1px 1px rgba(255,226,178,0.25);
+  }
+  .fader .cap::after { content: ''; position: absolute; left: 3px; right: 3px; top: 50%; height: 2px; background: var(--led-amber); box-shadow: 0 0 5px var(--led-amber); transform: translateY(-50%); }
+  .strip-ch.master .fader .cap { width: 46px; background: linear-gradient(180deg, #8c3b2a 0%, #5e2317 50%, #3a130b 100%); }
+  .strip-ch.master .fader .cap::after { background: #ffd2a4; box-shadow: 0 0 6px #ffd2a4; }
+
+  .db {
+    font-family: 'Share Tech Mono', monospace; font-size: 11px; color: var(--led-amber);
+    text-shadow: 0 0 6px rgba(255,174,66,0.6);
+    background: var(--led-glass); border: 1px solid #060302; border-radius: 3px; padding: 2px 8px 1px;
+    box-shadow: inset 0 1px 4px rgba(0,0,0,0.9);
+  }
+
+  .scribble {
+    width: 100%; text-align: center;
+    font-family: 'Share Tech Mono', monospace; font-size: 12px; letter-spacing: 0.12em; color: #221a10;
+    background: linear-gradient(180deg, #efe3c0, #cdbd93);
+    border-radius: 2px; padding: 4px 0 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    transform: rotate(-0.4deg);
+  }
+  .strip-ch:nth-child(odd) .scribble { transform: rotate(0.5deg); }
+  .strip-ch.master .scribble { background: linear-gradient(180deg, #e8b08a, #c08458); font-weight: 600; }
+
+  /* ── Bottom transport console ── */
+  .console {
+    display: flex; align-items: center; gap: 30px; padding: 0 34px;
+    background: linear-gradient(180deg, #322a21 0%, #1c1712 18%, #15100c 100%);
+    border-top: 2px solid #000;
+    box-shadow: inset 0 2px 0 rgba(255,226,178,0.14), inset 0 18px 30px rgba(0,0,0,0.4);
+  }
+  .console section { display: flex; align-items: center; gap: 14px; }
+  .sec-label {
+    writing-mode: vertical-rl; transform: rotate(180deg);
+    font-size: 9.5px; font-weight: 600; letter-spacing: 0.3em; color: var(--engrave-dim);
+    border-left: 1px solid var(--line); padding-left: 6px; height: 62px; display: flex; align-items: center;
+  }
+  .btn-play {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: radial-gradient(circle at 34% 28%, #e6cf9a, #b78f4a 55%, #6d5226);
+    border: 2px solid #050302;
+    box-shadow: 0 5px 12px rgba(0,0,0,0.7), inset 0 2px 2px rgba(255,240,205,0.6), 0 0 22px rgba(255,174,66,0.35);
+    display: grid; place-items: center; cursor: pointer;
+  }
+  .btn-play::after { content: ''; width: 0; height: 0; border-left: 18px solid #241803; border-top: 11px solid transparent; border-bottom: 11px solid transparent; margin-left: 4px; }
+  .btn-small {
+    width: 42px; height: 42px; border-radius: 50%;
+    background: radial-gradient(circle at 34% 28%, #463c30, #16100a 70%);
+    border: 2px solid #050302; box-shadow: 0 4px 8px rgba(0,0,0,0.7), inset 0 1px 1px rgba(255,226,178,0.2);
+    display: grid; place-items: center; cursor: pointer;
+  }
+  .btn-small .sq { width: 12px; height: 12px; background: var(--engrave-dim); }
+  .btn-small .dot { width: 13px; height: 13px; border-radius: 50%; background: var(--mute-red); box-shadow: 0 0 9px rgba(224,73,47,0.8); }
+  .lcd {
+    background: var(--led-glass); border: 2px solid #060302; border-radius: 5px;
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.95), 0 1px 0 rgba(255,226,178,0.1);
+    padding: 7px 14px 5px; text-align: center;
+  }
+  .lcd .val { font-family: 'Share Tech Mono', monospace; font-size: 30px; color: var(--led-amber);
+    text-shadow: 0 0 10px rgba(255,174,66,0.75); line-height: 1; }
+  .lcd .cap2 { font-size: 9px; letter-spacing: 0.3em; color: #7a5a33; margin-top: 3px; font-weight: 600; }
+  .lcd.small .val { font-size: 19px; }
+  .spacer { flex: 1; }
+
+  /* ═══ VARIANTE COULEUR : ACIER / GRAPHITE ═══ */
+  :root {
+    --panel-hi: #2a2e36; --panel-lo: #181b20;
+    --line: rgba(196, 216, 240, 0.13);
+    --engrave: #c9d4e2; --engrave-dim: #7c8a9c;
+    --brass: #9fb8d0; --led-amber: #6fcdff; --led-glass: #061018;
+  }
+  body { background: radial-gradient(1200px 500px at 50% -10%, rgba(110,175,255,0.06), transparent 60%), linear-gradient(180deg, #15181d 0%, #0a0c0f 100%); }
+  .strip-ch { background: linear-gradient(180deg, #2a2e36 0%, #1c1f25 100%); border-right-color: #07090c; border-top-color: rgba(196,216,240,0.12); }
+  .strip-ch.master { background: linear-gradient(180deg, #313641 0%, #21242c 100%); }
+  .knob .cap { background: radial-gradient(circle at 32% 28%, #454d58, #11141a 75%); }
+  .fader .cap { background: linear-gradient(180deg, #59616e 0%, #3a4049 45%, #23272e 100%); }
+  .console { background: linear-gradient(180deg, #30353e 0%, #1b1e24 18%, #14161b 100%); }
+  .btn-play { background: radial-gradient(circle at 34% 28%, #dfeaf5, #8ea7c0 55%, #46586d); box-shadow: 0 5px 12px rgba(0,0,0,0.7), inset 0 2px 2px rgba(235,245,255,0.65), 0 0 22px rgba(111,205,255,0.35); }
+  .btn-play::after { border-left-color: #0c1622; }
+  .btn-small { background: radial-gradient(circle at 34% 28%, #3e4550, #11141a 70%); }
+  .lcd .val { text-shadow: 0 0 10px rgba(111,205,255,0.75); }
+  .lcd .cap2 { color: #3e657f; }
+  .db { text-shadow: 0 0 6px rgba(111,205,255,0.6); }
+  .view-btn { background: linear-gradient(180deg, #2a2e36, #181b20); }
+  .view-btn.on { color: #0c1622; background: linear-gradient(180deg, #dfeaf5, #8ea7c0); }
+  .sw { background: linear-gradient(180deg, #303641, #1d2026); border-color: #0a0c10; }
+</style>
+</head>
+<body>
+
+  <header class="brand-rail">
+    <div class="brand-name">NOOB<em>SYNTH</em></div>
+    <div class="brand-sub">MODULAR INSTRUMENT · MK III — ACIER</div>
+    <div class="rail-right">Nº 0098-RW · 48 kHz</div>
+  </header>
+
+  <div class="mix-zone">
+    <div class="strips-row">
+      <span class="view-switch">
+        <button class="view-btn">RACKS</button>
+        <button class="view-btn on">MIXEUR</button>
+      </span>
+      <span class="strips-sep"></span>
+      <span class="mix-title">CONSOLE DE MIXAGE — 4 RACKS → BUS MASTER</span>
+    </div>
+
+    <div class="desk">
+      <div class="cheek l"></div>
+
+      <div class="strip-ch">
+        <span class="src">RACK A · 12 MODULES</span>
+        <div class="sec">
+          <span class="sec-title">ÉGALISEUR</span>
+          <div class="krow">
+            <div class="knob r2"><span class="cap"></span><label>GRAVE</label></div>
+            <div class="knob r1"><span class="cap"></span><label>MÉDIUM</label></div>
+            <div class="knob r3"><span class="cap"></span><label>AIGU</label></div>
+          </div>
+        </div>
+        <div class="sec">
+          <span class="sec-title">COMPRESSEUR</span>
+          <div class="krow">
+            <div class="knob r4"><span class="cap"></span><label>SEUIL</label></div>
+            <div class="knob r2"><span class="cap"></span><label>RATIO</label></div>
+          </div>
+        </div>
+        <div class="sw-row"><span class="sw solo">SOLO</span><span class="sw mute">MUTE</span></div>
+        <div style="display:flex; gap:10px; flex:1; min-height:0; width:100%; justify-content:center;">
+          <div class="vu-col"><i class="g"></i><i class="g"></i><i class="g"></i><i class="g"></i><i class="g"></i><i class="g"></i><i class="a"></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="fader" style="--p:34%;">
+            <span class="scale"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+            <span class="slot"></span><span class="cap"></span>
+          </div>
+        </div>
+        <span class="db">-3.2</span>
+        <div class="scribble">LEAD</div>
+      </div>
+
+      <div class="strip-ch">
+        <span class="src">RACK B · 9 MODULES</span>
+        <div class="sec">
+          <span class="sec-title">ÉGALISEUR</span>
+          <div class="krow">
+            <div class="knob r2"><span class="cap"></span><label>GRAVE</label></div>
+            <div class="knob r2"><span class="cap"></span><label>MÉDIUM</label></div>
+            <div class="knob r4"><span class="cap"></span><label>AIGU</label></div>
+          </div>
+        </div>
+        <div class="sec">
+          <span class="sec-title">COMPRESSEUR</span>
+          <div class="krow">
+            <div class="knob r2"><span class="cap"></span><label>SEUIL</label></div>
+            <div class="knob r1"><span class="cap"></span><label>RATIO</label></div>
+          </div>
+        </div>
+        <div class="sw-row"><span class="sw solo">SOLO</span><span class="sw mute">MUTE</span></div>
+        <div style="display:flex; gap:10px; flex:1; min-height:0; width:100%; justify-content:center;">
+          <div class="vu-col"><i class="g"></i><i class="g"></i><i class="g"></i><i class="g"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="fader" style="--p:44%;">
+            <span class="scale"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+            <span class="slot"></span><span class="cap"></span>
+          </div>
+        </div>
+        <span class="db">-8.0</span>
+        <div class="scribble">PAD</div>
+      </div>
+
+      <div class="strip-ch">
+        <span class="src">RACK C · 14 MODULES</span>
+        <div class="sec">
+          <span class="sec-title">ÉGALISEUR</span>
+          <div class="krow">
+            <div class="knob r3"><span class="cap"></span><label>GRAVE</label></div>
+            <div class="knob r2"><span class="cap"></span><label>MÉDIUM</label></div>
+            <div class="knob r2"><span class="cap"></span><label>AIGU</label></div>
+          </div>
+        </div>
+        <div class="sec">
+          <span class="sec-title">COMPRESSEUR</span>
+          <div class="krow">
+            <div class="knob r1"><span class="cap"></span><label>SEUIL</label></div>
+            <div class="knob r3"><span class="cap"></span><label>RATIO</label></div>
+          </div>
+        </div>
+        <div class="sw-row"><span class="sw solo on">SOLO</span><span class="sw mute">MUTE</span></div>
+        <div style="display:flex; gap:10px; flex:1; min-height:0; width:100%; justify-content:center;">
+          <div class="vu-col"><i class="g"></i><i class="g"></i><i class="g"></i><i class="g"></i><i class="g"></i><i class="g"></i><i class="g"></i><i class="a"></i><i class="a"></i><i class="r"></i><i></i><i></i></div>
+          <div class="fader" style="--p:26%;">
+            <span class="scale"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+            <span class="slot"></span><span class="cap"></span>
+          </div>
+        </div>
+        <span class="db">+1.5</span>
+        <div class="scribble">DRUMS</div>
+      </div>
+
+      <div class="strip-ch">
+        <span class="src">RACK D · 6 MODULES</span>
+        <div class="sec">
+          <span class="sec-title">ÉGALISEUR</span>
+          <div class="krow">
+            <div class="knob r2"><span class="cap"></span><label>GRAVE</label></div>
+            <div class="knob r2"><span class="cap"></span><label>MÉDIUM</label></div>
+            <div class="knob r2"><span class="cap"></span><label>AIGU</label></div>
+          </div>
+        </div>
+        <div class="sec">
+          <span class="sec-title">COMPRESSEUR</span>
+          <div class="krow">
+            <div class="knob r2"><span class="cap"></span><label>SEUIL</label></div>
+            <div class="knob r2"><span class="cap"></span><label>RATIO</label></div>
+          </div>
+        </div>
+        <div class="sw-row"><span class="sw solo">SOLO</span><span class="sw mute on">MUTE</span></div>
+        <div style="display:flex; gap:10px; flex:1; min-height:0; width:100%; justify-content:center;">
+          <div class="vu-col"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="fader" style="--p:58%;">
+            <span class="scale"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+            <span class="slot"></span><span class="cap"></span>
+          </div>
+        </div>
+        <span class="db">-14.6</span>
+        <div class="scribble">TEXTURES</div>
+      </div>
+
+      <div class="strip-ch master">
+        <span class="src">BUS MASTER · STÉRÉO</span>
+        <div class="sec">
+          <span class="sec-title">ÉGALISEUR MASTER</span>
+          <div class="krow">
+            <div class="knob big r2"><span class="cap"></span><label>GRAVE</label></div>
+            <div class="knob big r2"><span class="cap"></span><label>MÉDIUM</label></div>
+            <div class="knob big r3"><span class="cap"></span><label>AIGU</label></div>
+          </div>
+        </div>
+        <div class="sec">
+          <span class="sec-title">COMPRESSEUR BUS</span>
+          <div class="krow">
+            <div class="knob big r4"><span class="cap"></span><label>SEUIL</label></div>
+            <div class="knob big r2"><span class="cap"></span><label>RATIO</label></div>
+          </div>
+        </div>
+        <div style="display:flex; gap:12px; flex:1; min-height:0; width:100%; justify-content:center;">
+          <div class="vu-pair">
+            <div class="vu-col"><i class="g"></i><i class="g"></i><i class="g"></i><i class="g"></i><i class="g"></i><i class="g"></i><i class="g"></i><i class="a"></i><i></i><i></i><i></i><i></i></div>
+            <div class="vu-col"><i class="g"></i><i class="g"></i><i class="g"></i><i class="g"></i><i class="g"></i><i class="g"></i><i class="a"></i><i></i><i></i><i></i><i></i><i></i></div>
+          </div>
+          <div class="fader" style="--p:30%;">
+            <span class="scale"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+            <span class="slot"></span><span class="cap"></span>
+            <span class="scale right"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+          </div>
+        </div>
+        <span class="db">-0.8 dB</span>
+        <div class="scribble">MASTER</div>
+      </div>
+
+      <div class="cheek r"></div>
+    </div>
+  </div>
+
+  <footer class="console">
+    <section>
+      <div class="sec-label">TRANSPORT</div>
+      <button class="btn-play"></button>
+      <button class="btn-small"><span class="sq"></span></button>
+      <button class="btn-small"><span class="dot"></span></button>
+    </section>
+    <section>
+      <div class="sec-label">TEMPO</div>
+      <div class="lcd"><div class="val">120.0</div><div class="cap2">BPM</div></div>
+      <div class="lcd small"><div class="val">017:3</div><div class="cap2">MESURE</div></div>
+    </section>
+    <section>
+      <div class="sec-label">DSP</div>
+      <div class="lcd small"><div class="val">31%</div><div class="cap2">CHARGE</div></div>
+    </section>
+    <span class="spacer"></span>
+    <section>
+      <div class="sec-label">SESSION</div>
+      <div class="lcd small"><div class="val">CAPITULATION</div><div class="cap2">PROJET</div></div>
+    </section>
+  </footer>
+
+</body>
+</html>

@@ -51,7 +51,7 @@ Le menu Presets manipule fondamentalement **un seul `GraphState`** :
 
 À l'inverse, le **bouton Import** lit un fichier et gère les **deux** formats :
 
-- `src/ui/TopBar.tsx` ~L244-251 : l'icône Import (à côté d'Export) appelle `onImportPreset`.
+- `src/ui/BrandRail.tsx` : l'icône Import (à côté d'Export) appelle `onImportPreset` (tooltip dynamique : patch vs projet selon le nombre de racks).
 - `src/App.tsx` `handleImportPreset` (~L1964) ouvre le sélecteur de fichier.
 - `src/App.tsx` `handlePresetFileChange` (~L1969) :
   - **v2 project** : bloc L1983-2056 — lit `racks`, `mixer`, `channelFx`,

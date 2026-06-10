@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>NoobSynth — Direction B : ATELIER</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=IBM+Plex+Mono:wght@400;500&family=Caveat:wght@600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f2ecdd;
+    --paper-hi: #f8f4e8;
+    --ink: #21304a;
+    --ink-soft: rgba(33, 48, 74, 0.55);
+    --ink-faint: rgba(33, 48, 74, 0.18);
+    --grid: rgba(58, 91, 153, 0.10);
+    --grid-strong: rgba(58, 91, 153, 0.20);
+    --stamp: #b23a26;
+    --pencil: #7a6f5c;
+    --audio: #2b5fa3;
+    --cv: #2e7d5b;
+    --gate: #c06a1f;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    background: #cfc7b2;
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--ink);
+    overflow: hidden;
+    display: grid; place-items: center;
+    height: 100vh;
+  }
+
+  /* The sheet */
+  .sheet {
+    position: relative;
+    width: calc(100vw - 36px);
+    height: calc(100vh - 30px);
+    background:
+      linear-gradient(0deg, var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+      linear-gradient(0deg, var(--grid-strong) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-strong) 1px, transparent 1px),
+      radial-gradient(1200px 800px at 30% 20%, var(--paper-hi), var(--paper));
+    background-size: 14px 14px, 14px 14px, 70px 70px, 70px 70px, auto;
+    box-shadow: 0 22px 45px rgba(40, 32, 18, 0.45), 0 2px 6px rgba(40,32,18,0.3);
+  }
+  /* margin frame */
+  .frame {
+    position: absolute; inset: 16px;
+    border: 1.5px solid var(--ink);
+    outline: 1px solid var(--ink);
+    outline-offset: 3px;
+    pointer-events: none;
+  }
+
+  /* folder tabs (racks) */
+  .tabs { position: absolute; top: -1px; left: 90px; display: flex; gap: 6px; z-index: 10; }
+  .tab {
+    font-family: 'Fraunces', serif; font-weight: 600; font-size: 14px; letter-spacing: 0.04em;
+    padding: 7px 22px 9px; color: var(--ink-soft);
+    background: #e6dfc9; border: 1.5px solid var(--ink-soft); border-top: none;
+    border-radius: 0 0 10px 10px;
+    box-shadow: 0 3px 5px rgba(40,32,18,0.15);
+  }
+  .tab.active {
+    background: var(--paper-hi); color: var(--ink); border-color: var(--ink);
+    font-weight: 900; box-shadow: 0 4px 8px rgba(40,32,18,0.22);
+  }
+  .tab.add { border-style: dashed; background: transparent; box-shadow: none; }
+
+  /* sheet header */
+  .head { position: absolute; top: 34px; left: 44px; right: 360px; display: flex; align-items: baseline; gap: 18px; }
+  .head h1 { font-family: 'Fraunces', serif; font-weight: 900; font-size: 34px; letter-spacing: 0.01em; }
+  .head .sub { font-size: 11px; color: var(--ink-soft); letter-spacing: 0.08em; }
+  .head .sub b { color: var(--stamp); font-weight: 500; }
+
+  /* transport strip — drawn instruments */
+  .transport {
+    position: absolute; top: 30px; right: 44px; display: flex; align-items: stretch;
+    border: 1.5px solid var(--ink); background: var(--paper-hi);
+    box-shadow: 3px 3px 0 var(--ink-faint);
+  }
+  .t-cell { padding: 8px 14px; border-right: 1px solid var(--ink-faint); display: flex; flex-direction: column; align-items: center; gap: 3px; justify-content: center; }
+  .t-cell:last-child { border-right: none; }
+  .t-cell .big { font-family: 'Fraunces', serif; font-weight: 900; font-size: 22px; line-height: 1; }
+  .t-cell label { font-size: 8.5px; letter-spacing: 0.22em; color: var(--ink-soft); }
+  .t-go {
+    background: var(--stamp); color: var(--paper-hi); cursor: pointer;
+    display: flex; align-items: center; gap: 8px; padding: 8px 18px;
+  }
+  .t-go .tri { width: 0; height: 0; border-left: 12px solid var(--paper-hi); border-top: 8px solid transparent; border-bottom: 8px solid transparent; }
+  .t-go b { font-family: 'Fraunces', serif; font-size: 15px; letter-spacing: 0.06em; }
+  .t-rec circle { fill: none; stroke: var(--stamp); stroke-width: 2; }
+  .t-rec .c2 { fill: var(--stamp); stroke: none; }
+
+  /* drawing area */
+  .board { position: absolute; top: 96px; left: 44px; right: 332px; bottom: 44px; }
+
+  /* schematic module blocks */
+  .blk {
+    position: absolute; background: var(--paper-hi);
+    border: 1.5px solid var(--ink);
+    box-shadow: 4px 4px 0 var(--ink-faint);
+  }
+  .blk header {
+    display: flex; justify-content: space-between; align-items: baseline;
+    border-bottom: 1.5px solid var(--ink); padding: 6px 10px 5px;
+  }
+  .blk header h3 { font-family: 'Fraunces', serif; font-weight: 900; font-size: 14.5px; letter-spacing: 0.02em; }
+  .blk header .rep { font-size: 10px; color: var(--stamp); font-weight: 500; }
+  .blk .bb { padding: 10px 12px; display: flex; gap: 16px; justify-content: space-around; }
+  .dial { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .dial svg { display: block; }
+  .dial .nm { font-size: 9px; letter-spacing: 0.14em; color: var(--ink-soft); text-transform: uppercase; }
+  .dial .vl { font-size: 10.5px; font-weight: 500; }
+  .ports { position: absolute; bottom: -8px; left: 14px; right: 14px; display: flex; justify-content: space-between; }
+  .port { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .port i {
+    width: 14px; height: 14px; border-radius: 50%; background: var(--paper-hi);
+    border: 2.5px solid var(--ink); display: block;
+  }
+  .port.audio i { border-color: var(--audio); }
+  .port.cv i { border-color: var(--cv); }
+  .port.gate i { border-color: var(--gate); }
+  .port span { font-size: 8px; letter-spacing: 0.1em; color: var(--ink-soft); background: var(--paper); padding: 0 3px; }
+
+  /* ink cables */
+  svg.wires { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  svg.wires path { fill: none; stroke-width: 2; }
+  svg.wires text { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.12em; }
+
+  /* margin annotations */
+  .note { position: absolute; font-family: 'Caveat', cursive; font-size: 19px; color: var(--stamp); transform: rotate(-3deg); }
+  .note small { display: block; font-size: 16px; }
+  .dim { position: absolute; font-size: 9px; color: var(--pencil); letter-spacing: 0.1em; }
+
+  /* nomenclature (library) right column */
+  .nomen {
+    position: absolute; top: 96px; right: 44px; width: 268px; bottom: 240px;
+    border: 1.5px solid var(--ink); background: var(--paper-hi);
+    box-shadow: 4px 4px 0 var(--ink-faint);
+    display: flex; flex-direction: column;
+  }
+  .nomen h2 {
+    font-family: 'Fraunces', serif; font-weight: 900; font-size: 15px; letter-spacing: 0.05em;
+    padding: 8px 12px 7px; border-bottom: 1.5px solid var(--ink);
+    display: flex; justify-content: space-between; align-items: baseline;
+  }
+  .nomen h2 span { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--ink-soft); font-weight: 400; }
+  .nomen table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+  .nomen th {
+    text-align: left; font-weight: 500; font-size: 8.5px; letter-spacing: 0.2em; color: var(--ink-soft);
+    border-bottom: 1px solid var(--ink-faint); padding: 5px 10px 4px;
+  }
+  .nomen td { padding: 4.5px 10px; border-bottom: 1px solid var(--ink-faint); }
+  .nomen td.r { color: var(--stamp); width: 34px; }
+  .nomen td.q { text-align: right; width: 30px; color: var(--ink-soft); }
+  .nomen tr.cat td {
+    font-family: 'Fraunces', serif; font-weight: 600; font-size: 11.5px; background: rgba(58,91,153,0.07);
+    letter-spacing: 0.03em;
+  }
+  .nomen .more { margin-top: auto; padding: 7px 12px; font-size: 9.5px; color: var(--ink-soft); border-top: 1px solid var(--ink-faint); }
+
+  /* title block (cartouche) bottom-right */
+  .cartouche {
+    position: absolute; right: 44px; bottom: 44px; width: 268px;
+    border: 1.5px solid var(--ink); background: var(--paper-hi);
+    box-shadow: 4px 4px 0 var(--ink-faint);
+    font-size: 10px;
+  }
+  .cartouche .row { display: flex; border-bottom: 1px solid var(--ink-faint); }
+  .cartouche .row:last-child { border-bottom: none; }
+  .cartouche .cell { padding: 5px 9px; flex: 1; border-right: 1px solid var(--ink-faint); }
+  .cartouche .cell:last-child { border-right: none; }
+  .cartouche label { display: block; font-size: 7.5px; letter-spacing: 0.2em; color: var(--ink-soft); margin-bottom: 1px; }
+  .cartouche b { font-family: 'Fraunces', serif; font-size: 13px; font-weight: 900; }
+  .cartouche .proj b { font-size: 15px; }
+  .stamp {
+    position: absolute; right: 10px; top: -34px; transform: rotate(8deg);
+    border: 2.5px solid var(--stamp); color: var(--stamp); border-radius: 4px;
+    font-family: 'Fraunces', serif; font-weight: 900; font-size: 13px; letter-spacing: 0.12em;
+    padding: 3px 10px; opacity: 0.85; background: rgba(242,236,221,0.6);
+  }
+</style>
+</head>
+<body>
+
+<div class="sheet">
+  <div class="frame"></div>
+
+  <div class="tabs">
+    <span class="tab active">Rack A — Lead</span>
+    <span class="tab">Rack B — Pad</span>
+    <span class="tab">Percussions</span>
+    <span class="tab add">+ feuille</span>
+  </div>
+
+  <div class="head">
+    <h1>NoobSynth</h1>
+    <span class="sub">SYNTHÉTISEUR MODULAIRE — PLANCHE Nº <b>03</b> / 05 &nbsp;·&nbsp; 98 MODULES AU CATALOGUE &nbsp;·&nbsp; ÉCH. 1:1</span>
+  </div>
+
+  <div class="transport">
+    <div class="t-cell t-go"><span class="tri"></span><b>LECTURE</b></div>
+    <div class="t-cell"><span class="big">■</span><label>ARRÊT</label></div>
+    <div class="t-cell">
+      <svg class="t-rec" width="22" height="22"><circle cx="11" cy="11" r="9"/><circle class="c2" cx="11" cy="11" r="4.5"/></svg>
+      <label>PRISE</label>
+    </div>
+    <div class="t-cell"><span class="big">120</span><label>BPM</label></div>
+    <div class="t-cell"><span class="big">17:3</span><label>MESURE</label></div>
+    <div class="t-cell"><span class="big">31<small style="font-size:12px">%</small></span><label>DSP</label></div>
+    <div class="t-cell"><span class="big">↶ ↷</span><label>ÉDITION</label></div>
+  </div>
+
+  <div class="board">
+
+    <div class="blk" style="left:8px; top:18px; width:212px;">
+      <header><h3>Oscillateur</h3><span class="rep">REP. A1</span></header>
+      <div class="bb">
+        <div class="dial">
+          <svg width="40" height="40"><circle cx="20" cy="20" r="15" fill="none" stroke="#21304a" stroke-width="1.5"/><line x1="20" y1="20" x2="9" y2="11" stroke="#b23a26" stroke-width="2"/><g stroke="#21304a" stroke-width="1"><line x1="20" y1="1" x2="20" y2="4"/><line x1="4" y1="30" x2="7" y2="28"/><line x1="36" y1="30" x2="33" y2="28"/></g></svg>
+          <span class="nm">Freq</span><span class="vl">440 Hz</span>
+        </div>
+        <div class="dial">
+          <svg width="40" height="40"><circle cx="20" cy="20" r="15" fill="none" stroke="#21304a" stroke-width="1.5"/><line x1="20" y1="20" x2="28" y2="8" stroke="#b23a26" stroke-width="2"/></svg>
+          <span class="nm">Forme</span><span class="vl">scie</span>
+        </div>
+        <div class="dial">
+          <svg width="40" height="40"><circle cx="20" cy="20" r="15" fill="none" stroke="#21304a" stroke-width="1.5"/><line x1="20" y1="20" x2="20" y2="5" stroke="#b23a26" stroke-width="2"/></svg>
+          <span class="nm">Fin</span><span class="vl">0 ct</span>
+        </div>
+      </div>
+      <div class="ports">
+        <span class="port cv"><i id="a1-pitch"></i><span>PITCH</span></span>
+        <span class="port gate"><i id="a1-gate"></i><span>GATE</span></span>
+        <span class="port audio"><i id="a1-out"></i><span>OUT</span></span>
+      </div>
+    </div>
+
+    <div class="blk" style="left:300px; top:18px; width:212px;">
+      <header><h3>Filtre VCF</h3><span class="rep">REP. F1</span></header>
+      <div class="bb">
+        <div class="dial">
+          <svg width="40" height="40"><circle cx="20" cy="20" r="15" fill="none" stroke="#21304a" stroke-width="1.5"/><line x1="20" y1="20" x2="31" y2="11" stroke="#b23a26" stroke-width="2"/></svg>
+          <span class="nm">Cutoff</span><span class="vl">840 Hz</span>
+        </div>
+        <div class="dial">
+          <svg width="40" height="40"><circle cx="20" cy="20" r="15" fill="none" stroke="#21304a" stroke-width="1.5"/><line x1="20" y1="20" x2="12" y2="9" stroke="#b23a26" stroke-width="2"/></svg>
+          <span class="nm">Réso</span><span class="vl">0.42</span>
+        </div>
+        <div class="dial">
+          <svg width="40" height="40"><circle cx="20" cy="20" r="15" fill="none" stroke="#21304a" stroke-width="1.5"/><line x1="20" y1="20" x2="20" y2="5" stroke="#b23a26" stroke-width="2"/></svg>
+          <span class="nm">Pente</span><span class="vl">24 dB</span>
+        </div>
+      </div>
+      <div class="ports">
+        <span class="port audio"><i id="f1-in"></i><span>IN</span></span>
+        <span class="port cv"><i id="f1-mod"></i><span>MOD</span></span>
+        <span class="port audio"><i id="f1-out"></i><span>OUT</span></span>
+      </div>
+    </div>
+
+    <div class="blk" style="left:592px; top:18px; width:190px;">
+      <header><h3>ADSR</h3><span class="rep">REP. M1</span></header>
+      <div class="bb" style="padding:12px;">
+        <svg width="150" height="46">
+          <polyline points="4,42 30,6 52,22 108,22 146,42" fill="none" stroke="#21304a" stroke-width="1.8"/>
+          <g fill="#7a6f5c" font-size="8" font-family="IBM Plex Mono">
+            <text x="12" y="20">A</text><text x="38" y="14">D</text><text x="76" y="18">S</text><text x="124" y="28">R</text>
+          </g>
+        </svg>
+      </div>
+      <div class="ports">
+        <span class="port gate"><i id="m1-gate"></i><span>GATE</span></span>
+        <span class="port cv"><i id="m1-env"></i><span>ENV</span></span>
+      </div>
+    </div>
+
+    <div class="blk" style="left:8px; top:222px; width:170px;">
+      <header><h3>LFO</h3><span class="rep">REP. M2</span></header>
+      <div class="bb" style="padding:12px;">
+        <svg width="130" height="40">
+          <path d="M4 20 Q 14 0, 24 20 T 44 20 T 64 20 T 84 20 T 104 20 T 124 20" fill="none" stroke="#21304a" stroke-width="1.8"/>
+        </svg>
+      </div>
+      <div class="ports">
+        <span class="port cv"><i id="m2-out"></i><span>OUT</span></span>
+        <span class="port cv"><i id="m2-inv"></i><span>INV</span></span>
+      </div>
+    </div>
+
+    <div class="blk" style="left:258px; top:222px; width:330px;">
+      <header><h3>Séquenceur 16 pas</h3><span class="rep">REP. S1</span></header>
+      <div class="bb" style="padding:11px 12px; gap:4px;">
+        <svg width="300" height="42">
+          <g stroke="#21304a" stroke-width="1.3" fill="none">
+            <rect x="2"  y="8" width="14" height="26"/><rect x="20" y="8" width="14" height="26"/>
+            <rect x="38" y="8" width="14" height="26" fill="#b23a26" fill-opacity="0.85"/>
+            <rect x="56" y="8" width="14" height="26"/><rect x="74" y="8" width="14" height="26"/>
+            <rect x="92" y="8" width="14" height="26" fill="#21304a" fill-opacity="0.15"/>
+            <rect x="110" y="8" width="14" height="26"/><rect x="128" y="8" width="14" height="26"/>
+            <rect x="146" y="8" width="14" height="26" fill="#21304a" fill-opacity="0.15"/>
+            <rect x="164" y="8" width="14" height="26"/><rect x="182" y="8" width="14" height="26"/>
+            <rect x="200" y="8" width="14" height="26" fill="#21304a" fill-opacity="0.15"/>
+            <rect x="218" y="8" width="14" height="26"/><rect x="236" y="8" width="14" height="26"/>
+            <rect x="254" y="8" width="14" height="26"/><rect x="272" y="8" width="14" height="26"/>
+          </g>
+        </svg>
+      </div>
+      <div class="ports">
+        <span class="port gate"><i id="s1-clock"></i><span>CLOCK</span></span>
+        <span class="port cv"><i id="s1-cv"></i><span>CV</span></span>
+        <span class="port gate"><i id="s1-gate"></i><span>GATE</span></span>
+      </div>
+    </div>
+
+    <div class="blk" style="left:660px; top:222px; width:150px;">
+      <header><h3>Sortie</h3><span class="rep">REP. O1</span></header>
+      <div class="bb">
+        <div class="dial">
+          <svg width="40" height="40"><circle cx="20" cy="20" r="15" fill="none" stroke="#21304a" stroke-width="1.5"/><line x1="20" y1="20" x2="29" y2="9" stroke="#b23a26" stroke-width="2"/></svg>
+          <span class="nm">Niveau</span><span class="vl">0.9</span>
+        </div>
+      </div>
+      <div class="ports" style="justify-content:center; gap:22px;">
+        <span class="port audio"><i id="o1-l"></i><span>L</span></span>
+        <span class="port audio"><i id="o1-r"></i><span>R</span></span>
+      </div>
+    </div>
+
+    <svg class="wires"></svg>
+
+    <div class="note" style="left:560px; top:455px;">filtre un peu sombre,<small>monter cutoff → 1.2 kHz ?</small></div>
+    <div class="dim" style="left:10px; top:185px;">◄———— 212 ————►</div>
+  </div>
+
+  <aside class="nomen">
+    <h2>Nomenclature <span>98 RÉF.</span></h2>
+    <table>
+      <tr><th>REP</th><th>DÉSIGNATION</th><th>QTÉ</th></tr>
+      <tr class="cat"><td colspan="3">Sources</td></tr>
+      <tr><td class="r">A1</td><td>Oscillateur</td><td class="q">1</td></tr>
+      <tr><td class="r">A2</td><td>Supersaw</td><td class="q">—</td></tr>
+      <tr><td class="r">A7</td><td>Orgue à tuyaux</td><td class="q">—</td></tr>
+      <tr><td class="r">A12</td><td>Sampler</td><td class="q">—</td></tr>
+      <tr class="cat"><td colspan="3">Filtres &amp; effets</td></tr>
+      <tr><td class="r">F1</td><td>Filtre VCF</td><td class="q">1</td></tr>
+      <tr><td class="r">F8</td><td>Réverbération</td><td class="q">—</td></tr>
+      <tr><td class="r">F11</td><td>Leslie</td><td class="q">—</td></tr>
+      <tr class="cat"><td colspan="3">Modulation</td></tr>
+      <tr><td class="r">M1</td><td>Enveloppe ADSR</td><td class="q">1</td></tr>
+      <tr><td class="r">M2</td><td>LFO</td><td class="q">1</td></tr>
+      <tr><td class="r">M6</td><td>Quantizer</td><td class="q">—</td></tr>
+      <tr class="cat"><td colspan="3">Séquenceurs</td></tr>
+      <tr><td class="r">S1</td><td>Séquenceur 16 pas</td><td class="q">1</td></tr>
+      <tr><td class="r">S9</td><td>TR-909</td><td class="q">—</td></tr>
+    </table>
+    <div class="more">… glisser une référence sur la planche pour l'ajouter</div>
+  </aside>
+
+  <div class="cartouche">
+    <div class="stamp">EN COURS</div>
+    <div class="row"><div class="cell proj"><label>PROJET</label><b>Capitulation</b></div></div>
+    <div class="row">
+      <div class="cell"><label>DESSINÉ PAR</label>R. Warnotte</div>
+      <div class="cell"><label>DATE</label>09·06·2026</div>
+    </div>
+    <div class="row">
+      <div class="cell"><label>MOTEUR</label>Rust / WASM</div>
+      <div class="cell"><label>FRÉQ.</label>48 kHz</div>
+      <div class="cell"><label>RÉV.</label><b>C</b></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Ink wires: real endpoints from the DOM, drawn as gentle drafting curves
+  // with a signal label at the midpoint.
+  const LINKS = [
+    ['a1-out',  'f1-in',    '#2b5fa3', 'AUDIO'],
+    ['f1-out',  'o1-l',     '#2b5fa3', 'AUDIO'],
+    ['m1-env',  'f1-mod',   '#2e7d5b', 'CV ENV'],
+    ['s1-cv',   'a1-pitch', '#2e7d5b', 'CV NOTE'],
+    ['s1-gate', 'm1-gate',  '#c06a1f', 'GATE'],
+  ]
+  const svg = document.querySelector('svg.wires')
+  const draw = () => {
+    const s = svg.getBoundingClientRect()
+    const pt = (id) => {
+      const r = document.getElementById(id).getBoundingClientRect()
+      return [r.left + r.width / 2 - s.left, r.top + r.height / 2 - s.top]
+    }
+    svg.innerHTML = LINKS.map(([a, b, color, label]) => {
+      const [x1, y1] = pt(a), [x2, y2] = pt(b)
+      const drop = 46 + Math.abs(x2 - x1) * 0.12
+      const my = Math.max(y1, y2) + drop
+      const d = `M ${x1} ${y1} C ${x1} ${my}, ${x2} ${my}, ${x2} ${y2}`
+      const lx = (x1 + x2) / 2, ly = my - drop * 0.18
+      return `<path d="${d}" stroke="${color}"/>` +
+             `<text x="${lx}" y="${ly}" fill="${color}" text-anchor="middle">${label}</text>`
+    }).join('')
+  }
+  window.addEventListener('load', () => { draw(); setTimeout(draw, 600) })
+</script>
+</body>
+</html>

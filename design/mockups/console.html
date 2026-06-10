@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>NoobSynth — Direction A : CONSOLE</title>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #14100d;
+    --panel-hi: #2c251d;
+    --panel-lo: #1a1511;
+    --face: #221c16;
+    --line: rgba(255, 226, 178, 0.14);
+    --engrave: #d8c9a8;
+    --engrave-dim: #8d7f63;
+    --brass: #c9a35c;
+    --led-amber: #ffae42;
+    --led-glass: #1c0d05;
+    --audio: #6fb6e8;
+    --cv: #5dd6a8;
+    --gate: #f0a35e;
+    --shadow-deep: 0 18px 40px rgba(0,0,0,0.65);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    background:
+      radial-gradient(1200px 500px at 50% -10%, rgba(255,190,110,0.07), transparent 60%),
+      linear-gradient(180deg, #181310 0%, #0e0b09 100%);
+    color: var(--engrave);
+    font-family: 'Big Shoulders Display', sans-serif;
+    overflow: hidden;
+    display: grid;
+    grid-template-rows: 46px 1fr 116px;
+    height: 100vh;
+  }
+  /* grain */
+  body::after {
+    content: ''; position: fixed; inset: 0; pointer-events: none; opacity: 0.5; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+  }
+
+  /* ── Brand rail ───────────────────────── */
+  .brand-rail {
+    display: flex; align-items: center; gap: 22px; padding: 0 26px;
+    background: linear-gradient(180deg, var(--panel-hi), var(--panel-lo));
+    border-bottom: 1px solid #000;
+    box-shadow: inset 0 1px 0 rgba(255,226,178,0.10);
+  }
+  .brand-name {
+    font-weight: 700; font-size: 21px; letter-spacing: 0.22em; color: var(--engrave);
+    text-shadow: 0 1px 0 rgba(0,0,0,0.9), 0 -1px 0 rgba(255,235,200,0.12);
+  }
+  .brand-name em { font-style: normal; color: var(--brass); }
+  .brand-sub { font-size: 12px; letter-spacing: 0.3em; color: var(--engrave-dim); }
+  .rail-right { margin-left: auto; display: flex; gap: 26px; align-items: center; }
+  .toggle { display: flex; align-items: center; gap: 8px; font-size: 12px; letter-spacing: 0.18em; color: var(--engrave-dim); }
+  .switch {
+    width: 30px; height: 14px; border-radius: 7px; background: #0a0705; border: 1px solid #000;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.9); position: relative;
+  }
+  .switch::after {
+    content: ''; position: absolute; top: 1px; width: 12px; height: 10px; border-radius: 5px;
+    background: linear-gradient(180deg, #e8d9b8, #9a8a68); left: 15px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.8);
+  }
+  .switch.off::after { left: 1px; background: linear-gradient(180deg, #6a5f4c, #3c352a); }
+  .serial { font-family: 'Share Tech Mono', monospace; font-size: 11px; color: var(--engrave-dim); letter-spacing: 0.1em; }
+
+  /* ── Main: drawer + racks ─────────────── */
+  .main { display: grid; grid-template-columns: 270px 1fr; min-height: 0; }
+
+  /* Patch drawer (library) */
+  .drawer {
+    background: linear-gradient(90deg, #241d16, #1b1510 70%);
+    border-right: 3px solid #0a0705;
+    box-shadow: inset -8px 0 18px rgba(0,0,0,0.45);
+    display: flex; flex-direction: column; min-height: 0;
+  }
+  .drawer-title {
+    padding: 14px 18px 10px; font-size: 14px; font-weight: 600; letter-spacing: 0.32em; color: var(--brass);
+    border-bottom: 1px solid var(--line);
+    display: flex; justify-content: space-between; align-items: baseline;
+  }
+  .drawer-title span { font-size: 10px; color: var(--engrave-dim); letter-spacing: 0.2em; }
+  .drawer-scroll { overflow: hidden; padding: 10px 14px 14px; }
+  .cat { margin-bottom: 14px; }
+  .cat h3 {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.28em; color: var(--engrave-dim);
+    margin-bottom: 7px; display: flex; align-items: center; gap: 8px;
+  }
+  .cat h3::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    font-size: 12.5px; font-weight: 600; letter-spacing: 0.12em; padding: 5px 10px 4px;
+    color: var(--engrave);
+    background: linear-gradient(180deg, #322a21, #211b14);
+    border: 1px solid #0c0906; border-radius: 4px;
+    box-shadow: 0 2px 3px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,226,178,0.10);
+    display: flex; align-items: center; gap: 7px; cursor: grab;
+  }
+  .chip i { width: 7px; height: 7px; border-radius: 50%; box-shadow: 0 0 5px currentColor; }
+  .chip.audio i { background: var(--audio); color: var(--audio); }
+  .chip.cv i    { background: var(--cv); color: var(--cv); }
+  .chip.gate i  { background: var(--gate); color: var(--gate); }
+  .drawer-presets {
+    margin-top: auto; border-top: 1px solid var(--line); padding: 12px 18px 16px;
+    background: linear-gradient(180deg, transparent, rgba(0,0,0,0.35));
+  }
+  .drawer-presets h3 { font-size: 11px; letter-spacing: 0.28em; color: var(--engrave-dim); margin-bottom: 8px; }
+  .preset-row { font-family: 'Share Tech Mono', monospace; font-size: 12px; color: var(--engrave); padding: 4px 0; display: flex; gap: 8px; align-items: center; }
+  .preset-row::before { content: '▸'; color: var(--brass); font-size: 10px; }
+  .preset-row.dim { color: var(--engrave-dim); }
+
+  /* Rack zone */
+  .rack-zone { display: flex; flex-direction: column; min-height: 0; padding: 14px 22px 10px; position: relative; }
+
+  /* scribble-strip tabs */
+  .strips { display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-end; }
+  .strip {
+    font-family: 'Share Tech Mono', monospace; font-size: 12px; letter-spacing: 0.14em;
+    padding: 5px 16px 4px; color: #2a2télé118;
+    color: #221a10;
+    background: linear-gradient(180deg, #efe3c0, #cdbd93);
+    border-radius: 2px 6px 2px 2px;
+    box-shadow: 0 3px 5px rgba(0,0,0,0.5);
+    transform: rotate(-0.6deg);
+    position: relative;
+  }
+  .strip:nth-child(2) { transform: rotate(0.8deg); background: linear-gradient(180deg,#d9cba6,#b5a67e); opacity: 0.75; }
+  .strip:nth-child(3) { transform: rotate(-0.4deg); background: linear-gradient(180deg,#d9cba6,#b5a67e); opacity: 0.75; }
+  .strip.add { background: none; box-shadow: none; border: 1px dashed var(--engrave-dim); color: var(--engrave-dim); opacity: 0.8; }
+  .strip.active::after {
+    content: ''; position: absolute; left: 8px; right: 8px; bottom: -6px; height: 3px;
+    background: var(--led-amber); border-radius: 2px; box-shadow: 0 0 8px var(--led-amber);
+  }
+
+  /* view rocker: RACKS / MIXEUR — same place on both screens */
+  .view-switch {
+    display: flex; border: 1px solid #0a0705; border-radius: 5px; overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,226,178,0.1);
+    margin-right: 16px; align-self: center;
+  }
+  .view-btn {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.2em; padding: 7px 16px 6px;
+    color: var(--engrave-dim); background: linear-gradient(180deg, #2b241d, #1a1410);
+    border: none; cursor: pointer;
+  }
+  .view-btn + .view-btn { border-left: 1px solid #0a0705; }
+  .view-btn.on {
+    color: #241803;
+    background: linear-gradient(180deg, #e6cf9a, #b78f4a);
+    box-shadow: inset 0 1px 1px rgba(255,240,205,0.6);
+    text-shadow: none;
+  }
+  .strips-sep { width: 1px; height: 22px; background: var(--line); align-self: center; margin-right: 12px; }
+
+  /* rack unit with ears */
+  .rack-unit {
+    flex: 1; min-height: 0; position: relative;
+    display: grid; grid-template-columns: 26px 1fr 26px;
+    background: linear-gradient(180deg, #0d0a08, #120e0b);
+    border-radius: 6px;
+    box-shadow: var(--shadow-deep), inset 0 0 60px rgba(0,0,0,0.6);
+  }
+  .ear {
+    background: linear-gradient(90deg, #38302​4, #241e17);
+    background: linear-gradient(90deg, #383024, #241e17);
+    border-radius: 6px 0 0 6px; position: relative;
+  }
+  .ear.right { background: linear-gradient(270deg, #383024, #241e17); border-radius: 0 6px 6px 0; }
+  .screw {
+    position: absolute; left: 50%; transform: translateX(-50%); width: 13px; height: 13px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #cdbfa2, #59503e 60%, #2a251c);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.8);
+  }
+  .screw::after { content: ''; position: absolute; left: 1.5px; right: 1.5px; top: 50%; height: 1.5px; background: rgba(20,15,8,0.85); transform: rotate(38deg); }
+  .screw.s1 { top: 12px; } .screw.s2 { bottom: 12px; } .screw.s3 { top: 50%; }
+
+  .rack-bed { position: relative; overflow: hidden; padding: 16px; }
+  .rack-bed::before {
+    content: ''; position: absolute; inset: 0;
+    background:
+      repeating-linear-gradient(90deg, rgba(255,226,178,0.025) 0 1px, transparent 1px 56px),
+      repeating-linear-gradient(0deg, rgba(255,226,178,0.025) 0 1px, transparent 1px 56px);
+  }
+
+  /* ── Module faceplates ────────────────── */
+  .module {
+    position: absolute; border-radius: 5px;
+    background: linear-gradient(180deg, #2e2620 0%, #211b15 100%);
+    border: 1px solid #090604;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,226,178,0.12);
+    padding: 10px 12px 30px;
+  }
+  .module .ms { position: absolute; width: 9px; height: 9px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #b8aa8c, #4c4434 65%, #221d15); }
+  .ms.tl { top: 5px; left: 5px; } .ms.tr { top: 5px; right: 5px; }
+  .ms.bl { bottom: 5px; left: 5px; } .ms.br { bottom: 5px; right: 5px; }
+  .module h4 {
+    text-align: center; font-size: 13px; font-weight: 700; letter-spacing: 0.26em; color: var(--engrave);
+    text-shadow: 0 1px 0 rgba(0,0,0,0.9); margin-bottom: 8px;
+    border-bottom: 1px solid var(--line); padding-bottom: 5px;
+  }
+  .knobs { display: flex; justify-content: space-around; gap: 6px; }
+  .knob { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .knob .cap {
+    width: 34px; height: 34px; border-radius: 50%;
+    background:
+      radial-gradient(circle at 32% 28%, #4e443a, #161109 75%);
+    border: 1px solid #050302;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.7), inset 0 1px 1px rgba(255,226,178,0.18);
+    position: relative;
+  }
+  .knob .cap::before {
+    content: ''; position: absolute; inset: -4px; border-radius: 50%;
+    border: 1px solid rgba(255,226,178,0.12);
+    background:
+      conic-gradient(from 220deg, transparent 0 8%, rgba(216,201,168,0.35) 8% 9%, transparent 9% 18%, rgba(216,201,168,0.35) 18% 19%, transparent 19% 28%, rgba(216,201,168,0.35) 28% 29%, transparent 29% 38%, rgba(216,201,168,0.35) 38% 39%, transparent 39% 48%, rgba(216,201,168,0.35) 48% 49%, transparent 49% 58%, rgba(216,201,168,0.35) 58% 59%, transparent 59% 70%, rgba(216,201,168,0.35) 70% 71%, transparent 0);
+    mask: radial-gradient(circle, transparent 58%, #000 60%);
+  }
+  .knob .cap::after {
+    content: ''; position: absolute; left: 50%; top: 3px; width: 2.5px; height: 11px; border-radius: 2px;
+    background: var(--led-amber); box-shadow: 0 0 5px var(--led-amber);
+    transform-origin: 50% 14px;
+  }
+  .knob.r1 .cap::after { transform: translateX(-50%) rotate(-58deg); }
+  .knob.r2 .cap::after { transform: translateX(-50%) rotate(12deg); }
+  .knob.r3 .cap::after { transform: translateX(-50%) rotate(74deg); }
+  .knob.r4 .cap::after { transform: translateX(-50%) rotate(-15deg); }
+  .knob label { font-size: 10px; font-weight: 600; letter-spacing: 0.16em; color: var(--engrave-dim); }
+  .jacks { position: absolute; bottom: 7px; left: 12px; right: 12px; display: flex; justify-content: space-between; }
+  .jack { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .jack .hole {
+    width: 15px; height: 15px; border-radius: 50%;
+    background: radial-gradient(circle at 50% 50%, #000 0 34%, #2e2archive620 38%);
+    background: radial-gradient(circle at 50% 45%, #000 0 35%, #3a322a 40%, #15100b 75%);
+    border: 2px solid; box-shadow: 0 0 6px rgba(0,0,0,0.7);
+  }
+  .jack.audio .hole { border-color: var(--audio); }
+  .jack.cv .hole    { border-color: var(--cv); }
+  .jack.gate .hole  { border-color: var(--gate); }
+  .jack span { font-size: 8.5px; letter-spacing: 0.12em; color: var(--engrave-dim); font-weight: 600; }
+
+  .led { position: absolute; top: 12px; right: 22px; width: 7px; height: 7px; border-radius: 50%;
+    background: var(--led-amber); box-shadow: 0 0 8px var(--led-amber), 0 0 2px var(--led-amber); }
+
+  /* cables overlay */
+  svg.cables { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
+  svg.cables path { fill: none; stroke-linecap: round; }
+  .cable-shadow { stroke: rgba(0,0,0,0.5); stroke-width: 7; }
+
+  /* ── Master console (bottom) ──────────── */
+  .console {
+    display: flex; align-items: center; gap: 30px; padding: 0 34px;
+    background: linear-gradient(180deg, #322a21 0%, #1c1712 18%, #15100c 100%);
+    border-top: 2px solid #000;
+    box-shadow: inset 0 2px 0 rgba(255,226,178,0.14), inset 0 18px 30px rgba(0,0,0,0.4);
+  }
+  .console section { display: flex; align-items: center; gap: 14px; }
+  .console .sec-label {
+    writing-mode: vertical-rl; transform: rotate(180deg);
+    font-size: 9.5px; font-weight: 600; letter-spacing: 0.3em; color: var(--engrave-dim);
+    border-left: 1px solid var(--line); padding-left: 6px; height: 62px; display: flex; align-items: center;
+  }
+  .btn-play {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: radial-gradient(circle at 34% 28%, #e6cf9a, #b78f4a 55%, #6d5226);
+    border: 2px solid #050302;
+    box-shadow: 0 5px 12px rgba(0,0,0,0.7), inset 0 2px 2px rgba(255,240,205,0.6), 0 0 22px rgba(255,174,66,0.35);
+    display: grid; place-items: center; cursor: pointer;
+  }
+  .btn-play::after { content: ''; width: 0; height: 0; border-left: 18px solid #241803; border-top: 11px solid transparent; border-bottom: 11px solid transparent; margin-left: 4px; }
+  .btn-small {
+    width: 42px; height: 42px; border-radius: 50%;
+    background: radial-gradient(circle at 34% 28%, #463c30, #16100a 70%);
+    border: 2px solid #050302; box-shadow: 0 4px 8px rgba(0,0,0,0.7), inset 0 1px 1px rgba(255,226,178,0.2);
+    display: grid; place-items: center; cursor: pointer;
+  }
+  .btn-small .sq { width: 12px; height: 12px; background: var(--engrave-dim); }
+  .btn-small .dot { width: 13px; height: 13px; border-radius: 50%; background: #e0492f; box-shadow: 0 0 9px rgba(224,73,47,0.8); }
+  .lcd {
+    background: var(--led-glass); border: 2px solid #060302; border-radius: 5px;
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.95), 0 1px 0 rgba(255,226,178,0.1);
+    padding: 7px 14px 5px; text-align: center;
+  }
+  .lcd .val {
+    font-family: 'Share Tech Mono', monospace; font-size: 30px; color: var(--led-amber);
+    text-shadow: 0 0 10px rgba(255,174,66,0.75); line-height: 1;
+  }
+  .lcd .cap { font-size: 9px; letter-spacing: 0.3em; color: #7a5a33; margin-top: 3px; font-weight: 600; }
+  .lcd.small .val { font-size: 19px; }
+  .vu { display: flex; gap: 3px; align-items: flex-end; height: 40px; }
+  .vu i { width: 7px; border-radius: 1px; background: #241d14; box-shadow: inset 0 1px 2px rgba(0,0,0,0.8); }
+  .vu i.on { background: #76c043; box-shadow: 0 0 6px rgba(118,192,67,0.6); }
+  .vu i.on.warm { background: var(--led-amber); box-shadow: 0 0 6px rgba(255,174,66,0.6); }
+  .vu i:nth-child(1){height:12px}.vu i:nth-child(2){height:16px}.vu i:nth-child(3){height:20px}
+  .vu i:nth-child(4){height:24px}.vu i:nth-child(5){height:28px}.vu i:nth-child(6){height:32px}
+  .vu i:nth-child(7){height:36px}.vu i:nth-child(8){height:40px}
+  .hist { display: flex; gap: 10px; }
+  .pill {
+    font-size: 12px; font-weight: 600; letter-spacing: 0.18em; padding: 7px 14px; border-radius: 4px;
+    background: linear-gradient(180deg, #322a21, #1d1711); border: 1px solid #0a0705; color: var(--engrave);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,226,178,0.12); cursor: pointer;
+  }
+  .console .spacer { flex: 1; }
+  .master-knob { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .master-knob .cap {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: radial-gradient(circle at 32% 28%, #564a3c, #171108 75%);
+    border: 2px solid #050302; position: relative;
+    box-shadow: 0 4px 9px rgba(0,0,0,0.75), inset 0 2px 2px rgba(255,226,178,0.22);
+  }
+  .master-knob .cap::after {
+    content: ''; position: absolute; left: 50%; top: 5px; width: 3px; height: 15px; border-radius: 2px;
+    background: var(--led-amber); box-shadow: 0 0 6px var(--led-amber);
+    transform: translateX(-50%) rotate(35deg); transform-origin: 50% 21px;
+  }
+  .master-knob label { font-size: 10px; letter-spacing: 0.26em; color: var(--engrave-dim); font-weight: 600; }
+</style>
+</head>
+<body>
+
+  <header class="brand-rail">
+    <div class="brand-name">NOOB<em>SYNTH</em></div>
+    <div class="brand-sub">MODULAR INSTRUMENT · MK III</div>
+    <div class="rail-right">
+      <div class="toggle">CÂBLES <span class="switch"></span></div>
+      <div class="toggle">GRILLE <span class="switch off"></span></div>
+      <div class="serial">Nº 0098-RW · 48 kHz</div>
+    </div>
+  </header>
+
+  <div class="main">
+    <aside class="drawer">
+      <div class="drawer-title">MAGASIN <span>98 MODULES</span></div>
+      <div class="drawer-scroll">
+        <div class="cat">
+          <h3>SOURCES</h3>
+          <div class="chips">
+            <span class="chip audio"><i></i>OSC</span>
+            <span class="chip audio"><i></i>SUPERSAW</span>
+            <span class="chip audio"><i></i>ORGUE</span>
+            <span class="chip audio"><i></i>SAMPLER</span>
+            <span class="chip audio"><i></i>TB-303</span>
+          </div>
+        </div>
+        <div class="cat">
+          <h3>FILTRES &amp; FX</h3>
+          <div class="chips">
+            <span class="chip audio"><i></i>VCF</span>
+            <span class="chip audio"><i></i>REVERB</span>
+            <span class="chip audio"><i></i>DELAY</span>
+            <span class="chip audio"><i></i>LESLIE</span>
+          </div>
+        </div>
+        <div class="cat">
+          <h3>MODULATION</h3>
+          <div class="chips">
+            <span class="chip cv"><i></i>ADSR</span>
+            <span class="chip cv"><i></i>LFO</span>
+            <span class="chip cv"><i></i>CHAOS</span>
+            <span class="chip cv"><i></i>QUANTIZER</span>
+          </div>
+        </div>
+        <div class="cat">
+          <h3>SÉQUENCEURS</h3>
+          <div class="chips">
+            <span class="chip gate"><i></i>STEP SEQ</span>
+            <span class="chip gate"><i></i>EUCLIDE</span>
+            <span class="chip gate"><i></i>TR-909</span>
+            <span class="chip gate"><i></i>HARMONIST</span>
+          </div>
+        </div>
+      </div>
+      <div class="drawer-presets">
+        <h3>BANQUE DE PRESETS</h3>
+        <div class="preset-row">HAMMOND + LESLIE</div>
+        <div class="preset-row">CAPITULATION</div>
+        <div class="preset-row dim">ACID LINES</div>
+        <div class="preset-row dim">CLOÎTRE</div>
+      </div>
+    </aside>
+
+    <div class="rack-zone">
+      <div class="strips">
+        <span class="view-switch">
+          <button class="view-btn on">RACKS</button>
+          <button class="view-btn">MIXEUR</button>
+        </span>
+        <span class="strips-sep"></span>
+        <span class="strip active">RACK A — LEAD</span>
+        <span class="strip">RACK B — PAD</span>
+        <span class="strip">DRUMS</span>
+        <span class="strip add">+ UNITÉ</span>
+      </div>
+
+      <div class="rack-unit">
+        <div class="ear"><span class="screw s1"></span><span class="screw s3"></span><span class="screw s2"></span></div>
+        <div class="rack-bed">
+
+          <div class="module" style="left:28px; top:24px; width:200px; height:158px;">
+            <span class="ms tl"></span><span class="ms tr"></span><span class="ms bl"></span><span class="ms br"></span>
+            <span class="led"></span>
+            <h4>OSCILLATEUR</h4>
+            <div class="knobs">
+              <div class="knob r1"><span class="cap"></span><label>FREQ</label></div>
+              <div class="knob r2"><span class="cap"></span><label>FORME</label></div>
+              <div class="knob r3"><span class="cap"></span><label>FIN</label></div>
+            </div>
+            <div class="jacks">
+              <span class="jack cv"><span class="hole" id="j-osc-pitch"></span><span>PITCH</span></span>
+              <span class="jack gate"><span class="hole" id="j-osc-gate"></span><span>GATE</span></span>
+              <span class="jack audio"><span class="hole" id="j-osc-out"></span><span>OUT</span></span>
+            </div>
+          </div>
+
+          <div class="module" style="left:236px; top:24px; width:200px; height:158px;">
+            <span class="ms tl"></span><span class="ms tr"></span><span class="ms bl"></span><span class="ms br"></span>
+            <span class="led"></span>
+            <h4>FILTRE VCF</h4>
+            <div class="knobs">
+              <div class="knob r3"><span class="cap"></span><label>CUTOFF</label></div>
+              <div class="knob r1"><span class="cap"></span><label>RESO</label></div>
+              <div class="knob r4"><span class="cap"></span><label>DRIVE</label></div>
+            </div>
+            <div class="jacks">
+              <span class="jack audio"><span class="hole" id="j-vcf-in"></span><span>IN</span></span>
+              <span class="jack cv"><span class="hole" id="j-vcf-mod"></span><span>MOD</span></span>
+              <span class="jack audio"><span class="hole" id="j-vcf-out"></span><span>OUT</span></span>
+            </div>
+          </div>
+
+          <div class="module" style="left:444px; top:24px; width:172px; height:158px;">
+            <span class="ms tl"></span><span class="ms tr"></span><span class="ms bl"></span><span class="ms br"></span>
+            <h4>ADSR</h4>
+            <div class="knobs">
+              <div class="knob r1"><span class="cap"></span><label>A</label></div>
+              <div class="knob r2"><span class="cap"></span><label>D</label></div>
+              <div class="knob r3"><span class="cap"></span><label>S</label></div>
+              <div class="knob r2"><span class="cap"></span><label>R</label></div>
+            </div>
+            <div class="jacks">
+              <span class="jack gate"><span class="hole" id="j-adsr-gate"></span><span>GATE</span></span>
+              <span class="jack cv"><span class="hole" id="j-adsr-env"></span><span>ENV</span></span>
+            </div>
+          </div>
+
+          <div class="module" style="left:624px; top:24px; width:150px; height:158px;">
+            <span class="ms tl"></span><span class="ms tr"></span><span class="ms bl"></span><span class="ms br"></span>
+            <span class="led"></span>
+            <h4>SORTIE</h4>
+            <div class="knobs">
+              <div class="knob r2"><span class="cap"></span><label>NIVEAU</label></div>
+            </div>
+            <div class="jacks" style="justify-content:center; gap:18px;">
+              <span class="jack audio"><span class="hole" id="j-out-l"></span><span>L / MONO</span></span>
+              <span class="jack audio"><span class="hole" id="j-out-r"></span><span>R</span></span>
+            </div>
+          </div>
+
+          <div class="module" style="left:28px; top:190px; width:200px; height:150px;">
+            <span class="ms tl"></span><span class="ms tr"></span><span class="ms bl"></span><span class="ms br"></span>
+            <h4>LFO</h4>
+            <div class="knobs">
+              <div class="knob r4"><span class="cap"></span><label>VITESSE</label></div>
+              <div class="knob r2"><span class="cap"></span><label>AMPL</label></div>
+            </div>
+            <div class="jacks">
+              <span class="jack cv"><span class="hole"></span><span>OUT</span></span>
+              <span class="jack cv"><span class="hole"></span><span>INV</span></span>
+            </div>
+          </div>
+
+          <div class="module" style="left:236px; top:190px; width:406px; height:150px;">
+            <span class="ms tl"></span><span class="ms tr"></span><span class="ms bl"></span><span class="ms br"></span>
+            <span class="led"></span>
+            <h4>SÉQUENCEUR 16 PAS</h4>
+            <div style="display:flex; gap:5px; justify-content:center; margin-top:6px;">
+              <span style="width:16px;height:34px;border-radius:3px;background:linear-gradient(180deg,#3a3128,#221b14);box-shadow:inset 0 1px 2px rgba(0,0,0,.7)"></span>
+              <span style="width:16px;height:34px;border-radius:3px;background:linear-gradient(180deg,#3a3128,#221b14)"></span>
+              <span style="width:16px;height:34px;border-radius:3px;background:var(--led-amber);box-shadow:0 0 10px rgba(255,174,66,.7)"></span>
+              <span style="width:16px;height:34px;border-radius:3px;background:linear-gradient(180deg,#3a3128,#221b14)"></span>
+              <span style="width:16px;height:34px;border-radius:3px;background:linear-gradient(180deg,#3a3128,#221b14)"></span>
+              <span style="width:16px;height:34px;border-radius:3px;background:linear-gradient(180deg,#4a3e2e,#2c241a)"></span>
+              <span style="width:16px;height:34px;border-radius:3px;background:linear-gradient(180deg,#3a3128,#221b14)"></span>
+              <span style="width:16px;height:34px;border-radius:3px;background:linear-gradient(180deg,#3a3128,#221b14)"></span>
+              <span style="width:16px;height:34px;border-radius:3px;background:linear-gradient(180deg,#4a3e2e,#2c241a)"></span>
+              <span style="width:16px;height:34px;border-radius:3px;background:linear-gradient(180deg,#3a3128,#221b14)"></span>
+              <span style="width:16px;height:34px;border-radius:3px;background:linear-gradient(180deg,#3a3128,#221b14)"></span>
+              <span style="width:16px;height:34px;border-radius:3px;background:linear-gradient(180deg,#4a3e2e,#2c241a)"></span>
+              <span style="width:16px;height:34px;border-radius:3px;background:linear-gradient(180deg,#3a3128,#221b14)"></span>
+              <span style="width:16px;height:34px;border-radius:3px;background:linear-gradient(180deg,#3a3128,#221b14)"></span>
+              <span style="width:16px;height:34px;border-radius:3px;background:linear-gradient(180deg,#3a3128,#221b14)"></span>
+              <span style="width:16px;height:34px;border-radius:3px;background:linear-gradient(180deg,#3a3128,#221b14)"></span>
+            </div>
+            <div class="jacks">
+              <span class="jack gate"><span class="hole" id="j-seq-clock"></span><span>CLOCK</span></span>
+              <span class="jack cv"><span class="hole" id="j-seq-cv"></span><span>CV OUT</span></span>
+              <span class="jack gate"><span class="hole" id="j-seq-gate"></span><span>GATE OUT</span></span>
+            </div>
+          </div>
+
+          <svg class="cables"></svg>
+        </div>
+        <div class="ear right"><span class="screw s1"></span><span class="screw s3"></span><span class="screw s2"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="console">
+    <section>
+      <div class="sec-label">TRANSPORT</div>
+      <button class="btn-play" title="Lecture"></button>
+      <button class="btn-small"><span class="sq"></span></button>
+      <button class="btn-small"><span class="dot"></span></button>
+    </section>
+    <section>
+      <div class="sec-label">TEMPO</div>
+      <div class="lcd"><div class="val">120.0</div><div class="cap">BPM</div></div>
+      <div class="lcd small"><div class="val">017:3</div><div class="cap">MESURE</div></div>
+    </section>
+    <section>
+      <div class="sec-label">DSP</div>
+      <div class="vu">
+        <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on warm"></i><i></i><i></i><i></i>
+      </div>
+      <div class="lcd small"><div class="val">31%</div><div class="cap">CHARGE</div></div>
+    </section>
+    <section class="hist">
+      <div class="sec-label">ÉDITION</div>
+      <span class="pill">↶ ANNULER</span>
+      <span class="pill">↷ RÉTABLIR</span>
+    </section>
+    <span class="spacer"></span>
+    <section>
+      <div class="master-knob"><span class="cap"></span><label>MASTER</label></div>
+    </section>
+  </footer>
+
+<script>
+  // Patch cables: real endpoints from the DOM, hanging like physical cables.
+  const LINKS = [
+    ['j-osc-out',  'j-vcf-in',    '#6fb6e8'],
+    ['j-vcf-out',  'j-out-l',     '#6fb6e8'],
+    ['j-adsr-env', 'j-vcf-mod',   '#5dd6a8'],
+    ['j-seq-cv',   'j-osc-pitch', '#5dd6a8'],
+    ['j-seq-gate', 'j-adsr-gate', '#f0a35e'],
+  ]
+  const svg = document.querySelector('svg.cables')
+  const draw = () => {
+    const s = svg.getBoundingClientRect()
+    const pt = (id) => {
+      const r = document.getElementById(id).getBoundingClientRect()
+      return [r.left + r.width / 2 - s.left, r.top + r.height / 2 - s.top]
+    }
+    svg.innerHTML = LINKS.map(([a, b, color]) => {
+      const [x1, y1] = pt(a), [x2, y2] = pt(b)
+      const sag = Math.min(170, Math.abs(x2 - x1) * 0.3 + 60)
+      const my = Math.max(y1, y2) + sag
+      const d = `M ${x1} ${y1} C ${x1 + (x2 - x1) * 0.25} ${my}, ${x2 - (x2 - x1) * 0.25} ${my}, ${x2} ${y2}`
+      return `<path d="${d}" class="cable-shadow"/>` +
+             `<path d="${d}" stroke="${color}" stroke-width="4.5"/>`
+    }).join('')
+  }
+  window.addEventListener('load', () => { draw(); setTimeout(draw, 600) })
+</script>
+</body>
+</html>

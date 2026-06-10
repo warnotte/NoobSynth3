@@ -62,11 +62,16 @@ Modules de routing audio inter-racks via bus nommés (A-H).
 - Param `bus` (0-7) sélectionne le bus
 
 ### Mixer Console
-Vue mixer avec volume/mute/solo par rack + master volume + channel strip FX.
+Vue mixer « console analogique » (Console Steel) : une tranche verticale par rack + tranche MASTER, joues en bois.
 
+- **Tranche (ordre)** : scribble (nom du rack, clic = ouvrir en vue rack) → CH n → SOLO/MUTE (allumés ambre/rouge) → VU + fader long-throw → LCD dB → sections FX en bas
 - Volume contrôle le param `level` du module `output` de chaque rack via `setParamDirect`
+- **Fader = taper audio quadratique** (`gain = 2p²`, +6 dB en haut) ; les graduations dB sont placées à leur **vraie** position (`gainToPos`) → échelle, capuchon et LCD cohérents. La valeur stockée reste du gain linéaire.
+- **Piège** : le fader vertical est un `input range` pivoté à -90° qui tourne autour de son centre — course W ⇒ `right: -(W/2 - 30)px`
+- **FX en accordéon** : une section dépliée à la fois ; la zone FX prend la hauteur restante et scrolle en interne (la zone fader est fixe). Les LED bypass sont indépendantes du pliage.
+- **VU master** : le bus master vit dans le moteur (post-graphe) → peak L/R mesuré post-master-FX dans `GraphEngine`, exposé via l'id réservé `__master__` dans `get_meter_level()` (le `_` initial l'exempte du mapping rack côté JS — pipeline meter existant réutilisé tel quel, Web + Tauri).
 - Solo = mute tous les non-solo
-- Master BPM dans le transport (TopBar), toujours visible
+- Master BPM dans le transport (TransportConsole, bandeau bas), toujours visible
 - Resync = `resetTransport()`, remet tout au beat 0
 
 **Channel Strip FX (par canal) + Master FX :**
@@ -88,23 +93,26 @@ Implémenté via `useReducer` dans `src/hooks/useUndoableState.ts` :
 - **Reset** : `clearHistory()` appelé sur chargement preset et Clear rack
 - **Fichiers clés** : `src/hooks/useUndoableState.ts`, `src/hooks/UndoContext.tsx`, `src/App.tsx`
 
-### TopBar Layout
-La TopBar est divisée en deux éléments frères :
-- `<header className="topbar-head">` — Brand + subtitle, scroll normalement
-- `<div className="topbar-body">` — Toolbar sticky (z-index 1100, au-dessus des câbles)
-- **Zones** : Status | Transport (play/stop/record) | Patch (undo/redo/export/import) | View (cables toggle, CPU meter toggle) | Dev (resize toggle)
-- **Mobile** : Header masqué, toolbar wrap horizontal, labels cachés, SidePanel en drawer slide-in
+### Console Steel Shell (layout de page)
+La page est un « instrument hardware » en grille fixe `100vh` (aucun scroll de page) — maquettes de référence : `design/mockups/console-steel.html` + `console-mixer-steel.html`.
+
+- **Grille** : `BrandRail` (44px) → `RackTabs` (rocker RACKS|MIXER + onglets scribble) → `workbench` (SidePanel **à gauche** 280px + rack/mixer) → `TransportConsole` (96px, bandeau bas)
+- **BrandRail** : marque, LED statut moteur, toggles CABLES/RESIZE(dev), export/import (tooltip dynamique patch vs projet), bouton ⚙ I/O (Tauri) → popover `IoPanel` (config audio native — l'ancienne section « Tauri Bridge » du SidePanel)
+- **TransportConsole** : play/stop (un seul bouton), REC, resync, BPM sur LCD éditable, mesure, charge DSP (VU + LCD, toujours actif moteur lancé), UNDO/REDO
+- **Le rack scrolle en interne** : `PatchLayer` clippe les câbles au rectangle du rack (viewBox remap) ; l'auto-scroll du drag de module scrolle `.rack` (plus `window`)
+- **Mobile (≤960px)** : une colonne, SidePanel en drawer overlay (FAB au-dessus du bandeau), console compacte, `100dvh`
+- Palette/typo : variables `--cs-*` + `--font-engrave`/`--font-lcd` (section « CONSOLE STEEL SHELL » de `styles.css`)
 
 ### Recording (WAV Export)
-Le bouton Record dans la TopBar capture l'audio en WAV 16-bit PCM stéréo :
+Le bouton Record du TransportConsole (bandeau bas) capture l'audio en WAV 16-bit PCM stéréo :
 - **Capture** : `ScriptProcessorNode` connecté à `MediaStreamAudioDestinationNode` accumule les samples Float32
 - **Encodage** : Header RIFF/WAVE complet avec durée exacte → seek fonctionnel partout
 - **Format** : `.wav` (PCM 16-bit, stéréo, sample rate du AudioContext)
-- **Fichiers clés** : `src/App.tsx` (`handleToggleRecording`), `src/ui/TopBar.tsx` (bouton)
+- **Fichiers clés** : `src/App.tsx` (`handleToggleRecording`), `src/ui/TransportConsole.tsx` (bouton)
 - Le batch export (`runPresetBatchExport`) utilise le même encodage WAV
 
 ### CPU Meter (DSP Load)
-Indicateur de charge CPU audio en temps réel, activable via le bouton CPU dans la zone View de la TopBar.
+Indicateur de charge CPU audio en temps réel, **toujours actif quand le moteur tourne** (section DSP du TransportConsole : VU à LEDs + LCD %). Moteur arrêté : affiche `--`.
 
 **Fonctionnement :**
 - Mesure le temps réel de `engine.render()` vs le budget temps du buffer audio
@@ -125,7 +133,7 @@ Indicateur de charge CPU audio en temps réel, activable via le bouton CPU dans 
 **Fichiers clés :**
 - `src/engine/worklets/wasm-graph-processor.ts` — mesure + report
 - `src/engine/WasmGraphEngine.ts` — `watchCpuLoad()` subscription
-- `src/ui/TopBar.tsx` — UI (barre + texte)
+- `src/ui/TransportConsole.tsx` — UI (VU + LCD)
 - `src/App.tsx` — `useEffect` CPU load monitoring
 - `src-tauri/src/lib.rs` — `CpuLoadMetrics`, `native_get_cpu_load`
 - `src/styles.css` — `.cpu-meter-*`

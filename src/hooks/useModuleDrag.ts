@@ -138,16 +138,21 @@ export const useModuleDrag = ({
         }
         state.raf = window.requestAnimationFrame(() => {
           state.raf = null
-          const viewportHeight = window.innerHeight
-          const edge = 72
-          let scrollDelta = 0
-          if (moveEvent.clientY < edge) {
-            scrollDelta = -Math.ceil(((edge - moveEvent.clientY) / edge) * 18)
-          } else if (moveEvent.clientY > viewportHeight - edge) {
-            scrollDelta = Math.ceil(((moveEvent.clientY - (viewportHeight - edge)) / edge) * 18)
-          }
-          if (scrollDelta !== 0) {
-            window.scrollBy({ top: scrollDelta })
+          // Edge auto-scroll: the rack scrolls internally (the page itself is
+          // fixed in the Console Steel shell), so scroll the rack container.
+          const scroller = state.container.closest<HTMLElement>('.rack')
+          if (scroller) {
+            const bounds = scroller.getBoundingClientRect()
+            const edge = 64
+            let scrollDelta = 0
+            if (moveEvent.clientY < bounds.top + edge) {
+              scrollDelta = -Math.ceil(((bounds.top + edge - moveEvent.clientY) / edge) * 18)
+            } else if (moveEvent.clientY > bounds.bottom - edge) {
+              scrollDelta = Math.ceil(((moveEvent.clientY - (bounds.bottom - edge)) / edge) * 18)
+            }
+            if (scrollDelta !== 0) {
+              scroller.scrollBy({ top: scrollDelta })
+            }
           }
 
           const containerRect = state.container.getBoundingClientRect()
