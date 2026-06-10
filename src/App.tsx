@@ -2094,6 +2094,7 @@ function App() {
         onToggleDevResize={() => setDevResizeEnabled((prev) => !prev)}
         onExportPreset={handleExportPreset}
         onImportPreset={handleImportPreset}
+        rackCount={racks.length}
         ioPanel={
           isTauri ? (
             <IoPanel

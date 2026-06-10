@@ -20,6 +20,8 @@ type BrandRailProps = {
   onToggleDevResize?: () => void
   onExportPreset?: () => void
   onImportPreset?: () => void
+  /** Rack count — drives the export tooltip (1 rack = patch, more = full project) */
+  rackCount?: number
   /** Native audio/MIDI config panel (desktop mode only) — shown in a popover */
   ioPanel?: ReactNode
 }
@@ -47,6 +49,7 @@ export const BrandRail = ({
   onToggleDevResize = () => {},
   onExportPreset,
   onImportPreset,
+  rackCount = 1,
   ioPanel,
 }: BrandRailProps) => {
   const [ioOpen, setIoOpen] = useState(false)
@@ -109,10 +112,24 @@ export const BrandRail = ({
         </label>
       )}
       <div className="rail-patch-actions">
-        <button type="button" className="rail-btn" onClick={onExportPreset} title="Export patch (JSON)">
+        <button
+          type="button"
+          className="rail-btn"
+          onClick={onExportPreset}
+          title={
+            rackCount > 1
+              ? `Export FULL PROJECT (JSON) — ${rackCount} racks + mixer + master FX`
+              : 'Export patch (JSON) — current rack only (with 2+ racks this exports the full project)'
+          }
+        >
           <ExportIcon />
         </button>
-        <button type="button" className="rail-btn" onClick={onImportPreset} title="Import patch (JSON)">
+        <button
+          type="button"
+          className="rail-btn"
+          onClick={onImportPreset}
+          title="Import a patch or a full project (JSON) — the format is detected automatically"
+        >
           <ImportIcon />
         </button>
       </div>
