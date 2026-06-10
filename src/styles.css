@@ -4199,6 +4199,39 @@
   pointer-events: none;
 }
 
+/* Colonne de labels de rangées (Gate/Note/Vel/Slide) — même squelette qu'un
+   step (mêmes classes => mêmes hauteurs), sans data-step donc invisible au
+   playhead */
+.seq-step-labels {
+  flex: 0 0 34px;
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.seq-step-labels .seq-step-led,
+.seq-step-labels .seq-step-num {
+  visibility: hidden;
+}
+
+.seq-label {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+  padding-right: 3px;
+  font-size: 7px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.seq-label-gate { height: 22px; }
+.seq-label-note { height: 24px; }
+.seq-label-vel { height: 24px; }
+.seq-label-slide { height: 18px; }
+
 .seq-step-num {
   font-size: 9px;
   font-weight: 700;
@@ -4290,14 +4323,19 @@
 }
 
 /* Velocity bar */
+/* Vélocité : même contrôle visuel que le pitch (jauge + chiffre LCD) */
 .seq-step-vel {
   width: 100%;
-  height: 28px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: rgba(0, 0, 0, 0.45);
   border: 1px solid rgba(0, 0, 0, 0.6);
   border-radius: var(--radius-sm);
   position: relative;
   cursor: ns-resize;
+  user-select: none;
   touch-action: none;
   overflow: hidden;
 }
@@ -4311,12 +4349,21 @@
   height: calc(var(--vel, 100) * 1%);
   background: linear-gradient(
     180deg,
-    color-mix(in srgb, var(--cat, var(--accent-warm)) 85%, #fff) 0%,
-    color-mix(in srgb, var(--cat, var(--accent-warm)) 70%, #000) 100%
+    color-mix(in srgb, var(--cat, var(--accent-warm)) 30%, transparent),
+    color-mix(in srgb, var(--cat, var(--accent-warm)) 14%, transparent)
   );
-  box-shadow: 0 0 4px color-mix(in srgb, var(--cat, var(--accent-warm)) 50%, transparent);
-  border-radius: var(--radius-xs);
+  border-top: 1px solid color-mix(in srgb, var(--cat, var(--accent-warm)) 55%, transparent);
+  pointer-events: none;
   transition: height 0.05s;
+}
+
+.seq-step-vel-num {
+  position: relative;
+  z-index: 1;
+  font-size: 10px;
+  font-family: var(--font-lcd);
+  color: color-mix(in srgb, var(--cat, var(--accent-warm)) 70%, #fff);
+  text-shadow: 0 0 5px color-mix(in srgb, var(--cat, var(--accent-warm)) 40%, transparent);
 }
 
 /* Slide toggle button */
