@@ -292,7 +292,7 @@ control, output, audio-in, scope, meter, lab, notes, send, receive
 
 Les notes détaillées d'implémentation par feature et par module vivent dans **[docs/FEATURES.md](./docs/FEATURES.md)** — à consulter avant de travailler sur une feature précise.
 
-**Sujets couverts :** Multi-Rack System · Global Transport · Module Templates · Send/Receive · Mixer Console + Channel Strip/Master FX · Undo/Redo · TopBar Layout · Recording (WAV) · CPU Meter · Drum Sequencer · MIDI File Sequencer Polyphony · AY Player · TR-909 Accent Latching · Graph Update Modes · Sequencer Playhead Sync · Tauri Standalone Mode · Delay Tempo Sync · Compressor Sidechain · Flanger · Frequency Shifter · EQ 3-Band · Glitch/Stutter · Leslie · Pipe Organ (Hammond B3) · Wah-Wah · Tube Amp · Unified Rate Divisions · Clap909 Fix.
+**Sujets couverts :** Multi-Rack System · Global Transport · Module Templates · Send/Receive · Mixer Console + Channel Strip/Master FX · Undo/Redo · Console Steel Shell (layout de page) · Recording (WAV) · CPU Meter · Drum Sequencer · MIDI File Sequencer Polyphony · AY Player · TR-909 Accent Latching · Graph Update Modes · Sequencer Playhead Sync · Tauri Standalone Mode · Delay Tempo Sync · Compressor Sidechain · Flanger · Frequency Shifter · EQ 3-Band · Glitch/Stutter · Leslie · Pipe Organ (Hammond B3) · Wah-Wah · Tube Amp · Unified Rate Divisions · Clap909 Fix.
 
 ### Graph Update Modes (IMPORTANT — à garder en tête)
 

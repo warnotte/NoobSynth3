@@ -178,7 +178,7 @@ interface Connection {
 ## UI tooling
 
 - **Grille de rack** : overlay toujours actif pour visualiser l’alignement (CSS dans `src/styles.css`).
-- **Dev Resize** : bouton TopBar en mode dev pour activer les poignées de redimensionnement et le ghost preview.
+- **Dev Resize** : toggle RESIZE dans le BrandRail (rail supérieur) en mode dev pour activer les poignées de redimensionnement et le ghost preview.
 - **Lab Panel** : module de test UI (layout complet Osc/Env/Mod/Util) dans `src/ui/controls/IOControls.tsx`.
 
 ## Technologies

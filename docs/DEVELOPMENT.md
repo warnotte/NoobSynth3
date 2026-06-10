@@ -129,7 +129,9 @@ src/
 │   └── useMarioSequencer.ts  # Séquenceur Mario IO
 ├── ui/
 │   ├── controls/             # Contrôles modules (par catégorie)
-│   ├── TopBar.tsx            # Barre supérieure
+│   ├── BrandRail.tsx         # Rail supérieur (marque, statut, toggles, export/import, I/O)
+│   ├── TransportConsole.tsx  # Bandeau bas (play/stop, rec, BPM LCD, DSP, undo/redo)
+│   ├── IoPanel.tsx           # Popover config audio native (Tauri)
 │   ├── RackView.tsx          # Vue du rack
 │   ├── SidePanel.tsx         # Panneaux latéraux
 │   └── PatchLayer.tsx        # Rendu des câbles
@@ -213,7 +215,7 @@ Sections principales :
 ### Outils UI (debug layout)
 
 - **Grille du rack** : toujours visible via `.rack-grid-overlay` (géré dans `src/styles.css`).
-- **Dev Resize** : bouton en haut (TopBar) en mode dev, active les poignées de redimensionnement des modules.
+- **Dev Resize** : toggle RESIZE dans le BrandRail en mode dev, active les poignées de redimensionnement des modules.
 - **Lab Panel** : module de test UI qui affiche un layout complet (Osc/Env/Mod/Util) pour tester la réactivité.
 
 ## Tests

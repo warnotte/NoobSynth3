@@ -34,7 +34,7 @@
 - [x] set_graph_fresh resets transport to 0
 - [x] Queued transport messages for deterministic timing
 - [x] Swing stacking fix (external clock disables local swing)
-- [x] Transport position display (Bar:Beat) in TopBar
+- [x] Transport position display (Bar:Beat) in the transport bar
 
 ### Project Export/Import
 - [x] Version 2 format: all racks + mixer state + tempo + channel/master FX
