@@ -56,16 +56,29 @@ App.tsx                          # Root component, state management, undo/redo
     └── PatchLayer.tsx           # SVG cable rendering
 
 Shared UI components:
-├── RotaryKnob.tsx               # Rotary knob with drag
+├── RotaryKnob.tsx               # Rotary knob with drag (+ arc de valeur via --ratio, teinté catégorie)
 ├── ControlKnob.tsx              # Knob + label wrapper
-├── ControlBox.tsx               # Bordered container (horizontal, compact, flex)
+├── ControlBox.tsx               # Bordered container (horizontal, compact, flex) — label gravé + filet
 ├── ControlButtons.tsx           # Button grid with columns prop
 ├── ToggleButton.tsx             # On/off toggle
 ├── WaveformSelector.tsx         # Waveform picker
+├── Drawbar.tsx                  # Drawbar vertical façon Hammond (drag relatif, undo-aware, caps colorés)
 ├── PanelSection.tsx             # Collapsible section
 ├── Oscilloscope.tsx             # Scope display
 ├── PianoKeyboard.tsx            # Interactive piano keyboard (black/white keys, drag-to-play)
 └── KeyboardPopup.tsx            # 61-key expanded keyboard modal (React Portal)
+
+Theming des modules (phase 3 Console Steel):
+- Faceplate acier uniforme; identité par CATÉGORIE via `data-category` sur
+  `.module-card` (alimenté par `moduleCategoryByType` de moduleRegistry) →
+  liseré du header, arcs des knobs, états actifs des boutons, glow des LCD.
+  Tokens `--cat-*` (8 catégories) dans `src/index.css`.
+- Langage « LCD » unifié pour les displays riches : classes `.lcd`,
+  `.lcd-head`, `.lcd-canvas` (+ recettes locales pour les grilles seq) —
+  bezel verre inset + scanlines + glow catégorie.
+- ⚠️ Un `@container module-card` ne peut PAS cibler `.module-card` lui-même
+  (règle morte) — les paliers responsive ciblent `.module-body` (les custom
+  properties héritent vers les contrôles).
 ```
 
 ## Cable & Port Colors
@@ -90,6 +103,7 @@ Câbles et jacks sont colorés par type de signal :
 - Resize overrides are kept in `moduleSizeOverrides` inside the `useModuleResize` hook (`src/hooks/useModuleResize.ts`, wired from `src/App.tsx`) and only applied by `getModuleSize` while Dev Resize is enabled.
 - Rack grid overlay is always on via `.rack-grid-overlay` in `src/ui/RackView.tsx`, driven by `--rack-unit-x/y`, `--rack-gap`, `--rack-pad-y` in `src/styles.css`.
 - Lab Panel (`module.type === 'lab'`) renders a full layout stress test (Osc/Env/Mod/Util) in `src/ui/controls/IOControls.tsx`, using `updateParam(..., { skipEngine: true })`.
+- **Galerie des 98 modules** : `node design/mockups/gallery.mjs` (dev server requis) — construit un graphe avec un module de chaque type, le charge via l'import BrandRail, screenshote chaque module dans `design/gallery/<type>.png` et signale les débordements de `.module-controls`. À lancer après toute modif des primitives/CSS des modules. Scan ciblé par preset : `node design/mockups/check-overflow.mjs [preset...]`.
 
 ### Remove Dev Resize (rollback checklist)
 
@@ -425,6 +439,8 @@ Presets dans `public/presets/`, structure `{ id, name, description, group, graph
 | STATUS_STACK_OVERFLOW au boot natif (debug) | Thread audio natif sur stack ~2 MB par défaut ; `GraphEngine::new` (graphe poly, SID 64 KB RAM) déborde | Spawn du thread `noobsynth-audio` avec `stack_size(64 MB)` — `src-tauri/src/lib.rs` |
 | wasm-bindgen CLI ≠ crate Cargo.lock | Le step bindgen échoue si la CLI installée et la crate `wasm-bindgen` (pinnée) divergent | Garde-fou dans `scripts/build-wasm.ps1` : compare les versions, indique `cargo install -f wasm-bindgen-cli --version <crate>` |
 | SID/AY muets après (re)start audio natif | Le fichier chargé en UI n'était pas présent dans le moteur natif recréé au start | Re-upload du fichier SID/AY dans le moteur natif au démarrage audio (`loadSidFile`/`loadYmFile` du `nativeChiptuneBridge`) |
+| Container queries modules MORTES depuis toujours | `@container module-card { .module-card {...} }` — un container query ne peut pas matcher son propre container → les paliers responsive (dial-size, etc.) ne s'appliquaient jamais | Cibler `.module-body` (descendant) ; les custom properties héritent vers les contrôles |
+| Spectral Swarm : knobs ATK/REL inaccessibles | Module 2x3 trop petit pour son contenu, bas coupé par `overflow: hidden` (+162px) — découvert par la galerie 98 modules | Tailles registry revues (swarm 3x4, shepard 3x3, arpeggiator 3x5, audio-in 1x2) ; `layoutGraph` reflow les presets au chargement |
 
 ---
 
