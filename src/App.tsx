@@ -403,8 +403,27 @@ function App() {
     }
   }, [engine, isTauri, status, tauriNativeRunning])
 
-  // Subscribe to transport position updates
+  // Subscribe to transport position updates (Web: messages worklet ;
+  // Tauri natif: polling native_get_transport_beats, comme le CPU load)
   useEffect(() => {
+    if (isTauri) {
+      if (!tauriNativeRunning) {
+        setTransportBeats(0)
+        return
+      }
+      const interval = setInterval(async () => {
+        try {
+          const beats = await invokeTauri<number>('native_get_transport_beats')
+          setTransportBeats(beats)
+        } catch {
+          // ignore if command not available
+        }
+      }, 250)
+      return () => {
+        clearInterval(interval)
+        setTransportBeats(0)
+      }
+    }
     if (status !== 'running') {
       setTransportBeats(0)
       return
@@ -414,7 +433,7 @@ function App() {
       unsub()
       setTransportBeats(0)
     }
-  }, [engine, status])
+  }, [engine, isTauri, status, tauriNativeRunning])
 
   useEffect(() => {
     graphRef.current = graph
