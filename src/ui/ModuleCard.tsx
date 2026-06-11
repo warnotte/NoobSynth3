@@ -31,6 +31,8 @@ type ModuleCardProps = {
     port: PortDefinition,
     event: React.PointerEvent<HTMLButtonElement>,
   ) => void
+  /** Clic droit sur un jack : menu des connexions de ce port */
+  onPortContextMenu?: (moduleId: string, port: PortDefinition, x: number, y: number) => void
   children?: ReactNode
 }
 
@@ -52,6 +54,7 @@ export const ModuleCard = ({
   validTargets,
   hoverTargetKey,
   onPortPointerDown,
+  onPortContextMenu,
   children,
 }: ModuleCardProps) => (
   <div
@@ -110,6 +113,13 @@ export const ModuleCard = ({
                 aria-label={`${module.name} ${port.label} input`}
                 title={`${port.label} (${port.kind})`}
                 onPointerDown={(event) => onPortPointerDown?.(module.id, port, event)}
+                onContextMenu={(event) => {
+                  if (onPortContextMenu) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                    onPortContextMenu(module.id, port, event.clientX, event.clientY)
+                  }
+                }}
               />
               <span className="port-side-label">{port.label}</span>
             </div>
@@ -143,6 +153,13 @@ export const ModuleCard = ({
                 aria-label={`${module.name} ${port.label} output`}
                 title={`${port.label} (${port.kind})`}
                 onPointerDown={(event) => onPortPointerDown?.(module.id, port, event)}
+                onContextMenu={(event) => {
+                  if (onPortContextMenu) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                    onPortContextMenu(module.id, port, event.clientX, event.clientY)
+                  }
+                }}
               />
             </div>
           )

@@ -26,6 +26,9 @@ type RackViewProps = {
   rackRef: RefObject<HTMLDivElement | null>
   modulesRef: RefObject<HTMLDivElement | null>
   onRackDoubleClick: (event: ReactMouseEvent<HTMLElement>) => void
+  onRackClick?: (event: ReactMouseEvent<HTMLElement>) => void
+  onRackMouseMove?: (event: ReactMouseEvent<HTMLElement>) => void
+  onRackMouseLeave?: () => void
   collapsed: boolean
   onToggleCollapsed: () => void
   getModuleGridStyle: (module: ModuleSpec) => CSSProperties
@@ -44,6 +47,7 @@ type RackViewProps = {
     port: PortDefinition,
     event: ReactPointerEvent<HTMLButtonElement>,
   ) => void
+  onPortContextMenu?: (moduleId: string, port: PortDefinition, x: number, y: number) => void
   moduleDragPreview: ModuleDragPreview | null
   moduleResizePreview?: ModuleDragPreview | null
   moduleControls: Omit<ModuleControlsProps, 'module'>
@@ -54,6 +58,9 @@ export const RackView = ({
   rackRef,
   modulesRef,
   onRackDoubleClick,
+  onRackClick,
+  onRackMouseMove,
+  onRackMouseLeave,
   collapsed,
   onToggleCollapsed,
   getModuleGridStyle,
@@ -68,11 +75,19 @@ export const RackView = ({
   validTargets,
   hoverTargetKey,
   onPortPointerDown,
+  onPortContextMenu,
   moduleDragPreview,
   moduleResizePreview,
   moduleControls,
 }: RackViewProps) => (
-  <section className="rack" ref={rackRef} onDoubleClick={onRackDoubleClick}>
+  <section
+    className="rack"
+    ref={rackRef}
+    onDoubleClick={onRackDoubleClick}
+    onClick={onRackClick}
+    onMouseMove={onRackMouseMove}
+    onMouseLeave={onRackMouseLeave}
+  >
     <div className="rack-header">
       <div className="rack-title">
         <button
@@ -113,6 +128,7 @@ export const RackView = ({
             validTargets={validTargets}
             hoverTargetKey={hoverTargetKey}
             onPortPointerDown={onPortPointerDown}
+            onPortContextMenu={onPortContextMenu}
           >
             <ModuleControls module={module} {...moduleControls} />
           </ModuleCard>

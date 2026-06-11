@@ -2613,12 +2613,38 @@
   transition: stroke-width 0.15s ease, filter 0.15s ease, opacity 0.15s ease;
 }
 
-.patch-cable:hover {
+/* .hovered = survol « halo » détecté en JS (12px autour du câble, posé par
+   usePatching) — même visuel que le :hover natif limité au trait de 3px */
+.patch-cable:hover,
+.patch-cable.hovered {
   stroke-width: 5px;
   opacity: 1;
   filter: drop-shadow(0 0 8px rgba(150, 220, 255, 0.6))
           drop-shadow(0 3px 6px rgba(0, 0, 0, 0.45));
   animation: cable-glow 0.8s ease-in-out infinite alternate;
+}
+
+/* Bouton ✂ au milieu du câble survolé */
+.cable-cut {
+  cursor: pointer;
+  pointer-events: all;
+}
+
+.cable-cut-bg {
+  fill: #1b222b;
+  stroke: rgba(214, 224, 238, 0.75);
+  stroke-width: 1.5;
+}
+
+.cable-cut line {
+  stroke: #ff6b6b;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.cable-cut:hover .cable-cut-bg {
+  fill: #321418;
+  stroke: #ff6b6b;
 }
 
 @keyframes cable-glow {

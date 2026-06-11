@@ -8,6 +8,8 @@ type PatchLayerProps = {
   connections: Connection[]
   renderCable: (connection: Connection) => ReactNode
   renderGhostCable: () => ReactNode
+  /** Rendu au-dessus des câbles (ex: bouton ✂ du câble survolé) */
+  renderOverlay?: () => ReactNode
   /**
    * Element to clip cables to (the rack scroll container). Port positions are
    * client coords; the svg viewBox re-maps them into a wrapper pinned over the
@@ -30,6 +32,7 @@ export const PatchLayer = ({
   connections,
   renderCable,
   renderGhostCable,
+  renderOverlay,
   clipRef,
 }: PatchLayerProps) => {
   const [clip, setClip] = useState<ClipRect | null>(null)
@@ -115,6 +118,7 @@ export const PatchLayer = ({
         </defs>
         {connections.map((connection) => renderCable(connection))}
         {renderGhostCable()}
+        {renderOverlay?.()}
       </svg>
     </div>
   )

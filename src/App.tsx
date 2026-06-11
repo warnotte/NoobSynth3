@@ -253,6 +253,15 @@ function App() {
     x: number
     y: number
   } | null>(null)
+  /* Menu contextuel d'un JACK : liste les connexions du port pour débrancher
+     une par une (ou toutes) — seule façon de débrancher côté SORTIE (fan-out) */
+  const [portMenu, setPortMenu] = useState<{
+    x: number
+    y: number
+    portLabel: string
+    direction: 'in' | 'out'
+    connections: GraphState['connections']
+  } | null>(null)
   const rackRef = useRef<HTMLDivElement | null>(null)
   const modulesRef = useRef<HTMLDivElement | null>(null)
   const presetFileRef = useRef<HTMLInputElement | null>(null)
@@ -274,9 +283,14 @@ function App() {
     connectedInputs,
     dragTargets,
     handlePortPointerDown,
+    handleRackClick,
     handleRackDoubleClick,
+    handleRackMouseLeave,
+    handleRackMouseMove,
     hoverTargetKey,
+    removeConnection,
     renderCable,
+    renderCableOverlay,
     renderGhostCable,
     resetPatching,
     selectedPortKey,
@@ -1841,6 +1855,63 @@ function App() {
     ]
   }
 
+  // ── Menu contextuel d'un jack (déconnexion par câble) ──
+
+  const handlePortContextMenu = useCallback(
+    (
+      moduleId: string,
+      port: { id: string; label: string; direction: 'in' | 'out' },
+      x: number,
+      y: number,
+    ) => {
+      const connections = graphRef.current.connections.filter((connection) =>
+        port.direction === 'in'
+          ? connection.to.moduleId === moduleId && connection.to.portId === port.id
+          : connection.from.moduleId === moduleId && connection.from.portId === port.id,
+      )
+      setPortMenu({ x, y, portLabel: port.label, direction: port.direction, connections })
+    },
+    [],
+  )
+
+  const getPortMenuActions = (): ContextMenuAction[] => {
+    if (!portMenu) return []
+    if (portMenu.connections.length === 0) {
+      return [{ id: 'none', label: 'Aucun câble branché', disabled: true }]
+    }
+    const moduleName = (id: string) =>
+      graphRef.current.modules.find((m) => m.id === id)?.name ?? id
+    const items: ContextMenuAction[] = portMenu.connections.map((connection, index) => ({
+      id: `cut-${index}`,
+      label:
+        portMenu.direction === 'out'
+          ? `Débrancher → ${moduleName(connection.to.moduleId)} · ${connection.to.portId}`
+          : `Débrancher ← ${moduleName(connection.from.moduleId)} · ${connection.from.portId}`,
+      danger: true,
+    }))
+    if (portMenu.connections.length > 1) {
+      items.push({
+        id: 'cut-all',
+        label: `Tout débrancher (${portMenu.connections.length})`,
+        danger: true,
+      })
+    }
+    return items
+  }
+
+  const handlePortMenuAction = (actionId: string) => {
+    if (!portMenu) return
+    if (actionId === 'cut-all') {
+      portMenu.connections.forEach((connection) => removeConnection(connection))
+      return
+    }
+    const index = Number(actionId.replace('cut-', ''))
+    const target = portMenu.connections[index]
+    if (target) {
+      removeConnection(target)
+    }
+  }
+
   const handleClearRack = () => {
     setGridError(null)
     applyGraphUpdate({ modules: [], connections: [] })
@@ -2249,6 +2320,9 @@ function App() {
             rackRef={rackRef}
             modulesRef={modulesRef}
             onRackDoubleClick={handleRackDoubleClick}
+            onRackClick={handleRackClick}
+            onRackMouseMove={handleRackMouseMove}
+            onRackMouseLeave={handleRackMouseLeave}
             collapsed={rackCollapsed}
             onToggleCollapsed={() => setRackCollapsed((prev) => !prev)}
             getModuleGridStyle={getModuleGridStyle}
@@ -2263,6 +2337,7 @@ function App() {
             validTargets={dragTargets}
             hoverTargetKey={hoverTargetKey}
             onPortPointerDown={handlePortPointerDown}
+            onPortContextMenu={handlePortContextMenu}
             moduleDragPreview={moduleDragPreview}
             moduleResizePreview={moduleResizePreview}
             moduleControls={moduleControls}
@@ -2312,6 +2387,7 @@ function App() {
         connections={cablesVisible && viewMode === 'rack' ? graph.connections : []}
         renderCable={renderCable}
         renderGhostCable={renderGhostCable}
+        renderOverlay={renderCableOverlay}
         clipRef={rackRef}
       />
       <input
@@ -2329,6 +2405,15 @@ function App() {
           actions={getContextMenuActions()}
           onAction={handleContextMenuAction}
           onClose={() => setContextMenu(null)}
+        />
+      )}
+      {portMenu && (
+        <ContextMenu
+          x={portMenu.x}
+          y={portMenu.y}
+          actions={getPortMenuActions()}
+          onAction={handlePortMenuAction}
+          onClose={() => setPortMenu(null)}
         />
       )}
     </div>
