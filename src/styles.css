@@ -6583,6 +6583,19 @@ body {
   .keyboard-popup-hint {
     display: none;
   }
+
+  /* Sur téléphone les unités de grille rétrécissent (130×92 vs 200×120)
+     mais le contenu des modules garde ses tailles → overflow:hidden rendait
+     une partie des contrôles INATTEIGNABLE (step-seq +313px clippés).
+     Au tactile, le module scrolle en interne ; pas de conflit avec le drag
+     des knobs/cellules (ils ont touch-action: none).
+     NB: le mobile assume un scope « écouter et montrer » — pas un poste de
+     travail. Pas de redesign par module pour téléphone. */
+  .module-body .module-controls {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 /* ── Téléphone en PAYSAGE : barres minimales, le rack prend tout.
