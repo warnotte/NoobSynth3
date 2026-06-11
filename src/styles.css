@@ -2606,11 +2606,17 @@
 .patch-cable {
   stroke-width: 3px;
   stroke-linecap: round;
-  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.45));
+  /* PAS de drop-shadow ici : un filtre PAR PATH se repeint à chaque frame
+     de scroll — mesuré à ~15 fps perdus avec 78 câbles (34→49 fps,
+     bench-cables.mjs). L'ombre est posée UNE fois sur .patch-canvas. */
   opacity: 0.92;
   pointer-events: stroke;
   cursor: pointer;
   transition: stroke-width 0.15s ease, filter 0.15s ease, opacity 0.15s ease;
+}
+
+.patch-canvas {
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.45));
 }
 
 /* .hovered = survol « halo » détecté en JS (12px autour du câble, posé par
