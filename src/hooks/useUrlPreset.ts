@@ -56,7 +56,10 @@ export function useUrlPreset({
         urlGraph = preset.graph
         urlPresetId = preset.id
       }
-    } else if (initialUrlData.mode === 'patch' && initialUrlData.graph) {
+    } else if (initialUrlData.mode === 'patch' && initialUrlData.graph && presetsReady) {
+      /* Gater sur presetsReady comme le mode 'preset' : appliqué au premier
+         render, le patch était ÉCRASÉ par l'init des racks juste après
+         (le lien partagé montrait silencieusement le graphe par défaut). */
       urlGraph = initialUrlData.graph
     }
   }
