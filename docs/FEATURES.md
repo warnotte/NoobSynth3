@@ -115,6 +115,16 @@ Les modules eux-mêmes adoptent le langage Console Steel — maquette de référ
 - **Garde-fous** : `node design/mockups/gallery.mjs` (galerie des 98 modules + scan de débordement) et `check-overflow.mjs` (scan par preset).
 - ⚠️ **Container queries** : un `@container module-card` ne peut pas cibler `.module-card` lui-même — les paliers responsive ciblent `.module-body`.
 
+### Déconnexion des câbles (desktop)
+Quatre gestes, tous découvrables (l'ancien système — double-clic à 10px près, drag d'un jack d'entrée vers le vide — fonctionnait mais était invisible) :
+
+- **Survol d'un câble** (halo de 12px, détecté en JS via `findConnectionNearPoint` + `mouseenter` sur le trait) → le câble s'illumine + **bouton ✂** à mi-parcours (clic = débrancher).
+- **Alt-clic** sur/près d'un câble = débrancher direct.
+- **Double-clic** sur/près d'un câble (historique, conservé — et la zone morte « pile sur le trait » est corrigée : le path capturait l'événement sans handler).
+- **Clic droit sur un jack** → menu listant ses connexions (`Débrancher → module · port`, + « Tout débrancher » si plusieurs) — **seule façon de débrancher côté sortie** (fan-out).
+
+Tout passe par `removeConnection` (undoable). Fichiers : `usePatching.tsx` (hover state, handlers, chip SVG), `PatchLayer.tsx` (slot `renderOverlay`), `ModuleCard.tsx` (`onPortContextMenu`), App (menu de port via `ContextMenu`).
+
 ### Console Steel — Mobile (phase 4)
 **Scope assumé : « écouter et montrer »** — charger un preset/projet, play, tweaker quelques knobs. Un modulaire à câbles est un instrument desktop ; PAS de patching tactile ni de redesign par module pour téléphone (décision utilisateur).
 

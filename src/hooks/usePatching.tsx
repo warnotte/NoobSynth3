@@ -34,13 +34,20 @@ type UsePatchingParams = {
   onGraphChange?: () => void
 }
 
+type Connection = GraphState['connections'][number]
+
+const connectionKey = (connection: Connection) =>
+  `${connection.from.moduleId}:${connection.from.portId}->${connection.to.moduleId}:${connection.to.portId}`
+
 export const usePatching = ({ graph, setGraph, rackRef, onGraphChange }: UsePatchingParams) => {
   const [selectedPort, setSelectedPort] = useState<PortHandle | null>(null)
   const [portPositions, setPortPositions] = useState<Record<string, PortPosition>>({})
   const [ghostCable, setGhostCable] = useState<GhostCable | null>(null)
   const [dragTargets, setDragTargets] = useState<Set<string> | null>(null)
   const [hoverTargetKey, setHoverTargetKey] = useState<string | null>(null)
+  const [hoveredConnection, setHoveredConnection] = useState<Connection | null>(null)
   const dragRef = useRef<DragState | null>(null)
+  const hoverRafRef = useRef(0)
 
   useLayoutEffect(() => {
     const updatePositions = () => {
@@ -504,6 +511,49 @@ export const usePatching = ({ graph, setGraph, rackRef, onGraphChange }: UsePatc
       if (target) {
         removeConnection(target)
         setSelectedPort(null)
+        setHoveredConnection(null)
+      }
+    },
+    [findConnectionNearPoint, removeConnection],
+  )
+
+  /* ── Déconnexion découvrable (desktop) ──
+     Survol près d'un câble → il s'illumine + bouton ✂ à mi-parcours.
+     Alt-clic près d'un câble = débrancher direct. Le double-clic
+     historique continue de fonctionner. */
+
+  const handleRackMouseMove = useCallback(
+    (event: ReactMouseEvent<HTMLElement>) => {
+      const point = { x: event.clientX, y: event.clientY }
+      if (hoverRafRef.current) {
+        return
+      }
+      hoverRafRef.current = requestAnimationFrame(() => {
+        hoverRafRef.current = 0
+        const target = findConnectionNearPoint(point, 12)
+        setHoveredConnection((prev) => {
+          if (prev === target) return prev
+          if (prev && target && connectionKey(prev) === connectionKey(target)) return prev
+          return target
+        })
+      })
+    },
+    [findConnectionNearPoint],
+  )
+
+  const handleRackMouseLeave = useCallback(() => {
+    setHoveredConnection(null)
+  }, [])
+
+  const handleRackClick = useCallback(
+    (event: ReactMouseEvent<HTMLElement>) => {
+      if (!event.altKey) {
+        return
+      }
+      const target = findConnectionNearPoint({ x: event.clientX, y: event.clientY }, 12)
+      if (target) {
+        removeConnection(target)
+        setHoveredConnection(null)
       }
     },
     [findConnectionNearPoint, removeConnection],
@@ -518,18 +568,65 @@ export const usePatching = ({ graph, setGraph, rackRef, onGraphChange }: UsePatc
       if (!start || !end) {
         return null
       }
+      const isHovered =
+        hoveredConnection !== null && connectionKey(hoveredConnection) === connectionKey(connection)
+      /* Le path capture les événements sur son trait (pointer-events: stroke,
+         dans l'overlay au-dessus du rack) : les handlers du rack ne voient
+         donc PAS le pointeur exactement sur le câble — on double ici. */
       return (
         <path
           key={`${outputKey}-${inputKey}`}
           d={buildCablePath(start, end)}
-          className={`patch-cable kind-${connection.kind}`}
+          className={`patch-cable kind-${connection.kind}${isHovered ? ' hovered' : ''}`}
           stroke={`url(#${strokeByKind[connection.kind] ?? 'cable-audio'})`}
           fill="none"
+          onMouseEnter={() => setHoveredConnection(connection)}
+          onClick={(event) => {
+            if (event.altKey) {
+              removeConnection(connection)
+              setHoveredConnection(null)
+            }
+          }}
+          onDoubleClick={() => {
+            removeConnection(connection)
+            setHoveredConnection(null)
+          }}
         />
       )
     },
-    [portPositions],
+    [portPositions, hoveredConnection, removeConnection],
   )
+
+  /* Bouton ✂ au milieu du câble survolé — seul élément cliquable du
+     patch-layer (pointer-events: all dans le CSS, le layer reste none). */
+  const renderCableOverlay = useCallback((): ReactNode => {
+    if (!hoveredConnection) {
+      return null
+    }
+    const start = portPositions[`${hoveredConnection.from.moduleId}:${hoveredConnection.from.portId}`]
+    const end = portPositions[`${hoveredConnection.to.moduleId}:${hoveredConnection.to.portId}`]
+    if (!start || !end) {
+      return null
+    }
+    const { c1, c2 } = getCableControls(start, end)
+    const mid = getBezierPoint(0.5, start, c1, c2, end)
+    return (
+      <g
+        className="cable-cut"
+        transform={`translate(${mid.x} ${mid.y})`}
+        onClick={(event) => {
+          event.stopPropagation()
+          removeConnection(hoveredConnection)
+          setHoveredConnection(null)
+        }}
+      >
+        <title>Débrancher ce câble</title>
+        <circle r="9" className="cable-cut-bg" />
+        <line x1="-3.5" y1="-3.5" x2="3.5" y2="3.5" />
+        <line x1="-3.5" y1="3.5" x2="3.5" y2="-3.5" />
+      </g>
+    )
+  }, [hoveredConnection, portPositions, removeConnection])
 
   const renderGhostCable = useCallback((): ReactNode => {
     if (!ghostCable) {
@@ -549,9 +646,14 @@ export const usePatching = ({ graph, setGraph, rackRef, onGraphChange }: UsePatc
     connectedInputs,
     dragTargets,
     handlePortPointerDown,
+    handleRackClick,
     handleRackDoubleClick,
+    handleRackMouseLeave,
+    handleRackMouseMove,
     hoverTargetKey,
+    removeConnection,
     renderCable,
+    renderCableOverlay,
     renderGhostCable,
     resetPatching,
     selectedPortKey,
