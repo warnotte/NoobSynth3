@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react'
+import { useEffect, useCallback, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { PianoKeyboard } from './PianoKeyboard'
 import { formatMidiNote } from '../../state/midiUtils'
@@ -36,6 +36,18 @@ export function KeyboardPopup({
   keyboardEnabled,
   onKeyboardToggle,
 }: KeyboardPopupProps) {
+  /* Écran étroit : 5 octaves sur ~350px = touches de ~7px, injouables au
+     doigt. On descend à 2 octaves (touches ~25px) — la navigation -/+
+     d'octave couvre le reste de la tessiture. */
+  const [isNarrow, setIsNarrow] = useState(false)
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 700px)')
+    const update = () => setIsNarrow(mq.matches)
+    update()
+    mq.addEventListener('change', update)
+    return () => mq.removeEventListener('change', update)
+  }, [])
+
   // Close on Escape key
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
@@ -133,7 +145,7 @@ export function KeyboardPopup({
 
         <div className="keyboard-popup-piano">
           <PianoKeyboard
-            octaves={5}
+            octaves={isNarrow ? 2 : 5}
             startNote={baseNote}
             activeKeys={activeKeys}
             onKeyDown={onKeyDown}
