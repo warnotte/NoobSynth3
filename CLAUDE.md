@@ -117,7 +117,7 @@ Câbles et jacks sont colorés par type de signal :
 |------|------|---------|
 | `useUndoableState` | Undo/Redo avec historique (useReducer) | `hooks/useUndoableState.ts` |
 | `UndoContext` | Context pour transactions (begin/end/cancel) | `hooks/UndoContext.tsx` |
-| `usePatching` | Gestion des câbles (drag & drop) | `hooks/usePatching.tsx` |
+| `usePatching` | Gestion des câbles (drag & drop, survol + ciseaux/alt-clic/dbl-clic avec confirmation, menu de jack) | `hooks/usePatching.tsx` |
 | `useModuleDrag` | Déplacement des modules | `hooks/useModuleDrag.ts` |
 | `useControlVoices` | Polyphonie, voice stealing, CV output (note 60 = CV 0) | `hooks/useControlVoices.ts` |
 | `useMidi` | Web MIDI input | `hooks/useMidi.ts` |
@@ -444,6 +444,7 @@ Presets dans `public/presets/`, structure `{ id, name, description, group, graph
 | Mesure transport figée après stop→play | Report des beats gated sur `cpuLoadReportCounter % 24` — phase décalée à chaque stop/start vs le cycle de poll → plus aucun message | Compteur dédié `transportPollCounter` (~250ms), indépendant du CPU |
 | Mesure qui oscille entre deux valeurs (+ CPU gaspillé) | `loadGraph` recréait l'AudioWorkletNode sans tuer l'ancien : un processor qui retourne `true` **survit à `disconnect()`** — l'ancien moteur rendait tout le graphe et postait beats/steps sur son port encore écouté | Message `dispose` (process() → false) + `destroyGraphNode()` détache `onmessage` avant de déconnecter |
 | Seek MIDI seq : mélange ancienne/nouvelle lecture | Le midi-file-sequencer est **cloné par voix** (`is_poly_type`) mais `seek_midi_sequencer` ne seekait que `list.first()` = voix 0 — les autres voix continuaient depuis l'ancienne position | Itérer **toutes** les instances de `module_map`. Règle : toute commande mutante visant un module poly-cloné doit itérer la liste, jamais `.first()` |
+| Bouton ciseaux des câbles qui clignote au survol | Les câbles vivent dans le `.patch-layer` **fixe au-dessus du rack** : pointer le trait déclenche le `mouseleave` du rack → hover effacé puis re-posé à chaque micro-mouvement | Garde `relatedTarget → .patch-layer` dans `handleRackMouseLeave` (test anti-régression : `test-cable-flicker.mjs`) |
 
 ---
 

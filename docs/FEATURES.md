@@ -118,12 +118,16 @@ Les modules eux-mêmes adoptent le langage Console Steel — maquette de référ
 ### Déconnexion des câbles (desktop)
 Quatre gestes, tous découvrables (l'ancien système — double-clic à 10px près, drag d'un jack d'entrée vers le vide — fonctionnait mais était invisible) :
 
-- **Survol d'un câble** (halo de 12px, détecté en JS via `findConnectionNearPoint` + `mouseenter` sur le trait) → le câble s'illumine + **bouton ✂** à mi-parcours (clic = débrancher).
-- **Alt-clic** sur/près d'un câble = débrancher direct.
+- **Survol d'un câble** (halo de 12px, détecté en JS via `findConnectionNearPoint` + `mouseenter` sur le trait) → le câble s'illumine + **bouton ciseaux** à mi-parcours (icône dessinée en SVG, pas le caractère ✂ dont le rendu dépend de la police).
+- **Alt-clic** sur/près d'un câble.
 - **Double-clic** sur/près d'un câble (historique, conservé — et la zone morte « pile sur le trait » est corrigée : le path capturait l'événement sans handler).
 - **Clic droit sur un jack** → menu listant ses connexions (`Débrancher → module · port`, + « Tout débrancher » si plusieurs) — **seule façon de débrancher côté sortie** (fan-out).
 
-Tout passe par `removeConnection` (undoable). Fichiers : `usePatching.tsx` (hover state, handlers, chip SVG), `PatchLayer.tsx` (slot `renderOverlay`), `ModuleCard.tsx` (`onPortContextMenu`), App (menu de port via `ContextMenu`).
+**Confirmation** : les trois gestes rapides (ciseaux, alt-clic, double-clic) ouvrent un menu « Débrancher ce câble / Annuler » au point de coupe (Échap ou clic ailleurs = annule). Le menu de jack reste direct : un choix de menu explicite est déjà une confirmation. Tout passe par `removeConnection` (undoable).
+
+⚠️ **Gotcha overlay** : les câbles vivent dans le `.patch-layer` FIXE au-dessus du rack — pointer la souris sur le trait déclenche le `mouseleave` du rack (le pointeur « sort » du rack au sens DOM) ; sans la garde `relatedTarget → .patch-layer` dans `handleRackMouseLeave`, le hover s'efface/se re-pose à chaque micro-mouvement et le bouton clignote. Garde anti-régression : `design/mockups/test-cable-flicker.mjs` (99 échantillons le long du câble, 0 disparition).
+
+Fichiers : `usePatching.tsx` (hover state, handlers, chip SVG, `pendingDisconnect` + confirm/cancel), `PatchLayer.tsx` (slot `renderOverlay`), `ModuleCard.tsx` (`onPortContextMenu`), App (menus via `ContextMenu`). Tests : `design/mockups/test-cable-disconnect.mjs` (les 5 parcours, dont Annuler/Échap qui ne coupent rien).
 
 ### Console Steel — Mobile (phase 4)
 **Scope assumé : « écouter et montrer »** — charger un preset/projet, play, tweaker quelques knobs. Un modulaire à câbles est un instrument desktop ; PAS de patching tactile ni de redesign par module pour téléphone (décision utilisateur).
