@@ -10,11 +10,13 @@ await page.waitForTimeout(3500)
 const pts = await page.evaluate(() => {
   const p = document.querySelector('path.patch-cable:not(.ghost)')
   const len = p.getTotalLength()
+  const rack = document.querySelector('.rack')
+  const r = rack.getBoundingClientRect()
   const out = []
-  // du quart au milieu de la courbe, pas de ~3px
+  // du quart au milieu de la courbe, pas de ~3px (contenu → écran)
   for (let l = len * 0.25; l <= len * 0.5; l += 3) {
     const m = p.getPointAtLength(l)
-    out.push({ x: m.x, y: m.y })
+    out.push({ x: m.x + r.left - rack.scrollLeft, y: m.y + r.top - rack.scrollTop })
   }
   return out
 })

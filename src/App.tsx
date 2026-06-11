@@ -2344,6 +2344,14 @@ function App() {
             moduleDragPreview={moduleDragPreview}
             moduleResizePreview={moduleResizePreview}
             moduleControls={moduleControls}
+            patchLayer={
+              <PatchLayer
+                connections={cablesVisible ? graph.connections : []}
+                renderCable={renderCable}
+                renderGhostCable={renderGhostCable}
+                renderOverlay={renderCableOverlay}
+              />
+            }
           />
         )}
         <SidePanel
@@ -2385,13 +2393,6 @@ function App() {
         redoCount={redoCount}
         onUndo={handleUndo}
         onRedo={handleRedo}
-      />
-      <PatchLayer
-        connections={cablesVisible && viewMode === 'rack' ? graph.connections : []}
-        renderCable={renderCable}
-        renderGhostCable={renderGhostCable}
-        renderOverlay={renderCableOverlay}
-        clipRef={rackRef}
       />
       <input
         ref={presetFileRef}

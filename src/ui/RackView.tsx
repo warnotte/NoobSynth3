@@ -2,6 +2,7 @@ import type {
   CSSProperties,
   MouseEvent as ReactMouseEvent,
   PointerEvent as ReactPointerEvent,
+  ReactNode,
   RefObject,
 } from 'react'
 import type { GraphState, ModuleSpec } from '../shared/graph'
@@ -51,6 +52,8 @@ type RackViewProps = {
   moduleDragPreview: ModuleDragPreview | null
   moduleResizePreview?: ModuleDragPreview | null
   moduleControls: Omit<ModuleControlsProps, 'module'>
+  /** Calque des câbles — rendu DANS le scroller pour suivre le scroll nativement */
+  patchLayer?: ReactNode
 }
 
 export const RackView = ({
@@ -79,6 +82,7 @@ export const RackView = ({
   moduleDragPreview,
   moduleResizePreview,
   moduleControls,
+  patchLayer,
 }: RackViewProps) => (
   <section
     className="rack"
@@ -157,5 +161,6 @@ export const RackView = ({
         )}
       </div>
     )}
+    {patchLayer}
   </section>
 )

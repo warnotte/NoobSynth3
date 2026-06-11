@@ -62,6 +62,15 @@ export const usePatching = ({ graph, setGraph, rackRef, onGraphChange }: UsePatc
       if (!rack) {
         return
       }
+      /* Positions en COORDONNÉES CONTENU du rack (et plus en coordonnées
+         écran) : le calque SVG vit dans le conteneur qui scrolle, donc le
+         scroll déplace les câbles nativement (compositeur) — plus aucune
+         re-mesure ni re-render au scroll, et plus de câbles qui « nagent »
+         derrière les modules (l'ancien chemin re-mesurait ~300 ports avec
+         2 frames de retard à chaque frame de scroll). */
+      const rackRect = rack.getBoundingClientRect()
+      const offsetX = rack.scrollLeft - rackRect.left
+      const offsetY = rack.scrollTop - rackRect.top
       const nextPositions: Record<string, PortPosition> = {}
       rack.querySelectorAll<HTMLElement>('[data-port-key]').forEach((element) => {
         const key = element.dataset.portKey
@@ -70,8 +79,8 @@ export const usePatching = ({ graph, setGraph, rackRef, onGraphChange }: UsePatc
         }
         const rect = element.getBoundingClientRect()
         nextPositions[key] = {
-          x: rect.left + rect.width / 2,
-          y: rect.top + rect.height / 2,
+          x: rect.left + rect.width / 2 + offsetX,
+          y: rect.top + rect.height / 2 + offsetY,
         }
       })
       setPortPositions(nextPositions)
@@ -95,9 +104,10 @@ export const usePatching = ({ graph, setGraph, rackRef, onGraphChange }: UsePatc
       mutationObserver.observe(rack, { childList: true, subtree: true, attributes: true })
     }
 
+    /* Pas de listener scroll : les positions sont en coordonnées contenu,
+       le scroll ne les change pas (le calque scrolle avec le contenu). */
     window.addEventListener('resize', scheduleUpdate)
     window.addEventListener('load', scheduleUpdate)
-    window.addEventListener('scroll', scheduleUpdate, true)
     const fonts = document.fonts
     if (fonts?.ready) {
       fonts.ready.then(scheduleUpdate).catch(() => undefined)
@@ -108,7 +118,6 @@ export const usePatching = ({ graph, setGraph, rackRef, onGraphChange }: UsePatc
       mutationObserver?.disconnect()
       window.removeEventListener('resize', scheduleUpdate)
       window.removeEventListener('load', scheduleUpdate)
-      window.removeEventListener('scroll', scheduleUpdate, true)
     }
   }, [graph.modules.length, rackRef])
 
@@ -120,9 +129,25 @@ export const usePatching = ({ graph, setGraph, rackRef, onGraphChange }: UsePatc
     setHoverTargetKey(null)
   }, [])
 
+  /* Pointeur (coordonnées écran) → coordonnées contenu du rack */
+  const toContentPoint = useCallback(
+    (clientX: number, clientY: number): PortPosition => {
+      const rack = rackRef.current
+      if (!rack) {
+        return { x: clientX, y: clientY }
+      }
+      const rect = rack.getBoundingClientRect()
+      return {
+        x: clientX - rect.left + rack.scrollLeft,
+        y: clientY - rect.top + rack.scrollTop,
+      }
+    },
+    [rackRef],
+  )
+
   const getCenterFromElement = (element: HTMLElement): PortPosition => {
     const rect = element.getBoundingClientRect()
-    return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 }
+    return toContentPoint(rect.left + rect.width / 2, rect.top + rect.height / 2)
   }
 
   const getPortHandleFromElement = (element: HTMLElement | null): PortHandle | null => {
@@ -326,7 +351,7 @@ export const usePatching = ({ graph, setGraph, rackRef, onGraphChange }: UsePatc
         if (!state.didDrag) {
           return
         }
-        const pointer = { x: moveEvent.clientX, y: moveEvent.clientY }
+        const pointer = toContentPoint(moveEvent.clientX, moveEvent.clientY)
         const snapKey = findSnapTarget(pointer, state.validTargets)
         const endPoint = snapKey ? portPositions[snapKey] ?? pointer : pointer
         setHoverTargetKey(snapKey)
@@ -356,7 +381,7 @@ export const usePatching = ({ graph, setGraph, rackRef, onGraphChange }: UsePatc
         if (!state.didDrag) {
           return
         }
-        const pointer = { x: upEvent.clientX, y: upEvent.clientY }
+        const pointer = toContentPoint(upEvent.clientX, upEvent.clientY)
         const snapKey = findSnapTarget(pointer, state.validTargets)
         const snapElement = snapKey
           ? (rackRef.current?.querySelector<HTMLElement>(`[data-port-key="${snapKey}"]`) ?? null)
@@ -527,14 +552,15 @@ export const usePatching = ({ graph, setGraph, rackRef, onGraphChange }: UsePatc
 
   const handleRackDoubleClick = useCallback(
     (event: ReactMouseEvent<HTMLElement>) => {
-      const point = { x: event.clientX, y: event.clientY }
+      const point = toContentPoint(event.clientX, event.clientY)
       const target = findConnectionNearPoint(point)
       if (target) {
+        // x/y du menu de confirmation = coordonnées ÉCRAN (menu fixed)
         setPendingDisconnect({ connection: target, x: event.clientX, y: event.clientY })
         setSelectedPort(null)
       }
     },
-    [findConnectionNearPoint],
+    [findConnectionNearPoint, toContentPoint],
   )
 
   /* ── Déconnexion découvrable (desktop) ──
@@ -544,7 +570,7 @@ export const usePatching = ({ graph, setGraph, rackRef, onGraphChange }: UsePatc
 
   const handleRackMouseMove = useCallback(
     (event: ReactMouseEvent<HTMLElement>) => {
-      const point = { x: event.clientX, y: event.clientY }
+      const point = toContentPoint(event.clientX, event.clientY)
       if (hoverRafRef.current) {
         return
       }
@@ -558,16 +584,16 @@ export const usePatching = ({ graph, setGraph, rackRef, onGraphChange }: UsePatc
         })
       })
     },
-    [findConnectionNearPoint],
+    [findConnectionNearPoint, toContentPoint],
   )
 
   const handleRackMouseLeave = useCallback((event: ReactMouseEvent<HTMLElement>) => {
-    /* Les câbles vivent dans un overlay FIXE au-dessus du rack : passer la
-       souris pile sur le trait fait « sortir » du rack → sans ce garde, le
-       hover s'effaçait puis se re-posait à chaque micro-mouvement et le
-       bouton ✂ clignotait. */
+    /* Garde défensif (hérité de l'époque où le calque câbles était un
+       overlay fixe HORS du rack — le survol du trait déclenchait alors le
+       mouseleave du rack et le bouton ciseaux clignotait). Le calque vit
+       maintenant DANS le rack, mais le garde reste sans coût. */
     const next = event.relatedTarget as Element | null
-    if (next && typeof next.closest === 'function' && next.closest('.patch-layer')) {
+    if (next && typeof next.closest === 'function' && next.closest('.patch-layer-inline')) {
       return
     }
     setHoveredConnection(null)
@@ -578,12 +604,12 @@ export const usePatching = ({ graph, setGraph, rackRef, onGraphChange }: UsePatc
       if (!event.altKey) {
         return
       }
-      const target = findConnectionNearPoint({ x: event.clientX, y: event.clientY }, 12)
+      const target = findConnectionNearPoint(toContentPoint(event.clientX, event.clientY), 12)
       if (target) {
         setPendingDisconnect({ connection: target, x: event.clientX, y: event.clientY })
       }
     },
-    [findConnectionNearPoint],
+    [findConnectionNearPoint, toContentPoint],
   )
 
   const renderCable = useCallback(
@@ -597,9 +623,10 @@ export const usePatching = ({ graph, setGraph, rackRef, onGraphChange }: UsePatc
       }
       const isHovered =
         hoveredConnection !== null && connectionKey(hoveredConnection) === connectionKey(connection)
-      /* Le path capture les événements sur son trait (pointer-events: stroke,
-         dans l'overlay au-dessus du rack) : les handlers du rack ne voient
-         donc PAS le pointeur exactement sur le câble — on double ici. */
+      /* Le path est pointer-events: none (il volerait les clics des jacks
+         qu'il recouvre) : survol/alt-clic/dbl-clic passent par la détection
+         géométrique des handlers du rack — les événements traversent le
+         calque et bubblent vers .rack, y compris pile sur le trait. */
       return (
         <path
           key={`${outputKey}-${inputKey}`}
@@ -607,15 +634,6 @@ export const usePatching = ({ graph, setGraph, rackRef, onGraphChange }: UsePatc
           className={`patch-cable kind-${connection.kind}${isHovered ? ' hovered' : ''}`}
           stroke={`url(#${strokeByKind[connection.kind] ?? 'cable-audio'})`}
           fill="none"
-          onMouseEnter={() => setHoveredConnection(connection)}
-          onClick={(event) => {
-            if (event.altKey) {
-              setPendingDisconnect({ connection, x: event.clientX, y: event.clientY })
-            }
-          }}
-          onDoubleClick={(event) => {
-            setPendingDisconnect({ connection, x: event.clientX, y: event.clientY })
-          }}
         />
       )
     },
