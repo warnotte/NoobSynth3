@@ -443,6 +443,7 @@ Presets dans `public/presets/`, structure `{ id, name, description, group, graph
 | Spectral Swarm : knobs ATK/REL inaccessibles | Module 2x3 trop petit pour son contenu, bas coupé par `overflow: hidden` (+162px) — découvert par la galerie 98 modules | Tailles registry revues (swarm 3x4, shepard 3x3, arpeggiator 3x5, audio-in 1x2) ; `layoutGraph` reflow les presets au chargement |
 | Mesure transport figée après stop→play | Report des beats gated sur `cpuLoadReportCounter % 24` — phase décalée à chaque stop/start vs le cycle de poll → plus aucun message | Compteur dédié `transportPollCounter` (~250ms), indépendant du CPU |
 | Mesure qui oscille entre deux valeurs (+ CPU gaspillé) | `loadGraph` recréait l'AudioWorkletNode sans tuer l'ancien : un processor qui retourne `true` **survit à `disconnect()`** — l'ancien moteur rendait tout le graphe et postait beats/steps sur son port encore écouté | Message `dispose` (process() → false) + `destroyGraphNode()` détache `onmessage` avant de déconnecter |
+| Seek MIDI seq : mélange ancienne/nouvelle lecture | Le midi-file-sequencer est **cloné par voix** (`is_poly_type`) mais `seek_midi_sequencer` ne seekait que `list.first()` = voix 0 — les autres voix continuaient depuis l'ancienne position | Itérer **toutes** les instances de `module_map`. Règle : toute commande mutante visant un module poly-cloné doit itérer la liste, jamais `.first()` |
 
 ---
 
