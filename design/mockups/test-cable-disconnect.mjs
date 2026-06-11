@@ -13,7 +13,10 @@ const midOfFirstCable = () =>
     const p = document.querySelector('path.patch-cable:not(.ghost)')
     if (!p) return null
     const m = p.getPointAtLength(p.getTotalLength() / 2)
-    return { x: m.x, y: m.y }
+    // coordonnées CONTENU du rack → coordonnées écran pour la souris
+    const rack = document.querySelector('.rack')
+    const r = rack.getBoundingClientRect()
+    return { x: m.x + r.left - rack.scrollLeft, y: m.y + r.top - rack.scrollTop }
   })
 const confirmItem = () => page.locator('.context-menu-item', { hasText: 'Débrancher ce câble' })
 

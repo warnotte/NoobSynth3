@@ -1185,16 +1185,18 @@
   color: var(--text-dim);
 }
 
-.patch-layer {
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
+/* Calque des câbles — DANS le scroller (.rack), en coordonnées contenu :
+   le scroll déplace les câbles nativement, aucune re-mesure. Le svg fait
+   1×1 avec overflow visible ; le clipping vient du scroller lui-même. */
+.patch-layer-inline {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 4; /* au-dessus des cartes (1) et des ghosts (2-3) */
   pointer-events: none;
 }
 
 .patch-canvas {
-  width: 100%;
-  height: 100%;
   pointer-events: none;
   display: block;
   overflow: visible;
@@ -2610,8 +2612,11 @@
      de scroll — mesuré à ~15 fps perdus avec 78 câbles (34→49 fps,
      bench-cables.mjs). L'ombre est posée UNE fois sur .patch-canvas. */
   opacity: 0.92;
-  pointer-events: stroke;
-  cursor: pointer;
+  /* PAS de pointer-events : le trait volerait les clics des jacks qu'il
+     recouvre (il se termine pile au centre du jack). Le survol/clic des
+     câbles passe par la détection géométrique du rack (les événements
+     traversent le calque), seul le bouton ciseaux est interactif. */
+  pointer-events: none;
   transition: stroke-width 0.15s ease, filter 0.15s ease, opacity 0.15s ease;
 }
 
@@ -2620,8 +2625,7 @@
 }
 
 /* .hovered = survol « halo » détecté en JS (12px autour du câble, posé par
-   usePatching) — même visuel que le :hover natif limité au trait de 3px */
-.patch-cable:hover,
+   usePatching) — unique mécanisme de hover (le path est pointer-events: none) */
 .patch-cable.hovered {
   stroke-width: 5px;
   opacity: 1;

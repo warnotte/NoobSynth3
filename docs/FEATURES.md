@@ -99,7 +99,7 @@ La page est un « instrument hardware » en grille fixe `100vh` (aucun scroll de
 - **Grille** : `BrandRail` (44px) → `RackTabs` (rocker RACKS|MIXER + onglets scribble) → `workbench` (SidePanel **à gauche** 280px + rack/mixer) → `TransportConsole` (96px, bandeau bas)
 - **BrandRail** : marque, LED statut moteur, toggles CABLES/RESIZE(dev), export/import (tooltip dynamique patch vs projet), bouton ⚙ I/O (Tauri) → popover `IoPanel` (config audio native — l'ancienne section « Tauri Bridge » du SidePanel)
 - **TransportConsole** : play/stop (un seul bouton), REC, resync, BPM sur LCD éditable, mesure, charge DSP (VU + LCD, toujours actif moteur lancé), UNDO/REDO
-- **Le rack scrolle en interne** : `PatchLayer` clippe les câbles au rectangle du rack (viewBox remap) ; l'auto-scroll du drag de module scrolle `.rack` (plus `window`)
+- **Le rack scrolle en interne** : l'auto-scroll du drag de module scrolle `.rack` (plus `window`). Les câbles vivent **dans le scroller, en coordonnées contenu** (voir « Câbles — architecture » plus bas) : le clipping et le suivi du scroll sont natifs.
 - **Mobile (≤960px)** : une colonne, SidePanel en drawer overlay (FAB au-dessus du bandeau), console compacte, `100dvh`
 - Palette/typo : variables `--cs-*` + `--font-engrave`/`--font-lcd` (section « CONSOLE STEEL SHELL » de `styles.css`)
 
@@ -114,6 +114,18 @@ Les modules eux-mêmes adoptent le langage Console Steel — maquette de référ
 - **Règle absolue modules riches** : restyler en place, jamais reconstruire — les classes liées au playhead (`.seq-step.playing`, `.dm909-step.playing`…) sont du DOM manipulé par `updatePlayhead`, tout renommage doit synchroniser le JS. Playheads vérifiés en live à chaque vague.
 - **Garde-fous** : `node design/mockups/gallery.mjs` (galerie des 98 modules + scan de débordement) et `check-overflow.mjs` (scan par preset).
 - ⚠️ **Container queries** : un `@container module-card` ne peut pas cibler `.module-card` lui-même — les paliers responsive ciblent `.module-body`.
+
+### Câbles — architecture (coordonnées contenu)
+Le calque SVG des câbles est rendu **à l'intérieur du conteneur qui scrolle** (`.rack`), et les positions des ports sont mesurées en **coordonnées contenu** (relatives au contenu scrollable, pas à l'écran). Conséquences :
+
+- **Scroll = zéro JS** : le compositeur déplace le calque avec le contenu — les câbles restent collés aux jacks au pixel près (avant : re-mesure de ~300 ports + re-render des paths à chaque frame de scroll, avec 2 frames de retard → câbles qui « nageaient »).
+- Le clipping au rectangle du rack est natif (le scroller clippe) — plus de viewBox remap.
+- La re-mesure ne se déclenche plus que sur resize/mutations DOM (ajout/déplacement de module), plus jamais au scroll ni au changement de fenêtre.
+- Les paths sont `pointer-events: none` (sinon le trait vole les clics des jacks qu'il recouvre — il se termine pile au centre du jack) : tout le survol/clic câble passe par la détection géométrique des handlers du rack (`findConnectionNearPoint`), les événements traversant le calque. Seul le bouton ciseaux est interactif.
+- Le `drop-shadow` est posé une fois sur `.patch-canvas` (un filtre par path coûtait ~15 fps à 78 câbles).
+- Tout pointeur converti via `toContentPoint` (ghost de patching, snap, hover, alt/dbl-clic) ; les menus (confirmation, port) restent en coordonnées écran (position fixed).
+
+Bancs/tests : `bench-cables.mjs` (FPS scroll, 34→50+ sur showcase-odyssey), `test-cable-scroll-sync.mjs` (désalignement max 0px sur 390 échantillons), `test-cable-patch.mjs` (création au drag, rack scrollé).
 
 ### Déconnexion des câbles (desktop)
 Quatre gestes, tous découvrables (l'ancien système — double-clic à 10px près, drag d'un jack d'entrée vers le vide — fonctionnait mais était invisible) :
