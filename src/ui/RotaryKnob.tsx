@@ -128,6 +128,7 @@ export const RotaryKnob = ({
 
   const dialStyle = {
     '--angle': `${angle}deg`,
+    '--ratio': ratio,
   } as React.CSSProperties
 
   return (

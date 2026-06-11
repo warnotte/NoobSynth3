@@ -1,4 +1,6 @@
 import type { ControlProps } from '../types'
+import { ControlBox } from '../../ControlBox'
+import { ControlButtons } from '../../ControlButtons'
 
 const BUS_LABELS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
 
@@ -7,23 +9,13 @@ export const SendReceiveControls = ({ module, updateParam }: ControlProps) => {
   const isSend = module.type === 'send'
 
   return (
-    <div className="control-group">
-      <label className="control-label">Bus</label>
-      <div className="chip-row">
-        {BUS_LABELS.map((label, i) => (
-          <button
-            key={label}
-            type="button"
-            className={`chip ${bus === i ? 'active' : ''}`}
-            onClick={() => updateParam(module.id, 'bus', i)}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
-      <span className="muted" style={{ fontSize: '0.55rem', marginTop: 4 }}>
-        {isSend ? 'Sends audio to' : 'Receives audio from'} bus {BUS_LABELS[bus] ?? bus}
-      </span>
-    </div>
+    <ControlBox label={`Bus · ${isSend ? 'send' : 'recv'}`}>
+      <ControlButtons
+        options={BUS_LABELS.map((label, i) => ({ id: i, label }))}
+        value={bus}
+        onChange={(value) => updateParam(module.id, 'bus', value)}
+        columns={4}
+      />
+    </ControlBox>
   )
 }

@@ -88,7 +88,7 @@ export function ArpeggiatorControls({ module, updateParam }: ControlProps) {
       </ToggleGroup>
 
       <ControlBoxRow>
-        <ControlBox label="Timing" horizontal>
+        <ControlBox label="Timing · Expression" horizontal>
           <RotaryKnob
             label="Tempo"
             min={40}
@@ -129,6 +129,26 @@ export function ArpeggiatorControls({ module, updateParam }: ControlProps) {
             onChange={(value) => updateParam(module.id, 'probability', value)}
             format={formatInt}
           />
+          <RotaryKnob
+            label="Mutate"
+            min={0}
+            max={100}
+            step={1}
+            unit="%"
+            value={mutate}
+            onChange={(value) => updateParam(module.id, 'mutate', value)}
+            format={formatInt}
+          />
+          <RotaryKnob
+            label="Decay"
+            min={0}
+            max={100}
+            step={1}
+            unit="%"
+            value={ratchetDecay}
+            onChange={(value) => updateParam(module.id, 'ratchetDecay', value)}
+            format={formatInt}
+          />
         </ControlBox>
       </ControlBoxRow>
 
@@ -163,31 +183,6 @@ export function ArpeggiatorControls({ module, updateParam }: ControlProps) {
             options={ratchetOptions}
             value={ratchet}
             onChange={(value) => updateParam(module.id, 'ratchet', value)}
-          />
-        </ControlBox>
-      </ControlBoxRow>
-
-      <ControlBoxRow>
-        <ControlBox label="Expression" horizontal>
-          <RotaryKnob
-            label="Mutate"
-            min={0}
-            max={100}
-            step={1}
-            unit="%"
-            value={mutate}
-            onChange={(value) => updateParam(module.id, 'mutate', value)}
-            format={formatInt}
-          />
-          <RotaryKnob
-            label="Decay"
-            min={0}
-            max={100}
-            step={1}
-            unit="%"
-            value={ratchetDecay}
-            onChange={(value) => updateParam(module.id, 'ratchetDecay', value)}
-            format={formatInt}
           />
         </ControlBox>
       </ControlBoxRow>

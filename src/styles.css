@@ -19,36 +19,6 @@
   padding: 28px 36px 40px;
 }
 
-.topbar-head {
-  display: flex;
-  flex-direction: row;
-  align-items: baseline;
-  gap: 12px;
-}
-
-.topbar-body {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  position: sticky;
-  top: 0;
-  z-index: 1100;
-  padding: 12px 22px;
-  background:
-    linear-gradient(135deg, rgba(45, 55, 72, 0.15) 0%, transparent 50%),
-    linear-gradient(180deg, #1c1c22 0%, #0f0f14 100%);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-top-color: rgba(255, 255, 255, 0.18);
-  border-radius: var(--radius-xl);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
-    0 4px 24px rgba(0, 0, 0, 0.55),
-    0 8px 40px rgba(0, 0, 0, 0.3);
-  overflow: hidden;
-}
-
 /* ── Rack Tabs Bar ── */
 .rack-tabs {
   display: flex;
@@ -690,46 +660,6 @@
 }
 
 
-/* Zone layout: left | center | right */
-.topbar-zone {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.topbar-zone--left {
-  flex: 0 0 auto;
-}
-
-.topbar-zone--center {
-  flex: 1 1 auto;
-  justify-content: center;
-}
-
-.topbar-zone--right {
-  flex: 0 0 auto;
-  justify-content: flex-end;
-}
-
-/* Vertical separator between zones */
-.topbar-separator {
-  width: 1px;
-  height: 36px;
-  background: linear-gradient(
-    180deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.12) 20%,
-    rgba(255, 255, 255, 0.12) 80%,
-    transparent 100%
-  );
-}
-
-.status-block {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
 .engine-led {
   width: 10px;
   height: 10px;
@@ -1354,7 +1284,10 @@
 }
 
 .rack::after {
-  bottom: 0;
+  /* PAS de bottom: 0 — .rack scrolle en interne (Console Steel), un bottom: 0
+     absolu collerait la barre au bas de la zone NON scrollée (elle flotte au
+     milieu dès qu'on scrolle). Sans top/bottom, la position statique place la
+     barre après le dernier module = vrai bas du contenu. */
   border-radius: 0 0 8px 8px;
   background:
     linear-gradient(180deg,
@@ -1401,50 +1334,39 @@
    ============================================ */
 
 .module-card {
-  --panel-color: #1a1f2e;
+  --cat: var(--cat-io);
   --control-min: 44px;
   --dial-size: 28px;
   --dial-center-inset: 7px;
   --dial-indicator-height: 6px;
   --dial-indicator-offset: -9px;
-  --rotary-label-size: 6px;
-  --rotary-readout-size: 6px;
-  --rotary-readout-pad-x: 2px;
+  --rotary-label-size: 8px;
+  --rotary-readout-size: 8px;
+  --rotary-readout-pad-x: 3px;
   --rotary-readout-pad-y: 1px;
   --rotary-input-width: 40px;
   container-type: inline-size;
   container-name: module-card;
   position: relative;
   z-index: 1;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-lg);
+  /* Console Steel faceplate : acier uniforme, l'identité vient du liseré catégorie */
   background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.045), transparent 38%),
     repeating-linear-gradient(
-      0deg,
-      rgba(255, 255, 255, 0.015) 0px,
-      rgba(255, 255, 255, 0.015) 1px,
+      95deg,
+      rgba(255, 255, 255, 0.013) 0px,
+      rgba(255, 255, 255, 0.013) 1px,
       transparent 1px,
       transparent 3px
     ),
-    linear-gradient(180deg,
-      rgba(255, 255, 255, 0.1) 0%,
-      transparent 3%,
-      transparent 97%,
-      rgba(0, 0, 0, 0.2) 100%
-    ),
-    linear-gradient(90deg,
-      rgba(255, 255, 255, 0.05) 0%,
-      transparent 2%,
-      transparent 98%,
-      rgba(0, 0, 0, 0.1) 100%
-    ),
-    var(--panel-color);
-  border: none;
+    linear-gradient(180deg, var(--steel-1) 0%, var(--steel-0) 78%, #11161d 100%);
+  border: 1px solid rgba(0, 0, 0, 0.85);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    inset 0 -1px 0 var(--glass-overlay),
-    2px 0 4px var(--glass-overlay),
-    -2px 0 4px var(--glass-overlay);
-  padding: 4px 4px 6px;
+    inset 0 -1px 0 rgba(0, 0, 0, 0.6),
+    0 6px 14px rgba(0, 0, 0, 0.4);
+  padding: 0 4px 6px;
   gap: 4px;
   backdrop-filter: none;
   display: flex;
@@ -1452,15 +1374,34 @@
   height: 100%;
 }
 
-@container module-card (max-width: 170px) {
-  .module-card {
+/* Paliers responsive des contrôles.
+   IMPORTANT : un @container ne peut pas matcher le container lui-même —
+   cibler .module-card ici est une règle MORTE (bug historique, paliers
+   jamais appliqués). On cible .module-body : les custom properties héritent
+   vers tous les contrôles. */
+
+/* Modules 1 colonne (~200px) : la zone contrôles ne fait que ~90px de large,
+   --control-min 44px y interdit la 2e colonne de knobs (ADSR/909 restaient
+   empilés et débordaient). 40px permet le 2×2 du design validé. */
+@container module-card (max-width: 210px) {
+  .module-body {
     --control-min: 40px;
     --dial-size: 24px;
     --dial-center-inset: 6px;
     --dial-indicator-height: 5px;
     --dial-indicator-offset: -8px;
-    --rotary-label-size: 5px;
-    --rotary-readout-size: 5px;
+  }
+}
+
+@container module-card (max-width: 170px) {
+  .module-body {
+    --control-min: 40px;
+    --dial-size: 24px;
+    --dial-center-inset: 6px;
+    --dial-indicator-height: 5px;
+    --dial-indicator-offset: -8px;
+    --rotary-label-size: 7px;
+    --rotary-readout-size: 7px;
     --rotary-readout-pad-x: 2px;
     --rotary-readout-pad-y: 1px;
     --rotary-input-width: 36px;
@@ -1468,16 +1409,12 @@
 }
 
 @container module-card (min-width: 260px) {
-  .module-card {
-    --control-min: 52px;
-    --dial-size: 30px;
-    --dial-center-inset: 8px;
-    --dial-indicator-height: 7px;
-    --dial-indicator-offset: -10px;
-    --rotary-label-size: 7px;
-    --rotary-readout-size: 7px;
-    --rotary-readout-pad-x: 3px;
-    --rotary-readout-pad-y: 1px;
+  .module-body {
+    /* Palier volontairement minimal : dial 30px / labels 9px coûtent
+       ~3px par rangée et font déborder les modules larges DENSES
+       (oscillator, organ). À réactiver module par module en étape 4
+       quand leurs layouts seront revus. control-min reste 44px (52px
+       ferait perdre une colonne de knobs). */
     --rotary-input-width: 46px;
   }
 }
@@ -1540,19 +1477,15 @@
   box-shadow: inset 0 0 0 1px rgba(255, 120, 120, 0.35);
 }
 
-/* Module type colors */
-.module-card[data-module-type="oscillator"] { --panel-color: #1a1f2e; }
-.module-card[data-module-type="vcf"] { --panel-color: #1e2a1f; }
-.module-card[data-module-type="gain"] { --panel-color: #2a1f1e; }
-.module-card[data-module-type="adsr"] { --panel-color: #2a2a1e; }
-.module-card[data-module-type="lfo"] { --panel-color: #1e1e2a; }
-.module-card[data-module-type="mixer"] { --panel-color: #1f2a2a; }
-.module-card[data-module-type="chorus"] { --panel-color: #251e2a; }
-.module-card[data-module-type="delay"] { --panel-color: #1e2528; }
-.module-card[data-module-type="reverb"] { --panel-color: #1e2025; }
-.module-card[data-module-type="output"] { --panel-color: #2a1e2a; }
-.module-card[data-module-type="control"] { --panel-color: #1a2025; }
-.module-card[data-module-type="scope"] { --panel-color: #1a2320; }
+/* Accent par catégorie — data-category vient de moduleRegistry (les 98 types couverts) */
+.module-card[data-category="sources"] { --cat: var(--cat-sources); }
+.module-card[data-category="filters"] { --cat: var(--cat-filters); }
+.module-card[data-category="amplifiers"] { --cat: var(--cat-amplifiers); }
+.module-card[data-category="effects"] { --cat: var(--cat-effects); }
+.module-card[data-category="modulators"] { --cat: var(--cat-modulators); }
+.module-card[data-category="sequencers"] { --cat: var(--cat-sequencers); }
+.module-card[data-category="drums"] { --cat: var(--cat-drums); }
+.module-card[data-category="io"] { --cat: var(--cat-io); }
 
 /* ============================================
    SECTION 5: MODULE HEADER & BODY
@@ -1560,28 +1493,51 @@
 
 .module-header {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-bottom: 2px;
-  margin-bottom: 0;
-  border-bottom: 1px solid var(--border-soft);
-  gap: 2px;
+  align-items: stretch;
+  margin: 0 -4px;
+  height: 20px;
+  flex: none;
+  gap: 6px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.7);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.22));
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  overflow: hidden;
   cursor: grab;
+}
+
+.module-cat-bar {
+  width: 4px;
+  flex: none;
+  background: linear-gradient(180deg, var(--cat), color-mix(in srgb, var(--cat) 55%, #000));
+  box-shadow: 0 0 8px color-mix(in srgb, var(--cat) 60%, transparent);
+}
+
+.module-title {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
 }
 
 .module-actions {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
+  padding-right: 4px;
 }
 
 .module-name {
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
+  font-family: var(--font-engrave);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.9);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  color: var(--text-strong);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.8);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .module-subtitle {
@@ -1589,11 +1545,22 @@
 }
 
 .module-badge {
-  font-size: 7px;
-  padding: 3px 6px;
-  border-radius: var(--radius-sm);
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-family: var(--font-lcd);
+  font-size: 8px;
+  letter-spacing: 0.06em;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: color-mix(in srgb, var(--cat) 80%, #fff);
+  opacity: 0.85;
+  white-space: nowrap;
+}
+
+/* modules étroits : pas la place pour le badge type */
+@container module-card (max-width: 170px) {
+  .module-badge {
+    display: none;
+  }
 }
 
 .module-body {
@@ -1660,7 +1627,7 @@
 .ports-side--right .port-side-item { flex-direction: row; }
 
 .port-side-label {
-  font-size: 6px;
+  font-size: 7px;
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -1691,12 +1658,15 @@
   min-width: 18px;
   min-height: 18px;
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #555, #2a2a2a 50%, #1a1a1a 100%);
-  border: none;
+  /* bague métal teintée par le type de signal, trou sombre au centre */
+  background:
+    radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.28), transparent 46%),
+    radial-gradient(circle, color-mix(in srgb, var(--jack-color) 72%, #1c242c) 0 100%);
+  border: 1px solid rgba(0, 0, 0, 0.9);
   box-shadow:
-    inset 0 1px 3px rgba(255, 255, 255, 0.15),
-    inset 0 -1px 3px rgba(0, 0, 0, 0.5),
-    0 1px 4px rgba(0, 0, 0, 0.4);
+    inset 0 1px 1px rgba(255, 255, 255, 0.25),
+    inset 0 0 4px rgba(0, 0, 0, 0.6),
+    0 1px 2px rgba(0, 0, 0, 0.7);
   position: relative;
   flex-shrink: 0;
   touch-action: none;
@@ -1705,23 +1675,20 @@
 .jack::before {
   content: '';
   position: absolute;
-  inset: 2px;
+  inset: 4px;
   border-radius: 50%;
-  background: linear-gradient(145deg, #2a2a2a, #0a0a0a);
+  background: linear-gradient(145deg, #232a32, #05070a);
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 .jack::after {
   content: '';
   position: absolute;
-  inset: 4px;
+  inset: 5px;
   border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #1a1a1a, #000);
-  box-shadow:
-    inset 0 1px 1px rgba(0, 0, 0, 0.9),
-    0 0 0 1px var(--jack-color),
-    0 0 4px var(--jack-color);
-  opacity: 0.7;
+  background: radial-gradient(circle at 30% 30%, #11161c, #000);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.9);
+  opacity: 1;
 }
 
 .jack.kind-audio { --jack-color: var(--accent-cool); }
@@ -1869,6 +1836,60 @@
   text-align: center;
 }
 
+/* ── Knob v2 (phase 3, Console Steel) — scopé .module-card :
+     le mixer réutilise .rotary-dial et garde son rendu phase 2.
+     L'anneau extérieur est un arc de valeur (--ratio, posé par RotaryKnob),
+     teinté par la catégorie du module (--cat). ── */
+.module-card .rotary-dial {
+  --knob-color: var(--cat);
+  background: conic-gradient(
+    from 225deg,
+    var(--knob-color) calc(var(--ratio, 0) * 270deg),
+    rgba(255, 255, 255, 0.07) calc(var(--ratio, 0) * 270deg) 270deg,
+    transparent 270deg
+  );
+  box-shadow: none;
+}
+
+.module-card .rotary-dial::before {
+  inset: 3px;
+  background:
+    radial-gradient(circle at 32% 26%, rgba(255, 255, 255, 0.28), transparent 48%),
+    conic-gradient(from 90deg, #39444f, #232b34, #39444f, #1d242c, #39444f);
+  border: 1px solid rgba(0, 0, 0, 0.85);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.18),
+    0 2px 4px rgba(0, 0, 0, 0.65);
+}
+
+.module-card .rotary-center {
+  inset: calc(var(--dial-center-inset, 7px) + 1px);
+  background: radial-gradient(circle at 40% 35%, #2c343d, #14191f 70%);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.7);
+}
+
+.module-card .rotary-indicator::before {
+  background: var(--knob-color);
+  box-shadow: 0 0 5px var(--knob-color);
+}
+
+.module-card .rotary-label {
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+}
+
+.module-card .rotary-readout {
+  font-family: var(--font-lcd);
+  font-weight: 400;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(0, 0, 0, 0.6);
+  border-radius: var(--radius-sm);
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.6),
+    0 1px 0 rgba(255, 255, 255, 0.05);
+  color: var(--text-strong);
+}
+
 /* ============================================
    SECTION 10: MODULE CONTROLS GRID
    ============================================ */
@@ -1989,6 +2010,29 @@
   box-shadow: var(--btn-active-shadow);
 }
 
+/* ── Waveform v2 (phase 3) : même langage que les control-btn ── */
+.module-card .wave-button {
+  background: linear-gradient(180deg, #29333e, #1b222b);
+  border-color: rgba(0, 0, 0, 0.8);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 2px 3px rgba(0, 0, 0, 0.5);
+}
+
+.module-card .wave-button:hover {
+  background: linear-gradient(180deg, #33404d, #232c37);
+  border-color: rgba(0, 0, 0, 0.8);
+}
+
+.module-card .wave-button.active {
+  background: color-mix(in srgb, var(--cat) 18%, #11161c);
+  border-color: color-mix(in srgb, var(--cat) 45%, #000);
+  color: color-mix(in srgb, var(--cat) 90%, #fff);
+  box-shadow:
+    inset 0 0 8px color-mix(in srgb, var(--cat) 22%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
 /* Compact waveform in module controls */
 .module-controls .waveform { grid-column: 1 / -1; gap: var(--btn-compact-gap); }
 .module-controls .waveform-label { font-size: 6px; }
@@ -2047,6 +2091,20 @@
   --ui-btn-bg: var(--btn-inactive-bg);
 }
 
+/* ── Toggle v2 (phase 3) : actif lit par la catégorie, via les hooks ui-btn ──
+   Aussi les boutons du scope, SAUF les canaux (.scope-ch garde sa couleur) */
+.module-card .scope-btn:not(.scope-ch),
+.module-card .toggle-btn {
+  --ui-btn-bg: linear-gradient(180deg, #29333e, #1b222b);
+  --ui-btn-border: rgba(0, 0, 0, 0.8);
+  --ui-btn-active-text: color-mix(in srgb, var(--cat) 88%, #fff);
+  --ui-btn-active-bg: color-mix(in srgb, var(--cat) 22%, #11161c);
+  --ui-btn-active-border: color-mix(in srgb, var(--cat) 50%, #000);
+  --ui-btn-active-shadow:
+    inset 0 0 8px color-mix(in srgb, var(--cat) 25%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
 .meter-row {
   grid-column: 1 / -1;
   display: flex;
@@ -2100,16 +2158,19 @@
    SECTION 14: SCOPE / DATA MODULE
    ============================================ */
 
+/* Bezel LCD (langage phase 3) — la trace reste mint (couleur du signal) */
 .scope-view {
   position: relative;
-  background: radial-gradient(circle at 30% 30%, #0a1210, #050808);
-  border-radius: var(--radius-md);
-  border: 2px solid #1a1a1a;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 30%),
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.22) 0 1px, transparent 1px 3px),
+    radial-gradient(120% 130% at 50% 0%, #0c1512 0%, #070d0b 70%);
+  border-radius: 5px;
+  border: 1px solid rgba(0, 0, 0, 0.9);
   box-shadow:
-    inset 0 0 20px rgba(0, 0, 0, 0.8),
-    inset 0 0 4px rgba(80, 255, 160, 0.05),
-    0 2px 8px rgba(0, 0, 0, 0.5),
-    0 0 0 1px var(--glass-overlay);
+    inset 0 2px 8px rgba(0, 0, 0, 0.8),
+    inset 0 0 24px rgba(66, 226, 177, 0.06),
+    0 1px 0 rgba(255, 255, 255, 0.06);
   overflow: hidden;
   flex: 1;
   min-height: 80px;
@@ -2245,14 +2306,19 @@
 }
 
 /* Granular Waveform Visualization */
+/* Bezel LCD (langage phase 3) */
 .granular-waveform {
   position: relative;
-  background: radial-gradient(circle at 30% 30%, #0c1210, #060a08);
-  border-radius: var(--radius-md);
-  border: 2px solid #1a2420;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 30%),
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.22) 0 1px, transparent 1px 3px),
+    radial-gradient(120% 130% at 50% 0%, #10171c 0%, #0a0f13 70%);
+  border-radius: 5px;
+  border: 1px solid rgba(0, 0, 0, 0.9);
   box-shadow:
-    inset 0 0 20px rgba(0, 0, 0, 0.5),
-    0 2px 8px rgba(0, 0, 0, 0.3);
+    inset 0 2px 8px rgba(0, 0, 0, 0.8),
+    inset 0 0 24px color-mix(in srgb, var(--cat, var(--accent-cool)) 7%, transparent),
+    0 1px 0 rgba(255, 255, 255, 0.06);
   overflow: hidden;
   width: 100%;
   height: 100px;
@@ -2387,13 +2453,21 @@
 }
 
 /* Sampler — waveform preview canvas */
+/* Bezel LCD (langage phase 3) */
 .sampler-waveform {
   width: 100%;
   height: 52px;
   display: block;
-  border: 1px solid rgba(91, 182, 255, 0.25);
-  border-radius: 4px;
-  background: rgba(18, 26, 36, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.9);
+  border-radius: 5px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 30%),
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.22) 0 1px, transparent 1px 3px),
+    radial-gradient(120% 130% at 50% 0%, #10171c 0%, #0a0f13 70%);
+  box-shadow:
+    inset 0 2px 8px rgba(0, 0, 0, 0.8),
+    inset 0 0 24px color-mix(in srgb, var(--cat, var(--accent-cool)) 7%, transparent),
+    0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 /* Sampler — loaded file name */
@@ -2515,10 +2589,14 @@
   padding: 8px 0;
 }
 
+/* Bezel LCD (langage phase 3) */
 .particle-cloud-viz canvas {
+  border: 1px solid rgba(0, 0, 0, 0.9);
+  border-radius: 5px;
   box-shadow:
-    inset 0 2px 8px rgba(0, 0, 0, 0.4),
-    0 1px 0 rgba(255, 255, 255, 0.05);
+    inset 0 2px 8px rgba(0, 0, 0, 0.8),
+    inset 0 0 24px color-mix(in srgb, var(--cat, var(--accent-cool)) 7%, transparent),
+    0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 /* ============================================
@@ -2849,17 +2927,6 @@
   display: none;
 }
 
-/* Subtle shine overlay on sticky bar */
-.topbar-body::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 50%;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, transparent 100%);
-  pointer-events: none;
-}
 
 .panel-section {
   padding: 16px;
@@ -3102,73 +3169,6 @@
   margin-bottom: 8px;
   font-size: var(--text-md);
   color: rgba(230, 134, 134, 0.9);
-}
-
-.tauri-list {
-  display: grid;
-  gap: 6px;
-  margin-top: 6px;
-}
-
-.tauri-select-row {
-  display: grid;
-  grid-template-columns: 60px 1fr;
-  gap: 8px;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.tauri-select {
-  appearance: none;
-  background: var(--glass-3);
-  border: 1px solid rgba(90, 104, 126, 0.6);
-  border-radius: var(--radius-lg);
-  color: rgba(216, 230, 246, 0.9);
-  font-size: var(--text-sm);
-  padding: 6px 8px;
-}
-
-.tauri-select:disabled {
-  opacity: 0.6;
-}
-
-.tauri-item {
-  display: grid;
-  grid-template-columns: 60px 1fr;
-  gap: 8px;
-  font-size: var(--text-md);
-  color: rgba(198, 214, 232, 0.85);
-}
-
-.tauri-label {
-  font-size: var(--text-xs);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: rgba(198, 214, 232, 0.6);
-}
-
-.tauri-value {
-  color: rgba(216, 230, 246, 0.9);
-}
-
-.tauri-device-list {
-  display: grid;
-  gap: 4px;
-  margin: 0 0 6px 4px;
-  font-size: var(--text-sm);
-  color: rgba(198, 214, 232, 0.7);
-}
-
-.tauri-device {
-  position: relative;
-  padding-left: 10px;
-}
-
-.tauri-device::before {
-  content: '-';
-  position: absolute;
-  left: 0;
-  color: rgba(138, 156, 180, 0.7);
 }
 
 .preset-name {
@@ -3612,7 +3612,6 @@
    ============================================ */
 
 .module-card[data-module-type="mario"] {
-  --panel-color: #1a0a0a;
   background:
     repeating-linear-gradient(
       0deg,
@@ -3793,16 +3792,21 @@
    SID Player Styles
    ============================================ */
 
+/* Bezel LCD (langage phase 3) — le contenu garde son identité C64 bleue */
 .sid-display {
   grid-column: 1 / -1;
-  background: linear-gradient(180deg, #1a1a2e 0%, #0a0a15 100%);
-  border: 2px solid #4a6fa5;
-  border-radius: var(--radius-md);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 30%),
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.22) 0 1px, transparent 1px 3px),
+    radial-gradient(120% 130% at 50% 0%, #10141f 0%, #0a0d15 70%);
+  border: 1px solid rgba(0, 0, 0, 0.9);
+  border-radius: 5px;
   padding: 8px 10px;
   text-align: center;
   box-shadow:
-    inset 0 0 20px rgba(74, 111, 165, 0.15),
-    0 0 10px rgba(74, 111, 165, 0.2);
+    inset 0 2px 8px rgba(0, 0, 0, 0.8),
+    inset 0 0 24px rgba(74, 111, 165, 0.12),
+    0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 .sid-title {
@@ -3877,16 +3881,17 @@
   font-family: 'Courier New', monospace;
   font-size: 10px;
   padding: 6px 12px;
-  background: linear-gradient(180deg, #2a3a5e 0%, #1a2a4e 100%);
-  border: 1px solid #4a6fa5;
+  background: linear-gradient(180deg, #29333e, #1b222b);
+  border: 1px solid rgba(0, 0, 0, 0.8);
   border-radius: var(--radius-sm);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 2px 3px rgba(0, 0, 0, 0.5);
   color: #8fd4f9;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .sid-load-btn:hover {
-  background: linear-gradient(180deg, #3a4a6e 0%, #2a3a5e 100%);
+  background: linear-gradient(180deg, #33404d, #232c37);
   box-shadow: 0 0 8px rgba(74, 111, 165, 0.4);
 }
 
@@ -3895,16 +3900,17 @@
   font-size: 12px;
   width: 28px;
   height: 28px;
-  background: linear-gradient(180deg, #2a3a5e 0%, #1a2a4e 100%);
-  border: 1px solid #4a6fa5;
+  background: linear-gradient(180deg, #29333e, #1b222b);
+  border: 1px solid rgba(0, 0, 0, 0.8);
   border-radius: var(--radius-sm);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 2px 3px rgba(0, 0, 0, 0.5);
   color: #8fd4f9;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .sid-song-btn:hover:not(:disabled) {
-  background: linear-gradient(180deg, #3a4a6e 0%, #2a3a5e 100%);
+  background: linear-gradient(180deg, #33404d, #232c37);
 }
 
 .sid-song-btn:disabled {
@@ -4037,14 +4043,23 @@
    STEP SEQUENCER GRID - New Vertical Design
    ============================================ */
 
+/* Grille = display LCD (langage phase 3) — mêmes classes, .playing intact */
 .seq-step-grid {
   grid-column: 1 / -1;
   display: flex;
   flex-direction: column;
   gap: 6px;
-  background: rgba(0, 0, 0, 0.35);
-  padding: 10px;
-  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 30%),
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.22) 0 1px, transparent 1px 3px),
+    radial-gradient(120% 130% at 50% 0%, #10171c 0%, #0a0f13 70%);
+  border: 1px solid rgba(0, 0, 0, 0.9);
+  border-radius: 5px;
+  box-shadow:
+    inset 0 2px 8px rgba(0, 0, 0, 0.8),
+    inset 0 0 24px color-mix(in srgb, var(--cat, var(--accent-warm)) 7%, transparent),
+    0 1px 0 rgba(255, 255, 255, 0.06);
+  padding: 8px;
   margin-top: 8px;
 }
 
@@ -4060,9 +4075,10 @@
   align-items: center;
   gap: 3px;
   padding: 4px 2px;
-  background: rgba(30, 40, 50, 0.6);
-  border-radius: var(--radius-md);
-  border: 1px solid rgba(60, 80, 100, 0.3);
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(0, 0, 0, 0.6);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
   transition: opacity 0.2s;
 }
 
@@ -4070,6 +4086,39 @@
   opacity: 0.3;
   pointer-events: none;
 }
+
+/* Colonne de labels de rangées (Gate/Note/Vel/Slide) — même squelette qu'un
+   step (mêmes classes => mêmes hauteurs), sans data-step donc invisible au
+   playhead */
+.seq-step-labels {
+  flex: 0 0 34px;
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.seq-step-labels .seq-step-led,
+.seq-step-labels .seq-step-num {
+  visibility: hidden;
+}
+
+.seq-label {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+  padding-right: 3px;
+  font-size: 7px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.seq-label-gate { height: 22px; }
+.seq-label-note { height: 24px; }
+.seq-label-vel { height: 24px; }
+.seq-label-slide { height: 18px; }
 
 .seq-step-num {
   font-size: 9px;
@@ -4099,9 +4148,11 @@
 }
 
 .seq-step-gate.active {
-  background: linear-gradient(180deg, #3b8beb 0%, #2563eb 100%);
-  color: #fff;
-  box-shadow: 0 0 6px rgba(59, 139, 235, 0.4);
+  background: color-mix(in srgb, var(--cat, var(--accent-warm)) 35%, #0c1116);
+  color: color-mix(in srgb, var(--cat, var(--accent-warm)) 90%, #fff);
+  box-shadow:
+    inset 0 0 6px color-mix(in srgb, var(--cat, var(--accent-warm)) 30%, transparent),
+    0 0 6px color-mix(in srgb, var(--cat, var(--accent-warm)) 30%, transparent);
 }
 
 /* Pitch display - clickable/scrollable */
@@ -4111,16 +4162,45 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(20, 30, 40, 0.9);
-  border: 1px solid rgba(60, 80, 100, 0.4);
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(0, 0, 0, 0.6);
   border-radius: var(--radius-sm);
   font-size: 10px;
-  font-weight: 600;
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
-  color: #a5d6ff;
+  font-weight: 400;
+  font-family: var(--font-lcd);
+  color: color-mix(in srgb, var(--cat, var(--accent-warm)) 70%, #fff);
+  text-shadow: 0 0 5px color-mix(in srgb, var(--cat, var(--accent-warm)) 40%, transparent);
   cursor: ns-resize;
   user-select: none;
+  touch-action: none;
   transition: background 0.1s;
+  position: relative;
+  overflow: hidden;
+}
+
+.seq-step-pitch-num {
+  position: relative;
+  z-index: 1;
+}
+
+/* bargraph de pitch derrière le chiffre (look du mockup, précision conservée).
+   Scopé au step-sequencer : chord/polyrhythm réutilisent .seq-step-pitch
+   sans poser --pitch-ratio (le fallback 0.5 leur peindrait un faux niveau) */
+.module-card[data-module-type='step-sequencer'] .seq-step-pitch::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(var(--pitch-ratio, 0.5) * 100%);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--cat, var(--accent-warm)) 30%, transparent),
+    color-mix(in srgb, var(--cat, var(--accent-warm)) 14%, transparent)
+  );
+  border-top: 1px solid color-mix(in srgb, var(--cat, var(--accent-warm)) 55%, transparent);
+  pointer-events: none;
+  transition: height 0.05s;
 }
 
 .seq-step-pitch:hover {
@@ -4133,14 +4213,20 @@
 }
 
 /* Velocity bar */
+/* Vélocité : même contrôle visuel que le pitch (jauge + chiffre LCD) */
 .seq-step-vel {
   width: 100%;
-  height: 28px;
-  background: rgba(20, 30, 40, 0.9);
-  border: 1px solid rgba(60, 80, 100, 0.3);
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(0, 0, 0, 0.6);
   border-radius: var(--radius-sm);
   position: relative;
-  cursor: pointer;
+  cursor: ns-resize;
+  user-select: none;
+  touch-action: none;
   overflow: hidden;
 }
 
@@ -4151,9 +4237,23 @@
   left: 0;
   right: 0;
   height: calc(var(--vel, 100) * 1%);
-  background: linear-gradient(180deg, #34d399 0%, #10b981 50%, #059669 100%);
-  border-radius: var(--radius-xs);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--cat, var(--accent-warm)) 30%, transparent),
+    color-mix(in srgb, var(--cat, var(--accent-warm)) 14%, transparent)
+  );
+  border-top: 1px solid color-mix(in srgb, var(--cat, var(--accent-warm)) 55%, transparent);
+  pointer-events: none;
   transition: height 0.05s;
+}
+
+.seq-step-vel-num {
+  position: relative;
+  z-index: 1;
+  font-size: 10px;
+  font-family: var(--font-lcd);
+  color: color-mix(in srgb, var(--cat, var(--accent-warm)) 70%, #fff);
+  text-shadow: 0 0 5px color-mix(in srgb, var(--cat, var(--accent-warm)) 40%, transparent);
 }
 
 /* Slide toggle button */
@@ -4199,10 +4299,13 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
-  padding: 8px;
-  background: var(--glass-overlay);
+  padding: 6px 7px 7px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.08));
   border-radius: var(--radius-lg);
-  border: 1px solid rgba(60, 80, 100, 0.25);
+  border: 1px solid rgba(0, 0, 0, 0.55);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    inset 0 0 10px rgba(0, 0, 0, 0.25);
 }
 
 /* Compact variant: keep border, reduce padding and font */
@@ -4226,13 +4329,24 @@
   grid-column: 1 / -1;
 }
 
-/* Label at top of box */
+/* Label at top of box — gravé + filet */
 .control-box-label {
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.15em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: rgba(198, 212, 228, 0.7);
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.control-box-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--border-soft), transparent);
 }
 
 /* Content container inside box */
@@ -4313,6 +4427,29 @@
   box-shadow: var(--btn-active-shadow);
 }
 
+/* ── Boutons v2 (phase 3) : plastique sombre, actif = lit par la catégorie ── */
+.module-card .control-btn {
+  background: linear-gradient(180deg, #29333e, #1b222b);
+  border-color: rgba(0, 0, 0, 0.8);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 2px 3px rgba(0, 0, 0, 0.5);
+}
+
+.module-card .control-btn:hover {
+  background: linear-gradient(180deg, #33404d, #232c37);
+  border-color: rgba(0, 0, 0, 0.8);
+}
+
+.module-card .control-btn.active {
+  background: color-mix(in srgb, var(--cat) 22%, #11161c);
+  border-color: color-mix(in srgb, var(--cat) 50%, #000);
+  color: color-mix(in srgb, var(--cat) 88%, #fff);
+  box-shadow:
+    inset 0 0 8px color-mix(in srgb, var(--cat) 25%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
 /* CV-controlled button highlight (cyan glow for SID waveform etc) */
 .control-btn.cv-active {
   border-color: #00e5ff;
@@ -4341,9 +4478,10 @@
   flex: 1 1 auto;
   min-width: 55px;
   padding: 6px 8px;
-  border: 1px solid rgba(80, 100, 130, 0.4);
+  border: 1px solid rgba(0, 0, 0, 0.8);
   border-radius: var(--radius-md);
-  background: var(--glass-4);
+  background: linear-gradient(180deg, #29333e, #1b222b);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 2px 3px rgba(0, 0, 0, 0.5);
   color: rgba(198, 212, 228, 0.9);
   font-size: 9px;
   font-weight: 600;
@@ -4353,8 +4491,8 @@
 }
 
 .seq-pattern-btn:hover {
-  background: var(--glass-panel);
-  border-color: rgba(100, 130, 170, 0.6);
+  background: linear-gradient(180deg, #33404d, #232c37);
+  border-color: rgba(0, 0, 0, 0.8);
 }
 
 /* Page navigation for 64-step sequencer */
@@ -4368,9 +4506,10 @@
 .seq-page-btn {
   flex: 1;
   padding: 4px 6px;
-  border: 1px solid rgba(80, 100, 130, 0.4);
+  border: 1px solid rgba(0, 0, 0, 0.8);
   border-radius: var(--radius-md);
-  background: var(--glass-4);
+  background: linear-gradient(180deg, #29333e, #1b222b);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 2px 3px rgba(0, 0, 0, 0.5);
   color: rgba(198, 212, 228, 0.7);
   font-size: 9px;
   font-weight: 600;
@@ -4379,14 +4518,17 @@
 }
 
 .seq-page-btn.active {
-  background: rgba(0, 229, 255, 0.15);
-  border-color: rgba(0, 229, 255, 0.5);
-  color: #00e5ff;
+  background: color-mix(in srgb, var(--cat, var(--accent-warm)) 22%, #11161c);
+  border-color: color-mix(in srgb, var(--cat, var(--accent-warm)) 50%, #000);
+  color: color-mix(in srgb, var(--cat, var(--accent-warm)) 88%, #fff);
+  box-shadow:
+    inset 0 0 8px color-mix(in srgb, var(--cat, var(--accent-warm)) 25%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .seq-page-btn:hover:not(.active) {
-  background: var(--glass-panel);
-  border-color: rgba(100, 130, 170, 0.6);
+  background: linear-gradient(180deg, #33404d, #232c37);
+  border-color: rgba(0, 0, 0, 0.8);
 }
 
 /* Step indicator LED */
@@ -4421,13 +4563,22 @@
    DRUM SEQUENCER - 8x16 Grid (x0x style)
    ============================================ */
 
+/* Grille = display LCD (langage phase 3) — mêmes classes, .playing intact */
 .drum-seq-grid {
   grid-column: 1 / -1;
   display: flex;
   flex-direction: column;
   gap: 2px;
-  background: rgba(0, 0, 0, 0.35);
-  border-radius: var(--radius-xl);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 30%),
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.22) 0 1px, transparent 1px 3px),
+    radial-gradient(120% 130% at 50% 0%, #10171c 0%, #0a0f13 70%);
+  border: 1px solid rgba(0, 0, 0, 0.9);
+  border-radius: 5px;
+  box-shadow:
+    inset 0 2px 8px rgba(0, 0, 0, 0.8),
+    inset 0 0 24px color-mix(in srgb, var(--cat, var(--accent-warm)) 7%, transparent),
+    0 1px 0 rgba(255, 255, 255, 0.06);
   padding: 8px;
 }
 
@@ -4459,9 +4610,10 @@
   aspect-ratio: 1;
   min-width: 16px;
   max-width: 24px;
-  border: 1px solid rgba(80, 100, 130, 0.4);
+  border: 1px solid rgba(0, 0, 0, 0.6);
   border-radius: var(--radius-sm);
-  background: rgba(30, 40, 55, 0.6);
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
   color: rgba(120, 140, 160, 0.6);
   font-size: 10px;
   font-weight: 700;
@@ -4523,9 +4675,10 @@
 
 .seq-preset-btn {
   padding: 4px 10px;
-  border: 1px solid rgba(80, 100, 130, 0.4);
+  border: 1px solid rgba(0, 0, 0, 0.8);
   border-radius: var(--radius-md);
-  background: var(--glass-4);
+  background: linear-gradient(180deg, #29333e, #1b222b);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 2px 3px rgba(0, 0, 0, 0.5);
   color: rgba(198, 212, 228, 0.9);
   font-size: 9px;
   font-weight: 600;
@@ -4534,8 +4687,8 @@
 }
 
 .seq-preset-btn:hover {
-  background: var(--glass-panel);
-  border-color: rgba(100, 130, 170, 0.6);
+  background: linear-gradient(180deg, #33404d, #232c37);
+  border-color: rgba(0, 0, 0, 0.8);
 }
 
 .seq-knob-box {
@@ -4715,18 +4868,20 @@
   align-items: center;
   gap: 6px;
   padding: 6px 10px;
-  background: rgba(20, 30, 40, 0.6);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.08));
   border-radius: var(--radius-lg);
-  border: 1px solid rgba(60, 80, 100, 0.3);
+  border: 1px solid rgba(0, 0, 0, 0.55);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .dm909-bank-btn {
   position: relative;
   min-width: 34px;
   padding: 6px 10px;
-  border: 1px solid rgba(80, 100, 130, 0.5);
+  border: 1px solid rgba(0, 0, 0, 0.8);
   border-radius: var(--radius-md);
-  background: var(--glass-5);
+  background: linear-gradient(180deg, #29333e, #1b222b);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 2px 3px rgba(0, 0, 0, 0.5);
   color: rgba(198, 212, 228, 0.85);
   font-size: 11px;
   font-weight: 700;
@@ -4736,8 +4891,8 @@
 }
 
 .dm909-bank-btn:hover {
-  background: var(--glass-panel);
-  border-color: rgba(100, 130, 170, 0.6);
+  background: linear-gradient(180deg, #33404d, #232c37);
+  border-color: rgba(0, 0, 0, 0.8);
 }
 
 .dm909-bank-btn.sel {
@@ -4799,14 +4954,22 @@
   width: 100%;
 }
 
-/* Step grid */
+/* Step grid = display LCD (langage phase 3) — états/couleurs fonctionnels intacts */
 .dm909-grid {
   grid-column: 1 / -1;
   display: flex;
   flex-direction: column;
   gap: 2px;
-  background: rgba(0, 0, 0, 0.35);
-  border-radius: var(--radius-xl);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 30%),
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.22) 0 1px, transparent 1px 3px),
+    radial-gradient(120% 130% at 50% 0%, #10171c 0%, #0a0f13 70%);
+  border: 1px solid rgba(0, 0, 0, 0.9);
+  border-radius: 5px;
+  box-shadow:
+    inset 0 2px 8px rgba(0, 0, 0, 0.8),
+    inset 0 0 24px color-mix(in srgb, var(--cat, var(--accent-warm)) 7%, transparent),
+    0 1px 0 rgba(255, 255, 255, 0.06);
   padding: 8px;
 }
 
@@ -4820,9 +4983,10 @@
   width: 56px;
   flex-shrink: 0;
   padding: 4px 4px;
-  border: 1px solid rgba(80, 100, 130, 0.35);
+  border: 1px solid rgba(0, 0, 0, 0.7);
   border-radius: var(--radius-sm);
-  background: rgba(30, 40, 55, 0.5);
+  background: linear-gradient(180deg, #29333e, #1b222b);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
   color: rgba(198, 212, 228, 0.85);
   font-size: 9px;
   font-weight: 700;
@@ -4855,9 +5019,10 @@
   flex: 1;
   height: 22px;
   min-width: 14px;
-  border: 1px solid rgba(80, 100, 130, 0.4);
+  border: 1px solid rgba(0, 0, 0, 0.6);
   border-radius: var(--radius-sm);
-  background: rgba(30, 40, 55, 0.6);
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
   cursor: pointer;
   transition: var(--transition-fast);
   padding: 0;
@@ -4914,9 +5079,10 @@
 
 .dm909-page-btn {
   padding: 3px 8px;
-  border: 1px solid rgba(80, 100, 130, 0.4);
+  border: 1px solid rgba(0, 0, 0, 0.8);
   border-radius: var(--radius-sm);
-  background: var(--glass-4);
+  background: linear-gradient(180deg, #29333e, #1b222b);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 2px 3px rgba(0, 0, 0, 0.5);
   color: rgba(198, 212, 228, 0.85);
   font-size: 9px;
   font-weight: 600;
@@ -5604,27 +5770,7 @@ textarea:focus-visible,
 }
 
 @media (max-width: 960px) {
-  /* --- TopBar compact --- */
-  .topbar-body {
-    flex-wrap: wrap;
-    gap: 8px 12px;
-    padding: 8px 14px;
-  }
-
-  .topbar-separator {
-    display: none;
-  }
-
-  .topbar-zone {
-    gap: 8px;
-  }
-
   .action-label {
-    display: none;
-  }
-
-  /* --- Hide header --- */
-  .topbar-head {
     display: none;
   }
 
@@ -5908,7 +6054,7 @@ textarea:focus-visible,
   --thm-orange: #ff7a45;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
   padding: 4px;
 }
@@ -5952,7 +6098,8 @@ textarea:focus-visible,
 .theremin-pad {
   position: relative;
   flex: 1;
-  min-height: 200px;
+  /* 200px + labels knobs v2 (+2px) faisaient déborder les readouts du bas */
+  min-height: 172px;
   border-radius: 8px;
   background:
     radial-gradient(120% 100% at 50% 0%, rgba(176, 107, 255, 0.10), transparent 60%),
@@ -6704,3 +6851,207 @@ body {
    (UA line-height ~normal) while MASTER is a <span> inheriting the global
    1.45, which made the master tape a few px taller and shifted the strip */
 .mixer-strip-scribble { line-height: 1.2; }
+
+/* ════════════════════════════════════════════════════════════
+   PHASE 3 — LANGAGE LCD UNIFIÉ (displays des modules riches)
+   Bezel verre inset + scanlines + glow teinté catégorie. Utilisé par
+   l'organ (drawbar bay) puis les grilles de séquenceurs, scope, etc.
+   Référence : design/mockups/faceplates-steel.html
+   ════════════════════════════════════════════════════════════ */
+
+.lcd {
+  --lcd-glow: var(--cat, var(--accent-mint));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 30%),
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.22) 0 1px, transparent 1px 3px),
+    radial-gradient(120% 130% at 50% 0%, #10171c 0%, #0a0f13 70%);
+  border: 1px solid rgba(0, 0, 0, 0.9);
+  border-radius: 5px;
+  box-shadow:
+    inset 0 2px 8px rgba(0, 0, 0, 0.8),
+    inset 0 0 24px color-mix(in srgb, var(--lcd-glow) 7%, transparent),
+    0 1px 0 rgba(255, 255, 255, 0.06);
+  padding: 6px 7px;
+  min-width: 0;
+}
+
+.lcd-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  font-family: var(--font-lcd);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--lcd-glow) 75%, #fff);
+  text-shadow: 0 0 6px color-mix(in srgb, var(--lcd-glow) 55%, transparent);
+  margin-bottom: 5px;
+  white-space: nowrap;
+}
+
+.lcd-head .dim {
+  color: var(--text-dim);
+  text-shadow: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Game of Life : module large (4x4) → canvas à gauche, contrôles à droite */
+.gol-panel {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.gol-canvas-col {
+  flex: none;
+}
+
+.gol-controls-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+/* Canvas dans un bezel LCD (GoL, Gravity… le canvas peint son propre fond) */
+.lcd-canvas {
+  border: 1px solid rgba(0, 0, 0, 0.9);
+  border-radius: 5px;
+  background: radial-gradient(120% 130% at 50% 0%, #10171c 0%, #0a0f13 70%);
+  box-shadow:
+    inset 0 2px 8px rgba(0, 0, 0, 0.8),
+    inset 0 0 24px color-mix(in srgb, var(--cat, var(--accent-warm)) 7%, transparent),
+    0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* ── Drawbars (Hammond) ── */
+
+.organ-panel {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.organ-row {
+  display: flex;
+  gap: 6px;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.organ-row > .control-box {
+  min-width: 0;
+}
+
+.organ-drawbars {
+  display: flex;
+  gap: 4px;
+  justify-content: space-around;
+  padding: 2px 2px 0;
+}
+
+.organ-perc {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  min-width: 0;
+}
+
+.organ-perc > .control-buttons {
+  flex: 1;
+}
+
+.drawbar {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.drawbar-label {
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.drawbar-track {
+  position: relative;
+  width: 15px;
+  height: 84px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(0, 0, 0, 0.85);
+  box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.8);
+  touch-action: none;
+  cursor: ns-resize;
+}
+
+.drawbar-track:focus-visible {
+  outline: 2px solid var(--lcd-glow, var(--cat));
+  outline-offset: 2px;
+}
+
+/* graduations de registration */
+.drawbar-track::before {
+  content: '';
+  position: absolute;
+  inset: 7px 3px;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 0.1) 0 1px,
+    transparent 1px calc(100% / 8)
+  );
+  pointer-events: none;
+}
+
+/* tige : du haut jusqu'au capuchon */
+.drawbar-shaft {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  top: 0;
+  height: calc(var(--pull, 0) * (100% - 14px) + 7px);
+  border-radius: 0 0 2px 2px;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--lcd-glow, var(--cat)) 55%, #1a2027),
+    color-mix(in srgb, var(--lcd-glow, var(--cat)) 30%, #10151a)
+  );
+  box-shadow: 0 0 4px color-mix(in srgb, var(--lcd-glow, var(--cat)) 25%, transparent);
+  pointer-events: none;
+}
+
+.drawbar-cap {
+  position: absolute;
+  left: 1px;
+  right: 1px;
+  top: calc(var(--pull, 0) * (100% - 14px));
+  height: 14px;
+  border-radius: 3px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.35), transparent 40%),
+    var(--drawbar-cap, #ddd6c6);
+  border: 1px solid rgba(0, 0, 0, 0.7);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.8),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}
+
+.drawbar-value {
+  font-family: var(--font-lcd);
+  font-size: 9px;
+  line-height: 1.1;
+  color: color-mix(in srgb, var(--lcd-glow, var(--cat)) 80%, #fff);
+  text-shadow: 0 0 5px color-mix(in srgb, var(--lcd-glow, var(--cat)) 50%, transparent);
+}

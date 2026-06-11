@@ -77,14 +77,29 @@ export class AudioEngine {
   }
 
   dispose(): void {
-    this.graphNode?.disconnect()
+    this.destroyGraphNode()
     this.scopeAnalysers.clear()
-    this.graphNode = null
     this.currentGraph = null
     this.context?.close()
     this.context = null
     this.recordingDestination = null
     this.disableMic()
+  }
+
+  /**
+   * Tue vraiment l'ancien AudioWorkletNode : un processor qui retourne true
+   * survit à disconnect() (il continue de rendre le graphe et de poster ses
+   * beats/steps sur l'ancien port → affichage de mesure qui clignote entre
+   * deux valeurs + CPU gaspillé à chaque changement de preset).
+   */
+  private destroyGraphNode(): void {
+    if (!this.graphNode) {
+      return
+    }
+    this.graphNode.port.onmessage = null
+    this.graphNode.port.postMessage({ type: 'dispose' })
+    this.graphNode.disconnect()
+    this.graphNode = null
   }
 
   async enableMic(): Promise<boolean> {
@@ -634,8 +649,7 @@ export class AudioEngine {
     this.tapOutputs = tapOutputs
 
     if (needsReset) {
-      this.graphNode?.disconnect()
-      this.graphNode = null
+      this.destroyGraphNode()
       this.scopeAnalysers.clear()
       this.recordingDestination = null
       this.createGraphNode()

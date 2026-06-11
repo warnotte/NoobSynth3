@@ -7,6 +7,7 @@
 
 import type React from 'react'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useUndo } from '../../../hooks/UndoContext'
 import type { ControlProps } from '../types'
 import { RotaryKnob } from '../../RotaryKnob'
 import { ToggleButton, ToggleGroup } from '../../ToggleButton'
@@ -49,6 +50,37 @@ export function StepSequencerControls({ module, engine, status, audioMode, nativ
 
   const updateSteps = (newSteps: StepData[]) => {
     updateParam(module.id, 'stepData', JSON.stringify(newSteps))
+  }
+
+  /* Drag vertical sur la cellule pitch (le bargraph appelle un vrai slider).
+     Tap sans mouvement = +1, clic droit = −1, molette = ±1. Une transaction
+     undo par geste, comme RotaryKnob. */
+  const { beginTransaction, endTransaction } = useUndo()
+  const pitchDragRef = useRef<{ index: number; startY: number; startPitch: number; moved: boolean } | null>(null)
+
+  const setStepPitch = (index: number, pitch: number) => {
+    const next = Math.max(-24, Math.min(24, pitch))
+    if (steps[index].pitch === next) {
+      return
+    }
+    const newSteps = [...steps]
+    newSteps[index] = { ...newSteps[index], pitch: next }
+    updateSteps(newSteps)
+  }
+
+  /* Vélocité : exactement le même contrôle que le pitch (drag vertical
+     RELATIF — pas de saut de valeur au clic —, tap +5, clic droit −5,
+     molette ±5), seule l'échelle change (0-100). */
+  const velDragRef = useRef<{ index: number; startY: number; startVel: number; moved: boolean } | null>(null)
+
+  const setStepVelocity = (index: number, velocity: number) => {
+    const next = Math.max(0, Math.min(100, Math.round(velocity)))
+    if (steps[index].velocity === next) {
+      return
+    }
+    const newSteps = [...steps]
+    newSteps[index] = { ...newSteps[index], velocity: next }
+    updateSteps(newSteps)
   }
 
   const patternPresets = [
@@ -112,10 +144,16 @@ export function StepSequencerControls({ module, engine, status, audioMode, nativ
     { id: 3, label: 'RND' },
   ]
 
+  /* Affichage en notes (référence C4 = pitch 0, convention MIDI 60 = CV 0).
+     Le pitch reste RELATIF à la fréquence de base de l'oscillateur ciblé :
+     la note affichée est exacte si l'oscillo est accordé en C, sinon tout
+     est transposé d'un intervalle fixe. Demi-tons dans le tooltip. */
+  const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
   const formatPitch = (pitch: number) => {
-    if (pitch === 0) return '0'
-    return pitch > 0 ? `+${pitch}` : `${pitch}`
+    const midi = 60 + pitch
+    return `${NOTE_NAMES[((midi % 12) + 12) % 12]}${Math.floor(midi / 12) - 1}`
   }
+  const formatSemitones = (pitch: number) => (pitch > 0 ? `+${pitch}` : `${pitch}`)
 
   const gridRef = useRef<HTMLDivElement>(null)
   const stepRef = useRef(-1)
@@ -269,6 +307,7 @@ export function StepSequencerControls({ module, engine, status, audioMode, nativ
             options={directions}
             value={direction}
             onChange={(value) => updateParam(module.id, 'direction', value)}
+            columns={2}
           />
         </ControlBox>
         <ControlBox label="Length">
@@ -306,6 +345,16 @@ export function StepSequencerControls({ module, engine, status, audioMode, nativ
       <div className="seq-step-grid" ref={gridRef}>
         {[0, 8].map((bankOffset) => (
           <div key={bankOffset} className="seq-step-bank">
+            {/* colonne de labels — réutilise la structure d'un step pour l'alignement */}
+            <div className="seq-step seq-step-labels" aria-hidden="true">
+              <div className="seq-step-led" />
+              {/* contenu factice : un num vide aurait une hauteur 0 et tout remonterait */}
+              <div className="seq-step-num">0</div>
+              <span className="seq-label seq-label-gate">Gate</span>
+              <span className="seq-label seq-label-note">Note</span>
+              <span className="seq-label seq-label-vel">Vel</span>
+              <span className="seq-label seq-label-slide">Slide</span>
+            </div>
             {steps.slice(pageOffset + bankOffset, pageOffset + bankOffset + 8).map((step, i) => {
               const stepIndex = pageOffset + bankOffset + i
               return (
@@ -325,38 +374,96 @@ export function StepSequencerControls({ module, engine, status, audioMode, nativ
                   </button>
                   <div
                     className="seq-step-pitch"
+                    style={{ '--pitch-ratio': (step.pitch + 24) / 48 } as React.CSSProperties}
                     onWheel={(e) => {
                       e.preventDefault()
-                      const delta = e.deltaY > 0 ? -1 : 1
-                      const newPitch = Math.max(-24, Math.min(24, step.pitch + delta))
-                      const newSteps = [...steps]
-                      newSteps[stepIndex] = { ...newSteps[stepIndex], pitch: newPitch }
-                      updateSteps(newSteps)
+                      setStepPitch(stepIndex, step.pitch + (e.deltaY > 0 ? -1 : 1))
                     }}
-                    onClick={(e) => {
-                      const delta = e.button === 2 ? -1 : 1
-                      const newPitch = Math.max(-24, Math.min(24, step.pitch + delta))
-                      const newSteps = [...steps]
-                      newSteps[stepIndex] = { ...newSteps[stepIndex], pitch: newPitch }
-                      updateSteps(newSteps)
+                    onPointerDown={(e) => {
+                      if (e.button !== 0) return
+                      e.currentTarget.setPointerCapture(e.pointerId)
+                      pitchDragRef.current = { index: stepIndex, startY: e.clientY, startPitch: step.pitch, moved: false }
+                      beginTransaction()
                     }}
-                    onContextMenu={(e) => e.preventDefault()}
-                    title="Scroll or click to change, right-click to decrease"
+                    onPointerMove={(e) => {
+                      const drag = pitchDragRef.current
+                      if (!drag || drag.index !== stepIndex) return
+                      const delta = drag.startY - e.clientY
+                      if (Math.abs(delta) > 3) drag.moved = true
+                      const pxPerSemitone = e.shiftKey ? 12 : 4
+                      setStepPitch(stepIndex, drag.startPitch + Math.round(delta / pxPerSemitone))
+                    }}
+                    onPointerUp={(e) => {
+                      const drag = pitchDragRef.current
+                      if (!drag || drag.index !== stepIndex) return
+                      pitchDragRef.current = null
+                      e.currentTarget.releasePointerCapture(e.pointerId)
+                      endTransaction()
+                      if (!drag.moved) {
+                        setStepPitch(stepIndex, step.pitch + 1)
+                      }
+                    }}
+                    onPointerCancel={(e) => {
+                      if (!pitchDragRef.current) return
+                      pitchDragRef.current = null
+                      e.currentTarget.releasePointerCapture(e.pointerId)
+                      endTransaction()
+                    }}
+                    onContextMenu={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation() // sinon le menu contextuel du module s'ouvre aussi
+                      setStepPitch(stepIndex, step.pitch - 1)
+                    }}
+                    title={`${formatPitch(step.pitch)} (${formatSemitones(step.pitch)} st) — Glisser ↕ (Shift = fin) · clic +1 · clic droit −1 · molette ±1`}
                   >
-                    {formatPitch(step.pitch)}
+                    <span className="seq-step-pitch-num">{formatPitch(step.pitch)}</span>
                   </div>
                   <div
                     className="seq-step-vel"
                     style={{ '--vel': step.velocity } as React.CSSProperties}
-                    onClick={(e) => {
-                      const rect = e.currentTarget.getBoundingClientRect()
-                      const y = e.clientY - rect.top
-                      const velocity = Math.round(100 - (y / rect.height) * 100)
-                      const newSteps = [...steps]
-                      newSteps[stepIndex] = { ...newSteps[stepIndex], velocity: Math.max(0, Math.min(100, velocity)) }
-                      updateSteps(newSteps)
+                    onPointerDown={(e) => {
+                      if (e.button !== 0) return
+                      e.currentTarget.setPointerCapture(e.pointerId)
+                      velDragRef.current = { index: stepIndex, startY: e.clientY, startVel: step.velocity, moved: false }
+                      beginTransaction()
                     }}
-                  />
+                    onPointerMove={(e) => {
+                      const drag = velDragRef.current
+                      if (!drag || drag.index !== stepIndex) return
+                      const delta = drag.startY - e.clientY
+                      if (Math.abs(delta) > 3) drag.moved = true
+                      const pxPerUnit = e.shiftKey ? 4 : 1
+                      setStepVelocity(stepIndex, drag.startVel + Math.round(delta / pxPerUnit))
+                    }}
+                    onPointerUp={(e) => {
+                      const drag = velDragRef.current
+                      if (!drag || drag.index !== stepIndex) return
+                      velDragRef.current = null
+                      e.currentTarget.releasePointerCapture(e.pointerId)
+                      endTransaction()
+                      if (!drag.moved) {
+                        setStepVelocity(stepIndex, step.velocity + 5)
+                      }
+                    }}
+                    onPointerCancel={(e) => {
+                      if (!velDragRef.current) return
+                      velDragRef.current = null
+                      e.currentTarget.releasePointerCapture(e.pointerId)
+                      endTransaction()
+                    }}
+                    onContextMenu={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation() // sinon le menu contextuel du module s'ouvre aussi
+                      setStepVelocity(stepIndex, step.velocity - 5)
+                    }}
+                    onWheel={(e) => {
+                      e.preventDefault()
+                      setStepVelocity(stepIndex, step.velocity + (e.deltaY > 0 ? -5 : 5))
+                    }}
+                    title="Glisser ↕ pour régler (Shift = fin) · clic +5 · clic droit −5 · molette ±5"
+                  >
+                    <span className="seq-step-vel-num">{step.velocity}</span>
+                  </div>
                   <button
                     type="button"
                     className={`seq-step-slide ${step.slide ? 'active' : ''}`}

@@ -180,13 +180,11 @@ export function GravityControls({ module, updateParam }: ControlProps) {
       <div style={{ gridColumn: '1 / -1', marginBottom: 2 }}>
         <canvas
           ref={canvasRef}
+          className="lcd-canvas"
           style={{
             display: 'block',
             width: '100%',
             aspectRatio: '5 / 3',
-            borderRadius: 4,
-            border: '1px solid rgba(255,255,255,0.1)',
-            background: 'rgba(0,0,0,0.3)',
           }}
         />
       </div>

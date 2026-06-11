@@ -77,6 +77,7 @@ type GraphMessage =
   | { type: 'resetTransport' }
   | { type: 'setMasterFxParam'; param: string; value: number }
   | { type: 'watchGol'; moduleIds: string[] }
+  | { type: 'dispose' }
 
 class WasmGraphProcessor extends AudioWorkletProcessor {
   private engine: InstanceType<NonNullable<typeof WasmGraphEngine>> | null = null
@@ -101,6 +102,13 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
   private cpuLoadSamples = 0
   private cpuLoadPeak = 0
   private cpuLoadReportCounter = 0
+  private transportPollCounter = 0
+  /* Quand l'engine recrée son AudioWorkletNode (taps changés), l'ancien node
+     est déconnecté mais un processor qui retourne true VIT POUR TOUJOURS :
+     il continuait à rendre tout le graphe et à poster ses beats/steps sur son
+     ancien port (l'affichage de mesure clignotait entre deux valeurs).
+     'dispose' fait retourner false → le processor meurt vraiment. */
+  private disposed = false
 
   constructor() {
     super()
@@ -109,6 +117,10 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
   }
 
   private queueMessage(message: GraphMessage) {
+    if (message.type === 'dispose') {
+      this.disposed = true
+      return
+    }
     // setGraph is handled immediately (before engine is used in process)
     if (message.type === 'setGraph' || message.type === 'setGraphFresh') {
       if (this.ready && this.engine) {
@@ -284,6 +296,9 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
   }
 
   process(inputs: Float32Array[][], outputs: Float32Array[][]): boolean {
+    if (this.disposed) {
+      return false
+    }
     if (!outputs || outputs.length === 0) {
       return true
     }
@@ -505,10 +520,18 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
       }
     }
 
-    // Report transport position every ~500ms (~190 blocks)
-    if (shouldPoll && this.cpuLoadReportCounter % 24 === 0) {
-      const beats = this.engine.get_transport_beats()
-      this.port.postMessage({ type: 'transportBeats', beats })
+    // Report transport position toutes les ~12 polls (~250ms).
+    // NE PAS gater sur cpuLoadReportCounter : il n'avance que si la mesure
+    // CPU est active et sa phase se décale à chaque stop/start — selon
+    // l'alignement avec le cycle de poll, les beats ne partaient PLUS JAMAIS
+    // (mesure figée après un stop→play).
+    if (shouldPoll) {
+      this.transportPollCounter += 1
+      if (this.transportPollCounter >= 12) {
+        this.transportPollCounter = 0
+        const beats = this.engine.get_transport_beats()
+        this.port.postMessage({ type: 'transportBeats', beats })
+      }
     }
 
     return true

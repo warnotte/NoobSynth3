@@ -8,7 +8,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
 import type { ControlProps } from '../types'
 import { RotaryKnob } from '../../RotaryKnob'
-import { ControlBox, ControlBoxRow } from '../../ControlBox'
+import { ControlBox } from '../../ControlBox'
 import { ControlButtons } from '../../ControlButtons'
 import { ToggleButton } from '../../ToggleButton'
 import { formatInt } from '../../formatters'
@@ -219,18 +219,15 @@ export function GameOfLifeControls({ module, updateParam, engine, status, audioM
   const gridHeight = ROWS * (CELL_SIZE + CELL_GAP) - CELL_GAP
 
   return (
-    <>
+    <div className="gol-panel">
       {/* Grid canvas */}
-      <div style={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'center', marginBottom: 6 }}>
+      <div className="gol-canvas-col">
         <canvas
           ref={canvasRef}
+          className="lcd-canvas"
           width={gridWidth}
           height={gridHeight}
-          style={{
-            cursor: 'crosshair',
-            borderRadius: 4,
-            border: '1px solid rgba(255,255,255,0.1)',
-          }}
+          style={{ cursor: 'crosshair' }}
           onPointerDown={(e) => {
             const cell = getCellFromEvent(e)
             if (cell) {
@@ -254,17 +251,16 @@ export function GameOfLifeControls({ module, updateParam, engine, status, audioM
         />
       </div>
 
+      {/* Contrôles en colonne à droite du canvas (le module est large) */}
+      <div className="gol-controls-col">
       {/* Action buttons */}
-      <ControlBoxRow>
         <ControlBox label="Actions" horizontal>
-          <button className="btn-mini" onClick={handleRandomize}>Random</button>
-          <button className="btn-mini" onClick={handleClear}>Clear</button>
-          <button className="btn-mini" onClick={() => handlePattern('r-pentomino')}>R-pent</button>
+          <button className="ui-btn" onClick={handleRandomize}>Random</button>
+          <button className="ui-btn" onClick={handleClear}>Clear</button>
+          <button className="ui-btn" onClick={() => handlePattern('r-pentomino')}>R-pent</button>
         </ControlBox>
-      </ControlBoxRow>
 
       {/* Parameters */}
-      <ControlBoxRow>
         <ControlBox label="Evolution" horizontal>
           <RotaryKnob
             label="Rate"
@@ -291,10 +287,9 @@ export function GameOfLifeControls({ module, updateParam, engine, status, audioM
             onChange={(v) => updateParam(module.id, 'wrap', v ? 1 : 0)}
           />
         </ControlBox>
-      </ControlBoxRow>
 
       {/* Scale */}
-      <ControlBox label="Scale">
+        <ControlBox label="Scale">
         <ControlButtons
           options={scaleOptions}
           value={scale}
@@ -303,16 +298,17 @@ export function GameOfLifeControls({ module, updateParam, engine, status, audioM
         />
       </ControlBox>
 
-      {scale > 0 && (
-        <ControlBox label="Root">
-          <ControlButtons
-            options={rootOptions}
-            value={root}
-            onChange={(v) => updateParam(module.id, 'root', v)}
-            columns={4}
-          />
-        </ControlBox>
-      )}
-    </>
+        {scale > 0 && (
+          <ControlBox label="Root">
+            <ControlButtons
+              options={rootOptions}
+              value={root}
+              onChange={(v) => updateParam(module.id, 'root', v)}
+              columns={4}
+            />
+          </ControlBox>
+        )}
+      </div>
+    </div>
   )
 }

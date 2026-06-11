@@ -103,6 +103,18 @@ La page est un « instrument hardware » en grille fixe `100vh` (aucun scroll de
 - **Mobile (≤960px)** : une colonne, SidePanel en drawer overlay (FAB au-dessus du bandeau), console compacte, `100dvh`
 - Palette/typo : variables `--cs-*` + `--font-engrave`/`--font-lcd` (section « CONSOLE STEEL SHELL » de `styles.css`)
 
+### Console Steel — Faceplates des modules (phase 3)
+Les modules eux-mêmes adoptent le langage Console Steel — maquette de référence : `design/mockups/faceplates-steel.html` (posée sur la vraie grille 200×120).
+
+- **Faceplate acier uniforme** ; identité par **catégorie** : `data-category` sur `.module-card` (export `moduleCategoryByType` de `moduleRegistry`) pilote le liseré du header, l'arc des knobs, les états actifs des boutons et le glow des LCD. Tokens `--cat-*` (8 catégories) dans `index.css`. Exception : Mario garde sa faceplate rouge (easter egg).
+- **Header v2** : liseré catégorie + nom en Big Shoulders + badge type en mono teinté (masqué ≤170px). Jacks à bague teintée par type de signal (états connected/valid/hover inchangés).
+- **Primitives v2** : RotaryKnob (arc de valeur conic `--ratio`, readout LCD mono), ControlBox (label gravé + filet), boutons/toggles/waves « plastique » à actif lit catégorie — **scopés `.module-card`** car `MixerKnob` réutilise `.rotary-dial` (la console mixer phase 2 reste intacte).
+- **Langage LCD** (`.lcd`, `.lcd-head`, `.lcd-canvas`) pour les displays riches : drawbar bay de l'organ (composant `Drawbar`), grilles step/drum/909/chord/polyrhythm, canvas (scope, granular, sampler, particle, GoL, gravity), displays SID/AY (identité C64 conservée dans le bezel).
+- **Step Seq** : pitch et vélocité = un seul contrôle (jauge + chiffre, drag vertical relatif, tap/clic droit/molette), pitch affiché en notes (réf C4 = pitch 0), labels de rangées Gate/Note/Vel/Slide.
+- **Règle absolue modules riches** : restyler en place, jamais reconstruire — les classes liées au playhead (`.seq-step.playing`, `.dm909-step.playing`…) sont du DOM manipulé par `updatePlayhead`, tout renommage doit synchroniser le JS. Playheads vérifiés en live à chaque vague.
+- **Garde-fous** : `node design/mockups/gallery.mjs` (galerie des 98 modules + scan de débordement) et `check-overflow.mjs` (scan par preset).
+- ⚠️ **Container queries** : un `@container module-card` ne peut pas cibler `.module-card` lui-même — les paliers responsive ciblent `.module-body`.
+
 ### Recording (WAV Export)
 Le bouton Record du TransportConsole (bandeau bas) capture l'audio en WAV 16-bit PCM stéréo :
 - **Capture** : `ScriptProcessorNode` connecté à `MediaStreamAudioDestinationNode` accumule les samples Float32
