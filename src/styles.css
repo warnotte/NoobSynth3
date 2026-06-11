@@ -19,36 +19,6 @@
   padding: 28px 36px 40px;
 }
 
-.topbar-head {
-  display: flex;
-  flex-direction: row;
-  align-items: baseline;
-  gap: 12px;
-}
-
-.topbar-body {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  position: sticky;
-  top: 0;
-  z-index: 1100;
-  padding: 12px 22px;
-  background:
-    linear-gradient(135deg, rgba(45, 55, 72, 0.15) 0%, transparent 50%),
-    linear-gradient(180deg, #1c1c22 0%, #0f0f14 100%);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-top-color: rgba(255, 255, 255, 0.18);
-  border-radius: var(--radius-xl);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
-    0 4px 24px rgba(0, 0, 0, 0.55),
-    0 8px 40px rgba(0, 0, 0, 0.3);
-  overflow: hidden;
-}
-
 /* ── Rack Tabs Bar ── */
 .rack-tabs {
   display: flex;
@@ -689,46 +659,6 @@
   border-color: rgba(240, 176, 107, 0.5);
 }
 
-
-/* Zone layout: left | center | right */
-.topbar-zone {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.topbar-zone--left {
-  flex: 0 0 auto;
-}
-
-.topbar-zone--center {
-  flex: 1 1 auto;
-  justify-content: center;
-}
-
-.topbar-zone--right {
-  flex: 0 0 auto;
-  justify-content: flex-end;
-}
-
-/* Vertical separator between zones */
-.topbar-separator {
-  width: 1px;
-  height: 36px;
-  background: linear-gradient(
-    180deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.12) 20%,
-    rgba(255, 255, 255, 0.12) 80%,
-    transparent 100%
-  );
-}
-
-.status-block {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
 
 .engine-led {
   width: 10px;
@@ -2994,17 +2924,6 @@
   display: none;
 }
 
-/* Subtle shine overlay on sticky bar */
-.topbar-body::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 50%;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, transparent 100%);
-  pointer-events: none;
-}
 
 .panel-section {
   padding: 16px;
@@ -3247,73 +3166,6 @@
   margin-bottom: 8px;
   font-size: var(--text-md);
   color: rgba(230, 134, 134, 0.9);
-}
-
-.tauri-list {
-  display: grid;
-  gap: 6px;
-  margin-top: 6px;
-}
-
-.tauri-select-row {
-  display: grid;
-  grid-template-columns: 60px 1fr;
-  gap: 8px;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.tauri-select {
-  appearance: none;
-  background: var(--glass-3);
-  border: 1px solid rgba(90, 104, 126, 0.6);
-  border-radius: var(--radius-lg);
-  color: rgba(216, 230, 246, 0.9);
-  font-size: var(--text-sm);
-  padding: 6px 8px;
-}
-
-.tauri-select:disabled {
-  opacity: 0.6;
-}
-
-.tauri-item {
-  display: grid;
-  grid-template-columns: 60px 1fr;
-  gap: 8px;
-  font-size: var(--text-md);
-  color: rgba(198, 214, 232, 0.85);
-}
-
-.tauri-label {
-  font-size: var(--text-xs);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: rgba(198, 214, 232, 0.6);
-}
-
-.tauri-value {
-  color: rgba(216, 230, 246, 0.9);
-}
-
-.tauri-device-list {
-  display: grid;
-  gap: 4px;
-  margin: 0 0 6px 4px;
-  font-size: var(--text-sm);
-  color: rgba(198, 214, 232, 0.7);
-}
-
-.tauri-device {
-  position: relative;
-  padding-left: 10px;
-}
-
-.tauri-device::before {
-  content: '-';
-  position: absolute;
-  left: 0;
-  color: rgba(138, 156, 180, 0.7);
 }
 
 .preset-name {
@@ -5915,27 +5767,7 @@ textarea:focus-visible,
 }
 
 @media (max-width: 960px) {
-  /* --- TopBar compact --- */
-  .topbar-body {
-    flex-wrap: wrap;
-    gap: 8px 12px;
-    padding: 8px 14px;
-  }
-
-  .topbar-separator {
-    display: none;
-  }
-
-  .topbar-zone {
-    gap: 8px;
-  }
-
   .action-label {
-    display: none;
-  }
-
-  /* --- Hide header --- */
-  .topbar-head {
     display: none;
   }
 
