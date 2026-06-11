@@ -115,6 +115,16 @@ Les modules eux-mêmes adoptent le langage Console Steel — maquette de référ
 - **Garde-fous** : `node design/mockups/gallery.mjs` (galerie des 98 modules + scan de débordement) et `check-overflow.mjs` (scan par preset).
 - ⚠️ **Container queries** : un `@container module-card` ne peut pas cibler `.module-card` lui-même — les paliers responsive ciblent `.module-body`.
 
+### Console Steel — Mobile (phase 4)
+**Scope assumé : « écouter et montrer »** — charger un preset/projet, play, tweaker quelques knobs. Un modulaire à câbles est un instrument desktop ; PAS de patching tactile ni de redesign par module pour téléphone (décision utilisateur).
+
+- **Portrait** : header du rack sur une ligne, meta masquée. **Paysage** (`max-height: 480px`) : barres minimales, le rack occupe ~75% de l'écran.
+- **`(pointer: coarse)`** : zone de hit des knobs ~44px (::after invisible), `touch-action: manipulation` sur les boutons, piano plus haut (80px inline / 170px popup), popup Keyboard à 2 octaves sous 700px, aide PC masquée.
+- **Scroll interne des modules** au tactile : les unités de grille mobiles (130×92) clippent le contenu (`overflow: hidden`) — en coarse, `.module-controls` scrolle en interne (pas de conflit de gestes : knobs/cellules ont `touch-action: none`).
+- Fix au passage (desktop aussi) : touche de piano qui restait allumée après relâchement (le rendu lisait `currentNoteRef`, une ref ne re-rend pas → état `displayNote` miroir).
+- Outils : `shoot-mobile.mjs` (4 devices), `test-touch.mjs`/`test-touch-piano.mjs` (touch réel via CDP), `check-overflow-mobile.mjs`.
+- Le drawer mobile est volontairement inchangé (fermeture par X/backdrop uniquement).
+
 ### Recording (WAV Export)
 Le bouton Record du TransportConsole (bandeau bas) capture l'audio en WAV 16-bit PCM stéréo :
 - **Capture** : `ScriptProcessorNode` connecté à `MediaStreamAudioDestinationNode` accumule les samples Float32
