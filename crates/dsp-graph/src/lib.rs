@@ -429,12 +429,19 @@ impl GraphEngine {
     }
   }
 
-  /// Seek MIDI file sequencer to a specific tick position
+  /// Seek MIDI file sequencer to a specific tick position.
+  ///
+  /// Le MIDI seq est cloné PAR VOIX de polyphonie (`is_poly_type`) : il faut
+  /// seeker TOUTES les instances. Avec `.first()` seule la voix 0 sautait —
+  /// les autres continuaient depuis l'ancienne position, d'où un mélange
+  /// ancien/nouveau permanent après un drag de la barre de progression.
   pub fn seek_midi_sequencer(&mut self, module_id: &str, tick: u32) {
-    if let Some(index) = self.module_map.get(module_id).and_then(|list| list.first().copied()) {
-      if let Some(module) = self.modules.get_mut(index) {
-        if let ModuleState::MidiFileSequencer(ref mut state) = module.state {
-          state.seq.seek_to_tick(tick);
+    if let Some(indices) = self.module_map.get(module_id).cloned() {
+      for index in indices {
+        if let Some(module) = self.modules.get_mut(index) {
+          if let ModuleState::MidiFileSequencer(ref mut state) = module.state {
+            state.seq.seek_to_tick(tick);
+          }
         }
       }
     }
