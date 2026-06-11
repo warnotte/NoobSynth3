@@ -6516,6 +6516,12 @@ body {
   .rack-tabs-view-switch { margin-right: 10px; }
   .rack-tabs-view-btn { padding: 6px 12px 5px; font-size: 11px; }
 
+  /* rack header : une seule ligne discrète — « PATCH RACK / Audio graph:
+     N modules » prenait jusqu'à 3 lignes sur 320px de large */
+  .rack-header { margin-bottom: 8px; }
+  .rack-title .panel-title { font-size: 0.85rem; letter-spacing: 0.12em; white-space: nowrap; }
+  .rack-meta { display: none; }
+
   /* compact transport console */
   .transport-console { gap: 12px; padding: 0 12px; overflow-x: auto; }
   .tc-label { display: none; }
@@ -6543,6 +6549,60 @@ body {
   .brand-rail-status { display: none; }
   .transport-console { gap: 9px; }
   .tc-pill { padding: 6px 7px 5px; }
+}
+
+/* ── Tactile (pointer: coarse) : cibles élargies, sans changer le visuel ── */
+@media (pointer: coarse) {
+  /* zone de hit du knob étendue à ~44px (le dial fait 24-30px visuels) */
+  .rotary-dial::after {
+    content: '';
+    position: absolute;
+    inset: -10px;
+    border-radius: 50%;
+  }
+  /* pas de délai double-tap / zoom sur les contrôles */
+  button,
+  .ui-btn,
+  .control-btn,
+  .wave-button {
+    touch-action: manipulation;
+  }
+}
+
+/* ── Téléphone en PAYSAGE : barres minimales, le rack prend tout.
+   (max-height seul : aucun desktop ne fait < 480px de haut ; les tablettes
+   paysage dépassent largement) ── */
+@media (max-height: 480px) {
+  .app {
+    height: 100dvh;
+    grid-template-rows: 32px auto minmax(0, 1fr) 52px;
+  }
+  .brand-rail { padding: 0 10px; gap: 8px; }
+  .brand-rail-name { font-size: 14px; }
+  .brand-rail-sub, .brand-rail-serial, .brand-rail-status { display: none; }
+
+  .rack-tabs { padding: 3px 12px 2px; }
+  .rack-tabs-view-btn { padding: 4px 10px 3px; font-size: 10px; }
+
+  /* le header du rack n'apporte rien en paysage : chaque pixel de hauteur compte */
+  .rack-header { display: none; }
+  .rack { margin: 2px 10px 4px; padding: 8px 12px; }
+
+  /* console transport sur une ligne fine */
+  .transport-console { gap: 10px; padding: 0 10px; overflow-x: auto; }
+  .tc-label { display: none; }
+  .tc-section { gap: 6px; }
+  .tc-play { width: 36px; height: 36px; }
+  .tc-glyph-play { border-left-width: 11px; border-top-width: 7px; border-bottom-width: 7px; }
+  .tc-glyph-stop { width: 11px; height: 11px; }
+  .tc-small { width: 28px; height: 28px; }
+  .tc-lcd-input { width: 54px; font-size: 16px; }
+  .tc-lcd--small { min-width: 48px; padding: 2px 6px 1px; }
+  .tc-lcd-value { font-size: 12px; }
+  .tc-vu { height: 22px; }
+  .tc-pill { padding: 4px 7px 3px; font-size: 9px; }
+
+  .side-panel-fab { bottom: 62px; right: 10px; }
 }
 
 
