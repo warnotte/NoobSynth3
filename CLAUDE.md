@@ -513,7 +513,7 @@ Les plans/analyses de features déjà implémentées sont conservés dans [docs/
 - [ ] **Presets de test polyphonie** - Valider comportement avec plusieurs voix
 - [ ] **Presets de test edge cases** - Résonance extrême, feedback, etc.
 - [ ] **Documentation mono/stéréo par module** - Tableau clair dans MODULES.md
-- [ ] **Test Tauri du Sampler (v0.10.0)** - Valider en mode natif standalone : chargement de buffer, auto-load `samplePath` au chargement du preset, et re-upload après (re)start audio natif. La parité Web↔Tauri est construite (`native_load_sampler_buffer`, effet de re-upload) mais pas encore testée par l'utilisateur.
+- [x] **Test Tauri du Sampler (v0.10.0)** - ✅ Validé en standalone le 2026-06-11 (auto-load + re-upload après restart audio natif), en même temps que la mesure de transport native et le seek MIDI poly.
 
 ### UI / UX
 - [ ] **Idée disruptive UI/UX (à venir)** - À faire sur une **nouvelle branche, nouvelle session**. Concept à détailler par l'utilisateur. Refonte/expérimentation UI/UX d'ampleur (pas un simple ajustement).
