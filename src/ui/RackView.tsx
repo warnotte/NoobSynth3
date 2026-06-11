@@ -28,7 +28,7 @@ type RackViewProps = {
   onRackDoubleClick: (event: ReactMouseEvent<HTMLElement>) => void
   onRackClick?: (event: ReactMouseEvent<HTMLElement>) => void
   onRackMouseMove?: (event: ReactMouseEvent<HTMLElement>) => void
-  onRackMouseLeave?: () => void
+  onRackMouseLeave?: (event: ReactMouseEvent<HTMLElement>) => void
   collapsed: boolean
   onToggleCollapsed: () => void
   getModuleGridStyle: (module: ModuleSpec) => CSSProperties

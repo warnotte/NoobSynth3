@@ -541,7 +541,15 @@ export const usePatching = ({ graph, setGraph, rackRef, onGraphChange }: UsePatc
     [findConnectionNearPoint],
   )
 
-  const handleRackMouseLeave = useCallback(() => {
+  const handleRackMouseLeave = useCallback((event: ReactMouseEvent<HTMLElement>) => {
+    /* Les câbles vivent dans un overlay FIXE au-dessus du rack : passer la
+       souris pile sur le trait fait « sortir » du rack → sans ce garde, le
+       hover s'effaçait puis se re-posait à chaque micro-mouvement et le
+       bouton ✂ clignotait. */
+    const next = event.relatedTarget as Element | null
+    if (next && typeof next.closest === 'function' && next.closest('.patch-layer')) {
+      return
+    }
     setHoveredConnection(null)
   }, [])
 
