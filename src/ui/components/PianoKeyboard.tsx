@@ -1,4 +1,4 @@
-import { useCallback, useRef, useEffect } from 'react'
+import { useCallback, useRef, useEffect, useState } from 'react'
 
 type PianoKeyboardProps = {
   /** Number of octaves to display (1-5) */
@@ -72,6 +72,11 @@ export function PianoKeyboard({
 }: PianoKeyboardProps) {
   // Track the currently pressed note (only one at a time for mouse)
   const currentNoteRef = useRef<number | null>(null)
+  /* Miroir d'affichage de currentNoteRef : une ref seule ne déclenche pas de
+     re-render, donc la touche restait allumée après le relâchement (flagrant
+     au tactile où rien d'autre ne re-rend). La ref reste la source synchrone
+     des handlers ; l'état ne sert qu'au rendu. */
+  const [displayNote, setDisplayNote] = useState<number | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const isDragging = useRef(false)
 
@@ -141,6 +146,7 @@ export function PianoKeyboard({
       const note = getNoteAtPoint(event.clientX, event.clientY)
       if (note !== null) {
         currentNoteRef.current = note
+        setDisplayNote(note)
         onKeyDownRef.current(note)
       }
     },
@@ -169,6 +175,7 @@ export function PianoKeyboard({
       }
 
       currentNoteRef.current = note
+      setDisplayNote(note)
     },
     [getNoteAtPoint]
   )
@@ -185,6 +192,7 @@ export function PianoKeyboard({
         onKeyUpRef.current(note)
         currentNoteRef.current = null
       }
+      setDisplayNote(null)
     },
     []
   )
@@ -197,6 +205,7 @@ export function PianoKeyboard({
       onKeyUpRef.current(note)
       currentNoteRef.current = null
     }
+    setDisplayNote(null)
   }, [])
 
   // Calculate widths
@@ -205,8 +214,8 @@ export function PianoKeyboard({
 
   // Merge external active keys with current mouse note
   const displayActiveKeys = new Set(activeKeys)
-  if (currentNoteRef.current !== null) {
-    displayActiveKeys.add(currentNoteRef.current)
+  if (displayNote !== null) {
+    displayActiveKeys.add(displayNote)
   }
 
   return (
@@ -224,7 +233,7 @@ export function PianoKeyboard({
         {whiteKeys.map((key) => (
           <div
             key={key.note}
-            className={`piano-key piano-key--white ${activeKeys.has(key.note) || currentNoteRef.current === key.note ? 'active' : ''}`}
+            className={`piano-key piano-key--white ${displayActiveKeys.has(key.note) ? 'active' : ''}`}
             style={{ width: `${whiteKeyWidth}%` }}
             data-note={key.note}
           />
@@ -238,7 +247,7 @@ export function PianoKeyboard({
           return (
             <div
               key={key.note}
-              className={`piano-key piano-key--black ${activeKeys.has(key.note) || currentNoteRef.current === key.note ? 'active' : ''}`}
+              className={`piano-key piano-key--black ${displayActiveKeys.has(key.note) ? 'active' : ''}`}
               style={{
                 left: `${leftPercent}%`,
                 width: `${blackKeyWidth}%`,

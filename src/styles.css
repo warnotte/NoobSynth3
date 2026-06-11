@@ -6567,6 +6567,22 @@ body {
   .wave-button {
     touch-action: manipulation;
   }
+
+  /* clavier piano : des touches plus hautes pardonnent beaucoup au doigt
+     (la largeur est contrainte par le module, la hauteur non) */
+  .piano-keyboard {
+    height: 80px;
+  }
+  .piano-keyboard--compact {
+    height: 64px;
+  }
+  .keyboard-popup-piano .piano-keyboard {
+    height: 170px;
+  }
+  /* l'aide-mémoire des touches PC n'a pas de sens au tactile */
+  .keyboard-popup-hint {
+    display: none;
+  }
 }
 
 /* ── Téléphone en PAYSAGE : barres minimales, le rack prend tout.
