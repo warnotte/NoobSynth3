@@ -46,6 +46,13 @@ export const usePatching = ({ graph, setGraph, rackRef, onGraphChange }: UsePatc
   const [dragTargets, setDragTargets] = useState<Set<string> | null>(null)
   const [hoverTargetKey, setHoverTargetKey] = useState<string | null>(null)
   const [hoveredConnection, setHoveredConnection] = useState<Connection | null>(null)
+  /* Demande de déconnexion en attente de confirmation (ciseaux, dbl-clic,
+     alt-clic) — l'UI affiche un petit menu Débrancher/Annuler à (x, y) */
+  const [pendingDisconnect, setPendingDisconnect] = useState<{
+    connection: Connection
+    x: number
+    y: number
+  } | null>(null)
   const dragRef = useRef<DragState | null>(null)
   const hoverRafRef = useRef(0)
 
@@ -504,17 +511,30 @@ export const usePatching = ({ graph, setGraph, rackRef, onGraphChange }: UsePatc
     [graph.connections, portPositions],
   )
 
+  const confirmDisconnect = useCallback(() => {
+    setPendingDisconnect((pending) => {
+      if (pending) {
+        removeConnection(pending.connection)
+      }
+      return null
+    })
+    setHoveredConnection(null)
+  }, [removeConnection])
+
+  const cancelDisconnect = useCallback(() => {
+    setPendingDisconnect(null)
+  }, [])
+
   const handleRackDoubleClick = useCallback(
     (event: ReactMouseEvent<HTMLElement>) => {
       const point = { x: event.clientX, y: event.clientY }
       const target = findConnectionNearPoint(point)
       if (target) {
-        removeConnection(target)
+        setPendingDisconnect({ connection: target, x: event.clientX, y: event.clientY })
         setSelectedPort(null)
-        setHoveredConnection(null)
       }
     },
-    [findConnectionNearPoint, removeConnection],
+    [findConnectionNearPoint],
   )
 
   /* ── Déconnexion découvrable (desktop) ──
@@ -560,11 +580,10 @@ export const usePatching = ({ graph, setGraph, rackRef, onGraphChange }: UsePatc
       }
       const target = findConnectionNearPoint({ x: event.clientX, y: event.clientY }, 12)
       if (target) {
-        removeConnection(target)
-        setHoveredConnection(null)
+        setPendingDisconnect({ connection: target, x: event.clientX, y: event.clientY })
       }
     },
-    [findConnectionNearPoint, removeConnection],
+    [findConnectionNearPoint],
   )
 
   const renderCable = useCallback(
@@ -591,18 +610,16 @@ export const usePatching = ({ graph, setGraph, rackRef, onGraphChange }: UsePatc
           onMouseEnter={() => setHoveredConnection(connection)}
           onClick={(event) => {
             if (event.altKey) {
-              removeConnection(connection)
-              setHoveredConnection(null)
+              setPendingDisconnect({ connection, x: event.clientX, y: event.clientY })
             }
           }}
-          onDoubleClick={() => {
-            removeConnection(connection)
-            setHoveredConnection(null)
+          onDoubleClick={(event) => {
+            setPendingDisconnect({ connection, x: event.clientX, y: event.clientY })
           }}
         />
       )
     },
-    [portPositions, hoveredConnection, removeConnection],
+    [portPositions, hoveredConnection],
   )
 
   /* Bouton ✂ au milieu du câble survolé — seul élément cliquable du
@@ -624,8 +641,7 @@ export const usePatching = ({ graph, setGraph, rackRef, onGraphChange }: UsePatc
         transform={`translate(${mid.x} ${mid.y})`}
         onClick={(event) => {
           event.stopPropagation()
-          removeConnection(hoveredConnection)
-          setHoveredConnection(null)
+          setPendingDisconnect({ connection: hoveredConnection, x: event.clientX, y: event.clientY })
         }}
       >
         <title>Débrancher ce câble</title>
@@ -641,7 +657,7 @@ export const usePatching = ({ graph, setGraph, rackRef, onGraphChange }: UsePatc
         </g>
       </g>
     )
-  }, [hoveredConnection, portPositions, removeConnection])
+  }, [hoveredConnection, portPositions])
 
   const renderGhostCable = useCallback((): ReactNode => {
     if (!ghostCable) {
@@ -658,6 +674,8 @@ export const usePatching = ({ graph, setGraph, rackRef, onGraphChange }: UsePatc
   }, [ghostCable])
 
   return {
+    cancelDisconnect,
+    confirmDisconnect,
     connectedInputs,
     dragTargets,
     handlePortPointerDown,
@@ -666,6 +684,7 @@ export const usePatching = ({ graph, setGraph, rackRef, onGraphChange }: UsePatc
     handleRackMouseLeave,
     handleRackMouseMove,
     hoverTargetKey,
+    pendingDisconnect,
     removeConnection,
     renderCable,
     renderCableOverlay,

@@ -280,6 +280,8 @@ function App() {
     lastSignature: string | null
   }>({ timer: null, lastSignature: null })
   const {
+    cancelDisconnect,
+    confirmDisconnect,
     connectedInputs,
     dragTargets,
     handlePortPointerDown,
@@ -288,6 +290,7 @@ function App() {
     handleRackMouseLeave,
     handleRackMouseMove,
     hoverTargetKey,
+    pendingDisconnect,
     removeConnection,
     renderCable,
     renderCableOverlay,
@@ -2414,6 +2417,22 @@ function App() {
           actions={getPortMenuActions()}
           onAction={handlePortMenuAction}
           onClose={() => setPortMenu(null)}
+        />
+      )}
+      {pendingDisconnect && (
+        <ContextMenu
+          x={pendingDisconnect.x}
+          y={pendingDisconnect.y}
+          actions={[
+            { id: 'confirm', label: 'Débrancher ce câble', danger: true },
+            { id: 'cancel', label: 'Annuler' },
+          ]}
+          onAction={(actionId) => {
+            if (actionId === 'confirm') {
+              confirmDisconnect()
+            }
+          }}
+          onClose={cancelDisconnect}
         />
       )}
     </div>

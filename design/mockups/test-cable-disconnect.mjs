@@ -1,12 +1,13 @@
 import { chromium } from 'playwright'
 
+// Déconnexion des câbles : chaque geste rapide (ciseaux, alt-clic, dbl-clic)
+// ouvre une CONFIRMATION Débrancher/Annuler ; le menu de jack reste direct.
 const browser = await chromium.launch()
 const page = await browser.newPage({ viewport: { width: 1680, height: 1000 } })
 await page.goto('http://localhost:5173/?preset=hammond-leslie')
 await page.waitForTimeout(3500)
 
 const cableCount = () => page.locator('path.patch-cable:not(.ghost)').count()
-// point au milieu de la courbe du premier câble (coordonnées client = user units, viewBox 1:1)
 const midOfFirstCable = () =>
   page.evaluate(() => {
     const p = document.querySelector('path.patch-cable:not(.ghost)')
@@ -14,50 +15,58 @@ const midOfFirstCable = () =>
     const m = p.getPointAtLength(p.getTotalLength() / 2)
     return { x: m.x, y: m.y }
   })
+const confirmItem = () => page.locator('.context-menu-item', { hasText: 'Débrancher ce câble' })
 
 const n0 = await cableCount()
 
-// 1) survol du câble → highlight + chip ✂ → clic = débranché
+// 1) ciseaux → confirmation → Débrancher
 let mid = await midOfFirstCable()
 await page.mouse.move(mid.x, mid.y)
 await page.waitForTimeout(300)
-const hovered = await page.locator('path.patch-cable.hovered').count()
-const chipVisible = await page.locator('.cable-cut').count()
 await page.locator('.cable-cut').click()
+await page.waitForTimeout(200)
+const confirmShown = await confirmItem().count()
+await confirmItem().click()
 await page.waitForTimeout(300)
 const n1 = await cableCount()
 
-// 2) alt-clic sur le câble suivant = débranché
+// 2) ciseaux → Annuler = rien coupé
+mid = await midOfFirstCable()
+await page.mouse.move(mid.x, mid.y)
+await page.waitForTimeout(300)
+await page.locator('.cable-cut').click()
+await page.waitForTimeout(200)
+await page.locator('.context-menu-item', { hasText: 'Annuler' }).click()
+await page.waitForTimeout(300)
+const n2 = await cableCount()
+
+// 3) alt-clic → confirmation → Débrancher
 mid = await midOfFirstCable()
 await page.mouse.move(mid.x, mid.y)
 await page.waitForTimeout(200)
 await page.keyboard.down('Alt')
 await page.mouse.click(mid.x, mid.y)
 await page.keyboard.up('Alt')
+await page.waitForTimeout(200)
+await confirmItem().click()
 await page.waitForTimeout(300)
-const n2 = await cableCount()
+const n3 = await cableCount()
 
-// 3) clic droit sur un jack de SORTIE connecté → menu → débrancher
-const outJack = page.locator('.jack[data-port-direction="out"]').first()
-await outJack.click({ button: 'right' })
+// 4) dbl-clic → confirmation → Échap = rien coupé
+mid = await midOfFirstCable()
+await page.mouse.dblclick(mid.x, mid.y)
+await page.waitForTimeout(200)
+const dblConfirmShown = await confirmItem().count()
+await page.keyboard.press('Escape')
 await page.waitForTimeout(300)
-const menuItems = await page.locator('.context-menu-item').allTextContents()
-const cutItem = page.locator('.context-menu-item', { hasText: 'Débrancher' }).first()
-let n3 = n2
-if ((await cutItem.count()) > 0) {
-  await cutItem.click()
-  await page.waitForTimeout(300)
-  n3 = await cableCount()
-} else {
-  await page.keyboard.press('Escape')
-}
-
-// 4) undo ramène les câbles
-await page.keyboard.press('Control+z')
-await page.keyboard.press('Control+z')
-await page.keyboard.press('Control+z')
-await page.waitForTimeout(400)
 const n4 = await cableCount()
 
-console.log(JSON.stringify({ n0, hovered, chipVisible, n1, n2, menuItems, n3, n4 }))
+// 5) menu de jack (direct, pas de double confirmation)
+const jack = page.locator('.module-card[data-module-type="pipe-organ"] .jack[data-port-direction="out"]').first()
+await jack.click({ button: 'right' })
+await page.waitForTimeout(200)
+const jackItems = await page.locator('.context-menu-item').allTextContents()
+await page.keyboard.press('Escape')
+
+console.log(JSON.stringify({ n0, confirmShown, n1, n2, n3, dblConfirmShown, n4, jackItems }))
 await browser.close()
