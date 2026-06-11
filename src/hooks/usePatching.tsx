@@ -629,9 +629,16 @@ export const usePatching = ({ graph, setGraph, rackRef, onGraphChange }: UsePatc
         }}
       >
         <title>Débrancher ce câble</title>
-        <circle r="9" className="cable-cut-bg" />
-        <line x1="-3.5" y1="-3.5" x2="3.5" y2="3.5" />
-        <line x1="-3.5" y1="3.5" x2="3.5" y2="-3.5" />
+        <circle r="10" className="cable-cut-bg" />
+        {/* ciseaux : deux lames croisées + anneaux (dessinés, pas le caractère
+            ✂ dont le rendu dépend de la police) */}
+        <g className="cable-cut-icon">
+          <line x1="-2.8" y1="3.2" x2="3" y2="-4.4" />
+          <line x1="2.8" y1="3.2" x2="-3" y2="-4.4" />
+          <circle cx="-3.8" cy="4.4" r="1.7" />
+          <circle cx="3.8" cy="4.4" r="1.7" />
+          <circle cx="0" cy="-0.4" r="0.9" className="cable-cut-pivot" />
+        </g>
       </g>
     )
   }, [hoveredConnection, portPositions, removeConnection])
