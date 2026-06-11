@@ -441,6 +441,8 @@ Presets dans `public/presets/`, structure `{ id, name, description, group, graph
 | SID/AY muets après (re)start audio natif | Le fichier chargé en UI n'était pas présent dans le moteur natif recréé au start | Re-upload du fichier SID/AY dans le moteur natif au démarrage audio (`loadSidFile`/`loadYmFile` du `nativeChiptuneBridge`) |
 | Container queries modules MORTES depuis toujours | `@container module-card { .module-card {...} }` — un container query ne peut pas matcher son propre container → les paliers responsive (dial-size, etc.) ne s'appliquaient jamais | Cibler `.module-body` (descendant) ; les custom properties héritent vers les contrôles |
 | Spectral Swarm : knobs ATK/REL inaccessibles | Module 2x3 trop petit pour son contenu, bas coupé par `overflow: hidden` (+162px) — découvert par la galerie 98 modules | Tailles registry revues (swarm 3x4, shepard 3x3, arpeggiator 3x5, audio-in 1x2) ; `layoutGraph` reflow les presets au chargement |
+| Mesure transport figée après stop→play | Report des beats gated sur `cpuLoadReportCounter % 24` — phase décalée à chaque stop/start vs le cycle de poll → plus aucun message | Compteur dédié `transportPollCounter` (~250ms), indépendant du CPU |
+| Mesure qui oscille entre deux valeurs (+ CPU gaspillé) | `loadGraph` recréait l'AudioWorkletNode sans tuer l'ancien : un processor qui retourne `true` **survit à `disconnect()`** — l'ancien moteur rendait tout le graphe et postait beats/steps sur son port encore écouté | Message `dispose` (process() → false) + `destroyGraphNode()` détache `onmessage` avant de déconnecter |
 
 ---
 
