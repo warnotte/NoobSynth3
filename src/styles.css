@@ -1284,7 +1284,10 @@
 }
 
 .rack::after {
-  bottom: 0;
+  /* PAS de bottom: 0 — .rack scrolle en interne (Console Steel), un bottom: 0
+     absolu collerait la barre au bas de la zone NON scrollée (elle flotte au
+     milieu dès qu'on scrolle). Sans top/bottom, la position statique place la
+     barre après le dernier module = vrai bas du contenu. */
   border-radius: 0 0 8px 8px;
   background:
     linear-gradient(180deg,
