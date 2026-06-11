@@ -1453,6 +1453,10 @@
 @container module-card (max-width: 210px) {
   .module-body {
     --control-min: 40px;
+    --dial-size: 24px;
+    --dial-center-inset: 6px;
+    --dial-indicator-height: 5px;
+    --dial-indicator-offset: -8px;
   }
 }
 

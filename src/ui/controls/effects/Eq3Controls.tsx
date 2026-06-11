@@ -11,7 +11,7 @@ export function Eq3Controls({ module, updateParam }: ControlProps) {
   const fmtGain = (v: number) => { const s = v.toFixed(1); return v > 0 ? `+${s}` : s }
   return (
     <ControlBoxRow>
-      <ControlBox label="Low">
+      <ControlBox label="Low" horizontal>
         <RotaryKnob
           label="Gain"
           min={-12}
@@ -33,7 +33,7 @@ export function Eq3Controls({ module, updateParam }: ControlProps) {
           format={formatInt}
         />
       </ControlBox>
-      <ControlBox label="Mid">
+      <ControlBox label="Mid" horizontal>
         <RotaryKnob
           label="Gain"
           min={-12}
@@ -64,7 +64,7 @@ export function Eq3Controls({ module, updateParam }: ControlProps) {
           format={formatDecimal1}
         />
       </ControlBox>
-      <ControlBox label="High">
+      <ControlBox label="High" horizontal>
         <RotaryKnob
           label="Gain"
           min={-12}
