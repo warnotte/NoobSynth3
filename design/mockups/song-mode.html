@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>NoobSynth — SONG mode (arrangement timeline) — mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --font-ui: 'Sora', 'Segoe UI', sans-serif;
+    --font-lcd: 'Share Tech Mono', monospace;
+    --bg-0: #0a0c10;
+    --bg-1: #0f1319;
+    --steel-0: #161c23;
+    --steel-1: #1f2832;
+    --steel-2: #2a3644;
+    --border-soft: rgba(255,255,255,0.08);
+    --border-strong: rgba(255,255,255,0.18);
+    --text-strong: #f2f6fb;
+    --text-muted: rgba(214,224,238,0.72);
+    --text-dim: rgba(214,224,238,0.45);
+    --accent-cool: #5bb6ff;
+    --accent-mint: #42e2b1;
+    --accent-warm: #f0b06b;
+    --accent-rose: #ff6fae;
+    --cat-seq: #f0b06b;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    background:
+      radial-gradient(1100px 480px at 50% -12%, rgba(91,182,255,0.06), transparent 60%),
+      linear-gradient(180deg, var(--bg-1) 0%, var(--bg-0) 100%);
+    color: var(--text-strong);
+    font-family: var(--font-ui);
+    overflow: hidden;
+    display: grid;
+    grid-template-rows: 44px 46px 1fr 58px;
+    height: 100vh;
+  }
+
+  /* ── Brand rail ── */
+  .brand-rail {
+    display: flex; align-items: center; gap: 18px; padding: 0 22px;
+    background: linear-gradient(180deg, var(--steel-1), var(--steel-0));
+    border-bottom: 1px solid #000;
+    box-shadow: inset 0 1px 0 var(--border-soft);
+  }
+  .brand-name { font-weight: 600; font-size: 15px; letter-spacing: 0.18em; }
+  .brand-name em { font-style: normal; color: var(--accent-mint); }
+  .led { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-mint); box-shadow: 0 0 8px var(--accent-mint); }
+  .rail-right { margin-left: auto; font-family: var(--font-lcd); font-size: 10px; color: var(--text-dim); letter-spacing: 0.12em; }
+
+  /* ── Tabs row : view rocker + song strip ── */
+  .tabs-row {
+    display: flex; align-items: center; gap: 14px; padding: 0 22px;
+    background: linear-gradient(180deg, var(--steel-0), #10151b);
+    border-bottom: 1px solid #000;
+  }
+  .view-switch {
+    display: flex; border: 1px solid #05070a; border-radius: 6px; overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.55), inset 0 1px 0 var(--border-soft);
+  }
+  .view-btn {
+    font-family: var(--font-ui); font-size: 10px; font-weight: 600; letter-spacing: 0.22em;
+    padding: 7px 15px 6px; color: var(--text-dim);
+    background: linear-gradient(180deg, #232d38, #151b22); border: none;
+  }
+  .view-btn + .view-btn { border-left: 1px solid #05070a; }
+  .view-btn.on {
+    color: #0b1115;
+    background: linear-gradient(180deg, #ffd9a0, #d99a4e);
+    box-shadow: inset 0 1px 1px rgba(255,240,215,0.65), 0 0 10px rgba(240,176,107,0.35);
+  }
+  .scribble {
+    font-family: var(--font-lcd); font-size: 11px; letter-spacing: 0.16em; color: #1d1508;
+    padding: 4px 16px 3px; border-radius: 2px 5px 2px 2px;
+    background: linear-gradient(180deg, #efe3c0, #cdbd93);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.5); transform: rotate(-0.4deg);
+  }
+  .tabs-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+  .sw {
+    font-size: 9px; font-weight: 600; letter-spacing: 0.16em; padding: 5px 11px 4px;
+    border-radius: 4px; border: 1px solid #05070a; color: var(--text-dim);
+    background: linear-gradient(180deg, #232d38, #151b22);
+    box-shadow: inset 0 1px 0 var(--border-soft);
+  }
+  .sw.on { color: var(--accent-mint); text-shadow: 0 0 6px var(--accent-mint); border-color: rgba(66,226,177,0.4); }
+  .sw.add { color: var(--accent-warm); }
+
+  /* ── Song zone ── */
+  .song-zone { min-height: 0; padding: 14px 22px 10px; display: flex; flex-direction: column; gap: 10px; }
+  .timeline {
+    flex: none; position: relative;
+    display: grid;
+    grid-template-columns: 118px 1fr;
+    grid-auto-rows: min-content;
+    gap: 6px 10px;
+    background: linear-gradient(180deg, var(--steel-1), var(--steel-0));
+    border: 1px solid #05070a; border-radius: 10px;
+    box-shadow: 0 14px 30px rgba(0,0,0,0.5), inset 0 1px 0 var(--border-soft);
+    padding: 12px 14px 14px;
+  }
+  .row-label {
+    align-self: stretch; display: flex; align-items: center; justify-content: flex-end; gap: 8px;
+    font-size: 9px; font-weight: 600; letter-spacing: 0.2em; color: var(--text-muted);
+    text-transform: uppercase; padding-right: 2px; text-align: right;
+  }
+  .row-label .mled {
+    width: 7px; height: 7px; border-radius: 50%; background: #2a3644; box-shadow: inset 0 1px 2px #000;
+    flex: none;
+  }
+  .row-label .mled.on { background: var(--accent-mint); box-shadow: 0 0 6px var(--accent-mint); }
+
+  /* sections ruler — widths proportional to bar counts 8/8/16/8/16/8 */
+  .cells { display: grid; grid-template-columns: 8fr 8fr 16fr 8fr 16fr 8fr; gap: 4px; min-width: 0; }
+
+  .section-chip {
+    position: relative; text-align: center; padding: 7px 4px 6px;
+    font-size: 10px; font-weight: 600; letter-spacing: 0.24em; color: #0b1115;
+    background: linear-gradient(180deg, #f4c98b, #c98d45);
+    border: 1px solid #06080b; border-radius: 5px;
+    box-shadow: inset 0 1px 1px rgba(255,240,215,0.55), 0 2px 5px rgba(0,0,0,0.45);
+  }
+  .section-chip .bars {
+    display: block; font-family: var(--font-lcd); font-size: 8px; letter-spacing: 0.14em;
+    color: rgba(11,17,21,0.72); margin-top: 1px;
+  }
+  .section-chip.dim { background: linear-gradient(180deg, #3a4652, #232c36); color: var(--text-muted); box-shadow: inset 0 1px 0 var(--border-soft); }
+  .section-chip.dim .bars { color: var(--text-dim); }
+  .section-chip.playing { outline: 1px solid var(--accent-warm); box-shadow: 0 0 14px rgba(240,176,107,0.5), inset 0 1px 1px rgba(255,240,215,0.55); }
+
+  .measure-ruler {
+    display: grid; grid-template-columns: 8fr 8fr 16fr 8fr 16fr 8fr; gap: 4px;
+    font-family: var(--font-lcd); font-size: 8.5px; color: var(--text-dim); letter-spacing: 0.1em;
+  }
+  .measure-ruler span { border-left: 1px solid var(--border-soft); padding-left: 4px; }
+
+  /* rack lanes — LCD language */
+  .lane { min-width: 0; }
+  .lane .cells { height: 46px; }
+  .cell {
+    --glow: var(--accent-mint);
+    position: relative; border-radius: 5px; overflow: hidden;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.04), transparent 30%),
+      repeating-linear-gradient(0deg, rgba(0,0,0,0.22) 0 1px, transparent 1px 3px),
+      radial-gradient(120% 130% at 50% 0%, #10171c 0%, #0a0f13 70%);
+    border: 1px solid rgba(0,0,0,0.9);
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.8), inset 0 0 18px rgba(66,226,177,0.05), 0 1px 0 rgba(255,255,255,0.05);
+  }
+  .cell .fill {
+    position: absolute; left: 0; right: 0; bottom: 0; height: calc(var(--lvl) * 1%);
+    background: linear-gradient(180deg, color-mix(in srgb, var(--glow) 85%, #fff) 0%, color-mix(in srgb, var(--glow) 45%, #06231a) 100%);
+    opacity: 0.9; box-shadow: 0 0 10px color-mix(in srgb, var(--glow) 45%, transparent);
+  }
+  .cell .fill.ramp-up { clip-path: polygon(0 100%, 100% 0, 100% 100%); height: calc(var(--lvl) * 1%); }
+  .cell .fill.ramp-down { clip-path: polygon(0 0, 100% 100%, 0 100%); height: calc(var(--lvl) * 1%); }
+  .cell .db {
+    position: absolute; top: 3px; right: 5px; font-family: var(--font-lcd); font-size: 8px;
+    color: color-mix(in srgb, var(--glow) 80%, #fff); text-shadow: 0 0 5px var(--glow); letter-spacing: 0.08em;
+  }
+  .cell.mute {
+    background:
+      repeating-linear-gradient(45deg, rgba(255,255,255,0.03) 0 4px, transparent 4px 9px),
+      radial-gradient(120% 130% at 50% 0%, #0d1216 0%, #080c0f 70%);
+  }
+  .cell.mute .db { color: var(--text-dim); text-shadow: none; }
+  .lane.lead .cell { --glow: var(--accent-cool); }
+  .lane.pads .cell { --glow: #d98cff; }
+  .lane.bass .cell { --glow: var(--accent-mint); }
+  .lane.drums .cell { --glow: #ff7a66; }
+
+  /* automation lanes */
+  .auto-lane .cells { display: block; height: 40px; }
+  .auto-lcd {
+    height: 100%; border-radius: 5px; position: relative; overflow: hidden;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.04), transparent 30%),
+      repeating-linear-gradient(0deg, rgba(0,0,0,0.22) 0 1px, transparent 1px 3px),
+      radial-gradient(120% 130% at 50% 0%, #10171c 0%, #0a0f13 70%);
+    border: 1px solid rgba(0,0,0,0.9);
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.05);
+  }
+  .auto-lcd svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .auto-lcd .tag {
+    position: absolute; top: 3px; left: 7px; font-family: var(--font-lcd); font-size: 8px;
+    letter-spacing: 0.12em; color: var(--text-dim);
+  }
+  .row-label.auto { color: var(--text-dim); font-weight: 500; letter-spacing: 0.14em; }
+  .row-label .param { color: var(--accent-mint); }
+
+  /* playhead spanning all lanes */
+  .playhead {
+    position: absolute; top: 12px; bottom: 14px;
+    left: calc(142px + (100% - 156px) * 0.317);
+    width: 2px; border-radius: 2px;
+    background: var(--accent-rose);
+    box-shadow: 0 0 10px var(--accent-rose), 0 0 24px rgba(255,111,174,0.5);
+    pointer-events: none;
+  }
+  .playhead::before {
+    content: ''; position: absolute; top: -1px; left: 50%; transform: translateX(-50%);
+    border: 5px solid transparent; border-top-color: var(--accent-rose);
+  }
+
+  /* legend */
+  .legend {
+    display: flex; gap: 22px; align-items: center; padding: 0 4px;
+    font-size: 9px; letter-spacing: 0.14em; color: var(--text-dim); text-transform: uppercase;
+  }
+  .legend .k { display: inline-flex; align-items: center; gap: 6px; }
+  .legend .swatch { width: 16px; height: 9px; border-radius: 2px; border: 1px solid rgba(0,0,0,0.8); }
+  .legend .swatch.on { background: linear-gradient(180deg, #7af2c8, #1f9c78); box-shadow: 0 0 6px rgba(66,226,177,0.6); }
+  .legend .swatch.rampsw { background: linear-gradient(135deg, transparent 48%, #7af2c8 50%); }
+  .legend .swatch.mutesw { background: repeating-linear-gradient(45deg, rgba(255,255,255,0.09) 0 3px, transparent 3px 7px), #0a0f13; }
+
+  /* ── Transport console ── */
+  .transport {
+    display: flex; align-items: center; gap: 16px; padding: 0 22px;
+    background: linear-gradient(180deg, var(--steel-1), var(--steel-0));
+    border-top: 1px solid #000; box-shadow: inset 0 1px 0 var(--border-soft);
+  }
+  .t-btn {
+    width: 34px; height: 34px; border-radius: 50%;
+    border: 1px solid #05070a; background: radial-gradient(circle at 34% 30%, #33404e, #141a21 75%);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.6), inset 0 1px 1px var(--border-soft);
+    display: grid; place-items: center; color: var(--text-muted); font-size: 12px;
+  }
+  .t-btn.play { color: var(--accent-mint); text-shadow: 0 0 8px var(--accent-mint); border-color: rgba(66,226,177,0.4); }
+  .t-lcd {
+    font-family: var(--font-lcd); font-size: 12px; letter-spacing: 0.12em;
+    color: var(--accent-mint); text-shadow: 0 0 7px rgba(66,226,177,0.6);
+    background: radial-gradient(120% 130% at 50% 0%, #10171c 0%, #0a0f13 70%);
+    border: 1px solid rgba(0,0,0,0.9); border-radius: 5px; padding: 7px 13px 6px;
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.8);
+  }
+  .t-lcd .lbl { color: var(--text-dim); text-shadow: none; font-size: 9px; margin-right: 7px; }
+  .t-lcd.song { color: var(--accent-warm); text-shadow: 0 0 7px rgba(240,176,107,0.55); }
+  .t-right { margin-left: auto; display: flex; gap: 10px; }
+</style>
+</head>
+<body>
+
+  <div class="brand-rail">
+    <span class="led"></span>
+    <span class="brand-name">NOOB<em>SYNTH</em></span>
+    <span class="rail-right">WEB &middot; 48 kHz &middot; DSP 27%</span>
+  </div>
+
+  <div class="tabs-row">
+    <div class="view-switch">
+      <button class="view-btn">RACKS</button>
+      <button class="view-btn">MIXER</button>
+      <button class="view-btn on">SONG</button>
+    </div>
+    <span class="scribble">CAPITULATION</span>
+    <div class="tabs-right">
+      <button class="sw on">LOOP</button>
+      <button class="sw on">FOLLOW</button>
+      <button class="sw add">+ SECTION</button>
+    </div>
+  </div>
+
+  <div class="song-zone">
+    <div class="timeline">
+
+      <div class="row-label" style="color:var(--accent-warm)">SECTIONS</div>
+      <div class="cells">
+        <div class="section-chip dim">INTRO<span class="bars">8 MES</span></div>
+        <div class="section-chip dim">BUILD<span class="bars">8 MES</span></div>
+        <div class="section-chip playing">DROP<span class="bars">16 MES</span></div>
+        <div class="section-chip dim">BREAK<span class="bars">8 MES</span></div>
+        <div class="section-chip dim">DROP II<span class="bars">16 MES</span></div>
+        <div class="section-chip dim">OUTRO<span class="bars">8 MES</span></div>
+      </div>
+
+      <div class="row-label"></div>
+      <div class="measure-ruler">
+        <span>1</span><span>9</span><span>17</span><span>33</span><span>41</span><span>57</span>
+      </div>
+
+      <div class="row-label lane-label"><span class="mled on"></span>LEAD</div>
+      <div class="lane lead"><div class="cells">
+        <div class="cell mute"><span class="db">M</span></div>
+        <div class="cell"><div class="fill" style="--lvl:55"></div><span class="db">-9</span></div>
+        <div class="cell"><div class="fill" style="--lvl:92"></div><span class="db">0</span></div>
+        <div class="cell"><div class="fill" style="--lvl:38"></div><span class="db">-14</span></div>
+        <div class="cell"><div class="fill" style="--lvl:92"></div><span class="db">0</span></div>
+        <div class="cell"><div class="fill ramp-down" style="--lvl:70"></div><span class="db">&#8600;</span></div>
+      </div></div>
+
+      <div class="row-label lane-label"><span class="mled on"></span>PADS</div>
+      <div class="lane pads"><div class="cells">
+        <div class="cell"><div class="fill" style="--lvl:70"></div><span class="db">-5</span></div>
+        <div class="cell"><div class="fill" style="--lvl:80"></div><span class="db">-3</span></div>
+        <div class="cell"><div class="fill" style="--lvl:58"></div><span class="db">-8</span></div>
+        <div class="cell"><div class="fill" style="--lvl:90"></div><span class="db">-1</span></div>
+        <div class="cell"><div class="fill" style="--lvl:58"></div><span class="db">-8</span></div>
+        <div class="cell"><div class="fill ramp-down" style="--lvl:70"></div><span class="db">&#8600;</span></div>
+      </div></div>
+
+      <div class="row-label lane-label"><span class="mled on"></span>BASSE</div>
+      <div class="lane bass"><div class="cells">
+        <div class="cell mute"><span class="db">M</span></div>
+        <div class="cell"><div class="fill ramp-up" style="--lvl:78"></div><span class="db">&#8599;</span></div>
+        <div class="cell"><div class="fill" style="--lvl:86"></div><span class="db">-2</span></div>
+        <div class="cell mute"><span class="db">M</span></div>
+        <div class="cell"><div class="fill" style="--lvl:86"></div><span class="db">-2</span></div>
+        <div class="cell mute"><span class="db">M</span></div>
+      </div></div>
+
+      <div class="row-label lane-label"><span class="mled on"></span>RYTHME</div>
+      <div class="lane drums"><div class="cells">
+        <div class="cell mute"><span class="db">M</span></div>
+        <div class="cell"><div class="fill ramp-up" style="--lvl:95"></div><span class="db">&#8599;</span></div>
+        <div class="cell"><div class="fill" style="--lvl:96"></div><span class="db">0</span></div>
+        <div class="cell mute"><span class="db">M</span></div>
+        <div class="cell"><div class="fill" style="--lvl:96"></div><span class="db">0</span></div>
+        <div class="cell mute"><span class="db">M</span></div>
+      </div></div>
+
+      <div class="row-label auto">PADS &middot; <span class="param">VCF CUTOFF</span></div>
+      <div class="auto-lane"><div class="cells"><div class="auto-lcd">
+        <span class="tag">AUTOMATION</span>
+        <svg viewBox="0 0 640 40" preserveAspectRatio="none">
+          <polyline points="0,30 84,29 168,10 328,8 332,26 412,24 416,8 576,9 640,32"
+            fill="none" stroke="#42e2b1" stroke-width="1.6"
+            style="filter: drop-shadow(0 0 4px rgba(66,226,177,0.8))"/>
+          <polyline points="0,30 84,29 168,10 328,8 332,26 412,24 416,8 576,9 640,32 640,40 0,40"
+            fill="rgba(66,226,177,0.10)" stroke="none"/>
+        </svg>
+      </div></div></div>
+
+      <div class="row-label auto">MASTER &middot; <span class="param">VOLUME</span></div>
+      <div class="auto-lane"><div class="cells"><div class="auto-lcd">
+        <span class="tag">AUTOMATION</span>
+        <svg viewBox="0 0 640 40" preserveAspectRatio="none">
+          <polyline points="0,22 84,16 168,12 416,12 576,12 610,20 640,36"
+            fill="none" stroke="#5bb6ff" stroke-width="1.6"
+            style="filter: drop-shadow(0 0 4px rgba(91,182,255,0.8))"/>
+        </svg>
+      </div></div></div>
+
+      <div class="playhead"></div>
+    </div>
+
+    <div class="legend">
+      <span class="k"><span class="swatch on"></span> actif (hauteur = volume)</span>
+      <span class="k"><span class="swatch rampsw"></span> ramp (build / fade)</span>
+      <span class="k"><span class="swatch mutesw"></span> muet</span>
+      <span class="k" style="color:var(--accent-rose)">&#9475; t&ecirc;te de lecture</span>
+      <span class="k">clic cellule = mute &middot; drag vertical = volume &middot; drag bord de section = dur&eacute;e</span>
+    </div>
+  </div>
+
+  <div class="transport">
+    <button class="t-btn play">&#9654;</button>
+    <button class="t-btn">&#9632;</button>
+    <div class="t-lcd"><span class="lbl">BPM</span>120.0</div>
+    <div class="t-lcd"><span class="lbl">MES</span>021.3</div>
+    <div class="t-lcd song"><span class="lbl">SECTION</span>DROP &middot; 5/16</div>
+    <div class="t-lcd song"><span class="lbl">SONG</span>02:41 / 04:16</div>
+    <div class="t-right">
+      <div class="t-lcd"><span class="lbl">MODE</span>SONG &#9654;</div>
+    </div>
+  </div>
+
+</body>
+</html>
