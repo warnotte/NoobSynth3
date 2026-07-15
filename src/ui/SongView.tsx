@@ -171,14 +171,6 @@ export const SongView = ({ racks, song, onChange, transportBeats, bpm, running }
       <div className="song-toolbar">
         <button
           type="button"
-          className={`song-switch ${song.enabled ? 'active' : ''}`}
-          onClick={() => onChange({ ...song, enabled: !song.enabled })}
-          title="Activer / désactiver le pilotage SONG"
-        >
-          SONG {song.enabled ? 'ON' : 'OFF'}
-        </button>
-        <button
-          type="button"
           className={`song-switch ${song.loop ? 'active' : ''}`}
           onClick={() => onChange({ ...song, loop: !song.loop })}
         >
@@ -194,7 +186,7 @@ export const SongView = ({ racks, song, onChange, transportBeats, bpm, running }
               ? running
                 ? '···'
                 : 'TRANSPORT ARRÊTÉ'
-              : 'SONG OFF'}
+              : 'MODE RACK — PASSER EN SONG (TRANSPORT)'}
         </div>
         <div className="song-hint">
           clic = on/off · drag vertical = niveau · clic sur « N MES » = durée · dbl-clic = renommer

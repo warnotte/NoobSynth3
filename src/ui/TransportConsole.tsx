@@ -20,6 +20,11 @@ type TransportConsoleProps = {
   redoCount?: number
   onUndo?: () => void
   onRedo?: () => void
+  /** Mode de lecture : false = RACK (libre), true = SONG (l'arrangement pilote). */
+  songEnabled?: boolean
+  onSongModeChange?: (enabled: boolean) => void
+  /** Section du song en cours (ex. "DROP 5/16") — affichée quand SONG est actif. */
+  songPositionText?: string | null
 }
 
 const VU_SEGMENTS = 8
@@ -40,6 +45,9 @@ export const TransportConsole = ({
   redoCount = 0,
   onUndo = () => {},
   onRedo = () => {},
+  songEnabled = false,
+  onSongModeChange = () => {},
+  songPositionText = null,
 }: TransportConsoleProps) => {
   const avg = cpuLoad?.avg ?? 0
   const litSegments = cpuLoad ? Math.round((Math.min(avg, 100) / 100) * VU_SEGMENTS) : 0
@@ -99,6 +107,32 @@ export const TransportConsole = ({
           <div className="tc-lcd-value">{isRunning ? `${bar}:${beat}` : '--:-'}</div>
           <div className="tc-lcd-caption">MEASURE</div>
         </div>
+      </section>
+
+      <section className="tc-section">
+        <div className="tc-label">MODE</div>
+        <div className="tc-mode-switch" title="Mode de lecture — RACK : le patch joue librement · SONG : l'arrangement de la vue Song pilote les racks">
+          <button
+            type="button"
+            className={`tc-mode-btn ${!songEnabled ? 'active' : ''}`}
+            onClick={() => onSongModeChange(false)}
+          >
+            RACK
+          </button>
+          <button
+            type="button"
+            className={`tc-mode-btn song ${songEnabled ? 'active' : ''}`}
+            onClick={() => onSongModeChange(true)}
+          >
+            SONG
+          </button>
+        </div>
+        {songEnabled && (
+          <div className="tc-lcd tc-lcd--small tc-lcd--song" title="Section du song en cours">
+            <div className="tc-lcd-value">{songPositionText ?? '--'}</div>
+            <div className="tc-lcd-caption">SECTION</div>
+          </div>
+        )}
       </section>
 
       <section className="tc-section">

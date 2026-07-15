@@ -1,6 +1,7 @@
 // Prototype SONG mode — vérification E2E : charge Capitulation, ouvre la vue
-// Song, édite l'arrangement, démarre le transport et vérifie que la section
-// avance. Screenshots → design/mockups/proto-song-*.png
+// Song, édite l'arrangement (mutes + drag de volume), active le mode SONG via
+// le TRANSPORT, joue, et vérifie que le mode reste visible/pilotable depuis la
+// vue RACK. Screenshots → design/mockups/proto-song-*.png
 import { chromium } from 'playwright'
 
 const browser = await chromium.launch({
@@ -31,39 +32,63 @@ try {
 // 2) Ouvrir la vue Song
 await page.locator('.rack-tabs-view-btn', { hasText: 'Song' }).click()
 await page.waitForSelector('.song-view', { timeout: 5000 })
-await page.screenshot({ path: 'E:/CODEX/NoobSynth3/design/mockups/proto-song-initial.png' })
 console.log('song view open —', await page.locator('.song-row').count(), 'rows')
 
-// 3) Éditer l'arrangement : couper des cellules dans INTRO/BUILD (drop progressif)
+// 3) Éditer l'arrangement : mutes + DRAG VERTICAL = volume
 const rows = await page.locator('.song-lanes .song-row:not(.song-row-sections)').all()
 console.log('lanes:', rows.length)
 if (rows.length >= 2) {
-  // lane 2 muette en section 1
-  await rows[1].locator('.song-cell').nth(0).click()
-  // dernière lane muette en sections 1 et 2
+  await rows[1].locator('.song-cell').nth(0).click() // lane 2 muette section 1
   const last = rows[rows.length - 1]
   await last.locator('.song-cell').nth(0).click()
   await last.locator('.song-cell').nth(1).click()
+
+  // drag vertical vers le bas sur lane 1 / section 2 → baisse le niveau
+  const cell = rows[0].locator('.song-cell').nth(1)
+  const before = await cell.locator('.song-cell-db').textContent()
+  const box = await cell.boundingBox()
+  const cx = box.x + box.width / 2
+  const cy = box.y + box.height / 2
+  await page.mouse.move(cx, cy)
+  await page.mouse.down()
+  for (let i = 1; i <= 6; i++) await page.mouse.move(cx, cy + i * 5)
+  await page.mouse.up()
+  const after = await cell.locator('.song-cell-db').textContent()
+  const fillH = await cell
+    .locator('.song-cell-fill')
+    .evaluate((el) => el.style.height)
+    .catch(() => 'none')
+  console.log(`drag volume : ${before} dB -> ${after} dB (fill ${fillH})`)
 }
-// SONG ON
-await page.locator('.song-switch', { hasText: 'SONG' }).click()
-await page.waitForTimeout(300)
+
+// 4) Activer le mode SONG via le TRANSPORT (plus de toggle dans la vue)
+await page.locator('.tc-mode-btn.song').click()
+await page.waitForTimeout(200)
 await page.screenshot({ path: 'E:/CODEX/NoobSynth3/design/mockups/proto-song-edited.png' })
 
-// 4) Démarrer le transport et vérifier que la position avance
+// 5) Jouer, vérifier l'avance
 await page.locator('.tc-play').click()
 await page.waitForTimeout(4000)
-const lcd1 = await page.locator('.song-lcd').textContent()
-console.log('LCD après 4 s :', lcd1)
+console.log('LCD SongView :', await page.locator('.song-lcd').textContent())
+console.log('LCD transport SECTION :', await page.locator('.tc-lcd--song .tc-lcd-value').textContent())
 await page.screenshot({ path: 'E:/CODEX/NoobSynth3/design/mockups/proto-song-playing.png' })
-await page.waitForTimeout(5000)
-const lcd2 = await page.locator('.song-lcd').textContent()
-console.log('LCD après 9 s :', lcd2)
-const playheadLeft = await page.locator('.song-playhead').evaluate((el) => el.style.left)
-console.log('playhead left:', playheadLeft)
-await page.screenshot({ path: 'E:/CODEX/NoobSynth3/design/mockups/proto-song-playing2.png' })
 
-// 5) Stop
+// 6) Basculer en vue RACK pendant que le song pilote : le MODE + la SECTION
+//    restent visibles et commutables dans le transport
+await page.locator('.rack-tabs-view-btn', { hasText: 'Racks' }).click()
+await page.waitForTimeout(2500)
+console.log(
+  'vue RACK — SECTION transport :',
+  await page.locator('.tc-lcd--song .tc-lcd-value').textContent(),
+)
+await page.screenshot({ path: 'E:/CODEX/NoobSynth3/design/mockups/proto-song-rackview.png' })
+
+// 7) Repasser en mode RACK (lecture libre) depuis la vue rack
+await page.locator('.tc-mode-btn', { hasText: 'RACK' }).click()
+await page.waitForTimeout(300)
+const songLcdCount = await page.locator('.tc-lcd--song').count()
+console.log('mode RACK — LCD SECTION masqué :', songLcdCount === 0 ? 'oui' : 'NON')
+
 await page.locator('.tc-play').click()
 await browser.close()
 console.log('done')

@@ -52,7 +52,7 @@ import { RackView } from './ui/RackView'
 import { MixerConsole, type MixerChannelState } from './ui/MixerConsole'
 import { RackTabs, type ViewMode } from './ui/RackTabs'
 import { SongView } from './ui/SongView'
-import { useSongPlayer, defaultSongState, type SongState } from './hooks/useSongPlayer'
+import { useSongPlayer, defaultSongState, songPositionAt, type SongState } from './hooks/useSongPlayer'
 import { SidePanel } from './ui/SidePanel'
 import { BrandRail } from './ui/BrandRail'
 import { IoPanel } from './ui/IoPanel'
@@ -2429,6 +2429,13 @@ function App() {
         redoCount={redoCount}
         onUndo={handleUndo}
         onRedo={handleRedo}
+        songEnabled={songState.enabled}
+        onSongModeChange={(enabled) => setSongState((prev) => ({ ...prev, enabled }))}
+        songPositionText={(() => {
+          if (!songState.enabled || !audioRunning) return '--'
+          const pos = songPositionAt(songState, transportBeats)
+          return pos ? `${pos.section.name} ${Math.floor(pos.barInSection) + 1}/${pos.section.bars}` : '--'
+        })()}
       />
       <input
         ref={presetFileRef}

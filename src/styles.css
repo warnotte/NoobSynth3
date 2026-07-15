@@ -7455,3 +7455,37 @@ body {
   text-transform: uppercase;
   padding: 0 4px;
 }
+
+/* Sélecteur de mode de lecture RACK|SONG dans la console de transport */
+.tc-mode-switch {
+  display: flex;
+  border: 1px solid #05070a;
+  border-radius: 5px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+.tc-mode-btn {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  padding: 8px 13px 7px;
+  color: var(--text-dim);
+  background: linear-gradient(180deg, #232d38, #151b22);
+  border: none;
+  cursor: pointer;
+}
+.tc-mode-btn + .tc-mode-btn { border-left: 1px solid #05070a; }
+.tc-mode-btn.active {
+  color: var(--accent-mint);
+  text-shadow: 0 0 6px var(--accent-mint);
+  background: linear-gradient(180deg, #1c2a30, #12201c);
+}
+.tc-mode-btn.song.active {
+  color: var(--accent-warm);
+  text-shadow: 0 0 7px rgba(240, 176, 107, 0.6);
+  background: linear-gradient(180deg, #2d2418, #1f1810);
+}
+.tc-lcd--song .tc-lcd-value {
+  color: var(--accent-warm);
+  text-shadow: 0 0 7px rgba(240, 176, 107, 0.55);
+}
