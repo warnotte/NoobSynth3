@@ -102,6 +102,36 @@ caisse/clap uniquement** (pas sur le kick — c'est ce qui « muddait » le mix)
 → Roadmap drums : vélocité par pas (au moins étendre `drumData` + le parser), fills/song-mode (lié au point
 P1 timeline), choke group hhc/hho, pan par voix. *Le bug UI 909-hat est un quick-win à corriger.*
 
+## Audit séquenceurs — statiques vs génératifs (2026-07-16)
+
+> Réalisé en concevant le **SONG mode** (branche `feat/song-mode`, plan complet dans
+> `docs/SONG_MODE_PLAN.md` sur cette branche). Conservé ICI sur main pour survivre à la
+> branche : ces faits valent pour toute future feature « transfert / capture de notes ».
+
+**Transférer les notes d'un séquenceur de rack vers une timeline** n'est possible
+directement que si le séquenceur est **statique** (son pattern est une donnée lisible) :
+
+| Séquenceur | Nature | Transfert vers une liste de notes |
+|------------|--------|-----------------------------------|
+| step-sequencer | statique (`stepData` = `{pitch, gate, velocity, slide}`, pitch ±24 demi-tons, velocity 0-100) | ✅ direct, sans perte |
+| midi-file-sequencer | statique (midiData) | ✅ trivial |
+| chord-sequencer | statique (8 steps root/type/inversion, accords déterministes) | ✅ direct |
+| polyrhythm-sequencer | statique (4×16 steps, dérouler sur le LCM des longueurs) | ✅ direct |
+| euclidean | statique déterministe (Bjorklund), gates sans pitch | ✅ rythme mono-note |
+| **arpeggiator** | **génératif** (dépend des notes tenues en entrée + modes random/mutate) | ⏺ enregistrer sa sortie cv/gate |
+| **turing-machine** | **génératif** (RNG ; déterministe seulement à probability=0) | ⏺ enregistrer (sauf locked) |
+| **gravity-sequencer** | **génératif** (orbites à périodes irrationnelles, ne boucle jamais) | ⏺ enregistrer |
+
+**Il n'existe AUCUN enregistreur de CV/notes dans le moteur** (les taps ne servent qu'au
+scope, l'enregistrement ne capte que le mix audio WAV) → capturer un séquenceur génératif
+= petit chantier Rust : tap cv/gate aligné sur `transport_beats`, fronts de gate →
+`{note, tick, duration, velocity}`.
+
+**Piège de conversion pitch** (lié au P2 « unifier la réf pitch CV ») : step-seq sort
+`CV = pitch/12` (0 V = pitch 0 ≡ « C4 » nominal) ; midi-file-seq sort `CV = (note−69)/12`
+(A4 = 0 V). Conversion **transparente au niveau CV : `note = pitch + 69`** (surtout pas
++60 : tout sortirait une sixte majeure trop bas, sauf à réaccorder l'oscillateur de +9 demi-tons).
+
 ## Feuille de route proposée (vers le studio)
 
 1. **Arrangement timeline** (P1) — une piste maître « sections » : par mesure/section, état de chaque
