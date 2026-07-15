@@ -1,14 +1,21 @@
-# SONG Mode — Arrangement Timeline (plan v2)
+# SONG Mode — Arrangement Timeline (plan v3)
 
-> Branche : `feat/song-mode`. Maquette : `design/mockups/song-mode.html` / `.png`
-> (re-screenshot : `node design/mockups/shot-song-mode.mjs`).
-> v2 après retour utilisateur : « les racks qui ont leur séquenceur doivent rester ainsi ;
-> mais peut-être des racks pilotables TOTALEMENT depuis la partie song ? » → oui, c'est le cœur du design.
-> Les affirmations moteur ci-dessous ont été vérifiées dans le code (session 2026-07-16, 4 audits parallèles).
+> Branche : `feat/song-mode`. Maquettes : `design/mockups/song-mode.html` (timeline) et
+> `design/mockups/song-pianoroll.html` (éditeur de clip) — re-screenshot :
+> `node design/mockups/shot-song-mode.mjs`.
+> v2 après retour utilisateur : « des racks pilotables TOTALEMENT depuis la partie song ».
+> v3 après 2e retour : **aucun rôle imposé aux racks** — une lane = un rack, sous-lanes à la carte.
+> Les affirmations moteur ont été vérifiées dans le code (session 2026-07-16, 5 audits).
 
-## Concept v2 — trois natures de lanes
+## Concept v3 — une lane = un rack, sous-lanes par capacité
 
-Une 3e vue RACKS|MIXER|SONG. Chaque rack apparaît comme une lane dont la **nature dépend du rack** :
+Une 3e vue RACKS|MIXER|SONG. **Une lane = un rack, quel qu'il soit** — SONG ne présume
+rien de ce qu'est un rack. Ce qu'on pilote se choisit par **sous-lanes** ajoutées à la
+demande (« + lane »), et le menu ne propose que ce que le rack **contient réellement**
+(détection dans son graphe) : MIX toujours ; ♪ NOTES si un midi-file-sequencer est présent ;
+▦ PATTERNS si un drum-sequencer ; ⚙ AUTOMATION pour n'importe quel param de n'importe quel
+module. Un rack peut cumuler plusieurs sous-lanes, ou n'en avoir **aucune** (il joue en
+continu, hors arrangement). Types de sous-lanes :
 
 | Lane | Pour quels racks | Ce que SONG contrôle | Mécanisme moteur (vérifié) |
 |------|------------------|----------------------|----------------------------|
@@ -16,11 +23,40 @@ Une 3e vue RACKS|MIXER|SONG. Chaque rack apparaît comme une lane dont la **natu
 | **∞ Autonome** | Racks génératifs / à séquenceur interne (harmonist, step-seq, GoL…) — **intouchés** | Mute / volume / ramp par section, rien d'autre. Leur séquenceur interne continue de tourner. | Param `level` du module `output` du rack (chemin mixer existant : `applyMixerToEngine`, Web `setParamDirect` + Tauri `native_set_param`). |
 | **▦ Patterns** | Racks batterie avec `drum-sequencer` | Le pattern actif par section : A / B / FILL / —. Le drum-seq du rack reste le séquenceur. | **Swap de `drumData` à chaud = propre et vérifié** : seul le contenu des steps change, le playhead continue (aucun reset/glitch, `parse_drum_data` ne touche pas `current_step`/`phase`/`gate_on`), et le drum-seq est transport-locked. |
 
-Un rack peut aussi n'avoir **aucune lane** (il joue en continu, hors arrangement).
-
 Les 3 projets « Songs » (Monolithe/Vesper/Lumière) utilisent déjà le pattern « midiData embarqué »
 → ils deviennent **directement éditables** dans SONG mode. C'est aussi le P1 n°2 du
 STUDIO_GAP_ANALYSIS (piano-roll in-app) résolu par le même geste.
+
+## Édition des notes (piano-roll) & transfert depuis le rack
+
+Maquette : `design/mockups/song-pianoroll.html`. Dbl-clic sur un clip → **piano-roll**
+modal (langage LCD) : clavier à gauche, grille snap 1/16, drag = durée, lane vélocité,
+écoute en boucle pendant l'édition ; à la fermeture le clip se compile dans le midiData
+du MIDI seq du rack (+ re-seek si transport en marche).
+
+**Transfert rack → SONG** (« ← Transférer du rack », dans le piano-roll et le menu de lane) :
+récupérer les notes d'un séquenceur interne du rack pour en faire un clip — on part de ce
+qui joue déjà au lieu d'écrire de zéro. Faisabilité vérifiée par séquenceur :
+
+| Séquenceur du rack | Transfert | Détail (vérifié dans le code) |
+|--------------------|-----------|-------------------------------|
+| step-sequencer | ✅ **statique, direct** | `stepData` = `{pitch, gate, velocity, slide}` (pitch en demi-tons ±24, velocity 0-100). Conversion sans perte : 1 step = 1 note. |
+| midi-file-sequencer | ✅ direct | Son midiData existant (fichier .mid / preset) devient le clip. |
+| chord-sequencer | ✅ statique | 8 steps `{root, chordType, inversion, gate}`, accords déterministes → notes. |
+| polyrhythm-sequencer | ✅ statique | 4×16 steps `{pitch,gate,velocity}` ; dérouler sur le LCM des longueurs. |
+| euclidean | ✅ statique (rythme) | Pattern Bjorklund déterministe, gates sans pitch → piste rythmique mono-note. |
+| arpeggiator / turing-machine / gravity-seq | ⏺ **enregistrer** | Génératifs (RNG / temps réel / orbites irrationnelles) : il faut capturer leur sortie cv/gate sur N mesures. **Aucun recorder CV n'existe dans le moteur** → petit chantier Rust (tap cv/gate aligné transport_beats), phase 3. (Turing à probability=0 = boucle déterministe, extractible sans recorder.) |
+
+**Conversion pitch** (piège vérifié) : step-seq sort `CV = p/12` (0 V = pitch 0) ; le MIDI
+seq sort `CV = (note−69)/12` (A4 = 0 V). Transfert transparent (le rack sonne à l'identique) :
+**`note = p + 69`** — aucune retouche de l'oscillateur cible. La vélocité 0-100 → 0-127.
+Les `slide` du step-seq n'ont pas d'équivalent MIDI note : approximés en notes legato
+(chevauchement léger) ou ignorés (option au transfert).
+
+**Après transfert** : transaction undo unique qui (1) crée/réutilise le midi-file-sequencer
+du rack, (2) re-patch les connexions de l'ancien séquenceur (cv-out/gate-out → mêmes
+destinations depuis cv-1/gate-1/vel-1), (3) écrit le clip, (4) laisse l'ancien séquenceur
+en place mais débranché (l'utilisateur le supprime ou le garde pour jammer).
 
 ## Modèle de données (projet JSON)
 
@@ -94,16 +130,22 @@ dans le JSON projet, pas dans un param moteur → non concerné.
 3. Lanes **mix** complètes (mute/level/ramp) + scheduler `useSongPlayer`.
 4. Lanes **midi** : compilation clips→midiData + **éditeur piano-roll** (popup type
    KeyboardPopup, grille LCD) ; binding lane→midi-file-sequencer du rack.
-5. Lanes **pattern** : swap drumData par section (A/B/FILL), édition = la grille du
+5. **Transfert statique rack→SONG** : step-sequencer (16-64 pas) et midi-file-sequencer
+   → clip (voir section transfert) ; chord/polyrhythm/euclidean si le temps le permet.
+6. Lanes **pattern** : swap drumData par section (A/B/FILL), édition = la grille du
    drum-seq existante (le pattern édité dans le rack peut être « capturé » dans le song).
-6. LOOP song ; FOLLOW ; projet de démo arrangé en 6 sections.
+7. LOOP song ; FOLLOW ; projet de démo arrangé en 6 sections.
 
 ### Phase 2
 - Automation lanes (courbes de params, throttle ~30 Hz, deltas).
 - Seek dans le song (seek midi seqs + reset drum-seqs + resync transport).
 - Rampe DSP anti-click ; commande batch Tauri.
+- Transfert statique des séquenceurs restants (chord, polyrhythm, euclidean).
 
 ### Phase 3 (moteur)
+- **Recorder cv/gate** aligné sur transport_beats (tap type buildTapOutputs mais événements)
+  → « enregistrer N mesures » des séquenceurs génératifs (arpeggiator, turing, gravity)
+  vers un clip. CV → note = round(CV×12) + 69.
 - Asservissement transport du midi-file-sequencer (lire TransportContext) si la dérive
   ou le seek le justifient ; quantisation moteur des swaps de pattern.
 
