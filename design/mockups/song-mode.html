@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>NoobSynth — SONG mode (arrangement timeline) — mockup</title>
+<title>NoobSynth — SONG mode v2 (racks pilotés vs autonomes) — mockup</title>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -22,7 +22,6 @@
     --accent-mint: #42e2b1;
     --accent-warm: #f0b06b;
     --accent-rose: #ff6fae;
-    --cat-seq: #f0b06b;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body { height: 100%; }
@@ -50,7 +49,7 @@
   .led { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-mint); box-shadow: 0 0 8px var(--accent-mint); }
   .rail-right { margin-left: auto; font-family: var(--font-lcd); font-size: 10px; color: var(--text-dim); letter-spacing: 0.12em; }
 
-  /* ── Tabs row : view rocker + song strip ── */
+  /* ── Tabs row ── */
   .tabs-row {
     display: flex; align-items: center; gap: 14px; padding: 0 22px;
     background: linear-gradient(180deg, var(--steel-0), #10151b);
@@ -92,7 +91,7 @@
   .timeline {
     flex: none; position: relative;
     display: grid;
-    grid-template-columns: 118px 1fr;
+    grid-template-columns: 128px 1fr;
     grid-auto-rows: min-content;
     gap: 6px 10px;
     background: linear-gradient(180deg, var(--steel-1), var(--steel-0));
@@ -110,8 +109,16 @@
     flex: none;
   }
   .row-label .mled.on { background: var(--accent-mint); box-shadow: 0 0 6px var(--accent-mint); }
+  .lbl2 { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+  .lbl2 .tag {
+    font-family: var(--font-lcd); font-size: 7.5px; letter-spacing: 0.16em; font-weight: 400;
+    padding: 1px 5px; border-radius: 3px; border: 1px solid rgba(0,0,0,0.7);
+  }
+  .tag.song { color: #0b1115; background: linear-gradient(180deg, #f4c98b, #c98d45); }
+  .tag.auto { color: var(--text-dim); background: #141a21; }
+  .tag.ptn  { color: #ffb3a6; background: #2a1512; border-color: rgba(255,122,102,0.35); }
 
-  /* sections ruler — widths proportional to bar counts 8/8/16/8/16/8 */
+  /* sections ruler — 8/8/16/8/16/8 mesures */
   .cells { display: grid; grid-template-columns: 8fr 8fr 16fr 8fr 16fr 8fr; gap: 4px; min-width: 0; }
 
   .section-chip {
@@ -153,8 +160,8 @@
     background: linear-gradient(180deg, color-mix(in srgb, var(--glow) 85%, #fff) 0%, color-mix(in srgb, var(--glow) 45%, #06231a) 100%);
     opacity: 0.9; box-shadow: 0 0 10px color-mix(in srgb, var(--glow) 45%, transparent);
   }
-  .cell .fill.ramp-up { clip-path: polygon(0 100%, 100% 0, 100% 100%); height: calc(var(--lvl) * 1%); }
-  .cell .fill.ramp-down { clip-path: polygon(0 0, 100% 100%, 0 100%); height: calc(var(--lvl) * 1%); }
+  .cell .fill.ramp-up { clip-path: polygon(0 100%, 100% 0, 100% 100%); }
+  .cell .fill.ramp-down { clip-path: polygon(0 0, 100% 100%, 0 100%); }
   .cell .db {
     position: absolute; top: 3px; right: 5px; font-family: var(--font-lcd); font-size: 8px;
     color: color-mix(in srgb, var(--glow) 80%, #fff); text-shadow: 0 0 5px var(--glow); letter-spacing: 0.08em;
@@ -165,9 +172,27 @@
       radial-gradient(120% 130% at 50% 0%, #0d1216 0%, #080c0f 70%);
   }
   .cell.mute .db { color: var(--text-dim); text-shadow: none; }
+
+  /* clip de notes (rack piloté par SONG) — mini piano-roll */
+  .cell.notes svg { position: absolute; inset: 3px; width: calc(100% - 6px); height: calc(100% - 6px); }
+  .cell.notes rect { fill: var(--glow); }
+  .cell.notes svg { filter: drop-shadow(0 0 3px color-mix(in srgb, var(--glow) 70%, transparent)); }
+  .cell.notes::after {
+    content: '\266A'; position: absolute; top: 2px; right: 5px;
+    font-size: 8px; color: color-mix(in srgb, var(--glow) 65%, transparent);
+  }
+
+  /* chip de pattern batterie */
+  .cell .ptn-chip {
+    position: absolute; inset: 0; display: grid; place-items: center;
+    font-family: var(--font-lcd); font-size: 11px; letter-spacing: 0.22em;
+    color: #ff9d8b; text-shadow: 0 0 8px rgba(255,122,102,0.7);
+  }
+  .cell.mute .ptn-chip { color: var(--text-dim); text-shadow: none; }
+
   .lane.lead .cell { --glow: var(--accent-cool); }
-  .lane.pads .cell { --glow: #d98cff; }
   .lane.bass .cell { --glow: var(--accent-mint); }
+  .lane.pads .cell { --glow: #d98cff; }
   .lane.drums .cell { --glow: #ff7a66; }
 
   /* automation lanes */
@@ -182,17 +207,17 @@
     box-shadow: inset 0 2px 8px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.05);
   }
   .auto-lcd svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-  .auto-lcd .tag {
+  .auto-lcd .atag {
     position: absolute; top: 3px; left: 7px; font-family: var(--font-lcd); font-size: 8px;
     letter-spacing: 0.12em; color: var(--text-dim);
   }
   .row-label.auto { color: var(--text-dim); font-weight: 500; letter-spacing: 0.14em; }
   .row-label .param { color: var(--accent-mint); }
 
-  /* playhead spanning all lanes */
+  /* playhead */
   .playhead {
     position: absolute; top: 12px; bottom: 14px;
-    left: calc(142px + (100% - 156px) * 0.317);
+    left: calc(152px + (100% - 166px) * 0.317);
     width: 2px; border-radius: 2px;
     background: var(--accent-rose);
     box-shadow: 0 0 10px var(--accent-rose), 0 0 24px rgba(255,111,174,0.5);
@@ -205,14 +230,19 @@
 
   /* legend */
   .legend {
-    display: flex; gap: 22px; align-items: center; padding: 0 4px;
-    font-size: 9px; letter-spacing: 0.14em; color: var(--text-dim); text-transform: uppercase;
+    display: flex; gap: 20px; align-items: center; padding: 0 4px; flex-wrap: wrap;
+    font-size: 9px; letter-spacing: 0.12em; color: var(--text-dim); text-transform: uppercase;
   }
   .legend .k { display: inline-flex; align-items: center; gap: 6px; }
   .legend .swatch { width: 16px; height: 9px; border-radius: 2px; border: 1px solid rgba(0,0,0,0.8); }
-  .legend .swatch.on { background: linear-gradient(180deg, #7af2c8, #1f9c78); box-shadow: 0 0 6px rgba(66,226,177,0.6); }
-  .legend .swatch.rampsw { background: linear-gradient(135deg, transparent 48%, #7af2c8 50%); }
+  .legend .swatch.clip { background: #0a0f13; position: relative; }
+  .legend .swatch.clip::after {
+    content: ''; position: absolute; left: 2px; top: 2px; width: 4px; height: 2px;
+    background: var(--accent-cool); box-shadow: 6px 3px 0 var(--accent-cool), 3px -1px 0 0 transparent, 0 0 4px var(--accent-cool);
+  }
+  .legend .swatch.on { background: linear-gradient(180deg, #e2aaff, #8b4fc9); box-shadow: 0 0 6px rgba(217,140,255,0.6); }
   .legend .swatch.mutesw { background: repeating-linear-gradient(45deg, rgba(255,255,255,0.09) 0 3px, transparent 3px 7px), #0a0f13; }
+  .legend .ptnk { font-family: var(--font-lcd); font-size: 9px; color: #ff9d8b; letter-spacing: 0.18em; }
 
   /* ── Transport console ── */
   .transport {
@@ -279,17 +309,71 @@
         <span>1</span><span>9</span><span>17</span><span>33</span><span>41</span><span>57</span>
       </div>
 
-      <div class="row-label lane-label"><span class="mled on"></span>LEAD</div>
+      <!-- LEAD : rack piloté par SONG (les notes vivent ici) -->
+      <div class="row-label"><span class="mled on"></span><span class="lbl2">LEAD<span class="tag song">&#9834; PILOT&Eacute; SONG</span></span></div>
       <div class="lane lead"><div class="cells">
-        <div class="cell mute"><span class="db">M</span></div>
-        <div class="cell"><div class="fill" style="--lvl:55"></div><span class="db">-9</span></div>
-        <div class="cell"><div class="fill" style="--lvl:92"></div><span class="db">0</span></div>
-        <div class="cell"><div class="fill" style="--lvl:38"></div><span class="db">-14</span></div>
-        <div class="cell"><div class="fill" style="--lvl:92"></div><span class="db">0</span></div>
-        <div class="cell"><div class="fill ramp-down" style="--lvl:70"></div><span class="db">&#8600;</span></div>
+        <div class="cell mute"><span class="db">&mdash;</span></div>
+        <div class="cell notes"><svg viewBox="0 0 100 40" preserveAspectRatio="none">
+          <rect x="4" y="28" width="9" height="3"/><rect x="17" y="24" width="9" height="3"/>
+          <rect x="30" y="20" width="9" height="3"/><rect x="43" y="22" width="9" height="3"/>
+          <rect x="56" y="16" width="9" height="3"/><rect x="69" y="12" width="12" height="3"/>
+          <rect x="85" y="7" width="11" height="3"/>
+        </svg></div>
+        <div class="cell notes"><svg viewBox="0 0 100 40" preserveAspectRatio="none">
+          <rect x="2" y="8" width="6" height="3"/><rect x="10" y="14" width="4" height="3"/>
+          <rect x="16" y="8" width="6" height="3"/><rect x="24" y="20" width="8" height="3"/>
+          <rect x="34" y="14" width="4" height="3"/><rect x="40" y="8" width="6" height="3"/>
+          <rect x="48" y="4" width="10" height="3"/><rect x="60" y="14" width="4" height="3"/>
+          <rect x="66" y="8" width="6" height="3"/><rect x="74" y="20" width="8" height="3"/>
+          <rect x="84" y="8" width="5" height="3"/><rect x="91" y="4" width="7" height="3"/>
+        </svg></div>
+        <div class="cell notes"><svg viewBox="0 0 100 40" preserveAspectRatio="none">
+          <rect x="8" y="10" width="22" height="3"/><rect x="42" y="14" width="26" height="3"/>
+          <rect x="78" y="7" width="18" height="3"/>
+        </svg></div>
+        <div class="cell notes"><svg viewBox="0 0 100 40" preserveAspectRatio="none">
+          <rect x="2" y="8" width="6" height="3"/><rect x="10" y="14" width="4" height="3"/>
+          <rect x="16" y="8" width="6" height="3"/><rect x="24" y="20" width="8" height="3"/>
+          <rect x="34" y="14" width="4" height="3"/><rect x="40" y="4" width="6" height="3"/>
+          <rect x="48" y="8" width="10" height="3"/><rect x="60" y="14" width="4" height="3"/>
+          <rect x="66" y="4" width="6" height="3"/><rect x="74" y="10" width="8" height="3"/>
+          <rect x="84" y="14" width="5" height="3"/><rect x="91" y="8" width="7" height="3"/>
+        </svg></div>
+        <div class="cell notes"><svg viewBox="0 0 100 40" preserveAspectRatio="none">
+          <rect x="10" y="14" width="30" height="3"/><rect x="50" y="20" width="40" height="3"/>
+        </svg></div>
       </div></div>
 
-      <div class="row-label lane-label"><span class="mled on"></span>PADS</div>
+      <!-- BASSE : rack piloté par SONG -->
+      <div class="row-label"><span class="mled on"></span><span class="lbl2">BASSE<span class="tag song">&#9834; PILOT&Eacute; SONG</span></span></div>
+      <div class="lane bass"><div class="cells">
+        <div class="cell mute"><span class="db">&mdash;</span></div>
+        <div class="cell notes"><svg viewBox="0 0 100 40" preserveAspectRatio="none">
+          <rect x="4" y="34" width="18" height="3"/><rect x="30" y="32" width="18" height="3"/>
+          <rect x="56" y="30" width="18" height="3"/><rect x="80" y="27" width="16" height="3"/>
+        </svg></div>
+        <div class="cell notes"><svg viewBox="0 0 100 40" preserveAspectRatio="none">
+          <rect x="2" y="32" width="7" height="3"/><rect x="12" y="32" width="4" height="3"/>
+          <rect x="19" y="27" width="7" height="3"/><rect x="29" y="32" width="7" height="3"/>
+          <rect x="39" y="32" width="4" height="3"/><rect x="46" y="27" width="7" height="3"/>
+          <rect x="56" y="32" width="7" height="3"/><rect x="66" y="32" width="4" height="3"/>
+          <rect x="73" y="27" width="7" height="3"/><rect x="83" y="32" width="7" height="3"/>
+          <rect x="93" y="27" width="5" height="3"/>
+        </svg></div>
+        <div class="cell mute"><span class="db">&mdash;</span></div>
+        <div class="cell notes"><svg viewBox="0 0 100 40" preserveAspectRatio="none">
+          <rect x="2" y="32" width="7" height="3"/><rect x="12" y="32" width="4" height="3"/>
+          <rect x="19" y="27" width="7" height="3"/><rect x="29" y="32" width="7" height="3"/>
+          <rect x="39" y="32" width="4" height="3"/><rect x="46" y="27" width="7" height="3"/>
+          <rect x="56" y="32" width="7" height="3"/><rect x="66" y="32" width="4" height="3"/>
+          <rect x="73" y="27" width="7" height="3"/><rect x="83" y="32" width="7" height="3"/>
+          <rect x="93" y="27" width="5" height="3"/>
+        </svg></div>
+        <div class="cell mute"><span class="db">&mdash;</span></div>
+      </div></div>
+
+      <!-- PADS : rack AUTONOME (harmonist + son propre séquenceur continuent) — SONG ne touche qu'au mix -->
+      <div class="row-label"><span class="mled on"></span><span class="lbl2">PADS<span class="tag auto">&#8734; AUTONOME</span></span></div>
       <div class="lane pads"><div class="cells">
         <div class="cell"><div class="fill" style="--lvl:70"></div><span class="db">-5</span></div>
         <div class="cell"><div class="fill" style="--lvl:80"></div><span class="db">-3</span></div>
@@ -299,29 +383,20 @@
         <div class="cell"><div class="fill ramp-down" style="--lvl:70"></div><span class="db">&#8600;</span></div>
       </div></div>
 
-      <div class="row-label lane-label"><span class="mled on"></span>BASSE</div>
-      <div class="lane bass"><div class="cells">
-        <div class="cell mute"><span class="db">M</span></div>
-        <div class="cell"><div class="fill ramp-up" style="--lvl:78"></div><span class="db">&#8599;</span></div>
-        <div class="cell"><div class="fill" style="--lvl:86"></div><span class="db">-2</span></div>
-        <div class="cell mute"><span class="db">M</span></div>
-        <div class="cell"><div class="fill" style="--lvl:86"></div><span class="db">-2</span></div>
-        <div class="cell mute"><span class="db">M</span></div>
-      </div></div>
-
-      <div class="row-label lane-label"><span class="mled on"></span>RYTHME</div>
+      <!-- RYTHME : patterns par section -->
+      <div class="row-label"><span class="mled on"></span><span class="lbl2">RYTHME<span class="tag ptn">&#9638; PATTERNS</span></span></div>
       <div class="lane drums"><div class="cells">
-        <div class="cell mute"><span class="db">M</span></div>
-        <div class="cell"><div class="fill ramp-up" style="--lvl:95"></div><span class="db">&#8599;</span></div>
-        <div class="cell"><div class="fill" style="--lvl:96"></div><span class="db">0</span></div>
-        <div class="cell mute"><span class="db">M</span></div>
-        <div class="cell"><div class="fill" style="--lvl:96"></div><span class="db">0</span></div>
-        <div class="cell mute"><span class="db">M</span></div>
+        <div class="cell mute"><span class="ptn-chip">&mdash;</span></div>
+        <div class="cell"><span class="ptn-chip">PTN A</span></div>
+        <div class="cell"><span class="ptn-chip">PTN B</span></div>
+        <div class="cell"><span class="ptn-chip">FILL</span></div>
+        <div class="cell"><span class="ptn-chip">PTN B</span></div>
+        <div class="cell mute"><span class="ptn-chip">&mdash;</span></div>
       </div></div>
 
       <div class="row-label auto">PADS &middot; <span class="param">VCF CUTOFF</span></div>
       <div class="auto-lane"><div class="cells"><div class="auto-lcd">
-        <span class="tag">AUTOMATION</span>
+        <span class="atag">AUTOMATION</span>
         <svg viewBox="0 0 640 40" preserveAspectRatio="none">
           <polyline points="0,30 84,29 168,10 328,8 332,26 412,24 416,8 576,9 640,32"
             fill="none" stroke="#42e2b1" stroke-width="1.6"
@@ -333,7 +408,7 @@
 
       <div class="row-label auto">MASTER &middot; <span class="param">VOLUME</span></div>
       <div class="auto-lane"><div class="cells"><div class="auto-lcd">
-        <span class="tag">AUTOMATION</span>
+        <span class="atag">AUTOMATION</span>
         <svg viewBox="0 0 640 40" preserveAspectRatio="none">
           <polyline points="0,22 84,16 168,12 416,12 576,12 610,20 640,36"
             fill="none" stroke="#5bb6ff" stroke-width="1.6"
@@ -345,11 +420,11 @@
     </div>
 
     <div class="legend">
-      <span class="k"><span class="swatch on"></span> actif (hauteur = volume)</span>
-      <span class="k"><span class="swatch rampsw"></span> ramp (build / fade)</span>
+      <span class="k"><span class="swatch clip"></span> clip de notes &mdash; compos&eacute; dans SONG, jou&eacute; par le rack (dbl-clic = piano-roll)</span>
+      <span class="k"><span class="swatch on"></span> rack autonome &mdash; volume/mute seulement, son s&eacute;quenceur interne continue</span>
+      <span class="k"><span class="ptnk">PTN</span> pattern batterie par section</span>
       <span class="k"><span class="swatch mutesw"></span> muet</span>
       <span class="k" style="color:var(--accent-rose)">&#9475; t&ecirc;te de lecture</span>
-      <span class="k">clic cellule = mute &middot; drag vertical = volume &middot; drag bord de section = dur&eacute;e</span>
     </div>
   </div>
 
