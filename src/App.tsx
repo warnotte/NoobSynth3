@@ -51,6 +51,8 @@ import { PatchLayer } from './ui/PatchLayer'
 import { RackView } from './ui/RackView'
 import { MixerConsole, type MixerChannelState } from './ui/MixerConsole'
 import { RackTabs, type ViewMode } from './ui/RackTabs'
+import { SongView } from './ui/SongView'
+import { useSongPlayer, defaultSongState, type SongState } from './hooks/useSongPlayer'
 import { SidePanel } from './ui/SidePanel'
 import { BrandRail } from './ui/BrandRail'
 import { IoPanel } from './ui/IoPanel'
@@ -207,6 +209,13 @@ function App() {
   const masterTempoRef = useRef(120)
   const [viewMode, setViewMode] = useState<ViewMode>('rack')
   const mixerStateRef = useRef(mixerState)
+
+  // ── SONG mode (prototype, branche feat/song-mode) ──
+  // Facteurs 0..1 par rack pilotés par useSongPlayer ; multiplient le niveau
+  // mixer dans applyMixerToEngine. Vide = song inactif (facteur 1 partout).
+  const [songState, setSongState] = useState<SongState>(defaultSongState)
+  const songFactorsRef = useRef<Record<string, number>>({})
+  const applyMixerLevelsRef = useRef<() => void>(() => {})
 
   const racksRef = useRef(racks)
   const activeRackIdRef = useRef(activeRackId)
@@ -2069,7 +2078,9 @@ function App() {
       const ch = nextMixer[rack.id]
       if (!ch) continue
       const isMuted = ch.mute || (hasSolo && !ch.solo)
-      const effectiveLevel = isMuted ? 0 : ch.volume * masterVolumeRef.current
+      // Le SONG mode module le niveau via un facteur 0..1 par rack (1 si inactif)
+      const songFactor = songFactorsRef.current[rack.id] ?? 1
+      const effectiveLevel = isMuted ? 0 : ch.volume * masterVolumeRef.current * songFactor
       const graph = rack.id === activeRackIdRef.current ? graphRef.current : rack.graph
       const outputMod = graph.modules.find((m) => m.type === 'output')
       if (outputMod) {
@@ -2120,6 +2131,22 @@ function App() {
     masterTempoRef.current = clamped
     // Transport tempo is synced via the useEffect on masterTempo
   }
+
+  // Ref stable vers applyMixerToEngine pour le scheduler SONG (rAF) — évite
+  // de redémarrer sa boucle à chaque render.
+  useEffect(() => {
+    applyMixerLevelsRef.current = () => applyMixerToEngine(mixerStateRef.current)
+  })
+
+  useSongPlayer({
+    song: songState,
+    racks,
+    running: status === 'running' || (isTauri && tauriNativeRunning),
+    bpm: masterTempo,
+    transportBeats,
+    songFactorsRef,
+    applyLevelsRef: applyMixerLevelsRef,
+  })
 
   const handleAutoLayout = () => {
     if (graphRef.current.modules.length === 0) {
@@ -2316,6 +2343,15 @@ function App() {
                 setMasterFx((prev) => ({ ...prev, compEnabled: on }))
               }
             }}
+          />
+        ) : viewMode === 'song' ? (
+          <SongView
+            racks={racks}
+            song={songState}
+            onChange={setSongState}
+            transportBeats={transportBeats}
+            bpm={masterTempo}
+            running={status === 'running' || (isTauri && tauriNativeRunning)}
           />
         ) : (
           <RackView

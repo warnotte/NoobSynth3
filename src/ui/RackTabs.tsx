@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import type { RackSpec } from '../shared/graph'
 
-export type ViewMode = 'rack' | 'mixer'
+export type ViewMode = 'rack' | 'mixer' | 'song'
 
 type RackTabsProps = {
   racks: RackSpec[]
@@ -64,6 +64,13 @@ export const RackTabs = ({
           onClick={() => onViewModeChange('mixer')}
         >
           Mixer
+        </button>
+        <button
+          type="button"
+          className={`rack-tabs-view-btn ${viewMode === 'song' ? 'active' : ''}`}
+          onClick={() => onViewModeChange('song')}
+        >
+          Song
         </button>
       </div>
 
