@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>NoobSynth — SONG mode : éditeur piano-roll + transfert depuis le rack — mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --font-ui: 'Sora', 'Segoe UI', sans-serif;
+    --font-lcd: 'Share Tech Mono', monospace;
+    --bg-0: #0a0c10; --bg-1: #0f1319;
+    --steel-0: #161c23; --steel-1: #1f2832; --steel-2: #2a3644;
+    --border-soft: rgba(255,255,255,0.08);
+    --text-strong: #f2f6fb;
+    --text-muted: rgba(214,224,238,0.72);
+    --text-dim: rgba(214,224,238,0.45);
+    --accent-cool: #5bb6ff; --accent-mint: #42e2b1;
+    --accent-warm: #f0b06b; --accent-rose: #ff6fae;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    background: linear-gradient(180deg, var(--bg-1) 0%, var(--bg-0) 100%);
+    color: var(--text-strong); font-family: var(--font-ui); overflow: hidden; height: 100vh; position: relative;
+  }
+
+  /* ── fond : la vue SONG assombrie ── */
+  .backdrop { position: absolute; inset: 0; filter: brightness(0.38) blur(1px); pointer-events: none; padding: 60px 22px; }
+  .bd-sections { display: grid; grid-template-columns: 8fr 8fr 16fr 8fr 16fr 8fr; gap: 4px; margin-bottom: 10px; }
+  .bd-chip {
+    text-align: center; padding: 8px 4px; font-size: 10px; font-weight: 600; letter-spacing: 0.24em;
+    color: var(--text-muted); background: linear-gradient(180deg, #3a4652, #232c36);
+    border: 1px solid #06080b; border-radius: 5px;
+  }
+  .bd-chip.on { background: linear-gradient(180deg, #f4c98b, #c98d45); color: #0b1115; }
+  .bd-lane { height: 40px; border-radius: 5px; margin-bottom: 8px;
+    background: radial-gradient(120% 130% at 50% 0%, #10171c 0%, #0a0f13 70%); border: 1px solid #000; }
+
+  /* ── modal piano-roll ── */
+  .modal {
+    position: absolute; left: 50%; top: 52%; transform: translate(-50%, -50%);
+    width: 1330px; border-radius: 12px;
+    background: linear-gradient(180deg, var(--steel-1), var(--steel-0));
+    border: 1px solid #05070a;
+    box-shadow: 0 40px 90px rgba(0,0,0,0.85), inset 0 1px 0 var(--border-soft);
+    padding: 14px 16px 12px;
+  }
+  .m-head { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .m-title { font-size: 12px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; }
+  .m-title em { font-style: normal; color: var(--accent-cool); }
+  .m-sub { font-family: var(--font-lcd); font-size: 9px; color: var(--text-dim); letter-spacing: 0.12em; }
+  .m-actions { margin-left: auto; display: flex; gap: 8px; position: relative; }
+  .mbtn {
+    font-size: 9px; font-weight: 600; letter-spacing: 0.14em; padding: 6px 12px 5px;
+    border-radius: 4px; border: 1px solid #05070a; color: var(--text-muted);
+    background: linear-gradient(180deg, #232d38, #151b22);
+    box-shadow: inset 0 1px 0 var(--border-soft);
+  }
+  .mbtn.import { color: var(--accent-warm); border-color: rgba(240,176,107,0.4); }
+  .mbtn.ok { color: #0b1115; background: linear-gradient(180deg, #7af2c8, #2eb88d); font-weight: 700; }
+
+  /* menu transfert ouvert sous le bouton import */
+  .imp-menu {
+    position: absolute; top: 34px; right: 96px; z-index: 6; width: 360px;
+    background: linear-gradient(180deg, #232d38, #131a21);
+    border: 1px solid #05070a; border-radius: 8px;
+    box-shadow: 0 18px 40px rgba(0,0,0,0.8), inset 0 1px 0 var(--border-soft);
+    padding: 8px 9px; font-size: 9.5px; text-align: left;
+  }
+  .imp-menu::before {
+    content: ''; position: absolute; top: -6px; right: 60px;
+    border: 6px solid transparent; border-bottom-color: #232d38; border-top: none;
+  }
+  .im-title { font-family: var(--font-lcd); font-size: 8.5px; letter-spacing: 0.14em; color: var(--accent-warm);
+    text-transform: uppercase; margin-bottom: 6px; padding-bottom: 5px; border-bottom: 1px solid var(--border-soft); }
+  .im-item { padding: 5px 7px; border-radius: 4px; color: var(--text-muted); letter-spacing: 0.04em; }
+  .im-item b { color: var(--text-strong); font-weight: 600; }
+  .im-item.hover { background: rgba(240,176,107,0.14); outline: 1px solid rgba(240,176,107,0.35); }
+  .im-item.off { color: var(--text-dim); opacity: 0.55; }
+  .im-item .why { font-family: var(--font-lcd); font-size: 8px; color: var(--text-dim); display: block; margin-top: 1px; }
+
+  /* corps : clavier + grille */
+  .m-body { display: grid; grid-template-columns: 46px 1fr; gap: 0; }
+  .keys { position: relative; height: 375px; border-right: 1px solid #000; }
+  .key { position: absolute; left: 0; right: 4px; height: 15px; }
+  .key.white { background: linear-gradient(180deg, #d8dee6, #aeb7c2); border-bottom: 1px solid #7a828c; }
+  .key.black { background: linear-gradient(180deg, #262c33, #14181d); border-bottom: 1px solid #000; }
+  .key .kl { position: absolute; right: 7px; top: 2px; font-family: var(--font-lcd); font-size: 8px; color: #333; }
+
+  .grid {
+    position: relative; height: 375px; width: 1152px; overflow: hidden;
+    background:
+      /* rangées touches noires */
+      repeating-linear-gradient(180deg,
+        transparent 0 30px, rgba(0,0,0,0.30) 30px 45px,
+        transparent 45px 60px, rgba(0,0,0,0.30) 60px 75px,
+        transparent 75px 90px, rgba(0,0,0,0.30) 90px 105px,
+        transparent 105px 135px, rgba(0,0,0,0.30) 135px 150px,
+        transparent 150px 165px, rgba(0,0,0,0.30) 165px 180px),
+      /* lignes horizontales */
+      repeating-linear-gradient(180deg, rgba(255,255,255,0.045) 0 1px, transparent 1px 15px),
+      /* croches / temps / mesures */
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 18px),
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.07) 0 1px, transparent 1px 72px),
+      repeating-linear-gradient(90deg, rgba(240,176,107,0.22) 0 1px, transparent 1px 144px),
+      /* scanlines + fond LCD */
+      repeating-linear-gradient(0deg, rgba(0,0,0,0.18) 0 1px, transparent 1px 3px),
+      radial-gradient(120% 130% at 50% 0%, #10171c 0%, #0a0f13 70%);
+    border: 1px solid rgba(0,0,0,0.9);
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.8);
+  }
+  .bar-num { position: absolute; top: 2px; font-family: var(--font-lcd); font-size: 8px; color: var(--text-dim); }
+  .note {
+    position: absolute; height: 13px; border-radius: 2px;
+    background: linear-gradient(180deg, #9cd6ff, #2f7fbe);
+    box-shadow: 0 0 7px rgba(91,182,255,0.55), inset 0 1px 0 rgba(255,255,255,0.4);
+    border: 1px solid rgba(0,0,0,0.6);
+  }
+  .note.sel {
+    outline: 1.5px solid #fff; box-shadow: 0 0 12px rgba(91,182,255,0.9);
+  }
+  .note.sel::after {
+    content: ''; position: absolute; right: -1px; top: 1px; bottom: 1px; width: 4px;
+    background: rgba(255,255,255,0.85); border-radius: 0 2px 2px 0;
+  }
+  .gplayhead {
+    position: absolute; top: 0; bottom: 0; left: 486px; width: 2px;
+    background: var(--accent-rose); box-shadow: 0 0 10px var(--accent-rose);
+  }
+
+  /* vélocité */
+  .vel-wrap { display: grid; grid-template-columns: 46px 1fr; margin-top: 6px; }
+  .vel-label { font-family: var(--font-lcd); font-size: 8px; color: var(--text-dim); letter-spacing: 0.12em;
+    display: flex; align-items: flex-end; justify-content: flex-end; padding: 0 8px 4px 0; }
+  .vel {
+    position: relative; height: 54px; width: 1152px;
+    background:
+      repeating-linear-gradient(90deg, rgba(240,176,107,0.14) 0 1px, transparent 1px 144px),
+      repeating-linear-gradient(0deg, rgba(0,0,0,0.18) 0 1px, transparent 1px 3px),
+      radial-gradient(120% 130% at 50% 0%, #10171c 0%, #0a0f13 70%);
+    border: 1px solid rgba(0,0,0,0.9); box-shadow: inset 0 2px 8px rgba(0,0,0,0.8);
+  }
+  .vbar { position: absolute; bottom: 0; width: 12px; border-radius: 2px 2px 0 0;
+    background: linear-gradient(180deg, #ffd2a4, #c9793a); box-shadow: 0 0 6px rgba(240,176,107,0.4); }
+
+  .m-foot {
+    display: flex; gap: 18px; margin-top: 9px; align-items: center;
+    font-size: 8.5px; letter-spacing: 0.12em; color: var(--text-dim); text-transform: uppercase;
+  }
+  .chip {
+    font-family: var(--font-lcd); font-size: 8.5px; padding: 3px 8px 2px; border-radius: 3px;
+    border: 1px solid #05070a; background: #141a21; color: var(--accent-mint); letter-spacing: 0.1em;
+  }
+</style>
+</head>
+<body>
+
+  <!-- vue SONG assombrie derrière -->
+  <div class="backdrop">
+    <div class="bd-sections">
+      <div class="bd-chip">INTRO</div><div class="bd-chip on">BUILD</div><div class="bd-chip">DROP</div>
+      <div class="bd-chip">BREAK</div><div class="bd-chip">DROP II</div><div class="bd-chip">OUTRO</div>
+    </div>
+    <div class="bd-lane"></div><div class="bd-lane"></div><div class="bd-lane"></div>
+    <div class="bd-lane"></div><div class="bd-lane"></div><div class="bd-lane"></div>
+  </div>
+
+  <div class="modal">
+    <div class="m-head">
+      <div>
+        <div class="m-title">PIANO-ROLL &mdash; <em>ACID 303</em> &middot; clip &laquo; BUILD &raquo;</div>
+        <div class="m-sub">8 MESURES &middot; MES 9&ndash;17 &middot; &#9834; NOTES &rarr; MIDI SEQ 1 &middot; &eacute;coute en boucle pendant l'&eacute;dition</div>
+      </div>
+      <div class="m-actions">
+        <button class="mbtn import">&#8592; TRANSF&Eacute;RER DU RACK</button>
+        <button class="mbtn">&#9654; &Eacute;COUTER</button>
+        <button class="mbtn ok">&#10003; OK</button>
+
+        <div class="imp-menu">
+          <div class="im-title">Transf&eacute;rer des notes &mdash; rack &laquo; ACID 303 &raquo;</div>
+          <div class="im-item hover"><b>step-sequencer-1</b> &mdash; 16 pas &rarr; 1 mesure, r&eacute;p&eacute;t&eacute;e sur le clip
+            <span class="why">conversion directe pitch/gate &rarr; notes ; le step-seq est ensuite d&eacute;branch&eacute;, la lane prend le relais</span></div>
+          <div class="im-item"><b>midi-file-sequencer-1</b> &mdash; importer ses notes existantes
+            <span class="why">reprend le midiData d&eacute;j&agrave; charg&eacute; (fichier .mid ou preset)</span></div>
+          <div class="im-item off"><b>arpeggiator-1</b> &mdash; enregistrer 8 mesures&hellip;
+            <span class="why">g&eacute;n&eacute;ratif : capture de la sortie cv/gate &mdash; phase 2</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="m-body">
+      <div class="keys" id="keys"></div>
+      <div class="grid" id="grid">
+        <div class="gplayhead"></div>
+      </div>
+    </div>
+
+    <div class="vel-wrap">
+      <div class="vel-label">V&Eacute;LO</div>
+      <div class="vel" id="vel"></div>
+    </div>
+
+    <div class="m-foot">
+      <span class="chip">SNAP 1/16</span>
+      <span class="chip">OUTIL &#9998;</span>
+      <span>clic = poser &middot; drag = dur&eacute;e &middot; alt-clic = supprimer &middot; drag vertical dans V&Eacute;LO = accent</span>
+      <span style="margin-left:auto; color:var(--accent-warm)">le clip se compile dans le MIDI SEQ du rack &agrave; la fermeture</span>
+    </div>
+  </div>
+
+<script>
+  // clavier : 25 rangées C4 (haut) → C2 (bas), rowH 15
+  const keys = document.getElementById('keys');
+  const NAMES = ['C','B','A#','A','G#','G','F#','F','E','D#','D','C#'];
+  for (let r = 0; r < 25; r++) {
+    const name = NAMES[r % 12];
+    const oct = 4 - Math.floor((r + 11) / 12);
+    const k = document.createElement('div');
+    k.className = 'key ' + (name.includes('#') ? 'black' : 'white');
+    k.style.top = (r * 15) + 'px';
+    if (name === 'C') k.innerHTML = '<span class="kl">C' + oct + '</span>';
+    keys.appendChild(k);
+  }
+
+  // grille : 8 mesures × 8 croches, cell 18px — ligne acid autour de A2
+  const grid = document.getElementById('grid');
+  const vel = document.getElementById('vel');
+  for (let b = 0; b < 8; b++) {
+    const n = document.createElement('div');
+    n.className = 'bar-num'; n.style.left = (b * 144 + 4) + 'px'; n.textContent = 9 + b;
+    grid.appendChild(n);
+  }
+  // [mesure, croche, rangée (0=C4 … 24=C2), longueur croches, vélocité 0-1, sélectionnée?]
+  const NOTES = [
+    [0,0,15,1,.8],[0,1,15,1,.5],[0,2,8,1,.95],[0,3,15,1,.55],[0,4,15,1,.8],[0,5,12,1,.7],[0,6,15,1,.5],[0,7,5,1,.9],
+    [1,0,15,1,.8],[1,2,3,1,.95],[1,3,15,1,.5],[1,5,12,1,.65],[1,6,15,1,.55],
+    [2,0,15,1,.8],[2,1,15,1,.5],[2,2,8,1,.9],[2,4,10,2,.75],
+    [3,0,15,1,.8],[3,2,3,1,.95],[3,4,15,1,.55],[3,6,5,2,.85],
+    [4,0,15,1,.8],[4,1,15,1,.5],[4,2,8,2,.95,true],[4,5,12,1,.7],[4,7,15,1,.5],
+    [5,0,15,1,.8],[5,2,3,1,.9],[5,3,15,1,.5],[5,6,12,1,.7],
+    [6,0,15,1,.8],[6,1,15,1,.55],[6,2,8,1,.9],[6,4,15,1,.6],[6,5,10,1,.75],[6,6,8,1,.85],[6,7,5,1,.95],
+    [7,0,3,2,.9],[7,3,15,1,.6],[7,4,15,1,.7],[7,6,17,2,.85],
+  ];
+  for (const [bar, e8, row, len, v, sel] of NOTES) {
+    const x = (bar * 8 + e8) * 18, y = row * 15 + 1;
+    const n = document.createElement('div');
+    n.className = 'note' + (sel ? ' sel' : '');
+    n.style.cssText = `left:${x + 1}px; top:${y}px; width:${len * 18 - 3}px; opacity:${0.55 + v * 0.45}`;
+    grid.appendChild(n);
+    const vb = document.createElement('div');
+    vb.className = 'vbar';
+    vb.style.cssText = `left:${x + 2}px; height:${Math.round(v * 48)}px; opacity:${0.5 + v * 0.5}`;
+    vel.appendChild(vb);
+  }
+</script>
+</body>
+</html>
