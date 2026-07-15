@@ -518,7 +518,7 @@ Les plans/analyses de features déjà implémentées sont conservés dans [docs/
 - [x] **Test Tauri du Sampler (v0.10.0)** - ✅ Validé en standalone le 2026-06-11 (auto-load + re-upload après restart audio natif), en même temps que la mesure de transport native et le seek MIDI poly.
 
 ### UI / UX
-- [ ] **Idée disruptive UI/UX (à venir)** - À faire sur une **nouvelle branche, nouvelle session**. Concept à détailler par l'utilisateur. Refonte/expérimentation UI/UX d'ampleur (pas un simple ajustement).
+- [ ] **SONG mode (arrangement timeline)** - EN COURS sur la branche `feat/song-mode` (2026-07). Concept validé par itérations : une lane = un rack (aucun rôle imposé), sous-lanes à la carte selon ce que le rack contient (MIX toujours ; ♪ NOTES si midi-file-sequencer ; ▦ PATTERNS si drum-sequencer ; ⚙ AUTOMATION = tout param), piano-roll de clip, transfert des notes des séquenceurs statiques du rack vers le song. Plan complet : `docs/SONG_MODE_PLAN.md` (sur la branche) ; audit séquenceurs statiques/génératifs conservé sur main : `docs/STUDIO_GAP_ANALYSIS.md`. Si la branche est annulée, ce TODO + l'audit restent la base de reprise.
 
 ---
 
