@@ -52,7 +52,13 @@ import { RackView } from './ui/RackView'
 import { MixerConsole, type MixerChannelState } from './ui/MixerConsole'
 import { RackTabs, type ViewMode } from './ui/RackTabs'
 import { SongView } from './ui/SongView'
-import { useSongPlayer, defaultSongState, songPositionAt, type SongState } from './hooks/useSongPlayer'
+import {
+  useSongPlayer,
+  defaultSongState,
+  songPositionAt,
+  songTotalBars,
+  type SongState,
+} from './hooks/useSongPlayer'
 import { SidePanel } from './ui/SidePanel'
 import { BrandRail } from './ui/BrandRail'
 import { IoPanel } from './ui/IoPanel'
@@ -2148,6 +2154,113 @@ function App() {
     applyLevelsRef: applyMixerLevelsRef,
   })
 
+  const transportBeatsRef = useRef(0)
+  useEffect(() => {
+    transportBeatsRef.current = transportBeats
+  }, [transportBeats])
+
+  // rackId -> ids des midi-file-sequencer du rack (cibles des lanes ♪ du SONG mode)
+  const songMidiTargets = useMemo(() => {
+    const map: Record<string, string[]> = {}
+    for (const rack of racks) {
+      const g = rack.id === activeRackId ? graph : rack.graph
+      map[rack.id] = g.modules
+        .filter((m) => m.type === 'midi-file-sequencer')
+        .map((m) => m.id)
+    }
+    return map
+  }, [racks, activeRackId, graph])
+
+  /** Écrit le midiData compilé d'une lane ♪ dans le midi-file-sequencer du rack
+   *  (état + moteur Web/Tauri, rack actif ou non), puis re-seek à la position
+   *  courante (écrire midiData remet la lecture du module à tick 0). */
+  const pushSongLaneToRack = (rackId: string, moduleId: string, json: string, totalTicks: number) => {
+    const tempo = masterTempoRef.current
+    if (rackId === activeRackIdRef.current) {
+      // Rack actif : updateParam gère graphe + moteur Web + Tauri (id mappé)
+      updateParam(moduleId, 'tempo', tempo, { skipHistory: true })
+      updateParam(moduleId, 'loop', 1, { skipHistory: true })
+      updateParam(moduleId, 'midiData', json, { skipHistory: true })
+    } else {
+      setRacks((prev) =>
+        prev.map((r) =>
+          r.id === rackId
+            ? {
+                ...r,
+                graph: {
+                  ...r.graph,
+                  modules: r.graph.modules.map((m) =>
+                    m.id === moduleId
+                      ? { ...m, params: { ...m.params, midiData: json, tempo, loop: 1 } }
+                      : m,
+                  ),
+                },
+              }
+            : r,
+        ),
+      )
+      const engineId = `${rackId}/${moduleId}`
+      if (statusRef.current === 'running') {
+        engine.setParamDirect(engineId, 'tempo', tempo)
+        engine.setParamDirect(engineId, 'loop', 1)
+        engine.setParamStringDirect(engineId, 'midiData', json)
+      }
+      if (isTauri && tauriNativeRunning) {
+        void invokeTauri('native_set_param', { moduleId: engineId, paramId: 'tempo', value: tempo }).catch(() => {})
+        void invokeTauri('native_set_param', { moduleId: engineId, paramId: 'loop', value: 1 }).catch(() => {})
+        void invokeTauri('native_set_param_string', { moduleId: engineId, paramId: 'midiData', value: json }).catch(() => {})
+      }
+    }
+    const engineId = `${rackId}/${moduleId}`
+    const tick = Math.round((((transportBeatsRef.current * 480) % totalTicks) + totalTicks) % totalTicks)
+    if (statusRef.current === 'running') {
+      engine.seekMidiSequencerDirect(engineId, tick)
+    }
+    if (isTauri && tauriNativeRunning) {
+      void invokeTauri('native_seek_midi_sequencer', { moduleId: engineId, tick }).catch(() => {})
+    }
+  }
+
+  // Compilation débouncée des lanes ♪ → midiData (une écriture par édition,
+  // jamais par section — le parse tourne sur le thread audio, voir plan).
+  const songCompiledRef = useRef<Record<string, string>>({})
+  useEffect(() => {
+    const lanes = Object.entries(songState.notesLanes)
+    if (lanes.length === 0) return
+    const timer = setTimeout(() => {
+      const totalBars = songTotalBars(songState)
+      const totalTicks = Math.max(480, Math.round(totalBars * 4 * 480))
+      for (const [rackId, lane] of lanes) {
+        const midi = {
+          ticksPerBeat: 480,
+          totalTicks,
+          tempo: masterTempoRef.current,
+          tracks: [
+            {
+              name: 'SONG',
+              channel: 0,
+              notes: lane.notes
+                .map((n) => ({
+                  tick: Math.round(n.bar * 4 * 480),
+                  note: n.note,
+                  velocity: Math.max(1, Math.round(n.vel * 127)),
+                  duration: Math.max(1, Math.round(n.dur * 4 * 480)),
+                }))
+                .sort((a, b) => a.tick - b.tick),
+            },
+          ],
+        }
+        const json = JSON.stringify(midi)
+        const key = `${rackId}/${lane.targetModuleId}`
+        if (songCompiledRef.current[key] === json) continue
+        songCompiledRef.current[key] = json
+        pushSongLaneToRack(rackId, lane.targetModuleId, json, totalTicks)
+      }
+    }, 300)
+    return () => clearTimeout(timer)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [songState, masterTempo])
+
   const handleAutoLayout = () => {
     if (graphRef.current.modules.length === 0) {
       return
@@ -2352,6 +2465,7 @@ function App() {
             transportBeats={transportBeats}
             bpm={masterTempo}
             running={status === 'running' || (isTauri && tauriNativeRunning)}
+            midiTargets={songMidiTargets}
           />
         ) : (
           <RackView

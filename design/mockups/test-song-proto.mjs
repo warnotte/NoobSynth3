@@ -1,7 +1,8 @@
-// Prototype SONG mode — vérification E2E : charge Capitulation, ouvre la vue
-// Song, édite l'arrangement (mutes + drag de volume), active le mode SONG via
-// le TRANSPORT, joue, et vérifie que le mode reste visible/pilotable depuis la
-// vue RACK. Screenshots → design/mockups/proto-song-*.png
+// Prototype SONG mode — vérification E2E complète :
+// 1. mode RACK|SONG au transport, 2. mutes par section, 3. COURBE de volume
+// (points), 4. lane ♪ NOTES : +♪ → piano-roll → pose de notes → vignette →
+// compilation midiData. Projet : Lumière (rack 1 = midi-file-sequencer).
+// Screenshots → design/mockups/proto-song-*.png
 import { chromium } from 'playwright'
 
 const browser = await chromium.launch({
@@ -13,82 +14,75 @@ page.on('pageerror', (err) => console.log('PAGE ERROR:', err.message))
 await page.goto('http://localhost:5173')
 await page.waitForSelector('.rack-tabs-view-btn', { timeout: 15000 })
 
-// 1) Charger le projet multi-rack Capitulation depuis la section Projects
+// 1) Charger le projet Lumière (multi-rack, avec MIDI seq)
 const projectsHeader = page.locator('.panel-section', { hasText: 'Projects' }).first()
 const projectsToggle = projectsHeader.locator('button, .panel-section-header').first()
-try {
-  const capitCard = page.locator('.preset-card', { hasText: 'Capitulation' })
-  if (!(await capitCard.first().isVisible().catch(() => false))) {
-    await projectsToggle.click()
-    await page.waitForTimeout(400)
-  }
-  await capitCard.locator('button', { hasText: 'Load' }).first().click({ timeout: 5000 })
-  console.log('project loaded: Capitulation')
-  await page.waitForTimeout(1200)
-} catch (e) {
-  console.log('project load failed (fallback: default rack):', e.message.split('\n')[0])
+const lumCard = page.locator('.preset-card', { hasText: 'Lumière' })
+if (!(await lumCard.first().isVisible().catch(() => false))) {
+  await projectsToggle.click()
+  await page.waitForTimeout(400)
 }
+await lumCard.locator('button', { hasText: 'Load' }).first().click({ timeout: 5000 })
+console.log('project loaded: Lumière')
+await page.waitForTimeout(1200)
 
-// 2) Ouvrir la vue Song
+// 2) Vue Song
 await page.locator('.rack-tabs-view-btn', { hasText: 'Song' }).click()
 await page.waitForSelector('.song-view', { timeout: 5000 })
-console.log('song view open —', await page.locator('.song-row').count(), 'rows')
+console.log('lanes:', await page.locator('.song-lane-group').count())
 
-// 3) Éditer l'arrangement : mutes + DRAG VERTICAL = volume
-const rows = await page.locator('.song-lanes .song-row:not(.song-row-sections)').all()
-console.log('lanes:', rows.length)
-if (rows.length >= 2) {
-  await rows[1].locator('.song-cell').nth(0).click() // lane 2 muette section 1
-  const last = rows[rows.length - 1]
-  await last.locator('.song-cell').nth(0).click()
-  await last.locator('.song-cell').nth(1).click()
+// 3) Lane ♪ NOTES : le rack 1 (midi seq) doit proposer +♪
+const addNotesBtn = page.locator('.song-label-btn.add').first()
+console.log('+♪ visible :', await addNotesBtn.isVisible())
+await addNotesBtn.click()
+await page.waitForSelector('.song-pr', { timeout: 3000 })
+console.log('piano-roll ouvert')
 
-  // drag vertical vers le bas sur lane 1 / section 2 → baisse le niveau
-  const cell = rows[0].locator('.song-cell').nth(1)
-  const before = await cell.locator('.song-cell-db').textContent()
-  const box = await cell.boundingBox()
-  const cx = box.x + box.width / 2
-  const cy = box.y + box.height / 2
-  await page.mouse.move(cx, cy)
-  await page.mouse.down()
-  for (let i = 1; i <= 6; i++) await page.mouse.move(cx, cy + i * 5)
-  await page.mouse.up()
-  const after = await cell.locator('.song-cell-db').textContent()
-  const fillH = await cell
-    .locator('.song-cell-fill')
-    .evaluate((el) => el.style.height)
-    .catch(() => 'none')
-  console.log(`drag volume : ${before} dB -> ${after} dB (fill ${fillH})`)
+// Poser 5 notes (clic = pose, la grille snap 1/16)
+const grid = page.locator('.song-pr-grid')
+const gbox = await grid.boundingBox()
+const midY = gbox.y + gbox.height / 2
+for (let i = 0; i < 5; i++) {
+  const x = gbox.x + 12 + i * 56 // toutes les 4 double-croches
+  const y = midY - i * 24 // ligne montante
+  await page.mouse.click(x, y)
+  await page.waitForTimeout(80)
 }
+const prNotes = await page.locator('.song-pr-note').count()
+console.log('notes posées dans le piano-roll :', prNotes)
+// Déplacer la 2e note d'un ton vers le haut (drag)
+const n2 = page.locator('.song-pr-note').nth(1)
+const nb = await n2.boundingBox()
+await page.mouse.move(nb.x + 3, nb.y + nb.height / 2)
+await page.mouse.down()
+await page.mouse.move(nb.x + 3, nb.y + nb.height / 2 - 24, { steps: 4 })
+await page.mouse.up()
+await page.screenshot({ path: 'E:/CODEX/NoobSynth3/design/mockups/proto-song-pianoroll.png' })
+await page.locator('.song-pr-ok').click()
+await page.waitForTimeout(600) // compile (300 ms debounce)
+const thumbNotes = await page.locator('.song-row-notes rect').count()
+console.log('vignette lane ♪ :', thumbNotes, 'notes')
 
-// 4) Activer le mode SONG via le TRANSPORT (plus de toggle dans la vue)
+// 4) COURBE de volume sur la lane 1 : VOL → 2 points
+await page.locator('.song-label-btn', { hasText: 'VOL' }).first().click()
+const volZone = page.locator('.song-voledit').first()
+const vbox = await volZone.boundingBox()
+await page.mouse.click(vbox.x + vbox.width * 0.3, vbox.y + vbox.height * 0.7)
+await page.waitForTimeout(100)
+await page.mouse.click(vbox.x + vbox.width * 0.6, vbox.y + vbox.height * 0.15)
+await page.waitForTimeout(100)
+console.log('points de courbe :', await page.locator('.song-volpoint').count())
+
+// 5) Mute d'une cellule (lane 2, section 1)
+const lane2cells = page.locator('.song-lane-group').nth(1).locator('.song-cell')
+await lane2cells.nth(0).click()
+
+// 6) Mode SONG au transport + lecture
 await page.locator('.tc-mode-btn.song').click()
-await page.waitForTimeout(200)
-await page.screenshot({ path: 'E:/CODEX/NoobSynth3/design/mockups/proto-song-edited.png' })
-
-// 5) Jouer, vérifier l'avance
 await page.locator('.tc-play').click()
-await page.waitForTimeout(4000)
-console.log('LCD SongView :', await page.locator('.song-lcd').textContent())
-console.log('LCD transport SECTION :', await page.locator('.tc-lcd--song .tc-lcd-value').textContent())
-await page.screenshot({ path: 'E:/CODEX/NoobSynth3/design/mockups/proto-song-playing.png' })
-
-// 6) Basculer en vue RACK pendant que le song pilote : le MODE + la SECTION
-//    restent visibles et commutables dans le transport
-await page.locator('.rack-tabs-view-btn', { hasText: 'Racks' }).click()
-await page.waitForTimeout(2500)
-console.log(
-  'vue RACK — SECTION transport :',
-  await page.locator('.tc-lcd--song .tc-lcd-value').textContent(),
-)
-await page.screenshot({ path: 'E:/CODEX/NoobSynth3/design/mockups/proto-song-rackview.png' })
-
-// 7) Repasser en mode RACK (lecture libre) depuis la vue rack
-await page.locator('.tc-mode-btn', { hasText: 'RACK' }).click()
-await page.waitForTimeout(300)
-const songLcdCount = await page.locator('.tc-lcd--song').count()
-console.log('mode RACK — LCD SECTION masqué :', songLcdCount === 0 ? 'oui' : 'NON')
-
+await page.waitForTimeout(3500)
+console.log('SECTION transport :', await page.locator('.tc-lcd--song .tc-lcd-value').textContent())
+await page.screenshot({ path: 'E:/CODEX/NoobSynth3/design/mockups/proto-song-v2.png' })
 await page.locator('.tc-play').click()
 await browser.close()
 console.log('done')

@@ -267,6 +267,22 @@ export class AudioEngine {
     }
   }
 
+  /** String param via the full engine-side module ID (bypasses moduleIdMapper).
+   *  Used by the SONG mode to write midiData into NON-active racks. */
+  setParamStringDirect(engineModuleId: string, paramId: string, value: string): void {
+    this.graphNode?.port.postMessage({
+      type: 'setParamString',
+      moduleId: engineModuleId,
+      paramId,
+      value,
+    })
+  }
+
+  /** Seek via the full engine-side module ID (bypasses moduleIdMapper). */
+  seekMidiSequencerDirect(engineModuleId: string, tick: number): void {
+    this.graphNode?.port.postMessage({ type: 'seekMidiSeq', moduleId: engineModuleId, tick })
+  }
+
   setParamString(moduleId: string, paramId: string, value: string): void {
     const node = this.graphNode
     if (!node) {

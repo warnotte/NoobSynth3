@@ -5,25 +5,37 @@ import type { RackSpec } from '../shared/graph'
 /**
  * SONG mode (prototype) — arrangement timeline.
  *
- * Une lane = un rack (aucun rôle imposé). v0 : sous-lane MIX uniquement —
- * chaque section donne, par rack, un facteur de niveau 0..1 (0 = muet) qui
- * MULTIPLIE le niveau mixer normal (volume × master, mute/solo respectés).
- * Le scheduler tourne côté UI (rAF) sur les beats du transport global et
- * applique les facteurs via le même chemin que le mixer (level du module
- * output de chaque rack), avec une mini-rampe anti-click.
+ * Une lane = un rack (aucun rôle imposé). Sous-lanes :
+ * - MIX : cellules on/off par section + COURBE de volume continue (points
+ *   d'automation interpolés sur toute la durée du song) — le facteur 0..1
+ *   résultant MULTIPLIE le niveau mixer normal (mute/solo respectés).
+ * - ♪ NOTES : notes composées dans le song (piano-roll), compilées en
+ *   `midiData` dans le midi-file-sequencer du rack (côté App).
  *
+ * Le scheduler tourne côté UI (rAF) sur les beats du transport global et
+ * évalue la courbe en CONTINU (lissage exponentiel anti-click).
  * Voir docs/SONG_MODE_PLAN.md (branche feat/song-mode).
  */
 
 export type SongSection = { id: string; name: string; bars: number }
-/** Cellule d'une lane MIX. Absente = { on: true, level: 1 } (transparent). */
+/** Cellule on/off d'une lane MIX. Absente = { on: true, level: 1 }. */
 export type SongCell = { on: boolean; level: number }
+/** Point de la courbe de volume d'un rack (bar = position absolue en mesures). */
+export type SongVolumePoint = { bar: number; v: number }
+/** Note d'une lane ♪ : positions/durées en MESURES (fractions), vel 0..1. */
+export type SongNote = { bar: number; note: number; dur: number; vel: number }
+export type SongNotesLane = { targetModuleId: string; notes: SongNote[] }
+
 export type SongState = {
   enabled: boolean
   loop: boolean
   sections: SongSection[]
-  /** rackId -> sectionId -> cellule */
+  /** rackId -> sectionId -> cellule on/off */
   cells: Record<string, Record<string, SongCell>>
+  /** rackId -> courbe de volume (triée par bar ; vide = 1.0 constant) */
+  volumes: Record<string, SongVolumePoint[]>
+  /** rackId -> lane notes (compilée en midiData par App) */
+  notesLanes: Record<string, SongNotesLane>
 }
 
 export const DEFAULT_SONG_CELL: SongCell = { on: true, level: 1 }
@@ -38,6 +50,8 @@ export const defaultSongState = (): SongState => ({
     { id: 's4', name: 'OUTRO', bars: 8 },
   ],
   cells: {},
+  volumes: {},
+  notesLanes: {},
 })
 
 export const getSongCell = (song: SongState, rackId: string, sectionId: string): SongCell =>
@@ -45,6 +59,21 @@ export const getSongCell = (song: SongState, rackId: string, sectionId: string):
 
 export const songTotalBars = (song: SongState): number =>
   song.sections.reduce((sum, s) => sum + s.bars, 0)
+
+/** Valeur de la courbe de volume à la mesure `bar` (interp. linéaire, 1 si vide). */
+export const volumeCurveAt = (points: SongVolumePoint[] | undefined, bar: number): number => {
+  if (!points || points.length === 0) return 1
+  if (bar <= points[0].bar) return points[0].v
+  for (let i = 1; i < points.length; i++) {
+    if (bar < points[i].bar) {
+      const a = points[i - 1]
+      const b = points[i]
+      const t = (bar - a.bar) / Math.max(1e-6, b.bar - a.bar)
+      return a.v + (b.v - a.v) * t
+    }
+  }
+  return points[points.length - 1].v
+}
 
 export type SongPosition = {
   index: number
@@ -82,8 +111,9 @@ export const songPositionAt = (song: SongState, beats: number): SongPosition | n
   }
 }
 
-/** Durée de la mini-rampe appliquée aux frontières de section (anti-click). */
-const RAMP_MS = 150
+/** Lissage exponentiel par frame (anti-click) + seuil d'envoi au moteur. */
+const SMOOTHING = 0.25
+const APPLY_EPSILON = 0.003
 
 type UseSongPlayerArgs = {
   song: SongState
@@ -125,9 +155,8 @@ export function useSongPlayer({
     }
 
     let raf = 0
-    let lastSectionId: string | null = null // force la ré-application à l'entrée
-    let ramp: { from: Record<string, number>; to: Record<string, number>; start: number } | null =
-      null
+    // Dernière valeur effectivement envoyée au moteur, pour throttler.
+    let lastSent: Record<string, number> = {}
 
     const estimateBeats = () => {
       const { beats, at } = beatsInfoRef.current
@@ -136,26 +165,25 @@ export function useSongPlayer({
 
     const tick = () => {
       const pos = songPositionAt(song, estimateBeats())
-      if (pos && pos.section.id !== lastSectionId) {
-        lastSectionId = pos.section.id
-        const from: Record<string, number> = {}
-        const to: Record<string, number> = {}
-        for (const rack of racks) {
-          from[rack.id] = songFactorsRef.current[rack.id] ?? 1
-          const cell = getSongCell(song, rack.id, pos.section.id)
-          to[rack.id] = cell.on ? cell.level : 0
-        }
-        ramp = { from, to, start: performance.now() }
-      }
-      if (ramp) {
-        const t = Math.min(1, (performance.now() - ramp.start) / RAMP_MS)
+      if (pos) {
         const factors: Record<string, number> = {}
-        for (const id of Object.keys(ramp.to)) {
-          factors[id] = ramp.from[id] + (ramp.to[id] - ramp.from[id]) * t
+        let needsApply = false
+        for (const rack of racks) {
+          const cell = getSongCell(song, rack.id, pos.section.id)
+          const target = cell.on ? volumeCurveAt(song.volumes[rack.id], pos.barGlobal) : 0
+          const current = songFactorsRef.current[rack.id] ?? 1
+          let next = current + (target - current) * SMOOTHING
+          if (Math.abs(next - target) < 0.001) next = target
+          factors[rack.id] = next
+          if (Math.abs(next - (lastSent[rack.id] ?? 1)) > APPLY_EPSILON || (next === target && lastSent[rack.id] !== target)) {
+            needsApply = true
+          }
         }
         songFactorsRef.current = factors
-        applyLevelsRef.current()
-        if (t >= 1) ramp = null
+        if (needsApply) {
+          lastSent = { ...factors }
+          applyLevelsRef.current()
+        }
       }
       raf = requestAnimationFrame(tick)
     }
