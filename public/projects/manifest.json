@@ -86,6 +86,13 @@
       "group": "Songs"
     },
     {
+      "id": "nova-64",
+      "name": "NOVA 64 💾",
+      "description": "Chiptune × acid rave : puces NES/SNES + TB-303 + 909 dans un seul morceau. Accords arpégés en triples-croches (le trick C64), écho chip, structure demo-disk BOOT→GAME OVER. Lead et 303 éditables (lanes ♪). MODE SONG → PLAY.",
+      "file": "nova-64.json",
+      "group": "Songs"
+    },
+    {
       "id": "capitulation",
       "name": "Capitulation 📉",
       "description": "Génératif apocalyptique : un krach boursier sans fin (drone, ticker Turing/chaos, puces qui lâchent, alarmes + un beat acid TB-303 qui arrive après ~1-2 min). 5 racks, zéro MIDI, LFOs à périodes premières → jamais répétitif.",
