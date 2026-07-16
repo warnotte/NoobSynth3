@@ -67,8 +67,22 @@
     {
       "id": "nova",
       "name": "NOVA ⚡",
-      "description": "La démo ULTIME du SONG mode : melodic acid 126 BPM — harmonie par section (descente andalouse, napolitaine), hook syncopé éditable (lane ♪), stabs house, TB-303 avec slides et accents, kit 909 swingué avec fills et rolls gradués, risers par courbes. MODE SONG → PLAY.",
+      "description": "L'originale (v1) : 64 mesures, 124 BPM — lead & basse éditables (lanes ♪), accords + arpège, kit 909 avec fills et rolls gradués, risers par courbes. MODE SONG → PLAY.",
       "file": "nova.json",
+      "group": "Songs"
+    },
+    {
+      "id": "nova-2",
+      "name": "NOVA II 🔥",
+      "description": "Melodic acid, 126 BPM : harmonie par section (descente andalouse, napolitaine), hook syncopé, stabs house, TB-303 slides + accents, 909 swingué. MODE SONG → PLAY.",
+      "file": "nova-2.json",
+      "group": "Songs"
+    },
+    {
+      "id": "nova-3",
+      "name": "NOVA III 🌌",
+      "description": "L'ultime : 80 mesures, 122 BPM — MODULATION en si mineur au drop final, interlude HALF-TIME à l'orgue + Leslie, arpège 3-contre-4, coda ii–V–I en LA MAJEUR (tierce picarde). MODE SONG → PLAY.",
+      "file": "nova-3.json",
       "group": "Songs"
     },
     {
