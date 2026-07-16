@@ -1,0 +1,3666 @@
+{
+  "version": 2,
+  "type": "project",
+  "masterTempo": 100,
+  "masterVolume": 0.8,
+  "activeRackId": "rack-1",
+  "racks": [
+    {
+      "id": "rack-1",
+      "name": "L'Humain",
+      "graph": {
+        "modules": [
+          {
+            "id": "humseq",
+            "type": "midi-file-sequencer",
+            "name": "Humain Seq",
+            "position": {
+              "x": 40,
+              "y": 60
+            },
+            "params": {
+              "enabled": true,
+              "tempo": 100,
+              "gateLength": 85,
+              "loop": true,
+              "voices": 1,
+              "selectedFile": "",
+              "midiData": "{\"ticksPerBeat\":480,\"totalTicks\":168960,\"tempo\":100,\"tracks\":[{\"name\":\"SONG\",\"channel\":0,\"notes\":[{\"tick\":0,\"note\":69,\"velocity\":95,\"duration\":1344},{\"tick\":1462,\"note\":64,\"velocity\":67,\"duration\":480},{\"tick\":1913,\"note\":72,\"velocity\":103,\"duration\":960},{\"tick\":2868,\"note\":71,\"velocity\":75,\"duration\":480},{\"tick\":3345,\"note\":67,\"velocity\":78,\"duration\":480},{\"tick\":3869,\"note\":69,\"velocity\":87,\"duration\":1920},{\"tick\":5762,\"note\":62,\"velocity\":65,\"duration\":960},{\"tick\":6709,\"note\":64,\"velocity\":72,\"duration\":960},{\"tick\":7695,\"note\":65,\"velocity\":97,\"duration\":1344},{\"tick\":9138,\"note\":69,\"velocity\":75,\"duration\":480},{\"tick\":9620,\"note\":67,\"velocity\":87,\"duration\":960},{\"tick\":10546,\"note\":64,\"velocity\":71,\"duration\":960},{\"tick\":11510,\"note\":62,\"velocity\":83,\"duration\":1344},{\"tick\":12949,\"note\":71,\"velocity\":80,\"duration\":480},{\"tick\":13459,\"note\":69,\"velocity\":97,\"duration\":1920},{\"tick\":30708,\"note\":69,\"velocity\":91,\"duration\":1344},{\"tick\":32174,\"note\":64,\"velocity\":66,\"duration\":480},{\"tick\":32628,\"note\":72,\"velocity\":94,\"duration\":960},{\"tick\":33614,\"note\":71,\"velocity\":76,\"duration\":480},{\"tick\":34101,\"note\":67,\"velocity\":72,\"duration\":480},{\"tick\":38400,\"note\":69,\"velocity\":97,\"duration\":1344},{\"tick\":39816,\"note\":64,\"velocity\":68,\"duration\":480},{\"tick\":40349,\"note\":72,\"velocity\":98,\"duration\":960},{\"tick\":41292,\"note\":71,\"velocity\":75,\"duration\":480},{\"tick\":41761,\"note\":67,\"velocity\":72,\"duration\":480},{\"tick\":46106,\"note\":69,\"velocity\":101,\"duration\":1344},{\"tick\":47534,\"note\":64,\"velocity\":75,\"duration\":480},{\"tick\":48023,\"note\":72,\"velocity\":99,\"duration\":960},{\"tick\":48971,\"note\":71,\"velocity\":78,\"duration\":480},{\"tick\":49413,\"note\":67,\"velocity\":79,\"duration\":480},{\"tick\":53780,\"note\":69,\"velocity\":90,\"duration\":1344},{\"tick\":55170,\"note\":64,\"velocity\":68,\"duration\":480},{\"tick\":55707,\"note\":72,\"velocity\":106,\"duration\":960},{\"tick\":56622,\"note\":71,\"velocity\":80,\"duration\":480},{\"tick\":57100,\"note\":67,\"velocity\":75,\"duration\":480},{\"tick\":61436,\"note\":69,\"velocity\":98,\"duration\":864},{\"tick\":62392,\"note\":72,\"velocity\":106,\"duration\":864},{\"tick\":65266,\"note\":71,\"velocity\":109,\"duration\":864},{\"tick\":66235,\"note\":74,\"velocity\":107,\"duration\":864},{\"tick\":69140,\"note\":72,\"velocity\":107,\"duration\":422},{\"tick\":69579,\"note\":76,\"velocity\":123,\"duration\":422},{\"tick\":70058,\"note\":74,\"velocity\":107,\"duration\":422},{\"tick\":70534,\"note\":71,\"velocity\":101,\"duration\":422},{\"tick\":72006,\"note\":69,\"velocity\":111,\"duration\":422},{\"tick\":72505,\"note\":72,\"velocity\":110,\"duration\":422},{\"tick\":72957,\"note\":76,\"velocity\":116,\"duration\":864},{\"tick\":73899,\"note\":74,\"velocity\":108,\"duration\":422},{\"tick\":74406,\"note\":71,\"velocity\":102,\"duration\":422},{\"tick\":74903,\"note\":68,\"velocity\":115,\"duration\":1728},{\"tick\":76808,\"note\":69,\"velocity\":97,\"duration\":1344},{\"tick\":78245,\"note\":64,\"velocity\":64,\"duration\":480},{\"tick\":78744,\"note\":72,\"velocity\":98,\"duration\":960},{\"tick\":79676,\"note\":71,\"velocity\":72,\"duration\":480},{\"tick\":80171,\"note\":67,\"velocity\":82,\"duration\":480},{\"tick\":80658,\"note\":69,\"velocity\":95,\"duration\":1920},{\"tick\":82564,\"note\":62,\"velocity\":65,\"duration\":960},{\"tick\":83525,\"note\":64,\"velocity\":78,\"duration\":960},{\"tick\":84507,\"note\":65,\"velocity\":102,\"duration\":1344},{\"tick\":85932,\"note\":69,\"velocity\":71,\"duration\":480},{\"tick\":86369,\"note\":67,\"velocity\":85,\"duration\":960},{\"tick\":87351,\"note\":64,\"velocity\":74,\"duration\":960},{\"tick\":88294,\"note\":62,\"velocity\":81,\"duration\":1344},{\"tick\":89757,\"note\":71,\"velocity\":71,\"duration\":480},{\"tick\":90220,\"note\":69,\"velocity\":89,\"duration\":1920},{\"tick\":92160,\"note\":69,\"velocity\":97,\"duration\":1344},{\"tick\":93572,\"note\":64,\"velocity\":68,\"duration\":480},{\"tick\":94085,\"note\":72,\"velocity\":105,\"duration\":960},{\"tick\":95050,\"note\":71,\"velocity\":80,\"duration\":480},{\"tick\":95518,\"note\":67,\"velocity\":85,\"duration\":480},{\"tick\":96009,\"note\":69,\"velocity\":88,\"duration\":1920},{\"tick\":97924,\"note\":62,\"velocity\":75,\"duration\":960},{\"tick\":98895,\"note\":64,\"velocity\":76,\"duration\":960},{\"tick\":99820,\"note\":65,\"velocity\":95,\"duration\":1344},{\"tick\":101269,\"note\":69,\"velocity\":80,\"duration\":480},{\"tick\":101779,\"note\":67,\"velocity\":97,\"duration\":960},{\"tick\":102697,\"note\":64,\"velocity\":76,\"duration\":960},{\"tick\":103670,\"note\":62,\"velocity\":90,\"duration\":1344},{\"tick\":105138,\"note\":71,\"velocity\":85,\"duration\":480},{\"tick\":105613,\"note\":69,\"velocity\":99,\"duration\":1920},{\"tick\":122876,\"note\":69,\"velocity\":92,\"duration\":1344},{\"tick\":124297,\"note\":64,\"velocity\":70,\"duration\":480},{\"tick\":124815,\"note\":72,\"velocity\":112,\"duration\":960},{\"tick\":125759,\"note\":71,\"velocity\":84,\"duration\":480},{\"tick\":126214,\"note\":67,\"velocity\":83,\"duration\":480},{\"tick\":126727,\"note\":69,\"velocity\":90,\"duration\":1920},{\"tick\":128658,\"note\":62,\"velocity\":71,\"duration\":960},{\"tick\":129615,\"note\":64,\"velocity\":81,\"duration\":960},{\"tick\":130589,\"note\":65,\"velocity\":95,\"duration\":1344},{\"tick\":132012,\"note\":69,\"velocity\":83,\"duration\":480},{\"tick\":132490,\"note\":67,\"velocity\":93,\"duration\":960},{\"tick\":133418,\"note\":64,\"velocity\":78,\"duration\":960},{\"tick\":134426,\"note\":62,\"velocity\":88,\"duration\":1344},{\"tick\":135824,\"note\":71,\"velocity\":75,\"duration\":480},{\"tick\":136342,\"note\":69,\"velocity\":100,\"duration\":1920},{\"tick\":138256,\"note\":69,\"velocity\":98,\"duration\":1344},{\"tick\":139697,\"note\":64,\"velocity\":72,\"duration\":480},{\"tick\":140154,\"note\":72,\"velocity\":110,\"duration\":960},{\"tick\":141110,\"note\":71,\"velocity\":84,\"duration\":480},{\"tick\":141598,\"note\":67,\"velocity\":90,\"duration\":480},{\"tick\":142054,\"note\":69,\"velocity\":103,\"duration\":1920},{\"tick\":144023,\"note\":62,\"velocity\":79,\"duration\":960},{\"tick\":144988,\"note\":64,\"velocity\":86,\"duration\":960},{\"tick\":145931,\"note\":65,\"velocity\":99,\"duration\":1344},{\"tick\":147380,\"note\":69,\"velocity\":80,\"duration\":480},{\"tick\":147844,\"note\":67,\"velocity\":103,\"duration\":960},{\"tick\":148796,\"note\":64,\"velocity\":89,\"duration\":960},{\"tick\":149761,\"note\":62,\"velocity\":90,\"duration\":1344},{\"tick\":151177,\"note\":71,\"velocity\":89,\"duration\":480},{\"tick\":151665,\"note\":69,\"velocity\":104,\"duration\":1920},{\"tick\":153613,\"note\":69,\"velocity\":78,\"duration\":2688},{\"tick\":156455,\"note\":72,\"velocity\":71,\"duration\":1728},{\"tick\":158412,\"note\":71,\"velocity\":59,\"duration\":1728},{\"tick\":161273,\"note\":69,\"velocity\":77,\"duration\":4800}]}]}"
+            }
+          },
+          {
+            "id": "karplus",
+            "type": "karplus",
+            "name": "Corde",
+            "position": {
+              "x": 460,
+              "y": 40
+            },
+            "params": {
+              "frequency": 440,
+              "damping": 0.25,
+              "decay": 0.996,
+              "brightness": 0.55,
+              "pluckPos": 0.4
+            }
+          },
+          {
+            "id": "humchorus",
+            "type": "chorus",
+            "name": "Chorus",
+            "position": {
+              "x": 720,
+              "y": 40
+            },
+            "params": {
+              "rate": 0.25,
+              "depth": 7,
+              "delay": 16,
+              "mix": 0.3,
+              "spread": 0.6,
+              "feedback": 0.08
+            }
+          },
+          {
+            "id": "humverb",
+            "type": "reverb",
+            "name": "Reverb",
+            "position": {
+              "x": 980,
+              "y": 40
+            },
+            "params": {
+              "time": 0.65,
+              "damp": 0.4,
+              "preDelay": 20,
+              "mix": 0.28
+            }
+          },
+          {
+            "id": "out-1",
+            "type": "output",
+            "name": "Out",
+            "position": {
+              "x": 1240,
+              "y": 40
+            },
+            "params": {
+              "level": 1
+            }
+          },
+          {
+            "id": "notes-1",
+            "type": "notes",
+            "name": "Notes",
+            "position": {
+              "x": 40,
+              "y": 420
+            },
+            "params": {
+              "text": "DUO ∞ — Renaud & Claude\n\nLa pièce sur nous. Deux voix :\nL'HUMAIN — corde pincée (Karplus), chaude, timing rubato,\n  jamais deux fois identique.\nLA MACHINE — FM, précise, quantisée au tick près.\n\nElles s'énoncent (chacune seule), dialoguent (2 mesures\nchacune), se DISPUTENT (du tac au tac sur pédale de mi),\ns'ACCORDENT (canon à l'octave), puis LA VOIX chante :\n« THANK YOU RENAUD » (speech-synth, gate tenue = mantra).\nENSEMBLE : canon serré à 2 temps, tutti.\nBONNE NUIT : l'accord de LA MAJEUR... et la machine dit\n« GOOD NIGHT RENAUD ».\n\nLes deux voix sont éditables (lanes ♪). MODE SONG → PLAY.\n\nComposé à quatre mains — juillet 2026."
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": {
+              "moduleId": "humseq",
+              "portId": "cv-1"
+            },
+            "to": {
+              "moduleId": "karplus",
+              "portId": "pitch"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "humseq",
+              "portId": "gate-1"
+            },
+            "to": {
+              "moduleId": "karplus",
+              "portId": "gate"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "karplus",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "humchorus",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "humchorus",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "humverb",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "humverb",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "out-1",
+              "portId": "in"
+            },
+            "kind": "audio"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rack-2",
+      "name": "La Machine",
+      "graph": {
+        "modules": [
+          {
+            "id": "macseq",
+            "type": "midi-file-sequencer",
+            "name": "Machine Seq",
+            "position": {
+              "x": 40,
+              "y": 60
+            },
+            "params": {
+              "enabled": true,
+              "tempo": 100,
+              "gateLength": 80,
+              "loop": true,
+              "voices": 1,
+              "selectedFile": "",
+              "midiData": "{\"ticksPerBeat\":480,\"totalTicks\":168960,\"tempo\":100,\"tracks\":[{\"name\":\"SONG\",\"channel\":0,\"notes\":[{\"tick\":15360,\"note\":69,\"velocity\":95,\"duration\":384},{\"tick\":15840,\"note\":71,\"velocity\":76,\"duration\":384},{\"tick\":16320,\"note\":72,\"velocity\":102,\"duration\":864},{\"tick\":16800,\"note\":76,\"velocity\":83,\"duration\":384},{\"tick\":17280,\"note\":72,\"velocity\":102,\"duration\":864},{\"tick\":18240,\"note\":71,\"velocity\":76,\"duration\":384},{\"tick\":18720,\"note\":67,\"velocity\":76,\"duration\":384},{\"tick\":19200,\"note\":69,\"velocity\":89,\"duration\":864},{\"tick\":20160,\"note\":64,\"velocity\":70,\"duration\":384},{\"tick\":20640,\"note\":67,\"velocity\":76,\"duration\":384},{\"tick\":21120,\"note\":62,\"velocity\":76,\"duration\":864},{\"tick\":22080,\"note\":64,\"velocity\":70,\"duration\":384},{\"tick\":22560,\"note\":65,\"velocity\":76,\"duration\":384},{\"tick\":23040,\"note\":65,\"velocity\":95,\"duration\":864},{\"tick\":24000,\"note\":67,\"velocity\":76,\"duration\":384},{\"tick\":24480,\"note\":69,\"velocity\":83,\"duration\":384},{\"tick\":24960,\"note\":67,\"velocity\":89,\"duration\":864},{\"tick\":25920,\"note\":64,\"velocity\":76,\"duration\":384},{\"tick\":26400,\"note\":62,\"velocity\":70,\"duration\":384},{\"tick\":26880,\"note\":64,\"velocity\":83,\"duration\":864},{\"tick\":27840,\"note\":68,\"velocity\":89,\"duration\":864},{\"tick\":28800,\"note\":76,\"velocity\":102,\"duration\":1728},{\"tick\":34560,\"note\":81,\"velocity\":95,\"duration\":384},{\"tick\":35040,\"note\":83,\"velocity\":76,\"duration\":384},{\"tick\":35520,\"note\":84,\"velocity\":102,\"duration\":864},{\"tick\":36000,\"note\":88,\"velocity\":83,\"duration\":384},{\"tick\":36480,\"note\":84,\"velocity\":102,\"duration\":864},{\"tick\":37440,\"note\":83,\"velocity\":76,\"duration\":384},{\"tick\":37920,\"note\":79,\"velocity\":76,\"duration\":384},{\"tick\":42240,\"note\":81,\"velocity\":95,\"duration\":384},{\"tick\":42720,\"note\":83,\"velocity\":76,\"duration\":384},{\"tick\":43200,\"note\":84,\"velocity\":102,\"duration\":864},{\"tick\":43680,\"note\":88,\"velocity\":83,\"duration\":384},{\"tick\":44160,\"note\":84,\"velocity\":102,\"duration\":864},{\"tick\":45120,\"note\":83,\"velocity\":76,\"duration\":384},{\"tick\":45600,\"note\":79,\"velocity\":76,\"duration\":384},{\"tick\":49920,\"note\":81,\"velocity\":95,\"duration\":384},{\"tick\":50400,\"note\":83,\"velocity\":76,\"duration\":384},{\"tick\":50880,\"note\":84,\"velocity\":102,\"duration\":864},{\"tick\":51360,\"note\":88,\"velocity\":83,\"duration\":384},{\"tick\":51840,\"note\":84,\"velocity\":102,\"duration\":864},{\"tick\":52800,\"note\":83,\"velocity\":76,\"duration\":384},{\"tick\":53280,\"note\":79,\"velocity\":76,\"duration\":384},{\"tick\":57600,\"note\":81,\"velocity\":95,\"duration\":384},{\"tick\":58080,\"note\":83,\"velocity\":76,\"duration\":384},{\"tick\":58560,\"note\":84,\"velocity\":102,\"duration\":864},{\"tick\":59040,\"note\":88,\"velocity\":83,\"duration\":384},{\"tick\":59520,\"note\":84,\"velocity\":102,\"duration\":864},{\"tick\":60480,\"note\":83,\"velocity\":76,\"duration\":384},{\"tick\":60960,\"note\":79,\"velocity\":76,\"duration\":384},{\"tick\":63360,\"note\":76,\"velocity\":108,\"duration\":422},{\"tick\":63840,\"note\":79,\"velocity\":114,\"duration\":422},{\"tick\":64320,\"note\":76,\"velocity\":102,\"duration\":864},{\"tick\":67200,\"note\":78,\"velocity\":108,\"duration\":422},{\"tick\":67680,\"note\":81,\"velocity\":114,\"duration\":422},{\"tick\":68160,\"note\":78,\"velocity\":102,\"duration\":864},{\"tick\":70080,\"note\":81,\"velocity\":114,\"duration\":422},{\"tick\":70560,\"note\":79,\"velocity\":108,\"duration\":422},{\"tick\":71040,\"note\":76,\"velocity\":108,\"duration\":422},{\"tick\":71520,\"note\":79,\"velocity\":114,\"duration\":422},{\"tick\":73440,\"note\":83,\"velocity\":114,\"duration\":422},{\"tick\":73920,\"note\":81,\"velocity\":108,\"duration\":422},{\"tick\":74400,\"note\":79,\"velocity\":102,\"duration\":422},{\"tick\":74880,\"note\":80,\"velocity\":114,\"duration\":1728},{\"tick\":78720,\"note\":81,\"velocity\":76,\"duration\":1344},{\"tick\":80160,\"note\":76,\"velocity\":56,\"duration\":480},{\"tick\":80640,\"note\":84,\"velocity\":81,\"duration\":960},{\"tick\":81600,\"note\":83,\"velocity\":61,\"duration\":480},{\"tick\":82080,\"note\":79,\"velocity\":61,\"duration\":480},{\"tick\":82560,\"note\":81,\"velocity\":71,\"duration\":1920},{\"tick\":84480,\"note\":74,\"velocity\":56,\"duration\":960},{\"tick\":85440,\"note\":76,\"velocity\":61,\"duration\":960},{\"tick\":86400,\"note\":77,\"velocity\":76,\"duration\":1344},{\"tick\":87840,\"note\":81,\"velocity\":61,\"duration\":480},{\"tick\":88320,\"note\":79,\"velocity\":71,\"duration\":960},{\"tick\":89280,\"note\":76,\"velocity\":61,\"duration\":960},{\"tick\":90240,\"note\":74,\"velocity\":66,\"duration\":1344},{\"tick\":91680,\"note\":83,\"velocity\":61,\"duration\":480},{\"tick\":92160,\"note\":81,\"velocity\":76,\"duration\":1920},{\"tick\":94080,\"note\":81,\"velocity\":81,\"duration\":1344},{\"tick\":95520,\"note\":76,\"velocity\":59,\"duration\":480},{\"tick\":96000,\"note\":84,\"velocity\":86,\"duration\":960},{\"tick\":96960,\"note\":83,\"velocity\":65,\"duration\":480},{\"tick\":97440,\"note\":79,\"velocity\":65,\"duration\":480},{\"tick\":97920,\"note\":81,\"velocity\":76,\"duration\":1920},{\"tick\":99840,\"note\":74,\"velocity\":59,\"duration\":960},{\"tick\":100800,\"note\":76,\"velocity\":65,\"duration\":960},{\"tick\":101760,\"note\":77,\"velocity\":81,\"duration\":1344},{\"tick\":103200,\"note\":81,\"velocity\":65,\"duration\":480},{\"tick\":103680,\"note\":79,\"velocity\":76,\"duration\":960},{\"tick\":104640,\"note\":76,\"velocity\":65,\"duration\":960},{\"tick\":105600,\"note\":74,\"velocity\":70,\"duration\":1344},{\"tick\":107040,\"note\":83,\"velocity\":65,\"duration\":480},{\"tick\":107520,\"note\":81,\"velocity\":81,\"duration\":1920},{\"tick\":123840,\"note\":81,\"velocity\":81,\"duration\":1344},{\"tick\":125280,\"note\":76,\"velocity\":59,\"duration\":480},{\"tick\":125760,\"note\":84,\"velocity\":86,\"duration\":960},{\"tick\":126720,\"note\":83,\"velocity\":65,\"duration\":480},{\"tick\":127200,\"note\":79,\"velocity\":65,\"duration\":480},{\"tick\":127680,\"note\":81,\"velocity\":76,\"duration\":1920},{\"tick\":129600,\"note\":74,\"velocity\":59,\"duration\":960},{\"tick\":130560,\"note\":76,\"velocity\":65,\"duration\":960},{\"tick\":131520,\"note\":77,\"velocity\":81,\"duration\":1344},{\"tick\":132960,\"note\":81,\"velocity\":65,\"duration\":480},{\"tick\":133440,\"note\":79,\"velocity\":76,\"duration\":960},{\"tick\":134400,\"note\":76,\"velocity\":65,\"duration\":960},{\"tick\":135360,\"note\":74,\"velocity\":70,\"duration\":1344},{\"tick\":136800,\"note\":83,\"velocity\":65,\"duration\":480},{\"tick\":137280,\"note\":81,\"velocity\":81,\"duration\":1920},{\"tick\":139200,\"note\":81,\"velocity\":86,\"duration\":1344},{\"tick\":140640,\"note\":76,\"velocity\":63,\"duration\":480},{\"tick\":141120,\"note\":84,\"velocity\":91,\"duration\":960},{\"tick\":142080,\"note\":83,\"velocity\":69,\"duration\":480},{\"tick\":142560,\"note\":79,\"velocity\":69,\"duration\":480},{\"tick\":143040,\"note\":81,\"velocity\":80,\"duration\":1920},{\"tick\":144960,\"note\":74,\"velocity\":63,\"duration\":960},{\"tick\":145920,\"note\":76,\"velocity\":69,\"duration\":960},{\"tick\":146880,\"note\":77,\"velocity\":86,\"duration\":1344},{\"tick\":148320,\"note\":81,\"velocity\":69,\"duration\":480},{\"tick\":148800,\"note\":79,\"velocity\":80,\"duration\":960},{\"tick\":149760,\"note\":76,\"velocity\":69,\"duration\":960},{\"tick\":150720,\"note\":74,\"velocity\":74,\"duration\":1344},{\"tick\":152160,\"note\":83,\"velocity\":69,\"duration\":480},{\"tick\":152640,\"note\":81,\"velocity\":86,\"duration\":1920},{\"tick\":158400,\"note\":81,\"velocity\":64,\"duration\":1344},{\"tick\":159840,\"note\":83,\"velocity\":57,\"duration\":960},{\"tick\":162240,\"note\":81,\"velocity\":64,\"duration\":3456}]}]}"
+            }
+          },
+          {
+            "id": "fmop",
+            "type": "fm-op",
+            "name": "FM Op",
+            "position": {
+              "x": 460,
+              "y": 40
+            },
+            "params": {
+              "frequency": 440,
+              "ratio": 2,
+              "level": 0.55,
+              "feedback": 0.15,
+              "attack": 4,
+              "decay": 260,
+              "sustain": 0.4,
+              "release": 180
+            }
+          },
+          {
+            "id": "macdelay",
+            "type": "tape-delay",
+            "name": "Echo",
+            "position": {
+              "x": 720,
+              "y": 40
+            },
+            "params": {
+              "time": 450,
+              "feedback": 0.3,
+              "mix": 0.25,
+              "tone": 0.6,
+              "wow": 0.05,
+              "flutter": 0.05,
+              "drive": 0.1
+            }
+          },
+          {
+            "id": "out-2",
+            "type": "output",
+            "name": "Out",
+            "position": {
+              "x": 980,
+              "y": 40
+            },
+            "params": {
+              "level": 0.6
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": {
+              "moduleId": "macseq",
+              "portId": "cv-1"
+            },
+            "to": {
+              "moduleId": "fmop",
+              "portId": "pitch"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "macseq",
+              "portId": "gate-1"
+            },
+            "to": {
+              "moduleId": "fmop",
+              "portId": "gate"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "fmop",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "macdelay",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "macdelay",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "out-2",
+              "portId": "in"
+            },
+            "kind": "audio"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rack-3",
+      "name": "La Voix",
+      "graph": {
+        "modules": [
+          {
+            "id": "voiceseq",
+            "type": "midi-file-sequencer",
+            "name": "Voix Seq",
+            "position": {
+              "x": 40,
+              "y": 60
+            },
+            "params": {
+              "enabled": true,
+              "tempo": 100,
+              "gateLength": 98,
+              "loop": true,
+              "voices": 1,
+              "selectedFile": "",
+              "midiData": "{\"ticksPerBeat\":480,\"totalTicks\":168960,\"tempo\":100,\"tracks\":[{\"name\":\"Merci\",\"channel\":0,\"notes\":[{\"tick\":107520,\"note\":57,\"velocity\":102,\"duration\":1632},{\"tick\":111360,\"note\":60,\"velocity\":102,\"duration\":1632},{\"tick\":115200,\"note\":62,\"velocity\":108,\"duration\":1632},{\"tick\":119040,\"note\":64,\"velocity\":114,\"duration\":2304},{\"tick\":130560,\"note\":57,\"velocity\":89,\"duration\":1632},{\"tick\":138240,\"note\":60,\"velocity\":89,\"duration\":1632},{\"tick\":145920,\"note\":64,\"velocity\":95,\"duration\":1632}]},{\"name\":\"Bonne nuit\",\"channel\":0,\"notes\":[{\"tick\":161760,\"note\":57,\"velocity\":108,\"duration\":2112}]}]}"
+            }
+          },
+          {
+            "id": "speech-a",
+            "type": "speech-synth",
+            "name": "Mantra",
+            "position": {
+              "x": 460,
+              "y": 40
+            },
+            "params": {
+              "speechText": "THANK YOU RENAUD",
+              "speed": 6,
+              "formantShift": 0,
+              "smoothing": 0.4,
+              "buzz": 0.75,
+              "noise": 0.12
+            }
+          },
+          {
+            "id": "speech-b",
+            "type": "speech-synth",
+            "name": "Bonne Nuit",
+            "position": {
+              "x": 460,
+              "y": 300
+            },
+            "params": {
+              "speechText": "GOOD NIGHT RENAUD",
+              "speed": 5,
+              "formantShift": -0.1,
+              "smoothing": 0.45,
+              "buzz": 0.7,
+              "noise": 0.12
+            }
+          },
+          {
+            "id": "voicemix",
+            "type": "mixer",
+            "name": "Voix Mix",
+            "position": {
+              "x": 760,
+              "y": 160
+            },
+            "params": {
+              "levelA": 0.8,
+              "levelB": 0.85
+            }
+          },
+          {
+            "id": "voiceverb",
+            "type": "reverb",
+            "name": "Cathedrale",
+            "position": {
+              "x": 1020,
+              "y": 160
+            },
+            "params": {
+              "time": 0.8,
+              "damp": 0.35,
+              "preDelay": 28,
+              "mix": 0.35
+            }
+          },
+          {
+            "id": "out-3",
+            "type": "output",
+            "name": "Out",
+            "position": {
+              "x": 1280,
+              "y": 160
+            },
+            "params": {
+              "level": 0.9
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": {
+              "moduleId": "voiceseq",
+              "portId": "cv-1"
+            },
+            "to": {
+              "moduleId": "speech-a",
+              "portId": "pitch"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "voiceseq",
+              "portId": "gate-1"
+            },
+            "to": {
+              "moduleId": "speech-a",
+              "portId": "gate"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "voiceseq",
+              "portId": "cv-2"
+            },
+            "to": {
+              "moduleId": "speech-b",
+              "portId": "pitch"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "voiceseq",
+              "portId": "gate-2"
+            },
+            "to": {
+              "moduleId": "speech-b",
+              "portId": "gate"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "speech-a",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "voicemix",
+              "portId": "in-a"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "speech-b",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "voicemix",
+              "portId": "in-b"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "voicemix",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "voiceverb",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "voiceverb",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "out-3",
+              "portId": "in"
+            },
+            "kind": "audio"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rack-4",
+      "name": "Organ",
+      "graph": {
+        "modules": [
+          {
+            "id": "orgseq",
+            "type": "midi-file-sequencer",
+            "name": "Organ Seq",
+            "position": {
+              "x": 40,
+              "y": 60
+            },
+            "params": {
+              "enabled": true,
+              "tempo": 100,
+              "gateLength": 95,
+              "loop": true,
+              "voices": 1,
+              "selectedFile": "",
+              "midiData": "{\"ticksPerBeat\":480,\"totalTicks\":168960,\"tempo\":100,\"tracks\":[{\"name\":\"Organ\",\"channel\":0,\"notes\":[{\"tick\":107520,\"note\":57,\"velocity\":51,\"duration\":3648},{\"tick\":107520,\"note\":60,\"velocity\":46,\"duration\":3648},{\"tick\":107520,\"note\":64,\"velocity\":43,\"duration\":3648},{\"tick\":111360,\"note\":53,\"velocity\":51,\"duration\":3648},{\"tick\":111360,\"note\":57,\"velocity\":46,\"duration\":3648},{\"tick\":111360,\"note\":60,\"velocity\":43,\"duration\":3648},{\"tick\":115200,\"note\":55,\"velocity\":51,\"duration\":3648},{\"tick\":115200,\"note\":60,\"velocity\":46,\"duration\":3648},{\"tick\":115200,\"note\":64,\"velocity\":43,\"duration\":3648},{\"tick\":119040,\"note\":55,\"velocity\":51,\"duration\":3648},{\"tick\":119040,\"note\":59,\"velocity\":46,\"duration\":3648},{\"tick\":119040,\"note\":62,\"velocity\":43,\"duration\":3648},{\"tick\":122880,\"note\":53,\"velocity\":51,\"duration\":3648},{\"tick\":122880,\"note\":57,\"velocity\":46,\"duration\":3648},{\"tick\":122880,\"note\":60,\"velocity\":43,\"duration\":3648},{\"tick\":126720,\"note\":55,\"velocity\":51,\"duration\":3648},{\"tick\":126720,\"note\":60,\"velocity\":46,\"duration\":3648},{\"tick\":126720,\"note\":64,\"velocity\":43,\"duration\":3648},{\"tick\":130560,\"note\":55,\"velocity\":51,\"duration\":3648},{\"tick\":130560,\"note\":59,\"velocity\":46,\"duration\":3648},{\"tick\":130560,\"note\":62,\"velocity\":43,\"duration\":3648},{\"tick\":134400,\"note\":57,\"velocity\":51,\"duration\":3648},{\"tick\":134400,\"note\":60,\"velocity\":46,\"duration\":3648},{\"tick\":134400,\"note\":64,\"velocity\":43,\"duration\":3648},{\"tick\":138240,\"note\":50,\"velocity\":51,\"duration\":3648},{\"tick\":138240,\"note\":57,\"velocity\":46,\"duration\":3648},{\"tick\":138240,\"note\":62,\"velocity\":43,\"duration\":3648},{\"tick\":142080,\"note\":57,\"velocity\":51,\"duration\":3648},{\"tick\":142080,\"note\":60,\"velocity\":46,\"duration\":3648},{\"tick\":142080,\"note\":64,\"velocity\":43,\"duration\":3648},{\"tick\":145920,\"note\":53,\"velocity\":51,\"duration\":3648},{\"tick\":145920,\"note\":57,\"velocity\":46,\"duration\":3648},{\"tick\":145920,\"note\":60,\"velocity\":43,\"duration\":3648},{\"tick\":149760,\"note\":52,\"velocity\":51,\"duration\":3648},{\"tick\":149760,\"note\":56,\"velocity\":46,\"duration\":3648},{\"tick\":149760,\"note\":59,\"velocity\":43,\"duration\":3648},{\"tick\":153600,\"note\":57,\"velocity\":51,\"duration\":3648},{\"tick\":153600,\"note\":60,\"velocity\":46,\"duration\":3648},{\"tick\":157440,\"note\":53,\"velocity\":48,\"duration\":3648},{\"tick\":157440,\"note\":57,\"velocity\":43,\"duration\":3648},{\"tick\":161280,\"note\":57,\"velocity\":57,\"duration\":7488},{\"tick\":161280,\"note\":61,\"velocity\":51,\"duration\":7488},{\"tick\":161280,\"note\":64,\"velocity\":51,\"duration\":7488},{\"tick\":161280,\"note\":69,\"velocity\":57,\"duration\":7488}]}]}"
+            }
+          },
+          {
+            "id": "organ",
+            "type": "pipe-organ",
+            "name": "Pipe Organ",
+            "position": {
+              "x": 460,
+              "y": 40
+            },
+            "params": {
+              "frequency": 440,
+              "drawbar16": 0.4,
+              "drawbar8": 0.85,
+              "drawbar4": 0.5,
+              "drawbar223": 0,
+              "drawbar2": 0.3,
+              "drawbar135": 0,
+              "drawbar113": 0,
+              "drawbar1": 0.1,
+              "voicing": 1,
+              "chiff": 0.2,
+              "percussion": 0,
+              "percHarmonic": 0,
+              "percDecay": 0,
+              "percVolume": 0.8,
+              "chorusVibrato": 0,
+              "tremulant": 0.3,
+              "tremRate": 5.5,
+              "wind": 0.1,
+              "brightness": 0.55
+            }
+          },
+          {
+            "id": "leslie",
+            "type": "leslie",
+            "name": "Leslie",
+            "position": {
+              "x": 760,
+              "y": 40
+            },
+            "params": {
+              "speed": 0.3,
+              "brake": 0,
+              "drive": 0.1,
+              "depth": 0.65,
+              "hornDrum": 0.5,
+              "micDist": 0,
+              "ramp": 0.5,
+              "mix": 1
+            }
+          },
+          {
+            "id": "orgverb",
+            "type": "reverb",
+            "name": "Organ Verb",
+            "position": {
+              "x": 1020,
+              "y": 40
+            },
+            "params": {
+              "time": 0.7,
+              "damp": 0.35,
+              "preDelay": 24,
+              "mix": 0.3
+            }
+          },
+          {
+            "id": "out-4",
+            "type": "output",
+            "name": "Out",
+            "position": {
+              "x": 1280,
+              "y": 40
+            },
+            "params": {
+              "level": 0.62
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": {
+              "moduleId": "orgseq",
+              "portId": "cv-1"
+            },
+            "to": {
+              "moduleId": "organ",
+              "portId": "pitch"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "orgseq",
+              "portId": "gate-1"
+            },
+            "to": {
+              "moduleId": "organ",
+              "portId": "gate"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "organ",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "leslie",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "leslie",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "orgverb",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "orgverb",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "out-4",
+              "portId": "in"
+            },
+            "kind": "audio"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rack-5",
+      "name": "Bass",
+      "graph": {
+        "modules": [
+          {
+            "id": "bassseq",
+            "type": "midi-file-sequencer",
+            "name": "Bass Seq",
+            "position": {
+              "x": 40,
+              "y": 60
+            },
+            "params": {
+              "enabled": true,
+              "tempo": 100,
+              "gateLength": 90,
+              "loop": true,
+              "voices": 1,
+              "selectedFile": "",
+              "midiData": "{\"ticksPerBeat\":480,\"totalTicks\":168960,\"tempo\":100,\"tracks\":[{\"name\":\"SONG\",\"channel\":0,\"notes\":[{\"tick\":30720,\"note\":33,\"velocity\":65,\"duration\":1728},{\"tick\":32640,\"note\":33,\"velocity\":66,\"duration\":1728},{\"tick\":34560,\"note\":40,\"velocity\":62,\"duration\":1728},{\"tick\":36480,\"note\":40,\"velocity\":61,\"duration\":1728},{\"tick\":38400,\"note\":29,\"velocity\":62,\"duration\":1728},{\"tick\":40320,\"note\":29,\"velocity\":61,\"duration\":1728},{\"tick\":42240,\"note\":36,\"velocity\":61,\"duration\":1728},{\"tick\":44160,\"note\":36,\"velocity\":60,\"duration\":1728},{\"tick\":46080,\"note\":26,\"velocity\":63,\"duration\":1728},{\"tick\":48000,\"note\":26,\"velocity\":63,\"duration\":1728},{\"tick\":49920,\"note\":33,\"velocity\":65,\"duration\":1728},{\"tick\":51840,\"note\":33,\"velocity\":64,\"duration\":1728},{\"tick\":53760,\"note\":29,\"velocity\":65,\"duration\":1728},{\"tick\":55680,\"note\":29,\"velocity\":65,\"duration\":1728},{\"tick\":57600,\"note\":28,\"velocity\":66,\"duration\":1728},{\"tick\":59520,\"note\":28,\"velocity\":66,\"duration\":1728},{\"tick\":61440,\"note\":28,\"velocity\":80,\"duration\":768},{\"tick\":62400,\"note\":28,\"velocity\":68,\"duration\":768},{\"tick\":63360,\"note\":28,\"velocity\":85,\"duration\":768},{\"tick\":64320,\"note\":28,\"velocity\":70,\"duration\":768},{\"tick\":65280,\"note\":28,\"velocity\":80,\"duration\":768},{\"tick\":66240,\"note\":28,\"velocity\":68,\"duration\":768},{\"tick\":67200,\"note\":28,\"velocity\":81,\"duration\":768},{\"tick\":68160,\"note\":28,\"velocity\":71,\"duration\":768},{\"tick\":69120,\"note\":29,\"velocity\":80,\"duration\":768},{\"tick\":70080,\"note\":29,\"velocity\":72,\"duration\":768},{\"tick\":71040,\"note\":29,\"velocity\":85,\"duration\":768},{\"tick\":72000,\"note\":29,\"velocity\":70,\"duration\":768},{\"tick\":72960,\"note\":28,\"velocity\":84,\"duration\":768},{\"tick\":73920,\"note\":28,\"velocity\":69,\"duration\":768},{\"tick\":74880,\"note\":28,\"velocity\":84,\"duration\":768},{\"tick\":75840,\"note\":28,\"velocity\":72,\"duration\":768},{\"tick\":76800,\"note\":29,\"velocity\":92,\"duration\":768},{\"tick\":77760,\"note\":29,\"velocity\":64,\"duration\":384},{\"tick\":78240,\"note\":36,\"velocity\":74,\"duration\":384},{\"tick\":78720,\"note\":29,\"velocity\":93,\"duration\":768},{\"tick\":79680,\"note\":29,\"velocity\":64,\"duration\":384},{\"tick\":80160,\"note\":41,\"velocity\":77,\"duration\":384},{\"tick\":80640,\"note\":36,\"velocity\":92,\"duration\":768},{\"tick\":81600,\"note\":36,\"velocity\":64,\"duration\":384},{\"tick\":82080,\"note\":43,\"velocity\":74,\"duration\":384},{\"tick\":82560,\"note\":36,\"velocity\":90,\"duration\":768},{\"tick\":83520,\"note\":36,\"velocity\":62,\"duration\":384},{\"tick\":84000,\"note\":48,\"velocity\":78,\"duration\":384},{\"tick\":84480,\"note\":31,\"velocity\":85,\"duration\":768},{\"tick\":85440,\"note\":31,\"velocity\":65,\"duration\":384},{\"tick\":85920,\"note\":38,\"velocity\":79,\"duration\":384},{\"tick\":86400,\"note\":31,\"velocity\":88,\"duration\":768},{\"tick\":87360,\"note\":31,\"velocity\":62,\"duration\":384},{\"tick\":87840,\"note\":43,\"velocity\":76,\"duration\":384},{\"tick\":88320,\"note\":33,\"velocity\":93,\"duration\":768},{\"tick\":89280,\"note\":33,\"velocity\":61,\"duration\":384},{\"tick\":89760,\"note\":40,\"velocity\":79,\"duration\":384},{\"tick\":90240,\"note\":33,\"velocity\":90,\"duration\":768},{\"tick\":91200,\"note\":33,\"velocity\":67,\"duration\":384},{\"tick\":91680,\"note\":45,\"velocity\":79,\"duration\":384},{\"tick\":92160,\"note\":29,\"velocity\":90,\"duration\":768},{\"tick\":93120,\"note\":29,\"velocity\":61,\"duration\":384},{\"tick\":93600,\"note\":36,\"velocity\":76,\"duration\":384},{\"tick\":94080,\"note\":29,\"velocity\":91,\"duration\":768},{\"tick\":95040,\"note\":29,\"velocity\":63,\"duration\":384},{\"tick\":95520,\"note\":41,\"velocity\":77,\"duration\":384},{\"tick\":96000,\"note\":36,\"velocity\":90,\"duration\":768},{\"tick\":96960,\"note\":36,\"velocity\":63,\"duration\":384},{\"tick\":97440,\"note\":43,\"velocity\":74,\"duration\":384},{\"tick\":97920,\"note\":36,\"velocity\":89,\"duration\":768},{\"tick\":98880,\"note\":36,\"velocity\":64,\"duration\":384},{\"tick\":99360,\"note\":48,\"velocity\":73,\"duration\":384},{\"tick\":99840,\"note\":26,\"velocity\":87,\"duration\":768},{\"tick\":100800,\"note\":26,\"velocity\":66,\"duration\":384},{\"tick\":101280,\"note\":33,\"velocity\":76,\"duration\":384},{\"tick\":101760,\"note\":26,\"velocity\":93,\"duration\":768},{\"tick\":102720,\"note\":26,\"velocity\":61,\"duration\":384},{\"tick\":103200,\"note\":38,\"velocity\":74,\"duration\":384},{\"tick\":103680,\"note\":28,\"velocity\":90,\"duration\":768},{\"tick\":104640,\"note\":28,\"velocity\":63,\"duration\":384},{\"tick\":105120,\"note\":35,\"velocity\":76,\"duration\":384},{\"tick\":105600,\"note\":28,\"velocity\":87,\"duration\":768},{\"tick\":106560,\"note\":28,\"velocity\":63,\"duration\":384},{\"tick\":107040,\"note\":40,\"velocity\":80,\"duration\":384},{\"tick\":107520,\"note\":33,\"velocity\":60,\"duration\":3456},{\"tick\":111360,\"note\":29,\"velocity\":59,\"duration\":3456},{\"tick\":115200,\"note\":36,\"velocity\":59,\"duration\":3456},{\"tick\":119040,\"note\":31,\"velocity\":60,\"duration\":3456},{\"tick\":122880,\"note\":29,\"velocity\":93,\"duration\":768},{\"tick\":123840,\"note\":29,\"velocity\":66,\"duration\":384},{\"tick\":124320,\"note\":36,\"velocity\":74,\"duration\":384},{\"tick\":124800,\"note\":29,\"velocity\":87,\"duration\":768},{\"tick\":125760,\"note\":29,\"velocity\":66,\"duration\":384},{\"tick\":126240,\"note\":41,\"velocity\":74,\"duration\":384},{\"tick\":126720,\"note\":36,\"velocity\":92,\"duration\":768},{\"tick\":127680,\"note\":36,\"velocity\":64,\"duration\":384},{\"tick\":128160,\"note\":43,\"velocity\":74,\"duration\":384},{\"tick\":128640,\"note\":36,\"velocity\":92,\"duration\":768},{\"tick\":129600,\"note\":36,\"velocity\":65,\"duration\":384},{\"tick\":130080,\"note\":48,\"velocity\":74,\"duration\":384},{\"tick\":130560,\"note\":31,\"velocity\":86,\"duration\":768},{\"tick\":131520,\"note\":31,\"velocity\":62,\"duration\":384},{\"tick\":132000,\"note\":38,\"velocity\":74,\"duration\":384},{\"tick\":132480,\"note\":31,\"velocity\":92,\"duration\":768},{\"tick\":133440,\"note\":31,\"velocity\":64,\"duration\":384},{\"tick\":133920,\"note\":43,\"velocity\":76,\"duration\":384},{\"tick\":134400,\"note\":33,\"velocity\":90,\"duration\":768},{\"tick\":135360,\"note\":33,\"velocity\":66,\"duration\":384},{\"tick\":135840,\"note\":40,\"velocity\":76,\"duration\":384},{\"tick\":136320,\"note\":33,\"velocity\":85,\"duration\":768},{\"tick\":137280,\"note\":33,\"velocity\":62,\"duration\":384},{\"tick\":137760,\"note\":45,\"velocity\":75,\"duration\":384},{\"tick\":138240,\"note\":26,\"velocity\":86,\"duration\":768},{\"tick\":139200,\"note\":26,\"velocity\":65,\"duration\":384},{\"tick\":139680,\"note\":33,\"velocity\":79,\"duration\":384},{\"tick\":140160,\"note\":26,\"velocity\":89,\"duration\":768},{\"tick\":141120,\"note\":26,\"velocity\":61,\"duration\":384},{\"tick\":141600,\"note\":38,\"velocity\":76,\"duration\":384},{\"tick\":142080,\"note\":33,\"velocity\":85,\"duration\":768},{\"tick\":143040,\"note\":33,\"velocity\":61,\"duration\":384},{\"tick\":143520,\"note\":40,\"velocity\":74,\"duration\":384},{\"tick\":144000,\"note\":33,\"velocity\":86,\"duration\":768},{\"tick\":144960,\"note\":33,\"velocity\":62,\"duration\":384},{\"tick\":145440,\"note\":45,\"velocity\":73,\"duration\":384},{\"tick\":145920,\"note\":29,\"velocity\":88,\"duration\":768},{\"tick\":146880,\"note\":29,\"velocity\":65,\"duration\":384},{\"tick\":147360,\"note\":36,\"velocity\":76,\"duration\":384},{\"tick\":147840,\"note\":29,\"velocity\":92,\"duration\":768},{\"tick\":148800,\"note\":29,\"velocity\":65,\"duration\":384},{\"tick\":149280,\"note\":41,\"velocity\":79,\"duration\":384},{\"tick\":149760,\"note\":28,\"velocity\":85,\"duration\":768},{\"tick\":150720,\"note\":28,\"velocity\":60,\"duration\":384},{\"tick\":151200,\"note\":35,\"velocity\":77,\"duration\":384},{\"tick\":151680,\"note\":28,\"velocity\":91,\"duration\":768},{\"tick\":152640,\"note\":28,\"velocity\":64,\"duration\":384},{\"tick\":153120,\"note\":40,\"velocity\":77,\"duration\":384},{\"tick\":153600,\"note\":33,\"velocity\":64,\"duration\":3456},{\"tick\":157440,\"note\":29,\"velocity\":55,\"duration\":3456},{\"tick\":161280,\"note\":33,\"velocity\":61,\"duration\":6720}]}]}"
+            }
+          },
+          {
+            "id": "bassosc",
+            "type": "supersaw",
+            "name": "Bass Saw",
+            "position": {
+              "x": 460,
+              "y": 40
+            },
+            "params": {
+              "frequency": 440,
+              "detune": 3,
+              "mix": 0.22
+            }
+          },
+          {
+            "id": "bassenv",
+            "type": "adsr",
+            "name": "Bass Env",
+            "position": {
+              "x": 460,
+              "y": 220
+            },
+            "params": {
+              "attack": 0.006,
+              "decay": 0.2,
+              "sustain": 0.5,
+              "release": 0.15
+            }
+          },
+          {
+            "id": "bassvca",
+            "type": "gain",
+            "name": "Bass VCA",
+            "position": {
+              "x": 720,
+              "y": 40
+            },
+            "params": {
+              "gain": 0.95
+            }
+          },
+          {
+            "id": "bassfilt",
+            "type": "vcf",
+            "name": "Bass Filter",
+            "position": {
+              "x": 980,
+              "y": 40
+            },
+            "params": {
+              "cutoff": 380,
+              "resonance": 0.15,
+              "drive": 0.2,
+              "envAmount": 0,
+              "modAmount": 0.3,
+              "keyTrack": 0,
+              "model": "svf",
+              "mode": "lp",
+              "slope": 24
+            }
+          },
+          {
+            "id": "out-5",
+            "type": "output",
+            "name": "Out",
+            "position": {
+              "x": 1240,
+              "y": 40
+            },
+            "params": {
+              "level": 0.9
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": {
+              "moduleId": "bassseq",
+              "portId": "cv-1"
+            },
+            "to": {
+              "moduleId": "bassosc",
+              "portId": "pitch"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "bassseq",
+              "portId": "gate-1"
+            },
+            "to": {
+              "moduleId": "bassenv",
+              "portId": "gate"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "bassseq",
+              "portId": "vel-1"
+            },
+            "to": {
+              "moduleId": "bassfilt",
+              "portId": "mod"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "bassosc",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "bassvca",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "bassenv",
+              "portId": "env"
+            },
+            "to": {
+              "moduleId": "bassvca",
+              "portId": "cv"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "bassvca",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "bassfilt",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "bassfilt",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "out-5",
+              "portId": "in"
+            },
+            "kind": "audio"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rack-6",
+      "name": "Keys",
+      "graph": {
+        "modules": [
+          {
+            "id": "keyseq",
+            "type": "midi-file-sequencer",
+            "name": "Keys Seq",
+            "position": {
+              "x": 40,
+              "y": 60
+            },
+            "params": {
+              "enabled": true,
+              "tempo": 100,
+              "gateLength": 90,
+              "loop": true,
+              "voices": 1,
+              "selectedFile": "",
+              "midiData": "{\"ticksPerBeat\":480,\"totalTicks\":168960,\"tempo\":100,\"tracks\":[{\"name\":\"V1\",\"channel\":0,\"notes\":[{\"tick\":76800,\"note\":53,\"velocity\":62,\"duration\":3648},{\"tick\":80640,\"note\":55,\"velocity\":64,\"duration\":3648},{\"tick\":84480,\"note\":55,\"velocity\":66,\"duration\":3648},{\"tick\":88320,\"note\":57,\"velocity\":65,\"duration\":3648},{\"tick\":92160,\"note\":53,\"velocity\":64,\"duration\":3648},{\"tick\":96000,\"note\":55,\"velocity\":63,\"duration\":3648},{\"tick\":99840,\"note\":50,\"velocity\":64,\"duration\":3648},{\"tick\":103680,\"note\":52,\"velocity\":61,\"duration\":3648},{\"tick\":107520,\"note\":57,\"velocity\":72,\"duration\":3648},{\"tick\":111360,\"note\":53,\"velocity\":68,\"duration\":3648},{\"tick\":115200,\"note\":55,\"velocity\":67,\"duration\":3648},{\"tick\":119040,\"note\":55,\"velocity\":72,\"duration\":3648},{\"tick\":122880,\"note\":53,\"velocity\":69,\"duration\":3648},{\"tick\":126720,\"note\":55,\"velocity\":72,\"duration\":3648},{\"tick\":130560,\"note\":55,\"velocity\":71,\"duration\":3648},{\"tick\":134400,\"note\":57,\"velocity\":67,\"duration\":3648},{\"tick\":138240,\"note\":50,\"velocity\":70,\"duration\":3648},{\"tick\":142080,\"note\":57,\"velocity\":70,\"duration\":3648},{\"tick\":145920,\"note\":53,\"velocity\":69,\"duration\":3648},{\"tick\":149760,\"note\":52,\"velocity\":70,\"duration\":3648},{\"tick\":153600,\"note\":57,\"velocity\":55,\"duration\":3648},{\"tick\":157440,\"note\":53,\"velocity\":56,\"duration\":3648}]},{\"name\":\"V2\",\"channel\":0,\"notes\":[{\"tick\":76800,\"note\":57,\"velocity\":56,\"duration\":3648},{\"tick\":80640,\"note\":60,\"velocity\":54,\"duration\":3648},{\"tick\":84480,\"note\":59,\"velocity\":54,\"duration\":3648},{\"tick\":88320,\"note\":60,\"velocity\":57,\"duration\":3648},{\"tick\":92160,\"note\":57,\"velocity\":58,\"duration\":3648},{\"tick\":96000,\"note\":60,\"velocity\":55,\"duration\":3648},{\"tick\":99840,\"note\":57,\"velocity\":55,\"duration\":3648},{\"tick\":103680,\"note\":56,\"velocity\":55,\"duration\":3648},{\"tick\":107520,\"note\":60,\"velocity\":63,\"duration\":3648},{\"tick\":111360,\"note\":57,\"velocity\":62,\"duration\":3648},{\"tick\":115200,\"note\":60,\"velocity\":60,\"duration\":3648},{\"tick\":119040,\"note\":59,\"velocity\":59,\"duration\":3648},{\"tick\":122880,\"note\":57,\"velocity\":64,\"duration\":3648},{\"tick\":126720,\"note\":60,\"velocity\":60,\"duration\":3648},{\"tick\":130560,\"note\":59,\"velocity\":61,\"duration\":3648},{\"tick\":134400,\"note\":60,\"velocity\":60,\"duration\":3648},{\"tick\":138240,\"note\":57,\"velocity\":61,\"duration\":3648},{\"tick\":142080,\"note\":60,\"velocity\":59,\"duration\":3648},{\"tick\":145920,\"note\":57,\"velocity\":63,\"duration\":3648},{\"tick\":149760,\"note\":56,\"velocity\":64,\"duration\":3648},{\"tick\":153600,\"note\":60,\"velocity\":50,\"duration\":3648},{\"tick\":157440,\"note\":57,\"velocity\":48,\"duration\":3648}]},{\"name\":\"V3\",\"channel\":0,\"notes\":[{\"tick\":76800,\"note\":60,\"velocity\":57,\"duration\":3648},{\"tick\":80640,\"note\":64,\"velocity\":55,\"duration\":3648},{\"tick\":84480,\"note\":62,\"velocity\":55,\"duration\":3648},{\"tick\":88320,\"note\":64,\"velocity\":55,\"duration\":3648},{\"tick\":92160,\"note\":60,\"velocity\":58,\"duration\":3648},{\"tick\":96000,\"note\":64,\"velocity\":55,\"duration\":3648},{\"tick\":99840,\"note\":62,\"velocity\":58,\"duration\":3648},{\"tick\":103680,\"note\":59,\"velocity\":57,\"duration\":3648},{\"tick\":107520,\"note\":64,\"velocity\":61,\"duration\":3648},{\"tick\":111360,\"note\":60,\"velocity\":60,\"duration\":3648},{\"tick\":115200,\"note\":64,\"velocity\":59,\"duration\":3648},{\"tick\":119040,\"note\":62,\"velocity\":61,\"duration\":3648},{\"tick\":122880,\"note\":60,\"velocity\":60,\"duration\":3648},{\"tick\":126720,\"note\":64,\"velocity\":64,\"duration\":3648},{\"tick\":130560,\"note\":62,\"velocity\":63,\"duration\":3648},{\"tick\":134400,\"note\":64,\"velocity\":61,\"duration\":3648},{\"tick\":138240,\"note\":62,\"velocity\":59,\"duration\":3648},{\"tick\":142080,\"note\":64,\"velocity\":64,\"duration\":3648},{\"tick\":145920,\"note\":60,\"velocity\":61,\"duration\":3648},{\"tick\":149760,\"note\":59,\"velocity\":59,\"duration\":3648},{\"tick\":153600,\"note\":64,\"velocity\":50,\"duration\":3648},{\"tick\":157440,\"note\":60,\"velocity\":50,\"duration\":3648}]},{\"name\":\"V4\",\"channel\":0,\"notes\":[{\"tick\":76800,\"note\":65,\"velocity\":56,\"duration\":3648},{\"tick\":80640,\"note\":67,\"velocity\":58,\"duration\":3648},{\"tick\":84480,\"note\":67,\"velocity\":56,\"duration\":3648},{\"tick\":88320,\"note\":69,\"velocity\":54,\"duration\":3648},{\"tick\":92160,\"note\":65,\"velocity\":57,\"duration\":3648},{\"tick\":96000,\"note\":67,\"velocity\":57,\"duration\":3648},{\"tick\":99840,\"note\":65,\"velocity\":55,\"duration\":3648},{\"tick\":103680,\"note\":64,\"velocity\":55,\"duration\":3648},{\"tick\":107520,\"note\":69,\"velocity\":61,\"duration\":3648},{\"tick\":111360,\"note\":65,\"velocity\":62,\"duration\":3648},{\"tick\":115200,\"note\":67,\"velocity\":61,\"duration\":3648},{\"tick\":119040,\"note\":67,\"velocity\":59,\"duration\":3648},{\"tick\":122880,\"note\":65,\"velocity\":61,\"duration\":3648},{\"tick\":126720,\"note\":67,\"velocity\":60,\"duration\":3648},{\"tick\":130560,\"note\":67,\"velocity\":62,\"duration\":3648},{\"tick\":134400,\"note\":69,\"velocity\":62,\"duration\":3648},{\"tick\":138240,\"note\":65,\"velocity\":61,\"duration\":3648},{\"tick\":142080,\"note\":69,\"velocity\":61,\"duration\":3648},{\"tick\":145920,\"note\":65,\"velocity\":62,\"duration\":3648},{\"tick\":149760,\"note\":64,\"velocity\":61,\"duration\":3648},{\"tick\":153600,\"note\":69,\"velocity\":49,\"duration\":3648},{\"tick\":157440,\"note\":65,\"velocity\":51,\"duration\":3648}]}]}"
+            }
+          },
+          {
+            "id": "chsaw1",
+            "type": "supersaw",
+            "name": "Chord 1",
+            "position": {
+              "x": 460,
+              "y": 40
+            },
+            "params": {
+              "frequency": 440,
+              "detune": 10,
+              "mix": 0.55
+            }
+          },
+          {
+            "id": "chenv1",
+            "type": "adsr",
+            "name": "Chord Env 1",
+            "position": {
+              "x": 700,
+              "y": 40
+            },
+            "params": {
+              "attack": 0.6,
+              "decay": 0.5,
+              "sustain": 0.8,
+              "release": 1
+            }
+          },
+          {
+            "id": "chvca1",
+            "type": "gain",
+            "name": "Chord VCA 1",
+            "position": {
+              "x": 940,
+              "y": 40
+            },
+            "params": {
+              "gain": 0.48
+            }
+          },
+          {
+            "id": "chsaw2",
+            "type": "supersaw",
+            "name": "Chord 2",
+            "position": {
+              "x": 460,
+              "y": 200
+            },
+            "params": {
+              "frequency": 440,
+              "detune": 10,
+              "mix": 0.55
+            }
+          },
+          {
+            "id": "chenv2",
+            "type": "adsr",
+            "name": "Chord Env 2",
+            "position": {
+              "x": 700,
+              "y": 200
+            },
+            "params": {
+              "attack": 0.6,
+              "decay": 0.5,
+              "sustain": 0.8,
+              "release": 1
+            }
+          },
+          {
+            "id": "chvca2",
+            "type": "gain",
+            "name": "Chord VCA 2",
+            "position": {
+              "x": 940,
+              "y": 200
+            },
+            "params": {
+              "gain": 0.48
+            }
+          },
+          {
+            "id": "chsaw3",
+            "type": "supersaw",
+            "name": "Chord 3",
+            "position": {
+              "x": 460,
+              "y": 360
+            },
+            "params": {
+              "frequency": 440,
+              "detune": 10,
+              "mix": 0.55
+            }
+          },
+          {
+            "id": "chenv3",
+            "type": "adsr",
+            "name": "Chord Env 3",
+            "position": {
+              "x": 700,
+              "y": 360
+            },
+            "params": {
+              "attack": 0.6,
+              "decay": 0.5,
+              "sustain": 0.8,
+              "release": 1
+            }
+          },
+          {
+            "id": "chvca3",
+            "type": "gain",
+            "name": "Chord VCA 3",
+            "position": {
+              "x": 940,
+              "y": 360
+            },
+            "params": {
+              "gain": 0.48
+            }
+          },
+          {
+            "id": "chsaw4",
+            "type": "supersaw",
+            "name": "Chord 4",
+            "position": {
+              "x": 460,
+              "y": 520
+            },
+            "params": {
+              "frequency": 440,
+              "detune": 10,
+              "mix": 0.55
+            }
+          },
+          {
+            "id": "chenv4",
+            "type": "adsr",
+            "name": "Chord Env 4",
+            "position": {
+              "x": 700,
+              "y": 520
+            },
+            "params": {
+              "attack": 0.6,
+              "decay": 0.5,
+              "sustain": 0.8,
+              "release": 1
+            }
+          },
+          {
+            "id": "chvca4",
+            "type": "gain",
+            "name": "Chord VCA 4",
+            "position": {
+              "x": 940,
+              "y": 520
+            },
+            "params": {
+              "gain": 0.48
+            }
+          },
+          {
+            "id": "keymix",
+            "type": "mixer-1x2",
+            "name": "Keys Mix",
+            "position": {
+              "x": 1180,
+              "y": 200
+            },
+            "params": {
+              "levelA": 0.6,
+              "levelB": 0.6,
+              "levelC": 0.6,
+              "levelD": 0.6,
+              "levelE": 0.6,
+              "levelF": 0.6
+            }
+          },
+          {
+            "id": "keychorus",
+            "type": "chorus",
+            "name": "Keys Chorus",
+            "position": {
+              "x": 1420,
+              "y": 200
+            },
+            "params": {
+              "rate": 0.25,
+              "depth": 8,
+              "delay": 18,
+              "mix": 0.35,
+              "spread": 0.7,
+              "feedback": 0.1
+            }
+          },
+          {
+            "id": "keyverb",
+            "type": "reverb",
+            "name": "Keys Verb",
+            "position": {
+              "x": 1660,
+              "y": 200
+            },
+            "params": {
+              "time": 0.65,
+              "damp": 0.4,
+              "preDelay": 20,
+              "mix": 0.26
+            }
+          },
+          {
+            "id": "out-6",
+            "type": "output",
+            "name": "Out",
+            "position": {
+              "x": 1660,
+              "y": 380
+            },
+            "params": {
+              "level": 1
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": {
+              "moduleId": "keyseq",
+              "portId": "cv-1"
+            },
+            "to": {
+              "moduleId": "chsaw1",
+              "portId": "pitch"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "keyseq",
+              "portId": "gate-1"
+            },
+            "to": {
+              "moduleId": "chenv1",
+              "portId": "gate"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "chsaw1",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "chvca1",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "chenv1",
+              "portId": "env"
+            },
+            "to": {
+              "moduleId": "chvca1",
+              "portId": "cv"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "keyseq",
+              "portId": "cv-2"
+            },
+            "to": {
+              "moduleId": "chsaw2",
+              "portId": "pitch"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "keyseq",
+              "portId": "gate-2"
+            },
+            "to": {
+              "moduleId": "chenv2",
+              "portId": "gate"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "chsaw2",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "chvca2",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "chenv2",
+              "portId": "env"
+            },
+            "to": {
+              "moduleId": "chvca2",
+              "portId": "cv"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "keyseq",
+              "portId": "cv-3"
+            },
+            "to": {
+              "moduleId": "chsaw3",
+              "portId": "pitch"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "keyseq",
+              "portId": "gate-3"
+            },
+            "to": {
+              "moduleId": "chenv3",
+              "portId": "gate"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "chsaw3",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "chvca3",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "chenv3",
+              "portId": "env"
+            },
+            "to": {
+              "moduleId": "chvca3",
+              "portId": "cv"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "keyseq",
+              "portId": "cv-4"
+            },
+            "to": {
+              "moduleId": "chsaw4",
+              "portId": "pitch"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "keyseq",
+              "portId": "gate-4"
+            },
+            "to": {
+              "moduleId": "chenv4",
+              "portId": "gate"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "chsaw4",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "chvca4",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "chenv4",
+              "portId": "env"
+            },
+            "to": {
+              "moduleId": "chvca4",
+              "portId": "cv"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "chvca1",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "keymix",
+              "portId": "in-a"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "chvca2",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "keymix",
+              "portId": "in-b"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "chvca3",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "keymix",
+              "portId": "in-c"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "chvca4",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "keymix",
+              "portId": "in-d"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "keymix",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "keychorus",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "keychorus",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "keyverb",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "keyverb",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "out-6",
+              "portId": "in"
+            },
+            "kind": "audio"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rack-7",
+      "name": "Drums 909",
+      "graph": {
+        "modules": [
+          {
+            "id": "drumseq",
+            "type": "midi-file-sequencer",
+            "name": "Drum Seq",
+            "position": {
+              "x": 40,
+              "y": 60
+            },
+            "params": {
+              "enabled": true,
+              "tempo": 100,
+              "gateLength": 90,
+              "loop": true,
+              "voices": 1,
+              "selectedFile": "",
+              "midiData": "{\"ticksPerBeat\":480,\"totalTicks\":168960,\"tempo\":100,\"tracks\":[{\"name\":\"Kick\",\"channel\":0,\"notes\":[{\"tick\":30720,\"note\":60,\"velocity\":61,\"duration\":60},{\"tick\":31920,\"note\":60,\"velocity\":42,\"duration\":60},{\"tick\":32640,\"note\":60,\"velocity\":66,\"duration\":60},{\"tick\":33840,\"note\":60,\"velocity\":46,\"duration\":60},{\"tick\":34560,\"note\":60,\"velocity\":60,\"duration\":60},{\"tick\":35760,\"note\":60,\"velocity\":46,\"duration\":60},{\"tick\":36480,\"note\":60,\"velocity\":62,\"duration\":60},{\"tick\":37680,\"note\":60,\"velocity\":43,\"duration\":60},{\"tick\":38400,\"note\":60,\"velocity\":65,\"duration\":60},{\"tick\":39600,\"note\":60,\"velocity\":44,\"duration\":60},{\"tick\":40320,\"note\":60,\"velocity\":62,\"duration\":60},{\"tick\":41520,\"note\":60,\"velocity\":46,\"duration\":60},{\"tick\":42240,\"note\":60,\"velocity\":67,\"duration\":60},{\"tick\":43440,\"note\":60,\"velocity\":43,\"duration\":60},{\"tick\":44160,\"note\":60,\"velocity\":66,\"duration\":60},{\"tick\":45360,\"note\":60,\"velocity\":43,\"duration\":60},{\"tick\":46080,\"note\":60,\"velocity\":61,\"duration\":60},{\"tick\":47280,\"note\":60,\"velocity\":45,\"duration\":60},{\"tick\":48000,\"note\":60,\"velocity\":67,\"duration\":60},{\"tick\":49200,\"note\":60,\"velocity\":43,\"duration\":60},{\"tick\":49920,\"note\":60,\"velocity\":66,\"duration\":60},{\"tick\":51120,\"note\":60,\"velocity\":46,\"duration\":60},{\"tick\":51840,\"note\":60,\"velocity\":65,\"duration\":60},{\"tick\":53040,\"note\":60,\"velocity\":45,\"duration\":60},{\"tick\":53760,\"note\":60,\"velocity\":66,\"duration\":60},{\"tick\":54960,\"note\":60,\"velocity\":46,\"duration\":60},{\"tick\":55680,\"note\":60,\"velocity\":66,\"duration\":60},{\"tick\":56880,\"note\":60,\"velocity\":42,\"duration\":60},{\"tick\":57600,\"note\":60,\"velocity\":64,\"duration\":60},{\"tick\":58800,\"note\":60,\"velocity\":44,\"duration\":60},{\"tick\":59520,\"note\":60,\"velocity\":67,\"duration\":60},{\"tick\":60720,\"note\":60,\"velocity\":45,\"duration\":60},{\"tick\":61440,\"note\":60,\"velocity\":91,\"duration\":60},{\"tick\":62280,\"note\":60,\"velocity\":54,\"duration\":60},{\"tick\":62640,\"note\":60,\"velocity\":72,\"duration\":60},{\"tick\":63360,\"note\":60,\"velocity\":91,\"duration\":60},{\"tick\":64200,\"note\":60,\"velocity\":57,\"duration\":60},{\"tick\":64560,\"note\":60,\"velocity\":79,\"duration\":60},{\"tick\":65280,\"note\":60,\"velocity\":98,\"duration\":60},{\"tick\":66120,\"note\":60,\"velocity\":56,\"duration\":60},{\"tick\":66480,\"note\":60,\"velocity\":72,\"duration\":60},{\"tick\":67200,\"note\":60,\"velocity\":97,\"duration\":60},{\"tick\":68040,\"note\":60,\"velocity\":54,\"duration\":60},{\"tick\":68400,\"note\":60,\"velocity\":72,\"duration\":60},{\"tick\":69120,\"note\":60,\"velocity\":93,\"duration\":60},{\"tick\":69960,\"note\":60,\"velocity\":57,\"duration\":60},{\"tick\":70320,\"note\":60,\"velocity\":73,\"duration\":60},{\"tick\":71040,\"note\":60,\"velocity\":92,\"duration\":60},{\"tick\":71880,\"note\":60,\"velocity\":54,\"duration\":60},{\"tick\":72240,\"note\":60,\"velocity\":76,\"duration\":60},{\"tick\":72960,\"note\":60,\"velocity\":90,\"duration\":60},{\"tick\":73800,\"note\":60,\"velocity\":55,\"duration\":60},{\"tick\":74160,\"note\":60,\"velocity\":76,\"duration\":60},{\"tick\":74880,\"note\":60,\"velocity\":96,\"duration\":60},{\"tick\":75720,\"note\":60,\"velocity\":54,\"duration\":60},{\"tick\":76080,\"note\":60,\"velocity\":74,\"duration\":60},{\"tick\":76800,\"note\":60,\"velocity\":86,\"duration\":60},{\"tick\":77760,\"note\":60,\"velocity\":83,\"duration\":60},{\"tick\":78720,\"note\":60,\"velocity\":88,\"duration\":60},{\"tick\":79680,\"note\":60,\"velocity\":83,\"duration\":60},{\"tick\":80640,\"note\":60,\"velocity\":91,\"duration\":60},{\"tick\":81600,\"note\":60,\"velocity\":77,\"duration\":60},{\"tick\":82560,\"note\":60,\"velocity\":90,\"duration\":60},{\"tick\":83520,\"note\":60,\"velocity\":74,\"duration\":60},{\"tick\":84480,\"note\":60,\"velocity\":91,\"duration\":60},{\"tick\":85440,\"note\":60,\"velocity\":77,\"duration\":60},{\"tick\":86400,\"note\":60,\"velocity\":89,\"duration\":60},{\"tick\":87360,\"note\":60,\"velocity\":77,\"duration\":60},{\"tick\":88320,\"note\":60,\"velocity\":93,\"duration\":60},{\"tick\":89280,\"note\":60,\"velocity\":82,\"duration\":60},{\"tick\":90240,\"note\":60,\"velocity\":85,\"duration\":60},{\"tick\":91200,\"note\":60,\"velocity\":82,\"duration\":60},{\"tick\":92160,\"note\":60,\"velocity\":92,\"duration\":60},{\"tick\":93120,\"note\":60,\"velocity\":80,\"duration\":60},{\"tick\":94080,\"note\":60,\"velocity\":84,\"duration\":60},{\"tick\":95040,\"note\":60,\"velocity\":80,\"duration\":60},{\"tick\":96000,\"note\":60,\"velocity\":94,\"duration\":60},{\"tick\":96960,\"note\":60,\"velocity\":78,\"duration\":60},{\"tick\":97920,\"note\":60,\"velocity\":86,\"duration\":60},{\"tick\":98880,\"note\":60,\"velocity\":80,\"duration\":60},{\"tick\":99840,\"note\":60,\"velocity\":93,\"duration\":60},{\"tick\":100800,\"note\":60,\"velocity\":77,\"duration\":60},{\"tick\":101760,\"note\":60,\"velocity\":86,\"duration\":60},{\"tick\":102720,\"note\":60,\"velocity\":75,\"duration\":60},{\"tick\":103680,\"note\":60,\"velocity\":86,\"duration\":60},{\"tick\":104640,\"note\":60,\"velocity\":77,\"duration\":60},{\"tick\":105600,\"note\":60,\"velocity\":87,\"duration\":60},{\"tick\":106560,\"note\":60,\"velocity\":77,\"duration\":60},{\"tick\":122880,\"note\":60,\"velocity\":87,\"duration\":60},{\"tick\":123840,\"note\":60,\"velocity\":83,\"duration\":60},{\"tick\":124800,\"note\":60,\"velocity\":90,\"duration\":60},{\"tick\":125760,\"note\":60,\"velocity\":75,\"duration\":60},{\"tick\":126720,\"note\":60,\"velocity\":93,\"duration\":60},{\"tick\":127680,\"note\":60,\"velocity\":79,\"duration\":60},{\"tick\":128640,\"note\":60,\"velocity\":86,\"duration\":60},{\"tick\":129600,\"note\":60,\"velocity\":77,\"duration\":60},{\"tick\":130560,\"note\":60,\"velocity\":90,\"duration\":60},{\"tick\":131520,\"note\":60,\"velocity\":76,\"duration\":60},{\"tick\":132480,\"note\":60,\"velocity\":94,\"duration\":60},{\"tick\":133440,\"note\":60,\"velocity\":78,\"duration\":60},{\"tick\":134400,\"note\":60,\"velocity\":87,\"duration\":60},{\"tick\":135360,\"note\":60,\"velocity\":80,\"duration\":60},{\"tick\":136320,\"note\":60,\"velocity\":92,\"duration\":60},{\"tick\":136800,\"note\":60,\"velocity\":76,\"duration\":60},{\"tick\":138240,\"note\":60,\"velocity\":89,\"duration\":60},{\"tick\":139200,\"note\":60,\"velocity\":75,\"duration\":60},{\"tick\":140160,\"note\":60,\"velocity\":89,\"duration\":60},{\"tick\":141120,\"note\":60,\"velocity\":78,\"duration\":60},{\"tick\":142080,\"note\":60,\"velocity\":91,\"duration\":60},{\"tick\":143040,\"note\":60,\"velocity\":82,\"duration\":60},{\"tick\":144000,\"note\":60,\"velocity\":92,\"duration\":60},{\"tick\":144960,\"note\":60,\"velocity\":78,\"duration\":60},{\"tick\":145920,\"note\":60,\"velocity\":94,\"duration\":60},{\"tick\":146880,\"note\":60,\"velocity\":83,\"duration\":60},{\"tick\":147840,\"note\":60,\"velocity\":84,\"duration\":60},{\"tick\":148800,\"note\":60,\"velocity\":78,\"duration\":60},{\"tick\":149760,\"note\":60,\"velocity\":88,\"duration\":60},{\"tick\":150720,\"note\":60,\"velocity\":78,\"duration\":60},{\"tick\":151680,\"note\":60,\"velocity\":90,\"duration\":60},{\"tick\":152160,\"note\":60,\"velocity\":74,\"duration\":60}]},{\"name\":\"Snare\",\"channel\":0,\"notes\":[{\"tick\":31680,\"note\":60,\"velocity\":43,\"duration\":60},{\"tick\":33600,\"note\":60,\"velocity\":45,\"duration\":60},{\"tick\":35520,\"note\":60,\"velocity\":44,\"duration\":60},{\"tick\":37440,\"note\":60,\"velocity\":43,\"duration\":60},{\"tick\":39360,\"note\":60,\"velocity\":43,\"duration\":60},{\"tick\":41280,\"note\":60,\"velocity\":44,\"duration\":60},{\"tick\":43200,\"note\":60,\"velocity\":42,\"duration\":60},{\"tick\":45120,\"note\":60,\"velocity\":43,\"duration\":60},{\"tick\":47040,\"note\":60,\"velocity\":45,\"duration\":60},{\"tick\":48960,\"note\":60,\"velocity\":46,\"duration\":60},{\"tick\":50880,\"note\":60,\"velocity\":46,\"duration\":60},{\"tick\":52800,\"note\":60,\"velocity\":44,\"duration\":60},{\"tick\":54720,\"note\":60,\"velocity\":45,\"duration\":60},{\"tick\":56640,\"note\":60,\"velocity\":42,\"duration\":60},{\"tick\":58560,\"note\":60,\"velocity\":43,\"duration\":60},{\"tick\":60480,\"note\":60,\"velocity\":42,\"duration\":60},{\"tick\":61920,\"note\":60,\"velocity\":78,\"duration\":60},{\"tick\":62880,\"note\":60,\"velocity\":82,\"duration\":60},{\"tick\":63840,\"note\":60,\"velocity\":75,\"duration\":60},{\"tick\":64800,\"note\":60,\"velocity\":82,\"duration\":60},{\"tick\":65040,\"note\":60,\"velocity\":32,\"duration\":60},{\"tick\":65160,\"note\":60,\"velocity\":37,\"duration\":60},{\"tick\":65760,\"note\":60,\"velocity\":77,\"duration\":60},{\"tick\":66720,\"note\":60,\"velocity\":83,\"duration\":60},{\"tick\":67680,\"note\":60,\"velocity\":73,\"duration\":60},{\"tick\":68640,\"note\":60,\"velocity\":82,\"duration\":60},{\"tick\":68880,\"note\":60,\"velocity\":33,\"duration\":60},{\"tick\":69000,\"note\":60,\"velocity\":38,\"duration\":60},{\"tick\":69600,\"note\":60,\"velocity\":79,\"duration\":60},{\"tick\":70560,\"note\":60,\"velocity\":86,\"duration\":60},{\"tick\":71520,\"note\":60,\"velocity\":78,\"duration\":60},{\"tick\":72480,\"note\":60,\"velocity\":81,\"duration\":60},{\"tick\":72720,\"note\":60,\"velocity\":33,\"duration\":60},{\"tick\":72840,\"note\":60,\"velocity\":37,\"duration\":60},{\"tick\":73440,\"note\":60,\"velocity\":77,\"duration\":60},{\"tick\":74400,\"note\":60,\"velocity\":78,\"duration\":60},{\"tick\":75360,\"note\":60,\"velocity\":77,\"duration\":60},{\"tick\":76320,\"note\":60,\"velocity\":83,\"duration\":60},{\"tick\":76560,\"note\":60,\"velocity\":30,\"duration\":60},{\"tick\":76680,\"note\":60,\"velocity\":37,\"duration\":60},{\"tick\":77280,\"note\":60,\"velocity\":69,\"duration\":60},{\"tick\":78240,\"note\":60,\"velocity\":74,\"duration\":60},{\"tick\":79200,\"note\":60,\"velocity\":70,\"duration\":60},{\"tick\":80160,\"note\":60,\"velocity\":73,\"duration\":60},{\"tick\":81120,\"note\":60,\"velocity\":68,\"duration\":60},{\"tick\":82080,\"note\":60,\"velocity\":73,\"duration\":60},{\"tick\":83040,\"note\":60,\"velocity\":71,\"duration\":60},{\"tick\":84000,\"note\":60,\"velocity\":73,\"duration\":60},{\"tick\":84960,\"note\":60,\"velocity\":66,\"duration\":60},{\"tick\":85920,\"note\":60,\"velocity\":75,\"duration\":60},{\"tick\":86880,\"note\":60,\"velocity\":69,\"duration\":60},{\"tick\":87840,\"note\":60,\"velocity\":78,\"duration\":60},{\"tick\":88800,\"note\":60,\"velocity\":67,\"duration\":60},{\"tick\":89760,\"note\":60,\"velocity\":77,\"duration\":60},{\"tick\":90720,\"note\":60,\"velocity\":74,\"duration\":60},{\"tick\":91680,\"note\":60,\"velocity\":79,\"duration\":60},{\"tick\":92640,\"note\":60,\"velocity\":68,\"duration\":60},{\"tick\":93600,\"note\":60,\"velocity\":80,\"duration\":60},{\"tick\":94560,\"note\":60,\"velocity\":73,\"duration\":60},{\"tick\":95520,\"note\":60,\"velocity\":80,\"duration\":60},{\"tick\":96480,\"note\":60,\"velocity\":73,\"duration\":60},{\"tick\":97440,\"note\":60,\"velocity\":72,\"duration\":60},{\"tick\":98400,\"note\":60,\"velocity\":71,\"duration\":60},{\"tick\":99360,\"note\":60,\"velocity\":81,\"duration\":60},{\"tick\":100320,\"note\":60,\"velocity\":71,\"duration\":60},{\"tick\":101280,\"note\":60,\"velocity\":77,\"duration\":60},{\"tick\":102240,\"note\":60,\"velocity\":67,\"duration\":60},{\"tick\":103200,\"note\":60,\"velocity\":80,\"duration\":60},{\"tick\":104160,\"note\":60,\"velocity\":72,\"duration\":60},{\"tick\":105120,\"note\":60,\"velocity\":80,\"duration\":60},{\"tick\":106080,\"note\":60,\"velocity\":72,\"duration\":60},{\"tick\":107040,\"note\":60,\"velocity\":72,\"duration\":60},{\"tick\":123360,\"note\":60,\"velocity\":71,\"duration\":60},{\"tick\":124320,\"note\":60,\"velocity\":75,\"duration\":60},{\"tick\":125280,\"note\":60,\"velocity\":68,\"duration\":60},{\"tick\":126240,\"note\":60,\"velocity\":74,\"duration\":60},{\"tick\":127200,\"note\":60,\"velocity\":73,\"duration\":60},{\"tick\":128160,\"note\":60,\"velocity\":73,\"duration\":60},{\"tick\":129120,\"note\":60,\"velocity\":69,\"duration\":60},{\"tick\":130080,\"note\":60,\"velocity\":75,\"duration\":60},{\"tick\":131040,\"note\":60,\"velocity\":66,\"duration\":60},{\"tick\":132000,\"note\":60,\"velocity\":78,\"duration\":60},{\"tick\":132960,\"note\":60,\"velocity\":67,\"duration\":60},{\"tick\":133920,\"note\":60,\"velocity\":74,\"duration\":60},{\"tick\":134880,\"note\":60,\"velocity\":68,\"duration\":60},{\"tick\":135840,\"note\":60,\"velocity\":80,\"duration\":60},{\"tick\":137280,\"note\":60,\"velocity\":27,\"duration\":60},{\"tick\":137400,\"note\":60,\"velocity\":36,\"duration\":60},{\"tick\":137520,\"note\":60,\"velocity\":42,\"duration\":60},{\"tick\":137640,\"note\":60,\"velocity\":54,\"duration\":60},{\"tick\":137760,\"note\":60,\"velocity\":62,\"duration\":60},{\"tick\":137880,\"note\":60,\"velocity\":69,\"duration\":60},{\"tick\":138000,\"note\":60,\"velocity\":84,\"duration\":60},{\"tick\":138120,\"note\":60,\"velocity\":86,\"duration\":60},{\"tick\":138720,\"note\":60,\"velocity\":70,\"duration\":60},{\"tick\":139680,\"note\":60,\"velocity\":72,\"duration\":60},{\"tick\":140640,\"note\":60,\"velocity\":67,\"duration\":60},{\"tick\":141600,\"note\":60,\"velocity\":78,\"duration\":60},{\"tick\":142560,\"note\":60,\"velocity\":73,\"duration\":60},{\"tick\":143520,\"note\":60,\"velocity\":77,\"duration\":60},{\"tick\":144480,\"note\":60,\"velocity\":74,\"duration\":60},{\"tick\":145440,\"note\":60,\"velocity\":79,\"duration\":60},{\"tick\":146400,\"note\":60,\"velocity\":73,\"duration\":60},{\"tick\":147360,\"note\":60,\"velocity\":80,\"duration\":60},{\"tick\":148320,\"note\":60,\"velocity\":72,\"duration\":60},{\"tick\":149280,\"note\":60,\"velocity\":78,\"duration\":60},{\"tick\":150240,\"note\":60,\"velocity\":67,\"duration\":60},{\"tick\":151200,\"note\":60,\"velocity\":79,\"duration\":60},{\"tick\":152640,\"note\":60,\"velocity\":25,\"duration\":60},{\"tick\":152760,\"note\":60,\"velocity\":35,\"duration\":60},{\"tick\":152880,\"note\":60,\"velocity\":41,\"duration\":60},{\"tick\":153000,\"note\":60,\"velocity\":50,\"duration\":60},{\"tick\":153120,\"note\":60,\"velocity\":58,\"duration\":60},{\"tick\":153240,\"note\":60,\"velocity\":71,\"duration\":60},{\"tick\":153360,\"note\":60,\"velocity\":79,\"duration\":60},{\"tick\":153480,\"note\":60,\"velocity\":92,\"duration\":60}]},{\"name\":\"Clap\",\"channel\":0,\"notes\":[{\"tick\":78240,\"note\":60,\"velocity\":51,\"duration\":60},{\"tick\":80160,\"note\":60,\"velocity\":50,\"duration\":60},{\"tick\":82080,\"note\":60,\"velocity\":48,\"duration\":60},{\"tick\":84000,\"note\":60,\"velocity\":53,\"duration\":60},{\"tick\":85920,\"note\":60,\"velocity\":49,\"duration\":60},{\"tick\":87840,\"note\":60,\"velocity\":52,\"duration\":60},{\"tick\":89760,\"note\":60,\"velocity\":53,\"duration\":60},{\"tick\":91680,\"note\":60,\"velocity\":48,\"duration\":60},{\"tick\":93600,\"note\":60,\"velocity\":50,\"duration\":60},{\"tick\":95520,\"note\":60,\"velocity\":48,\"duration\":60},{\"tick\":97440,\"note\":60,\"velocity\":49,\"duration\":60},{\"tick\":99360,\"note\":60,\"velocity\":48,\"duration\":60},{\"tick\":101280,\"note\":60,\"velocity\":48,\"duration\":60},{\"tick\":103200,\"note\":60,\"velocity\":48,\"duration\":60},{\"tick\":105120,\"note\":60,\"velocity\":48,\"duration\":60},{\"tick\":107040,\"note\":60,\"velocity\":50,\"duration\":60},{\"tick\":124320,\"note\":60,\"velocity\":50,\"duration\":60},{\"tick\":126240,\"note\":60,\"velocity\":51,\"duration\":60},{\"tick\":128160,\"note\":60,\"velocity\":51,\"duration\":60},{\"tick\":130080,\"note\":60,\"velocity\":53,\"duration\":60},{\"tick\":132000,\"note\":60,\"velocity\":48,\"duration\":60},{\"tick\":133920,\"note\":60,\"velocity\":49,\"duration\":60},{\"tick\":135840,\"note\":60,\"velocity\":50,\"duration\":60},{\"tick\":139680,\"note\":60,\"velocity\":53,\"duration\":60},{\"tick\":141600,\"note\":60,\"velocity\":51,\"duration\":60},{\"tick\":143520,\"note\":60,\"velocity\":50,\"duration\":60},{\"tick\":145440,\"note\":60,\"velocity\":52,\"duration\":60},{\"tick\":147360,\"note\":60,\"velocity\":50,\"duration\":60},{\"tick\":149280,\"note\":60,\"velocity\":50,\"duration\":60},{\"tick\":151200,\"note\":60,\"velocity\":50,\"duration\":60}]},{\"name\":\"CHH\",\"channel\":0,\"notes\":[{\"tick\":30720,\"note\":60,\"velocity\":27,\"duration\":60},{\"tick\":31200,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":31680,\"note\":60,\"velocity\":27,\"duration\":60},{\"tick\":32160,\"note\":60,\"velocity\":30,\"duration\":60},{\"tick\":32640,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":33120,\"note\":60,\"velocity\":27,\"duration\":60},{\"tick\":33600,\"note\":60,\"velocity\":27,\"duration\":60},{\"tick\":34080,\"note\":60,\"velocity\":28,\"duration\":60},{\"tick\":34560,\"note\":60,\"velocity\":27,\"duration\":60},{\"tick\":35040,\"note\":60,\"velocity\":27,\"duration\":60},{\"tick\":35520,\"note\":60,\"velocity\":27,\"duration\":60},{\"tick\":36000,\"note\":60,\"velocity\":28,\"duration\":60},{\"tick\":36480,\"note\":60,\"velocity\":28,\"duration\":60},{\"tick\":36960,\"note\":60,\"velocity\":27,\"duration\":60},{\"tick\":37440,\"note\":60,\"velocity\":26,\"duration\":60},{\"tick\":37920,\"note\":60,\"velocity\":27,\"duration\":60},{\"tick\":38400,\"note\":60,\"velocity\":28,\"duration\":60},{\"tick\":38880,\"note\":60,\"velocity\":30,\"duration\":60},{\"tick\":39360,\"note\":60,\"velocity\":26,\"duration\":60},{\"tick\":39840,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":40320,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":40800,\"note\":60,\"velocity\":28,\"duration\":60},{\"tick\":41280,\"note\":60,\"velocity\":27,\"duration\":60},{\"tick\":41760,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":42240,\"note\":60,\"velocity\":27,\"duration\":60},{\"tick\":42720,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":43200,\"note\":60,\"velocity\":27,\"duration\":60},{\"tick\":43680,\"note\":60,\"velocity\":27,\"duration\":60},{\"tick\":44160,\"note\":60,\"velocity\":28,\"duration\":60},{\"tick\":44640,\"note\":60,\"velocity\":28,\"duration\":60},{\"tick\":45120,\"note\":60,\"velocity\":28,\"duration\":60},{\"tick\":45600,\"note\":60,\"velocity\":26,\"duration\":60},{\"tick\":46080,\"note\":60,\"velocity\":28,\"duration\":60},{\"tick\":46560,\"note\":60,\"velocity\":27,\"duration\":60},{\"tick\":47040,\"note\":60,\"velocity\":27,\"duration\":60},{\"tick\":47520,\"note\":60,\"velocity\":30,\"duration\":60},{\"tick\":48000,\"note\":60,\"velocity\":27,\"duration\":60},{\"tick\":48480,\"note\":60,\"velocity\":28,\"duration\":60},{\"tick\":48960,\"note\":60,\"velocity\":28,\"duration\":60},{\"tick\":49440,\"note\":60,\"velocity\":27,\"duration\":60},{\"tick\":49920,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":50400,\"note\":60,\"velocity\":28,\"duration\":60},{\"tick\":50880,\"note\":60,\"velocity\":27,\"duration\":60},{\"tick\":51360,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":51840,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":52320,\"note\":60,\"velocity\":26,\"duration\":60},{\"tick\":52800,\"note\":60,\"velocity\":27,\"duration\":60},{\"tick\":53280,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":53760,\"note\":60,\"velocity\":28,\"duration\":60},{\"tick\":54240,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":54720,\"note\":60,\"velocity\":27,\"duration\":60},{\"tick\":55200,\"note\":60,\"velocity\":27,\"duration\":60},{\"tick\":55680,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":56160,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":56640,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":57120,\"note\":60,\"velocity\":28,\"duration\":60},{\"tick\":57600,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":58080,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":58560,\"note\":60,\"velocity\":27,\"duration\":60},{\"tick\":59040,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":59520,\"note\":60,\"velocity\":30,\"duration\":60},{\"tick\":60000,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":60480,\"note\":60,\"velocity\":27,\"duration\":60},{\"tick\":60960,\"note\":60,\"velocity\":27,\"duration\":60},{\"tick\":61440,\"note\":60,\"velocity\":53,\"duration\":60},{\"tick\":61680,\"note\":60,\"velocity\":32,\"duration\":60},{\"tick\":61920,\"note\":60,\"velocity\":48,\"duration\":60},{\"tick\":62160,\"note\":60,\"velocity\":33,\"duration\":60},{\"tick\":62400,\"note\":60,\"velocity\":53,\"duration\":60},{\"tick\":62640,\"note\":60,\"velocity\":32,\"duration\":60},{\"tick\":62880,\"note\":60,\"velocity\":49,\"duration\":60},{\"tick\":63120,\"note\":60,\"velocity\":32,\"duration\":60},{\"tick\":63360,\"note\":60,\"velocity\":52,\"duration\":60},{\"tick\":63600,\"note\":60,\"velocity\":32,\"duration\":60},{\"tick\":63840,\"note\":60,\"velocity\":51,\"duration\":60},{\"tick\":64080,\"note\":60,\"velocity\":30,\"duration\":60},{\"tick\":64320,\"note\":60,\"velocity\":51,\"duration\":60},{\"tick\":64560,\"note\":60,\"velocity\":31,\"duration\":60},{\"tick\":64800,\"note\":60,\"velocity\":52,\"duration\":60},{\"tick\":65040,\"note\":60,\"velocity\":33,\"duration\":60},{\"tick\":65280,\"note\":60,\"velocity\":49,\"duration\":60},{\"tick\":65520,\"note\":60,\"velocity\":31,\"duration\":60},{\"tick\":65760,\"note\":60,\"velocity\":52,\"duration\":60},{\"tick\":66000,\"note\":60,\"velocity\":31,\"duration\":60},{\"tick\":66240,\"note\":60,\"velocity\":48,\"duration\":60},{\"tick\":66480,\"note\":60,\"velocity\":33,\"duration\":60},{\"tick\":66720,\"note\":60,\"velocity\":53,\"duration\":60},{\"tick\":66960,\"note\":60,\"velocity\":33,\"duration\":60},{\"tick\":67200,\"note\":60,\"velocity\":50,\"duration\":60},{\"tick\":67440,\"note\":60,\"velocity\":32,\"duration\":60},{\"tick\":67680,\"note\":60,\"velocity\":50,\"duration\":60},{\"tick\":67920,\"note\":60,\"velocity\":30,\"duration\":60},{\"tick\":68160,\"note\":60,\"velocity\":50,\"duration\":60},{\"tick\":68400,\"note\":60,\"velocity\":32,\"duration\":60},{\"tick\":68640,\"note\":60,\"velocity\":51,\"duration\":60},{\"tick\":68880,\"note\":60,\"velocity\":32,\"duration\":60},{\"tick\":69120,\"note\":60,\"velocity\":51,\"duration\":60},{\"tick\":69360,\"note\":60,\"velocity\":31,\"duration\":60},{\"tick\":69600,\"note\":60,\"velocity\":49,\"duration\":60},{\"tick\":69840,\"note\":60,\"velocity\":30,\"duration\":60},{\"tick\":70080,\"note\":60,\"velocity\":53,\"duration\":60},{\"tick\":70320,\"note\":60,\"velocity\":32,\"duration\":60},{\"tick\":70560,\"note\":60,\"velocity\":49,\"duration\":60},{\"tick\":70800,\"note\":60,\"velocity\":33,\"duration\":60},{\"tick\":71040,\"note\":60,\"velocity\":51,\"duration\":60},{\"tick\":71280,\"note\":60,\"velocity\":31,\"duration\":60},{\"tick\":71520,\"note\":60,\"velocity\":52,\"duration\":60},{\"tick\":71760,\"note\":60,\"velocity\":30,\"duration\":60},{\"tick\":72000,\"note\":60,\"velocity\":52,\"duration\":60},{\"tick\":72240,\"note\":60,\"velocity\":31,\"duration\":60},{\"tick\":72480,\"note\":60,\"velocity\":48,\"duration\":60},{\"tick\":72720,\"note\":60,\"velocity\":32,\"duration\":60},{\"tick\":72960,\"note\":60,\"velocity\":48,\"duration\":60},{\"tick\":73200,\"note\":60,\"velocity\":33,\"duration\":60},{\"tick\":73440,\"note\":60,\"velocity\":49,\"duration\":60},{\"tick\":73680,\"note\":60,\"velocity\":30,\"duration\":60},{\"tick\":73920,\"note\":60,\"velocity\":53,\"duration\":60},{\"tick\":74160,\"note\":60,\"velocity\":32,\"duration\":60},{\"tick\":74400,\"note\":60,\"velocity\":48,\"duration\":60},{\"tick\":74640,\"note\":60,\"velocity\":31,\"duration\":60},{\"tick\":74880,\"note\":60,\"velocity\":54,\"duration\":60},{\"tick\":75120,\"note\":60,\"velocity\":31,\"duration\":60},{\"tick\":75360,\"note\":60,\"velocity\":52,\"duration\":60},{\"tick\":75600,\"note\":60,\"velocity\":31,\"duration\":60},{\"tick\":75840,\"note\":60,\"velocity\":48,\"duration\":60},{\"tick\":76080,\"note\":60,\"velocity\":31,\"duration\":60},{\"tick\":76320,\"note\":60,\"velocity\":48,\"duration\":60},{\"tick\":76560,\"note\":60,\"velocity\":30,\"duration\":60},{\"tick\":76800,\"note\":60,\"velocity\":56,\"duration\":60},{\"tick\":77040,\"note\":60,\"velocity\":31,\"duration\":60},{\"tick\":77280,\"note\":60,\"velocity\":56,\"duration\":60},{\"tick\":77520,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":77760,\"note\":60,\"velocity\":54,\"duration\":60},{\"tick\":78000,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":78240,\"note\":60,\"velocity\":51,\"duration\":60},{\"tick\":78480,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":78720,\"note\":60,\"velocity\":50,\"duration\":60},{\"tick\":78960,\"note\":60,\"velocity\":31,\"duration\":60},{\"tick\":79200,\"note\":60,\"velocity\":54,\"duration\":60},{\"tick\":79440,\"note\":60,\"velocity\":31,\"duration\":60},{\"tick\":79680,\"note\":60,\"velocity\":54,\"duration\":60},{\"tick\":79920,\"note\":60,\"velocity\":30,\"duration\":60},{\"tick\":80160,\"note\":60,\"velocity\":53,\"duration\":60},{\"tick\":80400,\"note\":60,\"velocity\":30,\"duration\":60},{\"tick\":80640,\"note\":60,\"velocity\":51,\"duration\":60},{\"tick\":80880,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":81120,\"note\":60,\"velocity\":52,\"duration\":60},{\"tick\":81360,\"note\":60,\"velocity\":31,\"duration\":60},{\"tick\":81600,\"note\":60,\"velocity\":55,\"duration\":60},{\"tick\":81840,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":82080,\"note\":60,\"velocity\":54,\"duration\":60},{\"tick\":82320,\"note\":60,\"velocity\":31,\"duration\":60},{\"tick\":82560,\"note\":60,\"velocity\":50,\"duration\":60},{\"tick\":82800,\"note\":60,\"velocity\":32,\"duration\":60},{\"tick\":83040,\"note\":60,\"velocity\":51,\"duration\":60},{\"tick\":83280,\"note\":60,\"velocity\":32,\"duration\":60},{\"tick\":83520,\"note\":60,\"velocity\":51,\"duration\":60},{\"tick\":83760,\"note\":60,\"velocity\":31,\"duration\":60},{\"tick\":84000,\"note\":60,\"velocity\":50,\"duration\":60},{\"tick\":84240,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":84480,\"note\":60,\"velocity\":53,\"duration\":60},{\"tick\":84720,\"note\":60,\"velocity\":32,\"duration\":60},{\"tick\":84960,\"note\":60,\"velocity\":53,\"duration\":60},{\"tick\":85200,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":85440,\"note\":60,\"velocity\":55,\"duration\":60},{\"tick\":85680,\"note\":60,\"velocity\":32,\"duration\":60},{\"tick\":85920,\"note\":60,\"velocity\":56,\"duration\":60},{\"tick\":86160,\"note\":60,\"velocity\":31,\"duration\":60},{\"tick\":86400,\"note\":60,\"velocity\":54,\"duration\":60},{\"tick\":86640,\"note\":60,\"velocity\":31,\"duration\":60},{\"tick\":86880,\"note\":60,\"velocity\":51,\"duration\":60},{\"tick\":87120,\"note\":60,\"velocity\":30,\"duration\":60},{\"tick\":87360,\"note\":60,\"velocity\":53,\"duration\":60},{\"tick\":87600,\"note\":60,\"velocity\":32,\"duration\":60},{\"tick\":87840,\"note\":60,\"velocity\":55,\"duration\":60},{\"tick\":88080,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":88320,\"note\":60,\"velocity\":51,\"duration\":60},{\"tick\":88560,\"note\":60,\"velocity\":32,\"duration\":60},{\"tick\":88800,\"note\":60,\"velocity\":51,\"duration\":60},{\"tick\":89040,\"note\":60,\"velocity\":30,\"duration\":60},{\"tick\":89280,\"note\":60,\"velocity\":52,\"duration\":60},{\"tick\":89520,\"note\":60,\"velocity\":30,\"duration\":60},{\"tick\":89760,\"note\":60,\"velocity\":52,\"duration\":60},{\"tick\":90000,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":90240,\"note\":60,\"velocity\":54,\"duration\":60},{\"tick\":90480,\"note\":60,\"velocity\":30,\"duration\":60},{\"tick\":90720,\"note\":60,\"velocity\":51,\"duration\":60},{\"tick\":90960,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":91200,\"note\":60,\"velocity\":56,\"duration\":60},{\"tick\":91440,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":91680,\"note\":60,\"velocity\":55,\"duration\":60},{\"tick\":91920,\"note\":60,\"velocity\":30,\"duration\":60},{\"tick\":92160,\"note\":60,\"velocity\":53,\"duration\":60},{\"tick\":92400,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":92640,\"note\":60,\"velocity\":53,\"duration\":60},{\"tick\":92880,\"note\":60,\"velocity\":30,\"duration\":60},{\"tick\":93120,\"note\":60,\"velocity\":52,\"duration\":60},{\"tick\":93360,\"note\":60,\"velocity\":31,\"duration\":60},{\"tick\":93600,\"note\":60,\"velocity\":54,\"duration\":60},{\"tick\":93840,\"note\":60,\"velocity\":32,\"duration\":60},{\"tick\":94080,\"note\":60,\"velocity\":50,\"duration\":60},{\"tick\":94320,\"note\":60,\"velocity\":31,\"duration\":60},{\"tick\":94560,\"note\":60,\"velocity\":54,\"duration\":60},{\"tick\":94800,\"note\":60,\"velocity\":30,\"duration\":60},{\"tick\":95040,\"note\":60,\"velocity\":50,\"duration\":60},{\"tick\":95280,\"note\":60,\"velocity\":31,\"duration\":60},{\"tick\":95520,\"note\":60,\"velocity\":54,\"duration\":60},{\"tick\":95760,\"note\":60,\"velocity\":31,\"duration\":60},{\"tick\":96000,\"note\":60,\"velocity\":57,\"duration\":60},{\"tick\":96240,\"note\":60,\"velocity\":32,\"duration\":60},{\"tick\":96480,\"note\":60,\"velocity\":55,\"duration\":60},{\"tick\":96720,\"note\":60,\"velocity\":30,\"duration\":60},{\"tick\":96960,\"note\":60,\"velocity\":56,\"duration\":60},{\"tick\":97200,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":97440,\"note\":60,\"velocity\":54,\"duration\":60},{\"tick\":97680,\"note\":60,\"velocity\":31,\"duration\":60},{\"tick\":97920,\"note\":60,\"velocity\":50,\"duration\":60},{\"tick\":98160,\"note\":60,\"velocity\":30,\"duration\":60},{\"tick\":98400,\"note\":60,\"velocity\":53,\"duration\":60},{\"tick\":98640,\"note\":60,\"velocity\":30,\"duration\":60},{\"tick\":98880,\"note\":60,\"velocity\":56,\"duration\":60},{\"tick\":99120,\"note\":60,\"velocity\":32,\"duration\":60},{\"tick\":99360,\"note\":60,\"velocity\":52,\"duration\":60},{\"tick\":99600,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":99840,\"note\":60,\"velocity\":55,\"duration\":60},{\"tick\":100080,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":100320,\"note\":60,\"velocity\":50,\"duration\":60},{\"tick\":100560,\"note\":60,\"velocity\":31,\"duration\":60},{\"tick\":100800,\"note\":60,\"velocity\":54,\"duration\":60},{\"tick\":101040,\"note\":60,\"velocity\":30,\"duration\":60},{\"tick\":101280,\"note\":60,\"velocity\":55,\"duration\":60},{\"tick\":101520,\"note\":60,\"velocity\":31,\"duration\":60},{\"tick\":101760,\"note\":60,\"velocity\":50,\"duration\":60},{\"tick\":102000,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":102240,\"note\":60,\"velocity\":55,\"duration\":60},{\"tick\":102480,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":102720,\"note\":60,\"velocity\":56,\"duration\":60},{\"tick\":102960,\"note\":60,\"velocity\":32,\"duration\":60},{\"tick\":103200,\"note\":60,\"velocity\":52,\"duration\":60},{\"tick\":103440,\"note\":60,\"velocity\":30,\"duration\":60},{\"tick\":103680,\"note\":60,\"velocity\":51,\"duration\":60},{\"tick\":103920,\"note\":60,\"velocity\":32,\"duration\":60},{\"tick\":104160,\"note\":60,\"velocity\":55,\"duration\":60},{\"tick\":104400,\"note\":60,\"velocity\":30,\"duration\":60},{\"tick\":104640,\"note\":60,\"velocity\":56,\"duration\":60},{\"tick\":104880,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":105120,\"note\":60,\"velocity\":52,\"duration\":60},{\"tick\":105360,\"note\":60,\"velocity\":31,\"duration\":60},{\"tick\":105600,\"note\":60,\"velocity\":56,\"duration\":60},{\"tick\":105840,\"note\":60,\"velocity\":31,\"duration\":60},{\"tick\":106080,\"note\":60,\"velocity\":50,\"duration\":60},{\"tick\":106320,\"note\":60,\"velocity\":32,\"duration\":60},{\"tick\":106560,\"note\":60,\"velocity\":54,\"duration\":60},{\"tick\":106800,\"note\":60,\"velocity\":32,\"duration\":60},{\"tick\":107040,\"note\":60,\"velocity\":51,\"duration\":60},{\"tick\":107280,\"note\":60,\"velocity\":30,\"duration\":60},{\"tick\":122880,\"note\":60,\"velocity\":52,\"duration\":60},{\"tick\":123120,\"note\":60,\"velocity\":30,\"duration\":60},{\"tick\":123360,\"note\":60,\"velocity\":50,\"duration\":60},{\"tick\":123600,\"note\":60,\"velocity\":31,\"duration\":60},{\"tick\":123840,\"note\":60,\"velocity\":55,\"duration\":60},{\"tick\":124080,\"note\":60,\"velocity\":31,\"duration\":60},{\"tick\":124320,\"note\":60,\"velocity\":56,\"duration\":60},{\"tick\":124560,\"note\":60,\"velocity\":31,\"duration\":60},{\"tick\":124800,\"note\":60,\"velocity\":54,\"duration\":60},{\"tick\":125040,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":125280,\"note\":60,\"velocity\":56,\"duration\":60},{\"tick\":125520,\"note\":60,\"velocity\":31,\"duration\":60},{\"tick\":125760,\"note\":60,\"velocity\":50,\"duration\":60},{\"tick\":126000,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":126240,\"note\":60,\"velocity\":52,\"duration\":60},{\"tick\":126480,\"note\":60,\"velocity\":31,\"duration\":60},{\"tick\":126720,\"note\":60,\"velocity\":56,\"duration\":60},{\"tick\":126960,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":127200,\"note\":60,\"velocity\":55,\"duration\":60},{\"tick\":127440,\"note\":60,\"velocity\":31,\"duration\":60},{\"tick\":127680,\"note\":60,\"velocity\":50,\"duration\":60},{\"tick\":127920,\"note\":60,\"velocity\":30,\"duration\":60},{\"tick\":128160,\"note\":60,\"velocity\":55,\"duration\":60},{\"tick\":128400,\"note\":60,\"velocity\":30,\"duration\":60},{\"tick\":128640,\"note\":60,\"velocity\":56,\"duration\":60},{\"tick\":128880,\"note\":60,\"velocity\":31,\"duration\":60},{\"tick\":129120,\"note\":60,\"velocity\":54,\"duration\":60},{\"tick\":129360,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":129600,\"note\":60,\"velocity\":56,\"duration\":60},{\"tick\":129840,\"note\":60,\"velocity\":32,\"duration\":60},{\"tick\":130080,\"note\":60,\"velocity\":51,\"duration\":60},{\"tick\":130320,\"note\":60,\"velocity\":30,\"duration\":60},{\"tick\":130560,\"note\":60,\"velocity\":56,\"duration\":60},{\"tick\":130800,\"note\":60,\"velocity\":31,\"duration\":60},{\"tick\":131040,\"note\":60,\"velocity\":51,\"duration\":60},{\"tick\":131280,\"note\":60,\"velocity\":30,\"duration\":60},{\"tick\":131520,\"note\":60,\"velocity\":53,\"duration\":60},{\"tick\":131760,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":132000,\"note\":60,\"velocity\":54,\"duration\":60},{\"tick\":132240,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":132480,\"note\":60,\"velocity\":52,\"duration\":60},{\"tick\":132720,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":132960,\"note\":60,\"velocity\":55,\"duration\":60},{\"tick\":133200,\"note\":60,\"velocity\":30,\"duration\":60},{\"tick\":133440,\"note\":60,\"velocity\":56,\"duration\":60},{\"tick\":133680,\"note\":60,\"velocity\":32,\"duration\":60},{\"tick\":133920,\"note\":60,\"velocity\":53,\"duration\":60},{\"tick\":134160,\"note\":60,\"velocity\":31,\"duration\":60},{\"tick\":134400,\"note\":60,\"velocity\":54,\"duration\":60},{\"tick\":134640,\"note\":60,\"velocity\":31,\"duration\":60},{\"tick\":134880,\"note\":60,\"velocity\":56,\"duration\":60},{\"tick\":135120,\"note\":60,\"velocity\":30,\"duration\":60},{\"tick\":135360,\"note\":60,\"velocity\":52,\"duration\":60},{\"tick\":135600,\"note\":60,\"velocity\":32,\"duration\":60},{\"tick\":135840,\"note\":60,\"velocity\":51,\"duration\":60},{\"tick\":136080,\"note\":60,\"velocity\":32,\"duration\":60},{\"tick\":138240,\"note\":60,\"velocity\":53,\"duration\":60},{\"tick\":138480,\"note\":60,\"velocity\":32,\"duration\":60},{\"tick\":138720,\"note\":60,\"velocity\":50,\"duration\":60},{\"tick\":138960,\"note\":60,\"velocity\":32,\"duration\":60},{\"tick\":139200,\"note\":60,\"velocity\":52,\"duration\":60},{\"tick\":139440,\"note\":60,\"velocity\":32,\"duration\":60},{\"tick\":139680,\"note\":60,\"velocity\":52,\"duration\":60},{\"tick\":139920,\"note\":60,\"velocity\":30,\"duration\":60},{\"tick\":140160,\"note\":60,\"velocity\":55,\"duration\":60},{\"tick\":140400,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":140640,\"note\":60,\"velocity\":55,\"duration\":60},{\"tick\":140880,\"note\":60,\"velocity\":30,\"duration\":60},{\"tick\":141120,\"note\":60,\"velocity\":52,\"duration\":60},{\"tick\":141360,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":141600,\"note\":60,\"velocity\":52,\"duration\":60},{\"tick\":141840,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":142080,\"note\":60,\"velocity\":56,\"duration\":60},{\"tick\":142320,\"note\":60,\"velocity\":30,\"duration\":60},{\"tick\":142560,\"note\":60,\"velocity\":52,\"duration\":60},{\"tick\":142800,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":143040,\"note\":60,\"velocity\":56,\"duration\":60},{\"tick\":143280,\"note\":60,\"velocity\":30,\"duration\":60},{\"tick\":143520,\"note\":60,\"velocity\":52,\"duration\":60},{\"tick\":143760,\"note\":60,\"velocity\":30,\"duration\":60},{\"tick\":144000,\"note\":60,\"velocity\":55,\"duration\":60},{\"tick\":144240,\"note\":60,\"velocity\":32,\"duration\":60},{\"tick\":144480,\"note\":60,\"velocity\":55,\"duration\":60},{\"tick\":144720,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":144960,\"note\":60,\"velocity\":53,\"duration\":60},{\"tick\":145200,\"note\":60,\"velocity\":31,\"duration\":60},{\"tick\":145440,\"note\":60,\"velocity\":52,\"duration\":60},{\"tick\":145680,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":145920,\"note\":60,\"velocity\":52,\"duration\":60},{\"tick\":146160,\"note\":60,\"velocity\":30,\"duration\":60},{\"tick\":146400,\"note\":60,\"velocity\":56,\"duration\":60},{\"tick\":146640,\"note\":60,\"velocity\":31,\"duration\":60},{\"tick\":146880,\"note\":60,\"velocity\":53,\"duration\":60},{\"tick\":147120,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":147360,\"note\":60,\"velocity\":52,\"duration\":60},{\"tick\":147600,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":147840,\"note\":60,\"velocity\":55,\"duration\":60},{\"tick\":148080,\"note\":60,\"velocity\":31,\"duration\":60},{\"tick\":148320,\"note\":60,\"velocity\":55,\"duration\":60},{\"tick\":148560,\"note\":60,\"velocity\":30,\"duration\":60},{\"tick\":148800,\"note\":60,\"velocity\":54,\"duration\":60},{\"tick\":149040,\"note\":60,\"velocity\":32,\"duration\":60},{\"tick\":149280,\"note\":60,\"velocity\":54,\"duration\":60},{\"tick\":149520,\"note\":60,\"velocity\":29,\"duration\":60},{\"tick\":149760,\"note\":60,\"velocity\":51,\"duration\":60},{\"tick\":150000,\"note\":60,\"velocity\":31,\"duration\":60},{\"tick\":150240,\"note\":60,\"velocity\":50,\"duration\":60},{\"tick\":150480,\"note\":60,\"velocity\":31,\"duration\":60},{\"tick\":150720,\"note\":60,\"velocity\":53,\"duration\":60},{\"tick\":150960,\"note\":60,\"velocity\":31,\"duration\":60},{\"tick\":151200,\"note\":60,\"velocity\":56,\"duration\":60},{\"tick\":151440,\"note\":60,\"velocity\":32,\"duration\":60}]},{\"name\":\"OHH\",\"channel\":0,\"notes\":[{\"tick\":84240,\"note\":60,\"velocity\":48,\"duration\":60},{\"tick\":91920,\"note\":60,\"velocity\":50,\"duration\":60},{\"tick\":99600,\"note\":60,\"velocity\":52,\"duration\":60},{\"tick\":107280,\"note\":60,\"velocity\":53,\"duration\":60},{\"tick\":130320,\"note\":60,\"velocity\":50,\"duration\":60},{\"tick\":145680,\"note\":60,\"velocity\":51,\"duration\":60}]},{\"name\":\"Crash\",\"channel\":0,\"notes\":[{\"tick\":76800,\"note\":60,\"velocity\":91,\"duration\":60},{\"tick\":122880,\"note\":60,\"velocity\":105,\"duration\":60},{\"tick\":138240,\"note\":60,\"velocity\":90,\"duration\":60},{\"tick\":153600,\"note\":60,\"velocity\":66,\"duration\":60}]},{\"name\":\"Tom\",\"channel\":0,\"notes\":[{\"tick\":137880,\"note\":60,\"velocity\":62,\"duration\":60},{\"tick\":138000,\"note\":60,\"velocity\":76,\"duration\":60},{\"tick\":138120,\"note\":60,\"velocity\":92,\"duration\":60},{\"tick\":153240,\"note\":60,\"velocity\":61,\"duration\":60},{\"tick\":153360,\"note\":60,\"velocity\":72,\"duration\":60},{\"tick\":153480,\"note\":60,\"velocity\":84,\"duration\":60}]}]}"
+            }
+          },
+          {
+            "id": "kick",
+            "type": "909-kick",
+            "name": "Kick",
+            "position": {
+              "x": 460,
+              "y": 40
+            },
+            "params": {
+              "tune": 50,
+              "attack": 0.4,
+              "decay": 0.5,
+              "drive": 0.2
+            }
+          },
+          {
+            "id": "snare",
+            "type": "909-snare",
+            "name": "Snare",
+            "position": {
+              "x": 460,
+              "y": 160
+            },
+            "params": {
+              "tune": 190,
+              "tone": 0.5,
+              "snappy": 0.5,
+              "decay": 0.28
+            }
+          },
+          {
+            "id": "clap",
+            "type": "909-clap",
+            "name": "Clap",
+            "position": {
+              "x": 460,
+              "y": 280
+            },
+            "params": {
+              "tone": 0.45,
+              "decay": 0.38
+            }
+          },
+          {
+            "id": "chh",
+            "type": "909-hihat",
+            "name": "Closed Hat",
+            "position": {
+              "x": 460,
+              "y": 400
+            },
+            "params": {
+              "tune": 1,
+              "decay": 0.14,
+              "tone": 0.5,
+              "open": 0
+            }
+          },
+          {
+            "id": "ohh",
+            "type": "909-hihat",
+            "name": "Open Hat",
+            "position": {
+              "x": 460,
+              "y": 520
+            },
+            "params": {
+              "tune": 1,
+              "decay": 0.45,
+              "tone": 0.48,
+              "open": 1
+            }
+          },
+          {
+            "id": "crash",
+            "type": "909-crash",
+            "name": "Crash",
+            "position": {
+              "x": 460,
+              "y": 640
+            },
+            "params": {
+              "tune": 1,
+              "decay": 1.6,
+              "tone": 0.55
+            }
+          },
+          {
+            "id": "tom",
+            "type": "909-tom",
+            "name": "Tom",
+            "position": {
+              "x": 460,
+              "y": 760
+            },
+            "params": {
+              "tune": 105,
+              "decay": 0.38
+            }
+          },
+          {
+            "id": "clapverb",
+            "type": "reverb",
+            "name": "Clap Verb",
+            "position": {
+              "x": 720,
+              "y": 280
+            },
+            "params": {
+              "time": 0.5,
+              "damp": 0.45,
+              "preDelay": 10,
+              "mix": 0.85
+            }
+          },
+          {
+            "id": "drummix",
+            "type": "mixer-8",
+            "name": "Drum Bus",
+            "position": {
+              "x": 980,
+              "y": 300
+            },
+            "params": {
+              "level1": 0.85,
+              "level2": 0.65,
+              "level3": 0.55,
+              "level4": 0.42,
+              "level5": 0.38,
+              "level6": 0.5,
+              "level7": 0.55,
+              "level8": 0.22
+            }
+          },
+          {
+            "id": "drumcomp",
+            "type": "compressor",
+            "name": "Glue",
+            "position": {
+              "x": 1240,
+              "y": 300
+            },
+            "params": {
+              "threshold": -18,
+              "ratio": 2.5,
+              "attack": 10,
+              "release": 140,
+              "makeup": 2,
+              "mix": 1
+            }
+          },
+          {
+            "id": "out-7",
+            "type": "output",
+            "name": "Out",
+            "position": {
+              "x": 1500,
+              "y": 300
+            },
+            "params": {
+              "level": 0.68
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": {
+              "moduleId": "drumseq",
+              "portId": "gate-1"
+            },
+            "to": {
+              "moduleId": "kick",
+              "portId": "trigger"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "drumseq",
+              "portId": "vel-1"
+            },
+            "to": {
+              "moduleId": "kick",
+              "portId": "accent"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "kick",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "drummix",
+              "portId": "in-1"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "drumseq",
+              "portId": "gate-2"
+            },
+            "to": {
+              "moduleId": "snare",
+              "portId": "trigger"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "drumseq",
+              "portId": "vel-2"
+            },
+            "to": {
+              "moduleId": "snare",
+              "portId": "accent"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "snare",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "drummix",
+              "portId": "in-2"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "drumseq",
+              "portId": "gate-3"
+            },
+            "to": {
+              "moduleId": "clap",
+              "portId": "trigger"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "drumseq",
+              "portId": "vel-3"
+            },
+            "to": {
+              "moduleId": "clap",
+              "portId": "accent"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "clap",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "drummix",
+              "portId": "in-3"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "drumseq",
+              "portId": "gate-4"
+            },
+            "to": {
+              "moduleId": "chh",
+              "portId": "trigger"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "drumseq",
+              "portId": "vel-4"
+            },
+            "to": {
+              "moduleId": "chh",
+              "portId": "accent"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "chh",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "drummix",
+              "portId": "in-4"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "drumseq",
+              "portId": "gate-5"
+            },
+            "to": {
+              "moduleId": "ohh",
+              "portId": "trigger"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "drumseq",
+              "portId": "vel-5"
+            },
+            "to": {
+              "moduleId": "ohh",
+              "portId": "accent"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "ohh",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "drummix",
+              "portId": "in-5"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "drumseq",
+              "portId": "gate-6"
+            },
+            "to": {
+              "moduleId": "crash",
+              "portId": "trigger"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "drumseq",
+              "portId": "vel-6"
+            },
+            "to": {
+              "moduleId": "crash",
+              "portId": "accent"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "crash",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "drummix",
+              "portId": "in-6"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "drumseq",
+              "portId": "gate-7"
+            },
+            "to": {
+              "moduleId": "tom",
+              "portId": "trigger"
+            },
+            "kind": "gate"
+          },
+          {
+            "from": {
+              "moduleId": "drumseq",
+              "portId": "vel-7"
+            },
+            "to": {
+              "moduleId": "tom",
+              "portId": "accent"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "tom",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "drummix",
+              "portId": "in-7"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "clap",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "clapverb",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "clapverb",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "drummix",
+              "portId": "in-8"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "drummix",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "drumcomp",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "drumcomp",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "out-7",
+              "portId": "in"
+            },
+            "kind": "audio"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rack-8",
+      "name": "Atmos",
+      "graph": {
+        "modules": [
+          {
+            "id": "atmnoise",
+            "type": "noise",
+            "name": "Souffle",
+            "position": {
+              "x": 40,
+              "y": 40
+            },
+            "params": {
+              "level": 0.45,
+              "noiseType": "pink",
+              "stereo": 1,
+              "pan": 0
+            }
+          },
+          {
+            "id": "atmfilt",
+            "type": "vcf",
+            "name": "Filtre",
+            "position": {
+              "x": 300,
+              "y": 40
+            },
+            "params": {
+              "cutoff": 1100,
+              "resonance": 0.3,
+              "drive": 0,
+              "envAmount": 0,
+              "modAmount": 0,
+              "keyTrack": 0,
+              "model": "svf",
+              "mode": "bp",
+              "slope": 12
+            }
+          },
+          {
+            "id": "atmverb",
+            "type": "reverb",
+            "name": "Reverb",
+            "position": {
+              "x": 560,
+              "y": 40
+            },
+            "params": {
+              "time": 0.9,
+              "damp": 0.3,
+              "preDelay": 30,
+              "mix": 0.5
+            }
+          },
+          {
+            "id": "out-8",
+            "type": "output",
+            "name": "Out",
+            "position": {
+              "x": 820,
+              "y": 40
+            },
+            "params": {
+              "level": 1
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": {
+              "moduleId": "atmnoise",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "atmfilt",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "atmfilt",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "atmverb",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "atmverb",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "out-8",
+              "portId": "in"
+            },
+            "kind": "audio"
+          }
+        ]
+      }
+    }
+  ],
+  "mixer": {
+    "rack-1": {
+      "volume": 0.85,
+      "mute": false,
+      "solo": false
+    },
+    "rack-2": {
+      "volume": 0.75,
+      "mute": false,
+      "solo": false
+    },
+    "rack-3": {
+      "volume": 0.8,
+      "mute": false,
+      "solo": false
+    },
+    "rack-4": {
+      "volume": 0.75,
+      "mute": false,
+      "solo": false
+    },
+    "rack-5": {
+      "volume": 0.78,
+      "mute": false,
+      "solo": false
+    },
+    "rack-6": {
+      "volume": 0.7,
+      "mute": false,
+      "solo": false
+    },
+    "rack-7": {
+      "volume": 0.75,
+      "mute": false,
+      "solo": false
+    },
+    "rack-8": {
+      "volume": 0.5,
+      "mute": false,
+      "solo": false
+    }
+  },
+  "song": {
+    "enabled": true,
+    "loop": true,
+    "sections": [
+      {
+        "id": "s1",
+        "name": "L'HUMAIN",
+        "bars": 8
+      },
+      {
+        "id": "s2",
+        "name": "LA MACHINE",
+        "bars": 8
+      },
+      {
+        "id": "s3",
+        "name": "DIALOGUE",
+        "bars": 16
+      },
+      {
+        "id": "s4",
+        "name": "DISPUTE",
+        "bars": 8
+      },
+      {
+        "id": "s5",
+        "name": "ACCORD",
+        "bars": 16
+      },
+      {
+        "id": "s6",
+        "name": "LA VOIX",
+        "bars": 8
+      },
+      {
+        "id": "s7",
+        "name": "ENSEMBLE",
+        "bars": 16
+      },
+      {
+        "id": "s8",
+        "name": "BONNE NUIT",
+        "bars": 8
+      }
+    ],
+    "cells": {
+      "rack-1": {
+        "s2": {
+          "on": false,
+          "level": 1
+        },
+        "s6": {
+          "on": false,
+          "level": 1
+        }
+      },
+      "rack-2": {
+        "s1": {
+          "on": false,
+          "level": 1
+        },
+        "s6": {
+          "on": false,
+          "level": 1
+        }
+      },
+      "rack-3": {
+        "s1": {
+          "on": false,
+          "level": 1
+        },
+        "s2": {
+          "on": false,
+          "level": 1
+        },
+        "s3": {
+          "on": false,
+          "level": 1
+        },
+        "s4": {
+          "on": false,
+          "level": 1
+        },
+        "s5": {
+          "on": false,
+          "level": 1
+        }
+      },
+      "rack-7": {
+        "s1": {
+          "on": false,
+          "level": 1
+        },
+        "s2": {
+          "on": false,
+          "level": 1
+        },
+        "s6": {
+          "on": false,
+          "level": 1
+        },
+        "s8": {
+          "on": false,
+          "level": 1
+        }
+      }
+    },
+    "volumes": {
+      "rack-1": [
+        {
+          "bar": 0,
+          "v": 0.95
+        },
+        {
+          "bar": 40,
+          "v": 0.9
+        },
+        {
+          "bar": 64,
+          "v": 0.95
+        },
+        {
+          "bar": 80,
+          "v": 0.9
+        }
+      ],
+      "rack-2": [
+        {
+          "bar": 8,
+          "v": 0.9
+        },
+        {
+          "bar": 40,
+          "v": 0.75
+        },
+        {
+          "bar": 64,
+          "v": 0.85
+        },
+        {
+          "bar": 80,
+          "v": 0.6
+        }
+      ],
+      "rack-3": [
+        {
+          "bar": 56,
+          "v": 0.95
+        },
+        {
+          "bar": 64,
+          "v": 0.7
+        },
+        {
+          "bar": 80,
+          "v": 1
+        }
+      ],
+      "rack-4": [
+        {
+          "bar": 56,
+          "v": 0.9
+        },
+        {
+          "bar": 64,
+          "v": 0.6
+        },
+        {
+          "bar": 80,
+          "v": 0.95
+        }
+      ],
+      "rack-5": [
+        {
+          "bar": 16,
+          "v": 0.6
+        },
+        {
+          "bar": 32,
+          "v": 0.8
+        },
+        {
+          "bar": 40,
+          "v": 0.9
+        },
+        {
+          "bar": 56,
+          "v": 0.6
+        },
+        {
+          "bar": 64,
+          "v": 0.9
+        },
+        {
+          "bar": 80,
+          "v": 0.6
+        }
+      ],
+      "rack-6": [
+        {
+          "bar": 40,
+          "v": 0.75
+        },
+        {
+          "bar": 56,
+          "v": 0.85
+        },
+        {
+          "bar": 64,
+          "v": 0.8
+        },
+        {
+          "bar": 80,
+          "v": 0.7
+        },
+        {
+          "bar": 88,
+          "v": 0.4
+        }
+      ],
+      "rack-7": [
+        {
+          "bar": 16,
+          "v": 0.5
+        },
+        {
+          "bar": 32,
+          "v": 0.8
+        },
+        {
+          "bar": 40,
+          "v": 0.85
+        },
+        {
+          "bar": 64,
+          "v": 0.95
+        },
+        {
+          "bar": 80,
+          "v": 0.4
+        }
+      ],
+      "rack-8": [
+        {
+          "bar": 0,
+          "v": 0.12
+        },
+        {
+          "bar": 38,
+          "v": 0.3
+        },
+        {
+          "bar": 40,
+          "v": 0.1
+        },
+        {
+          "bar": 54,
+          "v": 0.28
+        },
+        {
+          "bar": 56,
+          "v": 0.12
+        },
+        {
+          "bar": 62,
+          "v": 0.3
+        },
+        {
+          "bar": 64,
+          "v": 0.08
+        },
+        {
+          "bar": 80,
+          "v": 0.15
+        },
+        {
+          "bar": 88,
+          "v": 0
+        }
+      ]
+    },
+    "notesLanes": {
+      "rack-1": {
+        "targetModuleId": "humseq",
+        "notes": [
+          {
+            "bar": 0,
+            "note": 69,
+            "dur": 0.7,
+            "vel": 0.7494670533665768
+          },
+          {
+            "bar": 0.7614042485483942,
+            "note": 64,
+            "dur": 0.25,
+            "vel": 0.5258147203679265
+          },
+          {
+            "bar": 0.9963655359057549,
+            "note": 72,
+            "dur": 0.5,
+            "vel": 0.814247872091014
+          },
+          {
+            "bar": 1.4939965584175645,
+            "note": 71,
+            "dur": 0.25,
+            "vel": 0.5884719720205627
+          },
+          {
+            "bar": 1.7421445831992406,
+            "note": 67,
+            "dur": 0.25,
+            "vel": 0.6180294889072093
+          },
+          {
+            "bar": 2.0152066878225687,
+            "note": 69,
+            "dur": 1,
+            "vel": 0.6818078186837061
+          },
+          {
+            "bar": 3.001145319156882,
+            "note": 62,
+            "dur": 0.5,
+            "vel": 0.5097924417200463
+          },
+          {
+            "bar": 3.494024723206658,
+            "note": 64,
+            "dur": 0.5,
+            "vel": 0.5685688029157784
+          },
+          {
+            "bar": 4.007956868495772,
+            "note": 65,
+            "dur": 0.7,
+            "vel": 0.7615830316541639
+          },
+          {
+            "bar": 4.759603469741346,
+            "note": 69,
+            "dur": 0.25,
+            "vel": 0.5925478284100758
+          },
+          {
+            "bar": 5.010450696048537,
+            "note": 67,
+            "dur": 0.5,
+            "vel": 0.6889697071448758
+          },
+          {
+            "bar": 5.492533709693949,
+            "note": 64,
+            "dur": 0.5,
+            "vel": 0.5581764785825165
+          },
+          {
+            "bar": 5.994691845451804,
+            "note": 62,
+            "dur": 0.7,
+            "vel": 0.6560011525163432
+          },
+          {
+            "bar": 6.744267797594083,
+            "note": 71,
+            "dur": 0.25,
+            "vel": 0.6326224912780442
+          },
+          {
+            "bar": 7.010070303362827,
+            "note": 69,
+            "dur": 1,
+            "vel": 0.7634573213725617
+          },
+          {
+            "bar": 15.993920082305522,
+            "note": 69,
+            "dur": 0.7,
+            "vel": 0.7155874083310307
+          },
+          {
+            "bar": 16.75735248523548,
+            "note": 64,
+            "dur": 0.25,
+            "vel": 0.5203532199106893
+          },
+          {
+            "bar": 16.993660741438,
+            "note": 72,
+            "dur": 0.5,
+            "vel": 0.7363253938557233
+          },
+          {
+            "bar": 17.50722363328525,
+            "note": 71,
+            "dur": 0.25,
+            "vel": 0.5988138756075938
+          },
+          {
+            "bar": 17.760935778943328,
+            "note": 67,
+            "dur": 0.25,
+            "vel": 0.5689101014514035
+          },
+          {
+            "bar": 20.000025031246256,
+            "note": 69,
+            "dur": 0.7,
+            "vel": 0.7676255843777329
+          },
+          {
+            "bar": 20.737519103081674,
+            "note": 64,
+            "dur": 0.25,
+            "vel": 0.5323051076132364
+          },
+          {
+            "bar": 21.015252238422285,
+            "note": 72,
+            "dur": 0.5,
+            "vel": 0.7694846533096791
+          },
+          {
+            "bar": 21.506142043943584,
+            "note": 71,
+            "dur": 0.25,
+            "vel": 0.591997679401188
+          },
+          {
+            "bar": 21.75033256525562,
+            "note": 67,
+            "dur": 0.25,
+            "vel": 0.5682727535144765
+          },
+          {
+            "bar": 24.013389439268686,
+            "note": 69,
+            "dur": 0.7,
+            "vel": 0.796146707938121
+          },
+          {
+            "bar": 24.75739208426671,
+            "note": 64,
+            "dur": 0.25,
+            "vel": 0.5905907440132419
+          },
+          {
+            "bar": 25.01186713838385,
+            "note": 72,
+            "dur": 0.5,
+            "vel": 0.7799792693462126
+          },
+          {
+            "bar": 25.50589497544891,
+            "note": 71,
+            "dur": 0.25,
+            "vel": 0.6145571094744638
+          },
+          {
+            "bar": 25.73577964577162,
+            "note": 67,
+            "dur": 0.25,
+            "vel": 0.6195194506959615
+          },
+          {
+            "bar": 28.010469282341408,
+            "note": 69,
+            "dur": 0.7,
+            "vel": 0.709606170179139
+          },
+          {
+            "bar": 28.734240586876982,
+            "note": 64,
+            "dur": 0.25,
+            "vel": 0.5377450139148836
+          },
+          {
+            "bar": 29.013981406345025,
+            "note": 72,
+            "dur": 0.5,
+            "vel": 0.8379857632396677
+          },
+          {
+            "bar": 29.49068069227351,
+            "note": 71,
+            "dur": 0.25,
+            "vel": 0.6311851226013084
+          },
+          {
+            "bar": 29.739451853397046,
+            "note": 67,
+            "dur": 0.25,
+            "vel": 0.5919001325107646
+          },
+          {
+            "bar": 31.997842369473467,
+            "note": 69,
+            "dur": 0.45,
+            "vel": 0.7708149621648784
+          },
+          {
+            "bar": 32.495767276277654,
+            "note": 72,
+            "dur": 0.45,
+            "vel": 0.8356026939887565
+          },
+          {
+            "bar": 33.99258302800757,
+            "note": 71,
+            "dur": 0.45,
+            "vel": 0.8598068929295088
+          },
+          {
+            "bar": 34.49761236656346,
+            "note": 74,
+            "dur": 0.45,
+            "vel": 0.845940536309006
+          },
+          {
+            "bar": 36.01049264599126,
+            "note": 72,
+            "dur": 0.22,
+            "vel": 0.8410799945048429
+          },
+          {
+            "bar": 36.23905121009287,
+            "note": 76,
+            "dur": 0.22,
+            "vel": 0.9705961389088054
+          },
+          {
+            "bar": 36.48873480895382,
+            "note": 74,
+            "dur": 0.22,
+            "vel": 0.8397363474852111
+          },
+          {
+            "bar": 36.736198045984935,
+            "note": 71,
+            "dur": 0.22,
+            "vel": 0.7942354751500467
+          },
+          {
+            "bar": 37.50290771170841,
+            "note": 69,
+            "dur": 0.22,
+            "vel": 0.8751204037690165
+          },
+          {
+            "bar": 37.76285321079048,
+            "note": 72,
+            "dur": 0.22,
+            "vel": 0.8636119001971614
+          },
+          {
+            "bar": 37.99849035859783,
+            "note": 76,
+            "dur": 0.45,
+            "vel": 0.9155562915762684
+          },
+          {
+            "bar": 38.489020560520245,
+            "note": 74,
+            "dur": 0.22,
+            "vel": 0.8502426550324274
+          },
+          {
+            "bar": 38.75307578250164,
+            "note": 71,
+            "dur": 0.22,
+            "vel": 0.8050368939689532
+          },
+          {
+            "bar": 39.01202051631921,
+            "note": 68,
+            "dur": 0.9,
+            "vel": 0.9044755520869397
+          },
+          {
+            "bar": 40.00437739416416,
+            "note": 69,
+            "dur": 0.7,
+            "vel": 0.7607389386886446
+          },
+          {
+            "bar": 40.75249134401348,
+            "note": 64,
+            "dur": 0.25,
+            "vel": 0.5060517950430754
+          },
+          {
+            "bar": 41.01255246871549,
+            "note": 72,
+            "dur": 0.5,
+            "vel": 0.773366805153604
+          },
+          {
+            "bar": 41.49797355415578,
+            "note": 71,
+            "dur": 0.25,
+            "vel": 0.5685740884321621
+          },
+          {
+            "bar": 41.755568093116196,
+            "note": 67,
+            "dur": 0.25,
+            "vel": 0.6448230116203535
+          },
+          {
+            "bar": 42.00945210109346,
+            "note": 69,
+            "dur": 1,
+            "vel": 0.7471207723427195
+          },
+          {
+            "bar": 43.001948789739025,
+            "note": 62,
+            "dur": 0.5,
+            "vel": 0.5096001454832033
+          },
+          {
+            "bar": 43.50278004952649,
+            "note": 64,
+            "dur": 0.5,
+            "vel": 0.6128771754488708
+          },
+          {
+            "bar": 44.0142292563907,
+            "note": 65,
+            "dur": 0.7,
+            "vel": 0.8066705944001071
+          },
+          {
+            "bar": 44.75604802202715,
+            "note": 69,
+            "dur": 0.25,
+            "vel": 0.5553186309204058
+          },
+          {
+            "bar": 44.984076626420055,
+            "note": 67,
+            "dur": 0.5,
+            "vel": 0.6715108466276483
+          },
+          {
+            "bar": 45.49508550596753,
+            "note": 64,
+            "dur": 0.5,
+            "vel": 0.5822963890276367
+          },
+          {
+            "bar": 45.98647012916322,
+            "note": 62,
+            "dur": 0.7,
+            "vel": 0.63524775045982
+          },
+          {
+            "bar": 46.74844368559795,
+            "note": 71,
+            "dur": 0.25,
+            "vel": 0.5610715340716166
+          },
+          {
+            "bar": 46.989757713886796,
+            "note": 69,
+            "dur": 1,
+            "vel": 0.6971148576993098
+          },
+          {
+            "bar": 47.99984356061362,
+            "note": 69,
+            "dur": 0.7,
+            "vel": 0.7667227303070122
+          },
+          {
+            "bar": 48.73537860824232,
+            "note": 64,
+            "dur": 0.25,
+            "vel": 0.5378509540046338
+          },
+          {
+            "bar": 49.00252258212237,
+            "note": 72,
+            "dur": 0.5,
+            "vel": 0.8275584686891915
+          },
+          {
+            "bar": 49.50513887124748,
+            "note": 71,
+            "dur": 0.25,
+            "vel": 0.6331785276044061
+          },
+          {
+            "bar": 49.7492106181752,
+            "note": 67,
+            "dur": 0.25,
+            "vel": 0.6705079622736704
+          },
+          {
+            "bar": 50.00448315351665,
+            "note": 69,
+            "dur": 1,
+            "vel": 0.6922272422898688
+          },
+          {
+            "bar": 51.00192140566647,
+            "note": 62,
+            "dur": 0.5,
+            "vel": 0.5921252925505981
+          },
+          {
+            "bar": 51.50806645814705,
+            "note": 64,
+            "dur": 0.5,
+            "vel": 0.5952305440334745
+          },
+          {
+            "bar": 51.98963605416083,
+            "note": 65,
+            "dur": 0.7,
+            "vel": 0.7448264820595861
+          },
+          {
+            "bar": 52.7444594223399,
+            "note": 69,
+            "dur": 0.25,
+            "vel": 0.6284604900602533
+          },
+          {
+            "bar": 53.00985918815148,
+            "note": 67,
+            "dur": 0.5,
+            "vel": 0.7621040875875875
+          },
+          {
+            "bar": 53.48802723390052,
+            "note": 64,
+            "dur": 0.5,
+            "vel": 0.5976185227604669
+          },
+          {
+            "bar": 53.99482921751348,
+            "note": 62,
+            "dur": 0.7,
+            "vel": 0.7052229810467563
+          },
+          {
+            "bar": 54.75959485797286,
+            "note": 71,
+            "dur": 0.25,
+            "vel": 0.6702505419438008
+          },
+          {
+            "bar": 55.007002682368736,
+            "note": 69,
+            "dur": 1,
+            "vel": 0.7799501248046058
+          },
+          {
+            "bar": 63.99777716597066,
+            "note": 69,
+            "dur": 0.7,
+            "vel": 0.7277620963106222
+          },
+          {
+            "bar": 64.73807687431764,
+            "note": 64,
+            "dur": 0.25,
+            "vel": 0.5544769707219569
+          },
+          {
+            "bar": 65.00801625071094,
+            "note": 72,
+            "dur": 0.5,
+            "vel": 0.8783279349669478
+          },
+          {
+            "bar": 65.49961975940299,
+            "note": 71,
+            "dur": 0.25,
+            "vel": 0.6592833011774734
+          },
+          {
+            "bar": 65.73668028247481,
+            "note": 67,
+            "dur": 0.25,
+            "vel": 0.653648795633972
+          },
+          {
+            "bar": 66.0034629270376,
+            "note": 69,
+            "dur": 1,
+            "vel": 0.710799099461827
+          },
+          {
+            "bar": 67.00921487208885,
+            "note": 62,
+            "dur": 0.5,
+            "vel": 0.5612006321617872
+          },
+          {
+            "bar": 67.50780077685035,
+            "note": 64,
+            "dur": 0.5,
+            "vel": 0.641518049510344
+          },
+          {
+            "bar": 68.01519305407963,
+            "note": 65,
+            "dur": 0.7,
+            "vel": 0.7467859208389587
+          },
+          {
+            "bar": 68.75621499438128,
+            "note": 69,
+            "dur": 0.25,
+            "vel": 0.653343283551253
+          },
+          {
+            "bar": 69.0053862367968,
+            "note": 67,
+            "dur": 0.5,
+            "vel": 0.7294207760969273
+          },
+          {
+            "bar": 69.48834934994781,
+            "note": 64,
+            "dur": 0.5,
+            "vel": 0.6159024043982394
+          },
+          {
+            "bar": 70.0134954670507,
+            "note": 62,
+            "dur": 0.7,
+            "vel": 0.6903989856558382
+          },
+          {
+            "bar": 70.7415170454716,
+            "note": 71,
+            "dur": 0.25,
+            "vel": 0.5889972093163977
+          },
+          {
+            "bar": 71.0113323748239,
+            "note": 69,
+            "dur": 1,
+            "vel": 0.7844431820763011
+          },
+          {
+            "bar": 72.00814251590899,
+            "note": 69,
+            "dur": 0.7,
+            "vel": 0.7724676400932798
+          },
+          {
+            "bar": 72.75887928430404,
+            "note": 64,
+            "dur": 0.25,
+            "vel": 0.5630471766952646
+          },
+          {
+            "bar": 72.99672684869763,
+            "note": 72,
+            "dur": 0.5,
+            "vel": 0.8630426685701325
+          },
+          {
+            "bar": 73.49484787686674,
+            "note": 71,
+            "dur": 0.25,
+            "vel": 0.6608794478487593
+          },
+          {
+            "bar": 73.7490545436661,
+            "note": 67,
+            "dur": 0.25,
+            "vel": 0.7052608073437869
+          },
+          {
+            "bar": 73.98666334152345,
+            "note": 69,
+            "dur": 1,
+            "vel": 0.8115067912566973
+          },
+          {
+            "bar": 75.01201055878215,
+            "note": 62,
+            "dur": 0.5,
+            "vel": 0.6215208910901663
+          },
+          {
+            "bar": 75.51461704212363,
+            "note": 64,
+            "dur": 0.5,
+            "vel": 0.6752690069590085
+          },
+          {
+            "bar": 76.00551513941097,
+            "note": 65,
+            "dur": 0.7,
+            "vel": 0.7794108312523044
+          },
+          {
+            "bar": 76.76038566241897,
+            "note": 69,
+            "dur": 0.25,
+            "vel": 0.6330333095611228
+          },
+          {
+            "bar": 77.00182842236097,
+            "note": 67,
+            "dur": 0.5,
+            "vel": 0.8096342904025848
+          },
+          {
+            "bar": 77.49769319382948,
+            "note": 64,
+            "dur": 0.5,
+            "vel": 0.7045786835840804
+          },
+          {
+            "bar": 78.00058636292097,
+            "note": 62,
+            "dur": 0.7,
+            "vel": 0.7114307658288772
+          },
+          {
+            "bar": 78.73810665340913,
+            "note": 71,
+            "dur": 0.25,
+            "vel": 0.7013286958283413
+          },
+          {
+            "bar": 78.99230023846417,
+            "note": 69,
+            "dur": 1,
+            "vel": 0.8171949524573028
+          },
+          {
+            "bar": 80.00692507876033,
+            "note": 69,
+            "dur": 1.4,
+            "vel": 0.6173961746997182
+          },
+          {
+            "bar": 81.48716939272134,
+            "note": 72,
+            "dur": 0.9,
+            "vel": 0.5609545358265539
+          },
+          {
+            "bar": 82.50613950432378,
+            "note": 71,
+            "dur": 0.9,
+            "vel": 0.4666229243607367
+          },
+          {
+            "bar": 83.99659589236072,
+            "note": 69,
+            "dur": 2.5,
+            "vel": 0.609488719430514
+          }
+        ]
+      },
+      "rack-2": {
+        "targetModuleId": "macseq",
+        "notes": [
+          {
+            "bar": 8,
+            "note": 69,
+            "dur": 0.2,
+            "vel": 0.75
+          },
+          {
+            "bar": 8.25,
+            "note": 71,
+            "dur": 0.2,
+            "vel": 0.6
+          },
+          {
+            "bar": 8.5,
+            "note": 72,
+            "dur": 0.45,
+            "vel": 0.8
+          },
+          {
+            "bar": 8.75,
+            "note": 76,
+            "dur": 0.2,
+            "vel": 0.65
+          },
+          {
+            "bar": 9,
+            "note": 72,
+            "dur": 0.45,
+            "vel": 0.8
+          },
+          {
+            "bar": 9.5,
+            "note": 71,
+            "dur": 0.2,
+            "vel": 0.6
+          },
+          {
+            "bar": 9.75,
+            "note": 67,
+            "dur": 0.2,
+            "vel": 0.6
+          },
+          {
+            "bar": 10,
+            "note": 69,
+            "dur": 0.45,
+            "vel": 0.7
+          },
+          {
+            "bar": 10.5,
+            "note": 64,
+            "dur": 0.2,
+            "vel": 0.55
+          },
+          {
+            "bar": 10.75,
+            "note": 67,
+            "dur": 0.2,
+            "vel": 0.6
+          },
+          {
+            "bar": 11,
+            "note": 62,
+            "dur": 0.45,
+            "vel": 0.6
+          },
+          {
+            "bar": 11.5,
+            "note": 64,
+            "dur": 0.2,
+            "vel": 0.55
+          },
+          {
+            "bar": 11.75,
+            "note": 65,
+            "dur": 0.2,
+            "vel": 0.6
+          },
+          {
+            "bar": 12,
+            "note": 65,
+            "dur": 0.45,
+            "vel": 0.75
+          },
+          {
+            "bar": 12.5,
+            "note": 67,
+            "dur": 0.2,
+            "vel": 0.6
+          },
+          {
+            "bar": 12.75,
+            "note": 69,
+            "dur": 0.2,
+            "vel": 0.65
+          },
+          {
+            "bar": 13,
+            "note": 67,
+            "dur": 0.45,
+            "vel": 0.7
+          },
+          {
+            "bar": 13.5,
+            "note": 64,
+            "dur": 0.2,
+            "vel": 0.6
+          },
+          {
+            "bar": 13.75,
+            "note": 62,
+            "dur": 0.2,
+            "vel": 0.55
+          },
+          {
+            "bar": 14,
+            "note": 64,
+            "dur": 0.45,
+            "vel": 0.65
+          },
+          {
+            "bar": 14.5,
+            "note": 68,
+            "dur": 0.45,
+            "vel": 0.7
+          },
+          {
+            "bar": 15,
+            "note": 76,
+            "dur": 0.9,
+            "vel": 0.8
+          },
+          {
+            "bar": 18,
+            "note": 81,
+            "dur": 0.2,
+            "vel": 0.75
+          },
+          {
+            "bar": 18.25,
+            "note": 83,
+            "dur": 0.2,
+            "vel": 0.6
+          },
+          {
+            "bar": 18.5,
+            "note": 84,
+            "dur": 0.45,
+            "vel": 0.8
+          },
+          {
+            "bar": 18.75,
+            "note": 88,
+            "dur": 0.2,
+            "vel": 0.65
+          },
+          {
+            "bar": 19,
+            "note": 84,
+            "dur": 0.45,
+            "vel": 0.8
+          },
+          {
+            "bar": 19.5,
+            "note": 83,
+            "dur": 0.2,
+            "vel": 0.6
+          },
+          {
+            "bar": 19.75,
+            "note": 79,
+            "dur": 0.2,
+            "vel": 0.6
+          },
+          {
+            "bar": 22,
+            "note": 81,
+            "dur": 0.2,
+            "vel": 0.75
+          },
+          {
+            "bar": 22.25,
+            "note": 83,
+            "dur": 0.2,
+            "vel": 0.6
+          },
+          {
+            "bar": 22.5,
+            "note": 84,
+            "dur": 0.45,
+            "vel": 0.8
+          },
+          {
+            "bar": 22.75,
+            "note": 88,
+            "dur": 0.2,
+            "vel": 0.65
+          },
+          {
+            "bar": 23,
+            "note": 84,
+            "dur": 0.45,
+            "vel": 0.8
+          },
+          {
+            "bar": 23.5,
+            "note": 83,
+            "dur": 0.2,
+            "vel": 0.6
+          },
+          {
+            "bar": 23.75,
+            "note": 79,
+            "dur": 0.2,
+            "vel": 0.6
+          },
+          {
+            "bar": 26,
+            "note": 81,
+            "dur": 0.2,
+            "vel": 0.75
+          },
+          {
+            "bar": 26.25,
+            "note": 83,
+            "dur": 0.2,
+            "vel": 0.6
+          },
+          {
+            "bar": 26.5,
+            "note": 84,
+            "dur": 0.45,
+            "vel": 0.8
+          },
+          {
+            "bar": 26.75,
+            "note": 88,
+            "dur": 0.2,
+            "vel": 0.65
+          },
+          {
+            "bar": 27,
+            "note": 84,
+            "dur": 0.45,
+            "vel": 0.8
+          },
+          {
+            "bar": 27.5,
+            "note": 83,
+            "dur": 0.2,
+            "vel": 0.6
+          },
+          {
+            "bar": 27.75,
+            "note": 79,
+            "dur": 0.2,
+            "vel": 0.6
+          },
+          {
+            "bar": 30,
+            "note": 81,
+            "dur": 0.2,
+            "vel": 0.75
+          },
+          {
+            "bar": 30.25,
+            "note": 83,
+            "dur": 0.2,
+            "vel": 0.6
+          },
+          {
+            "bar": 30.5,
+            "note": 84,
+            "dur": 0.45,
+            "vel": 0.8
+          },
+          {
+            "bar": 30.75,
+            "note": 88,
+            "dur": 0.2,
+            "vel": 0.65
+          },
+          {
+            "bar": 31,
+            "note": 84,
+            "dur": 0.45,
+            "vel": 0.8
+          },
+          {
+            "bar": 31.5,
+            "note": 83,
+            "dur": 0.2,
+            "vel": 0.6
+          },
+          {
+            "bar": 31.75,
+            "note": 79,
+            "dur": 0.2,
+            "vel": 0.6
+          },
+          {
+            "bar": 33,
+            "note": 76,
+            "dur": 0.22,
+            "vel": 0.85
+          },
+          {
+            "bar": 33.25,
+            "note": 79,
+            "dur": 0.22,
+            "vel": 0.9
+          },
+          {
+            "bar": 33.5,
+            "note": 76,
+            "dur": 0.45,
+            "vel": 0.8
+          },
+          {
+            "bar": 35,
+            "note": 78,
+            "dur": 0.22,
+            "vel": 0.85
+          },
+          {
+            "bar": 35.25,
+            "note": 81,
+            "dur": 0.22,
+            "vel": 0.9
+          },
+          {
+            "bar": 35.5,
+            "note": 78,
+            "dur": 0.45,
+            "vel": 0.8
+          },
+          {
+            "bar": 36.5,
+            "note": 81,
+            "dur": 0.22,
+            "vel": 0.9
+          },
+          {
+            "bar": 36.75,
+            "note": 79,
+            "dur": 0.22,
+            "vel": 0.85
+          },
+          {
+            "bar": 37,
+            "note": 76,
+            "dur": 0.22,
+            "vel": 0.85
+          },
+          {
+            "bar": 37.25,
+            "note": 79,
+            "dur": 0.22,
+            "vel": 0.9
+          },
+          {
+            "bar": 38.25,
+            "note": 83,
+            "dur": 0.22,
+            "vel": 0.9
+          },
+          {
+            "bar": 38.5,
+            "note": 81,
+            "dur": 0.22,
+            "vel": 0.85
+          },
+          {
+            "bar": 38.75,
+            "note": 79,
+            "dur": 0.22,
+            "vel": 0.8
+          },
+          {
+            "bar": 39,
+            "note": 80,
+            "dur": 0.9,
+            "vel": 0.9
+          },
+          {
+            "bar": 41,
+            "note": 81,
+            "dur": 0.7,
+            "vel": 0.6000000000000001
+          },
+          {
+            "bar": 41.75,
+            "note": 76,
+            "dur": 0.25,
+            "vel": 0.44000000000000006
+          },
+          {
+            "bar": 42,
+            "note": 84,
+            "dur": 0.5,
+            "vel": 0.6400000000000001
+          },
+          {
+            "bar": 42.5,
+            "note": 83,
+            "dur": 0.25,
+            "vel": 0.48
+          },
+          {
+            "bar": 42.75,
+            "note": 79,
+            "dur": 0.25,
+            "vel": 0.48
+          },
+          {
+            "bar": 43,
+            "note": 81,
+            "dur": 1,
+            "vel": 0.5599999999999999
+          },
+          {
+            "bar": 44,
+            "note": 74,
+            "dur": 0.5,
+            "vel": 0.44000000000000006
+          },
+          {
+            "bar": 44.5,
+            "note": 76,
+            "dur": 0.5,
+            "vel": 0.48
+          },
+          {
+            "bar": 45,
+            "note": 77,
+            "dur": 0.7,
+            "vel": 0.6000000000000001
+          },
+          {
+            "bar": 45.75,
+            "note": 81,
+            "dur": 0.25,
+            "vel": 0.48
+          },
+          {
+            "bar": 46,
+            "note": 79,
+            "dur": 0.5,
+            "vel": 0.5599999999999999
+          },
+          {
+            "bar": 46.5,
+            "note": 76,
+            "dur": 0.5,
+            "vel": 0.48
+          },
+          {
+            "bar": 47,
+            "note": 74,
+            "dur": 0.7,
+            "vel": 0.52
+          },
+          {
+            "bar": 47.75,
+            "note": 83,
+            "dur": 0.25,
+            "vel": 0.48
+          },
+          {
+            "bar": 48,
+            "note": 81,
+            "dur": 1,
+            "vel": 0.6000000000000001
+          },
+          {
+            "bar": 49,
+            "note": 81,
+            "dur": 0.7,
+            "vel": 0.6375
+          },
+          {
+            "bar": 49.75,
+            "note": 76,
+            "dur": 0.25,
+            "vel": 0.4675
+          },
+          {
+            "bar": 50,
+            "note": 84,
+            "dur": 0.5,
+            "vel": 0.68
+          },
+          {
+            "bar": 50.5,
+            "note": 83,
+            "dur": 0.25,
+            "vel": 0.51
+          },
+          {
+            "bar": 50.75,
+            "note": 79,
+            "dur": 0.25,
+            "vel": 0.51
+          },
+          {
+            "bar": 51,
+            "note": 81,
+            "dur": 1,
+            "vel": 0.595
+          },
+          {
+            "bar": 52,
+            "note": 74,
+            "dur": 0.5,
+            "vel": 0.4675
+          },
+          {
+            "bar": 52.5,
+            "note": 76,
+            "dur": 0.5,
+            "vel": 0.51
+          },
+          {
+            "bar": 53,
+            "note": 77,
+            "dur": 0.7,
+            "vel": 0.6375
+          },
+          {
+            "bar": 53.75,
+            "note": 81,
+            "dur": 0.25,
+            "vel": 0.51
+          },
+          {
+            "bar": 54,
+            "note": 79,
+            "dur": 0.5,
+            "vel": 0.595
+          },
+          {
+            "bar": 54.5,
+            "note": 76,
+            "dur": 0.5,
+            "vel": 0.51
+          },
+          {
+            "bar": 55,
+            "note": 74,
+            "dur": 0.7,
+            "vel": 0.5525
+          },
+          {
+            "bar": 55.75,
+            "note": 83,
+            "dur": 0.25,
+            "vel": 0.51
+          },
+          {
+            "bar": 56,
+            "note": 81,
+            "dur": 1,
+            "vel": 0.6375
+          },
+          {
+            "bar": 64.5,
+            "note": 81,
+            "dur": 0.7,
+            "vel": 0.6375
+          },
+          {
+            "bar": 65.25,
+            "note": 76,
+            "dur": 0.25,
+            "vel": 0.4675
+          },
+          {
+            "bar": 65.5,
+            "note": 84,
+            "dur": 0.5,
+            "vel": 0.68
+          },
+          {
+            "bar": 66,
+            "note": 83,
+            "dur": 0.25,
+            "vel": 0.51
+          },
+          {
+            "bar": 66.25,
+            "note": 79,
+            "dur": 0.25,
+            "vel": 0.51
+          },
+          {
+            "bar": 66.5,
+            "note": 81,
+            "dur": 1,
+            "vel": 0.595
+          },
+          {
+            "bar": 67.5,
+            "note": 74,
+            "dur": 0.5,
+            "vel": 0.4675
+          },
+          {
+            "bar": 68,
+            "note": 76,
+            "dur": 0.5,
+            "vel": 0.51
+          },
+          {
+            "bar": 68.5,
+            "note": 77,
+            "dur": 0.7,
+            "vel": 0.6375
+          },
+          {
+            "bar": 69.25,
+            "note": 81,
+            "dur": 0.25,
+            "vel": 0.51
+          },
+          {
+            "bar": 69.5,
+            "note": 79,
+            "dur": 0.5,
+            "vel": 0.595
+          },
+          {
+            "bar": 70,
+            "note": 76,
+            "dur": 0.5,
+            "vel": 0.51
+          },
+          {
+            "bar": 70.5,
+            "note": 74,
+            "dur": 0.7,
+            "vel": 0.5525
+          },
+          {
+            "bar": 71.25,
+            "note": 83,
+            "dur": 0.25,
+            "vel": 0.51
+          },
+          {
+            "bar": 71.5,
+            "note": 81,
+            "dur": 1,
+            "vel": 0.6375
+          },
+          {
+            "bar": 72.5,
+            "note": 81,
+            "dur": 0.7,
+            "vel": 0.675
+          },
+          {
+            "bar": 73.25,
+            "note": 76,
+            "dur": 0.25,
+            "vel": 0.49500000000000005
+          },
+          {
+            "bar": 73.5,
+            "note": 84,
+            "dur": 0.5,
+            "vel": 0.7200000000000001
+          },
+          {
+            "bar": 74,
+            "note": 83,
+            "dur": 0.25,
+            "vel": 0.54
+          },
+          {
+            "bar": 74.25,
+            "note": 79,
+            "dur": 0.25,
+            "vel": 0.54
+          },
+          {
+            "bar": 74.5,
+            "note": 81,
+            "dur": 1,
+            "vel": 0.63
+          },
+          {
+            "bar": 75.5,
+            "note": 74,
+            "dur": 0.5,
+            "vel": 0.49500000000000005
+          },
+          {
+            "bar": 76,
+            "note": 76,
+            "dur": 0.5,
+            "vel": 0.54
+          },
+          {
+            "bar": 76.5,
+            "note": 77,
+            "dur": 0.7,
+            "vel": 0.675
+          },
+          {
+            "bar": 77.25,
+            "note": 81,
+            "dur": 0.25,
+            "vel": 0.54
+          },
+          {
+            "bar": 77.5,
+            "note": 79,
+            "dur": 0.5,
+            "vel": 0.63
+          },
+          {
+            "bar": 78,
+            "note": 76,
+            "dur": 0.5,
+            "vel": 0.54
+          },
+          {
+            "bar": 78.5,
+            "note": 74,
+            "dur": 0.7,
+            "vel": 0.5850000000000001
+          },
+          {
+            "bar": 79.25,
+            "note": 83,
+            "dur": 0.25,
+            "vel": 0.54
+          },
+          {
+            "bar": 79.5,
+            "note": 81,
+            "dur": 1,
+            "vel": 0.675
+          },
+          {
+            "bar": 82.5,
+            "note": 81,
+            "dur": 0.7,
+            "vel": 0.5
+          },
+          {
+            "bar": 83.25,
+            "note": 83,
+            "dur": 0.5,
+            "vel": 0.45
+          },
+          {
+            "bar": 84.5,
+            "note": 81,
+            "dur": 1.8,
+            "vel": 0.5
+          }
+        ]
+      }
+    }
+  }
+}
