@@ -388,6 +388,39 @@ lourdes : ref scope / voices).
 
 ---
 
+## useSongPlayer
+
+**Fichier:** `useSongPlayer.ts`
+
+**Rôle:** Cœur du SONG mode (voir docs/FEATURES.md § SONG Mode). Exporte le modèle
+(`SongState` : sections, cellules on/off par rack, courbes de volume `{bar, v}`, lanes
+♪ `SongNote[]`) et ses helpers purs (`songPositionAt`, `songTotalBars`, `volumeCurveAt`,
+`defaultSongState`), plus le scheduler : une boucle rAF (active seulement si
+`song.enabled && running`) qui estime la position (dernier report de beats + interpolation
+locale au BPM), évalue la courbe de chaque rack en continu (cellule off → 0), lisse
+exponentiellement (anti-click, `ParamBuffer` n'a pas de rampe DSP) et écrit les facteurs
+dans `songFactorsRef` avant d'appeler `applyLevelsRef` (→ `applyMixerToEngine`, qui
+multiplie ces facteurs dans les niveaux mixer). N'envoie que les deltas (> 0.003) —
+jamais de `setState` React dans la boucle.
+
+**Params:**
+```typescript
+{
+  song: SongState                      // L'arrangement
+  racks: RackSpec[]
+  running: boolean                     // Transport audible (Web running / natif Tauri)
+  bpm: number
+  transportBeats: number               // Dernier report (poll ~250 ms)
+  songFactorsRef: MutableRefObject<Record<string, number>>  // Sortie : facteurs par rack
+  applyLevelsRef: MutableRefObject<() => void>              // Ré-applique les niveaux mixer
+}
+```
+
+**Retourne:** rien (effet pur). La compilation des lanes ♪ → `midiData` et le seek
+(`seekSong`) vivent dans `App.tsx` ; la vue est `src/ui/SongView.tsx` (+ `SongPianoRoll`).
+
+---
+
 ## Flux de données
 
 ```

@@ -41,6 +41,56 @@ Système de timing centralisé. Tous les séquenceurs dérivent leur position de
 - `src/engine/WasmGraphEngine.ts` — `setTransportTempo()`, `resetTransport()`
 - `src/engine/worklets/wasm-graph-processor.ts` — Messages transport
 
+### SONG Mode (arrangement timeline)
+Troisième vue à côté de RACKS|MIXER : une timeline de **sections** (INTRO/DROP/…) qui
+pilote les racks sur la durée du morceau. **Une lane = un rack, aucun rôle imposé** ;
+sous-lanes à la carte selon ce que le rack contient. Le morceau ÉVOLUE tout seul.
+
+**Le mode de lecture est GLOBAL** : sélecteur `RACK|SONG` dans la TransportConsole
+(pas dans la vue) + LCD SECTION. RACK = lecture libre (le mixer commande), SONG =
+l'arrangement pilote. La vue Song n'est que l'éditeur.
+
+**Architecture (zéro Rust pour le pilotage, un seul ajout moteur pour le seek) :**
+- État `song` dans App.tsx : `{ enabled, loop, sections[], cells{}, volumes{}, notesLanes{} }`
+  — persisté dans le payload **projet v2** (export + `applyProject`), défaut `enabled: false`.
+- **Scheduler UI** `useSongPlayer` (rAF) : position = poll transport beats + interpolation
+  locale → facteurs 0..1 par rack (cellule on/off × courbe de volume interpolée, lissage
+  exponentiel anti-click) → les facteurs MULTIPLIENT le niveau mixer dans
+  `applyMixerToEngine` (même chemin Web `setParamDirect` / Tauri `native_set_param`
+  que le mixer → parité gratuite).
+- **Lanes ♪ NOTES** (si le rack contient un midi-file-sequencer) : notes composées dans
+  le song (`SongPianoRoll`, modal, snap 1/16, lane vélocité), **compilées en `midiData`**
+  (une écriture débouncée 300 ms par édition — le parse tourne sur le thread audio) puis
+  **re-seek** à la position courante (écrire `midiData` remet le module à tick 0).
+  Racks non actifs : `engine.setParamStringDirect`/`seekMidiSequencerDirect` (IDs engine
+  complets, sans mapId) + `native_set_param_string`/`native_seek_midi_sequencer`.
+- **Courbes de volume** : points `{bar, v}` par rack, interpolation linéaire, éditeur
+  overlay (bouton VOL de la lane : clic = point, drag = déplacer, alt-clic = supprimer).
+- **Seek timeline** : règle cliquable/scrubbable sous les sections. A demandé
+  `set_transport_beats` dans le moteur (dsp-graph + dsp-wasm + worklet
+  `setTransportBeats` + `engine.seekTransport` + commande Tauri
+  `native_set_transport_beats`). Les séquenceurs transport-locked suivent seuls ; les
+  midi-file-sequencer **free-run** sont re-seekés un par un (modulo leur `totalTicks`).
+
+**Fichiers clés :**
+- `src/ui/SongView.tsx` — timeline (sections, lanes, courbes, règle de seek, tête de lecture)
+- `src/ui/SongPianoRoll.tsx` — éditeur de clip (portal modal)
+- `src/hooks/useSongPlayer.ts` — modèle (`SongState`) + scheduler + `songPositionAt`
+- `src/App.tsx` — état, compilation lanes→midiData, `seekSong`, persistance projet v2
+- `src/ui/TransportConsole.tsx` — sélecteur MODE RACK|SONG + LCD SECTION
+
+**Gotchas :**
+- Ne jamais pousser les facteurs song via `setMixerState` à 60 Hz (re-render React) —
+  ref + `applyMixerToEngine` directement, deltas seulement.
+- `ParamBuffer` n'a **aucune rampe DSP** : le lissage anti-click est fait côté scheduler.
+- Muter un rack via le song n'économise aucun CPU (level=0, le DSP calcule toujours).
+- Sous-lanes UI : gap 2px intra-rack vs 12px inter-racks + liseré bleu — sinon la lane ♪
+  semble flotter entre deux racks.
+- Démos : projets « Songs » (Studio Song, NOVA ⚡/II/III/64/ÆTERNA, DUO) — tous avec
+  `song` embarqué, mode SONG armé au chargement.
+- Restes (voir docs/SONG_MODE_PLAN.md) : undo de l'arrangement, patterns batterie
+  A/B/FILL, transfert step-seq→clip, vélocité éditable au piano-roll, automation de params.
+
 ### Module Templates
 Groupes de modules pré-câblés réutilisables.
 

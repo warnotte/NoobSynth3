@@ -90,6 +90,16 @@
 ### Oscilloscope Fix (tag v0.5.1)
 - [x] Scope affiche à nouveau le signal (Web + Tauri) : `getAnalyserNode` (Web) et `getNativeScopeBuffer` (Tauri) mappent l'ID UI nu vers la clé rack-préfixée. Cause racine : flattenRacks préfixe toujours ; 65e682c (master bus FX) avait été soupçonné à tort. (dd88ad3)
 
+### SONG Mode — arrangement timeline (branche `feat/song-mode`, 2026-07)
+- [x] Vue SONG (3e position du rocker) : sections nommées/redimensionnables, une lane par rack
+- [x] Lanes MIX : on/off par section + courbe de volume continue (points, interpolation, lissage anti-click côté scheduler)
+- [x] Lanes ♪ NOTES : piano-roll modal (snap 1/16) compilé en `midiData` du midi-file-sequencer du rack + re-seek auto
+- [x] Mode de lecture RACK|SONG global dans la TransportConsole + LCD SECTION
+- [x] Seek timeline à la souris (règle) — nouveau `set_transport_beats` moteur (Rust/WASM/worklet + `native_set_transport_beats`)
+- [x] Persistance : clé `song` du projet v2 (export/import + menu Projects)
+- [x] 7 projets démo « Songs » : Studio Song, NOVA ⚡/II/III/64/ÆTERNA, DUO (Renaud & Claude)
+- [ ] Restes → docs/SONG_MODE_PLAN.md : undo arrangement, patterns batterie A/B/FILL, transfert step-seq→clip, vélocité piano-roll, automation params
+
 ### Code Quality
 - [x] Zero TypeScript errors (strict tsc -b mode)
 - [x] Zero Rust warnings across workspace

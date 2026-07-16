@@ -19,7 +19,7 @@ Il existe **deux formats de fichier** et **deux chemins de chargement** :
 | | **Patch / Preset** | **Project (multi-rack)** |
 |---|---|---|
 | `version` du fichier | `1` (ou format manifest single-graph) | `2`, `"type": "project"` |
-| Contenu | **un seul** graphe (`{modules, connections}`) | **plusieurs racks** + `mixer` + `channelFx` + `masterFx` + `masterTempo` + `masterVolume` |
+| Contenu | **un seul** graphe (`{modules, connections}`) | **plusieurs racks** + `mixer` + `channelFx` + `masterFx` + `masterTempo` + `masterVolume` + `song` (arrangement SONG mode, optionnel — voir docs/FEATURES.md § SONG Mode) |
 | Apparaît dans le **menu Presets** | ✅ oui (via `manifest.json`) | ❌ **non** |
 | Se charge via **bouton Import** | ✅ oui | ✅ oui (le seul moyen aujourd'hui) |
 | Fixe le tempo au chargement | ❌ non (garde le BPM courant) | ✅ oui (`masterTempo`) |

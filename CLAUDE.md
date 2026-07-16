@@ -34,9 +34,13 @@ public/midi-presets/    # MIDI files + manifest.json
 ```
 App.tsx                          # Root component, state management, undo/redo
 ├── BrandRail.tsx                # Top rail (brand, status LED, cables/dev toggles, export/import)
-├── RackTabs.tsx                 # View rocker RACKS|MIXER + rack tabs (scribble strips)
-├── TransportConsole.tsx         # Bottom console (play/stop/rec/resync, BPM LCD, DSP load, undo/redo)
+├── RackTabs.tsx                 # View rocker RACKS|MIXER|SONG + rack tabs (scribble strips)
+├── TransportConsole.tsx         # Bottom console (play/stop/rec/resync, BPM LCD, DSP load, undo/redo,
+│                                #   sélecteur MODE RACK|SONG + LCD SECTION)
 ├── SidePanel.tsx                # Module library + Presets — left drawer (mobile: overlay drawer)
+├── SongView.tsx                 # Vue SONG : timeline d'arrangement (sections, lanes par rack,
+│   │                            #   courbes de volume, règle de seek) — voir docs/FEATURES.md
+│   └── SongPianoRoll.tsx        # Éditeur de clip ♪ (modal portal, snap 1/16, vélocité)
 └── RackView.tsx                 # Main rack container (scrolls internally; page is fixed 100vh)
     ├── ModuleCard.tsx           # Single module frame (header, ports, body)
     │   └── controls/            # Module-specific controls
@@ -126,6 +130,7 @@ Câbles et jacks sont colorés par type de signal :
 | `useUrlPreset` | Chargement preset/patch depuis l'URL (`?preset` / `?patch`, liens partageables) | `hooks/useUrlPreset.ts` |
 | `useModuleResize` | Outil Dev Resize : overrides de taille, preview, drag de redimensionnement + `getModuleSize` (source de vérité du span grille) | `hooks/useModuleResize.ts` |
 | `usePresetLibrary` | Chargement des bibliothèques presets / projets multi-rack / templates (data only) | `hooks/usePresetLibrary.ts` |
+| `useSongPlayer` | SONG mode : modèle `SongState` + scheduler rAF (facteurs 0..1 par rack × niveaux mixer, courbes interpolées, lissage anti-click) | `hooks/useSongPlayer.ts` |
 | `useNativeBridges` | Construit les 7 ponts natifs Tauri (chiptune, sequencer, theremin, granular, Game of Life, meter, particle cloud) — `invokeTauri('native_*')` | `hooks/useNativeBridges.ts` |
 
 Voir `src/hooks/HOOKS.md` pour la documentation détaillée.
@@ -306,7 +311,7 @@ control, output, audio-in, scope, meter, lab, notes, send, receive
 
 Les notes détaillées d'implémentation par feature et par module vivent dans **[docs/FEATURES.md](./docs/FEATURES.md)** — à consulter avant de travailler sur une feature précise.
 
-**Sujets couverts :** Multi-Rack System · Global Transport · Module Templates · Send/Receive · Mixer Console + Channel Strip/Master FX · Undo/Redo · Console Steel Shell (layout de page) · Recording (WAV) · CPU Meter · Drum Sequencer · MIDI File Sequencer Polyphony · AY Player · TR-909 Accent Latching · Graph Update Modes · Sequencer Playhead Sync · Tauri Standalone Mode · Delay Tempo Sync · Compressor Sidechain · Flanger · Frequency Shifter · EQ 3-Band · Glitch/Stutter · Leslie · Pipe Organ (Hammond B3) · Wah-Wah · Tube Amp · Unified Rate Divisions · Clap909 Fix.
+**Sujets couverts :** Multi-Rack System · Global Transport · **SONG Mode (arrangement timeline)** · Module Templates · Send/Receive · Mixer Console + Channel Strip/Master FX · Undo/Redo · Console Steel Shell (layout de page) · Recording (WAV) · CPU Meter · Drum Sequencer · MIDI File Sequencer Polyphony · AY Player · TR-909 Accent Latching · Graph Update Modes · Sequencer Playhead Sync · Tauri Standalone Mode · Delay Tempo Sync · Compressor Sidechain · Flanger · Frequency Shifter · EQ 3-Band · Glitch/Stutter · Leslie · Pipe Organ (Hammond B3) · Wah-Wah · Tube Amp · Unified Rate Divisions · Clap909 Fix.
 
 ### Graph Update Modes (IMPORTANT — à garder en tête)
 
@@ -518,7 +523,7 @@ Les plans/analyses de features déjà implémentées sont conservés dans [docs/
 - [x] **Test Tauri du Sampler (v0.10.0)** - ✅ Validé en standalone le 2026-06-11 (auto-load + re-upload après restart audio natif), en même temps que la mesure de transport native et le seek MIDI poly.
 
 ### UI / UX
-- [ ] **SONG mode (arrangement timeline)** - EN COURS sur la branche `feat/song-mode` (2026-07). Concept validé par itérations : une lane = un rack (aucun rôle imposé), sous-lanes à la carte selon ce que le rack contient (MIX toujours ; ♪ NOTES si midi-file-sequencer ; ▦ PATTERNS si drum-sequencer ; ⚙ AUTOMATION = tout param), piano-roll de clip, transfert des notes des séquenceurs statiques du rack vers le song. Plan complet : `docs/SONG_MODE_PLAN.md` (sur la branche) ; audit séquenceurs statiques/génératifs conservé sur main : `docs/STUDIO_GAP_ANALYSIS.md`. Si la branche est annulée, ce TODO + l'audit restent la base de reprise.
+- [ ] **SONG mode (arrangement timeline)** - IMPLÉMENTÉ (cœur) sur la branche `feat/song-mode` (2026-07), pas encore mergé. Livré : vue SONG (sections, lanes MIX on/off + courbes de volume, lanes ♪ NOTES + piano-roll compilé en midiData, règle de seek via `set_transport_beats` moteur), mode de lecture RACK|SONG global dans le transport, persistance dans les projets v2, 7 projets démo « Songs » (Studio Song, NOVA ⚡/II/III/64/ÆTERNA, DUO). Implémentation → `docs/FEATURES.md` § SONG Mode. Restes → `docs/SONG_MODE_PLAN.md` : undo de l'arrangement, ▦ patterns batterie A/B/FILL, transfert step-seq→clip, vélocité au piano-roll, ⚙ automation de params. Audit séquenceurs statiques/génératifs : `docs/STUDIO_GAP_ANALYSIS.md` (sur main).
 
 ---
 

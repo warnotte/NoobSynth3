@@ -24,9 +24,11 @@ Synthétiseur modulaire inspiré de VCV Rack, construit avec React + Rust/WASM.
 - **Master BPM** : tempo global dans la barre de transport
 
 ### Workflow
+- **SONG mode** : timeline d'arrangement (3e vue à côté de Racks/Mixer) — sections, mute/volume par rack avec courbes continues, mélodies composées au piano-roll (lanes ♪), seek à la souris, mode de lecture RACK|SONG dans le transport ; l'arrangement est sauvegardé avec le projet
 - **Module Templates** : sauvegarder/charger des groupes de modules pré-câblés
 - **250+ presets** : Jupiter, Juno, Moog, Prophet, Jarre, Acid, Moroder, TR-909, Shepard, MIDI Organ, Vocal Synthesis...
-- **Export/Import projet** : sauvegarder tous les racks + mixer + FX + tempo en un fichier
+- **Projets « Songs »** : morceaux complets arrangés (NOVA ⚡/II/III/64/ÆTERNA, DUO, Studio Song) — charger, MODE SONG, PLAY
+- **Export/Import projet** : sauvegarder tous les racks + mixer + FX + tempo + arrangement en un fichier
 - **MIDI** : entrée Web MIDI avec vélocité
 - **Undo/Redo** : historique avec transactions (knobs, modules)
 - **Enregistrement WAV** : capture audio stéréo 16-bit
