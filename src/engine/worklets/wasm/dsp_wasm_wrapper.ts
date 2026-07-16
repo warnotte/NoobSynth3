@@ -43,6 +43,7 @@ type WasmGraphEngineCtor = new (sampleRate: number) => {
   get_gol_grid(moduleId: string): Uint16Array
   set_transport_tempo(tempo: number): void
   reset_transport(): void
+  set_transport_beats(beats: number): void
   get_transport_beats(): number
   set_master_fx_param(param: string, value: number): void
 }

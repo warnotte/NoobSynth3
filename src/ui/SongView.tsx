@@ -28,6 +28,8 @@ type SongViewProps = {
   running: boolean
   /** rackId -> ids des midi-file-sequencer du rack (cibles possibles de la lane ♪) */
   midiTargets: Record<string, string[]>
+  /** Seek du song à une mesure (transport global + midi seqs) — timeline cliquable */
+  onSeek: (bar: number) => void
 }
 
 const BAR_CHOICES = [4, 8, 16, 32]
@@ -51,6 +53,7 @@ export const SongView = ({
   bpm,
   running,
   midiTargets,
+  onSeek,
 }: SongViewProps) => {
   const [renamingId, setRenamingId] = useState<string | null>(null)
   const [renameValue, setRenameValue] = useState('')
@@ -211,6 +214,32 @@ export const SongView = ({
     volDragRef.current = null
   }
 
+  // ── Règle de seek : clic / scrub = se déplacer dans le song ──
+  const rulerDragRef = useRef(false)
+  const lastSeekAtRef = useRef(0)
+  const seekFromEvent = (e: React.PointerEvent, force = false) => {
+    if (!running) return
+    const now = performance.now()
+    if (!force && now - lastSeekAtRef.current < 90) return
+    lastSeekAtRef.current = now
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
+    const frac = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width))
+    const bar = Math.round(frac * totalBars * 4) / 4
+    onSeek(Math.min(bar, totalBars - 0.001))
+  }
+  const handleRulerPointerDown = (e: React.PointerEvent) => {
+    ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
+    rulerDragRef.current = true
+    seekFromEvent(e, true)
+  }
+  const handleRulerPointerMove = (e: React.PointerEvent) => {
+    if (rulerDragRef.current) seekFromEvent(e)
+  }
+  const handleRulerPointerUp = (e: React.PointerEvent) => {
+    if (rulerDragRef.current) seekFromEvent(e, true)
+    rulerDragRef.current = false
+  }
+
   // ── Lane ♪ NOTES ──
   const addNotesLane = (rackId: string) => {
     const target = midiTargets[rackId]?.[0]
@@ -265,6 +294,7 @@ export const SongView = ({
       <div className="song-timeline">
         <div className="song-labels">
           <div className="song-label song-label-sections">SECTIONS</div>
+          <div className="song-label song-label-ruler">SEEK</div>
           {racks.map((rack) => {
             const hasNotes = !!song.notesLanes[rack.id]
             const canNotes = (midiTargets[rack.id]?.length ?? 0) > 0
@@ -367,6 +397,36 @@ export const SongView = ({
                 </div>
               )
             })}
+          </div>
+
+          <div
+            className={`song-ruler ${running ? '' : 'disabled'}`}
+            style={{ '--song-bars': totalBars } as React.CSSProperties}
+            onPointerDown={handleRulerPointerDown}
+            onPointerMove={handleRulerPointerMove}
+            onPointerUp={handleRulerPointerUp}
+            title={
+              running
+                ? 'Clic / glisser : se déplacer dans le song'
+                : 'Démarrer le transport pour se déplacer'
+            }
+          >
+            {(() => {
+              let acc = 0
+              return song.sections.map((s) => {
+                const mark = (
+                  <span
+                    key={s.id}
+                    className="song-ruler-mark"
+                    style={{ left: `${(acc / totalBars) * 100}%` }}
+                  >
+                    {acc + 1}
+                  </span>
+                )
+                acc += s.bars
+                return mark
+              })
+            })()}
           </div>
 
           {racks.map((rack) => {

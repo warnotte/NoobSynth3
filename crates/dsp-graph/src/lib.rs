@@ -188,6 +188,13 @@ impl GraphEngine {
     self.transport_beats = 0.0;
   }
 
+  /// Seek du transport global à un beat absolu (timeline du SONG mode).
+  /// Les séquenceurs transport-locked (step/drum/clock) suivent d'eux-mêmes ;
+  /// les midi-file-sequencer free-run doivent être re-seekés séparément.
+  pub fn set_transport_beats(&mut self, beats: f64) {
+    self.transport_beats = beats.max(0.0);
+  }
+
   pub fn get_transport_beats(&self) -> f64 {
     self.transport_beats
   }

@@ -188,6 +188,10 @@ enum AudioCommand {
   ResetTransport {
     reply: mpsc::Sender<Result<(), String>>,
   },
+  SetTransportBeats {
+    beats: f64,
+    reply: mpsc::Sender<Result<(), String>>,
+  },
   GetTransportBeats {
     reply: mpsc::Sender<f64>,
   },
@@ -803,6 +807,14 @@ fn audio_thread(rx: mpsc::Receiver<AudioCommand>, scope: Arc<Mutex<ScopeSnapshot
         if let Some(graph) = &state.graph {
           if let Ok(mut engine) = graph.lock() {
             engine.reset_transport();
+          }
+        }
+        let _ = reply.send(Ok(()));
+      }
+      AudioCommand::SetTransportBeats { beats, reply } => {
+        if let Some(graph) = &state.graph {
+          if let Ok(mut engine) = graph.lock() {
+            engine.set_transport_beats(beats);
           }
         }
         let _ = reply.send(Ok(()));
@@ -1867,6 +1879,24 @@ fn native_reset_transport(
 }
 
 #[tauri::command]
+fn native_set_transport_beats(
+  state: State<NativeAudioState>,
+  beats: f64,
+) -> Result<(), String> {
+  let (reply_tx, reply_rx) = mpsc::channel();
+  state
+    .tx
+    .send(AudioCommand::SetTransportBeats {
+      beats,
+      reply: reply_tx,
+    })
+    .map_err(|_| "native audio thread unavailable".to_string())?;
+  reply_rx
+    .recv()
+    .map_err(|_| "native audio thread unavailable".to_string())?
+}
+
+#[tauri::command]
 fn native_get_transport_beats(state: State<NativeAudioState>) -> Result<f64, String> {
   let (reply_tx, reply_rx) = mpsc::channel();
   state
@@ -1934,6 +1964,7 @@ pub fn run() {
       native_set_transport_tempo,
       native_reset_transport,
       native_get_transport_beats,
+      native_set_transport_beats,
     ])
     .setup(move |app| {
       if cfg!(debug_assertions) {

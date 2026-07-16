@@ -7533,6 +7533,40 @@ body {
   border-color: rgba(91, 182, 255, 0.3);
 }
 .song-label-notes { height: 34px; justify-content: center; }
+.song-label-ruler {
+  height: 16px;
+  font-size: 7.5px;
+  color: var(--text-dim);
+  justify-content: center;
+}
+
+/* Règle de seek — clic / scrub pour se déplacer dans le song */
+.song-ruler {
+  height: 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+  touch-action: none;
+  overflow: hidden;
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.08) 0 1px, transparent 1px calc(100% / var(--song-bars, 40))),
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.18) 0 1px, transparent 1px 3px),
+    radial-gradient(120% 130% at 50% 0%, #131b22 0%, #0b1015 70%);
+  border: 1px solid rgba(0, 0, 0, 0.9);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.7);
+}
+.song-ruler.disabled { opacity: 0.45; cursor: default; }
+.song-ruler-mark {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  padding: 2px 0 0 4px;
+  font-family: var(--font-lcd);
+  font-size: 7.5px;
+  color: var(--text-dim);
+  border-left: 1px solid rgba(240, 176, 107, 0.45);
+  pointer-events: none;
+}
 .song-cell-db {
   position: absolute;
   top: 3px;

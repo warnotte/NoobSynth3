@@ -229,6 +229,11 @@ export class AudioEngine {
     this.graphNode?.port.postMessage({ type: 'resetTransport' })
   }
 
+  /** Positionne le transport global à un beat absolu (seek timeline SONG). */
+  seekTransport(beats: number): void {
+    this.graphNode?.port.postMessage({ type: 'setTransportBeats', beats })
+  }
+
   /** Send a param directly using the full engine-side module ID (bypasses moduleIdMapper). */
   setParamDirect(engineModuleId: string, paramId: string, value: number): void {
     this.graphNode?.port.postMessage({

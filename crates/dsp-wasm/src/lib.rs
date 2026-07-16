@@ -208,6 +208,10 @@ impl WasmGraphEngine {
     self.engine.reset_transport();
   }
 
+  pub fn set_transport_beats(&mut self, beats: f64) {
+    self.engine.set_transport_beats(beats);
+  }
+
   /// Set a master bus FX parameter.
   pub fn set_master_fx_param(&mut self, param: &str, value: f32) {
     self.engine.set_master_fx_param(param, value);

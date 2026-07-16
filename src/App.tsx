@@ -220,6 +220,7 @@ function App() {
   // Facteurs 0..1 par rack pilotés par useSongPlayer ; multiplient le niveau
   // mixer dans applyMixerToEngine. Vide = song inactif (facteur 1 partout).
   const [songState, setSongState] = useState<SongState>(defaultSongState)
+  const songStateRef = useRef(songState)
   const songFactorsRef = useRef<Record<string, number>>({})
   const applyMixerLevelsRef = useRef<() => void>(() => {})
 
@@ -1019,6 +1020,7 @@ function App() {
         mixer: mixerStateRef.current,
         channelFx: channelFxRef.current,
         masterFx: masterFxRef.current,
+        song: songStateRef.current,
       }
       const json = JSON.stringify(payload, null, 2)
       const blob = new Blob([json], { type: 'application/json' })
@@ -1082,6 +1084,9 @@ function App() {
     }
     const projectTempo = typeof payload.masterTempo === 'number' ? payload.masterTempo : 120
     const projectVolume = typeof payload.masterVolume === 'number' ? payload.masterVolume : 0.8
+    const projectSong: SongState = isRecord(payload.song)
+      ? { ...defaultSongState(), ...(payload.song as Partial<SongState>) }
+      : defaultSongState()
     const projectActiveId = typeof payload.activeRackId === 'string'
       ? payload.activeRackId
       : projectRacks[0].id
@@ -1114,6 +1119,10 @@ function App() {
     setMasterFx(projectMasterFx)
     setMasterTempo(projectTempo)
     setMasterVolume(projectVolume)
+    songStateRef.current = projectSong
+    songFactorsRef.current = {}
+    songCompiledRef.current = {}
+    setSongState(projectSong)
     resetPatching()
     setGridError(null)
     setGraph(layouted, { skipHistory: true })
@@ -2158,6 +2167,46 @@ function App() {
   useEffect(() => {
     transportBeatsRef.current = transportBeats
   }, [transportBeats])
+  useEffect(() => {
+    songStateRef.current = songState
+  }, [songState])
+
+  /** Seek du song (timeline) : positionne le transport global ET re-seek tous
+   *  les midi-file-sequencer (ils free-run, le transport ne les déplace pas ;
+   *  les séquenceurs transport-locked — step/drum/clock — suivent d'eux-mêmes). */
+  const seekSong = (bar: number) => {
+    const beats = Math.max(0, bar * 4)
+    const running = statusRef.current === 'running'
+    if (running) engine.seekTransport(beats)
+    if (isTauri && tauriNativeRunning) {
+      void invokeTauri('native_set_transport_beats', { beats }).catch(() => {})
+    }
+    for (const rack of racksRef.current) {
+      const g = rack.id === activeRackIdRef.current ? graphRef.current : rack.graph
+      for (const m of g.modules) {
+        if (m.type !== 'midi-file-sequencer') continue
+        let ppq = 480
+        let total = 0
+        try {
+          const data = JSON.parse(String(m.params.midiData ?? '')) as { ticksPerBeat?: number; totalTicks?: number }
+          ppq = Number(data.ticksPerBeat) || 480
+          total = Number(data.totalTicks) || 0
+        } catch {
+          // pas de midiData chargé : seek brut
+        }
+        const raw = Math.round(beats * ppq)
+        const tick = total > 0 ? ((raw % total) + total) % total : raw
+        const engineId = `${rack.id}/${m.id}`
+        if (running) engine.seekMidiSequencerDirect(engineId, tick)
+        if (isTauri && tauriNativeRunning) {
+          void invokeTauri('native_seek_midi_sequencer', { moduleId: engineId, tick }).catch(() => {})
+        }
+      }
+    }
+    // Mise à jour optimiste (LCD, tête de lecture, scheduler) sans attendre le poll
+    transportBeatsRef.current = beats
+    setTransportBeats(beats)
+  }
 
   // rackId -> ids des midi-file-sequencer du rack (cibles des lanes ♪ du SONG mode)
   const songMidiTargets = useMemo(() => {
@@ -2466,6 +2515,7 @@ function App() {
             bpm={masterTempo}
             running={status === 'running' || (isTauri && tauriNativeRunning)}
             midiTargets={songMidiTargets}
+            onSeek={seekSong}
           />
         ) : (
           <RackView

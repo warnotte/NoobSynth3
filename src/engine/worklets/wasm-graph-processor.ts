@@ -75,6 +75,7 @@ type GraphMessage =
   | { type: 'enableCpuLoad'; enabled: boolean }
   | { type: 'setTransportTempo'; tempo: number }
   | { type: 'resetTransport' }
+  | { type: 'setTransportBeats'; beats: number }
   | { type: 'setMasterFxParam'; param: string; value: number }
   | { type: 'watchGol'; moduleIds: string[] }
   | { type: 'dispose' }
@@ -286,6 +287,9 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
         break
       case 'resetTransport':
         this.engine!.reset_transport()
+        break
+      case 'setTransportBeats':
+        this.engine!.set_transport_beats(message.beats)
         break
       case 'setMasterFxParam':
         this.engine!.set_master_fx_param(message.param, message.value)
