@@ -93,6 +93,13 @@
       "group": "Songs"
     },
     {
+      "id": "nova-aeterna",
+      "name": "NOVA ÆTERNA 👑",
+      "description": "Le grand œuvre : l'histoire de la synthèse en un morceau. Un leitmotiv voyage de l'orgue+Leslie aux puces NES (diminution, arps triples-croches) puis à la supersaw, TB-303 + 909, jusqu'au tutti de CONVERGENCE et la bénédiction en LA MAJEUR. 8 racks. MODE SONG → PLAY.",
+      "file": "nova-aeterna.json",
+      "group": "Songs"
+    },
+    {
       "id": "capitulation",
       "name": "Capitulation 📉",
       "description": "Génératif apocalyptique : un krach boursier sans fin (drone, ticker Turing/chaos, puces qui lâchent, alarmes + un beat acid TB-303 qui arrive après ~1-2 min). 5 racks, zéro MIDI, LFOs à périodes premières → jamais répétitif.",

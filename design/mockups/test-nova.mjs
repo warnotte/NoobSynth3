@@ -10,7 +10,7 @@ await page.goto('http://localhost:5173')
 await page.waitForSelector('.rack-tabs-view-btn', { timeout: 15000 })
 
 const projectsHeader = page.locator('.panel-section', { hasText: 'Projects' }).first()
-const card = page.locator('.preset-card', { hasText: 'NOVA 64' })
+const card = page.locator('.preset-card', { hasText: 'NOVA ÆTERNA' })
 if (!(await card.first().isVisible().catch(() => false))) {
   await projectsHeader.locator('button, .panel-section-header').first().click()
   await page.waitForTimeout(400)
@@ -53,4 +53,5 @@ await page.locator('.song-pr-ok').click()
 await page.locator('.tc-play').click()
 await browser.close()
 console.log('done')
+
 
