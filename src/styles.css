@@ -7791,13 +7791,50 @@ body {
   backdrop-filter: blur(2px);
 }
 .song-pr {
-  width: min(94vw, 1280px);
+  width: min(96vw, 1500px);
   border-radius: 12px;
   background: linear-gradient(180deg, var(--steel-1), var(--steel-0));
   border: 1px solid #05070a;
   box-shadow: 0 40px 90px rgba(0, 0, 0, 0.85), inset 0 1px 0 var(--border-soft);
   padding: 14px 16px 12px;
 }
+.song-pr-tools { display: flex; gap: 4px; margin-left: 14px; }
+.song-pr-tool {
+  min-width: 30px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  padding: 6px 9px 5px;
+  border-radius: 4px;
+  border: 1px solid #05070a;
+  color: var(--text-muted);
+  background: linear-gradient(180deg, #232d38, #151b22);
+  cursor: pointer;
+}
+.song-pr-tool.active {
+  color: var(--accent-mint);
+  text-shadow: 0 0 6px var(--accent-mint);
+  border-color: rgba(66, 226, 177, 0.4);
+}
+.song-pr-chips {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.song-pr-chip {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  padding: 3px 10px 2px;
+  border-radius: 3px;
+  border: 1px solid #05070a;
+  color: var(--accent-warm);
+  background: linear-gradient(180deg, #232d38, #151b22);
+  cursor: pointer;
+  text-transform: uppercase;
+}
+.song-pr-chip:hover { color: #ffd9a0; }
 .song-pr-head {
   display: flex;
   align-items: center;
@@ -7830,11 +7867,61 @@ body {
   background: linear-gradient(180deg, #7af2c8, #2eb88d);
   cursor: pointer;
 }
-.song-pr-scroll {
-  overflow: auto;
-  max-height: 66vh;
+/* Scroll HORIZONTAL uniquement — la grille seule scrolle verticalement,
+   la règle et la bande VÉLO restent toujours visibles */
+.song-pr-scrollx {
+  overflow-x: auto;
+  overflow-y: hidden;
   border: 1px solid #000;
   border-radius: 6px;
+}
+.song-pr-gridwrap {
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 52vh;
+}
+.song-pr-rulerrow { display: flex; border-bottom: 1px solid #000; }
+.song-pr-gutter {
+  position: sticky;
+  left: 0;
+  width: 44px;
+  flex: none;
+  z-index: 4;
+  background: linear-gradient(90deg, #1c242e, #151b22);
+  border-right: 1px solid #000;
+}
+.song-pr-ruler {
+  position: relative;
+  height: 18px;
+  flex: none;
+  cursor: pointer;
+  background:
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.18) 0 1px, transparent 1px 3px),
+    radial-gradient(120% 130% at 50% 0%, #131b22 0%, #0b1015 70%);
+}
+.song-pr-barnum {
+  position: absolute;
+  top: 3px;
+  font-family: var(--font-lcd);
+  font-size: 8.5px;
+  color: var(--text-dim);
+  letter-spacing: 0.08em;
+  pointer-events: none;
+}
+.song-pr-secline {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(240, 176, 107, 0.55);
+  pointer-events: none;
+}
+.song-pr-rowstripe {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.3);
+  pointer-events: none;
 }
 .song-pr-inner {
   display: flex;
@@ -7877,20 +7964,18 @@ body {
   flex: none;
   cursor: crosshair;
   touch-action: none;
-  background:
-    /* rangées touches noires (période 144px = 12 demi-tons × 12px) */
-    repeating-linear-gradient(180deg,
-      transparent 0 24px, rgba(0, 0, 0, 0.30) 24px 36px,
-      transparent 36px 48px, rgba(0, 0, 0, 0.30) 48px 60px,
-      transparent 60px 72px, rgba(0, 0, 0, 0.30) 72px 84px,
-      transparent 84px 108px, rgba(0, 0, 0, 0.30) 108px 120px,
-      transparent 120px 132px, rgba(0, 0, 0, 0.30) 132px 144px),
-    repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0 1px, transparent 1px 12px),
-    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 14px),
-    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.06) 0 1px, transparent 1px 56px),
-    repeating-linear-gradient(90deg, rgba(240, 176, 107, 0.20) 0 1px, transparent 1px 224px),
-    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.16) 0 1px, transparent 1px 3px),
-    radial-gradient(140% 130% at 50% 0%, #10171c 0%, #0a0f13 70%);
+  /* lignes verticales (1/16, temps, mesures) : backgroundImage INLINE calculé
+     depuis le zoom ; rangées noires : .song-pr-rowstripe (divs alignées) ;
+     lignes horizontales : bordures des stripes */
+  background-color: #0b1014;
+}
+.song-pr-grid::after {
+  /* fines lignes horizontales par demi-ton (13px = ROW_H) */
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0 1px, transparent 1px 13px);
 }
 .song-pr-section {
   position: absolute;

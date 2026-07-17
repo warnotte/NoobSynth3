@@ -926,6 +926,7 @@ export const SongView = ({
           sections={song.sections}
           totalBars={totalBars}
           stepSources={stepSources[pianoRollRackId] ?? []}
+          onSeek={running ? onSeek : undefined}
           notes={pianoRollLane.notes}
           onChange={(notes) =>
             onChange({

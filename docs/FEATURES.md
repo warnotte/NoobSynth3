@@ -111,11 +111,20 @@ mécanique de re-sync moteur de l'undo graphe — risque jugé trop élevé. Am�
 retenue (restes du plan) : **Ctrl+Z contextuel** — dans la vue Song, piloter la pile
 song (fallback graphe si vide).
 
-**Piano-roll — vélocité & transfert :** bande VÉLO sous la grille (drag = vélocité de
-la/des note(s) au même départ, accords inclus) ; bouton `⇐ <step-seq>` (si le rack en
-contient un) = insère une boucle du pattern au playhead — conversion **note = pitch + 69**
+**Piano-roll — navigation « zéro gymnastique » :** cadrage VERTICAL automatique sur les
+notes (plage = min−5..max+5, span mini 24, étendue à la volée si un drag atteint le bord) ;
+**zoom horizontal** −/+/FIT (les lignes de grille sont recalculées inline depuis le zoom,
+les rangées noires sont des divs alignées — plus de motif CSS figé) ; **ouverture cadrée**
+sur le playhead (si lecture) ou la première note ; **chips de sections** (clic = y aller) ;
+**FOLLOW** (suit la tête de lecture) ; **règle numérotée cliquable = seek** ; la bande
+VÉLO vit HORS du scroll vertical (toujours visible — seul le bloc grille scrolle en Y,
+le conteneur ne scrolle qu'en X).
+
+**Piano-roll — vélocité & transfert :** bande VÉLO (drag = vélocité de la/des note(s) au
+même départ, accords inclus, tolérance liée au zoom) ; bouton `⇐ <step-seq>` (si le rack
+en contient un) = insère une boucle du pattern au playhead — conversion **note = pitch + 69**
 (préserve le CV exactement, cf. audit STUDIO_GAP_ANALYSIS), vélocité 0-100 → 0..1,
-durée = pas × gateLength%.
+durée = pas × gateLength% ; le cadrage vertical se recale après transfert.
 
 **Lanes ⚙ AUTOMATION :** bouton `+⚙` → picker (module → param numérique du rack — liste
 = `moduleDefaults[type]` ∪ params posés, hors STRING_PARAMS — + bornes Min/Max saisies,
