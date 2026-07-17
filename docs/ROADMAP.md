@@ -103,7 +103,9 @@
 - [x] Vélocité éditable au piano-roll (bande VÉLO)
 - [x] Transfert step-seq → clip ♪ (note = pitch + 69, conversion CV exacte)
 - [x] Lanes ⚙ AUTOMATION : courbe → n'importe quel param numérique du rack (picker module/param + Min/Max, deltas seulement, moteur uniquement = non destructif)
-- [ ] Restes → docs/SONG_MODE_PLAN.md : recorder cv/gate (génératifs), Ctrl+Z contextuel, loi log fréquences
+- [x] Ctrl+Z contextuel : en vue Song le clavier pilote la pile de l'arrangement (repli graphe si vide) ; les boutons restent explicites par domaine
+- [x] Piano-roll v2 « zéro gymnastique » : cadrage vertical auto, zoom −/+/FIT, ouverture sur playhead/contenu, chips de sections, FOLLOW, règle cliquable = seek, VÉLO toujours visible
+- [ ] Restes → docs/SONG_MODE_PLAN.md : recorder cv/gate (génératifs), transfert chord/polyrhythm/euclidean, loi log fréquences
 
 ### Code Quality
 - [x] Zero TypeScript errors (strict tsc -b mode)

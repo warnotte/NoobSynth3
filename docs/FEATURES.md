@@ -101,15 +101,15 @@ seul le contenu des steps change, le playhead transport-locké continue.
 **Undo — DEUX PILES SÉPARÉES (choix assumé, à connaître) :**
 | Pile | Couvre | Déclencheurs |
 |------|--------|--------------|
-| **Graphe** (`useUndoableState`) | Patch du rack actif : modules, câbles, knobs, positions. PAS le mixer, ni les racks, ni le song. | `Ctrl+Z`/`Ctrl+Shift+Z`/`Ctrl+Y` (globaux) + boutons ↶/↷ de la **TransportConsole** |
-| **Arrangement** (pile locale App, 50 entrées) | Tout le `SongState` : sections, cellules, courbes, notes ♪, patterns ▦, lanes ⚙. Édits <800 ms **coalescés** (1 drag = 1 entrée). Reset au chargement d'un projet. | **Uniquement** les boutons ↶/↷ de la toolbar de la **vue Song** |
+| **Graphe** (`useUndoableState`) | Patch du rack actif : modules, câbles, knobs, positions. PAS le mixer, ni les racks, ni le song. | `Ctrl+Z`/`Ctrl+Shift+Z`/`Ctrl+Y` **hors vue Song** + boutons ↶/↷ de la **TransportConsole** (toujours graphe) |
+| **Arrangement** (pile locale App, 50 entrées) | Tout le `SongState` : sections, cellules, courbes, notes ♪, patterns ▦, lanes ⚙. Édits <800 ms **coalescés** (1 drag = 1 entrée). Reset au chargement d'un projet. | Boutons ↶/↷ de la toolbar **vue Song** + `Ctrl+Z`/`Ctrl+Shift+Z` **quand la vue Song est active** |
 
-⚠️ **Piège UX connu** : dans la vue Song, `Ctrl+Z` déclenche l'undo du GRAPHE (il peut
-défaire une édition de patch invisible depuis cette vue). Pourquoi séparé : fusionner le
-song dans `useUndoableState<GraphState>` toucherait des dizaines de sites d'appel + la
-mécanique de re-sync moteur de l'undo graphe — risque jugé trop élevé. Amélioration
-retenue (restes du plan) : **Ctrl+Z contextuel** — dans la vue Song, piloter la pile
-song (fallback graphe si vide).
+**Clavier CONTEXTUEL** : dans la vue Song, `Ctrl+Z` pilote la pile de l'ARRANGEMENT,
+avec **repli sur la pile du graphe si l'historique song est vide** ; ailleurs, pile du
+graphe. Les BOUTONS restent explicites par domaine (transport = toujours graphe,
+toolbar Song = toujours arrangement) — pas d'ambiguïté visuelle. Pourquoi deux piles :
+fusionner le song dans `useUndoableState<GraphState>` toucherait des dizaines de sites
+d'appel + la mécanique de re-sync moteur de l'undo graphe — risque jugé trop élevé.
 
 **Piano-roll — navigation « zéro gymnastique » :** cadrage VERTICAL automatique sur les
 notes (plage = min−5..max+5, span mini 24, étendue à la volée si un drag atteint le bord) ;

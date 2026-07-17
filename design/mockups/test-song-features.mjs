@@ -17,6 +17,7 @@ await page.locator('.rack-tabs-view-btn', { hasText: 'Song' }).click()
 await page.waitForSelector('.song-view', { timeout: 5000 })
 
 const addPtn = page.locator('.song-label-btn.add', { hasText: '+▦' })
+await addPtn.first().waitFor({ timeout: 5000 }) // le bouton apparaît après le chargement des sources
 console.log('+▦ visible :', await addPtn.count())
 await addPtn.first().click()
 await page.waitForTimeout(900) // > fenêtre de coalescence undo
@@ -42,6 +43,17 @@ await page.locator('.song-switch', { hasText: '↶' }).click()
 console.log('chip après 2e undo :', (await chip0.textContent())?.trim())
 await page.locator('.song-switch', { hasText: '↷' }).click()
 console.log('chip après redo :', (await chip0.textContent())?.trim())
+
+// Ctrl+Z CONTEXTUEL : en vue Song, le clavier pilote la pile de l'arrangement
+await page.keyboard.press('Control+z')
+console.log('chip après Ctrl+Z (vue Song) :', (await chip0.textContent())?.trim(), '(attendu — : pile SONG, pas graphe)')
+await page.keyboard.press('Control+Shift+z')
+console.log('chip après Ctrl+Shift+Z :', (await chip0.textContent())?.trim(), '(attendu A)')
+// en vue RACKS, Ctrl+Z retombe sur la pile du graphe (pas de crash, chip intact)
+await page.locator('.rack-tabs-view-btn', { hasText: 'Racks' }).click()
+await page.keyboard.press('Control+z')
+await page.locator('.rack-tabs-view-btn', { hasText: 'Song' }).click()
+console.log('chip après Ctrl+Z en vue RACKS :', (await chip0.textContent())?.trim(), '(attendu A — la pile song est intacte)')
 
 // ═══ B) Transfert step-seq → clip + vélocité, sur un patch importé ═══
 const stepData = JSON.stringify(

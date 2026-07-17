@@ -3,8 +3,8 @@
 > **STATUT (2026-07-17) — TOUT le plan v1+v2 IMPLÉMENTÉ sur cette branche** (y compris
 > ⚙ automation de params). L'implémentation fait foi dans `docs/FEATURES.md` § SONG
 > Mode. RESTE (phase 3 / polish) : recorder cv/gate pour les séquenceurs génératifs,
-> Ctrl+Z contextuel dans la vue Song, transfert des séquenceurs statiques restants
-> (chord/polyrhythm/euclidean), loi log pour l'automation des fréquences.
+> transfert des séquenceurs statiques restants (chord/polyrhythm/euclidean), loi log
+> pour l'automation des fréquences. (Ctrl+Z contextuel : FAIT.)
 > LIVRÉ : vue SONG (sections, lanes MIX on/off + courbes de volume continues, lanes ♪
 > + piano-roll compilé en midiData + re-seek), mode de lecture RACK|SONG global dans la
 > TransportConsole, seek timeline (`set_transport_beats` moteur Web+Tauri), persistance

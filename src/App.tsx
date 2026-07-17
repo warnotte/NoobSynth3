@@ -216,6 +216,7 @@ function App() {
   const [masterTempo, setMasterTempo] = useState(120)
   const masterTempoRef = useRef(120)
   const [viewMode, setViewMode] = useState<ViewMode>('rack')
+  const viewModeRef = useRef<ViewMode>('rack')
   const mixerStateRef = useRef(mixerState)
 
   // ── SONG mode (prototype, branche feat/song-mode) ──
@@ -595,23 +596,30 @@ function App() {
     }
   }, [graph, engine])
 
-  // Keyboard shortcuts: Ctrl+Z = undo, Ctrl+Shift+Z / Ctrl+Y = redo
+  // Keyboard shortcuts: Ctrl+Z = undo, Ctrl+Shift+Z / Ctrl+Y = redo.
+  // CONTEXTUEL : dans la vue Song, le clavier pilote la pile de l'ARRANGEMENT
+  // (repli sur la pile du graphe si l'historique song est vide) ; ailleurs,
+  // pile du graphe. Les boutons restent explicites par domaine (transport =
+  // graphe, toolbar Song = arrangement). Voir docs/FEATURES.md § SONG Mode.
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {
       const target = event.target as HTMLElement
       if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return
       if (!(event.ctrlKey || event.metaKey)) return
+      const songContext = viewModeRef.current === 'song'
       if (event.key === 'z' && !event.shiftKey) {
         event.preventDefault()
-        handleUndo()
+        if (songContext && songHistoryRef.current.past.length > 0) undoSong()
+        else handleUndo()
       } else if ((event.key === 'z' && event.shiftKey) || event.key === 'y') {
         event.preventDefault()
-        handleRedo()
+        if (songContext && songHistoryRef.current.future.length > 0) redoSong()
+        else handleRedo()
       }
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [handleUndo, handleRedo])
+  }, [handleUndo, handleRedo, undoSong, redoSong])
 
   useEffect(() => {
     if (tauriNativeRunning) {
@@ -2220,6 +2228,9 @@ function App() {
   useEffect(() => {
     songStateRef.current = songState
   }, [songState])
+  useEffect(() => {
+    viewModeRef.current = viewMode
+  }, [viewMode])
 
   /** Seek du song (timeline) : positionne le transport global ET re-seek tous
    *  les midi-file-sequencer (ils free-run, le transport ne les déplace pas ;
