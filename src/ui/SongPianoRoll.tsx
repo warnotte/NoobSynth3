@@ -222,6 +222,7 @@ export const SongPianoRoll = ({
     let startBar = 0
     if (running) {
       const { beats, at } = beatsInfoRef.current
+      // eslint-disable-next-line react-hooks/purity -- handler de clic, pas du rendu
       const est = beats + ((performance.now() - at) / 1000) * (bpm / 60)
       startBar = Math.floor((est / 4) % totalBars)
     }

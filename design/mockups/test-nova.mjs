@@ -40,7 +40,8 @@ const ruler = page.locator('.song-ruler')
 const rbox = await ruler.boundingBox()
 await page.mouse.click(rbox.x + rbox.width * 0.72, rbox.y + rbox.height / 2)
 await page.waitForTimeout(800)
-console.log('après seek 72% :', await page.locator('.tc-lcd--song .tc-lcd-value').textContent(), '(attendu DROP II)')
+// note : la section attendue dépend du projet chargé (DUO 88 mes : 72% ≈ LA VOIX)
+console.log('après seek 72% :', await page.locator('.tc-lcd--song .tc-lcd-value').textContent(), '(section à ~72% du morceau)')
 
 // Piano-roll du lead
 await page.locator('.song-row-notes').first().dblclick()
