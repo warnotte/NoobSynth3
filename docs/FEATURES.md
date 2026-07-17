@@ -98,9 +98,18 @@ Aux frontières de section, le scheduler (`onSectionRef` du rAF, précision ~1 f
 `setParamStringDirect`/`native_set_param_string` sinon) — **swap sans glitch vérifié** :
 seul le contenu des steps change, le playhead transport-locké continue.
 
-**Undo de l'arrangement :** pile LOCALE (boutons ↶/↷ dans la toolbar Song, 50 entrées,
-indépendante du Ctrl+Z du graphe). Les édits rapprochés (<800 ms — drags de courbe,
-piano-roll) sont **coalescés** en une seule entrée. Reset au chargement d'un projet.
+**Undo — DEUX PILES SÉPARÉES (choix assumé, à connaître) :**
+| Pile | Couvre | Déclencheurs |
+|------|--------|--------------|
+| **Graphe** (`useUndoableState`) | Patch du rack actif : modules, câbles, knobs, positions. PAS le mixer, ni les racks, ni le song. | `Ctrl+Z`/`Ctrl+Shift+Z`/`Ctrl+Y` (globaux) + boutons ↶/↷ de la **TransportConsole** |
+| **Arrangement** (pile locale App, 50 entrées) | Tout le `SongState` : sections, cellules, courbes, notes ♪, patterns ▦, lanes ⚙. Édits <800 ms **coalescés** (1 drag = 1 entrée). Reset au chargement d'un projet. | **Uniquement** les boutons ↶/↷ de la toolbar de la **vue Song** |
+
+⚠️ **Piège UX connu** : dans la vue Song, `Ctrl+Z` déclenche l'undo du GRAPHE (il peut
+défaire une édition de patch invisible depuis cette vue). Pourquoi séparé : fusionner le
+song dans `useUndoableState<GraphState>` toucherait des dizaines de sites d'appel + la
+mécanique de re-sync moteur de l'undo graphe — risque jugé trop élevé. Amélioration
+retenue (restes du plan) : **Ctrl+Z contextuel** — dans la vue Song, piloter la pile
+song (fallback graphe si vide).
 
 **Piano-roll — vélocité & transfert :** bande VÉLO sous la grille (drag = vélocité de
 la/des note(s) au même départ, accords inclus) ; bouton `⇐ <step-seq>` (si le rack en
