@@ -92,5 +92,40 @@ console.log(`vélocité note 1 : ${h0} → ${h1} (attendu ~100%)`)
 
 await page.screenshot({ path: 'E:/CODEX/NoobSynth3/design/mockups/song-features.png' })
 await page.locator('.song-pr-ok').click()
+
+// ═══ C) Lane ⚙ AUTOMATION : picker, courbe, points, écriture pendant lecture ═══
+await page.locator('.song-label-btn.add', { hasText: '+⚙' }).first().click()
+await page.waitForSelector('.song-auto-picker', { timeout: 3000 })
+const modOptions = await page.locator('.song-auto-picker select').first().locator('option').count()
+const paramOptions = await page.locator('.song-auto-picker select').nth(1).locator('option').count()
+console.log(`picker : ${modOptions} modules, ${paramOptions} params (module 1)`)
+// choisir un param précis : le step-sequencer → gateLength
+await page.locator('.song-auto-picker select').nth(1).selectOption({ index: 1 })
+await page.locator('.sap-range input').first().fill('10')
+await page.locator('.sap-range input').nth(1).fill('100')
+await page.locator('.song-auto-picker .song-switch.active').click()
+await page.waitForTimeout(900)
+console.log('lane ⚙ :', await page.locator('.song-row-auto').count())
+console.log('points initiaux :', await page.locator('.song-row-auto .song-volpoint').count())
+
+// clic sur la courbe = nouveau point
+const autoRow = page.locator('.song-row-auto').first()
+await autoRow.click({ position: { x: 400, y: 8 } })
+await page.waitForTimeout(300)
+console.log('points après clic :', await page.locator('.song-row-auto .song-volpoint').count(), '(attendu 2)')
+
+// lecture : le scheduler écrit au moteur sans erreur (pageerror serait loggé)
+await page.locator('.tc-mode-btn.song').click()
+await page.locator('.tc-play').click()
+await page.waitForTimeout(2500)
+console.log('SECTION pendant automation :', await page.locator('.tc-lcd--song .tc-lcd-value').textContent())
+await page.screenshot({ path: 'E:/CODEX/NoobSynth3/design/mockups/song-automation.png' })
+await page.locator('.tc-play').click()
+
+// undo : la lane ⚙ disparaît (2 entrées : ajout lane + point)
+await page.locator('.song-switch', { hasText: '↶' }).click()
+await page.locator('.song-switch', { hasText: '↶' }).click()
+console.log('lanes ⚙ après 2 undo :', await page.locator('.song-row-auto').count(), '(attendu 0)')
+
 await browser.close()
 console.log('done')

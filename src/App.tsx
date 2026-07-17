@@ -45,7 +45,7 @@ import {
   readGridMetrics,
 } from './state/gridLayout'
 import { useModuleResize } from './hooks/useModuleResize'
-import { buildModuleSpec, moduleSizes } from './state/moduleRegistry'
+import { buildModuleSpec, moduleDefaults, moduleSizes } from './state/moduleRegistry'
 import type { GraphState, ModuleSpec, ModuleType, RackSpec } from './shared/graph'
 import { PatchLayer } from './ui/PatchLayer'
 import { RackView } from './ui/RackView'
@@ -59,6 +59,7 @@ import {
   songTotalBars,
   type SongState,
   type SongPatternSlot,
+  type SongAutoWrite,
 } from './hooks/useSongPlayer'
 import { SidePanel } from './ui/SidePanel'
 import { BrandRail } from './ui/BrandRail'
@@ -225,6 +226,7 @@ function App() {
   const songFactorsRef = useRef<Record<string, number>>({})
   const applyMixerLevelsRef = useRef<() => void>(() => {})
   const songSectionRef = useRef<(sectionId: string) => void>(() => {})
+  const songAutoRef = useRef<(writes: SongAutoWrite[]) => void>(() => {})
   // Undo LOCAL de l'arrangement (indépendant du Ctrl+Z du graphe) : les édits
   // rapprochés (<800 ms, drags) sont coalescés en une seule entrée.
   const songHistoryRef = useRef<{ past: SongState[]; future: SongState[]; lastPush: number }>({
@@ -2208,6 +2210,7 @@ function App() {
     songFactorsRef,
     applyLevelsRef: applyMixerLevelsRef,
     onSectionRef: songSectionRef,
+    onAutoRef: songAutoRef,
   })
 
   const transportBeatsRef = useRef(0)
@@ -2442,6 +2445,50 @@ function App() {
     }
   })
 
+  // ⚙ automation : écritures MOTEUR uniquement (non destructif — le graphe garde
+  // ses valeurs de base ; stop/restart les restaure). Deltas déjà filtrés en amont.
+  useEffect(() => {
+    songAutoRef.current = (writes: SongAutoWrite[]) => {
+      const webRunning = statusRef.current === 'running'
+      const nativeRunning = isTauri && tauriNativeRunning
+      if (!webRunning && !nativeRunning) return
+      for (const w of writes) {
+        const engineId = `${w.rackId}/${w.moduleId}`
+        if (webRunning) engine.setParamDirect(engineId, w.paramId, w.value)
+        if (nativeRunning) {
+          void invokeTauri('native_set_param', { moduleId: engineId, paramId: w.paramId, value: w.value }).catch(() => {})
+        }
+      }
+    }
+  })
+
+  // rackId -> modules + params NUMÉRIQUES (cibles du picker ⚙ ; valeur courante
+  // pour préremplir min/max). Fusionne moduleDefaults (liste complète) + params posés.
+  const songParamSources = useMemo(() => {
+    const map: Record<
+      string,
+      { moduleId: string; name: string; params: { id: string; value: number }[] }[]
+    > = {}
+    for (const rack of racks) {
+      const g = rack.id === activeRackId ? graph : rack.graph
+      map[rack.id] = g.modules
+        .filter((m) => m.type !== 'notes' && m.type !== 'output')
+        .map((m) => {
+          const merged: Record<string, unknown> = {
+            ...(moduleDefaults[m.type] ?? {}),
+            ...m.params,
+          }
+          const params = Object.entries(merged)
+            .filter(([id, v]) => typeof v === 'number' && !STRING_PARAMS.has(id))
+            .map(([id, v]) => ({ id, value: v as number }))
+            .sort((a, b) => a.id.localeCompare(b.id))
+          return { moduleId: m.id, name: m.name ?? m.id, params }
+        })
+        .filter((m) => m.params.length > 0)
+    }
+    return map
+  }, [racks, activeRackId, graph])
+
   /** Capture le drumData courant du drum-seq de la lane ▦ dans un slot A/B/FILL. */
   const captureSongPattern = (rackId: string, slot: SongPatternSlot) => {
     const lane = songStateRef.current.patternLanes[rackId]
@@ -2664,6 +2711,7 @@ function App() {
             midiTargets={songMidiTargets}
             drumSources={songDrumSources}
             stepSources={songStepSources}
+            paramSources={songParamSources}
             onCapturePattern={captureSongPattern}
             onSeek={seekSong}
             onUndo={undoSong}

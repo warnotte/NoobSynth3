@@ -33,6 +33,20 @@ export type SongPatternLane = {
   patterns: Record<SongPatternSlot, string>
   states: Record<string, SongPatternSlot | undefined>
 }
+/** Lane ⚙ AUTOMATION : courbe de points {bar, v 0..1} → un param numérique
+ *  d'un module du rack (dénormalisé min..max, interp. linéaire). Écrit au
+ *  MOTEUR uniquement pendant la lecture — non destructif : le graphe garde
+ *  ses valeurs de base (restaurées au restart). */
+export type SongAutoLane = {
+  moduleId: string
+  paramId: string
+  /** Affichage : « nom du module · param » */
+  label: string
+  min: number
+  max: number
+  points: SongVolumePoint[]
+}
+export type SongAutoWrite = { rackId: string; moduleId: string; paramId: string; value: number }
 
 export type SongState = {
   enabled: boolean
@@ -46,6 +60,8 @@ export type SongState = {
   notesLanes: Record<string, SongNotesLane>
   /** rackId -> lane patterns batterie (appliquée aux frontières de section) */
   patternLanes: Record<string, SongPatternLane>
+  /** rackId -> lanes d'automation de params (plusieurs par rack) */
+  autoLanes: Record<string, SongAutoLane[]>
 }
 
 export const DEFAULT_SONG_CELL: SongCell = { on: true, level: 1 }
@@ -63,6 +79,7 @@ export const defaultSongState = (): SongState => ({
   volumes: {},
   notesLanes: {},
   patternLanes: {},
+  autoLanes: {},
 })
 
 export const getSongCell = (song: SongState, rackId: string, sectionId: string): SongCell =>
@@ -139,6 +156,8 @@ type UseSongPlayerArgs = {
   applyLevelsRef: MutableRefObject<() => void>
   /** Appelé au changement de section (et à l'entrée en lecture) — swaps de patterns. */
   onSectionRef?: MutableRefObject<(sectionId: string) => void>
+  /** Reçoit les écritures d'automation ⚙ (deltas seulement) — moteur uniquement. */
+  onAutoRef?: MutableRefObject<(writes: SongAutoWrite[]) => void>
 }
 
 export function useSongPlayer({
@@ -150,6 +169,7 @@ export function useSongPlayer({
   songFactorsRef,
   applyLevelsRef,
   onSectionRef,
+  onAutoRef,
 }: UseSongPlayerArgs) {
   // Dernier report de beats + son heure d'arrivée, pour interpoler entre
   // deux polls (~250 ms) sans redémarrer la boucle rAF à chaque report.
@@ -172,6 +192,7 @@ export function useSongPlayer({
     // Dernière valeur effectivement envoyée au moteur, pour throttler.
     let lastSent: Record<string, number> = {}
     let lastSectionId: string | null = null
+    const lastAuto: Record<string, number> = {}
 
     const estimateBeats = () => {
       const { beats, at } = beatsInfoRef.current
@@ -203,10 +224,29 @@ export function useSongPlayer({
           lastSent = { ...factors }
           applyLevelsRef.current()
         }
+
+        // ⚙ automation : évaluation continue des courbes, deltas seulement
+        if (onAutoRef) {
+          const writes: SongAutoWrite[] = []
+          for (const [rackId, lanes] of Object.entries(song.autoLanes)) {
+            for (const lane of lanes) {
+              if (lane.points.length === 0) continue
+              const v = volumeCurveAt(lane.points, pos.barGlobal)
+              const value = lane.min + v * (lane.max - lane.min)
+              const key = `${rackId}/${lane.moduleId}/${lane.paramId}`
+              const span = Math.abs(lane.max - lane.min)
+              if (!(key in lastAuto) || Math.abs(value - lastAuto[key]) > span * 0.002) {
+                lastAuto[key] = value
+                writes.push({ rackId, moduleId: lane.moduleId, paramId: lane.paramId, value })
+              }
+            }
+          }
+          if (writes.length > 0) onAutoRef.current(writes)
+        }
       }
       raf = requestAnimationFrame(tick)
     }
     raf = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(raf)
-  }, [song, racks, running, bpm, songFactorsRef, applyLevelsRef, onSectionRef])
+  }, [song, racks, running, bpm, songFactorsRef, applyLevelsRef, onSectionRef, onAutoRef])
 }

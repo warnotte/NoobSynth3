@@ -4,6 +4,7 @@ import {
   getSongCell,
   songPositionAt,
   songTotalBars,
+  type SongAutoLane,
   type SongPatternSlot,
   type SongState,
   type SongVolumePoint,
@@ -33,6 +34,8 @@ type SongViewProps = {
   drumSources: Record<string, { id: string; drumData: string | null }[]>
   /** rackId -> step-sequencers du rack (transfert vers le piano-roll) */
   stepSources: Record<string, SongStepSource[]>
+  /** rackId -> modules + params numériques (cibles du picker ⚙ AUTOMATION) */
+  paramSources: Record<string, { moduleId: string; name: string; params: { id: string; value: number }[] }[]>
   /** Capture la grille actuelle du drum-seq dans le slot A/B/FILL de la lane ▦ */
   onCapturePattern: (rackId: string, slot: SongPatternSlot) => void
   /** Seek du song à une mesure (transport global + midi seqs) — timeline cliquable */
@@ -68,6 +71,7 @@ export const SongView = ({
   midiTargets,
   drumSources,
   stepSources,
+  paramSources,
   onCapturePattern,
   onSeek,
   onUndo,
@@ -127,6 +131,15 @@ export const SongView = ({
 
   const pos = running && song.enabled ? songPositionAt(song, transportBeats) : null
   const gridTemplate = song.sections.map((s) => `${s.bars}fr`).join(' ')
+  // Marques de la règle SEEK (mesure de départ de chaque section)
+  const rulerMarks: { id: string; left: number }[] = []
+  {
+    let acc = 0
+    for (const s of song.sections) {
+      rulerMarks.push({ id: s.id, left: acc })
+      acc += s.bars
+    }
+  }
 
   // ── Éditions sections ──
   const addSection = () => {
@@ -258,6 +271,132 @@ export const SongView = ({
   const handleRulerPointerUp = (e: React.PointerEvent) => {
     if (rulerDragRef.current) seekFromEvent(e, true)
     rulerDragRef.current = false
+  }
+
+  // ── Lanes ⚙ AUTOMATION ──
+  const [autoPicker, setAutoPicker] = useState<{
+    rackId: string
+    moduleId: string
+    paramId: string
+    min: string
+    max: string
+  } | null>(null)
+  const autoDragRef = useRef<{ rackId: string; index: number; point: SongVolumePoint } | null>(null)
+
+  const openAutoPicker = (rackId: string) => {
+    const mod = paramSources[rackId]?.[0]
+    const param = mod?.params[0]
+    if (!mod || !param) return
+    setAutoPicker({
+      rackId,
+      moduleId: mod.moduleId,
+      paramId: param.id,
+      min: '0',
+      max: String(param.value > 0 ? +(param.value * 2).toPrecision(4) : 1),
+    })
+  }
+
+  const pickerSelectParam = (moduleId: string, paramId: string) => {
+    if (!autoPicker) return
+    const mod = paramSources[autoPicker.rackId]?.find((m) => m.moduleId === moduleId)
+    const param = mod?.params.find((p) => p.id === paramId) ?? mod?.params[0]
+    if (!mod || !param) return
+    setAutoPicker({
+      ...autoPicker,
+      moduleId,
+      paramId: param.id,
+      min: '0',
+      max: String(param.value > 0 ? +(param.value * 2).toPrecision(4) : 1),
+    })
+  }
+
+  const confirmAutoPicker = () => {
+    if (!autoPicker) return
+    const mod = paramSources[autoPicker.rackId]?.find((m) => m.moduleId === autoPicker.moduleId)
+    const min = Number(autoPicker.min)
+    const max = Number(autoPicker.max)
+    if (!mod || !Number.isFinite(min) || !Number.isFinite(max) || min === max) return
+    const lane: SongAutoLane = {
+      moduleId: autoPicker.moduleId,
+      paramId: autoPicker.paramId,
+      label: `${mod.name} · ${autoPicker.paramId}`,
+      min,
+      max,
+      points: [{ bar: 0, v: 0.5 }],
+    }
+    onChange({
+      ...song,
+      autoLanes: {
+        ...song.autoLanes,
+        [autoPicker.rackId]: [...(song.autoLanes[autoPicker.rackId] ?? []), lane],
+      },
+    })
+    setAutoPicker(null)
+  }
+
+  const removeAutoLane = (rackId: string, index: number) => {
+    onChange({
+      ...song,
+      autoLanes: {
+        ...song.autoLanes,
+        [rackId]: (song.autoLanes[rackId] ?? []).filter((_, i) => i !== index),
+      },
+    })
+  }
+
+  const setAutoPoints = (rackId: string, index: number, points: SongVolumePoint[]) => {
+    onChange({
+      ...songRef.current,
+      autoLanes: {
+        ...songRef.current.autoLanes,
+        [rackId]: (songRef.current.autoLanes[rackId] ?? []).map((l, i) =>
+          i === index ? { ...l, points } : l,
+        ),
+      },
+    })
+  }
+
+  const handleAutoPointerDown = (e: React.PointerEvent, rackId: string, index: number) => {
+    e.preventDefault()
+    ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
+    const { bar, v } = volPointFromEvent(e)
+    const points = [...(songRef.current.autoLanes[rackId]?.[index]?.points ?? [])]
+    const nearIdx = points.findIndex((p) => Math.abs(p.bar - bar) < totalBars * 0.02 + VOL_SNAP)
+    if (nearIdx >= 0 && e.altKey) {
+      points.splice(nearIdx, 1)
+      setAutoPoints(rackId, index, points)
+      autoDragRef.current = null
+      return
+    }
+    let point: SongVolumePoint
+    if (nearIdx >= 0) {
+      point = { ...points[nearIdx], v }
+      points[nearIdx] = point
+    } else {
+      point = { bar, v }
+      points.push(point)
+    }
+    points.sort((a, b) => a.bar - b.bar)
+    autoDragRef.current = { rackId, index, point }
+    setAutoPoints(rackId, index, points)
+  }
+
+  const handleAutoPointerMove = (e: React.PointerEvent) => {
+    const drag = autoDragRef.current
+    if (!drag) return
+    const { bar, v } = volPointFromEvent(e)
+    const points = (songRef.current.autoLanes[drag.rackId]?.[drag.index]?.points ?? []).filter(
+      (p) => p !== drag.point,
+    )
+    const point: SongVolumePoint = { bar, v }
+    points.push(point)
+    points.sort((a, b) => a.bar - b.bar)
+    drag.point = point
+    setAutoPoints(drag.rackId, drag.index, points)
+  }
+
+  const handleAutoPointerUp = () => {
+    autoDragRef.current = null
   }
 
   // ── Lane ▦ PATTERNS ──
@@ -412,6 +551,16 @@ export const SongView = ({
                         +▦
                       </button>
                     )}
+                    {(paramSources[rack.id]?.length ?? 0) > 0 && (
+                      <button
+                        type="button"
+                        className="song-label-btn add"
+                        onClick={() => openAutoPicker(rack.id)}
+                        title="Ajouter une lane d'automation (n'importe quel param numérique du rack)"
+                      >
+                        +⚙
+                      </button>
+                    )}
                   </span>
                 </div>
                 {hasNotes && (
@@ -455,6 +604,23 @@ export const SongView = ({
                     </span>
                   </div>
                 )}
+                {(song.autoLanes[rack.id] ?? []).map((al, i) => (
+                  <div key={`auto-${i}`} className="song-label song-label-notes">
+                    <span className="song-label-row">
+                      <span className="song-label-tag autp" title={`${al.label} — ${al.min} … ${al.max}`}>
+                        ⚙ {al.paramId}
+                      </span>
+                      <button
+                        type="button"
+                        className="song-label-btn"
+                        onClick={() => removeAutoLane(rack.id, i)}
+                        title="Supprimer la lane d'automation"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  </div>
+                ))}
               </div>
             )
           })}
@@ -525,22 +691,15 @@ export const SongView = ({
                 : 'Démarrer le transport pour se déplacer'
             }
           >
-            {(() => {
-              let acc = 0
-              return song.sections.map((s) => {
-                const mark = (
-                  <span
-                    key={s.id}
-                    className="song-ruler-mark"
-                    style={{ left: `${(acc / totalBars) * 100}%` }}
-                  >
-                    {acc + 1}
-                  </span>
-                )
-                acc += s.bars
-                return mark
-              })
-            })()}
+            {rulerMarks.map((m) => (
+              <span
+                key={m.id}
+                className="song-ruler-mark"
+                style={{ left: `${(m.left / totalBars) * 100}%` }}
+              >
+                {m.left + 1}
+              </span>
+            ))}
           </div>
 
           {racks.map((rack) => {
@@ -652,6 +811,34 @@ export const SongView = ({
                     </div>
                   </div>
                 )}
+
+                {(song.autoLanes[rack.id] ?? []).map((al, i) => (
+                  <div
+                    key={`auto-${i}`}
+                    className="song-row song-row-auto"
+                    onPointerDown={(e) => handleAutoPointerDown(e, rack.id, i)}
+                    onPointerMove={handleAutoPointerMove}
+                    onPointerUp={handleAutoPointerUp}
+                    title="Clic = point · drag = déplacer · alt-clic = supprimer un point"
+                  >
+                    <svg viewBox="0 0 1000 100" preserveAspectRatio="none">
+                      <polyline points={curvePath(al.points, totalBars)} />
+                    </svg>
+                    {al.points.map((p, j) => (
+                      <span
+                        key={j}
+                        className="song-volpoint"
+                        style={{
+                          left: `${(p.bar / Math.max(1e-6, totalBars)) * 100}%`,
+                          top: `${6 + (1 - p.v) * 88}%`,
+                        }}
+                      />
+                    ))}
+                    <span className="song-auto-range">
+                      {al.min} … {al.max}
+                    </span>
+                  </div>
+                ))}
               </div>
             )
           })}
@@ -661,10 +848,77 @@ export const SongView = ({
       </div>
 
       <div className="song-legend">
-        UNE LANE = UN RACK · MIX : on/off par section + courbe de volume continue · ♪ NOTES :
-        composées ici, jouées par le midi-file-sequencer du rack · à venir : ▦ patterns batterie,
-        ⚙ automation de params
+        UNE LANE = UN RACK · MIX : on/off par section + courbe de volume · ♪ NOTES : piano-roll →
+        midi-file-sequencer du rack · ▦ PATTERNS : A/B/FILL par section (capture depuis la grille) ·
+        ⚙ AUTOMATION : courbe → n'importe quel param (moteur seulement, non destructif)
       </div>
+
+      {autoPicker && (
+        <div
+          className="song-auto-picker-overlay"
+          onPointerDown={(e) => e.target === e.currentTarget && setAutoPicker(null)}
+        >
+          <div className="song-auto-picker">
+            <div className="sap-title">⚙ AUTOMATION</div>
+            <label>
+              Module
+              <select
+                value={autoPicker.moduleId}
+                onChange={(e) => pickerSelectParam(e.target.value, '')}
+              >
+                {(paramSources[autoPicker.rackId] ?? []).map((m) => (
+                  <option key={m.moduleId} value={m.moduleId}>
+                    {m.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Paramètre
+              <select
+                value={autoPicker.paramId}
+                onChange={(e) => pickerSelectParam(autoPicker.moduleId, e.target.value)}
+              >
+                {(paramSources[autoPicker.rackId] ?? [])
+                  .find((m) => m.moduleId === autoPicker.moduleId)
+                  ?.params.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.id} (={p.value})
+                    </option>
+                  ))}
+              </select>
+            </label>
+            <div className="sap-range">
+              <label>
+                Min
+                <input
+                  value={autoPicker.min}
+                  onChange={(e) => setAutoPicker({ ...autoPicker, min: e.target.value })}
+                />
+              </label>
+              <label>
+                Max
+                <input
+                  value={autoPicker.max}
+                  onChange={(e) => setAutoPicker({ ...autoPicker, max: e.target.value })}
+                />
+              </label>
+            </div>
+            <div className="sap-hint">
+              La courbe (0..1) est étirée entre Min et Max. Écrit au moteur pendant la
+              lecture — le patch garde ses valeurs de base.
+            </div>
+            <div className="sap-actions">
+              <button type="button" className="song-switch" onClick={() => setAutoPicker(null)}>
+                ANNULER
+              </button>
+              <button type="button" className="song-switch active" onClick={confirmAutoPicker}>
+                AJOUTER
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {pianoRollRackId && pianoRollLane && pianoRollRack && (
         <SongPianoRoll

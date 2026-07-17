@@ -102,7 +102,8 @@
 - [x] Undo local de l'arrangement (↶/↷, coalescence des drags)
 - [x] Vélocité éditable au piano-roll (bande VÉLO)
 - [x] Transfert step-seq → clip ♪ (note = pitch + 69, conversion CV exacte)
-- [ ] Restes → docs/SONG_MODE_PLAN.md : automation params, recorder cv/gate (génératifs), Ctrl+Z contextuel
+- [x] Lanes ⚙ AUTOMATION : courbe → n'importe quel param numérique du rack (picker module/param + Min/Max, deltas seulement, moteur uniquement = non destructif)
+- [ ] Restes → docs/SONG_MODE_PLAN.md : recorder cv/gate (génératifs), Ctrl+Z contextuel, loi log fréquences
 
 ### Code Quality
 - [x] Zero TypeScript errors (strict tsc -b mode)

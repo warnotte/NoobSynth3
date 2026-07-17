@@ -108,8 +108,19 @@ contient un) = insère une boucle du pattern au playhead — conversion **note =
 (préserve le CV exactement, cf. audit STUDIO_GAP_ANALYSIS), vélocité 0-100 → 0..1,
 durée = pas × gateLength%.
 
-- Restes (voir docs/SONG_MODE_PLAN.md) : ⚙ automation de params, recorder cv/gate pour
-  les séquenceurs génératifs (phase 3), Ctrl+Z contextuel dans la vue Song.
+**Lanes ⚙ AUTOMATION :** bouton `+⚙` → picker (module → param numérique du rack — liste
+= `moduleDefaults[type]` ∪ params posés, hors STRING_PARAMS — + bornes Min/Max saisies,
+préremplies 0 et 2× la valeur courante). La lane est une courbe de points `{bar, v 0..1}`
+éditable inline (clic = point, drag = déplacer, alt-clic = supprimer), dénormalisée
+linéairement Min..Max. Le scheduler l'évalue en continu (rAF) et pousse les **deltas
+seulement** (> 0.2 % de la plage) via `onAutoRef` → `setParamDirect`/`native_set_param`.
+**Non destructif : moteur uniquement** — le graphe garde ses valeurs de base (les knobs
+UI ne bougent pas ; stop/restart restaure le patch). Interpolation linéaire (pas de
+loi log pour les fréquences — borner la plage du cutoff plutôt que 20..20000).
+
+- Restes (voir docs/SONG_MODE_PLAN.md) : recorder cv/gate pour les séquenceurs
+  génératifs (phase 3), Ctrl+Z contextuel dans la vue Song, loi log optionnelle pour
+  l'automation des fréquences.
 
 ### Module Templates
 Groupes de modules pré-câblés réutilisables.
