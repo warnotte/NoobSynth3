@@ -25,6 +25,14 @@ export type SongVolumePoint = { bar: number; v: number }
 /** Note d'une lane ♪ : positions/durées en MESURES (fractions), vel 0..1. */
 export type SongNote = { bar: number; note: number; dur: number; vel: number }
 export type SongNotesLane = { targetModuleId: string; notes: SongNote[] }
+/** Lane ▦ PATTERNS : 3 snapshots de drumData, un slot choisi par section
+ *  (absent = garder le pattern courant). Swap à chaud vérifié sans glitch. */
+export type SongPatternSlot = 'A' | 'B' | 'FILL'
+export type SongPatternLane = {
+  targetModuleId: string
+  patterns: Record<SongPatternSlot, string>
+  states: Record<string, SongPatternSlot | undefined>
+}
 
 export type SongState = {
   enabled: boolean
@@ -36,6 +44,8 @@ export type SongState = {
   volumes: Record<string, SongVolumePoint[]>
   /** rackId -> lane notes (compilée en midiData par App) */
   notesLanes: Record<string, SongNotesLane>
+  /** rackId -> lane patterns batterie (appliquée aux frontières de section) */
+  patternLanes: Record<string, SongPatternLane>
 }
 
 export const DEFAULT_SONG_CELL: SongCell = { on: true, level: 1 }
@@ -52,6 +62,7 @@ export const defaultSongState = (): SongState => ({
   cells: {},
   volumes: {},
   notesLanes: {},
+  patternLanes: {},
 })
 
 export const getSongCell = (song: SongState, rackId: string, sectionId: string): SongCell =>
@@ -126,6 +137,8 @@ type UseSongPlayerArgs = {
   songFactorsRef: MutableRefObject<Record<string, number>>
   /** Ré-applique les niveaux mixer (qui intègrent songFactorsRef) au moteur. */
   applyLevelsRef: MutableRefObject<() => void>
+  /** Appelé au changement de section (et à l'entrée en lecture) — swaps de patterns. */
+  onSectionRef?: MutableRefObject<(sectionId: string) => void>
 }
 
 export function useSongPlayer({
@@ -136,6 +149,7 @@ export function useSongPlayer({
   transportBeats,
   songFactorsRef,
   applyLevelsRef,
+  onSectionRef,
 }: UseSongPlayerArgs) {
   // Dernier report de beats + son heure d'arrivée, pour interpoler entre
   // deux polls (~250 ms) sans redémarrer la boucle rAF à chaque report.
@@ -157,6 +171,7 @@ export function useSongPlayer({
     let raf = 0
     // Dernière valeur effectivement envoyée au moteur, pour throttler.
     let lastSent: Record<string, number> = {}
+    let lastSectionId: string | null = null
 
     const estimateBeats = () => {
       const { beats, at } = beatsInfoRef.current
@@ -166,6 +181,10 @@ export function useSongPlayer({
     const tick = () => {
       const pos = songPositionAt(song, estimateBeats())
       if (pos) {
+        if (pos.section.id !== lastSectionId) {
+          lastSectionId = pos.section.id
+          onSectionRef?.current(pos.section.id)
+        }
         const factors: Record<string, number> = {}
         let needsApply = false
         for (const rack of racks) {
@@ -189,5 +208,5 @@ export function useSongPlayer({
     }
     raf = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(raf)
-  }, [song, racks, running, bpm, songFactorsRef, applyLevelsRef])
+  }, [song, racks, running, bpm, songFactorsRef, applyLevelsRef, onSectionRef])
 }

@@ -58,6 +58,7 @@ import {
   songPositionAt,
   songTotalBars,
   type SongState,
+  type SongPatternSlot,
 } from './hooks/useSongPlayer'
 import { SidePanel } from './ui/SidePanel'
 import { BrandRail } from './ui/BrandRail'
@@ -223,6 +224,48 @@ function App() {
   const songStateRef = useRef(songState)
   const songFactorsRef = useRef<Record<string, number>>({})
   const applyMixerLevelsRef = useRef<() => void>(() => {})
+  const songSectionRef = useRef<(sectionId: string) => void>(() => {})
+  // Undo LOCAL de l'arrangement (indépendant du Ctrl+Z du graphe) : les édits
+  // rapprochés (<800 ms, drags) sont coalescés en une seule entrée.
+  const songHistoryRef = useRef<{ past: SongState[]; future: SongState[]; lastPush: number }>({
+    past: [],
+    future: [],
+    lastPush: 0,
+  })
+  const [songHistoryDepth, setSongHistoryDepth] = useState({ past: 0, future: 0 })
+  const changeSong = useCallback((next: SongState) => {
+    const h = songHistoryRef.current
+    const now = performance.now()
+    if (now - h.lastPush > 800) {
+      h.past.push(songStateRef.current)
+      if (h.past.length > 50) h.past.shift()
+      h.future = []
+      setSongHistoryDepth({ past: h.past.length, future: 0 })
+    }
+    h.lastPush = now
+    songStateRef.current = next
+    setSongState(next)
+  }, [])
+  const undoSong = useCallback(() => {
+    const h = songHistoryRef.current
+    const prev = h.past.pop()
+    if (!prev) return
+    h.future.push(songStateRef.current)
+    h.lastPush = 0
+    songStateRef.current = prev
+    setSongState(prev)
+    setSongHistoryDepth({ past: h.past.length, future: h.future.length })
+  }, [])
+  const redoSong = useCallback(() => {
+    const h = songHistoryRef.current
+    const next = h.future.pop()
+    if (!next) return
+    h.past.push(songStateRef.current)
+    h.lastPush = 0
+    songStateRef.current = next
+    setSongState(next)
+    setSongHistoryDepth({ past: h.past.length, future: h.future.length })
+  }, [])
 
   const racksRef = useRef(racks)
   const activeRackIdRef = useRef(activeRackId)
@@ -1122,6 +1165,9 @@ function App() {
     songStateRef.current = projectSong
     songFactorsRef.current = {}
     songCompiledRef.current = {}
+    songAppliedPatternRef.current = {}
+    songHistoryRef.current = { past: [], future: [], lastPush: 0 }
+    setSongHistoryDepth({ past: 0, future: 0 })
     setSongState(projectSong)
     resetPatching()
     setGridError(null)
@@ -2161,6 +2207,7 @@ function App() {
     transportBeats,
     songFactorsRef,
     applyLevelsRef: applyMixerLevelsRef,
+    onSectionRef: songSectionRef,
   })
 
   const transportBeatsRef = useRef(0)
@@ -2309,6 +2356,106 @@ function App() {
     return () => clearTimeout(timer)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [songState, masterTempo])
+
+  // rackId -> drum-sequencers du rack (cibles des lanes ▦ PATTERNS) + drumData live
+  const songDrumSources = useMemo(() => {
+    const map: Record<string, { id: string; drumData: string | null }[]> = {}
+    for (const rack of racks) {
+      const g = rack.id === activeRackId ? graph : rack.graph
+      map[rack.id] = g.modules
+        .filter((m) => m.type === 'drum-sequencer')
+        .map((m) => ({
+          id: m.id,
+          drumData: typeof m.params.drumData === 'string' ? m.params.drumData : null,
+        }))
+    }
+    return map
+  }, [racks, activeRackId, graph])
+
+  // rackId -> step-sequencers du rack (sources du transfert step-seq → clip ♪)
+  const songStepSources = useMemo(() => {
+    const map: Record<
+      string,
+      { id: string; name: string; stepData: string | null; rate: number; gateLength: number }[]
+    > = {}
+    for (const rack of racks) {
+      const g = rack.id === activeRackId ? graph : rack.graph
+      map[rack.id] = g.modules
+        .filter((m) => m.type === 'step-sequencer')
+        .map((m) => ({
+          id: m.id,
+          name: m.name ?? m.id,
+          stepData: typeof m.params.stepData === 'string' ? m.params.stepData : null,
+          rate: Number(m.params.rate ?? 3),
+          gateLength: Number(m.params.gateLength ?? 80),
+        }))
+    }
+    return map
+  }, [racks, activeRackId, graph])
+
+  /** Écrit un drumData dans un drum-sequencer (état graphe + moteur Web/Tauri).
+   *  Swap à chaud vérifié sans glitch : seul le contenu des steps change, le
+   *  playhead transport-locké continue. */
+  const writeSongDrumData = (rackId: string, moduleId: string, data: string) => {
+    if (rackId === activeRackIdRef.current) {
+      updateParam(moduleId, 'drumData', data, { skipHistory: true })
+    } else {
+      setRacks((prev) =>
+        prev.map((r) =>
+          r.id === rackId
+            ? {
+                ...r,
+                graph: {
+                  ...r.graph,
+                  modules: r.graph.modules.map((m) =>
+                    m.id === moduleId ? { ...m, params: { ...m.params, drumData: data } } : m,
+                  ),
+                },
+              }
+            : r,
+        ),
+      )
+      const engineId = `${rackId}/${moduleId}`
+      if (statusRef.current === 'running') {
+        engine.setParamStringDirect(engineId, 'drumData', data)
+      }
+      if (isTauri && tauriNativeRunning) {
+        void invokeTauri('native_set_param_string', { moduleId: engineId, paramId: 'drumData', value: data }).catch(() => {})
+      }
+    }
+  }
+
+  // Swaps de patterns ▦ aux frontières de section (appelé par le rAF du scheduler)
+  const songAppliedPatternRef = useRef<Record<string, string>>({})
+  useEffect(() => {
+    songSectionRef.current = (sectionId: string) => {
+      const song = songStateRef.current
+      for (const [rackId, lane] of Object.entries(song.patternLanes)) {
+        const slot = lane.states[sectionId]
+        if (!slot) continue // absent = garder le pattern courant
+        const data = lane.patterns[slot]
+        if (!data) continue
+        if (songAppliedPatternRef.current[rackId] === data) continue
+        songAppliedPatternRef.current[rackId] = data
+        writeSongDrumData(rackId, lane.targetModuleId, data)
+      }
+    }
+  })
+
+  /** Capture le drumData courant du drum-seq de la lane ▦ dans un slot A/B/FILL. */
+  const captureSongPattern = (rackId: string, slot: SongPatternSlot) => {
+    const lane = songStateRef.current.patternLanes[rackId]
+    if (!lane) return
+    const src = songDrumSources[rackId]?.find((d) => d.id === lane.targetModuleId)
+    if (!src?.drumData) return
+    changeSong({
+      ...songStateRef.current,
+      patternLanes: {
+        ...songStateRef.current.patternLanes,
+        [rackId]: { ...lane, patterns: { ...lane.patterns, [slot]: src.drumData } },
+      },
+    })
+  }
 
   const handleAutoLayout = () => {
     if (graphRef.current.modules.length === 0) {
@@ -2510,12 +2657,19 @@ function App() {
           <SongView
             racks={racks}
             song={songState}
-            onChange={setSongState}
+            onChange={changeSong}
             transportBeats={transportBeats}
             bpm={masterTempo}
             running={status === 'running' || (isTauri && tauriNativeRunning)}
             midiTargets={songMidiTargets}
+            drumSources={songDrumSources}
+            stepSources={songStepSources}
+            onCapturePattern={captureSongPattern}
             onSeek={seekSong}
+            onUndo={undoSong}
+            onRedo={redoSong}
+            canUndo={songHistoryDepth.past > 0}
+            canRedo={songHistoryDepth.future > 0}
           />
         ) : (
           <RackView

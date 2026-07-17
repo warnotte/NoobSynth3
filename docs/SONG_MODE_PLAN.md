@@ -1,14 +1,17 @@
 # SONG Mode — Arrangement Timeline (plan v3)
 
-> **STATUT (2026-07-17) — cœur IMPLÉMENTÉ sur cette branche.** L'implémentation fait
-> foi dans `docs/FEATURES.md` § SONG Mode ; ce document reste le plan de référence
-> pour ce qui RESTE : undo de l'arrangement, ▦ patterns batterie A/B/FILL, transfert
-> step-seq→clip (§ transfert ci-dessous, audit sur main dans STUDIO_GAP_ANALYSIS.md),
-> vélocité éditable au piano-roll, ⚙ automation de params, recorder cv/gate (phase 3).
+> **STATUT (2026-07-17) — cœur + restes v1 IMPLÉMENTÉS sur cette branche.**
+> L'implémentation fait foi dans `docs/FEATURES.md` § SONG Mode. RESTE : ⚙ automation
+> de params, recorder cv/gate pour les séquenceurs génératifs (phase 3), Ctrl+Z
+> contextuel dans la vue Song, transfert des séquenceurs statiques restants
+> (chord/polyrhythm/euclidean).
 > LIVRÉ : vue SONG (sections, lanes MIX on/off + courbes de volume continues, lanes ♪
 > + piano-roll compilé en midiData + re-seek), mode de lecture RACK|SONG global dans la
 > TransportConsole, seek timeline (`set_transport_beats` moteur Web+Tauri), persistance
-> projet v2, 7 projets démo « Songs ».
+> projet v2, 7 projets démo « Songs », **▦ patterns batterie A/B/FILL** (capture depuis
+> la grille + swap sans glitch aux frontières de section), **undo local de
+> l'arrangement** (coalescence 800 ms), **vélocité au piano-roll** (bande VÉLO),
+> **transfert step-seq→clip** (note = pitch + 69).
 
 > Branche : `feat/song-mode`. Maquettes : `design/mockups/song-mode.html` (timeline) et
 > `design/mockups/song-pianoroll.html` (éditeur de clip) — re-screenshot :

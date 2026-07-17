@@ -88,8 +88,28 @@ l'arrangement pilote. La vue Song n'est que l'éditeur.
   semble flotter entre deux racks.
 - Démos : projets « Songs » (Studio Song, NOVA ⚡/II/III/64/ÆTERNA, DUO) — tous avec
   `song` embarqué, mode SONG armé au chargement.
-- Restes (voir docs/SONG_MODE_PLAN.md) : undo de l'arrangement, patterns batterie
-  A/B/FILL, transfert step-seq→clip, vélocité éditable au piano-roll, automation de params.
+
+**Lanes ▦ PATTERNS (batterie A/B/FILL) :** si le rack contient un `drum-sequencer`,
+bouton `+▦` → lane de chips (— / A / B / FILL par section, — = garder le pattern
+courant). Les 3 patterns sont des snapshots de `drumData` **capturés** depuis la grille
+du drum-seq (boutons `A⟳ B⟳ F⟳` : éditer la grille dans la vue RACKS, puis capturer).
+Aux frontières de section, le scheduler (`onSectionRef` du rAF, précision ~1 frame)
+écrit le `drumData` du slot via `writeSongDrumData` (updateParam pour le rack actif,
+`setParamStringDirect`/`native_set_param_string` sinon) — **swap sans glitch vérifié** :
+seul le contenu des steps change, le playhead transport-locké continue.
+
+**Undo de l'arrangement :** pile LOCALE (boutons ↶/↷ dans la toolbar Song, 50 entrées,
+indépendante du Ctrl+Z du graphe). Les édits rapprochés (<800 ms — drags de courbe,
+piano-roll) sont **coalescés** en une seule entrée. Reset au chargement d'un projet.
+
+**Piano-roll — vélocité & transfert :** bande VÉLO sous la grille (drag = vélocité de
+la/des note(s) au même départ, accords inclus) ; bouton `⇐ <step-seq>` (si le rack en
+contient un) = insère une boucle du pattern au playhead — conversion **note = pitch + 69**
+(préserve le CV exactement, cf. audit STUDIO_GAP_ANALYSIS), vélocité 0-100 → 0..1,
+durée = pas × gateLength%.
+
+- Restes (voir docs/SONG_MODE_PLAN.md) : ⚙ automation de params, recorder cv/gate pour
+  les séquenceurs génératifs (phase 3), Ctrl+Z contextuel dans la vue Song.
 
 ### Module Templates
 Groupes de modules pré-câblés réutilisables.

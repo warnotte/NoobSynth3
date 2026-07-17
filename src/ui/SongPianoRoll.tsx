@@ -1,18 +1,31 @@
 import { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import type { SongNote, SongSection } from '../hooks/useSongPlayer'
+import { RATE_DIVISIONS } from '../shared/rates'
 
 /**
  * Piano-roll d'une lane ♪ NOTES du SONG mode (modal).
  * Édite les notes sur TOUTE la durée du song (frontières de sections dessinées).
  * clic = poser (puis drag = durée) · drag note = déplacer · drag bord droit =
- * durée · alt-clic = supprimer. Snap 1/16. Compilé en midiData à la volée (App).
+ * durée · alt-clic = supprimer · bande VÉLO en bas (drag = vélocité).
+ * Snap 1/16. Compilé en midiData à la volée (App).
  */
+
+/** Step-sequencer du rack, source du transfert vers le clip. */
+export type SongStepSource = {
+  id: string
+  name: string
+  stepData: string | null
+  rate: number
+  gateLength: number
+}
 
 type SongPianoRollProps = {
   laneName: string
   sections: SongSection[]
   totalBars: number
+  /** Step-sequencers du rack — bouton « ⇐ step-seq » si non vide */
+  stepSources: SongStepSource[]
   notes: SongNote[]
   onChange: (notes: SongNote[]) => void
   onClose: () => void
@@ -39,6 +52,7 @@ export const SongPianoRoll = ({
   laneName,
   sections,
   totalBars,
+  stepSources,
   notes,
   onChange,
   onClose,
@@ -165,6 +179,67 @@ export const SongPianoRoll = ({
     dragRef.current = null
   }
 
+  // ── Bande VÉLO : drag vertical = vélocité de la note sous le pointeur ──
+  const velDragRef = useRef(false)
+  const setVelAt = (e: React.PointerEvent) => {
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const vel = Math.min(1, Math.max(0.05, 1 - (e.clientY - rect.top - 2) / (rect.height - 4)))
+    // toutes les notes dont le début est à ±6 px (accords inclus)
+    const hits = notesRef.current
+      .map((n, i) => ({ i, dx: Math.abs(n.bar * 16 * STEP_W - x) }))
+      .filter((h) => h.dx < 7)
+      .map((h) => h.i)
+    if (hits.length === 0) return
+    onChange(notesRef.current.map((n, i) => (hits.includes(i) ? { ...n, vel } : n)))
+  }
+  const handleVelPointerDown = (e: React.PointerEvent) => {
+    ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
+    velDragRef.current = true
+    setVelAt(e)
+  }
+  const handleVelPointerMove = (e: React.PointerEvent) => {
+    if (velDragRef.current) setVelAt(e)
+  }
+  const handleVelPointerUp = () => {
+    velDragRef.current = false
+  }
+
+  // ── Transfert step-seq → clip : une boucle du pattern insérée au playhead ──
+  // Conversion vérifiée (audit moteur) : note = pitch + 69 préserve le CV
+  // exactement (step-seq : CV = pitch/12 ; midi seq : CV = (note−69)/12).
+  const transferFromStepSeq = (src: SongStepSource) => {
+    if (!src.stepData) return
+    let steps: { pitch?: number; gate?: boolean; velocity?: number }[]
+    try {
+      steps = JSON.parse(src.stepData)
+    } catch {
+      return
+    }
+    if (!Array.isArray(steps) || steps.length === 0) return
+    const rateBeats = RATE_DIVISIONS[src.rate]?.beats ?? 0.5
+    const stepBars = rateBeats / 4
+    let startBar = 0
+    if (running) {
+      const { beats, at } = beatsInfoRef.current
+      const est = beats + ((performance.now() - at) / 1000) * (bpm / 60)
+      startBar = Math.floor((est / 4) % totalBars)
+    }
+    const added: SongNote[] = []
+    steps.forEach((step, i) => {
+      if (!step.gate) return
+      const bar = startBar + i * stepBars
+      if (bar >= totalBars) return
+      added.push({
+        bar,
+        note: Math.round(step.pitch ?? 0) + 69,
+        dur: Math.max(SIXTEENTH / 2, stepBars * (src.gateLength / 100)),
+        vel: Math.min(1, Math.max(0.05, (step.velocity ?? 100) / 100)),
+      })
+    })
+    if (added.length > 0) onChange([...notesRef.current, ...added])
+  }
+
   // Frontières de sections (px cumulés)
   const sectionMarks: { name: string; left: number; width: number }[] = []
   {
@@ -185,9 +260,21 @@ export const SongPianoRoll = ({
             </div>
             <div className="song-pr-sub">
               {totalBars} MESURES · SNAP 1/16 · clic = poser puis étirer · drag = déplacer · bord
-              droit = durée · alt-clic = supprimer
+              droit = durée · alt-clic = supprimer · bande VÉLO : drag = vélocité
             </div>
           </div>
+          {stepSources.map((src) => (
+            <button
+              key={src.id}
+              type="button"
+              className="song-pr-transfer"
+              disabled={!src.stepData}
+              onClick={() => transferFromStepSeq(src)}
+              title={`Insérer une boucle du pattern de « ${src.name} » au playhead (conversion pitch exacte, note = pitch + 69)`}
+            >
+              ⇐ {src.name}
+            </button>
+          ))}
           <button type="button" className="song-pr-ok" onClick={onClose}>
             ✓ OK
           </button>
@@ -195,6 +282,7 @@ export const SongPianoRoll = ({
 
         <div className="song-pr-scroll">
           <div className="song-pr-inner" style={{ width: 44 + gridW }}>
+            <div className="song-pr-main">
             <div className="song-pr-keys" style={{ height: gridH }}>
               {Array.from({ length: ROWS }, (_, r) => {
                 const note = NOTE_MAX - r
@@ -238,6 +326,30 @@ export const SongPianoRoll = ({
                 />
               ))}
               <div ref={playheadRef} className="song-pr-playhead" />
+            </div>
+            </div>
+
+            <div className="song-pr-velrow">
+              <div className="song-pr-velgutter">VÉLO</div>
+              <div
+                className="song-pr-vel"
+                style={{ width: gridW }}
+                onPointerDown={handleVelPointerDown}
+                onPointerMove={handleVelPointerMove}
+                onPointerUp={handleVelPointerUp}
+              >
+                {notes.map((n, i) => (
+                  <div
+                    key={i}
+                    className="song-pr-velbar"
+                    style={{
+                      left: n.bar * 16 * STEP_W + 1,
+                      height: `${Math.round(n.vel * 100)}%`,
+                      opacity: 0.5 + n.vel * 0.5,
+                    }}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </div>

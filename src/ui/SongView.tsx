@@ -4,10 +4,11 @@ import {
   getSongCell,
   songPositionAt,
   songTotalBars,
+  type SongPatternSlot,
   type SongState,
   type SongVolumePoint,
 } from '../hooks/useSongPlayer'
-import { SongPianoRoll } from './SongPianoRoll'
+import { SongPianoRoll, type SongStepSource } from './SongPianoRoll'
 
 /**
  * Vue SONG (prototype) — timeline d'arrangement.
@@ -28,9 +29,21 @@ type SongViewProps = {
   running: boolean
   /** rackId -> ids des midi-file-sequencer du rack (cibles possibles de la lane ♪) */
   midiTargets: Record<string, string[]>
+  /** rackId -> drum-sequencers du rack + drumData courant (lanes ▦ PATTERNS) */
+  drumSources: Record<string, { id: string; drumData: string | null }[]>
+  /** rackId -> step-sequencers du rack (transfert vers le piano-roll) */
+  stepSources: Record<string, SongStepSource[]>
+  /** Capture la grille actuelle du drum-seq dans le slot A/B/FILL de la lane ▦ */
+  onCapturePattern: (rackId: string, slot: SongPatternSlot) => void
   /** Seek du song à une mesure (transport global + midi seqs) — timeline cliquable */
   onSeek: (bar: number) => void
+  onUndo: () => void
+  onRedo: () => void
+  canUndo: boolean
+  canRedo: boolean
 }
+
+const PATTERN_CYCLE: (SongPatternSlot | undefined)[] = [undefined, 'A', 'B', 'FILL']
 
 const BAR_CHOICES = [4, 8, 16, 32]
 const VOL_SNAP = 0.25 // points de courbe snappés au 1/4 de mesure
@@ -53,7 +66,14 @@ export const SongView = ({
   bpm,
   running,
   midiTargets,
+  drumSources,
+  stepSources,
+  onCapturePattern,
   onSeek,
+  onUndo,
+  onRedo,
+  canUndo,
+  canRedo,
 }: SongViewProps) => {
   const [renamingId, setRenamingId] = useState<string | null>(null)
   const [renameValue, setRenameValue] = useState('')
@@ -240,6 +260,44 @@ export const SongView = ({
     rulerDragRef.current = false
   }
 
+  // ── Lane ▦ PATTERNS ──
+  const addPatternLane = (rackId: string) => {
+    const src = drumSources[rackId]?.[0]
+    if (!src) return
+    const current = src.drumData ?? ''
+    onChange({
+      ...song,
+      patternLanes: {
+        ...song.patternLanes,
+        [rackId]: {
+          targetModuleId: src.id,
+          patterns: { A: current, B: current, FILL: current },
+          states: {},
+        },
+      },
+    })
+  }
+
+  const removePatternLane = (rackId: string) => {
+    const next = { ...song.patternLanes }
+    delete next[rackId]
+    onChange({ ...song, patternLanes: next })
+  }
+
+  const cyclePattern = (rackId: string, sectionId: string) => {
+    const lane = song.patternLanes[rackId]
+    if (!lane) return
+    const cur = lane.states[sectionId]
+    const next = PATTERN_CYCLE[(PATTERN_CYCLE.indexOf(cur) + 1) % PATTERN_CYCLE.length]
+    onChange({
+      ...song,
+      patternLanes: {
+        ...song.patternLanes,
+        [rackId]: { ...lane, states: { ...lane.states, [sectionId]: next } },
+      },
+    })
+  }
+
   // ── Lane ♪ NOTES ──
   const addNotesLane = (rackId: string) => {
     const target = midiTargets[rackId]?.[0]
@@ -276,6 +334,24 @@ export const SongView = ({
         <button type="button" className="song-switch song-switch-add" onClick={addSection}>
           + SECTION
         </button>
+        <button
+          type="button"
+          className="song-switch"
+          onClick={onUndo}
+          disabled={!canUndo}
+          title="Annuler la dernière édition de l'arrangement"
+        >
+          ↶
+        </button>
+        <button
+          type="button"
+          className="song-switch"
+          onClick={onRedo}
+          disabled={!canRedo}
+          title="Rétablir"
+        >
+          ↷
+        </button>
         <div className="song-lcd">
           {pos
             ? `${pos.section.name} · MES ${Math.floor(pos.barInSection) + 1}/${pos.section.bars}`
@@ -298,6 +374,8 @@ export const SongView = ({
           {racks.map((rack) => {
             const hasNotes = !!song.notesLanes[rack.id]
             const canNotes = (midiTargets[rack.id]?.length ?? 0) > 0
+            const hasPtn = !!song.patternLanes[rack.id]
+            const canPtn = (drumSources[rack.id]?.length ?? 0) > 0
             return (
               <div key={rack.id} className="song-label-group" data-notes={hasNotes || undefined}>
                 <div className="song-label">
@@ -324,6 +402,16 @@ export const SongView = ({
                         +♪
                       </button>
                     )}
+                    {canPtn && !hasPtn && (
+                      <button
+                        type="button"
+                        className="song-label-btn add"
+                        onClick={() => addPatternLane(rack.id)}
+                        title="Ajouter une lane de patterns batterie (drum-sequencer détecté)"
+                      >
+                        +▦
+                      </button>
+                    )}
                   </span>
                 </div>
                 {hasNotes && (
@@ -335,6 +423,32 @@ export const SongView = ({
                         className="song-label-btn"
                         onClick={() => removeNotesLane(rack.id)}
                         title="Supprimer la lane de notes"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  </div>
+                )}
+                {hasPtn && (
+                  <div className="song-label song-label-notes">
+                    <span className="song-label-row">
+                      <span className="song-label-tag ptn">▦</span>
+                      {(['A', 'B', 'FILL'] as SongPatternSlot[]).map((slot) => (
+                        <button
+                          key={slot}
+                          type="button"
+                          className="song-label-btn capture"
+                          onClick={() => onCapturePattern(rack.id, slot)}
+                          title={`Capturer la grille ACTUELLE du drum-seq dans le pattern ${slot} (éditer la grille dans la vue RACKS, puis capturer ici)`}
+                        >
+                          {slot === 'FILL' ? 'F' : slot}⟳
+                        </button>
+                      ))}
+                      <button
+                        type="button"
+                        className="song-label-btn"
+                        onClick={() => removePatternLane(rack.id)}
+                        title="Supprimer la lane de patterns"
                       >
                         ×
                       </button>
@@ -431,6 +545,7 @@ export const SongView = ({
 
           {racks.map((rack) => {
             const lane = song.notesLanes[rack.id]
+            const ptnLane = song.patternLanes[rack.id]
             const volEditing = volEditRackId === rack.id
             const points = song.volumes[rack.id]
             return (
@@ -516,6 +631,27 @@ export const SongView = ({
                     )}
                   </div>
                 )}
+
+                {ptnLane && (
+                  <div className="song-row song-row-ptn">
+                    <div className="song-cells" style={{ gridTemplateColumns: gridTemplate }}>
+                      {song.sections.map((section) => {
+                        const slot = ptnLane.states[section.id]
+                        return (
+                          <button
+                            key={section.id}
+                            type="button"
+                            className={`song-ptn-chip ${slot ? `slot-${slot.toLowerCase()}` : 'none'}`}
+                            onClick={() => cyclePattern(rack.id, section.id)}
+                            title="Clic : — → A → B → FILL (— = garder le pattern courant)"
+                          >
+                            {slot ?? '—'}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
             )
           })}
@@ -535,6 +671,7 @@ export const SongView = ({
           laneName={pianoRollRack.name}
           sections={song.sections}
           totalBars={totalBars}
+          stepSources={stepSources[pianoRollRackId] ?? []}
           notes={pianoRollLane.notes}
           onChange={(notes) =>
             onChange({

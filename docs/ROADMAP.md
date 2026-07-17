@@ -98,7 +98,11 @@
 - [x] Seek timeline à la souris (règle) — nouveau `set_transport_beats` moteur (Rust/WASM/worklet + `native_set_transport_beats`)
 - [x] Persistance : clé `song` du projet v2 (export/import + menu Projects)
 - [x] 7 projets démo « Songs » : Studio Song, NOVA ⚡/II/III/64/ÆTERNA, DUO (Renaud & Claude)
-- [ ] Restes → docs/SONG_MODE_PLAN.md : undo arrangement, patterns batterie A/B/FILL, transfert step-seq→clip, vélocité piano-roll, automation params
+- [x] Lanes ▦ PATTERNS batterie : A/B/FILL par section, capture depuis la grille du drum-seq, swap sans glitch
+- [x] Undo local de l'arrangement (↶/↷, coalescence des drags)
+- [x] Vélocité éditable au piano-roll (bande VÉLO)
+- [x] Transfert step-seq → clip ♪ (note = pitch + 69, conversion CV exacte)
+- [ ] Restes → docs/SONG_MODE_PLAN.md : automation params, recorder cv/gate (génératifs), Ctrl+Z contextuel
 
 ### Code Quality
 - [x] Zero TypeScript errors (strict tsc -b mode)
