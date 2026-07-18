@@ -20,6 +20,8 @@
 | E2E `test-nova.mjs` (DUO) | 2 lanes ♪, piano-roll 113 notes, seek 72%→LA VOIX 8/8 (position exacte) | ✅ (message du test corrigé) |
 | E2E `test-song-rec.mjs` (phase 3, 2026-07-19) | Transferts ⇐ Chords (12 notes = 4 accords × 3) + ⇐ Euclid (+4) ; **⏺ REC** d'un turing clocké en vraie lecture → 16 notes capturées | ✅ |
 | Test moteur `engine_cv_recorder_captures_step_sequencer` | Recorder cv/gate : capture exacte (beats/notes/vélo/durées) d'un step-seq déterministe | ✅ |
+| E2E `test-song-robust.mjs` (2026-07-19 — **remplace la Session 6 manuelle**) | Export→import fidèle (sections/lanes/mode armé) · vieux projet sans song OK · suppression rack porteur de lane ♪ (orpheline disparaît) · suppression section référencée par chips ▦ · F5 en lecture — zéro pageerror | ✅ |
+| Screenshots Playwright UI phase 3 | Toolbar ⏺/MES/⇐, chip ARMÉ/● REC, picker LOI LIN\|LOG (a attrapé le toggle rogné, fixé 350b9a7) | ✅ |
 | Banc offline ×7 | nova 0.797 · nova-2 0.956 · nova-3 0.966 · nova-64 0.991 · æterna 1.203 · duo 1.042 · studio-song 1.211 — **nan=0 partout**, aucun silence | ✅ (peaks >1 = artefact du banc sans volumes mixer) |
 
 ---
@@ -53,6 +55,7 @@ Sur **NOVA ⚡** chargée, transport en marche, vue SONG.
 - [ ] **Sections** : dbl-clic renomme, clic sur « N MES » change la durée, × supprime, + SECTION ajoute — la timeline se redessine, la lecture ne casse pas
 - [ ] **Undo ↶** : après quelques éditions, ↶ plusieurs fois → tout revient (un drag complet = UN undo) ; ↷ rétablit
 - [ ] **MODE RACK** au transport pendant la lecture → les niveaux mixer reprennent la main instantanément ; re-SONG → l'arrangement reprend
+- [ ] **BPM pendant la lecture SONG** (ex-Session 6) : changer le tempo → la position suit (limite connue : les MIDI seq free-run se recalent au prochain seek/restart)
 
 **Questions :**
 1. Un geste t'a-t-il semblé peu naturel ou surprenant ? Lequel ?
@@ -115,19 +118,13 @@ pattern/automation natifs n'ont jamais tourné en runtime. `npm run tauri dev`
 
 ---
 
-## Session 6 — Robustesse & persistance (~10 min) 💾
+## Session 6 — Robustesse & persistance ✅ AUTOMATISÉE (2026-07-19)
 
-- [ ] **Export** d'un projet avec song édité (sections renommées, courbes, lanes) → **Import** → tout est restauré à l'identique, mode SONG armé
-- [ ] Charger un **vieux projet sans song** (ex. Élégie) → aucun crash, song par défaut désactivé, l'app se comporte comme avant
-- [ ] Supprimer un RACK qui a des lanes (♪/▦/⚙) → pas de crash, les lanes orphelines disparaissent de la vue
-- [ ] Supprimer une SECTION référencée par des chips de pattern → pas de crash
-- [ ] Changer le BPM pendant la lecture SONG → la position suit (limite connue : les MIDI seq free-run se recalent au prochain seek/restart)
-- [ ] F5 (reload) en pleine lecture → l'app revient propre
-
-**Questions :**
-1. L'export/import du song est-il fidèle ?
-2. Un crash ou état bizarre quelque part ?
-3. (Rien d'autre — si les 2 premières passent, la session est verte.)
+Entièrement couverte par l'E2E **`test-song-robust.mjs`** (voir §0) : export→import
+fidèle, vieux projet sans song, suppression de rack porteur de lane ♪ (l'orpheline
+disparaît), suppression de section référencée par des chips ▦, F5 en pleine lecture —
+zéro pageerror. Le seul item nécessitant une oreille (BPM pendant la lecture) a été
+déplacé en Session 2. **Rien à jouer manuellement.**
 
 ---
 
@@ -140,7 +137,7 @@ pattern/automation natifs n'ont jamais tourné en runtime. `npm run tauri dev`
 | 3 Piano-roll | ☐ | |
 | 4 Patterns/Auto | ☐ | |
 | 5 Tauri | ☐ | |
-| 6 Robustesse | ☐ | |
+| 6 Robustesse | ✅ | 2026-07-19 — automatisée (`test-song-robust.mjs`, 5/5 vert ; item BPM déplacé en session 2) |
 
 **6/6 vertes → tag `v0.16.0` + merge vers main.** Une session rouge → on corrige et on
 rejoue seulement cette session.
