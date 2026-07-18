@@ -135,7 +135,7 @@ pattern/automation natifs n'ont jamais tourné en runtime. `npm run tauri dev`
 
 | Session | Verte ? | Notes |
 |---|---|---|
-| 1 Écoute | ☐ | |
+| 1 Écoute | ✅ | 2026-07-19 — verte, rien à signaler (équilibre OK, pas de clics aux frontières, voix DUO intelligible) |
 | 2 Timeline | ☐ | |
 | 3 Piano-roll | ☐ | |
 | 4 Patterns/Auto | ☐ | |

@@ -937,22 +937,23 @@ export const SongView = ({
                   onChange={(e) => setAutoPicker({ ...autoPicker, max: e.target.value })}
                 />
               </label>
-              <div className="sap-law" title="LOG : chaque octave occupe la même portion de courbe (fréquences). LIN : progression arithmétique.">
-                <button
-                  type="button"
-                  className={`song-switch ${autoPicker.log ? '' : 'active'}`}
-                  onClick={() => setAutoPicker({ ...autoPicker, log: false })}
-                >
-                  LIN
-                </button>
-                <button
-                  type="button"
-                  className={`song-switch ${autoPicker.log ? 'active' : ''}`}
-                  onClick={() => setAutoPicker({ ...autoPicker, log: true })}
-                >
-                  LOG
-                </button>
-              </div>
+            </div>
+            <div className="sap-law" title="LOG : chaque octave occupe la même portion de courbe (fréquences). LIN : progression arithmétique.">
+              <span>Loi</span>
+              <button
+                type="button"
+                className={`song-switch ${autoPicker.log ? '' : 'active'}`}
+                onClick={() => setAutoPicker({ ...autoPicker, log: false })}
+              >
+                LIN
+              </button>
+              <button
+                type="button"
+                className={`song-switch ${autoPicker.log ? 'active' : ''}`}
+                onClick={() => setAutoPicker({ ...autoPicker, log: true })}
+              >
+                LOG
+              </button>
             </div>
             <div className="sap-hint">
               La courbe (0..1) est étirée entre Min et Max{autoPicker.log ? ' (loi LOG — balayage naturel des fréquences, Min > 0)' : ''}. Écrit au moteur pendant la

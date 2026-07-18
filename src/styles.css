@@ -7667,9 +7667,17 @@ body {
   padding: 6px 8px;
   box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.7);
 }
-.sap-range { display: flex; gap: 10px; align-items: flex-end; }
+.sap-range { display: flex; gap: 10px; }
 .sap-range label { flex: 1; }
-.sap-law { display: flex; gap: 2px; padding-bottom: 1px; }
+.sap-law { display: flex; align-items: center; gap: 3px; }
+.sap-law span {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  margin-right: 7px;
+}
 .sap-hint {
   font-size: 8.5px;
   letter-spacing: 0.04em;
