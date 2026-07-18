@@ -46,6 +46,16 @@ type WasmGraphEngineCtor = new (sampleRate: number) => {
   set_transport_beats(beats: number): void
   get_transport_beats(): number
   set_master_fx_param(param: string, value: number): void
+  arm_cv_recorder(
+    moduleId: string,
+    cvPort: string,
+    gatePort: string,
+    velPort: string,
+    bars: number,
+  ): boolean
+  cancel_cv_recorder(): void
+  cv_recorder_status(): Float64Array
+  take_cv_recording(): Float64Array
 }
 
 const WasmGraphEngine = (wasm as unknown as { WasmGraphEngine?: WasmGraphEngineCtor })

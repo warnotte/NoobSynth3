@@ -14,21 +14,56 @@ import { RATE_DIVISIONS } from '../shared/rates'
  * alt-clic = supprimer · bande VÉLO : drag = vélocité. Snap 1/16.
  */
 
-/** Step-sequencer du rack, source du transfert vers le clip. */
+/** Séquenceur statique du rack, source du transfert vers le clip.
+ *  `kind` pilote la conversion : step/chord/poly lisent `stepData`, euclid n'a
+ *  que des params numériques (steps/pulses/rotation). */
 export type SongStepSource = {
   id: string
   name: string
+  kind: 'step' | 'chord' | 'poly' | 'euclid'
   stepData: string | null
   rate: number
   gateLength: number
+  /** chord : nombre de steps joués (2/4/6/8) + voicing (0 close / 1 spread) */
+  length?: number
+  voicing?: number
+  /** poly : longueurs (1..16) et mutes des 4 pistes */
+  trackLengths?: number[]
+  trackMutes?: boolean[]
+  /** euclid : pattern E(pulses, steps) tourné de rotation */
+  steps?: number
+  pulses?: number
+  rotation?: number
 }
+
+/** Séquenceur génératif du rack (arpeggiator / turing / gravity) — cible du ⏺ REC. */
+export type SongGenSource = {
+  id: string
+  name: string
+}
+
+/** État du recorder cv/gate remonté par App (null = inactif). */
+export type SongRecState = {
+  phase: 'armed' | 'recording'
+  rackId: string
+  moduleId: string
+  beatsDone: number
+  beatsTotal: number
+} | null
 
 type SongPianoRollProps = {
   laneName: string
   sections: SongSection[]
   totalBars: number
-  /** Step-sequencers du rack — bouton « ⇐ step-seq » si non vide */
+  /** Séquenceurs statiques du rack — bouton « ⇐ nom » par source */
   stepSources: SongStepSource[]
+  /** Séquenceurs génératifs du rack — bouton « ⏺ nom » par source (enregistrement) */
+  genSources: SongGenSource[]
+  /** État du recorder (si un enregistrement vise CE rack), null sinon */
+  recState: SongRecState
+  onRecArm?: (moduleId: string, bars: number) => void
+  onRecStop?: () => void
+  onRecCancel?: () => void
   notes: SongNote[]
   onChange: (notes: SongNote[]) => void
   onClose: () => void
@@ -47,6 +82,61 @@ const ZOOM_LEVELS = [2, 3.5, 5, 7, 10, 14, 20] // px par 1/16
 const NAME_BY_PC = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 const isBlack = (note: number) => NAME_BY_PC[note % 12].includes('#')
 const snapBar = (bar: number) => Math.round(bar / SIXTEENTH) * SIXTEENTH
+const REC_BAR_CHOICES = [1, 2, 4, 8, 16]
+
+// ── Répliques TS des algos moteur (transfert statique → clip) ──
+
+/** Tables du chord-sequencer (chord_sequencer.rs CHORD_TYPES, mêmes indices). */
+const CHORD_INTERVALS: number[][] = [
+  [0, 4, 7], // Maj
+  [0, 3, 7], // Min
+  [0, 4, 7, 10], // Dom7
+  [0, 3, 7, 10], // Min7
+  [0, 4, 7, 11], // Maj7
+  [0, 3, 6], // Dim
+  [0, 4, 8], // Aug
+  [0, 2, 7], // Sus2
+  [0, 5, 7], // Sus4
+  [0, 7], // Power
+]
+
+/** Réplique exacte de build_chord (inversion = +12 sur les N basses, tri,
+ *  spread = basse −12 / aigüe +12). Retourne des notes MIDI base 60. */
+const chordNotes = (root: number, chordType: number, inversion: number, voicing: number): number[] => {
+  const intervals = CHORD_INTERVALS[Math.min(9, Math.max(0, Math.round(chordType)))]
+  const notes = intervals.map((iv) => root + iv)
+  const inv = Math.min(Math.max(0, Math.round(inversion)), notes.length - 1)
+  for (let i = 0; i < inv; i += 1) notes[i] += 12
+  notes.sort((a, b) => a - b)
+  if (voicing === 1 && notes.length >= 3) {
+    notes[0] -= 12
+    if (notes.length >= 4) notes[3] += 12
+    else notes[2] += 12
+  }
+  return notes
+}
+
+/** Réplique exacte de compute_pattern (euclidean.rs) : distribution Bresenham
+ *  par seau (PAS Bjorklund malgré le nom du module), rotation vers la gauche. */
+const euclidPattern = (steps: number, pulses: number, rotation: number): boolean[] => {
+  const n = Math.min(32, Math.max(2, Math.round(steps)))
+  const k = Math.min(n, Math.max(0, Math.round(pulses)))
+  const pattern = new Array<boolean>(n).fill(false)
+  if (k === 0) return pattern
+  if (k >= n) return pattern.fill(true)
+  let bucket = 0
+  const rot = ((Math.round(rotation) % n) + n) % n
+  for (let i = 0; i < n; i += 1) {
+    bucket += k
+    if (bucket >= n) {
+      bucket -= n
+      pattern[(i + n - rot) % n] = true
+    }
+  }
+  return pattern
+}
+
+const gcd = (a: number, b: number): number => (b === 0 ? a : gcd(b, a % b))
 
 /** Plage de notes cadrée sur le contenu : marge ±5, span mini 24, bornes 21..108. */
 const rangeForNotes = (notes: SongNote[]): { lo: number; hi: number } => {
@@ -68,6 +158,11 @@ export const SongPianoRoll = ({
   sections,
   totalBars,
   stepSources,
+  genSources,
+  recState,
+  onRecArm,
+  onRecStop,
+  onRecCancel,
   notes,
   onChange,
   onClose,
@@ -79,6 +174,7 @@ export const SongPianoRoll = ({
   const [stepW, setStepW] = useState(7)
   const [range, setRange] = useState(() => rangeForNotes(notes))
   const [follow, setFollow] = useState(false)
+  const [recBars, setRecBars] = useState(4)
   const rows = range.hi - range.lo + 1
   const gridW = totalBars * 16 * stepW
   const gridH = rows * ROW_H
@@ -99,6 +195,16 @@ export const SongPianoRoll = ({
   useEffect(() => {
     rangeRef.current = range
   }, [range])
+
+  // Des notes peuvent arriver de l'EXTÉRIEUR du modal (fin d'un ⏺ REC) :
+  // étendre le cadrage vertical si elles sortent de la plage visible.
+  useEffect(() => {
+    if (notes.length === 0) return
+    const lo = Math.min(...notes.map((n) => n.note))
+    const hi = Math.max(...notes.map((n) => n.note))
+    const r = rangeRef.current
+    if (lo < r.lo || hi > r.hi) setRange(rangeForNotes(notes))
+  }, [notes])
 
   // Échap pour fermer
   useEffect(() => {
@@ -291,39 +397,120 @@ export const SongPianoRoll = ({
     velDragRef.current = false
   }
 
-  // ── Transfert step-seq → clip : une boucle du pattern insérée au playhead ──
-  // Conversion vérifiée (audit moteur) : note = pitch + 69 préserve le CV
-  // exactement (step-seq : CV = pitch/12 ; midi seq : CV = (note−69)/12).
-  const transferFromStepSeq = (src: SongStepSource) => {
-    if (!src.stepData) return
-    let steps: { pitch?: number; gate?: boolean; velocity?: number }[]
+  // ── Transfert séquenceur statique → clip : une boucle insérée au playhead ──
+  // Conversions de hauteur vérifiées (audit moteur) — le rack sonne à l'identique
+  // après recâblage sur le midi-file-sequencer (CV relu = (note−69)/12) :
+  //   step / poly : CV = pitch/12          → note = pitch + 69
+  //   chord       : CV = (note−60)/12     → note = note_accord + 9
+  //   euclid      : pas de pitch (gates)  → note fixe 69 (CV 0)
+  const playheadStartBar = () => {
+    if (!running) return 0
+    const { beats, at } = beatsInfoRef.current
+    // eslint-disable-next-line react-hooks/purity -- handler de clic, pas du rendu
+    const est = beats + ((performance.now() - at) / 1000) * (bpm / 60)
+    return Math.floor((est / 4) % totalBars)
+  }
+
+  const parseJson = (data: string | null): unknown[] | null => {
+    if (!data) return null
     try {
-      steps = JSON.parse(src.stepData)
+      const parsed = JSON.parse(data)
+      return Array.isArray(parsed) ? parsed : null
     } catch {
-      return
+      return null
     }
-    if (!Array.isArray(steps) || steps.length === 0) return
+  }
+
+  const transferFromSource = (src: SongStepSource) => {
     const rateBeats = RATE_DIVISIONS[src.rate]?.beats ?? 0.5
     const stepBars = rateBeats / 4
-    let startBar = 0
-    if (running) {
-      const { beats, at } = beatsInfoRef.current
-      // eslint-disable-next-line react-hooks/purity -- handler de clic, pas du rendu
-      const est = beats + ((performance.now() - at) / 1000) * (bpm / 60)
-      startBar = Math.floor((est / 4) % totalBars)
-    }
+    const dur = Math.max(SIXTEENTH / 2, stepBars * (src.gateLength / 100))
+    const startBar = playheadStartBar()
     const added: SongNote[] = []
-    steps.forEach((step, i) => {
-      if (!step.gate) return
-      const bar = startBar + i * stepBars
-      if (bar >= totalBars) return
-      added.push({
-        bar,
-        note: Math.round(step.pitch ?? 0) + 69,
-        dur: Math.max(SIXTEENTH / 2, stepBars * (src.gateLength / 100)),
-        vel: Math.min(1, Math.max(0.05, (step.velocity ?? 100) / 100)),
+    const clampVel = (v: number) => Math.min(1, Math.max(0.05, v))
+
+    if (src.kind === 'step') {
+      const steps = parseJson(src.stepData) as
+        | { pitch?: number; gate?: boolean; velocity?: number }[]
+        | null
+      if (!steps || steps.length === 0) return
+      steps.forEach((step, i) => {
+        if (!step.gate) return
+        const bar = startBar + i * stepBars
+        if (bar >= totalBars) return
+        added.push({
+          bar,
+          note: Math.round(step.pitch ?? 0) + 69,
+          dur,
+          vel: clampVel((step.velocity ?? 100) / 100),
+        })
       })
-    })
+    } else if (src.kind === 'chord') {
+      const steps = parseJson(src.stepData) as
+        | { root?: number; chordType?: number; inversion?: number; gate?: boolean }[]
+        | null
+      if (!steps || steps.length === 0) return
+      const count = Math.min(steps.length, Math.max(1, Math.round(src.length ?? 4)))
+      for (let i = 0; i < count; i += 1) {
+        const step = steps[i]
+        if (!step?.gate) continue
+        const bar = startBar + i * stepBars
+        if (bar >= totalBars) continue
+        for (const note of chordNotes(step.root ?? 60, step.chordType ?? 0, step.inversion ?? 0, src.voicing ?? 0)) {
+          added.push({ bar, note: note + 9, dur, vel: DEFAULT_VEL })
+        }
+      }
+    } else if (src.kind === 'poly') {
+      // stepData : liste plate {track, step, …} OU tableaux imbriqués par piste
+      // (défaut du registry) — le parseur moteur scanne les objets, on aplatit.
+      const flat = (parseJson(src.stepData)?.flat() ?? []) as {
+        track?: number
+        step?: number
+        pitch?: number
+        gate?: boolean
+        velocity?: number
+      }[]
+      if (flat.length === 0) return
+      const lengths = (src.trackLengths ?? [8, 12, 16, 7]).map((l) =>
+        Math.min(16, Math.max(1, Math.round(l))),
+      )
+      const mutes = src.trackMutes ?? []
+      const grid: ({ pitch: number; gate: boolean; velocity: number } | undefined)[][] = [[], [], [], []]
+      for (const s of flat) {
+        const t = Math.round(s.track ?? 0)
+        const i = Math.round(s.step ?? 0)
+        if (t < 0 || t > 3 || i < 0 || i > 15) continue
+        grid[t][i] = {
+          pitch: Math.round(s.pitch ?? 0),
+          gate: s.gate !== false,
+          velocity: s.velocity ?? 100,
+        }
+      }
+      const active = [0, 1, 2, 3].filter((t) => !mutes[t] && grid[t].some((s) => s?.gate))
+      if (active.length === 0) return
+      // Une boucle complète = LCM des longueurs actives (la polyrythmie ne se
+      // referme que là), plafonnée à ce qui tient jusqu'à la fin du song.
+      const cycle = active.map((t) => lengths[t]).reduce((a, b) => (a * b) / gcd(a, b), 1)
+      const count = Math.min(cycle, Math.max(1, Math.floor((totalBars - startBar) / stepBars)))
+      for (let i = 0; i < count; i += 1) {
+        const bar = startBar + i * stepBars
+        for (const t of active) {
+          const s = grid[t][i % lengths[t]]
+          if (!s?.gate) continue
+          added.push({ bar, note: s.pitch + 69, dur, vel: clampVel(s.velocity / 100) })
+        }
+      }
+    } else {
+      // euclid : rythme pur, une boucle du pattern sur une note fixe (69 = CV 0)
+      const pattern = euclidPattern(src.steps ?? 16, src.pulses ?? 4, src.rotation ?? 0)
+      pattern.forEach((on, i) => {
+        if (!on) return
+        const bar = startBar + i * stepBars
+        if (bar >= totalBars) return
+        added.push({ bar, note: 69, dur, vel: DEFAULT_VEL })
+      })
+    }
+
     if (added.length === 0) return
     const next = [...notesRef.current, ...added]
     onChange(next)
@@ -420,13 +607,60 @@ export const SongPianoRoll = ({
               key={src.id}
               type="button"
               className="song-pr-transfer"
-              disabled={!src.stepData}
-              onClick={() => transferFromStepSeq(src)}
-              title={`Insérer une boucle du pattern de « ${src.name} » au playhead (conversion pitch exacte, note = pitch + 69)`}
+              disabled={src.kind !== 'euclid' && !src.stepData}
+              onClick={() => transferFromSource(src)}
+              title={`Insérer une boucle du pattern de « ${src.name} » au playhead (conversion de hauteur exacte — le rack sonne à l'identique)`}
             >
               ⇐ {src.name}
             </button>
           ))}
+          {genSources.length > 0 && !recState && (
+            <>
+              <select
+                className="song-pr-recbars"
+                value={recBars}
+                onChange={(e) => setRecBars(Number(e.target.value))}
+                title="Durée de l'enregistrement (mesures)"
+              >
+                {REC_BAR_CHOICES.map((b) => (
+                  <option key={b} value={b}>
+                    {b} MES
+                  </option>
+                ))}
+              </select>
+              {genSources.map((src) => (
+                <button
+                  key={src.id}
+                  type="button"
+                  className="song-pr-transfer song-pr-rec"
+                  disabled={!running || !onRecArm}
+                  onClick={() => onRecArm?.(src.id, recBars)}
+                  title={
+                    running
+                      ? `Enregistrer ${recBars} mesures de « ${src.name} » (cv/gate) dans le clip — départ à la prochaine mesure`
+                      : 'PLAY d’abord : l’enregistrement se cale sur le transport en marche'
+                  }
+                >
+                  ⏺ {src.name}
+                </button>
+              ))}
+            </>
+          )}
+          {recState && (
+            <span className={`song-pr-recstate ${recState.phase}`}>
+              {recState.phase === 'armed'
+                ? '⏺ ARMÉ — départ à la prochaine mesure'
+                : `● REC ${Math.min(Math.floor(recState.beatsDone / 4) + 1, recState.beatsTotal / 4)}/${Math.round(recState.beatsTotal / 4)} MES`}
+              {recState.phase === 'recording' && (
+                <button type="button" className="song-pr-tool" onClick={onRecStop} title="Arrêter et garder ce qui est enregistré">
+                  ⏹
+                </button>
+              )}
+              <button type="button" className="song-pr-tool" onClick={onRecCancel} title="Annuler l'enregistrement">
+                ✕
+              </button>
+            </span>
+          )}
           <button type="button" className="song-pr-ok" onClick={onClose}>
             ✓ OK
           </button>

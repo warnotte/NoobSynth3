@@ -273,3 +273,71 @@ fn engine_sid_player() {
         .join()
         .unwrap();
 }
+
+#[test]
+fn engine_cv_recorder_captures_step_sequencer() {
+    // SONG mode phase 3 : le recorder cv/gate doit capturer exactement le
+    // pattern d'un step-sequencer (déterministe, transport-locked).
+    // 4 steps à la noire (rate=2), pitches 0/3/7/12 → notes 69/72/76/81.
+    let step_data = serde_json::json!([
+        { "pitch": 0,  "gate": true, "velocity": 100, "slide": false },
+        { "pitch": 3,  "gate": true, "velocity": 100, "slide": false },
+        { "pitch": 7,  "gate": true, "velocity": 100, "slide": false },
+        { "pitch": 12, "gate": true, "velocity": 100, "slide": false }
+    ]);
+    let payload = serde_json::json!({
+        "modules": [
+            { "id": "seq-1", "type": "step-sequencer", "params": {
+                "enabled": 1.0, "rate": 2, "gateLength": 50, "steps": 4, "swing": 0,
+                "stepData": step_data.to_string()
+            } },
+            { "id": "out-1", "type": "output", "params": { "level": 1.0 } }
+        ],
+        "connections": [],
+        "taps": []
+    });
+    let mut engine = GraphEngine::new(SAMPLE_RATE);
+    engine.set_graph_json(&payload.to_string()).expect("should load");
+
+    // Armer à transport 0 → départ immédiat (frontière de mesure), 1 mesure.
+    assert!(
+        engine.arm_cv_recorder("seq-1", "cv-out", "gate-out", "", 1),
+        "arm should succeed on a step-sequencer"
+    );
+    let status = engine.cv_recorder_status();
+    assert_eq!(status[0], 1.0, "recorder should be armed");
+
+    // 1 mesure à 120 BPM / 48 kHz = 96 000 samples = 750 blocs de 128.
+    let mut done = false;
+    for _ in 0..800 {
+        engine.render(FRAMES);
+        if engine.cv_recorder_status()[0] == 3.0 {
+            done = true;
+            break;
+        }
+    }
+    assert!(done, "recorder should auto-stop after 1 bar");
+
+    let events = engine.take_cv_recording();
+    assert_eq!(events.len(), 4 * 4, "expected 4 notes, got {:?}", events);
+    // Convention du step-seq (transport-locked) : il AVANCE à chaque frontière
+    // (beat 0 inclus) → au beat i sonne le step (i+1) % len. Le recorder
+    // capture ce qui SONNE, d'où la rotation d'un step vs stepData.
+    let expected_notes = [72.0, 76.0, 81.0, 69.0];
+    for (i, chunk) in events.chunks(4).enumerate() {
+        let (beat, note, vel, dur) = (chunk[0], chunk[1], chunk[2], chunk[3]);
+        assert!(
+            (beat - i as f64).abs() < 0.02,
+            "note {i}: beat {beat} should be ~{i}"
+        );
+        assert_eq!(note, expected_notes[i], "note {i}: pitch+69");
+        assert_eq!(vel, 100.0, "note {i}: default velocity");
+        assert!(
+            (dur - 0.5).abs() < 0.05,
+            "note {i}: gateLength 50% of a quarter = ~0.5 beat, got {dur}"
+        );
+    }
+
+    // Après take : recorder désarmé.
+    assert_eq!(engine.cv_recorder_status()[0], 0.0, "recorder should be idle after take");
+}

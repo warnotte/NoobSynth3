@@ -195,6 +195,24 @@ enum AudioCommand {
   GetTransportBeats {
     reply: mpsc::Sender<f64>,
   },
+  // SONG mode : recorder cv/gate (capture d'un séquenceur génératif)
+  ArmCvRecorder {
+    module_id: String,
+    cv_port: String,
+    gate_port: String,
+    vel_port: String,
+    bars: u32,
+    reply: mpsc::Sender<Result<bool, String>>,
+  },
+  CancelCvRecorder {
+    reply: mpsc::Sender<Result<(), String>>,
+  },
+  GetCvRecorderStatus {
+    reply: mpsc::Sender<Result<Vec<f64>, String>>,
+  },
+  TakeCvRecording {
+    reply: mpsc::Sender<Result<Vec<f64>, String>>,
+  },
 }
 
 const SCOPE_FRAMES: usize = 2048;
@@ -826,6 +844,49 @@ fn audio_thread(rx: mpsc::Receiver<AudioCommand>, scope: Arc<Mutex<ScopeSnapshot
           .and_then(|graph| graph.lock().ok().map(|engine| engine.get_transport_beats()))
           .unwrap_or(0.0);
         let _ = reply.send(beats);
+      }
+      AudioCommand::ArmCvRecorder { module_id, cv_port, gate_port, vel_port, bars, reply } => {
+        let result = if let Some(graph) = &state.graph {
+          match graph.lock() {
+            Ok(mut engine) => {
+              Ok(engine.arm_cv_recorder(&module_id, &cv_port, &gate_port, &vel_port, bars))
+            }
+            Err(_) => Err("graph engine unavailable".to_string()),
+          }
+        } else {
+          Ok(false)
+        };
+        let _ = reply.send(result);
+      }
+      AudioCommand::CancelCvRecorder { reply } => {
+        if let Some(graph) = &state.graph {
+          if let Ok(mut engine) = graph.lock() {
+            engine.cancel_cv_recorder();
+          }
+        }
+        let _ = reply.send(Ok(()));
+      }
+      AudioCommand::GetCvRecorderStatus { reply } => {
+        let result = if let Some(graph) = &state.graph {
+          match graph.lock() {
+            Ok(engine) => Ok(engine.cv_recorder_status()),
+            Err(_) => Err("graph engine unavailable".to_string()),
+          }
+        } else {
+          Ok(vec![0.0; 5])
+        };
+        let _ = reply.send(result);
+      }
+      AudioCommand::TakeCvRecording { reply } => {
+        let result = if let Some(graph) = &state.graph {
+          match graph.lock() {
+            Ok(mut engine) => Ok(engine.take_cv_recording()),
+            Err(_) => Err("graph engine unavailable".to_string()),
+          }
+        } else {
+          Ok(Vec::new())
+        };
+        let _ = reply.send(result);
       }
     }
   }
@@ -1908,6 +1969,73 @@ fn native_get_transport_beats(state: State<NativeAudioState>) -> Result<f64, Str
     .map_err(|_| "native audio thread unavailable".to_string())
 }
 
+// ── SONG mode : recorder cv/gate (parité avec armCvRecorderDirect Web) ──
+
+#[tauri::command]
+fn native_arm_cv_recorder(
+  state: State<NativeAudioState>,
+  module_id: String,
+  cv_port: String,
+  gate_port: String,
+  vel_port: Option<String>,
+  bars: u32,
+) -> Result<bool, String> {
+  let (reply_tx, reply_rx) = mpsc::channel();
+  state
+    .tx
+    .send(AudioCommand::ArmCvRecorder {
+      module_id,
+      cv_port,
+      gate_port,
+      vel_port: vel_port.unwrap_or_default(),
+      bars,
+      reply: reply_tx,
+    })
+    .map_err(|_| "native audio thread unavailable".to_string())?;
+  reply_rx
+    .recv()
+    .map_err(|_| "native audio thread unavailable".to_string())?
+}
+
+#[tauri::command]
+fn native_cancel_cv_recorder(state: State<NativeAudioState>) -> Result<(), String> {
+  let (reply_tx, reply_rx) = mpsc::channel();
+  state
+    .tx
+    .send(AudioCommand::CancelCvRecorder { reply: reply_tx })
+    .map_err(|_| "native audio thread unavailable".to_string())?;
+  reply_rx
+    .recv()
+    .map_err(|_| "native audio thread unavailable".to_string())?
+}
+
+/// Status : [phase (0 aucun/1 armé/2 rec/3 fini), beats_faits, beats_total,
+/// nb_events, start_beat]
+#[tauri::command]
+fn native_get_cv_recorder_status(state: State<NativeAudioState>) -> Result<Vec<f64>, String> {
+  let (reply_tx, reply_rx) = mpsc::channel();
+  state
+    .tx
+    .send(AudioCommand::GetCvRecorderStatus { reply: reply_tx })
+    .map_err(|_| "native audio thread unavailable".to_string())?;
+  reply_rx
+    .recv()
+    .map_err(|_| "native audio thread unavailable".to_string())?
+}
+
+/// Draine l'enregistrement ([beat, note, vel, dur] × N) et désarme le recorder.
+#[tauri::command]
+fn native_take_cv_recording(state: State<NativeAudioState>) -> Result<Vec<f64>, String> {
+  let (reply_tx, reply_rx) = mpsc::channel();
+  state
+    .tx
+    .send(AudioCommand::TakeCvRecording { reply: reply_tx })
+    .map_err(|_| "native audio thread unavailable".to_string())?;
+  reply_rx
+    .recv()
+    .map_err(|_| "native audio thread unavailable".to_string())?
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
   let args: Vec<String> = std::env::args().collect();
@@ -1965,6 +2093,11 @@ pub fn run() {
       native_reset_transport,
       native_get_transport_beats,
       native_set_transport_beats,
+      // SONG mode : recorder cv/gate
+      native_arm_cv_recorder,
+      native_cancel_cv_recorder,
+      native_get_cv_recorder_status,
+      native_take_cv_recording,
     ])
     .setup(move |app| {
       if cfg!(debug_assertions) {

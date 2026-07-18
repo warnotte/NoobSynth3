@@ -130,15 +130,61 @@ durée = pas × gateLength% ; le cadrage vertical se recale après transfert.
 = `moduleDefaults[type]` ∪ params posés, hors STRING_PARAMS — + bornes Min/Max saisies,
 préremplies 0 et 2× la valeur courante). La lane est une courbe de points `{bar, v 0..1}`
 éditable inline (clic = point, drag = déplacer, alt-clic = supprimer), dénormalisée
-linéairement Min..Max. Le scheduler l'évalue en continu (rAF) et pousse les **deltas
-seulement** (> 0.2 % de la plage) via `onAutoRef` → `setParamDirect`/`native_set_param`.
+Min..Max. Le scheduler l'évalue en continu (rAF) et pousse les **deltas
+seulement** via `onAutoRef` → `setParamDirect`/`native_set_param`.
 **Non destructif : moteur uniquement** — le graphe garde ses valeurs de base (les knobs
-UI ne bougent pas ; stop/restart restaure le patch). Interpolation linéaire (pas de
-loi log pour les fréquences — borner la plage du cutoff plutôt que 20..20000).
+UI ne bougent pas ; stop/restart restaure le patch).
 
-- Restes (voir docs/SONG_MODE_PLAN.md) : recorder cv/gate pour les séquenceurs
-  génératifs (phase 3), Ctrl+Z contextuel dans la vue Song, loi log optionnelle pour
-  l'automation des fréquences.
+**Loi LOG (phase 3) :** toggle `LIN|LOG` dans le picker, **auto-sélectionné pour les
+params `freq|cutoff`** (volontairement PAS `rate` : souvent un index de division chez
+les séquenceurs). En LOG la dénormalisation est `min·(max/min)^v` — chaque octave
+occupe la même portion de courbe (un balayage linéaire de cutoff passe 90 % du temps
+dans l'aigu) ; exige `min > 0` (préremplissage `max/32`, plancher `max/100` au confirm,
+repli linéaire sinon). Seuil de delta **relatif** (~0,3 % ≈ 5 cents) en LOG, absolu
+(0,2 % du span) en LIN — sinon marches audibles dans les graves. Le champ `log` vit sur
+`SongAutoLane` (persisté projet), le label de lane gagne « · LOG ».
+
+**⏺ REC — recorder cv/gate moteur (phase 3) :** les séquenceurs GÉNÉRATIFS
+(arpeggiator, turing-machine, gravity-sequencer) ne sont pas extractibles statiquement →
+le moteur les **enregistre**. `CvRecorder` (`crates/dsp-graph/src/recorder.rs`, un seul
+à la fois, champ de `GraphEngine`) : armé sur un module + ports de sortie cv/gate, il
+attend la **prochaine frontière de mesure** (4/4, `transport_beats`), capture N mesures
+d'événements (front montant de gate → note = `round(CV×12)+69` samplé au front, vélocité
+optionnelle sinon 100), clôt la note ouverte à la fin, s'auto-stoppe. Scan dans `render()`
+juste après la boucle des modules (les `output_buffers` du bloc + `transport.beats` sont
+cohérents à cet endroit) ; module/ports re-résolus par id à chaque bloc → un rebuild du
+graphe est inoffensif ; `set_graph_fresh` (preset) le purge.
+- **API moteur** : `arm_cv_recorder(id, cv, gate, vel, bars) -> bool` ·
+  `cv_recorder_status() -> [phase, faits, total, n, start_beat]` ·
+  `take_cv_recording() -> [beat, note, vel, dur]×N` (stop anticipé inclus : clôt et draine) ·
+  `cancel_cv_recorder()`.
+- **Web** : worklet (messages `armCvRecorder`/`cancelCvRecorder`/`takeCvRecording`, poll
+  status ~20 ms, auto-drain à Done → `cvRecorderDone`) + `WasmGraphEngine.armCvRecorderDirect`
+  (id engine complet, comme `setParamDirect`) / `watchCvRecorder(onStatus, onDone)`.
+- **Tauri (parité)** : `native_arm_cv_recorder` / `native_cancel_cv_recorder` /
+  `native_get_cv_recorder_status` / `native_take_cv_recording` (poll 200 ms côté App).
+- **UI** (piano-roll) : sélecteur 1/2/4/8/16 MES + bouton `⏺ <génératif>` (exige la
+  lecture en cours), chip d'état ARMÉ → ● REC x/y MES avec ⏹ (stop = garder) et ✕
+  (annuler). Les notes se posent à la mesure où elles ont été JOUÉES (mesure de départ
+  modulo la longueur du song), via `changeSong` (undo arrangement OK) ; le cadrage
+  vertical du piano-roll s'étend aux notes arrivées de l'extérieur.
+- Vérifié : test moteur `engine_cv_recorder_captures_step_sequencer` (capture exacte
+  d'un step-seq déterministe — NOTE : le step-seq transport-locked AVANCE à chaque
+  frontière, à beat i sonne le step `(i+1) % len`) + E2E `test-song-rec.mjs` (turing
+  clocké enregistré en vraie lecture).
+
+**Transferts statiques restants (phase 3) :** le bouton `⇐` du piano-roll couvre
+maintenant **chord-sequencer** (réplique TS de `build_chord` — tables d'accords,
+inversion, spread ; base CV 60 → **note = accord + 9** pour préserver la hauteur),
+**polyrhythm-sequencer** (4 pistes, longueurs indépendantes, déroulé sur le **LCM des
+longueurs actives** plafonné à la fin du song, mutes respectés, note = pitch + 69) et
+**euclidean** (réplique de `compute_pattern` — Bresenham par seau, PAS Bjorklund —,
+rythme pur sur note fixe 69 = CV 0). Sources construites dans App (`songStepSources`,
+défauts registry ∪ params posés — un module fraîchement importé est transférable).
+
+- Restes (voir docs/SONG_MODE_PLAN.md) : asservissement transport du
+  midi-file-sequencer / quantisation moteur des swaps (conditionnels — « si la dérive
+  ou le seek le justifient »).
 
 ### Module Templates
 Groupes de modules pré-câblés réutilisables.

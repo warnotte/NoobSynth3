@@ -78,6 +78,9 @@ type GraphMessage =
   | { type: 'setTransportBeats'; beats: number }
   | { type: 'setMasterFxParam'; param: string; value: number }
   | { type: 'watchGol'; moduleIds: string[] }
+  | { type: 'armCvRecorder'; moduleId: string; cvPort: string; gatePort: string; velPort: string; bars: number }
+  | { type: 'cancelCvRecorder' }
+  | { type: 'takeCvRecording' }
   | { type: 'dispose' }
 
 class WasmGraphProcessor extends AudioWorkletProcessor {
@@ -98,6 +101,7 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
   private watchedMeters: string[] = []
   private watchedTheremins: string[] = []
   private messageQueue: GraphMessage[] = []
+  private cvRecorderActive = false
   private cpuLoadEnabled = false
   private cpuLoadAccum = 0
   private cpuLoadSamples = 0
@@ -294,6 +298,32 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
       case 'setMasterFxParam':
         this.engine!.set_master_fx_param(message.param, message.value)
         break
+      case 'armCvRecorder': {
+        const ok = this.engine!.arm_cv_recorder(
+          message.moduleId,
+          message.cvPort,
+          message.gatePort,
+          message.velPort,
+          message.bars,
+        )
+        this.cvRecorderActive = ok
+        if (!ok) {
+          // Module/ports introuvables : signaler l'échec (status idle) tout de suite.
+          this.port.postMessage({ type: 'cvRecorderStatus', status: [0, 0, 0, 0, 0] })
+        }
+        break
+      }
+      case 'cancelCvRecorder':
+        this.engine!.cancel_cv_recorder()
+        this.cvRecorderActive = false
+        break
+      case 'takeCvRecording': {
+        // Stop anticipé : draine ce qui est capturé (clôt la note ouverte côté moteur).
+        const events = this.engine!.take_cv_recording()
+        this.cvRecorderActive = false
+        this.port.postMessage({ type: 'cvRecorderDone', events: Array.from(events) })
+        break
+      }
       default:
         break
     }
@@ -413,6 +443,21 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
       }
       if (Object.keys(updates).length > 0) {
         this.port.postMessage({ type: 'sequencerSteps', steps: updates })
+      }
+    }
+
+    // Poll cv/gate recorder (SONG mode) — auto-drain à la fin de l'enregistrement
+    if (shouldPoll && this.cvRecorderActive) {
+      const status = this.engine.cv_recorder_status()
+      this.port.postMessage({ type: 'cvRecorderStatus', status: Array.from(status) })
+      if (status[0] === 3) {
+        const events = this.engine.take_cv_recording()
+        this.cvRecorderActive = false
+        this.port.postMessage({ type: 'cvRecorderDone', events: Array.from(events) })
+      } else if (status[0] === 0) {
+        // Le moteur a perdu le recorder (ex. set_graph_fresh) : cesser de poller,
+        // le status idle posté ci-dessus signale l'abandon à l'UI.
+        this.cvRecorderActive = false
       }
     }
 

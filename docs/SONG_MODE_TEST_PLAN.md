@@ -18,6 +18,8 @@
 | E2E `test-song-features.mjs` | Patterns A/B/FILL, undo, transfert (4 notes), vélo, automation | ✅ tout vert |
 | E2E `test-song-proto.mjs` | Studio Song : mode armé au chargement, seek 58%→DROP / 8%→INTRO | ✅ |
 | E2E `test-nova.mjs` (DUO) | 2 lanes ♪, piano-roll 113 notes, seek 72%→LA VOIX 8/8 (position exacte) | ✅ (message du test corrigé) |
+| E2E `test-song-rec.mjs` (phase 3, 2026-07-19) | Transferts ⇐ Chords (12 notes = 4 accords × 3) + ⇐ Euclid (+4) ; **⏺ REC** d'un turing clocké en vraie lecture → 16 notes capturées | ✅ |
+| Test moteur `engine_cv_recorder_captures_step_sequencer` | Recorder cv/gate : capture exacte (beats/notes/vélo/durées) d'un step-seq déterministe | ✅ |
 | Banc offline ×7 | nova 0.797 · nova-2 0.956 · nova-3 0.966 · nova-64 0.991 · æterna 1.203 · duo 1.042 · studio-song 1.211 — **nan=0 partout**, aucun silence | ✅ (peaks >1 = artefact du banc sans volumes mixer) |
 
 ---
@@ -67,6 +69,7 @@ Sur **DUO ∞** (ou NOVA), transport en marche.
 - [ ] Poser une note (clic + étirer), la supprimer (alt-clic)
 - [ ] **Bande VÉLO** (scroller en bas du modal) : drag sur une barre → la note joue plus fort/doux
 - [ ] **Transfert step-seq** : charger le preset **Take On Me** (step-seq), ajouter un module **MIDI File Sequencer** depuis la librairie, vue SONG → +♪ → bouton « ⇐ Steps » dans le piano-roll → les notes du step-seq apparaissent ; **câbler** cv-1/gate-1 du MIDI seq à la place du step-seq → ça joue la même mélodie, à la même hauteur
+- [ ] **(phase 3) ⏺ REC d'un génératif** : sur un rack avec un turing-machine clocké (ou un arpeggiator qui joue) + un MIDI File Sequencer, transport EN MARCHE, piano-roll → sélecteur « 4 MES » → `⏺ <nom>` → chip « ARMÉ » puis « ● REC x/4 » → à la fin les notes jouées apparaissent, posées à la mesure où elles ont sonné ; ⏹ en cours de route garde le partiel, ✕ annule
 
 **Questions :**
 1. L'édition pendant la lecture est-elle confortable (re-seek transparent) ?
@@ -82,7 +85,7 @@ Charger le preset **909 House** (drum-sequencer), transport en marche.
 - [ ] Vue SONG → **+▦** → lane de chips ; vue RACKS : éditer la grille du drum-seq (variation) → retour SONG → **B⟳** (capture) ; assigner section 1 = A, section 2 = B
 - [ ] MODE SONG + PLAY : **le pattern change à la frontière de section — le beat reste calé, AUCUN trou ni glitch** (le point critique de cette feature)
 - [ ] Chip sur « — » → le pattern courant est conservé (pas de changement)
-- [ ] **+⚙** → picker : choisir le VCF (ou un filtre audible) → `cutoff`, Min 200, Max 3000 → AJOUTER ; dessiner une montée sur 8 mesures → PLAY : **le balayage s'entend**, progressif, sans zipper audible
+- [ ] **+⚙** → picker : choisir le VCF (ou un filtre audible) → `cutoff` (**LOG se sélectionne tout seul**, Min prérempli > 0), Min 200, Max 3000 → AJOUTER ; dessiner une montée sur 8 mesures → PLAY : **le balayage s'entend**, progressif, sans zipper audible — et en LOG la montée sonne régulière (les graves ne défilent pas d'un coup)
 - [ ] Stop → Play : le patch repart avec ses valeurs de BASE (l'automation est non destructive) ; les knobs du rack n'ont pas bougé
 - [ ] Supprimer la lane ⚙ (×) en cours de lecture → pas d'erreur (le param reste à sa dernière valeur jusqu'au restart — comportement assumé)
 

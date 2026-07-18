@@ -7667,8 +7667,9 @@ body {
   padding: 6px 8px;
   box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.7);
 }
-.sap-range { display: flex; gap: 10px; }
+.sap-range { display: flex; gap: 10px; align-items: flex-end; }
 .sap-range label { flex: 1; }
+.sap-law { display: flex; gap: 2px; padding-bottom: 1px; }
 .sap-hint {
   font-size: 8.5px;
   letter-spacing: 0.04em;
@@ -8067,3 +8068,37 @@ body {
   white-space: nowrap;
 }
 .song-pr-transfer:disabled { opacity: 0.4; cursor: default; }
+
+/* ⏺ REC (piano-roll) : durée + boutons génératifs + état armé/enregistre */
+.song-pr-recbars {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  padding: 5px 4px;
+  border-radius: 4px;
+  border: 1px solid #05070a;
+  color: var(--accent-rose);
+  background: linear-gradient(180deg, #232d38, #151b22);
+}
+.song-pr-rec { color: var(--accent-rose); }
+.song-pr-recstate {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--accent-rose);
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 111, 174, 0.35);
+  background: rgba(255, 111, 174, 0.08);
+  white-space: nowrap;
+}
+.song-pr-recstate.recording {
+  animation: song-rec-blink 1s steps(2, start) infinite;
+}
+@keyframes song-rec-blink {
+  0% { border-color: rgba(255, 111, 174, 0.7); }
+  50% { border-color: rgba(255, 111, 174, 0.25); }
+}

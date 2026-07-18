@@ -221,4 +221,33 @@ impl WasmGraphEngine {
   pub fn get_transport_beats(&self) -> f64 {
     self.engine.get_transport_beats()
   }
+
+  /// SONG mode — arm the cv/gate recorder on a generative sequencer.
+  /// Recording starts at the next bar boundary and lasts `bars` bars (4/4).
+  /// Empty `vel_port` = fixed velocity 100. Returns false if module/ports missing.
+  pub fn arm_cv_recorder(
+    &mut self,
+    module_id: &str,
+    cv_port: &str,
+    gate_port: &str,
+    vel_port: &str,
+    bars: u32,
+  ) -> bool {
+    self.engine.arm_cv_recorder(module_id, cv_port, gate_port, vel_port, bars)
+  }
+
+  pub fn cancel_cv_recorder(&mut self) {
+    self.engine.cancel_cv_recorder();
+  }
+
+  /// Recorder status: [phase (0 none/1 armed/2 recording/3 done), beats_done,
+  /// beats_total, event_count, start_beat]
+  pub fn cv_recorder_status(&self) -> Vec<f64> {
+    self.engine.cv_recorder_status()
+  }
+
+  /// Drain the recording as [beat, note, vel, dur] × N and disarm the recorder.
+  pub fn take_cv_recording(&mut self) -> Vec<f64> {
+    self.engine.take_cv_recording()
+  }
 }

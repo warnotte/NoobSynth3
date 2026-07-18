@@ -34,9 +34,12 @@ export type SongPatternLane = {
   states: Record<string, SongPatternSlot | undefined>
 }
 /** Lane ⚙ AUTOMATION : courbe de points {bar, v 0..1} → un param numérique
- *  d'un module du rack (dénormalisé min..max, interp. linéaire). Écrit au
- *  MOTEUR uniquement pendant la lecture — non destructif : le graphe garde
- *  ses valeurs de base (restaurées au restart). */
+ *  d'un module du rack (dénormalisé min..max). Écrit au MOTEUR uniquement
+ *  pendant la lecture — non destructif : le graphe garde ses valeurs de base
+ *  (restaurées au restart). `log: true` = dénormalisation logarithmique
+ *  min·(max/min)^v — la loi naturelle des FRÉQUENCES (cutoff, freq…) : un
+ *  balayage linéaire y passe 90 % du temps dans l'aigu ; en log chaque octave
+ *  occupe la même portion de courbe. Exige min > 0 (sinon repli linéaire). */
 export type SongAutoLane = {
   moduleId: string
   paramId: string
@@ -44,6 +47,7 @@ export type SongAutoLane = {
   label: string
   min: number
   max: number
+  log?: boolean
   points: SongVolumePoint[]
 }
 export type SongAutoWrite = { rackId: string; moduleId: string; paramId: string; value: number }
@@ -232,10 +236,21 @@ export function useSongPlayer({
             for (const lane of lanes) {
               if (lane.points.length === 0) continue
               const v = volumeCurveAt(lane.points, pos.barGlobal)
-              const value = lane.min + v * (lane.max - lane.min)
+              const useLog = lane.log === true && lane.min > 0 && lane.max > 0
+              const value = useLog
+                ? lane.min * Math.pow(lane.max / lane.min, v)
+                : lane.min + v * (lane.max - lane.min)
               const key = `${rackId}/${lane.moduleId}/${lane.paramId}`
-              const span = Math.abs(lane.max - lane.min)
-              if (!(key in lastAuto) || Math.abs(value - lastAuto[key]) > span * 0.002) {
+              // Seuil de delta : absolu (0,2 % du span) en linéaire ; RELATIF
+              // (~0,3 % ≈ 5 cents) en log, sinon les graves — où l'oreille est
+              // la plus fine — avanceraient par marches audibles.
+              const last = lastAuto[key]
+              const changed =
+                last === undefined ||
+                (useLog
+                  ? Math.abs(value - last) > Math.abs(last) * 0.003
+                  : Math.abs(value - last) > Math.abs(lane.max - lane.min) * 0.002)
+              if (changed) {
                 lastAuto[key] = value
                 writes.push({ rackId, moduleId: lane.moduleId, paramId: lane.paramId, value })
               }

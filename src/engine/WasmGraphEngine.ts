@@ -234,6 +234,56 @@ export class AudioEngine {
     this.graphNode?.port.postMessage({ type: 'setTransportBeats', beats })
   }
 
+  // ── SONG mode : recorder cv/gate (capture d'un séquenceur génératif) ──
+
+  private cvRecorderStatusCallback: ((status: number[]) => void) | null = null
+  private cvRecorderDoneCallback: ((events: number[]) => void) | null = null
+
+  /**
+   * Abonnement singleton au recorder cv/gate. `onStatus` reçoit
+   * [phase (0 aucun/1 armé/2 rec/3 fini), beatsFaits, beatsTotal, nbEvents,
+   * startBeat] ; `onDone` reçoit les événements drainés [beat, note, vel, dur]×N.
+   */
+  watchCvRecorder(
+    onStatus: (status: number[]) => void,
+    onDone: (events: number[]) => void,
+  ): () => void {
+    this.cvRecorderStatusCallback = onStatus
+    this.cvRecorderDoneCallback = onDone
+    return () => {
+      this.cvRecorderStatusCallback = null
+      this.cvRecorderDoneCallback = null
+    }
+  }
+
+  /** Arme le recorder. `engineModuleId` = id complet côté moteur (`rackId/moduleId`),
+   *  comme `setParamDirect` — la lane SONG peut viser un rack non actif. */
+  armCvRecorderDirect(
+    engineModuleId: string,
+    cvPort: string,
+    gatePort: string,
+    bars: number,
+    velPort = '',
+  ): void {
+    this.graphNode?.port.postMessage({
+      type: 'armCvRecorder',
+      moduleId: engineModuleId,
+      cvPort,
+      gatePort,
+      velPort,
+      bars,
+    })
+  }
+
+  cancelCvRecorder(): void {
+    this.graphNode?.port.postMessage({ type: 'cancelCvRecorder' })
+  }
+
+  /** Stop anticipé : draine l'enregistrement en cours → callback `onDone`. */
+  takeCvRecording(): void {
+    this.graphNode?.port.postMessage({ type: 'takeCvRecording' })
+  }
+
   /** Send a param directly using the full engine-side module ID (bypasses moduleIdMapper). */
   setParamDirect(engineModuleId: string, paramId: string, value: number): void {
     this.graphNode?.port.postMessage({
@@ -705,11 +755,15 @@ export class AudioEngine {
 
     // Listen for messages from the worklet
     this.graphNode.port.onmessage = (event) => {
-      const data = event.data as { type: string; steps?: Record<string, number>; positions?: Record<string, number> | number[]; data?: number[]; voices?: Record<string, number[]>; elapsed?: Record<string, number>; moduleId?: string; peakL?: number; peakR?: number; grid?: number[]; step?: number; beats?: number; x?: number; y?: number; gate?: boolean }
+      const data = event.data as { type: string; steps?: Record<string, number>; positions?: Record<string, number> | number[]; data?: number[]; voices?: Record<string, number[]>; elapsed?: Record<string, number>; moduleId?: string; peakL?: number; peakR?: number; grid?: number[]; step?: number; beats?: number; x?: number; y?: number; gate?: boolean; status?: number[]; events?: number[] }
       if (data.type === 'transportBeats' && data.beats != null) {
         if (this.transportBeatsCallback) {
           this.transportBeatsCallback(data.beats)
         }
+      } else if (data.type === 'cvRecorderStatus' && data.status) {
+        this.cvRecorderStatusCallback?.(data.status)
+      } else if (data.type === 'cvRecorderDone' && data.events) {
+        this.cvRecorderDoneCallback?.(data.events)
       } else if (data.type === 'cpuLoad') {
         const cpuData = data as { type: string; avg: number; peak: number }
         if (this.cpuLoadCallback) {

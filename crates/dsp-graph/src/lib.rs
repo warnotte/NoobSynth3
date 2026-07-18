@@ -5,6 +5,7 @@ mod ports;
 mod process;
 mod instantiate;
 mod module_type;
+mod recorder;
 
 use dsp_core::{Sample, MARIO_CHANNELS};
 use dsp_core::effects::eq3::{Eq3, Eq3Inputs, Eq3Params};
@@ -16,6 +17,7 @@ pub use buffer::{Buffer, mix_buffers, downmix_to_mono};
 pub use state::*;
 pub use ports::{input_ports, output_ports, input_port_index, output_port_index};
 use module_type::normalize_module_type;
+use recorder::{CvRecorder, RecPhase};
 use serde::Deserialize;
 use std::collections::{HashMap, VecDeque};
 
@@ -83,6 +85,8 @@ pub struct GraphEngine {
   external_input_frames: usize,
   transport_beats: f64,
   transport_tempo: f32,
+  // SONG mode : recorder cv/gate (un seul à la fois), voir recorder.rs
+  cv_recorder: Option<CvRecorder>,
   // Master bus FX
   master_eq: Eq3,
   master_comp: Compressor,
@@ -119,6 +123,7 @@ impl GraphEngine {
       external_input_frames: 0,
       transport_beats: 0.0,
       transport_tempo: 120.0,
+      cv_recorder: None,
       master_eq: Eq3::new(sample_rate),
       master_comp: Compressor::new(sample_rate),
       master_eq_low: 0.0,
@@ -197,6 +202,134 @@ impl GraphEngine {
 
   pub fn get_transport_beats(&self) -> f64 {
     self.transport_beats
+  }
+
+  /// SONG mode — arme le recorder cv/gate sur un module (séquenceur génératif).
+  /// L'enregistrement démarre à la prochaine frontière de mesure du transport
+  /// (4/4) et couvre `bars` mesures. Un seul recorder à la fois (ré-armer
+  /// remplace). `vel_port` vide = pas de sortie vélocité (vel fixe 100).
+  /// Retourne false si le module ou un port cv/gate est introuvable.
+  pub fn arm_cv_recorder(
+    &mut self,
+    module_id: &str,
+    cv_port: &str,
+    gate_port: &str,
+    vel_port: &str,
+    bars: u32,
+  ) -> bool {
+    let valid = self
+      .module_map
+      .get(module_id)
+      .and_then(|list| list.first())
+      .and_then(|&idx| self.modules.get(idx))
+      .map(|module| {
+        output_port_index(module.module_type, cv_port).is_some()
+          && output_port_index(module.module_type, gate_port).is_some()
+      })
+      .unwrap_or(false);
+    if !valid {
+      self.cv_recorder = None;
+      return false;
+    }
+    let vel = if vel_port.is_empty() { None } else { Some(vel_port.to_string()) };
+    self.cv_recorder = Some(CvRecorder::new(
+      module_id.to_string(),
+      cv_port.to_string(),
+      gate_port.to_string(),
+      vel,
+      bars,
+      self.transport_beats,
+    ));
+    true
+  }
+
+  pub fn cancel_cv_recorder(&mut self) {
+    self.cv_recorder = None;
+  }
+
+  /// État du recorder : `[phase, beats_faits, beats_total, nb_events, start_beat]`
+  /// avec phase 0 = aucun, 1 = armé, 2 = enregistre, 3 = terminé.
+  pub fn cv_recorder_status(&self) -> Vec<f64> {
+    match &self.cv_recorder {
+      None => vec![0.0, 0.0, 0.0, 0.0, 0.0],
+      Some(rec) => {
+        let phase = match rec.phase {
+          RecPhase::Armed => 1.0,
+          RecPhase::Recording => 2.0,
+          RecPhase::Done => 3.0,
+        };
+        vec![
+          phase,
+          rec.beats_done(self.transport_beats),
+          rec.end_beat - rec.start_beat,
+          rec.event_count() as f64,
+          rec.start_beat,
+        ]
+      }
+    }
+  }
+
+  /// Draine l'enregistrement : `[beat, note, vel, dur] × N` (beats relatifs au
+  /// départ de l'enregistrement). Si l'enregistrement est encore en cours (stop
+  /// anticipé), clôt la note ouverte à la position courante. Désarme le recorder.
+  pub fn take_cv_recording(&mut self) -> Vec<f64> {
+    let Some(mut rec) = self.cv_recorder.take() else {
+      return Vec::new();
+    };
+    rec.finalize(self.transport_beats);
+    let events = rec.take_events();
+    let mut out = Vec::with_capacity(events.len() * 4);
+    for e in events {
+      out.push(e.beat);
+      out.push(f64::from(e.note));
+      out.push(f64::from(e.vel));
+      out.push(e.dur);
+    }
+    out
+  }
+
+  /// Fait avancer le recorder sur le bloc qui vient d'être rendu (appelé par
+  /// `render` avant l'avance du transport, pour lire `output_buffers` en phase
+  /// avec `transport.beats`). Résout module et ports par id à chaque bloc :
+  /// un rebuild du graphe (indices invalidés) est ainsi inoffensif.
+  fn scan_cv_recorder(&mut self, frames: usize, transport: &TransportContext) {
+    let Some(rec) = self.cv_recorder.as_mut() else { return };
+    if rec.phase == RecPhase::Done {
+      return;
+    }
+    let Some(&idx) = self.module_map.get(&rec.module_id).and_then(|list| list.first()) else {
+      // Module disparu (suppression / rebuild) : clore proprement.
+      rec.finalize(transport.beats);
+      return;
+    };
+    let Some(module) = self.modules.get(idx) else {
+      rec.finalize(transport.beats);
+      return;
+    };
+    let cv_port = output_port_index(module.module_type, &rec.cv_port);
+    let gate_port = output_port_index(module.module_type, &rec.gate_port);
+    let (Some(cv_port), Some(gate_port)) = (cv_port, gate_port) else {
+      rec.finalize(transport.beats);
+      return;
+    };
+    let outputs = &self.output_buffers[idx];
+    let (Some(cv_buf), Some(gate_buf)) = (outputs.get(cv_port), outputs.get(gate_port)) else {
+      rec.finalize(transport.beats);
+      return;
+    };
+    let vel_buf = rec
+      .vel_port
+      .as_deref()
+      .and_then(|port| output_port_index(module.module_type, port))
+      .and_then(|p| outputs.get(p));
+    rec.scan(
+      cv_buf.channel(0),
+      gate_buf.channel(0),
+      vel_buf.map(|b| b.channel(0)),
+      frames,
+      transport.beats,
+      transport.beats_per_sample,
+    );
   }
 
   pub fn set_master_fx_param(&mut self, param: &str, value: f32) {
@@ -693,6 +826,8 @@ impl GraphEngine {
       module.process(inputs, outputs, frames, self.sample_rate, transport);
     }
 
+    self.scan_cv_recorder(frames, &transport);
+
     self.transport_beats += frames as f64 * (self.transport_tempo as f64 / 60.0 / self.sample_rate as f64);
 
     self.main_buffer.resize(2, frames);
@@ -787,6 +922,7 @@ impl GraphEngine {
   fn set_graph_fresh(&mut self, graph: GraphPayload) {
     self.set_graph_inner(graph, false);
     self.transport_beats = 0.0;
+    self.cv_recorder = None;
   }
 
   fn set_graph_inner(&mut self, graph: GraphPayload, preserve_state: bool) {

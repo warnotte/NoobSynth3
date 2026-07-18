@@ -52,11 +52,13 @@ import { RackView } from './ui/RackView'
 import { MixerConsole, type MixerChannelState } from './ui/MixerConsole'
 import { RackTabs, type ViewMode } from './ui/RackTabs'
 import { SongView } from './ui/SongView'
+import type { SongRecState, SongStepSource } from './ui/SongPianoRoll'
 import {
   useSongPlayer,
   defaultSongState,
   songPositionAt,
   songTotalBars,
+  type SongNote,
   type SongState,
   type SongPatternSlot,
   type SongAutoWrite,
@@ -2386,23 +2388,80 @@ function App() {
     return map
   }, [racks, activeRackId, graph])
 
-  // rackId -> step-sequencers du rack (sources du transfert step-seq → clip ♪)
+  // rackId -> séquenceurs STATIQUES du rack (sources du transfert → clip ♪) :
+  // step-sequencer + chord/polyrhythm/euclidean (phase 3). La conversion en
+  // notes vit dans SongPianoRoll (transferFromSource, algos moteur répliqués).
   const songStepSources = useMemo(() => {
-    const map: Record<
-      string,
-      { id: string; name: string; stepData: string | null; rate: number; gateLength: number }[]
-    > = {}
+    const map: Record<string, SongStepSource[]> = {}
+    for (const rack of racks) {
+      const g = rack.id === activeRackId ? graph : rack.graph
+      const out: SongStepSource[] = []
+      for (const m of g.modules) {
+        // Défauts registry + params posés : un module fraîchement ajouté/importé
+        // sans stepData explicite joue son pattern par défaut — le transfert
+        // doit voir la même chose que le moteur.
+        const p: Record<string, unknown> = { ...(moduleDefaults[m.type] ?? {}), ...m.params }
+        const base = {
+          id: m.id,
+          name: m.name ?? m.id,
+          stepData: typeof p.stepData === 'string' ? p.stepData : null,
+        }
+        if (m.type === 'step-sequencer') {
+          out.push({
+            ...base,
+            kind: 'step',
+            rate: Number(p.rate ?? 3),
+            gateLength: Number(p.gateLength ?? 80),
+          })
+        } else if (m.type === 'chord-sequencer') {
+          out.push({
+            ...base,
+            kind: 'chord',
+            rate: Number(p.rate ?? 2),
+            gateLength: Number(p.gateLength ?? 50),
+            length: Number(p.length ?? 4),
+            voicing: Number(p.voicing ?? 0),
+          })
+        } else if (m.type === 'polyrhythm-sequencer') {
+          out.push({
+            ...base,
+            kind: 'poly',
+            rate: Number(p.rate ?? 3),
+            gateLength: Number(p.gateLength ?? 50),
+            trackLengths: [1, 2, 3, 4].map((t) =>
+              Number(p[`track${t}Length`] ?? [8, 12, 16, 7][t - 1]),
+            ),
+            trackMutes: [1, 2, 3, 4].map((t) => Boolean(p[`track${t}Mute`] ?? false)),
+          })
+        } else if (m.type === 'euclidean') {
+          out.push({
+            ...base,
+            kind: 'euclid',
+            rate: Number(p.rate ?? 4),
+            gateLength: Number(p.gateLength ?? 50),
+            steps: Number(p.steps ?? 16),
+            pulses: Number(p.pulses ?? 4),
+            rotation: Number(p.rotation ?? 0),
+          })
+        }
+      }
+      map[rack.id] = out
+    }
+    return map
+  }, [racks, activeRackId, graph])
+
+  // rackId -> séquenceurs GÉNÉRATIFS du rack (cibles du ⏺ REC — leur sortie
+  // cv/gate est capturée par le recorder moteur, pas extractible statiquement)
+  const songGenSources = useMemo(() => {
+    const map: Record<string, { id: string; name: string }[]> = {}
     for (const rack of racks) {
       const g = rack.id === activeRackId ? graph : rack.graph
       map[rack.id] = g.modules
-        .filter((m) => m.type === 'step-sequencer')
-        .map((m) => ({
-          id: m.id,
-          name: m.name ?? m.id,
-          stepData: typeof m.params.stepData === 'string' ? m.params.stepData : null,
-          rate: Number(m.params.rate ?? 3),
-          gateLength: Number(m.params.gateLength ?? 80),
-        }))
+        .filter(
+          (m) =>
+            m.type === 'arpeggiator' || m.type === 'turing-machine' || m.type === 'gravity-sequencer',
+        )
+        .map((m) => ({ id: m.id, name: m.name ?? m.id }))
     }
     return map
   }, [racks, activeRackId, graph])
@@ -2472,6 +2531,166 @@ function App() {
       }
     }
   })
+
+  // ── ⏺ REC : recorder cv/gate moteur → clip ♪ (séquenceurs génératifs) ──
+  // Le moteur capture N mesures d'événements notes alignées sur transport_beats
+  // (départ à la prochaine frontière de mesure) ; ici on arme, on suit le status,
+  // et à la fin on convertit [beat, note, vel, dur]×N en SongNote dans la lane.
+  const [songRec, setSongRec] = useState<SongRecState>(null)
+  const songRecRef = useRef<{
+    rackId: string
+    startBeat: number
+    unsub?: () => void
+    pollTimer?: number
+  } | null>(null)
+
+  const clearSongRecWatch = () => {
+    songRecRef.current?.unsub?.()
+    if (songRecRef.current?.pollTimer) window.clearInterval(songRecRef.current.pollTimer)
+    songRecRef.current = null
+  }
+
+  const handleRecordedEvents = (rackId: string, events: number[], startBeat: number) => {
+    clearSongRecWatch()
+    setSongRec(null)
+    const song = songStateRef.current
+    const lane = song.notesLanes[rackId]
+    if (!lane || events.length < 4) return
+    const totalBars = songTotalBars(song)
+    if (totalBars <= 0) return
+    // Les notes se posent là où elles ont été JOUÉES dans le song (mesure de
+    // départ de l'enregistrement, modulo la longueur du song).
+    const startBar = Math.floor(startBeat / 4) % totalBars
+    const added: SongNote[] = []
+    for (let i = 0; i + 3 < events.length; i += 4) {
+      const bar = startBar + events[i] / 4
+      if (bar >= totalBars) continue
+      added.push({
+        bar,
+        note: Math.round(events[i + 1]),
+        vel: Math.min(1, Math.max(0.05, events[i + 2] / 127)),
+        dur: Math.max(1 / 32, Math.min(events[i + 3] / 4, totalBars - bar)),
+      })
+    }
+    if (added.length === 0) return
+    changeSong({
+      ...song,
+      notesLanes: {
+        ...song.notesLanes,
+        [rackId]: { ...lane, notes: [...lane.notes, ...added] },
+      },
+    })
+  }
+
+  const cancelSongRecorder = () => {
+    clearSongRecWatch()
+    setSongRec(null)
+    if (statusRef.current === 'running') engine.cancelCvRecorder()
+    if (isTauri && tauriNativeRunning) {
+      void invokeTauri('native_cancel_cv_recorder', {}).catch(() => {})
+    }
+  }
+
+  const armSongRecorder = (rackId: string, moduleId: string, bars: number) => {
+    cancelSongRecorder()
+    const engineId = `${rackId}/${moduleId}`
+    const webRunning = statusRef.current === 'running'
+    const nativeRunning = isTauri && tauriNativeRunning
+    // Les 3 génératifs exposent cv-out/gate-out (alias cv/gate résolus moteur).
+    if (webRunning) {
+      const unsub = engine.watchCvRecorder(
+        (status) => {
+          const rec = songRecRef.current
+          if (!rec) return
+          if (status[0] === 0) {
+            // Recorder perdu côté moteur (changement de preset…) : abandon.
+            clearSongRecWatch()
+            setSongRec(null)
+            return
+          }
+          rec.startBeat = status[4]
+          setSongRec({
+            phase: status[0] === 2 ? 'recording' : 'armed',
+            rackId,
+            moduleId,
+            beatsDone: status[1],
+            beatsTotal: status[2],
+          })
+        },
+        (events) => {
+          const rec = songRecRef.current
+          if (!rec) return
+          handleRecordedEvents(rackId, events, rec.startBeat)
+        },
+      )
+      songRecRef.current = { rackId, startBeat: 0, unsub }
+      engine.armCvRecorderDirect(engineId, 'cv-out', 'gate-out', bars)
+      setSongRec({ phase: 'armed', rackId, moduleId, beatsDone: 0, beatsTotal: bars * 4 })
+    } else if (nativeRunning) {
+      songRecRef.current = { rackId, startBeat: 0 }
+      void invokeTauri<boolean>('native_arm_cv_recorder', {
+        moduleId: engineId,
+        cvPort: 'cv-out',
+        gatePort: 'gate-out',
+        velPort: '',
+        bars,
+      })
+        .then((ok) => {
+          if (!ok || !songRecRef.current) {
+            clearSongRecWatch()
+            setSongRec(null)
+            return
+          }
+          setSongRec({ phase: 'armed', rackId, moduleId, beatsDone: 0, beatsTotal: bars * 4 })
+          const timer = window.setInterval(() => {
+            void invokeTauri<number[]>('native_get_cv_recorder_status', {})
+              .then(async (status) => {
+                const rec = songRecRef.current
+                if (!rec) return
+                if (status[0] === 0) {
+                  clearSongRecWatch()
+                  setSongRec(null)
+                  return
+                }
+                rec.startBeat = status[4]
+                if (status[0] === 3) {
+                  const events = await invokeTauri<number[]>('native_take_cv_recording', {})
+                  handleRecordedEvents(rackId, events, status[4])
+                  return
+                }
+                setSongRec({
+                  phase: status[0] === 2 ? 'recording' : 'armed',
+                  rackId,
+                  moduleId,
+                  beatsDone: status[1],
+                  beatsTotal: status[2],
+                })
+              })
+              .catch(() => {})
+          }, 200)
+          songRecRef.current.pollTimer = timer
+        })
+        .catch(() => {
+          clearSongRecWatch()
+          setSongRec(null)
+        })
+    }
+  }
+
+  /** Stop anticipé : draine ce que le moteur a capturé jusqu'ici. */
+  const stopSongRecorder = () => {
+    const rec = songRecRef.current
+    if (!rec) return
+    if (statusRef.current === 'running') {
+      // Le drain répond par le message cvRecorderDone → handleRecordedEvents.
+      engine.takeCvRecording()
+    } else if (isTauri && tauriNativeRunning) {
+      const { rackId, startBeat } = rec
+      void invokeTauri<number[]>('native_take_cv_recording', {})
+        .then((events) => handleRecordedEvents(rackId, events, startBeat))
+        .catch(() => {})
+    }
+  }
 
   // rackId -> modules + params NUMÉRIQUES (cibles du picker ⚙ ; valeur courante
   // pour préremplir min/max). Fusionne moduleDefaults (liste complète) + params posés.
@@ -2722,6 +2941,11 @@ function App() {
             midiTargets={songMidiTargets}
             drumSources={songDrumSources}
             stepSources={songStepSources}
+            genSources={songGenSources}
+            recState={songRec}
+            onRecArm={armSongRecorder}
+            onRecStop={stopSongRecorder}
+            onRecCancel={cancelSongRecorder}
             paramSources={songParamSources}
             onCapturePattern={captureSongPattern}
             onSeek={seekSong}

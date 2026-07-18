@@ -1,10 +1,13 @@
 # SONG Mode — Arrangement Timeline (plan v3)
 
-> **STATUT (2026-07-17) — TOUT le plan v1+v2 IMPLÉMENTÉ sur cette branche** (y compris
-> ⚙ automation de params). L'implémentation fait foi dans `docs/FEATURES.md` § SONG
-> Mode. RESTE (phase 3 / polish) : recorder cv/gate pour les séquenceurs génératifs,
-> transfert des séquenceurs statiques restants (chord/polyrhythm/euclidean), loi log
-> pour l'automation des fréquences. (Ctrl+Z contextuel : FAIT.)
+> **STATUT (2026-07-19) — plan v1+v2 ET phase 3 IMPLÉMENTÉS sur cette branche.**
+> L'implémentation fait foi dans `docs/FEATURES.md` § SONG Mode. Phase 3 livrée :
+> **⏺ recorder cv/gate moteur** (génératifs → clip, 4 couches + Tauri, test moteur +
+> E2E `test-song-rec.mjs`), **transferts statiques chord/polyrhythm/euclidean**,
+> **loi LOG pour l'automation des fréquences** (toggle picker, auto sur freq|cutoff).
+> (Ctrl+Z contextuel : FAIT.) RESTE (conditionnel, non planifié) : asservissement
+> transport du midi-file-sequencer / quantisation moteur des swaps — seulement « si la
+> dérive ou le seek le justifient ».
 > LIVRÉ : vue SONG (sections, lanes MIX on/off + courbes de volume continues, lanes ♪
 > + piano-roll compilé en midiData + re-seek), mode de lecture RACK|SONG global dans la
 > TransportConsole, seek timeline (`set_transport_beats` moteur Web+Tauri), persistance
@@ -155,12 +158,17 @@ dans le JSON projet, pas dans un param moteur → non concerné.
 - Rampe DSP anti-click ; commande batch Tauri.
 - Transfert statique des séquenceurs restants (chord, polyrhythm, euclidean).
 
-### Phase 3 (moteur)
-- **Recorder cv/gate** aligné sur transport_beats (tap type buildTapOutputs mais événements)
-  → « enregistrer N mesures » des séquenceurs génératifs (arpeggiator, turing, gravity)
-  vers un clip. CV → note = round(CV×12) + 69.
-- Asservissement transport du midi-file-sequencer (lire TransportContext) si la dérive
-  ou le seek le justifient ; quantisation moteur des swaps de pattern.
+### Phase 3 (moteur) — LIVRÉE (2026-07-19)
+- ✅ **Recorder cv/gate** aligné sur transport_beats (`crates/dsp-graph/src/recorder.rs`,
+  scan dans `render()` post-boucle modules) → « enregistrer N mesures » des séquenceurs
+  génératifs (arpeggiator, turing, gravity) vers un clip. CV → note = round(CV×12) + 69.
+  UI ⏺ dans le piano-roll ; 4 couches + parité Tauri. Détails → FEATURES.md § SONG Mode.
+- ✅ Transferts statiques restants (chord/polyrhythm/euclidean) — répliques TS des algos
+  moteur, chord en base CV 60 → note+9.
+- ✅ Loi log pour l'automation des fréquences (`SongAutoLane.log`, toggle LIN|LOG).
+- ⏳ (conditionnel, non fait) Asservissement transport du midi-file-sequencer (lire
+  TransportContext) si la dérive ou le seek le justifient ; quantisation moteur des
+  swaps de pattern.
 
 ## Vérification
 

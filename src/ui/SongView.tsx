@@ -9,7 +9,12 @@ import {
   type SongState,
   type SongVolumePoint,
 } from '../hooks/useSongPlayer'
-import { SongPianoRoll, type SongStepSource } from './SongPianoRoll'
+import {
+  SongPianoRoll,
+  type SongGenSource,
+  type SongRecState,
+  type SongStepSource,
+} from './SongPianoRoll'
 
 /**
  * Vue SONG (prototype) — timeline d'arrangement.
@@ -32,8 +37,17 @@ type SongViewProps = {
   midiTargets: Record<string, string[]>
   /** rackId -> drum-sequencers du rack + drumData courant (lanes ▦ PATTERNS) */
   drumSources: Record<string, { id: string; drumData: string | null }[]>
-  /** rackId -> step-sequencers du rack (transfert vers le piano-roll) */
+  /** rackId -> séquenceurs statiques du rack (transfert vers le piano-roll) */
   stepSources: Record<string, SongStepSource[]>
+  /** rackId -> séquenceurs génératifs du rack (⏺ REC du piano-roll) */
+  genSources: Record<string, SongGenSource[]>
+  /** État du recorder cv/gate (App) — null si inactif */
+  recState: SongRecState
+  /** Arme le recorder sur un génératif du rack (N mesures) */
+  onRecArm: (rackId: string, moduleId: string, bars: number) => void
+  /** Stop anticipé (garde ce qui est capturé) / annulation */
+  onRecStop: () => void
+  onRecCancel: () => void
   /** rackId -> modules + params numériques (cibles du picker ⚙ AUTOMATION) */
   paramSources: Record<string, { moduleId: string; name: string; params: { id: string; value: number }[] }[]>
   /** Capture la grille actuelle du drum-seq dans le slot A/B/FILL de la lane ▦ */
@@ -71,6 +85,11 @@ export const SongView = ({
   midiTargets,
   drumSources,
   stepSources,
+  genSources,
+  recState,
+  onRecArm,
+  onRecStop,
+  onRecCancel,
   paramSources,
   onCapturePattern,
   onSeek,
@@ -280,8 +299,22 @@ export const SongView = ({
     paramId: string
     min: string
     max: string
+    log: boolean
   } | null>(null)
   const autoDragRef = useRef<{ rackId: string; index: number; point: SongVolumePoint } | null>(null)
+
+  /** Les params de fréquence se balaient en LOG par défaut (loi de l'oreille).
+   *  Volontairement restreint à freq/cutoff — `rate` est souvent un INDEX de
+   *  division chez les séquenceurs, pas des Hz. */
+  const isFreqParam = (paramId: string) => /freq|cutoff/i.test(paramId)
+
+  const pickerDefaults = (paramId: string, value: number) => {
+    const log = isFreqParam(paramId)
+    const max = value > 0 ? +(value * 2).toPrecision(4) : 1
+    // En log il faut min > 0 : 5 octaves sous le max par défaut.
+    const min = log ? +(max / 32).toPrecision(4) : 0
+    return { min: String(min), max: String(max), log }
+  }
 
   const openAutoPicker = (rackId: string) => {
     const mod = paramSources[rackId]?.[0]
@@ -291,8 +324,7 @@ export const SongView = ({
       rackId,
       moduleId: mod.moduleId,
       paramId: param.id,
-      min: '0',
-      max: String(param.value > 0 ? +(param.value * 2).toPrecision(4) : 1),
+      ...pickerDefaults(param.id, param.value),
     })
   }
 
@@ -305,23 +337,25 @@ export const SongView = ({
       ...autoPicker,
       moduleId,
       paramId: param.id,
-      min: '0',
-      max: String(param.value > 0 ? +(param.value * 2).toPrecision(4) : 1),
+      ...pickerDefaults(param.id, param.value),
     })
   }
 
   const confirmAutoPicker = () => {
     if (!autoPicker) return
     const mod = paramSources[autoPicker.rackId]?.find((m) => m.moduleId === autoPicker.moduleId)
-    const min = Number(autoPicker.min)
+    let min = Number(autoPicker.min)
     const max = Number(autoPicker.max)
     if (!mod || !Number.isFinite(min) || !Number.isFinite(max) || min === max) return
+    // La loi log exige des bornes > 0 : plancher à max/100 si besoin.
+    if (autoPicker.log && min <= 0) min = max / 100
     const lane: SongAutoLane = {
       moduleId: autoPicker.moduleId,
       paramId: autoPicker.paramId,
-      label: `${mod.name} · ${autoPicker.paramId}`,
+      label: `${mod.name} · ${autoPicker.paramId}${autoPicker.log ? ' · LOG' : ''}`,
       min,
       max,
+      log: autoPicker.log,
       points: [{ bar: 0, v: 0.5 }],
     }
     onChange({
@@ -903,9 +937,25 @@ export const SongView = ({
                   onChange={(e) => setAutoPicker({ ...autoPicker, max: e.target.value })}
                 />
               </label>
+              <div className="sap-law" title="LOG : chaque octave occupe la même portion de courbe (fréquences). LIN : progression arithmétique.">
+                <button
+                  type="button"
+                  className={`song-switch ${autoPicker.log ? '' : 'active'}`}
+                  onClick={() => setAutoPicker({ ...autoPicker, log: false })}
+                >
+                  LIN
+                </button>
+                <button
+                  type="button"
+                  className={`song-switch ${autoPicker.log ? 'active' : ''}`}
+                  onClick={() => setAutoPicker({ ...autoPicker, log: true })}
+                >
+                  LOG
+                </button>
+              </div>
             </div>
             <div className="sap-hint">
-              La courbe (0..1) est étirée entre Min et Max. Écrit au moteur pendant la
+              La courbe (0..1) est étirée entre Min et Max{autoPicker.log ? ' (loi LOG — balayage naturel des fréquences, Min > 0)' : ''}. Écrit au moteur pendant la
               lecture — le patch garde ses valeurs de base.
             </div>
             <div className="sap-actions">
@@ -926,6 +976,11 @@ export const SongView = ({
           sections={song.sections}
           totalBars={totalBars}
           stepSources={stepSources[pianoRollRackId] ?? []}
+          genSources={genSources[pianoRollRackId] ?? []}
+          recState={recState && recState.rackId === pianoRollRackId ? recState : null}
+          onRecArm={(moduleId, bars) => onRecArm(pianoRollRackId, moduleId, bars)}
+          onRecStop={onRecStop}
+          onRecCancel={onRecCancel}
           onSeek={running ? onSeek : undefined}
           notes={pianoRollLane.notes}
           onChange={(notes) =>
