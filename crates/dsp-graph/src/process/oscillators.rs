@@ -25,6 +25,7 @@ use dsp_core::{
     HiHat808Inputs, HiHat808Params,
     HiHat909Inputs, HiHat909Params, HpfInputs, HpfParams,
     KarplusInputs, KarplusParams,
+    KoshiInputs, KoshiParams,
     Kick808Inputs, Kick808Params,
     Kick909Inputs, Kick909Params,
     LfoInputs, LfoParams,
@@ -550,6 +551,48 @@ pub(crate) fn process(
                 };
                 out[i] = state.resonator.process(params, res_inputs);
             }
+        }
+        ModuleState::Koshi(state) => {
+            // Input 0: wind CV, Input 1: gate (manual strike), Input 2: pitch CV (rod choice), Input 3: velocity CV
+            let pick = |idx: usize| -> Option<&[f32]> {
+                if connections.len() > idx && !connections[idx].is_empty() {
+                    Some(&inputs[idx].channel(0)[..frames])
+                } else {
+                    None
+                }
+            };
+            let wind_cv = pick(0);
+            let gate = pick(1);
+            let pitch_cv = pick(2);
+            let vel_cv = pick(3);
+
+            let params = KoshiParams {
+                tuning: state.tuning.slice(frames)[0] as i32,
+                wind: state.wind.slice(frames)[0],
+                gust: state.gust.slice(frames)[0],
+                sustain: state.sustain.slice(frames)[0],
+                brightness: state.brightness.slice(frames)[0],
+                body: state.body.slice(frames)[0],
+                tune: state.tune.slice(frames)[0],
+                octave: state.octave.slice(frames)[0].round() as i32,
+                seed: state.seed.slice(frames)[0] as i32,
+                level: state.level.slice(frames)[0],
+            };
+
+            // Output 0: stereo audio, Output 1: strike gate, Output 2: strike CV (V/oct, C4 = 0)
+            let (audio_group, rest) = outputs.split_at_mut(1);
+            let (gate_group, cv_group) = rest.split_at_mut(1);
+            let (out_l, out_r) = audio_group[0].channels_mut_2();
+            let gate_out = gate_group[0].channel_mut(0);
+            let cv_out = cv_group[0].channel_mut(0);
+            state.koshi.process_block(
+                &mut out_l[..frames],
+                &mut out_r[..frames],
+                &mut gate_out[..frames],
+                &mut cv_out[..frames],
+                KoshiInputs { wind_cv, gate, pitch_cv, vel_cv },
+                params,
+            );
         }
         ModuleState::Wavetable(state) => {
             // Input 0: pitch CV, Input 1: gate, Input 2: position CV, Input 3: sync

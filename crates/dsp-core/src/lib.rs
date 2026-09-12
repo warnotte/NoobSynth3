@@ -48,6 +48,7 @@ pub use oscillators::{
     PipeOrgan, PipeOrganParams, PipeOrganInputs, OrganVoicing, ORGAN_DRAWBARS, DRAWBAR_NAMES,
     SpectralSwarm, SpectralSwarmParams, SpectralSwarmInputs,
     Resonator, ResonatorParams, ResonatorInputs,
+    Koshi, KoshiParams, KoshiInputs, KOSHI_NUM_RODS, KOSHI_TUNING_NAMES,
     Wavetable, WavetableParams, WavetableInputs,
     Granular, GranularParams, GranularInputs, GrainShape,
     Sampler, SamplerParams, SamplerInputs,

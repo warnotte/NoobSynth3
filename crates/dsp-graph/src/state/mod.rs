@@ -41,6 +41,7 @@ pub enum ModuleState {
     PipeOrgan(PipeOrganState),
     SpectralSwarm(SpectralSwarmState),
     Resonator(ResonatorState),
+    Koshi(KoshiState),
     Wavetable(WavetableState),
     Granular(GranularState),
     Sampler(SamplerState),

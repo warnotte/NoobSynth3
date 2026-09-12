@@ -11,6 +11,7 @@ export const moduleSizes: Record<ModuleType, string> = {
   'pipe-organ': '3x4',
   'spectral-swarm': '3x4',
   'resonator': '2x3',
+  koshi: '3x2',
   'wavetable': '2x3',
   'granular': '3x4',
   sampler: '2x3',
@@ -130,6 +131,7 @@ export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>>
   'pipe-organ': 'strip',
   'spectral-swarm': 'strip',
   'resonator': 'strip',
+  koshi: 'strip',
   'wavetable': 'strip',
   'granular': 'strip',
   sampler: 'strip',
@@ -250,6 +252,7 @@ export const moduleCatalog: { type: ModuleType; label: string; category: ModuleC
   { type: 'pipe-organ', label: 'Pipe Organ', category: 'sources' },
   { type: 'spectral-swarm', label: 'Spectral Swarm', category: 'sources' },
   { type: 'resonator', label: 'Resonator', category: 'sources' },
+  { type: 'koshi', label: 'Koshi Chime', category: 'sources' },
   { type: 'wavetable', label: 'Wavetable', category: 'sources' },
   { type: 'granular', label: 'Granular', category: 'sources' },
   { type: 'sampler', label: 'Sampler', category: 'sources' },
@@ -361,6 +364,7 @@ export const modulePrefixes: Record<ModuleType, string> = {
   'pipe-organ': 'organ',
   'spectral-swarm': 'swarm',
   'resonator': 'res',
+  koshi: 'koshi',
   'wavetable': 'wt',
   'granular': 'gran',
   sampler: 'smp',
@@ -471,6 +475,7 @@ export const moduleLabels: Record<ModuleType, string> = {
   'pipe-organ': 'Pipe Organ',
   'spectral-swarm': 'Spectral Swarm',
   'resonator': 'Resonator',
+  koshi: 'Koshi Chime',
   'wavetable': 'Wavetable',
   'granular': 'Granular',
   sampler: 'Sampler',
@@ -659,6 +664,18 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     polyphony: 1,         // Number of voices (1-4)
     internalExc: 0.8,     // Internal exciter level (0-1)
     chorus: 0,            // Detune between voices (0-1)
+  },
+  koshi: {
+    tuning: 0,            // 0=Terra, 1=Aqua, 2=Aria, 3=Ignis (factory chords)
+    wind: 0.5,            // Wind strength (0-1) — 0 = silent unless struck by gate
+    gust: 0.5,            // Gust depth (0 = steady breeze, 1 = squalls and lulls)
+    sustain: 1.0,         // Decay time multiplier (0.25-2, 1 = measured T60 ≈ 6 s)
+    brightness: 0.5,      // Balance of the upper partials (0-1)
+    body: 0.5,            // Tube resonance level (0-1)
+    tune: 0,              // Global tune in cents (-100..100)
+    octave: 0,            // Transpose (-2..1)
+    seed: 1,              // Wind random seed (1-99) — give each chime its own
+    level: 0.8,           // Output level (0-1)
   },
   'wavetable': {
     frequency: 220,       // Base frequency Hz

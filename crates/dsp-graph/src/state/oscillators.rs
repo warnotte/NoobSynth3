@@ -290,3 +290,17 @@ pub struct ThereminState {
     pub lo_freq: ParamBuffer,
     pub hi_freq: ParamBuffer,
 }
+
+pub struct KoshiState {
+    pub koshi: Koshi,
+    pub tuning: ParamBuffer,
+    pub wind: ParamBuffer,
+    pub gust: ParamBuffer,
+    pub sustain: ParamBuffer,
+    pub brightness: ParamBuffer,
+    pub body: ParamBuffer,
+    pub tune: ParamBuffer,
+    pub octave: ParamBuffer,
+    pub seed: ParamBuffer,
+    pub level: ParamBuffer,
+}

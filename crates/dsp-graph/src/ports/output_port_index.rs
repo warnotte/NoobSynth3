@@ -319,6 +319,13 @@ pub fn output_port_index(module_type: ModuleType, port_id: &str) -> Option<usize
       "out" | "output" => Some(0),
       _ => None,
     },
+    // Koshi - stereo audio + gate + cv
+    ModuleType::Koshi => match port_id {
+      "out" | "output" => Some(0),
+      "gate" | "gate-out" => Some(1),
+      "cv" | "cv-out" => Some(2),
+      _ => None,
+    },
     // Wavetable - 1 mono output
     ModuleType::Wavetable => match port_id {
       "out" | "output" => Some(0),

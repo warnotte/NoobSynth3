@@ -1,0 +1,183 @@
+{
+  "id": "koshi-trio",
+  "name": "Koshi Trio",
+  "description": "Trois carillons Koshi (Terra, Aqua grave, Aria aigu) dans le meme vent, chacun avec sa graine. Jardin generatif infini.",
+  "group": "Physical Modeling",
+  "graph": {
+    "modules": [
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Notes",
+        "position": {
+          "x": 40,
+          "y": 40
+        },
+        "params": {
+          "text": "KOSHI TRIO\n\nTrois carillons dans le meme jardin :\n- TERRA (G C E F G C E G), vent moyen\n- AQUA une octave plus bas (A D F G A D F A) : le grand carillon, vent faible\n- ARIA une octave plus haut (A C E A B C E B) : le petit, rare\n\nTerra + Aqua + Aria = toute la gamme de do majeur, en trois registres. Chaque carillon a sa propre graine (SEED) : le vent ne frappe jamais deux fois pareil. Baisse WIND sur un carillon pour l'eloigner, monte GUST pour des bourrasques."
+        }
+      },
+      {
+        "id": "koshi-1",
+        "type": "koshi",
+        "name": "Terra",
+        "position": {
+          "x": 40,
+          "y": 300
+        },
+        "params": {
+          "tuning": 0,
+          "wind": 0.4,
+          "gust": 0.6,
+          "sustain": 1.0,
+          "brightness": 0.5,
+          "body": 0.5,
+          "tune": 0,
+          "octave": 0,
+          "seed": 3,
+          "level": 0.8
+        }
+      },
+      {
+        "id": "koshi-2",
+        "type": "koshi",
+        "name": "Aqua (grave)",
+        "position": {
+          "x": 40,
+          "y": 700
+        },
+        "params": {
+          "tuning": 1,
+          "wind": 0.3,
+          "gust": 0.7,
+          "sustain": 1.2,
+          "brightness": 0.4,
+          "body": 0.6,
+          "tune": 0,
+          "octave": -1,
+          "seed": 7,
+          "level": 0.7
+        }
+      },
+      {
+        "id": "koshi-3",
+        "type": "koshi",
+        "name": "Aria (aigu)",
+        "position": {
+          "x": 40,
+          "y": 1100
+        },
+        "params": {
+          "tuning": 2,
+          "wind": 0.25,
+          "gust": 0.8,
+          "sustain": 0.9,
+          "brightness": 0.55,
+          "body": 0.3,
+          "tune": 0,
+          "octave": 1,
+          "seed": 11,
+          "level": 0.5
+        }
+      },
+      {
+        "id": "mixer-1",
+        "type": "mixer-8",
+        "name": "Mixer",
+        "position": {
+          "x": 700,
+          "y": 300
+        },
+        "params": {
+          "level1": 0.8,
+          "level2": 0.8,
+          "level3": 0.7
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": {
+          "x": 900,
+          "y": 300
+        },
+        "params": {
+          "time": 0.85,
+          "damp": 0.35,
+          "preDelay": 30,
+          "mix": 0.4
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Output",
+        "position": {
+          "x": 1350,
+          "y": 300
+        },
+        "params": {
+          "level": 1
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": {
+          "moduleId": "koshi-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mixer-1",
+          "portId": "in-1"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "koshi-2",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mixer-1",
+          "portId": "in-2"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "koshi-3",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mixer-1",
+          "portId": "in-3"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "mixer-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "reverb-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "reverb-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "out-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      }
+    ]
+  }
+}

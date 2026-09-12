@@ -668,6 +668,19 @@ pub(crate) fn apply_param(state: &mut ModuleState, param: &str, value: f32) {
       "chorus" => state.chorus.set(value),
       _ => {}
     },
+    ModuleState::Koshi(state) => match param {
+      "tuning" => state.tuning.set(value),
+      "wind" => state.wind.set(value),
+      "gust" => state.gust.set(value),
+      "sustain" => state.sustain.set(value),
+      "brightness" => state.brightness.set(value),
+      "body" => state.body.set(value),
+      "tune" => state.tune.set(value),
+      "octave" => state.octave.set(value),
+      "seed" => state.seed.set(value),
+      "level" => state.level.set(value),
+      _ => {}
+    },
     ModuleState::Wavetable(state) => match param {
       "frequency" => state.frequency.set(value),
       "bank" => state.bank.set(value),

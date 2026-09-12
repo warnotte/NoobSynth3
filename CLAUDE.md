@@ -103,7 +103,7 @@ Câbles et jacks sont colorés par type de signal :
 - Resize overrides are kept in `moduleSizeOverrides` inside the `useModuleResize` hook (`src/hooks/useModuleResize.ts`, wired from `src/App.tsx`) and only applied by `getModuleSize` while Dev Resize is enabled.
 - Rack grid overlay is always on via `.rack-grid-overlay` in `src/ui/RackView.tsx`, driven by `--rack-unit-x/y`, `--rack-gap`, `--rack-pad-y` in `src/styles.css`.
 - Lab Panel (`module.type === 'lab'`) renders a full layout stress test (Osc/Env/Mod/Util) in `src/ui/controls/IOControls.tsx`, using `updateParam(..., { skipEngine: true })`.
-- **Galerie des 98 modules** : `node design/mockups/gallery.mjs` (dev server requis) — construit un graphe avec un module de chaque type, le charge via l'import BrandRail, screenshote chaque module dans `design/gallery/<type>.png` et signale les débordements de `.module-controls`. À lancer après toute modif des primitives/CSS des modules. Scan ciblé par preset : `node design/mockups/check-overflow.mjs [preset...]`.
+- **Galerie des 99 modules** : `node design/mockups/gallery.mjs` (dev server requis) — construit un graphe avec un module de chaque type, le charge via l'import BrandRail, screenshote chaque module dans `design/gallery/<type>.png` et signale les débordements de `.module-controls`. À lancer après toute modif des primitives/CSS des modules. Scan ciblé par preset : `node design/mockups/check-overflow.mjs [preset...]`.
 
 ### Remove Dev Resize (rollback checklist)
 
@@ -188,7 +188,7 @@ npm run test:presets  # Run preset integration tests (load + render all presets)
 | `scripts/gen-module-reference.mjs` | `npm run module-ref` | Régénère `docs/MODULE_REFERENCE.md` (ports + params + defaults de tous les modules). |
 | `scripts/spectrogram.mjs` | `node scripts/spectrogram.mjs <in.f32> <out.png> "<label>"` | **Banc de test son** : transforme des samples f32 bruts en spectrogramme PNG log-fréquence + métriques de timbre (platitude spectrale = tonal↔bruité, centroïde = brillance, énergie par bande). Permet de « voir » un son qu'on ne peut pas entendre et de le régler sur des chiffres. PNG via `zlib` natif (zéro dépendance). Renderers associés : `cargo run -p dsp-core --example dump_cymbals` (cymbales) ou la paire projet ci-dessous. |
 | `scripts/flatten-project.mjs` | `node scripts/flatten-project.mjs <project.json> <out-flat.json> [onlyRackId]` | **Banc projet (1/2)** : aplatit un projet multi-rack en un graphe unique (mime `flattenRacks` : préfixe les ids par `${rackId}/`) pour rendu offline. `onlyRackId` optionnel = auditionner UNE seule couche (diagnostiquer un rack muet). |
-| `crates/dsp-graph/examples/render_graph.rs` | `cargo run -p dsp-graph --example render_graph -- <flat.json> <out.f32> <secondes>` | **Banc projet (2/2)** : rend N secondes d'un graphe aplati → f32 + rapport peak / NaN / RMS-par-10s (voir si une pièce générative ÉVOLUE, ou trouver une couche morte/saturée). Enchaîner avec `spectrogram.mjs`. |
+| `crates/dsp-graph/examples/render_graph.rs` | `cargo run -p dsp-graph --example render_graph -- <flat.json> <out.f32> <secondes>` | **Banc projet (2/2)** : rend N secondes d'un graphe aplati → f32 **mono (L+R)/2 à 48 kHz** (la sortie moteur est planaire `[L|R|taps]`, pas entrelacée) + rapport peak / NaN / RMS-par-10s (voir si une pièce générative ÉVOLUE, ou trouver une couche morte/saturée). Enchaîner avec `spectrogram.mjs`. |
 
 ## New Module Checklist
 
@@ -267,10 +267,12 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 
 **⚠️ RÈGLE:** Toute nouvelle feature UI↔Audio DOIT être implémentée pour Tauri en même temps que Web. Ne jamais merger une feature Web-only. **Garde-fou auto:** `npm run check:ui-audio` échoue si un contrôle utilise `engine.watch*` sans chemin natif (le bug récurrent type Game-of-Life/Meter).
 
-## Module Types (98 total)
+## Module Types (99 total)
 
-### Sources (19)
-oscillator, supersaw, karplus, fm-op, fm-matrix, nes-osc, snes-osc, noise, tb-303, shepard, pipe-organ, spectral-swarm, resonator, wavetable, granular, sampler, particle-cloud, speech-synth, theremin
+### Sources (20)
+oscillator, supersaw, karplus, fm-op, fm-matrix, nes-osc, snes-osc, noise, tb-303, shepard, pipe-organ, spectral-swarm, resonator, koshi, wavetable, granular, sampler, particle-cloud, speech-synth, theremin
+
+**Koshi Chime** (`koshi`) : carillon Koshi 8 tiges modélisé sur les enregistrements officiels (banc spectrogramme : partiels libre-libre 2.79/5.55/8.9, accordage étiré, T60, tube). Autonome (battant pendulaire poussé par le vent) ET jouable (gate + pitch CV) ; publie chaque frappe sur `gate`/`cv`. DSP : `crates/dsp-core/src/oscillators/koshi.rs`.
 
 ### Filters (2)
 vcf, hpf

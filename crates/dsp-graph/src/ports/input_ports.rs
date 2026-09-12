@@ -209,6 +209,13 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // strum trigger
       PortInfo { channels: 1 },  // damp CV
     ],
+    // Koshi - 4 inputs (wind CV, gate, pitch CV, velocity CV)
+    ModuleType::Koshi => vec![
+      PortInfo { channels: 1 },  // wind CV
+      PortInfo { channels: 1 },  // gate (manual strike)
+      PortInfo { channels: 1 },  // pitch CV (rod choice)
+      PortInfo { channels: 1 },  // velocity CV
+    ],
     // Wavetable - 4 inputs (pitch, gate, position CV, sync)
     ModuleType::Wavetable => vec![
       PortInfo { channels: 1 },  // pitch CV

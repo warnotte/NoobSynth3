@@ -253,6 +253,43 @@ Trois modes : Modal (cloches/plaques), Sympathetic (cordes sympathiques), Inharm
 
 **Presets (3)** : resonator-bells, resonator-strings, resonator-metallic
 
+### Koshi Chime
+
+Carillon Koshi (8 tiges en cercle dans un tube, 4 accords d'usine) modélisé par synthèse modale
+à partir des enregistrements officiels (koshi.fr) : partiels de barre libre-libre 1 : 2.79 : 5.55 : 8.9,
+accordage étiré (~28 cents/octave : les tiges graves sont ~40 c basses, les aiguës ~15 c hautes — c'est
+le « shimmer » de l'instrument), T60 ≈ 6 s sous 2,5 kHz, trois résonances du tube (150-330 Hz).
+**Autonome** : un battant (pendule 2D poussé par un vent turbulent, rafales lognormales) frappe les
+tiges tout seul, avec les grappes et les silences des vrais enregistrements. **Jouable** : entrée gate
+(+ CV de hauteur pour choisir la tige). Chaque frappe est publiée sur les sorties `gate`/`cv`.
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `tuning` | 0-3 | Accord : 0=Terra, 1=Aqua, 2=Aria, 3=Ignis |
+| `wind` | 0-1 | Force du vent (0 = silence sauf frappe manuelle ; 0.3 brise rare ; 0.5 ≈ 2 frappes/s comme les enregistrements ; 1 tempête ≈ 5/s) |
+| `gust` | 0-1 | Profondeur des rafales (0 = brise régulière, 1 = bourrasques et accalmies) |
+| `sustain` | 0.25-2 | Multiplicateur du temps de décroissance (1 = T60 mesuré) |
+| `brightness` | 0-1 | Balance des partiels supérieurs |
+| `body` | 0-1 | Niveau des résonances du tube |
+| `tune` | -100..100 ct | Accord global |
+| `octave` | -2..1 | Transposition (−1 = grand carillon) |
+| `seed` | 1-99 | Graine du vent — donner une graine différente à chaque carillon d'un patch |
+| `level` | 0-1 | Niveau de sortie |
+
+**Entrées** : wind (CV, s'ajoute au knob), gate (frappe manuelle), pitch (CV V/oct, C4 = 0 : frappe la tige la plus proche ; sinon tige au hasard), vel (CV 0-1, vélocité de la frappe manuelle, 0.8 si non câblé)
+**Sorties** : out (audio stéréo, tiges pannées en cercle), gate (impulsion 10 ms à chaque frappe), cv (V/oct de la dernière tige frappée, C4 = 0)
+
+**Accords** : Terra G4 C5 E5 F5 G5 C6 E6 G6 · Aqua A4 D5 F5 G5 A5 D6 F6 A6 · Aria A4 C5 E5 A5 B5 C6 E6 B6 · Ignis G4 B4 D5 G5 B5 D6 G6 A6
+
+**Conseils son :**
+- **Jardin** : wind 0.3-0.5, gust 0.6, une reverb derrière ; Terra + Aqua se mélangent bien (Terra + Ignis moins : fa contre si)
+- **Séquenceur aléatoire** : `gate`/`cv` → ADSR + VCA d'une autre voix — le vent joue le synthé sur les notes du carillon
+- **Clavier** : wind 0, `gate`+`pitch` depuis le Control ou un séquenceur (la hauteur est quantifiée sur les 8 tiges)
+
+**Banc** : `KOSHI_DUMP=out.f32 cargo test -p dsp-core dump_isolated_strikes` écrit chaque tige frappée seule (3 s chacune) ; ajouter `KOSHI_DUMP_WIND=0.5` pour 45 s de mode vent. À analyser avec `scripts/spectrogram.mjs` / un banc de partiels — c'est ainsi que le module a été calé sur les enregistrements (tiges et partiels dans ±2,5 dB de 140 Hz à 2,9 kHz, densité et grappes de frappes équivalentes).
+
+**Presets (3)** : koshi-garden, koshi-trio, koshi-wind-sequencer
+
 ### Wavetable
 
 Oscillateur wavetable avec 4 banques, morphing et unison.

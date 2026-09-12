@@ -229,6 +229,35 @@ fn engine_nes_osc() {
 }
 
 #[test]
+fn engine_koshi_wind() {
+    // A Koshi chime with medium wind and nothing patched in must play by itself
+    // (autonomous mode): non-zero audio, strike gate pulses, stereo output.
+    let payload = serde_json::json!({
+        "modules": [
+            { "id": "koshi-1", "type": "koshi", "params": { "tuning": 0, "wind": 0.6, "gust": 0.5, "seed": 3 } },
+            { "id": "out-1", "type": "output", "params": { "level": 1.0 } }
+        ],
+        "connections": [
+            { "from": { "moduleId": "koshi-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+        ],
+        "taps": []
+    });
+    let mut engine = GraphEngine::new(SAMPLE_RATE);
+    engine.set_graph_json(&payload.to_string()).expect("should load");
+
+    let mut max_abs = 0.0f32;
+    for _ in 0..BLOCKS * 4 {
+        let output = engine.render(FRAMES);
+        for &sample in output {
+            assert!(sample.is_finite(), "koshi produced NaN/Inf");
+            max_abs = max_abs.max(sample.abs());
+        }
+    }
+    assert!(max_abs > 0.01, "koshi in wind should ring by itself (got {max_abs})");
+    assert!(max_abs < 1.5, "koshi output too hot (got {max_abs})");
+}
+
+#[test]
 fn engine_sid_player() {
     // SidPlayer carries 64KB of C64 RAM inline → needs a big stack to construct
     // (same reason the Tauri audio thread uses a large stack). Run on a 64MB thread.
