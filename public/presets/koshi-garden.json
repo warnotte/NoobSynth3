@@ -106,7 +106,7 @@
         },
         "to": {
           "moduleId": "scope-1",
-          "portId": "in"
+          "portId": "in-a"
         },
         "kind": "audio"
       }

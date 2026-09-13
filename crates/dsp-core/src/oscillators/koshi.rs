@@ -3,15 +3,20 @@
 //! Every constant below was measured on the four factory recordings
 //! (koshi.fr/sound/{Terra,Aqua,Aria,Ignis}.mp3) with the spectrogram bench:
 //!
-//! - each rod rings like a FREE-FREE bar (not a cantilever): partials 1 : 2.79 : 5.55 : 8.9
+//! - each rod rings like a FREE-FREE bar (not a cantilever): partials 1 : 2.79 : 5.55 : 8.9 : 13.3
 //! - the tuning is stretched ≈ 28 cents/octave around 1250 Hz (low rods ~40 c flat,
 //!   top rods ~15 c sharp) — that shimmer is part of the instrument
 //! - the second partial of the low rods is LOUDER than their fundamental; the balance
 //!   of partials follows the absolute frequency (radiation of the tube), see `mode_level_db`
 //! - T60 ≈ 6 s below 2.5 kHz, ≈ 1 s at 5 kHz, ≈ 0.3 s at 8 kHz, see `t60_for`
+//! - every partial BEATS during its decay (8-20 dB peak-to-peak at 0.7-3.5 Hz): the two
+//!   bending planes of a round rod are split by a few cents → each mode is a detuned PAIR,
+//!   and the strike direction decides how much of each plane is excited
+//! - rods are hand-made: ratios spread ±2 % (2nd) to ±6 % (3rd/4th), levels ±2 dB → fixed
+//!   per-rod "personality" (`jitter`)
 //! - three tube/plate resonances between 150 and 330 Hz, ≈ -10 dB, T60 2-5 s
 //! - strikes come in clusters (IOI 60-250 ms inside a cluster, 0.3-2 s between clusters):
-//!   a clapper swings inside the tube. The 2D pendulum in `Clapper` reproduces that.
+//!   a clapper swings inside the tube. The 2D pendulum in `clapper_step` reproduces that.
 //!
 //! The module is autonomous (wind mode: the clapper plays by itself) AND playable
 //! (gate input strikes a rod, chosen by the pitch CV or at random). It also reports
@@ -22,11 +27,13 @@ use std::f32::consts::PI;
 pub const KOSHI_NUM_RODS: usize = 8;
 const NUM_RODS: usize = KOSHI_NUM_RODS;
 pub const NUM_TUNINGS: usize = 4;
-const NUM_MODES: usize = 4;
+const NUM_MODES: usize = 5;
 const NUM_BODY: usize = 3;
 
-/// Free-free bar partials (measured median over 32 rods: 2.789 / 5.55 / 8.9).
-const MODE_RATIOS: [f32; NUM_MODES] = [1.0, 2.79, 5.55, 8.9];
+/// Free-free bar partials (measured median over 32 rods: 2.789 / 5.55 / 8.9; 5th = theory 13.3).
+const MODE_RATIOS: [f32; NUM_MODES] = [1.0, 2.79, 5.55, 8.9, 13.3];
+/// Measured spread of the ratios between rods (relative, ±).
+const RATIO_JITTER: [f32; NUM_MODES] = [0.0, 0.015, 0.035, 0.045, 0.05];
 
 /// MIDI notes of the 8 rods for the 4 factory tunings.
 const TUNINGS: [[u8; NUM_RODS]; NUM_TUNINGS] = [
@@ -51,8 +58,16 @@ const BODY_T60: [f32; NUM_BODY] = [3.0, 2.0, 2.5];
 const STRETCH_CENTS_PER_OCT: f32 = 28.0;
 const STRETCH_CENTER_HZ: f32 = 1250.0;
 
+/// Bending-plane split of a mode pair (relative): beat rate = f * split → 0.7-3.5 Hz measured.
+const SPLIT_MIN: f32 = 0.0006;
+const SPLIT_MAX: f32 = 0.0030;
+/// Sympathetic coupling through the base plate: every strike faintly rings the other rods.
+const COUPLING: f32 = 0.03;
+
 const STRIKE_PULSE_MS: f32 = 0.1;
-const TICK_MS: f32 = 2.0;
+const TICK_MS: f32 = 1.5;
+const TICK_LP_HZ: f32 = 9000.0;
+const TICK_LEVEL: f32 = 0.22;
 const GATE_OUT_MS: f32 = 10.0;
 const LN_1000: f32 = 6.907_755;
 
@@ -105,17 +120,28 @@ impl Mode {
     // sine component: smooth onset (velocity excitation), no click
     s2
   }
+
+  #[inline]
+  fn clear(&mut self) {
+    self.s1 = 0.0;
+    self.s2 = 0.0;
+  }
 }
 
 #[derive(Clone, Copy, Default)]
 struct Rod {
-  modes: [Mode; NUM_MODES],
+  /// bending plane A and its detuned twin B, per partial
+  modes_a: [Mode; NUM_MODES],
+  modes_b: [Mode; NUM_MODES],
   midi: i32,
   pan_l: f32,
   pan_r: f32,
+  // current strike pulse
   pulse_left: u32,
   pulse_len: u32,
-  pulse_vel: f32,
+  /// excitation per partial and plane for the current strike (velocity, brightness, angle)
+  exc_a: [f32; NUM_MODES],
+  exc_b: [f32; NUM_MODES],
   refractory: u32,
 }
 
@@ -200,6 +226,22 @@ pub struct Koshi {
   seed: i32,
   prev_gate: f32,
   wind_force: f32,
+}
+
+/// Deterministic per-rod "personality" in [-1, 1] (fixed: the instrument does not change
+/// with the wind seed).
+fn jitter(tuning: usize, rod: usize, k: usize, salt: u32) -> f32 {
+  let mut h = (tuning as u32)
+    .wrapping_mul(0x9E37_79B1)
+    .wrapping_add((rod as u32).wrapping_mul(0x85EB_CA6B))
+    .wrapping_add((k as u32).wrapping_mul(0xC2B2_AE35))
+    .wrapping_add(salt.wrapping_mul(0x27D4_EB2F));
+  h ^= h >> 15;
+  h = h.wrapping_mul(0x2C1B_3C6D);
+  h ^= h >> 12;
+  h = h.wrapping_mul(0x297A_2D39);
+  h ^= h >> 15;
+  (h >> 8) as f32 / 8_388_608.0 - 1.0
 }
 
 impl Koshi {
@@ -289,7 +331,8 @@ impl Koshi {
       0 => 0.0,
       1 => (6.0 - 11.0 * l).clamp(-12.0, 8.0),
       2 => (-10.0 * l).clamp(-50.0, 6.0),
-      _ => (-8.0 - 14.0 * l).clamp(-60.0, 2.0),
+      3 => (-8.0 - 14.0 * l).clamp(-60.0, 2.0),
+      _ => (-14.0 - 14.0 * l).clamp(-60.0, 0.0),
     }
   }
 
@@ -321,19 +364,27 @@ impl Koshi {
 
       let t60_1 = Self::t60_for(f0) * sustain;
       let rod_db = Self::rod_level_db(f0);
-      for (k, mode) in rod.modes.iter_mut().enumerate() {
-        let f = f0 * MODE_RATIOS[k];
-        if f >= sr * 0.45 {
-          mode.set(1000.0, 0.1, 0.0, sr);
+      for k in 0..NUM_MODES {
+        let ratio = MODE_RATIOS[k] * (1.0 + RATIO_JITTER[k] * jitter(tuning, i, k, 1));
+        let f = f0 * ratio;
+        // bending-plane split: twin B a few cents away (beat = f * split)
+        let u = 0.5 * (1.0 + jitter(tuning, i, k, 2));
+        let split = (SPLIT_MIN + (SPLIT_MAX - SPLIT_MIN) * u) * jitter(tuning, i, k, 3).signum();
+        let f_b = f * (1.0 + split);
+        if f.max(f_b) >= sr * 0.45 {
+          rod.modes_a[k].set(1000.0, 0.1, 0.0, sr);
+          rod.modes_b[k].set(1000.0, 0.1, 0.0, sr);
           continue;
         }
-        let t60 = Self::t60_for(f) * sustain;
+        let t60 = Self::t60_for(f) * sustain * (1.0 + 0.2 * jitter(tuning, i, k, 4));
         // measured levels are long-term averages: a fast-decaying partial needs a
         // higher initial amplitude to show the same average energy
         let decay_comp = 10.0 * (t60_1 / t60).log10();
         let bright = (p.brightness.clamp(0.0, 1.0) - 0.5) * 16.0 * (k as f32 / 3.0);
-        let db = rod_db + Self::mode_level_db(k, f0) + decay_comp + bright;
-        mode.set(f, t60, 10f32.powf(db / 20.0), sr);
+        let db = rod_db + Self::mode_level_db(k, f0) + decay_comp + bright + 2.0 * jitter(tuning, i, k, 5);
+        let gain = 10f32.powf(db / 20.0);
+        rod.modes_a[k].set(f, t60, gain, sr);
+        rod.modes_b[k].set(f_b, t60 * (1.0 + 0.1 * jitter(tuning, i, k, 6)), gain, sr);
       }
     }
 
@@ -350,14 +401,34 @@ impl Koshi {
     }
     let rod_i = rod.min(NUM_RODS - 1);
     let pulse_len = ((STRIKE_PULSE_MS * 0.001 * self.sample_rate) as u32).max(2);
+    // strike direction vs the two bending planes: 20°..70° → both planes always ring,
+    // in a different balance every time (that is what makes the beating vary)
+    let angle = (20.0 + 50.0 * 0.5 * (1.0 + self.noise())) * PI / 180.0;
+    let (mix_a, mix_b) = (angle.cos(), angle.sin());
     {
       let r = &mut self.rods[rod_i];
       r.pulse_len = pulse_len;
       r.pulse_left = pulse_len;
-      r.pulse_vel = vel;
+      for k in 0..NUM_MODES {
+        // harder strikes are brighter (shorter contact): partial k scales with vel^(0.25k)
+        let v = vel * vel.powf(0.25 * k as f32);
+        r.exc_a[k] = v * mix_a;
+        r.exc_b[k] = v * mix_b;
+      }
       self.tick_pan_l = r.pan_l;
       self.tick_pan_r = r.pan_r;
       self.last_cv = (r.midi - 60) as f32 / 12.0;
+    }
+    // sympathetic ring of the other rods through the base plate (fundamental + 2nd partial)
+    for (j, other) in self.rods.iter_mut().enumerate() {
+      if j == rod_i {
+        continue;
+      }
+      for k in 0..2 {
+        let g = vel * COUPLING;
+        other.modes_a[k].s1 += g * other.modes_a[k].gain * 0.7;
+        other.modes_b[k].s1 += g * other.modes_b[k].gain * 0.7;
+      }
     }
     // tube resonance: every strike kicks the body
     for k in 0..NUM_BODY {
@@ -466,8 +537,8 @@ impl Koshi {
 
     let gust = params.gust.clamp(0.0, 1.0);
     let body = params.body.clamp(0.0, 1.0);
-    let level = params.level.clamp(0.0, 2.0) * 0.28;
-    let tick_a = (2.0 * PI * 5000.0 / self.sample_rate).min(1.0);
+    let level = params.level.clamp(0.0, 2.0) * 0.25;
+    let tick_a = (2.0 * PI * TICK_LP_HZ / self.sample_rate).min(1.0);
     let body_pan = 0.7071;
 
     for i in 0..frames {
@@ -509,18 +580,21 @@ impl Koshi {
         if rod.refractory > 0 {
           rod.refractory -= 1;
         }
-        let exc = if rod.pulse_left > 0 {
+        let mut s = 0.0;
+        if rod.pulse_left > 0 {
           let n = (rod.pulse_len - rod.pulse_left) as f32;
           rod.pulse_left -= 1;
           // raised cosine pulse, unit area
-          let w = 0.5 * (1.0 - (2.0 * PI * n / rod.pulse_len as f32).cos());
-          rod.pulse_vel * w * 2.0 / rod.pulse_len as f32
+          let w = (1.0 - (2.0 * PI * n / rod.pulse_len as f32).cos()) / rod.pulse_len as f32;
+          for k in 0..NUM_MODES {
+            let ma = &mut rod.modes_a[k];
+            let mb = &mut rod.modes_b[k];
+            s += ma.tick(rod.exc_a[k] * w * ma.gain) + mb.tick(rod.exc_b[k] * w * mb.gain);
+          }
         } else {
-          0.0
-        };
-        let mut s = 0.0;
-        for mode in rod.modes.iter_mut() {
-          s += mode.tick(exc * mode.gain);
+          for k in 0..NUM_MODES {
+            s += rod.modes_a[k].tick(0.0) + rod.modes_b[k].tick(0.0);
+          }
         }
         l += s * rod.pan_l;
         r += s * rod.pan_r;
@@ -540,7 +614,7 @@ impl Koshi {
         self.tick_left -= 1;
         let n = self.noise();
         self.tick_lp += tick_a * (n - self.tick_lp);
-        let t = self.tick_lp * env * self.tick_vel * 0.18;
+        let t = self.tick_lp * env * self.tick_vel * TICK_LEVEL;
         l += t * self.tick_pan_l;
         r += t * self.tick_pan_r;
       }
@@ -561,15 +635,15 @@ impl Koshi {
 
   pub fn reset(&mut self) {
     for rod in self.rods.iter_mut() {
-      for m in rod.modes.iter_mut() {
-        m.s1 = 0.0;
-        m.s2 = 0.0;
+      for k in 0..NUM_MODES {
+        rod.modes_a[k].clear();
+        rod.modes_b[k].clear();
       }
       rod.pulse_left = 0;
+      rod.refractory = 0;
     }
     for m in self.body.iter_mut() {
-      m.s1 = 0.0;
-      m.s2 = 0.0;
+      m.clear();
     }
     self.px = 0.0;
     self.py = 0.0;
@@ -577,6 +651,7 @@ impl Koshi {
     self.vy = 0.0;
     self.tick_left = 0;
     self.gate_left = 0;
+    self.global_refractory = 0;
     self.prev_gate = 0.0;
   }
 }
@@ -666,13 +741,13 @@ mod tests {
   }
 
   /// Debug bench: KOSHI_DUMP=path strikes each rod once (3 s apart, wind 0) and writes raw f32.
+  /// KOSHI_DUMP_WIND=0.5 dumps 45 s of autonomous playing instead (mono downmix).
   #[test]
   fn dump_isolated_strikes() {
     let Ok(path) = std::env::var("KOSHI_DUMP") else { return };
     let sr = 48000.0;
     let mut k = Koshi::new(sr);
     if let Ok(wind) = std::env::var("KOSHI_DUMP_WIND") {
-      // wind mode instead: 45 s of autonomous playing, mono downmix
       let wind: f32 = wind.parse().unwrap();
       let frames = 512;
       let (mut l, mut r, mut g, mut cv) = (vec![0.0; frames], vec![0.0; frames], vec![0.0; frames], vec![0.0; frames]);
@@ -746,5 +821,35 @@ mod tests {
     assert_eq!(k.strike_count(), 1);
     assert!(g[0] == 1.0 && cv[0] == 2.0);
     assert!(l.iter().any(|&s| s != 0.0));
+  }
+
+  /// Each partial must beat during its decay (measured 8-20 dB peak-to-peak on the recordings).
+  #[test]
+  fn partials_beat_during_decay() {
+    let sr = 48000.0;
+    let mut k = Koshi::new(sr);
+    let frames = 128;
+    let (mut l, mut r, mut g, mut cv) = (vec![0.0; frames], vec![0.0; frames], vec![0.0; frames], vec![0.0; frames]);
+    let pitch = vec![(84.0 - 60.0) / 12.0; frames]; // C6
+    let mut out = Vec::new();
+    for b in 0..(4.0 * sr / frames as f32) as usize {
+      let gate = vec![if b == 0 { 1.0 } else { 0.0 }; frames];
+      k.process_block(&mut l, &mut r, &mut g, &mut cv,
+        KoshiInputs { wind_cv: None, gate: Some(&gate), pitch_cv: Some(&pitch), vel_cv: None },
+        params(0.0, 0.0));
+      out.extend_from_slice(&l);
+    }
+    // RMS envelope in 50 ms windows over seconds 0.5-3.5, detrended in dB → must undulate
+    let win = (0.05 * sr) as usize;
+    let env: Vec<f32> = (((0.5 * sr) as usize)..((3.5 * sr) as usize))
+      .step_by(win)
+      .map(|s| 20.0 * (out[s..s + win].iter().map(|v| v * v).sum::<f32>() / win as f32).sqrt().max(1e-9).log10())
+      .collect();
+    let n = env.len() as f32;
+    let slope = (env[env.len() - 1] - env[0]) / (n - 1.0);
+    let resid: Vec<f32> = env.iter().enumerate().map(|(i, e)| e - env[0] - slope * i as f32).collect();
+    let p2p = resid.iter().cloned().fold(f32::MIN, f32::max) - resid.iter().cloned().fold(f32::MAX, f32::min);
+    eprintln!("decay undulation peak-to-peak = {p2p:.1} dB");
+    assert!(p2p > 3.0, "partials should beat during the decay (got {p2p:.1} dB)");
   }
 }

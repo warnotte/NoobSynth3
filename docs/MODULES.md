@@ -259,6 +259,11 @@ Carillon Koshi (8 tiges en cercle dans un tube, 4 accords d'usine) modélisé pa
 à partir des enregistrements officiels (koshi.fr) : partiels de barre libre-libre 1 : 2.79 : 5.55 : 8.9,
 accordage étiré (~28 cents/octave : les tiges graves sont ~40 c basses, les aiguës ~15 c hautes — c'est
 le « shimmer » de l'instrument), T60 ≈ 6 s sous 2,5 kHz, trois résonances du tube (150-330 Hz).
+**Chaque partiel bat pendant la tenue** (mesuré : 8-20 dB crête à crête à 0,7-3,5 Hz) : les deux plans de
+flexion d'une tige ronde sont désaccordés de quelques cents → chaque mode est une **paire** dont l'équilibre
+dépend de l'angle de frappe (différent à chaque coup). Chaque tige a une personnalité fixe (ratios ±2-6 %,
+niveaux ±2 dB, comme les tiges faites main), les frappes fortes sont plus brillantes (contact plus court),
+et chaque coup fait vibrer faiblement les autres tiges par la plaque (couplage sympathique).
 **Autonome** : un battant (pendule 2D poussé par un vent turbulent, rafales lognormales) frappe les
 tiges tout seul, avec les grappes et les silences des vrais enregistrements. **Jouable** : entrée gate
 (+ CV de hauteur pour choisir la tige). Chaque frappe est publiée sur les sorties `gate`/`cv`.
