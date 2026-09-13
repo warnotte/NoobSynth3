@@ -19,13 +19,13 @@
               "y": 40
             },
             "params": {
-              "text": "JARDIN DE VENT\n\nUn jardin au crepuscule. Le vent monte et retombe sur environ quatre minutes (LFO METEO, 0.004 Hz), avec des sautes plus courtes (LFO RAFALES). Rien n'est sequence : tout vient des carillons Koshi et de leur battant.\n\nRack CARILLONS : Terra + Aqua (grave), poussees par la meteo.\nRack SOUFFLE : le vent lui-meme (bruit rose filtre), plus fort quand la meteo monte.\nRack OMBRE : un second Koshi Terra IDENTIQUE (meme graine, meme meteo) mais muet : ses sorties GATE/CV pilotent un sinus deux octaves plus bas qui glisse vers chaque tige frappee. L'ombre de chaque note.\nRack GRAND CARILLON : Aqua deux octaves plus bas, vent rare : les gongs.\n\nA toucher : WIND des Koshi (base), les faders du mixer. La graine (SEED) du Koshi Ombre doit rester celle du Koshi Terra pour que l'ombre suive."
+              "text": "JARDIN DE VENT\n\nUn jardin au crepuscule, sur un tres long cycle : une maree de fond (~24 min, LFO MAREE)\nporte une meteo plus rapide (~4 min, LFO METEO) elle-meme secouee de rafales (~43 s).\nTerra et Aqua respirent sur des meteos legerement differentes (4 min vs 4.5 min) : leurs\nphases derivent lentement, tantot ensemble tantot en opposition, sur plusieurs dizaines\nde minutes (a la Steve Reich). Rien n'est sequence : tout vient des carillons Koshi et\nde leur battant.\n\nRack CARILLONS : Terra + Aqua (grave), poussees par la meme maree, des meteos qui derivent.\nRack SOUFFLE : le vent lui-meme (bruit rose filtre), plus fort quand la meteo monte.\nRack OMBRE : un second Koshi Terra IDENTIQUE (meme graine, meme maree/meteo/rafales que\n  Terra) mais muet : ses sorties GATE/CV pilotent un sinus deux octaves plus bas qui\n  glisse vers chaque tige frappee. L'ombre de chaque note.\nRack GRAND CARILLON : Aqua deux octaves plus bas, vent rare, maree attenuee : les gongs.\nRack HALO : capte Carillons + Grand Carillon (bus A) et les transforme en nappe granulaire\n  qui plane dans une grande reverbe - le halo laisse par les tiges qui sonnent encore\n  apres qu'on ne les entend plus au premier plan.\n\nA toucher : WIND des Koshi (base), les faders du mixer. La graine (SEED) du Koshi Ombre\ndoit rester celle du Koshi Terra pour que l'ombre suive."
             }
           },
           {
             "id": "meteo-1",
             "type": "lfo",
-            "name": "Meteo",
+            "name": "Meteo Terra",
             "position": {
               "x": 40,
               "y": 300
@@ -55,6 +55,38 @@
             }
           },
           {
+            "id": "maree-1",
+            "type": "lfo",
+            "name": "Maree",
+            "position": {
+              "x": 40,
+              "y": 820
+            },
+            "params": {
+              "rate": 0.0007,
+              "depth": 0.35,
+              "offset": 0.15,
+              "shape": "sine",
+              "bipolar": false
+            }
+          },
+          {
+            "id": "meteo-aqua-1",
+            "type": "lfo",
+            "name": "Meteo Aqua",
+            "position": {
+              "x": 40,
+              "y": 1080
+            },
+            "params": {
+              "rate": 0.0037,
+              "depth": 0.5,
+              "offset": 0.0,
+              "shape": "sine",
+              "bipolar": false
+            }
+          },
+          {
             "id": "koshi-terra",
             "type": "koshi",
             "name": "Koshi Terra",
@@ -81,7 +113,7 @@
             "name": "Koshi Aqua (grave)",
             "position": {
               "x": 480,
-              "y": 560
+              "y": 620
             },
             "params": {
               "tuning": 1,
@@ -125,6 +157,18 @@
             }
           },
           {
+            "id": "send-1",
+            "type": "send",
+            "name": "Send Halo",
+            "position": {
+              "x": 1320,
+              "y": 560
+            },
+            "params": {
+              "bus": 0
+            }
+          },
+          {
             "id": "out-1",
             "type": "output",
             "name": "Out Carillons",
@@ -162,7 +206,40 @@
           },
           {
             "from": {
-              "moduleId": "meteo-1",
+              "moduleId": "maree-1",
+              "portId": "cv-out"
+            },
+            "to": {
+              "moduleId": "koshi-terra",
+              "portId": "wind"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "meteo-aqua-1",
+              "portId": "cv-out"
+            },
+            "to": {
+              "moduleId": "koshi-aqua",
+              "portId": "wind"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "rafales-1",
+              "portId": "cv-out"
+            },
+            "to": {
+              "moduleId": "koshi-aqua",
+              "portId": "wind"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "maree-1",
               "portId": "cv-out"
             },
             "to": {
@@ -211,6 +288,17 @@
             },
             "to": {
               "moduleId": "out-1",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "mix-1",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "send-1",
               "portId": "in"
             },
             "kind": "audio"
@@ -438,7 +526,7 @@
               "y": 40
             },
             "params": {
-              "text": "OMBRE : ce Koshi est la copie exacte du Koshi Terra du rack Carillons (meme accord, meme graine 3, meme LFO meteo et rafales) mais son niveau est a zero : il ne sert qu'a publier les frappes. GATE -> deux slews (attaque douce, longue retombee) -> VCA ; CV -> slew -> hauteur d'un sinus deux octaves plus bas. Chaque frappe fait glisser l'ombre vers la note frappee."
+              "text": "OMBRE : ce Koshi est la copie exacte du Koshi Terra du rack Carillons (meme accord, meme graine 3, memes LFO meteo/rafales/maree) mais son niveau est a zero : il ne sert qu'a publier les frappes. GATE -> deux slews (attaque douce, retombee) -> VCA ; CV -> slew -> hauteur d'un sinus deux octaves plus bas. Chaque frappe fait glisser l'ombre vers la note frappee."
             }
           },
           {
@@ -471,6 +559,22 @@
               "offset": 0.0,
               "shape": "triangle",
               "bipolar": true
+            }
+          },
+          {
+            "id": "maree-3",
+            "type": "lfo",
+            "name": "Maree",
+            "position": {
+              "x": 40,
+              "y": 820
+            },
+            "params": {
+              "rate": 0.0007,
+              "depth": 0.35,
+              "offset": 0.15,
+              "shape": "sine",
+              "bipolar": false
             }
           },
           {
@@ -634,6 +738,17 @@
           },
           {
             "from": {
+              "moduleId": "maree-3",
+              "portId": "cv-out"
+            },
+            "to": {
+              "moduleId": "koshi-ombre",
+              "portId": "wind"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
               "moduleId": "koshi-ombre",
               "portId": "cv"
             },
@@ -748,7 +863,7 @@
               "y": 40
             },
             "params": {
-              "text": "GRAND CARILLON : Aqua deux octaves plus bas, vent rare (base 0.04 + un quart de la meteo), sustain long : des gongs espaces, dans une grande reverb."
+              "text": "GRAND CARILLON : Aqua deux octaves plus bas, vent rare (base 0.04 + un quart de la meteo + une maree attenuee), sustain long : des gongs espaces, dans une grande reverb. Egalement envoye au bus Halo."
             }
           },
           {
@@ -763,6 +878,22 @@
               "rate": 0.004,
               "depth": 0.25,
               "offset": 0.0,
+              "shape": "sine",
+              "bipolar": false
+            }
+          },
+          {
+            "id": "maree-4",
+            "type": "lfo",
+            "name": "Maree (att.)",
+            "position": {
+              "x": 40,
+              "y": 560
+            },
+            "params": {
+              "rate": 0.0007,
+              "depth": 0.15,
+              "offset": 0.05,
               "shape": "sine",
               "bipolar": false
             }
@@ -804,6 +935,18 @@
             }
           },
           {
+            "id": "send-4",
+            "type": "send",
+            "name": "Send Halo",
+            "position": {
+              "x": 1120,
+              "y": 560
+            },
+            "params": {
+              "bus": 0
+            }
+          },
+          {
             "id": "out-4",
             "type": "output",
             "name": "Out Grand",
@@ -820,6 +963,17 @@
           {
             "from": {
               "moduleId": "meteo-4",
+              "portId": "cv-out"
+            },
+            "to": {
+              "moduleId": "koshi-grand",
+              "portId": "wind"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "maree-4",
               "portId": "cv-out"
             },
             "to": {
@@ -849,6 +1003,151 @@
               "portId": "in"
             },
             "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "koshi-grand",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "send-4",
+              "portId": "in"
+            },
+            "kind": "audio"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rack-5",
+      "name": "Halo",
+      "graph": {
+        "modules": [
+          {
+            "id": "notes-5",
+            "type": "notes",
+            "name": "Halo",
+            "position": {
+              "x": 40,
+              "y": 40
+            },
+            "params": {
+              "text": "HALO : capte l'audio de Carillons et Grand Carillon (bus Send/Receive A) et le transforme en nappe. Gain d'entree (mise a niveau) -> Granular Delay (grains qui trainent et se decalent legerement en hauteur = shimmer) -> grande reverb. Ce n'est PAS un nouveau son : c'est la resonance des memes tiges, etalee et prolongee. Aucune connexion CV inter-rack n'existe (seul l'audio traverse les racks via Send/Receive) : ce rack ne recoit donc pas le vent directement, seulement ce que les carillons lui envoient."
+            }
+          },
+          {
+            "id": "recv-5",
+            "type": "receive",
+            "name": "Recoit Carillons",
+            "position": {
+              "x": 40,
+              "y": 300
+            },
+            "params": {
+              "bus": 0
+            }
+          },
+          {
+            "id": "gain-5",
+            "type": "gain",
+            "name": "Niveau",
+            "position": {
+              "x": 400,
+              "y": 300
+            },
+            "params": {
+              "gain": 0.55
+            }
+          },
+          {
+            "id": "gdly-5",
+            "type": "granular-delay",
+            "name": "Shimmer",
+            "position": {
+              "x": 620,
+              "y": 300
+            },
+            "params": {
+              "time": 900,
+              "size": 180,
+              "density": 9,
+              "pitch": 1.0,
+              "feedback": 0.55,
+              "mix": 0.6
+            }
+          },
+          {
+            "id": "rev-5",
+            "type": "reverb",
+            "name": "Grande Reverb",
+            "position": {
+              "x": 900,
+              "y": 300
+            },
+            "params": {
+              "time": 0.92,
+              "damp": 0.35,
+              "preDelay": 50,
+              "mix": 0.6
+            }
+          },
+          {
+            "id": "out-5",
+            "type": "output",
+            "name": "Out Halo",
+            "position": {
+              "x": 1340,
+              "y": 300
+            },
+            "params": {
+              "level": 1
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": {
+              "moduleId": "recv-5",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "gain-5",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "gain-5",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "gdly-5",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "gdly-5",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "rev-5",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "rev-5",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "out-5",
+              "portId": "in"
+            },
+            "kind": "audio"
           }
         ]
       }
@@ -872,6 +1171,11 @@
     },
     "rack-4": {
       "volume": 0.6,
+      "mute": false,
+      "solo": false
+    },
+    "rack-5": {
+      "volume": 0.5,
       "mute": false,
       "solo": false
     }

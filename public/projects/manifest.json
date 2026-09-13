@@ -81,7 +81,7 @@
     {
       "id": "jardin-de-vent",
       "name": "Jardin de Vent 🎐",
-      "description": "Quatre carillons Koshi dans un vent qui monte et retombe sur quatre minutes : carillons, souffle, ombre (un sinus qui glisse vers chaque tige frappee), gongs graves. Generatif infini, rien de sequence.",
+      "description": "Cinq racks autour du carillon Koshi : une maree de fond (~24 min) porte une meteo plus rapide, Terra et Aqua derivent en phase l'un contre l'autre, une Ombre fait glisser un sinus vers chaque tige frappee, un rack Halo transforme la resonance des carillons en nappe granulaire. Generatif infini, rien de sequence.",
       "file": "jardin-de-vent.json",
       "group": "Ambient"
     }
