@@ -1,8 +1,15 @@
 name: Release (Tauri desktop app)
 
-# Builds the Tauri standalone app (native audio, no WASM involved - see dsp-standalone)
-# for Windows / macOS / Linux and publishes the installers as a GitHub Release, as a
-# DRAFT so a human reviews and hits "Publish" - nothing goes public automatically.
+# Builds the Tauri standalone app (native audio, no WASM involved at RUNTIME - see
+# dsp-standalone) for Windows / macOS / Linux and publishes the installers as a GitHub
+# Release, as a DRAFT so a human reviews and hits "Publish" - nothing goes public
+# automatically.
+#
+# Gotcha: `tauri build`'s beforeBuildCommand runs the SAME `npm run build` as the web
+# app, and the frontend bundles the Web-mode engine (wasm-graph-processor.ts) even for a
+# Tauri build - it just isn't used at runtime. So this job builds the WASM engine first,
+# same as pages.yml, purely so the frontend compiles; discovered because the first real
+# release run failed on all 4 platforms with "Could not resolve dsp_wasm_bg.wasm".
 #
 # Triggered by pushing a version tag (matches this repo's existing v0.x.y convention),
 # or manually from the Actions tab.
@@ -48,12 +55,24 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin,wasm32-unknown-unknown' || 'wasm32-unknown-unknown' }}
 
       - name: Cache Rust build
         uses: Swatinem/rust-cache@v2
         with:
           workspaces: '. -> target'
+
+      - name: Install wasm-bindgen-cli (pinned to the version in Cargo.lock)
+        shell: bash
+        run: |
+          set -e
+          VER=$(grep -A1 '^name = "wasm-bindgen"$' Cargo.lock | grep version | head -1 | cut -d'"' -f2)
+          echo "wasm-bindgen-cli $VER"
+          cargo install wasm-bindgen-cli --version "$VER" --locked
+
+      - name: Build WASM engine (needed by the frontend build even in Tauri mode)
+        shell: pwsh
+        run: ./scripts/build-wasm.ps1
 
       - name: npm ci
         run: npm ci
