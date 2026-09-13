@@ -1066,6 +1066,13 @@
       "group": "Physical Modeling"
     },
     {
+      "id": "koshi-cadence",
+      "name": "Koshi Cadence",
+      "description": "Le carillon Koshi (Aria) dans un vent lent, avec une petite rythmique legere en plus : un Euclidean 13/5 declenche une note pincee dont la hauteur erre sur la pentatonique mineure de La (Chaos de Lorenz quantifie, echantillonne a chaque frappe). Pouls stable, notes jamais identiques.",
+      "file": "koshi-cadence.json",
+      "group": "Physical Modeling"
+    },
+    {
       "id": "wavetable-vocal",
       "name": "Wavetable Vocal",
       "description": "Vocal formants bank with LFO-controlled position morphing.",

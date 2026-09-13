@@ -1,0 +1,392 @@
+{
+  "id": "koshi-cadence",
+  "name": "Koshi Cadence",
+  "description": "Le carillon Koshi (Aria) dans un vent lent, avec une petite rythmique legere en plus : un Euclidean 13/5 declenche une note pincee dont la hauteur erre sur la pentatonique mineure de La (Chaos de Lorenz quantifie, echantillonne a chaque frappe). Pouls stable, notes jamais identiques.",
+  "group": "Physical Modeling",
+  "graph": {
+    "modules": [
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Koshi Cadence",
+        "position": {
+          "x": 40,
+          "y": 40
+        },
+        "params": {
+          "text": "KOSHI CADENCE\n\nLe meme carillon Koshi que Jardin de Vent (vent autonome, rien de sequence dans le\nsouffle) - mais avec, cette fois, une petite rythmique legere qui n'existait dans aucun\nautre preset : un euclideen lent (13 pas, 5 frappes, ~58 bpm) declenche une note pincee\n(VCO + enveloppe courte), dont la hauteur n'est jamais la meme deux fois : un attracteur\nde Lorenz erre lentement et se fait echantillonner a chaque frappe, quantifie sur la\ngamme pentatonique mineure de La (A C D E G) - la meme famille de notes que le carillon\nAria choisi ici (A C E A B C E B). Le pouls reste stable et previsible ; les notes,\nelles, dansent sans jamais se repeter.\n\nCarillon Aria : vent modere (0.35) avec meteo lente (~3 min) + rafales (~30 s).\nRythmique : Euclidean -> Chaos (quantifie La pentatonique mineure) -> Sample & Hold ->\nVCO (base DO, voir note technique) -> enveloppe courte -> delay leger -> meme reverb\nque le carillon.\n\nNote technique (pour qui modifie ce patch) : la base du VCO doit rester un DO (ici DO4,\n261.63 Hz) - le Chaos calcule deja son decalage de tonalite (root=La) en comptant les\ndemi-tons depuis DO. Changer la base du VCO pour une autre note transposerait TOUT le\nmotif de facon incorrecte (le root serait applique deux fois).\n\nA toucher : WIND du Koshi, tempo/steps/pulses de l'Euclidean, speed du Chaos (vitesse\nde la derive des notes), les deux faders du mixeur (carillon vs rythmique)."
+        }
+      },
+      {
+        "id": "koshi-1",
+        "type": "koshi",
+        "name": "Koshi Aria",
+        "position": {
+          "x": 40,
+          "y": 300
+        },
+        "params": {
+          "tuning": 2,
+          "wind": 0.35,
+          "gust": 0.6,
+          "sustain": 1.0,
+          "brightness": 0.5,
+          "body": 0.5,
+          "tune": 0,
+          "octave": 0,
+          "seed": 13,
+          "level": 0.75
+        }
+      },
+      {
+        "id": "meteo-1",
+        "type": "lfo",
+        "name": "Meteo",
+        "position": {
+          "x": 40,
+          "y": 560
+        },
+        "params": {
+          "rate": 0.006,
+          "depth": 0.45,
+          "offset": 0.05,
+          "shape": "sine",
+          "bipolar": false
+        }
+      },
+      {
+        "id": "rafales-1",
+        "type": "lfo",
+        "name": "Rafales",
+        "position": {
+          "x": 40,
+          "y": 820
+        },
+        "params": {
+          "rate": 0.03,
+          "depth": 0.15,
+          "offset": 0.0,
+          "shape": "triangle",
+          "bipolar": true
+        }
+      },
+      {
+        "id": "euclid-1",
+        "type": "euclidean",
+        "name": "Pouls (13/5)",
+        "position": {
+          "x": 480,
+          "y": 40
+        },
+        "params": {
+          "enabled": true,
+          "tempo": 58,
+          "rate": 2,
+          "steps": 13,
+          "pulses": 5,
+          "rotation": 0,
+          "gateLength": 45,
+          "swing": 8
+        }
+      },
+      {
+        "id": "chaos-1",
+        "type": "chaos",
+        "name": "Derive (La min pent)",
+        "position": {
+          "x": 480,
+          "y": 300
+        },
+        "params": {
+          "speed": 0.06,
+          "rho": 28,
+          "sigma": 10,
+          "beta": 2.6667,
+          "scale": 8,
+          "root": 9
+        }
+      },
+      {
+        "id": "sh-1",
+        "type": "sample-hold",
+        "name": "Echantillonne",
+        "position": {
+          "x": 720,
+          "y": 300
+        },
+        "params": {
+          "mode": 0
+        }
+      },
+      {
+        "id": "osc-1",
+        "type": "oscillator",
+        "name": "Note pincee (base DO)",
+        "position": {
+          "x": 940,
+          "y": 300
+        },
+        "params": {
+          "frequency": 261.6256,
+          "type": "triangle",
+          "pwm": 0.5,
+          "unison": 1,
+          "detune": 0,
+          "fmLin": 0,
+          "fmExp": 0,
+          "subMix": 0,
+          "subOct": 1
+        }
+      },
+      {
+        "id": "env-1",
+        "type": "adsr",
+        "name": "Enveloppe",
+        "position": {
+          "x": 1160,
+          "y": 300
+        },
+        "params": {
+          "attack": 0.003,
+          "decay": 0.22,
+          "sustain": 0.0,
+          "release": 0.08
+        }
+      },
+      {
+        "id": "vca-1",
+        "type": "gain",
+        "name": "VCA",
+        "position": {
+          "x": 1160,
+          "y": 560
+        },
+        "params": {
+          "gain": 0.9
+        }
+      },
+      {
+        "id": "dly-1",
+        "type": "delay",
+        "name": "Delay leger",
+        "position": {
+          "x": 1380,
+          "y": 300
+        },
+        "params": {
+          "time": 340,
+          "feedback": 0.22,
+          "mix": 0.28,
+          "tone": 0.5,
+          "pingPong": false
+        }
+      },
+      {
+        "id": "mix-1",
+        "type": "mixer-8",
+        "name": "Mix",
+        "position": {
+          "x": 1600,
+          "y": 300
+        },
+        "params": {
+          "level1": 0.85,
+          "level2": 0.55
+        }
+      },
+      {
+        "id": "rev-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": {
+          "x": 1820,
+          "y": 300
+        },
+        "params": {
+          "time": 0.6,
+          "damp": 0.4,
+          "preDelay": 20,
+          "mix": 0.3
+        }
+      },
+      {
+        "id": "scope-1",
+        "type": "scope",
+        "name": "Scope",
+        "position": {
+          "x": 1820,
+          "y": 40
+        },
+        "params": {}
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Out",
+        "position": {
+          "x": 2260,
+          "y": 300
+        },
+        "params": {
+          "level": 1
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": {
+          "moduleId": "meteo-1",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "koshi-1",
+          "portId": "wind"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "rafales-1",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "koshi-1",
+          "portId": "wind"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "euclid-1",
+          "portId": "gate"
+        },
+        "to": {
+          "moduleId": "sh-1",
+          "portId": "trig"
+        },
+        "kind": "sync"
+      },
+      {
+        "from": {
+          "moduleId": "chaos-1",
+          "portId": "x"
+        },
+        "to": {
+          "moduleId": "sh-1",
+          "portId": "in"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "sh-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "osc-1",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "euclid-1",
+          "portId": "gate"
+        },
+        "to": {
+          "moduleId": "env-1",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "osc-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "vca-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "env-1",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "vca-1",
+          "portId": "cv"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "vca-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "dly-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "koshi-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mix-1",
+          "portId": "in-1"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "dly-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mix-1",
+          "portId": "in-2"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "mix-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "rev-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "rev-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "out-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "mix-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "scope-1",
+          "portId": "in-a"
+        },
+        "kind": "audio"
+      }
+    ]
+  }
+}
