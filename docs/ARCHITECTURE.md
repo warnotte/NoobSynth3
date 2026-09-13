@@ -117,7 +117,7 @@ NoobSynth3/
 │   └── src/lib.rs          # Commandes Tauri
 │
 ├── crates/                 # Workspace Rust
-│   ├── dsp-core/           # DSP partagé (~23300 lignes, 88 fichiers)
+│   ├── dsp-core/           # DSP partagé (~25800 lignes, 94 fichiers)
 │   │   ├── lib.rs          # Exports publics
 │   │   ├── common.rs       # Utilitaires partagés
 │   │   ├── oscillators/    # VCO, Supersaw, FM, TB-303, NES, SNES...

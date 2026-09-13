@@ -1,5 +1,7 @@
 # Plan: Polyphonie pour MIDI File Sequencer
 
+**Statut :** 📦 Archivé (historique) — conservé dans `docs/archive/` pour référence, plus un plan actif.
+
 ## Contexte
 
 ### Problème actuel

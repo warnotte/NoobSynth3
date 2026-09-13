@@ -41,14 +41,14 @@ App.tsx                          # Root component, state management, undo/redo
     ├── ModuleCard.tsx           # Single module frame (header, ports, body)
     │   └── controls/            # Module-specific controls
     │       ├── index.tsx        # Router → category files
-    │       ├── sources/         # Source modules (18 files)
-    │       │   └── ... (18 modules)
-    │       ├── sequencers/      # Sequencer modules (16 files)
-    │       │   └── ... (15 modules)
-    │       ├── io/              # I/O modules (9 files)
+    │       ├── sources/         # Source modules (18 files, 20 types — granular/sampler
+    │       │   └── ... (20 modules)  #   are controlled one level up, in controls/)
+    │       ├── sequencers/      # Sequencer modules (17 files)
+    │       │   └── ... (17 modules)
+    │       ├── io/              # I/O modules (8 files — send/receive share one file)
     │       │   └── ... (9 modules)
-    │       ├── effects/         # Effect modules (23 files)
-    │       │   └── ... (22 modules)
+    │       ├── effects/         # Effect modules (22 files, 23 types — ring-mod's
+    │       │   └── ... (23 modules)  #   control lives in AmplifierControls.tsx)
     │       ├── FilterControls.tsx
     │       ├── AmplifierControls.tsx
     │       ├── ModulatorControls.tsx
@@ -309,7 +309,9 @@ control, output, audio-in, scope, meter, lab, notes, send, receive
 
 Les notes détaillées d'implémentation par feature et par module vivent dans **[docs/FEATURES.md](./docs/FEATURES.md)** — à consulter avant de travailler sur une feature précise.
 
-**Sujets couverts :** Multi-Rack System · Global Transport · Module Templates · Send/Receive · Mixer Console + Channel Strip/Master FX · Undo/Redo · Console Steel Shell (layout de page) · Recording (WAV) · CPU Meter · Drum Sequencer · MIDI File Sequencer Polyphony · AY Player · TR-909 Accent Latching · Graph Update Modes · Sequencer Playhead Sync · Tauri Standalone Mode · Delay Tempo Sync · Compressor Sidechain · Flanger · Frequency Shifter · EQ 3-Band · Glitch/Stutter · Leslie · Pipe Organ (Hammond B3) · Wah-Wah · Tube Amp · Unified Rate Divisions · Clap909 Fix.
+**Sujets couverts :** Multi-Rack System · Global Transport · Module Templates · Send/Receive · Mixer Console + Channel Strip/Master FX · Undo/Redo · Console Steel Shell (layout de page) · Console Steel — Faceplates des modules (phase 3) ·
+Console Steel — Mobile (phase 4) · Câbles — architecture (coordonnées contenu) ·
+Déconnexion des câbles (desktop) · Recording (WAV) · CPU Meter · Drum Sequencer · MIDI File Sequencer Polyphony · AY Player · TR-909 Accent Latching · Graph Update Modes · Sequencer Playhead Sync · Tauri Standalone Mode · Delay Tempo Sync · Compressor Sidechain · Flanger · Frequency Shifter · EQ 3-Band · Glitch/Stutter · Leslie · Pipe Organ (Hammond B3) · Wah-Wah · Tube Amp · Unified Rate Divisions · Clap909 Fix.
 
 ### Graph Update Modes (IMPORTANT — à garder en tête)
 

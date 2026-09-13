@@ -19,6 +19,7 @@ src/ui/controls/
 │   ├── NoiseControls.tsx
 │   ├── SupersawControls.tsx
 │   ├── KarplusControls.tsx
+│   ├── KoshiControls.tsx
 │   ├── NesOscControls.tsx
 │   ├── SnesOscControls.tsx
 │   ├── Tb303Controls.tsx
@@ -35,16 +36,18 @@ src/ui/controls/
 │   └── shared/
 │       └── sidWaveformHelpers.ts  # Helpers CV pour NES/SNES
 │
-├── sequencers/              # Sequenceurs (15 modules)
+├── sequencers/              # Sequenceurs (17 modules)
 │   ├── index.tsx            # Router pour sequencers
 │   ├── ArpeggiatorControls.tsx
 │   ├── StepSequencerControls.tsx
 │   ├── DrumSequencerControls.tsx
+│   ├── DrumMachine909Controls.tsx
 │   ├── EuclideanControls.tsx
 │   ├── ClockControls.tsx
 │   ├── MarioControls.tsx
 │   ├── MidiFileSequencerControls.tsx
 │   ├── TuringMachineControls.tsx
+│   ├── HarmonistControls.tsx
 │   ├── SidPlayerControls.tsx
 │   ├── AyPlayerControls.tsx
 │   ├── ChordSequencerControls.tsx
@@ -97,7 +100,8 @@ src/ui/controls/
 ├── AmplifierControls.tsx    # gain, cv-vca, mixer, mixer-1x2, mixer-8, crossfader, ring-mod
 ├── ModulatorControls.tsx    # adsr, lfo, mod-router, sample-hold, slew, quantizer, envelope-follower, chaos
 ├── DrumControls.tsx         # 909-*, 808-*
-└── GranularControls.tsx     # granular (extrait car complexe)
+├── GranularControls.tsx     # granular (extrait car complexe)
+└── SamplerControls.tsx      # sampler (extrait car complexe : auto-load, waveform, loop)
 ```
 
 ## Lab Panel (layout test)

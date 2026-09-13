@@ -53,6 +53,8 @@ Chaque connexion utilise des objets imbriqués `from`/`to` avec `moduleId` et `p
 1. [ ] `public/presets/<preset-name>.json` - Le fichier preset
 2. [ ] `public/presets/manifest.json` - **OBLIGATOIRE** : Ajouter l'entrée au manifest
 3. [ ] **Module Notes** - **OBLIGATOIRE** : Ajouter un module `notes` explicatif dans le preset
+4. [ ] `npm run check:presets <preset-name>` - Vérifie qu'aucun câble ne vise un port inexistant
+   (le moteur ignore silencieusement un port inconnu → preset qui joue avec un câble mort)
 
 ```json
 {

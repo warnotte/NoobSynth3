@@ -68,7 +68,7 @@ Le projet est bien optimisé pour un usage normal:
 
 | Zone | Risque | Solution |
 |------|--------|----------|
-| Câbles SVG | Élevé (>50) | Canvas/WebGL, virtualisation |
+| Câbles SVG | ✅ Résolu (v0.15.0) | Calque SVG déplacé DANS le scroller, coordonnées contenu (pas écran) — scroll natif, 0 recalcul JS par frame |
 | Re-renders modules | Moyen | React.memo, état granulaire |
 | Séquenceurs (128 boutons) | Moyen | Canvas pour grille |
 
@@ -194,12 +194,15 @@ Atomics.notify(state, 0);
 
 ## Optimisations React/UI
 
-### Câbles SVG
-- **Problème:** 50+ câbles = 50 recalculs Bézier par frame
-- **Solutions:**
-  - Canvas 2D ou WebGL
-  - Virtualisation (rendre uniquement les visibles)
-  - Throttling pendant le drag
+### Câbles SVG ✅ Résolu (v0.15.0)
+- **Problème (d'origine):** Positions des ports en coordonnées écran → chaque frame de scroll
+  re-mesurait ~300 `getBoundingClientRect` + re-rendait tous les paths, avec 2 frames de retard.
+- **Solution livrée:** calque SVG déplacé DANS le rack/scroller, positions calculées en
+  **coordonnées contenu** au lieu de coordonnées écran → le scroll natif du navigateur suffit
+  (0 JS par frame), clipping natif, désalignement 0px (`test-cable-scroll-sync.mjs`). Canvas/WebGL
+  s'est avéré inutile une fois ce changement fait — mesuré, pas juste supposé.
+  ⚠️ Piège : les paths doivent rester `pointer-events: none`, sinon le trait du câble vole les
+  clics des jacks en dessous.
 
 ### Re-renders
 - **Problème:** Cascade App → RackView → tous les ModuleView
@@ -227,7 +230,7 @@ Atomics.notify(state, 0);
 | 4 | SharedArrayBuffer setup | 2h | Basse |
 | 5 | Worker pour Granular Delay | 2-3 jours | Basse |
 | 6 | Worker pour Reverb/Vocoder | 2-3 jours | Basse |
-| 7 | Canvas pour câbles | 1-2 jours | Moyenne |
+| ~~7~~ | ~~Canvas pour câbles~~ ✅ Résolu autrement (coordonnées contenu, v0.15.0) | — | — |
 | 8 | React.memo sur modules | 2-4h | Moyenne |
 
 ---

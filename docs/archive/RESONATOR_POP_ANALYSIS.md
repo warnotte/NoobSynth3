@@ -1,5 +1,7 @@
 # Resonator Pop/Click Issue Analysis
 
+**Statut :** 📦 Archivé (historique) — conservé dans `docs/archive/` pour référence, plus un plan actif.
+
 ## Executive Summary
 
 The resonator module produces audible pops/clicks at each gate trigger. After analyzing the DSP implementation and comparing with other modules (Karplus-Strong, TR-909 drums), the root cause has been identified: **the internal exciter generates a sharp impulse with a discontinuity at trigger onset**.

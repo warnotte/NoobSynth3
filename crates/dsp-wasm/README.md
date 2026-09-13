@@ -73,6 +73,11 @@ impl WasmGraphEngine {
 
 ## Optimisations
 
-- Compilé avec `opt-level = 3` et `lto = true`
+- Compilé avec `opt-level = "s"` (taille, pas vitesse), `lto = true`, `codegen-units = 1`,
+  `panic = "abort"`, `strip = "symbols"` (profil `[profile.release]` du workspace)
+- `wasm-opt -O2 --enable-bulk-memory --enable-nontrapping-float-to-int` en post-traitement
+  (`scripts/build-wasm.ps1`, ~15% plus petit)
+- Le script de build patche aussi `dsp_wasm.js` avec un polyfill TextDecoder/TextEncoder
+  (nécessaire dans le contexte restreint de l'AudioWorklet)
 - Pas d'allocations dans la boucle audio
 - SIMD automatique via LLVM

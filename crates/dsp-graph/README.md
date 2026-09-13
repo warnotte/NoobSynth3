@@ -14,17 +14,17 @@ Moteur d'exécution du graphe modulaire. Parse le JSON et exécute les modules D
 
 ```
 src/
-├── lib.rs          # GraphEngine, tri topologique, routage (~1020 lignes)
-├── module_type.rs  # normalize_module_type : string → ModuleType (~125 lignes)
-├── types.rs        # ModuleType, PortInfo, ParamBuffer, TransportContext (~166 lignes)
-├── buffer.rs       # Buffer, mix_buffers, downmix (~122 lignes)
-├── state/          # Structs *State par catégorie + enum ModuleState (9 fichiers, ~955 l)
-├── ports/          # Ports I/O + résolution d'index, un fichier par fonction (5 fichiers, ~1510 l)
-├── instantiate/    # create_state / apply_param / apply_param_str (4 fichiers, ~1762 l)
-└── process/        # process_module + traitement DSP par catégorie (9 fichiers, ~3105 l)
+├── lib.rs          # GraphEngine, tri topologique, routage (~1179 lignes)
+├── module_type.rs  # normalize_module_type : string → ModuleType (~131 lignes)
+├── types.rs        # ModuleType, PortInfo, ParamBuffer, TransportContext (~190 lignes)
+├── buffer.rs       # Buffer, mix_buffers, downmix (~133 lignes)
+├── state/          # Structs *State par catégorie + enum ModuleState (9 fichiers, ~1158 l)
+├── ports/          # Ports I/O + résolution d'index, un fichier par fonction (5 fichiers, ~1625 l)
+├── instantiate/    # create_state / apply_param / apply_param_str (4 fichiers, ~2008 l)
+└── process/        # process_module + traitement DSP par catégorie (9 fichiers, ~3477 l)
 ```
 
-**Total : ~8760 lignes en 31 fichiers** (découpé par catégorie, cf. dsp-core)
+**Total : ~9900 lignes en 31 fichiers** (découpé par catégorie, cf. dsp-core)
 
 | Fichier | Responsabilité |
 |---------|----------------|
@@ -120,3 +120,11 @@ Voice 3: VCO → VCF → VCA ─┘
 | `cv` | Control voltage (modulation) |
 | `gate` | Gate/trigger binaire |
 | `sync` | Sync oscillateur |
+
+## Tests & Bancs de test
+
+- `tests/presets.rs` — tests d'intégration : charge et rend tous les presets/projets, vérifie
+  l'absence de NaN/Inf/panic (`npm run test:presets`).
+- `examples/render_graph.rs` — banc offline : rend N secondes d'un graphe aplati vers un fichier
+  f32 (peak/NaN/RMS-par-10s). Sortie **planaire** `[L|R|taps]`, pas entrelacée (voir CLAUDE.md §
+  Scripts). À enchaîner avec `scripts/spectrogram.mjs` pour visualiser le rendu.

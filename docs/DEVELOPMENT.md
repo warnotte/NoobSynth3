@@ -107,6 +107,25 @@ rmdir /s /q dist
 build.bat
 ```
 
+## CI/CD & Releases
+
+Trois workflows GitHub Actions (`.github/workflows/`) :
+
+| Workflow | Trigger | Rôle |
+|----------|---------|------|
+| `ci.yml` | Push/PR vers `main` | `cargo test --workspace` + build web complet (wasm+vite) |
+| `release.yml` | Push d'un tag `v*.*.*` | Build Tauri (audio natif) Windows/macOS(x64+arm64)/Linux, publie une **Release GitHub en brouillon** (installeurs attachés — publication manuelle) |
+| `pages.yml` | Push d'un tag `v*.*.*` | Build web, déploie sur [GitHub Pages](https://warnotte.github.io/NoobSynth3/) |
+
+**Avant de tagger une release**, voir CLAUDE.md § Development Notes : synchroniser le numéro de
+version dans `package.json`, `src-tauri/tauri.conf.json` **et** `src-tauri/Cargo.toml`, committer
+et merger sur `main` **avant** de pousser le tag (sinon le build tourne sur l'ancien numéro).
+
+```bash
+git tag -a vX.Y.Z -m "..."
+git push origin vX.Y.Z
+```
+
 ## Structure du code
 
 ### Frontend (TypeScript)
@@ -173,6 +192,7 @@ crates/
 > **Vérification** : après ajout/modif d'un module, lancer ces garde-fous :
 > - `npm run check:modules` — parité ports TS↔Rust
 > - `npm run check:ui-audio` — parité Web↔Tauri (si playhead/viz)
+> - `npm run check:presets` — câbles morts dans les presets/projets
 > - `npm run module-ref` — régénère `docs/MODULE_REFERENCE.md`
 > - `npm run build:wasm` — rebuild après modif Rust
 

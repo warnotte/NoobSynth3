@@ -1,6 +1,9 @@
 # NoobSynth3 - Future Development Roadmap
 
-> Revu contre v0.5.x — plusieurs items ci-dessous sont désormais livrés (voir docs/ROADMAP.md).
+> Revu une première fois contre v0.5.x, puis à nouveau contre v0.16.1 (2026-09-14) : §2.1, §4.4,
+> §7.1, §7.2 corrigés/marqués ci-dessous d'après le code réel. Le reste du document n'a pas été
+> revérifié section par section dans cette dernière passe — vérifier l'état réel avant de reprendre
+> un item ancien. Plusieurs items sont désormais livrés (voir aussi docs/ROADMAP.md).
 
 Ce document détaille les améliorations planifiées pour NoobSynth3, organisées par priorité et domaine.
 
@@ -178,11 +181,15 @@ Si on garde le séquenceur interne:
 
 **Problème:** Fichiers trop volumineux
 
-| Fichier | Lignes | Modules | Statut |
-|---------|--------|---------|--------|
-| sources/ | ~1700 | 18 modules | ✅ Fait |
-| sequencers/ | ~2050 | 15 modules | ✅ Fait |
-| io/ | ~840 | 9 modules | ✅ Fait |
+| Fichier | Modules | Statut |
+|---------|---------|--------|
+| sources/ | 20 types (18 fichiers, granular/sampler partagés dans controls/) | ✅ Fait |
+| sequencers/ | 17 types (17 fichiers) | ✅ Fait |
+| io/ | 9 types (8 fichiers, send/receive partagés) | ✅ Fait |
+
+*(Cette section entière est maintenant ✅ Fait — voir `src/ui/controls/ARCHITECTURE.md` pour la
+structure réelle livrée, différente du plan ci-dessous. Candidate à un déplacement vers
+`docs/archive/` aux côtés de `docs/archive/CONTROLS_REFACTORING_PLAN.md`.)*
 
 **Solution:** Structure modulaire (voir `docs/archive/CONTROLS_REFACTORING_PLAN.md`)
 
@@ -265,7 +272,7 @@ src/ui/controls/
 
 ### 2.2 Extraction de App.tsx (Priorité: Moyenne)
 
-**Problème:** App.tsx ~2175 lignes, trop de responsabilités
+**Problème:** App.tsx ~2444 lignes (mesuré), trop de responsabilités
 
 **Déjà extraits** (App.tsx est passé de ~3168 → ~2168 lignes) :
 - `src/hooks/useModuleResize.ts` — état/handlers du Dev Resize
@@ -688,9 +695,15 @@ let scale = 1.0 / active_count as Sample;
 }
 ```
 
-### 4.4 Zoom & Pan du Rack (Priorité: Moyenne)
+### 4.4 Zoom & Pan du Rack — ❌ REJETÉ (tenté et abandonné)
 
-**Problème:** Grands patches débordent de l'écran
+**Historique:** Une version de cette idée ("Canvas Vivant", pan/zoom) a été construite puis tuée
+en cours de chantier — l'utilisateur l'a jugée inutile après coup ("zoom inutile"), crédits déjà
+dépensés à l'aveugle sans validation préalable par maquette. Voir la mémoire du projet
+(`feedback_ui_redesign_not_canvas`). **Ne pas retenter sans nouvelle validation explicite de
+l'utilisateur, et avec une maquette visuelle statique validée AVANT tout code.**
+
+**Problème (d'origine):** Grands patches débordent de l'écran
 
 **Solution:**
 - Mouse wheel = zoom (50% - 200%)
@@ -843,73 +856,30 @@ impl Compressor {
 
 ## 7. Infrastructure & Tooling
 
-### 7.1 Tests Automatisés (Priorité: Haute)
+### 7.1 Tests Automatisés ✅ FAIT (approche différente de celle proposée ici)
 
-**Actuellement:** Pas de tests mentionnés
+**Réalité actuelle** (pas de Vitest/Playwright — cette section décrivait un plan jamais construit) :
+- 35 tests Rust : `crates/dsp-graph/tests/presets.rs` (charge + rend tous les presets, cherche
+  NaN/panic) + tests unitaires `dsp-core` — voir CLAUDE.md § Testing.
+- 3 garde-fous Node en remplacement des tests unit/e2e JS envisagés ici : `check-modules.mjs`
+  (cohérence ports TS↔Rust), `check-ui-audio.mjs` (parité Web↔Tauri), `check-presets.mjs`
+  (câbles morts dans les presets/projets).
+- Le tout tourne dans `ci.yml` sur chaque push/PR (voir 7.2).
 
-**Plan:**
+### 7.2 CI/CD Pipeline ✅ FAIT
 
-```
-tests/
-├── unit/
-│   ├── graph.test.ts        # Graph manipulation
-│   ├── midiParser.test.ts   # MIDI parsing
-│   └── rates.test.ts        # Rate calculations
-├── integration/
-│   ├── presets.test.ts      # All presets load without error
-│   └── engine.test.ts       # Engine start/stop
-└── e2e/
-    ├── basic-patch.spec.ts  # Create simple patch
-    └── preset-load.spec.ts  # Load each preset
-```
-
-**Outils:**
-- Vitest pour unit tests
-- Playwright pour E2E
-
-### 7.2 CI/CD Pipeline (Priorité: Moyenne)
-
-```yaml
-# .github/workflows/ci.yml
-name: CI
-
-on: [push, pull_request]
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Rust
-        uses: dtolnay/rust-action@stable
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install wasm-pack
-        run: cargo install wasm-pack
-
-      - name: Build WASM
-        run: npm run build:wasm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Type check
-        run: npx tsc -b
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Build
-        run: npm run build
-
-      - name: Test
-        run: npm run test
-```
+Livré (2026-09-13, PR #14 puis suivantes) — va au-delà du sketch initialement envisagé pour cette
+section (un seul job `ci.yml` minimal) :
+- `.github/workflows/ci.yml` — `cargo test --workspace` + build web complet (wasm+vite) sur
+  chaque push/PR vers `main`. Node épinglé à **24** (pas 20 comme le plan initial l'esquissait).
+- `.github/workflows/release.yml` — sur push d'un tag `v*.*.*` : build Tauri (audio natif) pour
+  Windows/macOS(x64+arm64)/Linux via `tauri-apps/tauri-action`, publie une Release GitHub en
+  brouillon (installeurs attachés, publication manuelle).
+- `.github/workflows/pages.yml` — même trigger : build web, déploie sur GitHub Pages
+  (https://warnotte.github.io/NoobSynth3/).
+- Ni Vitest (§7.1) ni le job `ci.yml` minimal initialement esquissé n'ont été utilisés tels quels
+  — l'approche réelle (tests Rust + garde-fous Node + release Tauri + démo Pages) couvre plus que
+  ce qui était envisagé ici.
 
 ### 7.3 Documentation Améliorée (Priorité: Basse)
 
@@ -982,5 +952,5 @@ LOW EFFORT ─────────────┼─────────
 
 ---
 
-*Document généré le 30 janvier 2026*
-*Basé sur l'analyse du codebase NoobSynth3 v0.0.0*
+*Document généré le 30 janvier 2026 — basé sur l'analyse du codebase NoobSynth3 v0.0.0. Voir la
+note en tête de document pour l'état des révisions ultérieures.*

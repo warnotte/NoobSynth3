@@ -1,5 +1,7 @@
 # Undo/Redo - Roadmap d'implémentation
 
+**Statut :** 📦 Archivé (historique) — conservé dans `docs/archive/` pour référence, plus un plan actif.
+
 ## 1. Vue d'ensemble
 
 ### Objectif

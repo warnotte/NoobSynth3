@@ -94,8 +94,6 @@ caisse/clap uniquement** (pas sur le kick — c'est ce qui « muddait » le mix)
 - **Max 16 pas = 1 mesure** — pas de patterns 32/64, pas de **song-mode / fills A-B** intégrés (la variation
   demande un 2e drum-seq + gating, bricolé).
 - **Pas de choke group** hhc/hho ; **pas de pan/stéréo par voix** ni de room batterie intégrée.
-- **Bug UI 909-hihat** : les boutons Open/Closed/Mix sont ignorés par le moteur (`apply_param.rs`) — n'utiliser
-  que `tone` + le param JSON `open`.
 - **Format `drumData` non extensible** (le parser ne lit que `g`/`a`) — un champ vélocité `v` serait ignoré
   sans modif Rust.
 

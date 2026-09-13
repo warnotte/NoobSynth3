@@ -81,6 +81,8 @@ Ouvrir l'app, cliquer **Play**, puis jouer avec le clavier ou charger un preset.
 | [Architecture](docs/ARCHITECTURE.md) | Vue d'ensemble technique (2 modes) |
 | [Développement](docs/DEVELOPMENT.md) | Guide de build et contribution |
 | [Modules](docs/MODULES.md) | Référence des 99 modules DSP |
+| [Presets](docs/PRESETS.md) | Format des presets, checklist de création |
+| [Features](docs/FEATURES.md) | Notes d'implémentation par feature/module |
 | [Roadmap](docs/ROADMAP.md) | Plan de développement |
 
 ## Licence
