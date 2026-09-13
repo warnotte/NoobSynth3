@@ -74,11 +74,30 @@
         "position": { "x": 500, "y": 50 },
         "params": {
           "frequency": 220,
-          "waveform": "sawtooth",
-          "pulseWidth": 0.5,
-          "sync": false,
+          "type": "sawtooth",
+          "pwm": 0.5,
+          "sync": false
+        }
+      },
+      {
+        "id": "adsr-1",
+        "type": "adsr",
+        "name": "Env",
+        "position": { "x": 500, "y": 350 },
+        "params": {
           "attack": 0.01,
+          "decay": 0.01,
+          "sustain": 1.0,
           "release": 0.2
+        }
+      },
+      {
+        "id": "vca-1",
+        "type": "gain",
+        "name": "VCA",
+        "position": { "x": 725, "y": 50 },
+        "params": {
+          "gain": 0.9
         }
       },
       {
@@ -117,6 +136,15 @@
         "name": "Out",
         "position": { "x": 950, "y": 50 },
         "params": { "level": 1 }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 50, "y": 500 },
+        "params": {
+          "text": "RANDOM CV GENERATOR\n\nBruit -> S&H x2 -> Quantizer (pitch) + VCF mod, au rythme d'un\nEuclidien. ADSR (attack=0.01, release=0.2) + VCA gates l'oscillateur\nsur chaque pas -> vraies notes rythmees plutot qu'un drone continu."
+        }
       }
     ],
     "connections": [
@@ -152,8 +180,13 @@
       },
       {
         "from": { "moduleId": "euclid-1", "portId": "gate" },
-        "to": { "moduleId": "osc-1", "portId": "gate" },
+        "to": { "moduleId": "adsr-1", "portId": "gate" },
         "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "adsr-1", "portId": "env" },
+        "to": { "moduleId": "vca-1", "portId": "cv" },
+        "kind": "cv"
       },
       {
         "from": { "moduleId": "sh-pitch", "portId": "out" },
@@ -177,6 +210,11 @@
       },
       {
         "from": { "moduleId": "vcf-1", "portId": "out" },
+        "to": { "moduleId": "vca-1", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "vca-1", "portId": "out" },
         "to": { "moduleId": "delay-1", "portId": "in" },
         "kind": "audio"
       },
