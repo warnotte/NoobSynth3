@@ -1,0 +1,74 @@
+name: Deploy web demo (GitHub Pages)
+
+# Builds the Web mode (Vite + WASM engine) and publishes it to GitHub Pages so anyone can
+# try NoobSynth3 in a browser, no install - https://warnotte.github.io/NoobSynth3/
+#
+# Runs on the same version-tag push as release.yml, so the live demo always matches the
+# latest tagged release, plus manual dispatch to redeploy on demand.
+
+on:
+  push:
+    tags: ['v*.*.*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust (+ wasm32 target)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install wasm-bindgen-cli (pinned to the version in Cargo.lock)
+        run: |
+          set -e
+          VER=$(grep -A1 '^name = "wasm-bindgen"$' Cargo.lock | grep version | head -1 | cut -d'"' -f2)
+          echo "wasm-bindgen-cli $VER"
+          cargo install wasm-bindgen-cli --version "$VER" --locked
+
+      - name: Build WASM engine
+        shell: pwsh
+        run: ./scripts/build-wasm.ps1
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+
+      - name: npm ci
+        run: npm ci
+
+      - name: npm run build
+        run: npm run build
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

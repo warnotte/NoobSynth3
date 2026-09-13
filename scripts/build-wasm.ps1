@@ -1,11 +1,23 @@
 $ErrorActionPreference = 'Stop'
 
+# Resolve a cargo-installed tool: prefer whatever's on PATH (true on CI runners once
+# `cargo install` puts it in ~/.cargo/bin, and on any *nix dev machine), else fall back
+# to the well-known Windows install location (some Windows setups don't add it to PATH).
+function Resolve-CargoTool {
+  param([string]$Name)
+  $onPath = Get-Command $Name -ErrorAction SilentlyContinue
+  if ($onPath) { return $onPath.Source }
+  $home_ = if ($env:USERPROFILE) { $env:USERPROFILE } else { $HOME }
+  $ext = if ($IsWindows -or $env:OS -eq 'Windows_NT') { '.exe' } else { '' }
+  return Join-Path $home_ ".cargo/bin/$Name$ext"
+}
+
 $root = Split-Path -Parent $PSScriptRoot
-$cargo = Join-Path $env:USERPROFILE '.cargo\bin\cargo.exe'
-$bindgen = Join-Path $env:USERPROFILE '.cargo\bin\wasm-bindgen.exe'
-$wasmOpt = Join-Path $env:USERPROFILE '.cargo\bin\wasm-opt.exe'
-$outDir = Join-Path $root 'src\engine\worklets\wasm'
-$wasmPath = Join-Path $root 'target\wasm32-unknown-unknown\release\dsp_wasm.wasm'
+$cargo = Resolve-CargoTool 'cargo'
+$bindgen = Resolve-CargoTool 'wasm-bindgen'
+$wasmOpt = Resolve-CargoTool 'wasm-opt'
+$outDir = Join-Path $root 'src/engine/worklets/wasm'
+$wasmPath = Join-Path $root 'target/wasm32-unknown-unknown/release/dsp_wasm.wasm'
 
 # wasm-bindgen requires the installed CLI binary and the `wasm-bindgen` crate
 # (pinned in Cargo.lock) to be the EXACT same version, or the bindgen step fails
