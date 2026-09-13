@@ -1,15 +1,19 @@
 //! TR-909 Hi-Hat.
 //!
-//! Metallic hi-hat with 6 square waves at inharmonic ratios.
+//! Metallic hi-hat. Originally 6 square-wave oscillators through a single resonant filter;
+//! rebuilt (see `crash.rs`/`ride.rs` for the same technique) as a *dense additive* engine -
+//! inharmonic SINE partials spread log-scale up into the bright metallic register, plus a
+//! high-passed noise sizzle for "air", plus an output high-pass so it never reads as dull.
+//! The old 6-oscillator version measured centroid ~2.1-2.4 kHz (duller than this project's
+//! own 808 hat, and than a real 909 hat) because 6 carriers capped at ~2.7x a few-hundred-Hz
+//! base don't leave much real energy up where a resonant filter alone can find it — filtering
+//! harder just removes more signal, it doesn't manufacture brightness that isn't there.
 
 use crate::common::Sample;
 
-/// TR-909 Hi-Hat.
-///
-/// Classic 909-style metallic hi-hat with:
-/// - 6 square wave oscillators at inharmonic ratios
-/// - Bandpass filter for metallic character
-/// - Open/closed modes with different decay times
+const N: usize = 20; // inharmonic sine partials (fewer/tighter than crash's 32 - a hat, not a wash)
+
+/// TR-909 Hi-Hat (dense additive synthesis).
 ///
 /// # Parameters
 ///
@@ -40,9 +44,15 @@ use crate::common::Sample;
 /// ```
 pub struct HiHat909 {
     sample_rate: f32,
-    phases: [f32; 6],
-    filter_state: [f32; 2], // Simple bandpass state
-    amp_env: f32,
+    ratios: [f32; N],
+    amps: [f32; N],
+    decay_mul: [f32; N],
+    phases: [f32; N],
+    env: [f32; N],
+    noise_state: u32,
+    noise_hp: f32,
+    noise_env: f32,
+    hp_state: f32, // output high-pass state
     last_trig: f32,
     is_open: bool,
     latched_accent: f32,
@@ -69,21 +79,54 @@ pub struct HiHat909Inputs<'a> {
 }
 
 impl HiHat909 {
-    // Metallic ratios from TR-909 analysis
-    const RATIOS: [f32; 6] = [1.0, 1.4471, 1.6170, 1.9265, 2.5028, 2.6637];
-    const BASE_FREQ: f32 = 320.0; // Base metallic frequency
+    const BASE_FREQ: f32 = 400.0;
 
     /// Create a new 909 hi-hat.
     pub fn new(sample_rate: f32) -> Self {
+        let (ratios, amps, decay_mul) = Self::build_partials();
         Self {
             sample_rate: sample_rate.max(1.0),
-            phases: [0.0; 6],
-            filter_state: [0.0; 2],
-            amp_env: 0.0,
+            ratios,
+            amps,
+            decay_mul,
+            phases: [0.0; N],
+            env: [0.0; N],
+            noise_state: 0x5EED_1234,
+            noise_hp: 0.0,
+            noise_env: 0.0,
+            hp_state: 0.0,
             last_trig: 0.0,
             is_open: false,
             latched_accent: 0.5,
         }
+    }
+
+    /// Precompute the inharmonic partial bank (deterministic - same on every instance).
+    fn build_partials() -> ([f32; N], [f32; N], [f32; N]) {
+        let mut ratios = [0.0f32; N];
+        let mut amps = [0.0f32; N];
+        let mut decay_mul = [0.0f32; N];
+        let mut seed: u32 = 0x2545_F491;
+        let mut rng = || {
+            seed = seed.wrapping_mul(1_664_525).wrapping_add(1_013_904_223);
+            (seed >> 8) as f32 / 16_777_216.0
+        };
+        // top ratio ~26 -> ~10.4 kHz at BASE 400 / tune 1.0 (bright metallic register)
+        let f_hi = 26.0f32;
+        let mut amp_sum = 0.0f32;
+        for j in 0..N {
+            let t = j as f32 / (N - 1) as f32;
+            let base_ratio = f_hi.powf(t);
+            let jitter = 1.0 + (rng() - 0.5) * 0.4; // +-20% -> inharmonic
+            ratios[j] = base_ratio * jitter;
+            amps[j] = 0.35 + 0.65 * t; // strong high tilt - a hat should read bright, not washy
+            amp_sum += amps[j];
+            decay_mul[j] = 0.6 + rng() * 1.0;
+        }
+        for a in amps.iter_mut() {
+            *a /= amp_sum;
+        }
+        (ratios, amps, decay_mul)
     }
 
     /// Update the sample rate.
@@ -99,6 +142,9 @@ impl HiHat909 {
         params: HiHat909Params,
     ) {
         let len = output.len();
+        let sr = self.sample_rate;
+        let nyq = sr * 0.47;
+        let tau = std::f32::consts::TAU;
 
         for i in 0..len {
             let tune = params.tune.get(i).copied().unwrap_or(params.tune[0]).clamp(0.5, 2.0);
@@ -109,54 +155,95 @@ impl HiHat909 {
             let trig = inputs.trigger.map_or(0.0, |t| t.get(i).copied().unwrap_or(t[0]));
             let accent_in = inputs.accent.map_or(0.5, |a| a.get(i).copied().unwrap_or(a[0])).clamp(0.0, 1.0);
 
-            // Trigger detection
             if trig > 0.5 && self.last_trig <= 0.5 {
-                self.amp_env = 1.0;
+                for j in 0..N {
+                    self.env[j] = self.amps[j];
+                }
+                self.noise_env = 1.0;
                 self.is_open = open > 0.5;
                 self.latched_accent = accent_in;
             }
             self.last_trig = trig;
 
-            // Generate metallic noise from 6 square waves
-            let base_freq = Self::BASE_FREQ * tune;
-            let mut metallic = 0.0_f32;
+            // Closed hats are much shorter than open ones (same knob as before); this rate
+            // drives BOTH the per-partial and the noise decay below - no separate master gate.
+            let actual_decay = if self.is_open { decay } else { decay * 0.15 };
 
-            for (j, phase) in self.phases.iter_mut().enumerate() {
-                let freq = base_freq * Self::RATIOS[j];
-                let dt = freq / self.sample_rate;
-                *phase += dt;
-                if *phase >= 1.0 {
-                    *phase -= 1.0;
+            // Dense inharmonic sine partials, each on its own decay -> metallic shimmer.
+            let base = Self::BASE_FREQ * tune;
+            let base_rate = 1.0 / (actual_decay.max(0.02) * sr);
+            let mut partials = 0.0_f32;
+            for j in 0..N {
+                let freq = base * self.ratios[j];
+                self.phases[j] += freq / sr;
+                if self.phases[j] >= 1.0 {
+                    self.phases[j] -= 1.0;
                 }
-                // Square wave
-                let square = if *phase < 0.5 { 1.0 } else { -1.0 };
-                metallic += square;
+                if freq < nyq {
+                    partials += (self.phases[j] * tau).sin() * self.env[j];
+                }
+                self.env[j] = (self.env[j] - base_rate * self.decay_mul[j]).max(0.0);
             }
-            metallic /= 6.0; // Normalize
 
-            // Simple bandpass filter (resonant)
-            let cutoff = 4000.0 + tone * 8000.0; // 4-12 kHz
-            let f = (std::f32::consts::PI * cutoff / self.sample_rate).tan();
-            let q = 0.5 + tone * 1.5;
-            let k = 1.0 / q;
-            let norm = 1.0 / (1.0 + k * f + f * f);
+            // Noise sizzle: white -> one-pole high-pass -> its own (faster) decay - the "air".
+            self.noise_state = self.noise_state.wrapping_mul(1_664_525).wrapping_add(1_013_904_223);
+            let white = (self.noise_state as f32 / u32::MAX as f32) * 2.0 - 1.0;
+            let hp_a = 1.0 - (tau * 3000.0 / sr).min(0.99);
+            self.noise_hp = hp_a * (self.noise_hp + white);
+            let noise_hp_signal = white - self.noise_hp;
+            let noise_rate = 1.0 / (actual_decay.max(0.02) * 0.6 * sr);
+            self.noise_env = (self.noise_env - noise_rate).max(0.0);
 
-            let _filtered = metallic - self.filter_state[0] * 2.0;
-            self.filter_state[0] += f * (metallic - self.filter_state[0] - self.filter_state[1] * k);
-            self.filter_state[1] += f * self.filter_state[0];
-            let bandpass = self.filter_state[0] * f * norm * 2.0;
+            let bright = 0.5 + tone * 0.5;
+            let mut sample =
+                partials * 1.8 + noise_hp_signal * self.noise_env * (0.15 + tone * 0.35) * bright;
 
-            // Amplitude envelope
-            let actual_decay = if self.is_open { decay } else { decay * 0.15 }; // Closed is much shorter
-            let amp_decay_rate = 1.0 / (actual_decay * self.sample_rate);
-            self.amp_env = (self.amp_env - amp_decay_rate).max(0.0);
+            // Output high-pass to keep it hat-bright (kills any residual low thump).
+            let hp_cut = 900.0 + tone * 1400.0;
+            let hp_a = (tau * hp_cut / sr).min(0.9);
+            self.hp_state += hp_a * (sample - self.hp_state);
+            sample -= self.hp_state;
 
-            let mut sample = bandpass * self.amp_env * 0.8;
-
-            // Apply accent (latched at trigger)
+            // Accent (latched at trigger)
             sample *= 0.7 + self.latched_accent * 0.4;
 
-            output[i] = sample.clamp(-1.0, 1.0);
+            output[i] = (sample * 0.55).clamp(-1.0, 1.0);
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn fire(open: f32, decay: f32) -> f32 {
+        let mut hh = HiHat909::new(48_000.0);
+        let mut peak = 0.0f32;
+        for block in 0..40 {
+            let mut out = [0.0f32; 128];
+            let trig: [f32; 128] = if block == 0 {
+                let mut t = [0.0f32; 128];
+                t[0] = 1.0;
+                t
+            } else {
+                [0.0f32; 128]
+            };
+            hh.process_block(
+                &mut out,
+                HiHat909Inputs { trigger: Some(&trig), accent: Some(&[1.0]) },
+                HiHat909Params { tune: &[1.0], decay: &[decay], tone: &[0.5], open: &[open] },
+            );
+            for &s in &out {
+                assert!(s.is_finite(), "non-finite sample");
+                peak = peak.max(s.abs());
+            }
+        }
+        peak
+    }
+
+    #[test]
+    fn hihat_triggers_closed_and_open() {
+        assert!(fire(0.0, 0.2) > 1e-3, "closed hat should produce audible output");
+        assert!(fire(1.0, 0.9) > 1e-3, "open hat should produce audible output");
     }
 }
