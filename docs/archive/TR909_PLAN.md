@@ -1,5 +1,9 @@
 # TR-909 Drum Machine — Implementation Plan
 
+**Statut :** 📦 Archivé (historique) — les 6 jalons sont livrés et mergés (v0.7.0), le TR-909
+Machine tourne sur `main` en production. Le caveat cymbales ci-dessous a depuis été résolu (voir
+note en fin de fichier). Conservé pour référence, plus un plan actif.
+
 > All-in-one, faithful **11-voice TR-909** module (`drum-machine-909`) with an internal sequencer.
 > Container that **embeds the existing 909 voice DSP** + a new sequencer; voices are NOT reimplemented.
 > Plan designed (4-agent workflow) + approved by the user. Build is bottom-up, each milestone verified.
@@ -96,8 +100,16 @@ The riskiest logic, built + verified OFFLINE before the container consumes it.
 - [x] **M5** — React panel (`DrumMachine909Controls.tsx`, ReBirth-style): transport (play/rate/swing/steps 16-32-64/A-B/FILL) · 11-lane velocity step-grid (click=on/off, shift+click=ghost/normal/accent, paged for 32/64 with playhead auto-follow) · selected-instrument knob strip · 4 full-kit presets + Clear · single `patternData` serialization funnel · dual playhead (web `watchSequencer` + native poll). Router arm + `.dm909-*` styles. **Adversarial review (4-dim workflow, 15 agents) caught + fixed:** (1) CRITICAL — `patternData` was missing from App.tsx string-param allowlists → every live grid edit silently dropped (NaN); fixed via one shared module-scope `STRING_PARAMS` set (all 3 sites). (2) MAJOR — decay knobs were `%`/0..1 but the DSP reads SECONDS; relabeled all 8 to real per-voice seconds ranges. (3) tune ranges (rs 200-600, toms min 60) trimmed to DSP clamps. (4) FILL tooltip honesty (one-bar drop, bar-latched). (5) pageRef desync + a `sec` double-unit bug. Also swapped the mix bus hard-clamp → **tanh soft saturation** (measured peak 0.74, 0 samples pinned — backbeat no longer hard-clips). Verified: `tsc -b`, `check:ui-audio` ✓, `check:modules` ✓ 96, `build`, live-swap engine test (empty pattern → silent), preset suite 6/6. (Pre-existing: the standalone 909-kick/snare/tom/clap/hihat decay knobs have the same %/seconds mislabel — flagged, out of M5 scope.)
 - [x] **M6** — demo preset `tr909-machine` (group "TR-909": house groove A, variation B, tom-roll FILL, graded velocity) + manifest. Docs: `MODULES.md` (Crash/Ride + the Machine section), `MODULE_REFERENCE.md` regen → 96, `README.md`/`CLAUDE.md` counts 93→96 + TR-909 6→8 + Sequencers 15→16, UI↔Audio parity table row. Verified: `module-ref` ✓ 96, `check:modules` ✓, `check:ui-audio` ✓, `tsc -b` ✓, `build` ✓, preset suite 6/6.
 
-> 🎉 **ALL 6 MILESTONES COMPLETE.** The TR-909 machine is built, reviewed, fixed, documented, and demo'd on branch `feat/tr909-drum-machine`. Pending: user test of the panel + sound, then merge to main + tag. KNOWN: crash/ride timbre still rough (deferred → samples). Pre-existing standalone-909 decay %/seconds mislabel flagged separately.
+> 🎉 **ALL 6 MILESTONES COMPLETE.** The TR-909 machine was built, reviewed, fixed, documented, and
+> demo'd, then merged to `main` and tagged **v0.7.0** (96 modules at the time). KNOWN issue below
+> since resolved.
 
+> **RESOLVED (this was "KNOWN — cymbal SOUND is rough").** Crash909/Ride909 were rebuilt with dense
+> additive synthesis (32 log-spaced inharmonic sine partials, same technique later reused for the
+> 909 hi-hat/rimshot rebuild — see CLAUDE.md § Recent Bug Fixes) instead of the original synthesis
+> approach. The "revisit via sample playback" idea below was **not** needed in the end — synthesis
+> got there. Original note kept for context:
+>
 > **KNOWN — cymbal SOUND is rough (user-confirmed "dégueulasse").** Crash909/Ride909 are *functional*
 > (trigger/accent/decay verified) but the synthesized character is poor: too few partials + too tonal/buzzy,
 > ride "bell" is a beepy sine. The REAL TR-909 crash/ride were 6-bit **samples**, not synthesis — that's why

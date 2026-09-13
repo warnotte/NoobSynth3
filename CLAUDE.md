@@ -295,7 +295,7 @@ clock, clock-divider, arpeggiator, step-sequencer, euclidean, drum-sequencer, mi
 ### TR-909 Drums (8)
 909-kick, 909-snare, 909-hihat, 909-clap, 909-tom, 909-rimshot, 909-crash, 909-ride
 
-**TR-909 Machine** (`drum-machine-909`, dans Sequencers) : boîte à rythmes 909 tout-en-un — 11 voix (les 8 ci-dessus + 3 toms distincts) + séquenceur interne (A/B/FILL, vélocité graduée, 16/32/64). Voir `docs/TR909_PLAN.md`.
+**TR-909 Machine** (`drum-machine-909`, dans Sequencers) : boîte à rythmes 909 tout-en-un — 11 voix (les 8 ci-dessus + 3 toms distincts) + séquenceur interne (A/B/FILL, vélocité graduée, 16/32/64). Voir `docs/archive/TR909_PLAN.md` (plan d'implémentation, terminé).
 
 ### TR-808 Drums (6)
 808-kick, 808-snare, 808-hihat, 808-cowbell, 808-clap, 808-tom
@@ -480,7 +480,7 @@ Presets dans `public/presets/`, structure `{ id, name, description, group, graph
 | Document | Description |
 |----------|-------------|
 | [docs/FUTURE_ROADMAP.md](./docs/FUTURE_ROADMAP.md) | Plan de développement complet (Control v2, refactoring, nouveaux modules) |
-| [docs/ROADMAP.md](./docs/ROADMAP.md) | Statut des features livrées (checklist « Completed ») |
+| [docs/ROADMAP.md](./docs/ROADMAP.md) | Known Issues + Next Up/Backlog (historique livré → git log / Recent Bug Fixes ci-dessus) |
 | [docs/ARPEGGIATOR_PLAN.md](./docs/ARPEGGIATOR_PLAN.md) | Plan d'amélioration de l'arpégiateur (partiellement implémenté) |
 | [docs/LAYOUT_CONSISTENCY_PLAN.md](./docs/LAYOUT_CONSISTENCY_PLAN.md) | Plan d'harmonisation des boutons UI |
 

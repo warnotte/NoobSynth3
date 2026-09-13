@@ -177,98 +177,12 @@ Si on garde le séquenceur interne:
 
 ## 2. Refactoring & Code Quality
 
-### 2.1 Splitting des Fichiers Controls (Priorité: Haute)
+### 2.1 Splitting des Fichiers Controls ✅ FAIT — voir `docs/archive/CONTROLS_REFACTORING_PLAN.md`
 
-**Problème:** Fichiers trop volumineux
-
-| Fichier | Modules | Statut |
-|---------|---------|--------|
-| sources/ | 20 types (18 fichiers, granular/sampler partagés dans controls/) | ✅ Fait |
-| sequencers/ | 17 types (17 fichiers) | ✅ Fait |
-| io/ | 9 types (8 fichiers, send/receive partagés) | ✅ Fait |
-
-*(Cette section entière est maintenant ✅ Fait — voir `src/ui/controls/ARCHITECTURE.md` pour la
-structure réelle livrée, différente du plan ci-dessous. Candidate à un déplacement vers
-`docs/archive/` aux côtés de `docs/archive/CONTROLS_REFACTORING_PLAN.md`.)*
-
-**Solution:** Structure modulaire (voir `docs/archive/CONTROLS_REFACTORING_PLAN.md`)
-
-```
-src/ui/controls/
-├── index.tsx                    # Router principal
-├── types.ts                     # Types partagés
-├── ARCHITECTURE.md              # Documentation
-│
-├── sources/                     # ✅ FAIT - 15 fichiers
-│   ├── index.tsx                # Router switch
-│   ├── OscillatorControls.tsx
-│   ├── SupersawControls.tsx
-│   ├── KarplusControls.tsx
-│   ├── FmOpControls.tsx
-│   ├── FmMatrixControls.tsx
-│   ├── NesOscControls.tsx
-│   ├── SnesOscControls.tsx
-│   ├── NoiseControls.tsx
-│   ├── Tb303Controls.tsx
-│   ├── ShepardControls.tsx
-│   ├── PipeOrganControls.tsx
-│   ├── SpectralSwarmControls.tsx
-│   ├── ResonatorControls.tsx
-│   ├── WavetableControls.tsx
-│   └── shared/sidWaveformHelpers.ts
-│
-├── sequencers/                  # 10 fichiers
-│   ├── index.ts
-│   ├── ClockControls.tsx
-│   ├── ArpeggiatorControls.tsx
-│   ├── StepSequencerControls.tsx
-│   ├── EuclideanControls.tsx
-│   ├── DrumSequencerControls.tsx
-│   ├── MidiFileControls.tsx
-│   ├── TuringMachineControls.tsx
-│   ├── MarioControls.tsx
-│   ├── SidPlayerControls.tsx
-│   └── AyPlayerControls.tsx
-│
-├── filters/
-│   ├── VcfControls.tsx
-│   └── HpfControls.tsx
-│
-├── amplifiers/
-│   ├── GainControls.tsx
-│   ├── CvVcaControls.tsx
-│   ├── MixerControls.tsx
-│   └── CrossfaderControls.tsx
-│
-├── effects/
-│   ├── ChorusControls.tsx
-│   ├── DelayControls.tsx
-│   ├── ReverbControls.tsx
-│   └── [etc...]
-│
-├── modulators/
-│   ├── AdsrControls.tsx
-│   ├── LfoControls.tsx
-│   └── [etc...]
-│
-├── drums/
-│   ├── Drum909Controls.tsx
-│   └── Drum808Controls.tsx
-│
-└── io/
-    ├── ControlModuleControls.tsx
-    ├── OutputControls.tsx
-    ├── AudioInControls.tsx
-    ├── ScopeControls.tsx
-    ├── NotesControls.tsx
-    └── LabControls.tsx
-```
-
-**Avantages:**
-- Navigation facile
-- Tests isolés par module
-- Parallélisation du développement
-- Hot reload plus rapide
+Le découpage proposé ici a été livré, avec une structure réelle différente du sketch initial
+(20 types de sources / 17 séquenceurs / 9 I/O, répartis sur des fichiers parfois partagés entre
+modules frères). Détails et arbre réel → `src/ui/controls/ARCHITECTURE.md` ; plan d'origine du
+refactor → `docs/archive/CONTROLS_REFACTORING_PLAN.md`.
 
 ### 2.2 Extraction de App.tsx (Priorité: Moyenne)
 
