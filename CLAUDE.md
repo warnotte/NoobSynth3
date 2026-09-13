@@ -184,6 +184,7 @@ npm run test:presets  # Run preset integration tests (load + render all presets)
 |--------|-------|-------------|
 | `scripts/validate-preset-notes.mjs` | `node scripts/validate-preset-notes.mjs [preset-file]` | Valide les notes d'un preset. Lit le JSON, convertit les pitch des step sequencers en noms de notes réels (en tenant compte de la fréquence de base de l'oscillateur cible), et compare avec une mélodie de référence si disponible. Défaut : `public/presets/take-on-me.json`. |
 | `scripts/check-modules.mjs` | `npm run check:modules` | Cohérence TS↔Rust : chaque port de `portCatalog` est résolu par `ports.rs` et le type est mappé dans `normalize_module_type`. |
+| `scripts/check-presets.mjs` | `npm run check:presets [id...]` | **Câbles morts dans les presets** : chaque connexion doit viser un module existant et un port déclaré dans `portCatalog` pour ce type (le moteur ignore silencieusement un port inconnu → preset qui joue avec un câble mort, ex. `scope.in` au lieu de `scope.in-a`). Notes/manifest = avertissements. |
 | `scripts/check-ui-audio.mjs` | `npm run check:ui-audio` | Garde-fou parité Web↔Tauri : échoue si un contrôle poll `engine.watch*` sans chemin natif Tauri, ou si un pont `nativeXxx` (ControlProps) n'est pas câblé via `controls/index.tsx`. |
 | `scripts/gen-module-reference.mjs` | `npm run module-ref` | Régénère `docs/MODULE_REFERENCE.md` (ports + params + defaults de tous les modules). |
 | `scripts/spectrogram.mjs` | `node scripts/spectrogram.mjs <in.f32> <out.png> "<label>"` | **Banc de test son** : transforme des samples f32 bruts en spectrogramme PNG log-fréquence + métriques de timbre (platitude spectrale = tonal↔bruité, centroïde = brillance, énergie par bande). Permet de « voir » un son qu'on ne peut pas entendre et de le régler sur des chiffres. PNG via `zlib` natif (zéro dépendance). Renderers associés : `cargo run -p dsp-core --example dump_cymbals` (cymbales) ou la paire projet ci-dessous. |
@@ -406,6 +407,7 @@ Presets dans `public/presets/`, structure `{ id, name, description, group, graph
 
 **Règles critiques (à ne JAMAIS oublier) :**
 - **Connexions** : objets imbriqués `{ "from": {"moduleId","portId"}, "to": {"moduleId","portId"}, "kind": "audio|cv|gate|sync" }`. **PAS** le format plat `{ "from", "fromPort" }` (ne fonctionne pas).
+- **Vérifier** : `npm run check:presets <id>` — attrape les ports inexistants (câble mort silencieux).
 - **Manifest OBLIGATOIRE** : ajouter l'entrée dans `public/presets/manifest.json` (`{ id, name, description, file, group }`), sinon le preset n'apparaît pas dans l'UI.
 - **Module `notes` OBLIGATOIRE** : chaque preset inclut un module `notes` expliquant le patch à l'utilisateur.
 - **Port IDs** : doivent matcher `src/ui/portCatalog.ts` **exactement**. Pièges fréquents : adsr sortie = `env` (pas `out`) · mixers entrées = `in-1`, `in-2`… (pas `in1`) · oscillator pitch = `pitch` / sortie = `out` · vcf modulation = `mod`.
