@@ -140,7 +140,7 @@ Les modules eux-mêmes adoptent le langage Console Steel — maquette de référ
 - **Langage LCD** (`.lcd`, `.lcd-head`, `.lcd-canvas`) pour les displays riches : drawbar bay de l'organ (composant `Drawbar`), grilles step/drum/909/chord/polyrhythm, canvas (scope, granular, sampler, particle, GoL, gravity), displays SID/AY (identité C64 conservée dans le bezel).
 - **Step Seq** : pitch et vélocité = un seul contrôle (jauge + chiffre, drag vertical relatif, tap/clic droit/molette), pitch affiché en notes (réf C4 = pitch 0), labels de rangées Gate/Note/Vel/Slide.
 - **Règle absolue modules riches** : restyler en place, jamais reconstruire — les classes liées au playhead (`.seq-step.playing`, `.dm909-step.playing`…) sont du DOM manipulé par `updatePlayhead`, tout renommage doit synchroniser le JS. Playheads vérifiés en live à chaque vague.
-- **Garde-fous** : `node design/mockups/gallery.mjs` (galerie des 98 modules + scan de débordement) et `check-overflow.mjs` (scan par preset).
+- **Garde-fous** : `node design/mockups/gallery.mjs` (galerie des 99 modules + scan de débordement) et `check-overflow.mjs` (scan par preset).
 - ⚠️ **Container queries** : un `@container module-card` ne peut pas cibler `.module-card` lui-même — les paliers responsive ciblent `.module-body`.
 
 ### Câbles — architecture (coordonnées contenu)
