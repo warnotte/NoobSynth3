@@ -534,3 +534,9 @@ Les plans/analyses de features déjà implémentées sont conservés dans [docs/
 - Le DSP tourne dans un AudioWorklet avec WASM
 - Toujours rebuild WASM après modif Rust: `npm run build:wasm`
 - Les warnings Rust sont préfixés `_` ou annotés `#[allow(dead_code)]` pour le code réservé
+- **Avant de tagger une release (`git tag vX.Y.Z`)** : synchroniser le numéro `X.Y.Z` (sans le
+  `v`) dans **`package.json`** et **`src-tauri/tauri.conf.json`** — aucun des deux ne se met à
+  jour tout seul depuis le tag git. `release.yml` nomme la Release GitHub d'après le tag poussé
+  (`${{ github.ref_name }}`), donc un oubli ne casse pas la release, mais les fichiers installeurs
+  produits par Tauri portent le numéro de `tauri.conf.json` dans leur nom (ex.
+  `noobsynth3_0.16.0_x64-setup.exe`) — un decalage s'y voit immediatement.
