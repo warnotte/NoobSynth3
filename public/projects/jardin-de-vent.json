@@ -1,0 +1,879 @@
+{
+  "version": 2,
+  "type": "project",
+  "masterTempo": 60,
+  "masterVolume": 0.8,
+  "activeRackId": "rack-1",
+  "racks": [
+    {
+      "id": "rack-1",
+      "name": "Carillons",
+      "graph": {
+        "modules": [
+          {
+            "id": "notes-1",
+            "type": "notes",
+            "name": "Jardin de Vent",
+            "position": {
+              "x": 40,
+              "y": 40
+            },
+            "params": {
+              "text": "JARDIN DE VENT\n\nUn jardin au crepuscule. Le vent monte et retombe sur environ quatre minutes (LFO METEO, 0.004 Hz), avec des sautes plus courtes (LFO RAFALES). Rien n'est sequence : tout vient des carillons Koshi et de leur battant.\n\nRack CARILLONS : Terra + Aqua (grave), poussees par la meteo.\nRack SOUFFLE : le vent lui-meme (bruit rose filtre), plus fort quand la meteo monte.\nRack OMBRE : un second Koshi Terra IDENTIQUE (meme graine, meme meteo) mais muet : ses sorties GATE/CV pilotent un sinus deux octaves plus bas qui glisse vers chaque tige frappee. L'ombre de chaque note.\nRack GRAND CARILLON : Aqua deux octaves plus bas, vent rare : les gongs.\n\nA toucher : WIND des Koshi (base), les faders du mixer. La graine (SEED) du Koshi Ombre doit rester celle du Koshi Terra pour que l'ombre suive."
+            }
+          },
+          {
+            "id": "meteo-1",
+            "type": "lfo",
+            "name": "Meteo",
+            "position": {
+              "x": 40,
+              "y": 300
+            },
+            "params": {
+              "rate": 0.004,
+              "depth": 0.5,
+              "offset": 0.0,
+              "shape": "sine",
+              "bipolar": false
+            }
+          },
+          {
+            "id": "rafales-1",
+            "type": "lfo",
+            "name": "Rafales",
+            "position": {
+              "x": 40,
+              "y": 560
+            },
+            "params": {
+              "rate": 0.023,
+              "depth": 0.12,
+              "offset": 0.0,
+              "shape": "triangle",
+              "bipolar": true
+            }
+          },
+          {
+            "id": "koshi-terra",
+            "type": "koshi",
+            "name": "Koshi Terra",
+            "position": {
+              "x": 480,
+              "y": 300
+            },
+            "params": {
+              "tuning": 0,
+              "wind": 0.05,
+              "gust": 0.6,
+              "sustain": 1.0,
+              "brightness": 0.5,
+              "body": 0.5,
+              "tune": 0,
+              "octave": 0,
+              "seed": 3,
+              "level": 0.8
+            }
+          },
+          {
+            "id": "koshi-aqua",
+            "type": "koshi",
+            "name": "Koshi Aqua (grave)",
+            "position": {
+              "x": 480,
+              "y": 560
+            },
+            "params": {
+              "tuning": 1,
+              "wind": 0.0,
+              "gust": 0.7,
+              "sustain": 1.3,
+              "brightness": 0.45,
+              "body": 0.6,
+              "tune": 0,
+              "octave": -1,
+              "seed": 7,
+              "level": 0.7
+            }
+          },
+          {
+            "id": "mix-1",
+            "type": "mixer-8",
+            "name": "Mix",
+            "position": {
+              "x": 1120,
+              "y": 300
+            },
+            "params": {
+              "level1": 0.8,
+              "level2": 0.8
+            }
+          },
+          {
+            "id": "rev-1",
+            "type": "reverb",
+            "name": "Reverb",
+            "position": {
+              "x": 1320,
+              "y": 300
+            },
+            "params": {
+              "time": 0.9,
+              "damp": 0.3,
+              "preDelay": 40,
+              "mix": 0.4
+            }
+          },
+          {
+            "id": "out-1",
+            "type": "output",
+            "name": "Out Carillons",
+            "position": {
+              "x": 1760,
+              "y": 300
+            },
+            "params": {
+              "level": 1
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": {
+              "moduleId": "meteo-1",
+              "portId": "cv-out"
+            },
+            "to": {
+              "moduleId": "koshi-terra",
+              "portId": "wind"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "rafales-1",
+              "portId": "cv-out"
+            },
+            "to": {
+              "moduleId": "koshi-terra",
+              "portId": "wind"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "meteo-1",
+              "portId": "cv-out"
+            },
+            "to": {
+              "moduleId": "koshi-aqua",
+              "portId": "wind"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "koshi-terra",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "mix-1",
+              "portId": "in-1"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "koshi-aqua",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "mix-1",
+              "portId": "in-2"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "mix-1",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "rev-1",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "rev-1",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "out-1",
+              "portId": "in"
+            },
+            "kind": "audio"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rack-2",
+      "name": "Souffle",
+      "graph": {
+        "modules": [
+          {
+            "id": "notes-2",
+            "type": "notes",
+            "name": "Souffle",
+            "position": {
+              "x": 40,
+              "y": 40
+            },
+            "params": {
+              "text": "SOUFFLE : le vent audible. Bruit rose -> filtre passe-bande dont la frequence et le niveau suivent la meme METEO que les carillons (plus de vent = plus de souffle), plus un flutter chaotique (Lorenz) sur le filtre."
+            }
+          },
+          {
+            "id": "meteo-2",
+            "type": "lfo",
+            "name": "Meteo",
+            "position": {
+              "x": 40,
+              "y": 300
+            },
+            "params": {
+              "rate": 0.004,
+              "depth": 0.5,
+              "offset": 0.1,
+              "shape": "sine",
+              "bipolar": false
+            }
+          },
+          {
+            "id": "flutter-2",
+            "type": "chaos",
+            "name": "Flutter",
+            "position": {
+              "x": 40,
+              "y": 560
+            },
+            "params": {
+              "speed": 0.08,
+              "rho": 28,
+              "sigma": 10,
+              "beta": 2.66,
+              "scale": 0,
+              "root": 0
+            }
+          },
+          {
+            "id": "noise-2",
+            "type": "noise",
+            "name": "Air",
+            "position": {
+              "x": 480,
+              "y": 300
+            },
+            "params": {
+              "level": 0.8,
+              "noiseType": "pink",
+              "stereo": 1,
+              "pan": 0
+            }
+          },
+          {
+            "id": "vcf-2",
+            "type": "vcf",
+            "name": "Filtre",
+            "position": {
+              "x": 700,
+              "y": 300
+            },
+            "params": {
+              "cutoff": 420,
+              "resonance": 0.4,
+              "drive": 0.05,
+              "envAmount": 0,
+              "modAmount": 0.8,
+              "keyTrack": 0,
+              "model": "svf",
+              "mode": "bp",
+              "slope": 12
+            }
+          },
+          {
+            "id": "vca-2",
+            "type": "gain",
+            "name": "VCA Meteo",
+            "position": {
+              "x": 920,
+              "y": 300
+            },
+            "params": {
+              "gain": 1.0
+            }
+          },
+          {
+            "id": "rev-2",
+            "type": "reverb",
+            "name": "Reverb",
+            "position": {
+              "x": 1140,
+              "y": 300
+            },
+            "params": {
+              "time": 0.7,
+              "damp": 0.5,
+              "preDelay": 20,
+              "mix": 0.3
+            }
+          },
+          {
+            "id": "out-2",
+            "type": "output",
+            "name": "Out Souffle",
+            "position": {
+              "x": 1580,
+              "y": 300
+            },
+            "params": {
+              "level": 1
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": {
+              "moduleId": "noise-2",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "vcf-2",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "meteo-2",
+              "portId": "cv-out"
+            },
+            "to": {
+              "moduleId": "vcf-2",
+              "portId": "mod"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "flutter-2",
+              "portId": "x"
+            },
+            "to": {
+              "moduleId": "vcf-2",
+              "portId": "mod"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "vcf-2",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "vca-2",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "meteo-2",
+              "portId": "cv-out"
+            },
+            "to": {
+              "moduleId": "vca-2",
+              "portId": "cv"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "vca-2",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "rev-2",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "rev-2",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "out-2",
+              "portId": "in"
+            },
+            "kind": "audio"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rack-3",
+      "name": "Ombre",
+      "graph": {
+        "modules": [
+          {
+            "id": "notes-3",
+            "type": "notes",
+            "name": "Ombre",
+            "position": {
+              "x": 40,
+              "y": 40
+            },
+            "params": {
+              "text": "OMBRE : ce Koshi est la copie exacte du Koshi Terra du rack Carillons (meme accord, meme graine 3, meme LFO meteo et rafales) mais son niveau est a zero : il ne sert qu'a publier les frappes. GATE -> deux slews (attaque douce, longue retombee) -> VCA ; CV -> slew -> hauteur d'un sinus deux octaves plus bas. Chaque frappe fait glisser l'ombre vers la note frappee."
+            }
+          },
+          {
+            "id": "meteo-3",
+            "type": "lfo",
+            "name": "Meteo",
+            "position": {
+              "x": 40,
+              "y": 300
+            },
+            "params": {
+              "rate": 0.004,
+              "depth": 0.5,
+              "offset": 0.0,
+              "shape": "sine",
+              "bipolar": false
+            }
+          },
+          {
+            "id": "rafales-3",
+            "type": "lfo",
+            "name": "Rafales",
+            "position": {
+              "x": 40,
+              "y": 560
+            },
+            "params": {
+              "rate": 0.023,
+              "depth": 0.12,
+              "offset": 0.0,
+              "shape": "triangle",
+              "bipolar": true
+            }
+          },
+          {
+            "id": "koshi-ombre",
+            "type": "koshi",
+            "name": "Koshi (muet, copie)",
+            "position": {
+              "x": 480,
+              "y": 300
+            },
+            "params": {
+              "tuning": 0,
+              "wind": 0.05,
+              "gust": 0.6,
+              "sustain": 1.0,
+              "brightness": 0.5,
+              "body": 0.5,
+              "tune": 0,
+              "octave": 0,
+              "seed": 3,
+              "level": 0.0
+            }
+          },
+          {
+            "id": "glide-3",
+            "type": "slew",
+            "name": "Glide",
+            "position": {
+              "x": 920,
+              "y": 300
+            },
+            "params": {
+              "rise": 1.5,
+              "fall": 1.5
+            }
+          },
+          {
+            "id": "osc-3",
+            "type": "oscillator",
+            "name": "Sinus",
+            "position": {
+              "x": 1140,
+              "y": 300
+            },
+            "params": {
+              "frequency": 65.41,
+              "type": "sine",
+              "pwm": 0.5,
+              "unison": 1,
+              "detune": 0,
+              "fmLin": 0,
+              "fmExp": 0,
+              "subMix": 0.25,
+              "subOct": 1
+            }
+          },
+          {
+            "id": "env-a-3",
+            "type": "slew",
+            "name": "Env retombee",
+            "position": {
+              "x": 920,
+              "y": 560
+            },
+            "params": {
+              "rise": 0.005,
+              "fall": 1.8
+            }
+          },
+          {
+            "id": "env-b-3",
+            "type": "slew",
+            "name": "Env attaque",
+            "position": {
+              "x": 1140,
+              "y": 560
+            },
+            "params": {
+              "rise": 0.7,
+              "fall": 0.4
+            }
+          },
+          {
+            "id": "vca-3",
+            "type": "gain",
+            "name": "VCA",
+            "position": {
+              "x": 1360,
+              "y": 300
+            },
+            "params": {
+              "gain": 0.15
+            }
+          },
+          {
+            "id": "dly-3",
+            "type": "delay",
+            "name": "Delay",
+            "position": {
+              "x": 1580,
+              "y": 300
+            },
+            "params": {
+              "time": 710,
+              "feedback": 0.25,
+              "mix": 0.2,
+              "tone": 0.4,
+              "pingPong": true
+            }
+          },
+          {
+            "id": "rev-3",
+            "type": "reverb",
+            "name": "Reverb",
+            "position": {
+              "x": 1800,
+              "y": 300
+            },
+            "params": {
+              "time": 0.8,
+              "damp": 0.5,
+              "preDelay": 30,
+              "mix": 0.35
+            }
+          },
+          {
+            "id": "out-3",
+            "type": "output",
+            "name": "Out Ombre",
+            "position": {
+              "x": 2240,
+              "y": 300
+            },
+            "params": {
+              "level": 1
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": {
+              "moduleId": "meteo-3",
+              "portId": "cv-out"
+            },
+            "to": {
+              "moduleId": "koshi-ombre",
+              "portId": "wind"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "rafales-3",
+              "portId": "cv-out"
+            },
+            "to": {
+              "moduleId": "koshi-ombre",
+              "portId": "wind"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "koshi-ombre",
+              "portId": "cv"
+            },
+            "to": {
+              "moduleId": "glide-3",
+              "portId": "in"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "glide-3",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "osc-3",
+              "portId": "pitch"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "koshi-ombre",
+              "portId": "gate"
+            },
+            "to": {
+              "moduleId": "env-a-3",
+              "portId": "in"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "env-a-3",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "env-b-3",
+              "portId": "in"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "osc-3",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "vca-3",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "env-b-3",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "vca-3",
+              "portId": "cv"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "vca-3",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "dly-3",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "dly-3",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "rev-3",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "rev-3",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "out-3",
+              "portId": "in"
+            },
+            "kind": "audio"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rack-4",
+      "name": "Grand carillon",
+      "graph": {
+        "modules": [
+          {
+            "id": "notes-4",
+            "type": "notes",
+            "name": "Grand carillon",
+            "position": {
+              "x": 40,
+              "y": 40
+            },
+            "params": {
+              "text": "GRAND CARILLON : Aqua deux octaves plus bas, vent rare (base 0.04 + un quart de la meteo), sustain long : des gongs espaces, dans une grande reverb."
+            }
+          },
+          {
+            "id": "meteo-4",
+            "type": "lfo",
+            "name": "Meteo (quart)",
+            "position": {
+              "x": 40,
+              "y": 300
+            },
+            "params": {
+              "rate": 0.004,
+              "depth": 0.25,
+              "offset": 0.0,
+              "shape": "sine",
+              "bipolar": false
+            }
+          },
+          {
+            "id": "koshi-grand",
+            "type": "koshi",
+            "name": "Koshi Aqua -2",
+            "position": {
+              "x": 480,
+              "y": 300
+            },
+            "params": {
+              "tuning": 1,
+              "wind": 0.04,
+              "gust": 0.8,
+              "sustain": 1.8,
+              "brightness": 0.4,
+              "body": 0.7,
+              "tune": 0,
+              "octave": -2,
+              "seed": 11,
+              "level": 0.9
+            }
+          },
+          {
+            "id": "rev-4",
+            "type": "reverb",
+            "name": "Reverb",
+            "position": {
+              "x": 1120,
+              "y": 300
+            },
+            "params": {
+              "time": 1.0,
+              "damp": 0.45,
+              "preDelay": 60,
+              "mix": 0.5
+            }
+          },
+          {
+            "id": "out-4",
+            "type": "output",
+            "name": "Out Grand",
+            "position": {
+              "x": 1560,
+              "y": 300
+            },
+            "params": {
+              "level": 1
+            }
+          }
+        ],
+        "connections": [
+          {
+            "from": {
+              "moduleId": "meteo-4",
+              "portId": "cv-out"
+            },
+            "to": {
+              "moduleId": "koshi-grand",
+              "portId": "wind"
+            },
+            "kind": "cv"
+          },
+          {
+            "from": {
+              "moduleId": "koshi-grand",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "rev-4",
+              "portId": "in"
+            },
+            "kind": "audio"
+          },
+          {
+            "from": {
+              "moduleId": "rev-4",
+              "portId": "out"
+            },
+            "to": {
+              "moduleId": "out-4",
+              "portId": "in"
+            },
+            "kind": "audio"
+          }
+        ]
+      }
+    }
+  ],
+  "mixer": {
+    "rack-1": {
+      "volume": 0.85,
+      "mute": false,
+      "solo": false
+    },
+    "rack-2": {
+      "volume": 0.45,
+      "mute": false,
+      "solo": false
+    },
+    "rack-3": {
+      "volume": 0.4,
+      "mute": false,
+      "solo": false
+    },
+    "rack-4": {
+      "volume": 0.6,
+      "mute": false,
+      "solo": false
+    }
+  }
+}

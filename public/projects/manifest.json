@@ -77,6 +77,13 @@
       "description": "2e vitrine du Harmonist, en orgue + cordes pincées : un lit d'orgue (harmonie qui enfle à chaque accord) sous des plucks Karplus + cloches Resonator. Néo-classique sacré, génératif, jamais répétitif.",
       "file": "cloitre.json",
       "group": "Ambient"
+    },
+    {
+      "id": "jardin-de-vent",
+      "name": "Jardin de Vent 🎐",
+      "description": "Quatre carillons Koshi dans un vent qui monte et retombe sur quatre minutes : carillons, souffle, ombre (un sinus qui glisse vers chaque tige frappee), gongs graves. Generatif infini, rien de sequence.",
+      "file": "jardin-de-vent.json",
+      "group": "Ambient"
     }
   ]
 }
