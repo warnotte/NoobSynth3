@@ -61,13 +61,21 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
     ModuleType::Chorus
     | ModuleType::Ensemble
     | ModuleType::Delay
-    | ModuleType::GranularDelay
     | ModuleType::TapeDelay
-    | ModuleType::SpringReverb
-    | ModuleType::Reverb
     | ModuleType::Phaser => {
       vec![PortInfo { channels: 2 }]
     },
+    // Reverb / spring reverb: audio in + mix CV (added to the mix param)
+    ModuleType::SpringReverb
+    | ModuleType::Reverb => vec![
+      PortInfo { channels: 2 },  // in
+      PortInfo { channels: 1 },  // mix CV
+    ],
+    // Granular delay: audio in + pitch CV (added to the pitch ratio param)
+    ModuleType::GranularDelay => vec![
+      PortInfo { channels: 2 },  // in
+      PortInfo { channels: 1 },  // pitch CV
+    ],
     ModuleType::Choir => vec![
       PortInfo { channels: 2 }, // audio in (stereo)
       PortInfo { channels: 1 }, // vowel CV

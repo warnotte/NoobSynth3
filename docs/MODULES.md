@@ -885,7 +885,7 @@ Délai granulaire pour textures shimmer.
 | `feedback` | 0-0.85 | Rétroaction |
 | `mix` | 0-1 | Dry/Wet |
 
-**Entrées** : in (audio)  
+**Entrées** : in (audio), pitch (cv — ajoutée directement au ratio `pitch`, ~-1..1)  
 **Sorties** : out (audio)
 
 ### Spring Reverb
@@ -899,7 +899,7 @@ Réverbération type ressort.
 | `mix` | 0-1 | Dry/Wet |
 | `drive` | 0-1 | Saturation |
 
-**Entrées** : in (audio)  
+**Entrées** : in (audio), mix (cv — ajoutée directement au param `mix`, ~-1..1)  
 **Sorties** : out (audio)
 
 ### Reverb
@@ -913,8 +913,12 @@ Réverbération algorithmique (Freeverb).
 | `preDelay` | 0-80 ms | Pré-délai |
 | `mix` | 0-1 | Dry/Wet |
 
-**Entrées** : in (audio)  
+**Entrées** : in (audio), mix (cv — ajoutée directement au param `mix`, ~-1..1)  
 **Sorties** : out (audio)
+
+⚠️ À `mix` haut (proche de 1) combiné à un `time` long, le chemin wet peut dépasser 0dB (headroom
+latent du Freeverb, pas lié à l'entrée CV). Si un preset pousse `mix` haut (statique ou via CV),
+vérifier le niveau de sortie au banc (`render_graph` + `spectrogram.mjs`), pas juste à l'oreille.
 
 ### Phaser
 

@@ -36,6 +36,8 @@ pub struct SpringReverbInputs<'a> {
     pub input_l: Option<&'a [Sample]>,
     /// Right audio input
     pub input_r: Option<&'a [Sample]>,
+    /// Dry/wet mix CV, added directly to the `mix` param (bipolar, ~-1..1)
+    pub mix_cv: Option<&'a [Sample]>,
 }
 
 /// Parameters for SpringReverb.
@@ -130,7 +132,8 @@ impl SpringReverb {
         }
 
         for i in 0..out_l.len() {
-            let mix = clamp(sample_at(params.mix, i, 0.4), 0.0, 1.0);
+            let mix_cv = input_at(inputs.mix_cv, i);
+            let mix = clamp(sample_at(params.mix, i, 0.4) + mix_cv, 0.0, 1.0);
             let drive = clamp(sample_at(params.drive, i, 0.2), 0.0, 1.0);
 
             let input_l = input_at(inputs.input_l, i);

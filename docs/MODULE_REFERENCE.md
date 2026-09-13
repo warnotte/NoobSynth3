@@ -58,10 +58,10 @@ _99 modules._
 | **Choir** | `choir` | 2x2 | `in` (audio), `vowel` (cv) | `out` (audio) | `vowel`=0, `rate`=0.25, `depth`=0.35, `mix`=0.5 |
 | **Vocoder** | `vocoder` | 2x3 | `mod` (audio), `car` (audio) | `out` (audio) | `attack`=25, `release`=140, `low`=120, `high`=5000, `q`=2.5, `formant`=0, `emphasis`=0.4, `unvoiced`=0, `mix`=0.8, `modGain`=1, `carGain`=1 |
 | **Delay** | `delay` | 2x1 | `in` (audio) | `out` (audio) | `time`=360, `feedback`=0.25, `mix`=0.2, `tone`=0.6, `pingPong`=false |
-| **Granular** | `granular-delay` | 2x1 | `in` (audio) | `out` (audio) | `time`=420, `size`=120, `density`=6, `pitch`=1, `feedback`=0.35, `mix`=0.5 |
+| **Granular** | `granular-delay` | 2x1 | `in` (audio), `pitch` (cv) | `out` (audio) | `time`=420, `size`=120, `density`=6, `pitch`=1, `feedback`=0.35, `mix`=0.5 |
 | **Tape Delay** | `tape-delay` | 2x2 | `in` (audio) | `out` (audio) | `time`=420, `feedback`=0.35, `mix`=0.35, `tone`=0.55, `wow`=0.2, `flutter`=0.2, `drive`=0.2 |
-| **Spring** | `spring-reverb` | 2x1 | `in` (audio) | `out` (audio) | `decay`=0.6, `tone`=0.4, `mix`=0.4, `drive`=0.2 |
-| **Reverb** | `reverb` | 2x1 | `in` (audio) | `out` (audio) | `time`=0.6, `damp`=0.4, `preDelay`=18, `mix`=0.2 |
+| **Spring** | `spring-reverb` | 2x1 | `in` (audio), `mix` (cv) | `out` (audio) | `decay`=0.6, `tone`=0.4, `mix`=0.4, `drive`=0.2 |
+| **Reverb** | `reverb` | 2x1 | `in` (audio), `mix` (cv) | `out` (audio) | `time`=0.6, `damp`=0.4, `preDelay`=18, `mix`=0.2 |
 | **Phaser** | `phaser` | 2x1 | `in` (audio) | `out` (audio) | `rate`=0.5, `depth`=0.7, `feedback`=0.3, `mix`=0.5 |
 | **Distortion** | `distortion` | 2x2 | `in` (audio) | `out` (audio) | `drive`=0.5, `tone`=0.5, `mix`=1, `mode`="soft" |
 | **Wavefolder** | `wavefolder` | 2x2 | `in` (audio) | `out` (audio) | `drive`=0.4, `fold`=0.5, `bias`=0, `mix`=0.8 |
@@ -105,7 +105,7 @@ _99 modules._
 | **SID Player** | `sid-player` | 3x5 | `reset` (sync) | `out` (audio), `gate-1` (gate), `gate-2` (gate), `gate-3` (gate), `cv-1` (cv), `cv-2` (cv), `cv-3` (cv), `wf-1` (cv), `wf-2` (cv), `wf-3` (cv) | `playing`=0, `song`=1, `chipModel`=0 |
 | **AY Player** | `ay-player` | 3x5 | `reset` (sync) | `out` (audio), `gate-a` (gate), `gate-b` (gate), `gate-c` (gate), `cv-a` (cv), `cv-b` (cv), `cv-c` (cv) | `playing`=0, `loop`=1 |
 | **Chord Seq** | `chord-sequencer` | 3x5 | `clock` (sync), `reset` (sync) | `cv-1` (cv), `gate-1` (gate), `cv-2` (cv), `gate-2` (gate), `cv-3` (cv), `gate-3` (gate), `cv-4` (cv), `gate-4` (gate), `step-out` (cv), `root-cv` (cv) | `enabled`=true, `tempo`=120, `rate`=2, `gateLength`=50, `swing`=0, `length`=4, `strumSpeed`=0, `strumDirection`=0, `voicing`=0, `stepData`="[{"root":60,"chordType":0,"inversion"…" |
-| **Polyrhythm** | `polyrhythm-sequencer` | 3x5 | `clock` (sync), `reset` (sync) | `cv-1` (cv), `gate-1` (gate), `cv-2` (cv), `gate-2` (gate), `cv-3` (cv), `gate-3` (gate), `cv-4` (cv), `gate-4` (gate), `step-out` (cv) | `enabled`=true, `tempo`=120, `rate`=3, `gateLength`=50, `swing`=0, `track1Length`=8, `track2Length`=12, `track3Length`=16, `track4Length`=7, `track1Mute`=false, `track2Mute`=false, `track3Mute`=false, `track4Mute`=false, `stepData`="[{"track":0,"step":0,"pitch":-1,"gate…" |
+| **Polyrhythm** | `polyrhythm-sequencer` | 3x5 | `clock` (sync), `reset` (sync) | `cv-1` (cv), `gate-1` (gate), `cv-2` (cv), `gate-2` (gate), `cv-3` (cv), `gate-3` (gate), `cv-4` (cv), `gate-4` (gate), `step-out` (cv) | `enabled`=true, `tempo`=120, `rate`=3, `gateLength`=50, `swing`=0, `track1Length`=8, `track2Length`=12, `track3Length`=16, `track4Length`=7, `track1Mute`=false, `track2Mute`=false, `track3Mute`=false, `track4Mute`=false, `stepData`="[{"track":0,"step":0,"pitch":5,"gate"…" |
 | **Clock Div** | `clock-divider` | 1x2 | `clock` (sync), `reset` (sync) | `div-2` (sync), `div-4` (sync), `div-8` (sync), `div-16` (sync) | — |
 | **Game of Life** | `game-of-life` | 4x4 | `clock` (sync), `reset` (sync) | `cv` (cv), `gate` (gate), `pulse` (sync), `density` (cv) | `evolveRate`=4, `range`=2, `scale`=0, `root`=0, `wrap`=1 |
 | **Gravity Seq** | `gravity-sequencer` | 2x4 | `reset` (sync) | `cv` (cv), `gate` (gate), `pulse` (sync), `x` (cv), `y` (cv) | `speed`=1, `bodies`=4, `eccentricity`=0.3, `spread`=1, `range`=2, `scale`=0, `root`=0, `chaos`=0 |

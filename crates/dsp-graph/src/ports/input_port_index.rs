@@ -116,12 +116,20 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
     ModuleType::Chorus
     | ModuleType::Ensemble
     | ModuleType::Delay
-    | ModuleType::GranularDelay
     | ModuleType::TapeDelay
-    | ModuleType::SpringReverb
-    | ModuleType::Reverb
     | ModuleType::Phaser => match port_id {
       "in" => Some(0),
+      _ => None,
+    },
+    ModuleType::SpringReverb
+    | ModuleType::Reverb => match port_id {
+      "in" => Some(0),
+      "mix" => Some(1),
+      _ => None,
+    },
+    ModuleType::GranularDelay => match port_id {
+      "in" => Some(0),
+      "pitch" => Some(1),
       _ => None,
     },
     ModuleType::Choir => match port_id {

@@ -190,10 +190,28 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
     outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
   },
   delay: simpleAudioEffect(),
-  'granular-delay': simpleAudioEffect(),
+  'granular-delay': {
+    inputs: [
+      { id: 'in', label: 'In', kind: 'audio', direction: 'in' },
+      { id: 'pitch', label: 'Pitch', kind: 'cv', direction: 'in' },
+    ],
+    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
+  },
   'tape-delay': simpleAudioEffect(),
-  'spring-reverb': simpleAudioEffect(),
-  reverb: simpleAudioEffect(),
+  'spring-reverb': {
+    inputs: [
+      { id: 'in', label: 'In', kind: 'audio', direction: 'in' },
+      { id: 'mix', label: 'Mix', kind: 'cv', direction: 'in' },
+    ],
+    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
+  },
+  reverb: {
+    inputs: [
+      { id: 'in', label: 'In', kind: 'audio', direction: 'in' },
+      { id: 'mix', label: 'Mix', kind: 'cv', direction: 'in' },
+    ],
+    outputs: [{ id: 'out', label: 'Out', kind: 'audio', direction: 'out' }],
+  },
   phaser: simpleAudioEffect(),
   distortion: simpleAudioEffect(),
   wavefolder: simpleAudioEffect(),

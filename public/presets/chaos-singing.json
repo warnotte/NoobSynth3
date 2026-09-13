@@ -10,7 +10,7 @@
         "type": "output",
         "name": "Main Out",
         "params": {
-          "level": 0.8
+          "level": 0.3
         },
         "position": {
           "x": 40,

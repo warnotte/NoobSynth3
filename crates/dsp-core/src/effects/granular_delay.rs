@@ -55,6 +55,8 @@ pub struct GranularDelayInputs<'a> {
     pub input_l: Option<&'a [Sample]>,
     /// Right audio input
     pub input_r: Option<&'a [Sample]>,
+    /// Pitch ratio CV, added directly to the `pitch` param (bipolar, ~-1..1)
+    pub pitch_cv: Option<&'a [Sample]>,
 }
 
 /// Parameters for GranularDelay.
@@ -188,7 +190,8 @@ impl GranularDelay {
             let time_ms = sample_at(params.time_ms, i, 420.0).clamp(40.0, 2000.0);
             let size_ms = sample_at(params.size_ms, i, 120.0).clamp(10.0, 500.0);
             let density = sample_at(params.density, i, 6.0).clamp(0.2, 40.0);
-            let pitch = sample_at(params.pitch, i, 1.0).clamp(0.25, 2.0);
+            let pitch_cv = input_at(inputs.pitch_cv, i);
+            let pitch = (sample_at(params.pitch, i, 1.0) + pitch_cv).clamp(0.25, 2.0);
             let feedback = sample_at(params.feedback, i, 0.35).clamp(0.0, 0.85);
             let mix = sample_at(params.mix, i, 0.5).clamp(0.0, 1.0);
 

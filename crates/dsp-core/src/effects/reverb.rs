@@ -109,6 +109,8 @@ pub struct ReverbInputs<'a> {
     pub input_l: Option<&'a [Sample]>,
     /// Right audio input
     pub input_r: Option<&'a [Sample]>,
+    /// Dry/wet mix CV, added directly to the `mix` param (bipolar, ~-1..1)
+    pub mix_cv: Option<&'a [Sample]>,
 }
 
 /// Parameters for Reverb.
@@ -230,7 +232,8 @@ impl Reverb {
         let max_pre_delay = (pre_buffer_size as f32 - 2.0) / self.sample_rate * 1000.0;
 
         for i in 0..out_l.len() {
-            let mix = clamp(sample_at(params.mix, i, 0.25), 0.0, 1.0);
+            let mix_cv = input_at(inputs.mix_cv, i);
+            let mix = clamp(sample_at(params.mix, i, 0.25) + mix_cv, 0.0, 1.0);
             let pre_delay_ms = sample_at(params.pre_delay, i, 0.0);
             let pre_delay_samples =
                 clamp((pre_delay_ms * self.sample_rate) / 1000.0, 0.0, max_pre_delay);

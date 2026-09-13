@@ -9,7 +9,7 @@
         "id": "out",
         "type": "output",
         "name": "Master",
-        "params": { "level": 0.8 },
+        "params": { "level": 0.4 },
         "position": { "x": 42, "y": 2 }
       },
       {

@@ -209,6 +209,7 @@ pub(crate) fn process(
             } else {
                 None
             };
+            let pitch_cv = if connections[1].is_empty() { None } else { Some(inputs[1].channel(0)) };
             let params = GranularDelayParams {
                 time_ms: state.time.slice(frames),
                 size_ms: state.size.slice(frames),
@@ -217,7 +218,7 @@ pub(crate) fn process(
                 feedback: state.feedback.slice(frames),
                 mix: state.mix.slice(frames),
             };
-            let granular_inputs = GranularDelayInputs { input_l, input_r };
+            let granular_inputs = GranularDelayInputs { input_l, input_r, pitch_cv };
             let (left, right) = outputs[0].channels.split_at_mut(1);
             let out_l = &mut left[0];
             let out_r = &mut right[0];
@@ -254,13 +255,14 @@ pub(crate) fn process(
             } else {
                 None
             };
+            let mix_cv = if connections[1].is_empty() { None } else { Some(inputs[1].channel(0)) };
             let params = SpringReverbParams {
                 decay: state.decay.slice(frames),
                 tone: state.tone.slice(frames),
                 mix: state.mix.slice(frames),
                 drive: state.drive.slice(frames),
             };
-            let spring_inputs = SpringReverbInputs { input_l, input_r };
+            let spring_inputs = SpringReverbInputs { input_l, input_r, mix_cv };
             let (left, right) = outputs[0].channels.split_at_mut(1);
             let out_l = &mut left[0];
             let out_r = &mut right[0];
@@ -274,13 +276,14 @@ pub(crate) fn process(
             } else {
                 None
             };
+            let mix_cv = if connections[1].is_empty() { None } else { Some(inputs[1].channel(0)) };
             let params = ReverbParams {
                 time: state.time.slice(frames),
                 damp: state.damp.slice(frames),
                 pre_delay: state.pre_delay.slice(frames),
                 mix: state.mix.slice(frames),
             };
-            let reverb_inputs = ReverbInputs { input_l, input_r };
+            let reverb_inputs = ReverbInputs { input_l, input_r, mix_cv };
             let (left, right) = outputs[0].channels.split_at_mut(1);
             let out_l = &mut left[0];
             let out_r = &mut right[0];
