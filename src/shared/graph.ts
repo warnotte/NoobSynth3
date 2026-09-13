@@ -11,6 +11,7 @@ export type ModuleType =
   | 'pipe-organ'
   | 'spectral-swarm'
   | 'resonator'
+  | 'koshi'
   | 'wavetable'
   | 'granular'
   | 'sampler'

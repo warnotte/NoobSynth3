@@ -1,0 +1,115 @@
+{
+  "id": "koshi-garden",
+  "name": "Koshi Garden",
+  "description": "Carillon Koshi (accord Terra) qui joue tout seul dans le vent, avec une reverb. Tourne le vent, change d'accord, ajoute des rafales.",
+  "group": "Physical Modeling",
+  "graph": {
+    "modules": [
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Notes",
+        "position": {
+          "x": 40,
+          "y": 40
+        },
+        "params": {
+          "text": "KOSHI GARDEN\n\nUn carillon Koshi (8 tiges en cercle dans un tube, accord TERRA : G C E F G C E G) qui joue tout seul : un battant pousse par le vent frappe les tiges.\n\n- WIND : force du vent (0.5 = densite des enregistrements officiels, ~2 frappes/s)\n- GUST : rafales et accalmies\n- TUNING : les 4 accords d'usine (Terra / Aqua / Aria / Ignis)\n- OCTAVE -1 : grand carillon\n\nLe modele est mesure sur les enregistrements de koshi.fr : partiels de barre libre-libre (1 : 2.79 : 5.55 : 8.9), accordage etire, resonances du tube. Les sorties GATE/CV publient chaque frappe : branche-les sur un ADSR + VCA pour que le vent joue un autre synthe (voir preset Koshi Wind Sequencer)."
+        }
+      },
+      {
+        "id": "koshi-1",
+        "type": "koshi",
+        "name": "Koshi Chime",
+        "position": {
+          "x": 40,
+          "y": 300
+        },
+        "params": {
+          "tuning": 0,
+          "wind": 0.45,
+          "gust": 0.6,
+          "sustain": 1.0,
+          "brightness": 0.5,
+          "body": 0.5,
+          "tune": 0,
+          "octave": 0,
+          "seed": 5,
+          "level": 0.8
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": {
+          "x": 700,
+          "y": 300
+        },
+        "params": {
+          "time": 0.8,
+          "damp": 0.35,
+          "preDelay": 25,
+          "mix": 0.35
+        }
+      },
+      {
+        "id": "scope-1",
+        "type": "scope",
+        "name": "Scope",
+        "position": {
+          "x": 700,
+          "y": 40
+        },
+        "params": {}
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Output",
+        "position": {
+          "x": 1150,
+          "y": 300
+        },
+        "params": {
+          "level": 1
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": {
+          "moduleId": "koshi-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "reverb-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "reverb-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "out-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "koshi-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "scope-1",
+          "portId": "in-a"
+        },
+        "kind": "audio"
+      }
+    ]
+  }
+}

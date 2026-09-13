@@ -1,0 +1,220 @@
+{
+  "id": "koshi-wind-sequencer",
+  "name": "Koshi Wind Sequencer",
+  "description": "Le vent du Koshi joue un synthe : ses sorties GATE/CV declenchent un ADSR + VCA sur un VCO accorde sur les tiges. Carillon et synthe melanges.",
+  "group": "Physical Modeling",
+  "graph": {
+    "modules": [
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Notes",
+        "position": {
+          "x": 40,
+          "y": 40
+        },
+        "params": {
+          "text": "KOSHI WIND SEQUENCER\n\nLe carillon publie chaque frappe sur ses sorties GATE (impulsion) et CV (hauteur de la tige, V/oct, C4 = 0).\n\nIci : GATE -> ADSR, CV -> pitch du VCO (base 261.6 Hz = C4, donc le VCO joue exactement la tige frappee, une octave plus bas via OCTAVE), env -> VCA. Le vent devient un sequenceur aleatoire mais musical : les 8 notes de l'accord Terra, aux rythmes des rafales.\n\nMonte WIND pour densifier, baisse le niveau du carillon pour n'entendre que le synthe."
+        }
+      },
+      {
+        "id": "koshi-1",
+        "type": "koshi",
+        "name": "Koshi Chime",
+        "position": {
+          "x": 40,
+          "y": 300
+        },
+        "params": {
+          "tuning": 0,
+          "wind": 0.45,
+          "gust": 0.6,
+          "sustain": 1.0,
+          "brightness": 0.5,
+          "body": 0.5,
+          "tune": 0,
+          "octave": 0,
+          "seed": 9,
+          "level": 0.5
+        }
+      },
+      {
+        "id": "osc-1",
+        "type": "oscillator",
+        "name": "VCO",
+        "position": {
+          "x": 700,
+          "y": 40
+        },
+        "params": {
+          "frequency": 130.81,
+          "type": "triangle",
+          "pwm": 0.5,
+          "unison": 1,
+          "detune": 0,
+          "fmLin": 0,
+          "fmExp": 0,
+          "subMix": 0.3,
+          "subOct": 1
+        }
+      },
+      {
+        "id": "adsr-1",
+        "type": "adsr",
+        "name": "ADSR",
+        "position": {
+          "x": 700,
+          "y": 300
+        },
+        "params": {
+          "attack": 0.005,
+          "decay": 0.6,
+          "sustain": 0.0,
+          "release": 1.2
+        }
+      },
+      {
+        "id": "vca-1",
+        "type": "gain",
+        "name": "VCA",
+        "position": {
+          "x": 900,
+          "y": 40
+        },
+        "params": {
+          "gain": 0.6
+        }
+      },
+      {
+        "id": "mixer-1",
+        "type": "mixer",
+        "name": "Mix",
+        "position": {
+          "x": 1100,
+          "y": 300
+        },
+        "params": {
+          "levelA": 0.8,
+          "levelB": 0.8
+        }
+      },
+      {
+        "id": "reverb-1",
+        "type": "reverb",
+        "name": "Reverb",
+        "position": {
+          "x": 1300,
+          "y": 300
+        },
+        "params": {
+          "time": 0.8,
+          "damp": 0.4,
+          "preDelay": 20,
+          "mix": 0.35
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Output",
+        "position": {
+          "x": 1750,
+          "y": 300
+        },
+        "params": {
+          "level": 1
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": {
+          "moduleId": "koshi-1",
+          "portId": "gate"
+        },
+        "to": {
+          "moduleId": "adsr-1",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "koshi-1",
+          "portId": "cv"
+        },
+        "to": {
+          "moduleId": "osc-1",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "osc-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "vca-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "adsr-1",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "vca-1",
+          "portId": "cv"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "vca-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mixer-1",
+          "portId": "in-a"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "koshi-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mixer-1",
+          "portId": "in-b"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "mixer-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "reverb-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "reverb-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "out-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      }
+    ]
+  }
+}

@@ -7065,6 +7065,52 @@ body {
     0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
+/* ── Koshi chime (3x2) : LCD des 8 tiges + rangée tuning/octave + rangée de knobs ── */
+
+.koshi-panel {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.koshi-row {
+  display: flex;
+  gap: 6px;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.koshi-row > .control-box {
+  min-width: 0;
+}
+
+.koshi-knobs {
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.koshi-rods {
+  display: block;
+  width: 100%;
+  height: 34px;
+}
+
+.koshi-rod {
+  stroke: color-mix(in srgb, var(--lcd-glow) 80%, #fff);
+  stroke-width: 3;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--lcd-glow) 60%, transparent));
+}
+
+.koshi-rod-label {
+  font-family: var(--font-lcd);
+  font-size: 8px;
+  letter-spacing: 0.04em;
+  fill: var(--text-dim);
+}
+
 /* ── Drawbars (Hammond) ── */
 
 .organ-panel {

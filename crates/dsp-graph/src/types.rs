@@ -19,6 +19,7 @@ pub enum ModuleType {
     PipeOrgan,
     SpectralSwarm,
     Resonator,
+    Koshi,
     Wavetable,
     Granular,
     Sampler,

@@ -103,7 +103,7 @@ Câbles et jacks sont colorés par type de signal :
 - Resize overrides are kept in `moduleSizeOverrides` inside the `useModuleResize` hook (`src/hooks/useModuleResize.ts`, wired from `src/App.tsx`) and only applied by `getModuleSize` while Dev Resize is enabled.
 - Rack grid overlay is always on via `.rack-grid-overlay` in `src/ui/RackView.tsx`, driven by `--rack-unit-x/y`, `--rack-gap`, `--rack-pad-y` in `src/styles.css`.
 - Lab Panel (`module.type === 'lab'`) renders a full layout stress test (Osc/Env/Mod/Util) in `src/ui/controls/IOControls.tsx`, using `updateParam(..., { skipEngine: true })`.
-- **Galerie des 98 modules** : `node design/mockups/gallery.mjs` (dev server requis) — construit un graphe avec un module de chaque type, le charge via l'import BrandRail, screenshote chaque module dans `design/gallery/<type>.png` et signale les débordements de `.module-controls`. À lancer après toute modif des primitives/CSS des modules. Scan ciblé par preset : `node design/mockups/check-overflow.mjs [preset...]`.
+- **Galerie des 99 modules** : `node design/mockups/gallery.mjs` (dev server requis) — construit un graphe avec un module de chaque type, le charge via l'import BrandRail, screenshote chaque module dans `design/gallery/<type>.png` et signale les débordements de `.module-controls`. À lancer après toute modif des primitives/CSS des modules. Scan ciblé par preset : `node design/mockups/check-overflow.mjs [preset...]`.
 
 ### Remove Dev Resize (rollback checklist)
 
@@ -184,11 +184,12 @@ npm run test:presets  # Run preset integration tests (load + render all presets)
 |--------|-------|-------------|
 | `scripts/validate-preset-notes.mjs` | `node scripts/validate-preset-notes.mjs [preset-file]` | Valide les notes d'un preset. Lit le JSON, convertit les pitch des step sequencers en noms de notes réels (en tenant compte de la fréquence de base de l'oscillateur cible), et compare avec une mélodie de référence si disponible. Défaut : `public/presets/take-on-me.json`. |
 | `scripts/check-modules.mjs` | `npm run check:modules` | Cohérence TS↔Rust : chaque port de `portCatalog` est résolu par `ports.rs` et le type est mappé dans `normalize_module_type`. |
+| `scripts/check-presets.mjs` | `npm run check:presets [id...]` | **Câbles morts dans les presets** : chaque connexion doit viser un module existant et un port déclaré dans `portCatalog` pour ce type (le moteur ignore silencieusement un port inconnu → preset qui joue avec un câble mort, ex. `scope.in` au lieu de `scope.in-a`). Notes/manifest = avertissements. |
 | `scripts/check-ui-audio.mjs` | `npm run check:ui-audio` | Garde-fou parité Web↔Tauri : échoue si un contrôle poll `engine.watch*` sans chemin natif Tauri, ou si un pont `nativeXxx` (ControlProps) n'est pas câblé via `controls/index.tsx`. |
 | `scripts/gen-module-reference.mjs` | `npm run module-ref` | Régénère `docs/MODULE_REFERENCE.md` (ports + params + defaults de tous les modules). |
 | `scripts/spectrogram.mjs` | `node scripts/spectrogram.mjs <in.f32> <out.png> "<label>"` | **Banc de test son** : transforme des samples f32 bruts en spectrogramme PNG log-fréquence + métriques de timbre (platitude spectrale = tonal↔bruité, centroïde = brillance, énergie par bande). Permet de « voir » un son qu'on ne peut pas entendre et de le régler sur des chiffres. PNG via `zlib` natif (zéro dépendance). Renderers associés : `cargo run -p dsp-core --example dump_cymbals` (cymbales) ou la paire projet ci-dessous. |
 | `scripts/flatten-project.mjs` | `node scripts/flatten-project.mjs <project.json> <out-flat.json> [onlyRackId]` | **Banc projet (1/2)** : aplatit un projet multi-rack en un graphe unique (mime `flattenRacks` : préfixe les ids par `${rackId}/`) pour rendu offline. `onlyRackId` optionnel = auditionner UNE seule couche (diagnostiquer un rack muet). |
-| `crates/dsp-graph/examples/render_graph.rs` | `cargo run -p dsp-graph --example render_graph -- <flat.json> <out.f32> <secondes>` | **Banc projet (2/2)** : rend N secondes d'un graphe aplati → f32 + rapport peak / NaN / RMS-par-10s (voir si une pièce générative ÉVOLUE, ou trouver une couche morte/saturée). Enchaîner avec `spectrogram.mjs`. |
+| `crates/dsp-graph/examples/render_graph.rs` | `cargo run -p dsp-graph --example render_graph -- <flat.json> <out.f32> <secondes>` | **Banc projet (2/2)** : rend N secondes d'un graphe aplati → f32 **mono (L+R)/2 à 48 kHz** (la sortie moteur est planaire `[L|R|taps]`, pas entrelacée) + rapport peak / NaN / RMS-par-10s (voir si une pièce générative ÉVOLUE, ou trouver une couche morte/saturée). Enchaîner avec `spectrogram.mjs`. |
 
 ## New Module Checklist
 
@@ -267,10 +268,12 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 
 **⚠️ RÈGLE:** Toute nouvelle feature UI↔Audio DOIT être implémentée pour Tauri en même temps que Web. Ne jamais merger une feature Web-only. **Garde-fou auto:** `npm run check:ui-audio` échoue si un contrôle utilise `engine.watch*` sans chemin natif (le bug récurrent type Game-of-Life/Meter).
 
-## Module Types (98 total)
+## Module Types (99 total)
 
-### Sources (19)
-oscillator, supersaw, karplus, fm-op, fm-matrix, nes-osc, snes-osc, noise, tb-303, shepard, pipe-organ, spectral-swarm, resonator, wavetable, granular, sampler, particle-cloud, speech-synth, theremin
+### Sources (20)
+oscillator, supersaw, karplus, fm-op, fm-matrix, nes-osc, snes-osc, noise, tb-303, shepard, pipe-organ, spectral-swarm, resonator, koshi, wavetable, granular, sampler, particle-cloud, speech-synth, theremin
+
+**Koshi Chime** (`koshi`) : carillon Koshi 8 tiges modélisé sur les enregistrements officiels (banc spectrogramme : partiels libre-libre 2.79/5.55/8.9, accordage étiré, T60, tube). Autonome (battant pendulaire poussé par le vent) ET jouable (gate + pitch CV) ; publie chaque frappe sur `gate`/`cv`. DSP : `crates/dsp-core/src/oscillators/koshi.rs`.
 
 ### Filters (2)
 vcf, hpf
@@ -404,6 +407,7 @@ Presets dans `public/presets/`, structure `{ id, name, description, group, graph
 
 **Règles critiques (à ne JAMAIS oublier) :**
 - **Connexions** : objets imbriqués `{ "from": {"moduleId","portId"}, "to": {"moduleId","portId"}, "kind": "audio|cv|gate|sync" }`. **PAS** le format plat `{ "from", "fromPort" }` (ne fonctionne pas).
+- **Vérifier** : `npm run check:presets <id>` — attrape les ports inexistants (câble mort silencieux).
 - **Manifest OBLIGATOIRE** : ajouter l'entrée dans `public/presets/manifest.json` (`{ id, name, description, file, group }`), sinon le preset n'apparaît pas dans l'UI.
 - **Module `notes` OBLIGATOIRE** : chaque preset inclut un module `notes` expliquant le patch à l'utilisateur.
 - **Port IDs** : doivent matcher `src/ui/portCatalog.ts` **exactement**. Pièges fréquents : adsr sortie = `env` (pas `out`) · mixers entrées = `in-1`, `in-2`… (pas `in1`) · oscillator pitch = `pitch` / sortie = `out` · vcf modulation = `mod`.
@@ -432,6 +436,8 @@ Presets dans `public/presets/`, structure `{ id, name, description, group, graph
 | Reverb wet trop atténuée | `input_gain=0.35 × wet_scale=0.3 = ×0.105` | `input_gain=0.5 × wet_scale=0.5 = ×0.25` (2.4× plus fort) |
 | Presets Showcase/Chord trop faibles | Accumulation d'atténuations (gain×mixer×VCF×reverb) | Recalibrage gains, mixer levels, VCF cutoff sur 15 presets |
 | Phaser feedback runaway | Feedback pris depuis l'état interne allpass (croissance infinie) | Feedback via sortie bornée par `tanh()` avant réinjection |
+| 909 hi-hat plus terne que le 808 (et qu'un vrai 909) | 6 oscillateurs carrés plafonnant à 2,7× une base de quelques centaines de Hz → peu d'énergie réelle dans l'aigu, le filtre résonant ne pouvait que filtrer un signal déjà faible (centroïde ~2,1-2,4 kHz, 57% d'énergie <1 kHz) | Reconstruit en synthèse additive dense (20 partiels sinus inharmoniques log-espacés jusqu'à ~10 kHz, même technique que le crash/ride) + sizzle de bruit filtré passe-haut + sortie passe-haut. Centroïde 5,3-6,5 kHz, <1 kHz tombé à 12-13% |
+| 909 rimshot = simple ton grave (pas un « knock ») | Deux triangles seuls (harmoniques faibles, roll-off rapide) : flatness 0.04, centroïde 511 Hz, quasi aucune énergie >1 kHz | Ajout d'un transitoire de bruit passe-haut (~4,5 kHz, ~16 ms) superposé au corps tonal → flatness 0.53, centroïde 1483 Hz |
 | Ajout module = full restart | `applyGraphUpdate()` appelait `queueEngineRestart()` pour tout changement | Update incrémental (`set_graph` preserve state), full restart uniquement pour presets (`set_graph_fresh`) |
 | Turing Machine panic | `1u16 << length` overflow quand `length == 16` | Guard `if length >= 16 { 0xFFFF }` |
 | Channel/Master FX reset au restart transport | Valeurs FX envoyées au moteur en direct, jamais stockées → graphe reconstruit avec valeurs neutres au stop/start | Persister `channelFx`/`masterFx` dans l'état App ; `channelFx` injecté via `flattenRacks`, `masterFx` ré-appliqué dans `handleStart`/`queueEngineRestart` |

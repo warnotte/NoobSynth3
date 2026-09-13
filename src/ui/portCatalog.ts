@@ -578,6 +578,19 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
       { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
     ],
   },
+  koshi: {
+    inputs: [
+      { id: 'wind', label: 'Wind', kind: 'cv', direction: 'in' },
+      { id: 'gate', label: 'Strike', kind: 'gate', direction: 'in' },
+      { id: 'pitch', label: '1V/Oct', kind: 'cv', direction: 'in' },
+      { id: 'vel', label: 'Vel', kind: 'cv', direction: 'in' },
+    ],
+    outputs: [
+      { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
+      { id: 'gate', label: 'Gate', kind: 'gate', direction: 'out' },
+      { id: 'cv', label: 'CV', kind: 'cv', direction: 'out' },
+    ],
+  },
   'wavetable': {
     inputs: [
       { id: 'pitch', label: '1V/Oct', kind: 'cv', direction: 'in' },

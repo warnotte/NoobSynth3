@@ -286,6 +286,14 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
       "damp" | "damper" => Some(4),
       _ => None,
     },
+    // Koshi - 4 inputs
+    ModuleType::Koshi => match port_id {
+      "wind" | "wind-cv" => Some(0),
+      "gate" | "strike" => Some(1),
+      "pitch" | "pitch-cv" | "1volt" => Some(2),
+      "vel" | "velocity" => Some(3),
+      _ => None,
+    },
     // Wavetable - 4 inputs
     ModuleType::Wavetable => match port_id {
       "pitch" | "pitch-cv" | "1volt" => Some(0),

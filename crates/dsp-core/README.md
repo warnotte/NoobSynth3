@@ -15,7 +15,7 @@ Bibliothèque DSP (Digital Signal Processing) pure Rust, sans dépendances exter
 src/
 ├── lib.rs              # Exports publics
 ├── common.rs           # Utilitaires partagés
-├── oscillators/        # Sources sonores (18 modules)
+├── oscillators/        # Sources sonores (20 modules)
 │   ├── vco.rs          # VCO principal (unison, PWM, FM, sub, sync)
 │   ├── supersaw.rs     # 7 voix désaccordées
 │   ├── karplus.rs      # Karplus-Strong (cordes pincées)
@@ -30,8 +30,10 @@ src/
 │   ├── pipe_organ.rs   # Orgue à tuyaux (8 registres)
 │   ├── spectral_swarm.rs # Essaim d'oscillateurs
 │   ├── resonator.rs    # Résonance sympathique (Rings-style)
+│   ├── koshi.rs        # Carillon Koshi (8 tiges modales + battant pendulaire)
 │   ├── wavetable.rs    # Synthèse wavetable
 │   ├── granular.rs     # Synthèse granulaire
+│   ├── sampler.rs      # Lecteur de sample .wav (one-shot, accordé V/oct)
 │   ├── particle_cloud.rs # Nuage de particules sonores
 │   ├── speech_synth.rs # Synthèse vocale (formants)
 │   └── theremin.rs     # Theremin (pitch/volume CV, monophonique)
@@ -70,13 +72,15 @@ src/
 │   ├── leslie.rs       # Cabine Leslie (rotary horn/drum)
 │   ├── wah.rs          # Wah-wah (auto/pédale)
 │   └── tube_amp.rs     # Ampli à lampes (saturation)
-├── drums/              # TR-909 + TR-808 drums (12 modules)
+├── drums/              # TR-909 + TR-808 drums (14 modules)
 │   ├── kick.rs         # 909 Kick drum
 │   ├── snare.rs        # 909 Snare drum
-│   ├── hihat.rs        # 909 Hi-hat (closed/open)
+│   ├── hihat.rs        # 909 Hi-hat (closed/open, synthese additive dense)
 │   ├── clap.rs         # 909 Handclap
 │   ├── tom.rs          # 909 Tom
-│   ├── rimshot.rs      # 909 Rimshot
+│   ├── rimshot.rs      # 909 Rimshot (corps tonal + transitoire de bruit)
+│   ├── crash.rs        # 909 Crash (32 partiels sinus inharmoniques)
+│   ├── ride.rs         # 909 Ride (partiels + cloche/ping)
 │   ├── kick808.rs      # 808 Kick drum
 │   ├── snare808.rs     # 808 Snare drum
 │   ├── hihat808.rs     # 808 Hi-hat
@@ -105,11 +109,11 @@ src/
     └── gravity.rs      # Gravity sequencer (gravité/rebonds)
 ```
 
-**Total : ~20800 lignes en 88 fichiers**
+**Total : ~25800 lignes en 94 fichiers**
 
 ## Modules
 
-### Oscillateurs (18)
+### Oscillateurs (20)
 
 | Struct | Description |
 |--------|-------------|
@@ -126,8 +130,10 @@ src/
 | `PipeOrgan` | Orgue à tuyaux 8 registres |
 | `SpectralSwarm` | Essaim d'oscillateurs |
 | `Resonator` | Résonance sympathique (Rings-style) |
+| `Koshi` | Carillon Koshi : 8 tiges modales (paires de modes désaccordées) + battant pendulaire pousse par le vent |
 | `Wavetable` | Synthèse wavetable |
 | `Granular` | Synthèse granulaire |
+| `Sampler` | Lecteur de sample .wav one-shot, accordé V/oct |
 | `ParticleCloud` | Nuage de particules audio |
 | `SpeechSynth` | Synthèse vocale à formants |
 | `Theremin` | Theremin (pitch/volume CV, monophonique) |
@@ -179,16 +185,18 @@ src/
 | `Wah` | Wah-wah (auto/pédale) |
 | `TubeAmp` | Ampli à lampes (saturation) |
 
-### TR-909 Drums (6)
+### TR-909 Drums (8)
 
 | Struct | Description |
 |--------|-------------|
 | `Kick909` | Kick drum avec tune/attack/decay/drive |
 | `Snare909` | Snare avec tune/tone/snappy/decay |
-| `HiHat909` | Hi-hat closed/open avec tune/decay/tone |
+| `HiHat909` | Hi-hat closed/open, synthese additive dense (20 partiels inharmoniques + sizzle) |
 | `Clap909` | Handclap avec tone/decay |
 | `Tom909` | Tom avec tune/decay |
-| `Rimshot909` | Rimshot avec tune |
+| `Rimshot909` | Rimshot : corps tonal (2 triangles) + transitoire de bruit passe-haut |
+| `Crash909` | Crash : 32 partiels sinus inharmoniques + sizzle de bruit + passe-haut de sortie |
+| `Ride909` | Ride : partiels + cloche/ping resonant + shimmer |
 
 ### TR-808 Drums (6)
 

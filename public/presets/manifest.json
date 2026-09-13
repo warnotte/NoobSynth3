@@ -1045,6 +1045,34 @@
       "group": "Physical Modeling"
     },
     {
+      "id": "koshi-garden",
+      "name": "Koshi Garden",
+      "description": "Carillon Koshi (accord Terra) qui joue tout seul dans le vent, avec une reverb. Tourne le vent, change d'accord, ajoute des rafales.",
+      "file": "koshi-garden.json",
+      "group": "Physical Modeling"
+    },
+    {
+      "id": "koshi-trio",
+      "name": "Koshi Trio",
+      "description": "Trois carillons Koshi (Terra, Aqua grave, Aria aigu) dans le meme vent, chacun avec sa graine. Jardin generatif infini.",
+      "file": "koshi-trio.json",
+      "group": "Physical Modeling"
+    },
+    {
+      "id": "koshi-wind-sequencer",
+      "name": "Koshi Wind Sequencer",
+      "description": "Le vent du Koshi joue un synthe : ses sorties GATE/CV declenchent un ADSR + VCA sur un VCO accorde sur les tiges. Carillon et synthe melanges.",
+      "file": "koshi-wind-sequencer.json",
+      "group": "Physical Modeling"
+    },
+    {
+      "id": "koshi-cadence",
+      "name": "Koshi Cadence",
+      "description": "Le carillon Koshi (Aria) dans un vent lent, avec une petite rythmique legere en plus : un Euclidean 13/5 declenche une note pincee dont la hauteur erre sur la pentatonique mineure de La (Chaos de Lorenz quantifie, echantillonne a chaque frappe). Pouls stable, notes jamais identiques.",
+      "file": "koshi-cadence.json",
+      "group": "Physical Modeling"
+    },
+    {
       "id": "wavetable-vocal",
       "name": "Wavetable Vocal",
       "description": "Vocal formants bank with LFO-controlled position morphing.",

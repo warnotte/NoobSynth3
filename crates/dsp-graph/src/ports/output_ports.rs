@@ -207,6 +207,12 @@ pub fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
     ModuleType::Resonator => vec![
       PortInfo { channels: 1 },  // audio out
     ],
+    // Koshi - stereo audio + strike gate + strike CV
+    ModuleType::Koshi => vec![
+      PortInfo { channels: 2 },  // stereo audio out
+      PortInfo { channels: 1 },  // strike gate
+      PortInfo { channels: 1 },  // strike CV (V/oct)
+    ],
     // Wavetable - 1 mono output
     ModuleType::Wavetable => vec![
       PortInfo { channels: 1 },  // audio out
