@@ -56,16 +56,31 @@
       {
         "id": "hh-1",
         "type": "909-hihat",
-        "name": "909 HiHat",
+        "name": "909 HiHat Closed",
         "position": {
           "x": 7,
           "y": 0
         },
         "params": {
-          "openDecay": 0.35,
-          "closedDecay": 0.08,
+          "tune": 1.0,
+          "decay": 0.08,
           "tone": 0.7,
-          "mix": 0.6
+          "open": 0.0
+        }
+      },
+      {
+        "id": "hh-1-open",
+        "type": "909-hihat",
+        "name": "909 HiHat Open",
+        "position": {
+          "x": 7,
+          "y": 1
+        },
+        "params": {
+          "tune": 1.0,
+          "decay": 0.35,
+          "tone": 0.7,
+          "open": 1.0
         }
       },
       {
@@ -182,8 +197,8 @@
           "portId": "gate-hho"
         },
         "to": {
-          "moduleId": "hh-1",
-          "portId": "open-trig"
+          "moduleId": "hh-1-open",
+          "portId": "trigger"
         },
         "kind": "gate"
       },
@@ -234,6 +249,17 @@
       {
         "from": {
           "moduleId": "drumseq-1",
+          "portId": "acc-hho"
+        },
+        "to": {
+          "moduleId": "hh-1-open",
+          "portId": "accent"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "drumseq-1",
           "portId": "acc-clap"
         },
         "to": {
@@ -267,6 +293,17 @@
       {
         "from": {
           "moduleId": "hh-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mix-1",
+          "portId": "in-c"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "hh-1-open",
           "portId": "out"
         },
         "to": {
