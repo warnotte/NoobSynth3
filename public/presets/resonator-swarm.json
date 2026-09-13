@@ -326,19 +326,19 @@
       { "from": { "moduleId": "clock-1", "portId": "clock" }, "to": { "moduleId": "euc-swarm", "portId": "clock" }, "kind": "sync" },
       { "from": { "moduleId": "clock-1", "portId": "reset" }, "to": { "moduleId": "euc-swarm", "portId": "reset" }, "kind": "sync" },
 
-      { "from": { "moduleId": "chaos-1", "portId": "cv" }, "to": { "moduleId": "res-bells", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "chaos-1", "portId": "z" }, "to": { "moduleId": "res-bells", "portId": "pitch" }, "kind": "cv" },
       { "from": { "moduleId": "euc-bells", "portId": "gate" }, "to": { "moduleId": "res-bells", "portId": "gate" }, "kind": "gate" },
 
-      { "from": { "moduleId": "chaos-1", "portId": "cv" }, "to": { "moduleId": "res-strings", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "chaos-1", "portId": "z" }, "to": { "moduleId": "res-strings", "portId": "pitch" }, "kind": "cv" },
       { "from": { "moduleId": "euc-strings", "portId": "gate" }, "to": { "moduleId": "res-strings", "portId": "gate" }, "kind": "gate" },
 
-      { "from": { "moduleId": "chaos-1", "portId": "cv" }, "to": { "moduleId": "res-metal", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "chaos-1", "portId": "z" }, "to": { "moduleId": "res-metal", "portId": "pitch" }, "kind": "cv" },
       { "from": { "moduleId": "euc-metal", "portId": "gate" }, "to": { "moduleId": "res-metal", "portId": "gate" }, "kind": "gate" },
 
-      { "from": { "moduleId": "chaos-1", "portId": "cv" }, "to": { "moduleId": "res-pluck", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "chaos-1", "portId": "z" }, "to": { "moduleId": "res-pluck", "portId": "pitch" }, "kind": "cv" },
       { "from": { "moduleId": "euc-pluck", "portId": "gate" }, "to": { "moduleId": "res-pluck", "portId": "gate" }, "kind": "gate" },
 
-      { "from": { "moduleId": "chaos-1", "portId": "cv" }, "to": { "moduleId": "swarm-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "chaos-1", "portId": "z" }, "to": { "moduleId": "swarm-1", "portId": "pitch" }, "kind": "cv" },
       { "from": { "moduleId": "euc-swarm", "portId": "gate" }, "to": { "moduleId": "swarm-1", "portId": "gate" }, "kind": "gate" },
 
       { "from": { "moduleId": "chaos-1", "portId": "x" }, "to": { "moduleId": "vcf-bells", "portId": "mod" }, "kind": "cv" },

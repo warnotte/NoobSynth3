@@ -240,16 +240,16 @@
       }
     ],
     "connections": [
-      { "from": { "moduleId": "chaos-main", "portId": "cv" }, "to": { "moduleId": "wt-lead", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "chaos-main", "portId": "z" }, "to": { "moduleId": "wt-lead", "portId": "pitch" }, "kind": "cv" },
       { "from": { "moduleId": "chaos-main", "portId": "gate" }, "to": { "moduleId": "wt-lead", "portId": "gate" }, "kind": "gate" },
 
-      { "from": { "moduleId": "chaos-main", "portId": "cv" }, "to": { "moduleId": "fm-mid", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "chaos-main", "portId": "z" }, "to": { "moduleId": "fm-mid", "portId": "pitch" }, "kind": "cv" },
       { "from": { "moduleId": "chaos-main", "portId": "gate" }, "to": { "moduleId": "fm-mid", "portId": "gate" }, "kind": "gate" },
 
-      { "from": { "moduleId": "chaos-slow", "portId": "cv" }, "to": { "moduleId": "swarm-pad", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "chaos-slow", "portId": "z" }, "to": { "moduleId": "swarm-pad", "portId": "pitch" }, "kind": "cv" },
       { "from": { "moduleId": "chaos-slow", "portId": "gate" }, "to": { "moduleId": "swarm-pad", "portId": "gate" }, "kind": "gate" },
 
-      { "from": { "moduleId": "chaos-main", "portId": "cv" }, "to": { "moduleId": "res-perc", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "chaos-main", "portId": "z" }, "to": { "moduleId": "res-perc", "portId": "pitch" }, "kind": "cv" },
       { "from": { "moduleId": "chaos-main", "portId": "gate" }, "to": { "moduleId": "res-perc", "portId": "gate" }, "kind": "gate" },
 
       { "from": { "moduleId": "chaos-main", "portId": "x" }, "to": { "moduleId": "vcf-lead", "portId": "mod" }, "kind": "cv" },
