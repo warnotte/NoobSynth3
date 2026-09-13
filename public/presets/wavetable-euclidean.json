@@ -172,8 +172,8 @@
       },
       {
         "from": { "moduleId": "euclid-1", "portId": "gate" },
-        "to": { "moduleId": "sh-1", "portId": "trigger" },
-        "kind": "gate"
+        "to": { "moduleId": "sh-1", "portId": "trig" },
+        "kind": "sync"
       },
       {
         "from": { "moduleId": "lfo-2", "portId": "cv-out" },

@@ -256,7 +256,7 @@
       { "from": { "moduleId": "chaos-main", "portId": "y" }, "to": { "moduleId": "vcf-fm", "portId": "mod" }, "kind": "cv" },
       { "from": { "moduleId": "chaos-slow", "portId": "x" }, "to": { "moduleId": "vcf-swarm", "portId": "mod" }, "kind": "cv" },
 
-      { "from": { "moduleId": "chaos-main", "portId": "z" }, "to": { "moduleId": "wt-lead", "portId": "pos-cv" }, "kind": "cv" },
+      { "from": { "moduleId": "chaos-main", "portId": "z" }, "to": { "moduleId": "wt-lead", "portId": "position" }, "kind": "cv" },
       { "from": { "moduleId": "chaos-slow", "portId": "y" }, "to": { "moduleId": "fm-mid", "portId": "index-cv" }, "kind": "cv" },
 
       { "from": { "moduleId": "wt-lead", "portId": "out" }, "to": { "moduleId": "vcf-lead", "portId": "in" }, "kind": "audio" },

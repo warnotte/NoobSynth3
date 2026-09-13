@@ -157,7 +157,7 @@
       {
         "from": {
           "moduleId": "adsr-1",
-          "portId": "out"
+          "portId": "env"
         },
         "to": {
           "moduleId": "vcf-1",
@@ -168,7 +168,7 @@
       {
         "from": {
           "moduleId": "adsr-1",
-          "portId": "out"
+          "portId": "env"
         },
         "to": {
           "moduleId": "gain-1",

@@ -411,7 +411,7 @@
 
       { "from": { "moduleId": "mixer-final", "portId": "out" }, "to": { "moduleId": "reverb-1", "portId": "in" }, "kind": "audio" },
       { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "output-1", "portId": "in" }, "kind": "audio" },
-      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "scope-1", "portId": "in" }, "kind": "audio" }
+      { "from": { "moduleId": "reverb-1", "portId": "out" }, "to": { "moduleId": "scope-1", "portId": "in-a" }, "kind": "audio" }
     ]
   }
 }

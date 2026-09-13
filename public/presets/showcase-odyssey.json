@@ -113,7 +113,7 @@
       { "from": { "moduleId": "drumseq-1", "portId": "gate-snare" }, "to": { "moduleId": "snare-1", "portId": "trigger" }, "kind": "gate" },
       { "from": { "moduleId": "drumseq-1", "portId": "acc-snare" }, "to": { "moduleId": "snare-1", "portId": "accent" }, "kind": "cv" },
       { "from": { "moduleId": "drumseq-1", "portId": "gate-hhc" }, "to": { "moduleId": "hihat-1", "portId": "trigger" }, "kind": "gate" },
-      { "from": { "moduleId": "drumseq-1", "portId": "accent-hhc" }, "to": { "moduleId": "hihat-1", "portId": "accent" }, "kind": "cv" },
+      { "from": { "moduleId": "drumseq-1", "portId": "acc-hhc" }, "to": { "moduleId": "hihat-1", "portId": "accent" }, "kind": "cv" },
       { "from": { "moduleId": "drumseq-1", "portId": "gate-clap" }, "to": { "moduleId": "clap-1", "portId": "trigger" }, "kind": "gate" },
       { "from": { "moduleId": "drumseq-1", "portId": "acc-clap" }, "to": { "moduleId": "clap-1", "portId": "accent" }, "kind": "cv" },
 

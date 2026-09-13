@@ -104,12 +104,12 @@
     ],
     "connections": [
       {
-        "from": { "moduleId": "control", "portId": "cv" },
+        "from": { "moduleId": "control", "portId": "cv-out" },
         "to": { "moduleId": "osc", "portId": "pitch" },
         "kind": "cv"
       },
       {
-        "from": { "moduleId": "control", "portId": "gate" },
+        "from": { "moduleId": "control", "portId": "gate-out" },
         "to": { "moduleId": "adsr", "portId": "gate" },
         "kind": "gate"
       },
@@ -119,12 +119,12 @@
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "adsr", "portId": "out" },
+        "from": { "moduleId": "adsr", "portId": "env" },
         "to": { "moduleId": "vcf", "portId": "env" },
         "kind": "cv"
       },
       {
-        "from": { "moduleId": "adsr", "portId": "out" },
+        "from": { "moduleId": "adsr", "portId": "env" },
         "to": { "moduleId": "gain", "portId": "cv" },
         "kind": "cv"
       },
@@ -139,7 +139,7 @@
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "lfo", "portId": "out" },
+        "from": { "moduleId": "lfo", "portId": "cv-out" },
         "to": { "moduleId": "pitch-shifter", "portId": "pitch-cv" },
         "kind": "cv"
       },

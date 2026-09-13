@@ -327,7 +327,7 @@
         },
         "to": {
           "moduleId": "vcf-1",
-          "portId": "cv"
+          "portId": "mod"
         },
         "kind": "cv"
       },
