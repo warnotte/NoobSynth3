@@ -18,6 +18,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # `cargo test --workspace` also builds the `src-tauri` member, which needs the
+      # Linux webview/GTK dev headers to compile at all (glib-sys/gobject-sys build
+      # scripts shell out to pkg-config) - same package list as release.yml's Tauri job.
+      - name: Install Linux webview/audio dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf xdg-utils libasound2-dev
+
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
