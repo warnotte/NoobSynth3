@@ -535,8 +535,20 @@ Les plans/analyses de features déjà implémentées sont conservés dans [docs/
 - Toujours rebuild WASM après modif Rust: `npm run build:wasm`
 - Les warnings Rust sont préfixés `_` ou annotés `#[allow(dead_code)]` pour le code réservé
 - **Avant de tagger une release (`git tag vX.Y.Z`)** : synchroniser le numéro `X.Y.Z` (sans le
-  `v`) dans **`package.json`** et **`src-tauri/tauri.conf.json`** — aucun des deux ne se met à
-  jour tout seul depuis le tag git. `release.yml` nomme la Release GitHub d'après le tag poussé
-  (`${{ github.ref_name }}`), donc un oubli ne casse pas la release, mais les fichiers installeurs
-  produits par Tauri portent le numéro de `tauri.conf.json` dans leur nom (ex.
-  `noobsynth3_0.16.0_x64-setup.exe`) — un decalage s'y voit immediatement.
+  `v`) dans **TROIS fichiers** — aucun ne se met à jour tout seul depuis le tag git, et aucun ne
+  dérive des deux autres :
+  - **`package.json`** (`"version"`)
+  - **`src-tauri/tauri.conf.json`** (`"version"`) — c'est CE numéro que Tauri grave dans le nom
+    des installeurs (ex. `noobsynth3_0.16.1_x64-setup.exe`), pas celui de Cargo.toml.
+  - **`src-tauri/Cargo.toml`** (`[package] version`) — champ Cargo indépendant, découvert
+    desynchronisé à `0.1.0` (jamais touché) alors que les deux autres étaient déjà à jour.
+  - Après avoir changé `Cargo.toml`, lancer `cargo check --workspace` pour répercuter le numéro
+    dans `Cargo.lock` (entrée `name = "noobsynth3"`) avant de committer.
+  - **Ordre des opérations critique** : synchroniser + committer + merger sur `main` **AVANT** de
+    pousser le tag, jamais après. `release.yml` nomme la Release GitHub d'après le tag poussé
+    (`${{ github.ref_name }}`), donc un oubli ne casse pas la release — mais le build Tauri tourne
+    sur le commit du tag, pas sur un commit ultérieur. Incident vécu : le tag `v0.16.0` a été
+    poussé un cran trop tôt (avant le merge de la PR de sync des versions) → tous les installeurs
+    de cette release sont sortis étiquetés `0.1.0`. Il a fallu re-synchroniser (`0.16.1`) et
+    re-tagger pour corriger, en laissant la release `v0.16.0` mal étiquetée derrière (ou en la
+    supprimant, selon décision utilisateur).
