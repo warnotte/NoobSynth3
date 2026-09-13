@@ -59,7 +59,35 @@ Modules de routing audio inter-racks via bus nommés (A-H).
 
 - `Send` et `Receive` sont des pass-through audio (stéréo in → stéréo out)
 - `flattenRacks()` crée automatiquement les connexions entre Send/Receive du même bus
-- Param `bus` (0-7) sélectionne le bus
+- Param `bus` (0-7) sélectionne le bus (0=A, 1=B, … 7=H)
+- **Fan-out, pas remplacement** : brancher un `Send` sur une sortie ne retire rien à cette sortie —
+  elle continue d'alimenter normalement le reste de son propre rack ; le `Send` la duplique en plus
+  vers le bus. Plusieurs `Send` sur le même bus SOMMENT chez chaque `Receive` de ce bus (comme toute
+  entrée à plusieurs câbles).
+- **Aucune CV/gate ne traverse les racks** : seul l'audio le fait (Send/Receive n'a que des ports
+  `audio`). Un rack qui reçoit un bus ne peut donc pas suivre le *contrôle* d'un autre rack (son vent,
+  son horloge…), seulement le *son* qu'on lui envoie.
+- **Banc offline** : `scripts/flatten-project.mjs` reproduit cet auto-câblage Send→Receive (ajouté en
+  même temps que le pattern Halo ci-dessous) pour pouvoir vérifier un projet multi-rack hors ligne.
+
+**Pattern « Halo »** (rack dédié qui transforme la résonance d'autres racks en nappe, sans dupliquer le
+son de zéro) — exemple vivant : `public/projects/jardin-de-vent.json`, rack `Halo` :
+1. Dans chaque rack source, un `Send` (même `bus`) branché en parallèle sur un point du signal déjà
+   existant (sortie d'un module, ou d'un mixeur avant sa reverb locale).
+2. Un rack dédié contient un `Receive` (même `bus`) → une chaîne d'effets purement continue (pas de
+   déclenchement manuel) : `gain` (mise à niveau — plusieurs sources sommées peuvent saturer, tamponner
+   ici) → `granular-delay` ou `spring-reverb`/`ensemble` → `reverb` longue → `output`.
+3. **Piège évité** : le module `granular` « à mémoire » (charger/enregistrer un buffer) exige un
+   déclenchement d'enregistrement qu'aucun paramètre JSON de preset ne peut simuler
+   (`start_recording()` côté Rust n'est appelé que par une commande moteur dédiée, jamais par
+   `apply_param`) — inutilisable pour un preset autonome. `granular-delay` est un effet continu normal,
+   il convient.
+4. **Vérifier au banc AVANT de livrer** : une chaîne avec feedback (delay + reverb) nourrie en continu
+   par plusieurs sources peut accumuler de l'énergie. Rendre le rack Halo seul (les autres racks isolés
+   avec leur propre sortie coupée à 0, voir `render_graph` + `flatten-project.mjs`) sur plusieurs
+   minutes et vérifier que le RMS ne dérive pas, en plus du mix complet avec les volumes `mixer` du
+   projet réellement appliqués (`mixer.rack-X.volume` fixe le param `level` du module `output` de ce
+   rack — voir Mixer Console ci-dessous — un bench qui ignore ce trim est pessimiste, pas représentatif).
 
 ### Mixer Console
 Vue mixer « console analogique » (Console Steel) : une tranche verticale par rack + tranche MASTER, joues en bois.
