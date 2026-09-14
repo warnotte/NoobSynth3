@@ -110,6 +110,8 @@ pub struct SpectralSwarmInputs<'a> {
     pub gate: Option<&'a [Sample]>,
     /// Sync/reset trigger
     pub sync: Option<&'a [Sample]>,
+    /// Formant frequency CV, scaled ×1000 Hz and added to `formant_freq` (bipolar, ~-1..1 → ~-1000..1000 Hz)
+    pub formant_cv: Option<&'a [Sample]>,
 }
 
 impl SpectralSwarm {
@@ -368,7 +370,8 @@ impl SpectralSwarm {
             let waveform = sample_at(params.waveform, i, 0.0) as i32;
             let odd_even = sample_at(params.odd_even, i, 0.0).clamp(-1.0, 1.0);
             let fundamental_mix = sample_at(params.fundamental_mix, i, 0.5).clamp(0.0, 1.0);
-            let formant_freq = sample_at(params.formant_freq, i, 0.0).clamp(0.0, 4000.0);
+            let formant_cv = input_at(inputs.formant_cv, i) * 1000.0;
+            let formant_freq = (sample_at(params.formant_freq, i, 0.0) + formant_cv).clamp(0.0, 4000.0);
             let formant_q = sample_at(params.formant_q, i, 0.5).clamp(0.1, 20.0);
             let freeze = sample_at(params.freeze, i, 0.0) > 0.5;
             let chorus_amt = sample_at(params.chorus, i, 0.0).clamp(0.0, 1.0);

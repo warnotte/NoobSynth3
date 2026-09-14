@@ -239,11 +239,12 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
       "reset" | "rst" => Some(1),
       _ => None,
     },
-    // FM Operator - 3 inputs
+    // FM Operator - 4 inputs
     ModuleType::FmOp => match port_id {
       "pitch" | "1volt" => Some(0),
       "gate" => Some(1),
       "fm" | "fm-in" => Some(2),
+      "index-cv" | "index" => Some(3),
       _ => None,
     },
     // FM Matrix - 6 inputs
@@ -278,11 +279,12 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
       "gate" => Some(1),
       _ => None,
     },
-    // Spectral Swarm - 3 inputs
+    // Spectral Swarm - 4 inputs
     ModuleType::SpectralSwarm => match port_id {
       "pitch" | "pitch-cv" | "1volt" => Some(0),
       "gate" => Some(1),
       "sync" | "reset" => Some(2),
+      "formant-cv" | "formant" => Some(3),
       _ => None,
     },
     // Resonator - 5 inputs

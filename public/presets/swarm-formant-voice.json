@@ -134,7 +134,7 @@
       {
         "from": {
           "moduleId": "lfo1",
-          "portId": "out"
+          "portId": "cv-out"
         },
         "to": {
           "moduleId": "swarm1",

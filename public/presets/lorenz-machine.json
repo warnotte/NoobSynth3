@@ -226,7 +226,7 @@
         "name": "Out",
         "position": { "x": 18, "y": 3 },
         "params": {
-          "level": 1.0
+          "level": 0.75
         }
       },
       {

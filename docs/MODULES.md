@@ -211,7 +211,8 @@ Synthèse additive avec essaim de partiels évolutifs. Crée des textures organi
 | `releaseLow` | 0.1-4 | Multiplicateur release basses |
 | `releaseHigh` | 0.1-4 | Multiplicateur release aigus |
 
-**Entrées** : pitch (CV), gate (gate), sync (sync - reset de l'état)
+**Entrées** : pitch (CV), gate (gate), sync (sync - reset de l'état),
+formant-cv (cv — ×1000 Hz, ajoutée directement à `formantFreq`, ~-1000..1000 Hz)
 **Sorties** : out (audio)
 
 **Conseils :**
@@ -362,7 +363,8 @@ Opérateur FM avec enveloppe intégrée. Utilisable comme source ou modulateur F
 | `sustain` | 0-1 | Niveau de maintien |
 | `release` | 1-5000 ms | Temps de relâchement |
 
-**Entrées** : pitch (CV), gate (gate), fm (audio)
+**Entrées** : pitch (CV), gate (gate), fm (audio), index-cv (cv — ajoutée
+directement à `level`, qui fait aussi office d'index de modulation, ~-1..1)
 **Sorties** : out (audio)
 
 **Utilisation type :**

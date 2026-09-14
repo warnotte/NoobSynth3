@@ -213,8 +213,13 @@ pub(crate) fn process(
             } else {
                 None
             };
+            let index_cv = if connections.len() > 3 && !connections[3].is_empty() {
+                Some(inputs[3].channel(0))
+            } else {
+                None
+            };
 
-            let fm_inputs = FmOperatorInputs { pitch, gate, fm_in };
+            let fm_inputs = FmOperatorInputs { pitch, gate, fm_in, index_cv };
             let params = FmOperatorParams {
                 frequency: state.frequency.slice(frames),
                 ratio: state.ratio.slice(frames),
@@ -441,7 +446,7 @@ pub(crate) fn process(
             state.organ.process_block(out, organ_inputs, params);
         }
         ModuleState::SpectralSwarm(state) => {
-            // Input 0: pitch CV, Input 1: gate, Input 2: sync
+            // Input 0: pitch CV, Input 1: gate, Input 2: sync, Input 3: formant CV
             let pitch = if !connections[0].is_empty() {
                 Some(inputs[0].channel(0))
             } else {
@@ -457,8 +462,13 @@ pub(crate) fn process(
             } else {
                 None
             };
+            let formant_cv = if connections.len() > 3 && !connections[3].is_empty() {
+                Some(inputs[3].channel(0))
+            } else {
+                None
+            };
 
-            let swarm_inputs = SpectralSwarmInputs { pitch, gate, sync };
+            let swarm_inputs = SpectralSwarmInputs { pitch, gate, sync, formant_cv };
             let params = SpectralSwarmParams {
                 frequency: state.frequency.slice(frames),
                 partials: state.partials.slice(frames),

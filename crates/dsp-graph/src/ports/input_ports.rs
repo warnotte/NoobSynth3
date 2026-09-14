@@ -164,11 +164,12 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // clock
       PortInfo { channels: 1 },  // reset
     ],
-    // FM Operator - 3 inputs (pitch, gate, fm)
+    // FM Operator - 4 inputs (pitch, gate, fm, index CV)
     ModuleType::FmOp => vec![
       PortInfo { channels: 1 },  // pitch CV
       PortInfo { channels: 1 },  // gate
       PortInfo { channels: 1 },  // FM input
+      PortInfo { channels: 1 },  // modulation index CV
     ],
     // FM Matrix - 6 inputs (pitch, gate, velocity, fm-in, mod, ratio-cv)
     ModuleType::FmMatrix => vec![
@@ -203,11 +204,12 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // pitch CV
       PortInfo { channels: 1 },  // gate
     ],
-    // Spectral Swarm - 3 inputs (pitch, gate, sync)
+    // Spectral Swarm - 4 inputs (pitch, gate, sync, formant CV)
     ModuleType::SpectralSwarm => vec![
       PortInfo { channels: 1 },  // pitch CV
       PortInfo { channels: 1 },  // gate
       PortInfo { channels: 1 },  // sync
+      PortInfo { channels: 1 },  // formant CV
     ],
     // Resonator - 5 inputs (audio in, pitch, gate, strum, damp)
     ModuleType::Resonator => vec![

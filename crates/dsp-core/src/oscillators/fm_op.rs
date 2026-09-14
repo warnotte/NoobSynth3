@@ -68,6 +68,8 @@ pub struct FmOperatorInputs<'a> {
     pub gate: Option<&'a [Sample]>,
     /// FM input (audio-rate phase modulation)
     pub fm_in: Option<&'a [Sample]>,
+    /// Modulation index CV, added directly to the `level` param (bipolar, ~-1..1)
+    pub index_cv: Option<&'a [Sample]>,
 }
 
 /// Parameters for FM operator.
@@ -124,7 +126,8 @@ impl FmOperator {
             // Get parameters
             let base_freq = params.frequency[0].max(1.0);
             let ratio = params.ratio[0].max(0.01);
-            let level = params.level[0].clamp(0.0, 1.0);
+            let index_cv = inputs.index_cv.map_or(0.0, |c| c[i.min(c.len() - 1)]);
+            let level = (params.level[0] + index_cv).clamp(0.0, 1.0);
             let feedback = params.feedback[0].clamp(0.0, 1.0);
             let attack_ms = params.attack[0].max(0.1);
             let decay_ms = params.decay[0].max(0.1);

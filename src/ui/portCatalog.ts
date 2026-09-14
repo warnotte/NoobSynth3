@@ -536,6 +536,7 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
       { id: 'pitch', label: '1V', kind: 'cv', direction: 'in' },
       { id: 'gate', label: 'Gate', kind: 'gate', direction: 'in' },
       { id: 'fm', label: 'FM', kind: 'audio', direction: 'in' },
+      { id: 'index-cv', label: 'Index', kind: 'cv', direction: 'in' },
     ],
     outputs: [
       { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
@@ -579,6 +580,7 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
       { id: 'pitch', label: '1V/Oct', kind: 'cv', direction: 'in' },
       { id: 'gate', label: 'Gate', kind: 'gate', direction: 'in' },
       { id: 'sync', label: 'Sync', kind: 'sync', direction: 'in' },
+      { id: 'formant-cv', label: 'Formant', kind: 'cv', direction: 'in' },
     ],
     outputs: [
       { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
