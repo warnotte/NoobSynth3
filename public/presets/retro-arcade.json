@@ -54,11 +54,23 @@
         "position": { "x": 400, "y": 50 },
         "params": {
           "frequency": 440,
-          "wave": 1,
-          "duty": 1,
-          "attack": 0.005,
-          "release": 0.1
+          "mode": 1,
+          "duty": 1
         }
+      },
+      {
+        "id": "adsr-pulse",
+        "type": "adsr",
+        "name": "Lead Env",
+        "position": { "x": 400, "y": 100 },
+        "params": { "attack": 0.005, "decay": 0.01, "sustain": 1.0, "release": 0.1 }
+      },
+      {
+        "id": "vca-pulse",
+        "type": "gain",
+        "name": "Lead VCA",
+        "position": { "x": 500, "y": 50 },
+        "params": { "gain": 0.9 }
       },
       {
         "id": "nes-tri",
@@ -67,11 +79,23 @@
         "position": { "x": 400, "y": 200 },
         "params": {
           "frequency": 110,
-          "wave": 2,
-          "duty": 0,
-          "attack": 0.002,
-          "release": 0.15
+          "mode": 2,
+          "duty": 0
         }
+      },
+      {
+        "id": "adsr-tri",
+        "type": "adsr",
+        "name": "Bass Env",
+        "position": { "x": 400, "y": 250 },
+        "params": { "attack": 0.002, "decay": 0.01, "sustain": 1.0, "release": 0.15 }
+      },
+      {
+        "id": "vca-tri",
+        "type": "gain",
+        "name": "Bass VCA",
+        "position": { "x": 500, "y": 200 },
+        "params": { "gain": 0.9 }
       },
       {
         "id": "nes-noise",
@@ -80,11 +104,23 @@
         "position": { "x": 400, "y": 350 },
         "params": {
           "frequency": 440,
-          "wave": 3,
-          "duty": 0,
-          "attack": 0.001,
-          "release": 0.08
+          "mode": 3,
+          "duty": 0
         }
+      },
+      {
+        "id": "adsr-noise",
+        "type": "adsr",
+        "name": "Drum Env",
+        "position": { "x": 400, "y": 400 },
+        "params": { "attack": 0.001, "decay": 0.08, "sustain": 0.0, "release": 0.02 }
+      },
+      {
+        "id": "vca-noise",
+        "type": "gain",
+        "name": "Drum VCA",
+        "position": { "x": 500, "y": 350 },
+        "params": { "gain": 0.9 }
       },
       {
         "id": "euclid-drum",
@@ -134,7 +170,16 @@
         "type": "output",
         "name": "Out",
         "position": { "x": 900, "y": 150 },
-        "params": { "level": 1 }
+        "params": { "level": 0.8 }
+      },
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Info",
+        "position": { "x": 50, "y": 500 },
+        "params": {
+          "text": "RETRO ARCADE\n\n3 voix NES : Lead (pulse), Bass (triangle), Drum (noise) au rythme\nd'un Euclidien. Chaque voix a son propre ADSR + VCA (l'oscillateur\nNES n'a pas d'enveloppe interne) pour de vraies notes articulees."
+        }
       }
     ],
     "connections": [
@@ -175,8 +220,13 @@
       },
       {
         "from": { "moduleId": "seq-melody", "portId": "gate-out" },
-        "to": { "moduleId": "nes-pulse", "portId": "gate" },
+        "to": { "moduleId": "adsr-pulse", "portId": "gate" },
         "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "adsr-pulse", "portId": "env" },
+        "to": { "moduleId": "vca-pulse", "portId": "cv" },
+        "kind": "cv"
       },
       {
         "from": { "moduleId": "seq-bass", "portId": "cv-out" },
@@ -185,26 +235,51 @@
       },
       {
         "from": { "moduleId": "seq-bass", "portId": "gate-out" },
-        "to": { "moduleId": "nes-tri", "portId": "gate" },
+        "to": { "moduleId": "adsr-tri", "portId": "gate" },
         "kind": "gate"
+      },
+      {
+        "from": { "moduleId": "adsr-tri", "portId": "env" },
+        "to": { "moduleId": "vca-tri", "portId": "cv" },
+        "kind": "cv"
       },
       {
         "from": { "moduleId": "euclid-drum", "portId": "gate" },
-        "to": { "moduleId": "nes-noise", "portId": "gate" },
+        "to": { "moduleId": "adsr-noise", "portId": "gate" },
         "kind": "gate"
       },
       {
+        "from": { "moduleId": "adsr-noise", "portId": "env" },
+        "to": { "moduleId": "vca-noise", "portId": "cv" },
+        "kind": "cv"
+      },
+      {
         "from": { "moduleId": "nes-pulse", "portId": "out" },
+        "to": { "moduleId": "vca-pulse", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "vca-pulse", "portId": "out" },
         "to": { "moduleId": "main-mix", "portId": "in-a" },
         "kind": "audio"
       },
       {
         "from": { "moduleId": "nes-tri", "portId": "out" },
+        "to": { "moduleId": "vca-tri", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "vca-tri", "portId": "out" },
         "to": { "moduleId": "main-mix", "portId": "in-b" },
         "kind": "audio"
       },
       {
         "from": { "moduleId": "nes-noise", "portId": "out" },
+        "to": { "moduleId": "vca-noise", "portId": "in" },
+        "kind": "audio"
+      },
+      {
+        "from": { "moduleId": "vca-noise", "portId": "out" },
         "to": { "moduleId": "main-mix", "portId": "in-c" },
         "kind": "audio"
       },
