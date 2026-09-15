@@ -5,6 +5,15 @@
 
 use crate::common::{clamp, input_at, sample_at, Sample};
 
+/// Below this a recirculating value is inaudible (-360 dB) and heading for the denormal range, where
+/// x86 float ops get 10-100x slower: a reverb left ringing into silence would slowly eat the CPU.
+const DENORMAL_FLOOR: f32 = 1e-18;
+
+#[inline]
+fn undenormal(x: f32) -> f32 {
+    if x.abs() < DENORMAL_FLOOR { 0.0 } else { x }
+}
+
 /// Comb filter for reverb.
 pub struct CombFilter {
     buffer: Vec<Sample>,
@@ -42,8 +51,8 @@ impl CombFilter {
     /// Process a single sample.
     pub fn process(&mut self, input: f32) -> f32 {
         let output = self.buffer[self.index];
-        self.filter_store = output * self.damp2 + self.filter_store * self.damp1;
-        self.buffer[self.index] = input + self.filter_store * self.feedback;
+        self.filter_store = undenormal(output * self.damp2 + self.filter_store * self.damp1);
+        self.buffer[self.index] = undenormal(input + self.filter_store * self.feedback);
         self.index = (self.index + 1) % self.buffer.len();
         output
     }
@@ -70,7 +79,7 @@ impl AllpassFilter {
     pub fn process(&mut self, input: f32) -> f32 {
         let buffer_out = self.buffer[self.index];
         let output = -input + buffer_out;
-        self.buffer[self.index] = input + buffer_out * self.feedback;
+        self.buffer[self.index] = undenormal(input + buffer_out * self.feedback);
         self.index = (self.index + 1) % self.buffer.len();
         output
     }

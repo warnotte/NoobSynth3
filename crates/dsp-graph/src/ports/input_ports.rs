@@ -219,6 +219,13 @@ pub fn input_ports(module_type: ModuleType) -> Vec<PortInfo> {
       PortInfo { channels: 1 },  // strum trigger
       PortInfo { channels: 1 },  // damp CV
     ],
+    // Handpan - 3 inputs (gate, pitch CV, velocity CV); fed by a poly source, each carries one
+    // voice lane per channel (generic engine rule) and the handpan strikes on every lane
+    ModuleType::Handpan => vec![
+      PortInfo { channels: 1 },  // gate (strike)
+      PortInfo { channels: 1 },  // pitch CV (nearest note field)
+      PortInfo { channels: 1 },  // velocity CV
+    ],
     // Koshi - 4 inputs (wind CV, gate, pitch CV, velocity CV)
     ModuleType::Koshi => vec![
       PortInfo { channels: 1 },  // wind CV

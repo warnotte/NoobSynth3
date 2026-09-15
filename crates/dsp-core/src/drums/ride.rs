@@ -28,6 +28,7 @@ pub struct Ride909 {
     noise_state: u32,
     noise_lp: f32,
     hp_state: f32,
+    idle: bool,
     last_trig: f32,
     latched_accent: f32,
 }
@@ -71,6 +72,7 @@ impl Ride909 {
             noise_state: 0x2545_F491,
             noise_lp: 0.0,
             hp_state: 0.0,
+            idle: true,
             last_trig: 0.0,
             latched_accent: 0.5,
         }
@@ -136,15 +138,29 @@ impl Ride909 {
                 self.bell_env = 1.0;
                 self.bell_phase = [0.0; 3];
                 self.latched_accent = accent_in;
+                self.idle = false;
             }
             self.last_trig = trig;
+
+            // Fully decayed: every partial, the sizzle and the output filter are at rest. Skipping the
+            // bank saves ~20-32 sine evaluations per sample, and keeps the high-pass state out of the
+            // denormal range that slowed long silent passages down.
+            if self.idle {
+                output[i] = 0.0;
+                continue;
+            }
 
             let base = Self::BASE_FREQ * tune;
             let base_rate = 1.0 / (decay * sr);
 
             // Shimmer body: inharmonic sine partials, slow per-partial decay.
             let mut partials = 0.0_f32;
+            let mut ringing = false;
             for j in 0..N {
+                if self.env[j] == 0.0 {
+                    continue;
+                }
+                ringing = true;
                 let freq = base * self.ratios[j];
                 self.phases[j] += freq / sr;
                 if self.phases[j] >= 1.0 {
@@ -187,9 +203,13 @@ impl Ride909 {
             let hp_a = (tau * 1300.0 / sr).min(0.9);
             self.hp_state += hp_a * (sample - self.hp_state);
             sample -= self.hp_state;
+            if self.hp_state.abs() < 1e-12 {
+                self.hp_state = 0.0;
+            }
 
             sample *= 0.7 + self.latched_accent * 0.4;
 
+            self.idle = !ringing && self.bell_env == 0.0 && self.hp_state == 0.0;
             output[i] = (sample * 0.45).clamp(-1.0, 1.0);
         }
     }

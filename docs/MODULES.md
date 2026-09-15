@@ -294,6 +294,94 @@ tiges tout seul, avec les grappes et les silences des vrais enregistrements. **J
 
 **Banc** : `KOSHI_DUMP=out.f32 cargo test -p dsp-core dump_isolated_strikes` écrit chaque tige frappée seule (3 s chacune) ; ajouter `KOSHI_DUMP_WIND=0.5` pour 45 s de mode vent. À analyser avec `scripts/spectrogram.mjs` / un banc de partiels — c'est ainsi que le module a été calé sur les enregistrements (tiges et partiels dans ±2,5 dB de 140 Hz à 2,9 kHz, densité et grappes de frappes équivalentes).
 
+### Handpan
+
+Handpan modélisé par synthèse modale couplée, **dans n'importe quelle gamme** : 6 gammes intégrées
+(D Kurde 15 — le D Kurde de référence, Ding D3, notes du dessous F3 G3, puis A3 Bb3 C4 D4 E4 F4 G4 A4 C5 D5
+E5 F5 —, D Kurde 9, D Celtic/Amara, D Integral, F Pygmy, C Aegean ; chacune confirmée par au moins deux
+fabricants/revendeurs) ou une **gamme libre** écrite comme les fabricants (`D3/(F3 G3) A3 Bb3 C4…`, jusqu'à
+32 zones). La physique suit la gamme : Ding étiré, voisines, couplages recalculés. Calé sur trois
+instruments réels (une vidéo d'un D Kurde, le pack freesound GAMEDRIX974 note par note, le Hang FreePats)
+puis validé à l'oreille sur un prototype avant le portage :
+
+- **Partiels 1 : 2 : 3** (+ 4× et 6× faibles) par zone, à ±0,5 % — le fabricant accorde l'octave et la
+  « quinte composée » de chaque zone. Le **Ding est étiré** (mesuré 144,2 / 292 / 437,5 Hz) pour que son
+  octave et sa quinte tombent sur les zones D4 et A4 : elles sonnent ensemble. L'étirement (et la tenue
+  plus longue) ne vaut que pour un Ding grave : il s'efface de D3 à A4, pour qu'une gamme libre dont la note la
+  plus basse est aiguë (partie MIDI) reste juste. Accord : ±2 cents entre exemplaires, pour que plusieurs
+  handpans jouent ensemble sans battre ; renforts de registre limités à la plage mesurée (C3-A5).
+- **Bloom** : l'octave et la quinte ne sont presque pas frappées, elles **montent après la frappe**
+  (maximum ~110 ms, -16 / -26 dB). Modélisé comme la non-linéarité quadratique de l'acier (fondamentale²
+  → octave, fondamentale × octave → quinte) ; le léger désaccord de ces modes fixe le temps de bloom. Plus
+  on frappe fort, plus le bloom est présent (comme sur l'instrument).
+- **Battements** ~3 dB : chaque partiel est une paire de modes légèrement désaccordés.
+- **Halo de la coque** ≈ -13 dB : les 1-2 zones juste en dessous de la note frappée répondent le plus
+  (-17 dB, mesuré), et les partiels qui coïncident (Ding ↔ D4/A4…) se nourrissent par un couplage linéaire
+  global — chaque résonateur ne retient que ce qui est proche de sa fréquence. Borné pour ne jamais
+  s'auto-entretenir (gain de boucle < 1 garanti).
+- **Forme de la décroissance (v2)** : la fondamentale chute vite pendant ~0,4 s (perte non linéaire
+  proportionnelle à son amplitude) puis suit son T60, pendant que l'octave et la quinte tiennent : la queue
+  de la note devient un accord octave + quinte, comme sur les enregistrements. T60 ≈ 3-4,5 s presque
+  indépendant de la hauteur, Ding ~1,6× plus long.
+- **Hauteur qui se pose** : une zone frappée fort démarre ~8 cents trop haut et redescend en s'éteignant
+  (l'acier se raidit avec l'amplitude), mesuré sur deux instruments.
+- **Rayonnement stéréo par partiel** : la fondamentale sort de sa zone, l'octave de toute la coque (vers le
+  centre), la quinte du côté opposé, avec un léger décalage de phase gauche/droite.
+- **Registre** : vers l'aigu, l'octave ressort davantage (+4 dB/octave) et le claquement aussi.
+- **Cavité d'air** (Helmholtz) à 87,5 Hz, discrète (~-28 dB), et un **claquement de doigt** : bruit filtré
+  autour de ~3 kHz qui s'éteint en ~25 ms (mesuré 3,3-3,4 kHz et 25-31 ms), plus ou moins fort selon le
+  toucher du joueur → réglage `attack`.
+
+Toutes les zones vivent dans **une seule instance** (jamais clonée par voix) : c'est ce qui rend la
+résonance sympathique réelle. Joué au **gate + CV de hauteur** : la note reçue est ramenée à la zone la plus
+proche de la gamme (comme le vrai instrument, on ne joue que ses notes), les précédentes continuent de
+sonner. **Accords** : branché sur une source polyphonique (séquenceur MIDI à plusieurs voix, clavier du
+Control), chaque voix arrive sur sa propre *voie* d'entrée (règle générique du moteur, voir
+`docs/FEATURES.md` « Voice lanes ») et frappe indépendamment — plusieurs zones à la fois sur la même coque.
+Voix entièrement silencieuse → calcul sauté (pas de piège des flottants dénormalisés).
+
+| Paramètre | Range | Description |
+|-----------|-------|-------------|
+| `scale` | 0-6 | 0 Kurde 15, 1 Kurde 9, 2 Celtic, 3 Integral, 4 Pygmy, 5 Aegean, 6 = gamme libre |
+| `scaleNotes` | texte | Gamme libre en notation fabricant : première note = Ding, notes entre parenthèses = dessous, noms (`Bb3`, `F#4`) ou numéros MIDI, 32 zones max (utilisée si `scale` = 6) |
+| `pitchRef` | 0/1 | Référence de la CV de hauteur : 0 = C4 (step/chord/control), 1 = A4 (séquenceur de fichier MIDI) |
+| `attack` | 0-1 | Toucher : 0 = pulpe du doigt, 0.5 = mesuré, 1 = bout du doigt dur (claquement ±14 dB, octave/quinte et partiels aigus frappés plus directement) |
+| `tune` | -100..100 ct | Accord global |
+| `octave` | -1..1 | Transposition |
+| `sustain` | 0.25-2 | Multiplicateur du temps de décroissance (1 = mesuré) |
+| `bloom` | 0-1 | Épanouissement octave/quinte (0.5 = mesuré, ±8 dB) |
+| `resonance` | 0-1 | Halo sympathique de la coque (0 = zones isolées, 0.5 = mesuré) — knob « Halo » |
+| `cavity` | 0-1 | Résonance d'air de la cavité (0.5 = mesuré) |
+| `humanize` | 0-1 | Variation de chaque frappe : force ±6 dB, frappe en retard jusqu'à 25 ms (deux mains ne tombent jamais pile ensemble), position sur la zone (octave/quinte ±4 dB, équilibre des modes jumeaux), claquement ±3 dB. La frappe à la souris n'est jamais retardée |
+| `seed` | 1-99 | Graine de l'humanisation |
+| `pan` | -1..1 | Place tout l'instrument dans la stéréo (resserre l'image de la coque) — deux handpans côte à côte |
+| `instrument` | 0-99 | Exemplaire : 0 = handpan de référence, 1-99 = autres instruments du même modèle (accord global ±2 ct, cavité 0,55-0,9× le Ding, tenue ±20 %, couleur ±2 dB, claquement ±3 dB, tirages par zone propres) |
+| `level` | 0-1 | Niveau de sortie |
+
+**Entrées** : gate (frappe), pitch (CV V/oct, référence `pitchRef` : zone la plus proche ; Ding si non câblé), vel (CV 0-1, 0.8 si non câblé) — chacune accepte une voie par voix d'une source polyphonique
+**Sorties** : out (audio stéréo : Ding et notes du dessous au centre, zones en zigzag gauche/droite comme sur la coque)
+
+**Jeu à la main et visualisation** : l'écran montre la coque vue de dessus. **Cliquer** une zone la frappe
+(vélocité 0.85, humanisation appliquée), **glisser** sur plusieurs zones fait un roulé (souris ou doigt).
+Chaque zone **s'illumine selon son amplitude de vibration réelle**, lue dans le moteur (Web et Tauri) sur
+une fenêtre de 36 dB : on voit la note frappée, mais aussi le halo — les voisines et les partiels qui
+coïncident (frapper A4 éclaire A3, dont l'octave tombe sur A4, et G4 juste en dessous). La frappe
+manuelle passe par le paramètre `strike` (`compteur × 64 + zone`) : le moteur ne frappe que quand la valeur
+change, donc recharger un patch ne rejoue jamais la dernière note.
+
+**Conseils son :**
+- Un **step sequencer** avec vélocités variées (notes fantômes à 40-55) et un peu de swing ; le Ding sur les temps forts
+- Toute hauteur est ramenée dans la gamme : un Turing Machine ou un Chaos donnent des mélodies toujours « justes »
+- Une reverb courte (pièce) plutôt qu'une grande salle : le halo de la coque fait déjà l'espace
+- **Jouer un fichier MIDI** : séquenceur MIDI avec `voices` ≥ nombre de notes tenues ensemble, `cv/gate/vel-1` →
+  handpan, `pitchRef` = A4, et une gamme (souvent libre) qui contient les notes du morceau. Les exports piano
+  ont souvent des vélocités basses (25-50) : un **Gain** polyphonique ×2 sur la vélocité rend accents ET bloom
+  (qui croît avec le carré de la force)
+
+**Banc** : `HANDPAN_DUMP=<dossier> cargo test -p dsp-core --release dump_for_bench` écrit chaque zone frappée seule (`rust-single-<note>.f32`, 3 s) et une montée de référence (`rust-run.f32`), en f32 mono 48 kHz, à analyser avec `scripts/spectrogram.mjs`.
+
+**Non implémenté (encore)** : techniques de jeu dédiées (slap, note étouffée, harmonique, basse du Gu, « tak » sur l'épaule), dispositions harmoniques alternatives (1:2:4, 1:3:4), taille de coque. Les mesures ont été faites sur des D Kurde et deux autres handpans : les autres gammes reprennent la même physique avec les hauteurs publiées par les fabricants.
+
 **Presets (3)** : koshi-garden, koshi-trio, koshi-wind-sequencer
 
 ### Wavetable

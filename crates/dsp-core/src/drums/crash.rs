@@ -28,6 +28,7 @@ pub struct Crash909 {
     noise_env: f32,  // sizzle envelope
     attack_env: f32, // fast bright transient
     hp_state: f32,   // output high-pass state
+    idle: bool,
     last_trig: f32,
     latched_accent: f32,
 }
@@ -68,6 +69,7 @@ impl Crash909 {
             noise_env: 0.0,
             attack_env: 0.0,
             hp_state: 0.0,
+            idle: true,
             last_trig: 0.0,
             latched_accent: 0.5,
         }
@@ -133,14 +135,28 @@ impl Crash909 {
                 self.noise_env = 1.0;
                 self.attack_env = 1.0;
                 self.latched_accent = accent_in;
+                self.idle = false;
             }
             self.last_trig = trig;
+
+            // Fully decayed: every partial, the sizzle and the output filter are at rest. Skipping the
+            // bank saves ~20-32 sine evaluations per sample, and keeps the high-pass state out of the
+            // denormal range that slowed long silent passages down.
+            if self.idle {
+                output[i] = 0.0;
+                continue;
+            }
 
             // Dense inharmonic sine partials, each on its own decay → shimmer.
             let base = Self::BASE_FREQ * tune;
             let base_rate = 1.0 / (decay * sr);
             let mut partials = 0.0_f32;
+            let mut ringing = false;
             for j in 0..N {
+                if self.env[j] == 0.0 {
+                    continue;
+                }
+                ringing = true;
                 let freq = base * self.ratios[j];
                 self.phases[j] += freq / sr;
                 if self.phases[j] >= 1.0 {
@@ -174,10 +190,14 @@ impl Crash909 {
             let hp_a = (tau * hp_cut / sr).min(0.9);
             self.hp_state += hp_a * (sample - self.hp_state);
             sample -= self.hp_state;
+            if self.hp_state.abs() < 1e-12 {
+                self.hp_state = 0.0;
+            }
 
             // Accent (latched at trigger)
             sample *= 0.7 + self.latched_accent * 0.4;
 
+            self.idle = !ringing && self.noise_env == 0.0 && self.attack_env == 0.0 && self.hp_state == 0.0;
             output[i] = (sample * 0.42).clamp(-1.0, 1.0);
         }
     }

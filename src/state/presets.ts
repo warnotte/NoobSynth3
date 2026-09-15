@@ -154,16 +154,36 @@ const isManifestEntry = (value: unknown): value is PresetManifestEntry =>
   typeof value.description === 'string' &&
   typeof value.file === 'string'
 
-export const loadPresets = async (): Promise<PresetLoadResult> => {
-  const { manifest, url } = await loadManifest()
-  const errors: string[] = []
+/**
+ * Optional machine-local presets in `presets/local/` (gitignored): personal patches appear in the
+ * Presets panel without ever being committed or published. Missing/invalid manifest = none.
+ */
+const loadLocalManifest = async (): Promise<{ manifest: PresetManifest; url: URL } | null> => {
+  const url = new URL(`${import.meta.env.BASE_URL ?? '/'}presets/local/manifest.json`, window.location.href)
+  try {
+    const response = await fetch(url.toString(), { cache: 'no-cache' })
+    if (!response.ok) return null
+    const data = (await response.json()) as unknown
+    return isRecord(data) && Array.isArray(data.presets) ? { manifest: data as PresetManifest, url } : null
+  } catch {
+    return null
+  }
+}
 
-  const tasks = manifest.presets.map(async (entry) => {
+export const loadPresets = async (): Promise<PresetLoadResult> => {
+  const [{ manifest, url }, local] = await Promise.all([loadManifest(), loadLocalManifest()])
+  const errors: string[] = []
+  const entries = [
+    ...manifest.presets.map((entry) => ({ entry, base: url })),
+    ...(local?.manifest.presets ?? []).map((entry) => ({ entry, base: local!.url })),
+  ]
+
+  const tasks = entries.map(async ({ entry, base }) => {
     if (!isManifestEntry(entry)) {
       errors.push('Preset manifest entry is invalid.')
       return null
     }
-    const presetUrl = new URL(entry.file, url).toString()
+    const presetUrl = new URL(entry.file, base).toString()
     try {
       const response = await fetch(presetUrl, { cache: 'no-cache' })
       if (!response.ok) {

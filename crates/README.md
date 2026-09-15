@@ -37,7 +37,7 @@ Bibliothèque de traitement audio sans dépendance externe (~25800 lignes, 94 fi
 **Structure modulaire :**
 | Dossier | Contenu |
 |---------|---------|
-| `oscillators/` | VCO, Supersaw, Karplus, FM, TB-303, NES, SNES, Noise, Wavetable, Granular, Sampler, Theremin, Koshi… (20) |
+| `oscillators/` | VCO, Supersaw, Karplus, FM, TB-303, NES, SNES, Noise, Wavetable, Granular, Sampler, Theremin, Koshi, Handpan… (21) |
 | `filters/` | VCF (SVF/Ladder, multi-mode), HPF |
 | `modulators/` | ADSR, LFO, Sample & Hold, Slew, Quantizer, Chaos, Envelope Follower |
 | `effects/` | Chorus, Ensemble, Choir, Vocoder, Delays, Reverbs, Phaser, Distortion, Leslie, Wah, Tube Amp… (23) |

@@ -80,6 +80,11 @@ pub(crate) fn apply_param_str(state: &mut ModuleState, param: &str, value: &str)
         state.gol.set_cell_data(value);
       }
     }
+    ModuleState::Handpan(state) => {
+      if param == "scaleNotes" {
+        state.handpan.set_custom_notes(value);
+      }
+    }
     _ => {}
   }
 }

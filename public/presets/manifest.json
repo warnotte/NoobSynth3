@@ -1073,6 +1073,76 @@
       "group": "Physical Modeling"
     },
     {
+      "id": "handpan-kurde",
+      "name": "Handpan Kurde",
+      "description": "Le handpan D Kurde 15 notes (100e module) joue un groove en doubles-croches : Ding grave sur les temps forts, arpeges et notes fantomes. Humanisation a 50 % pour que deux mesures ne sonnent jamais pareil, petite piece autour.",
+      "file": "handpan-kurde.json",
+      "group": "Physical Modeling"
+    },
+    {
+      "id": "handpan-zelda-fairy",
+      "name": "Handpans - Zelda Fairy Fountain (4 voix)",
+      "description": "La Fontaine des Fees (Zelda: A Link to the Past, SNES, Koji Kondo) sur deux handpans : arpeges de harpe a gauche, melodie a droite, sequenceur a 4 voix.",
+      "file": "handpan-zelda-fairy.json",
+      "group": "Physical Modeling"
+    },
+    {
+      "id": "handpan-satie-gymnopedie",
+      "name": "Handpans - Satie Gymnopedie n°1 (8 voix)",
+      "description": "Gymnopedie n°1 d'Erik Satie sur deux handpans : main droite a droite, main gauche a gauche, sequenceur a 8 voix, notes exactes.",
+      "file": "handpan-satie-gymnopedie.json",
+      "group": "Physical Modeling"
+    },
+    {
+      "id": "handpan-purcell-trumpet",
+      "name": "Handpans - Purcell Trumpet Voluntary (4 voix)",
+      "description": "Trumpet Voluntary (Jeremiah Clarke, longtemps attribue a Purcell) sur quatre handpans : trompette, main droite, main gauche et pedalier de l'orgue, sequenceur a 4 voix.",
+      "file": "handpan-purcell-trumpet.json",
+      "group": "Physical Modeling"
+    },
+    {
+      "id": "handpan-zelda-kakariko",
+      "name": "Handpans - Zelda Kakariko (8 pistes)",
+      "description": "Kakariko Village (Zelda: A Link to the Past, SNES, Koji Kondo) : les 8 pistes du MIDI sur 8 handpans, un par piste, doublures jouees par deux handpans de part et d'autre de la stereo.",
+      "file": "handpan-zelda-kakariko.json",
+      "group": "Physical Modeling"
+    },
+    {
+      "id": "handpan-zelda-dark-world",
+      "name": "Handpans - Zelda Dark World (8 pistes)",
+      "description": "Dark World (Zelda: A Link to the Past, SNES, Koji Kondo) : les 8 pistes que charge le lecteur MIDI sur 8 handpans, cordes, basses doublees et cuivres.",
+      "file": "handpan-zelda-dark-world.json",
+      "group": "Physical Modeling"
+    },
+    {
+      "id": "handpan-monolithe",
+      "name": "Handpans - Monolithe (4 voix)",
+      "description": "Monolithe, composition originale du projet (projet Songs), sur deux handpans : melodie a droite, arpege a gauche, sequenceur a 4 voix.",
+      "file": "handpan-monolithe.json",
+      "group": "Physical Modeling"
+    },
+    {
+      "id": "handpan-lumiere",
+      "name": "Handpans - Lumiere (4 voix)",
+      "description": "Lumiere, composition originale du projet (projet Songs), sur deux handpans : melodie a droite, arpege a gauche, sequenceur a 4 voix.",
+      "file": "handpan-lumiere.json",
+      "group": "Physical Modeling"
+    },
+    {
+      "id": "handpan-avril-14th",
+      "name": "Handpans - Aphex Twin Avril 14th (8 voix)",
+      "description": "Avril 14th (Aphex Twin) sur deux handpans distincts : melodie a droite, accompagnement a gauche, sequenceur a 8 voix.",
+      "file": "handpan-avril-14th.json",
+      "group": "Physical Modeling"
+    },
+    {
+      "id": "handpan-smw-overworld",
+      "name": "Handpans - Super Mario World Overworld (4 voix)",
+      "description": "Le theme du monde de Super Mario World (SNES, Koji Kondo) sur deux handpans : la melodie a droite, la basse qui marche a gauche, sequenceur a 4 voix.",
+      "file": "handpan-smw-overworld.json",
+      "group": "Physical Modeling"
+    },
+    {
       "id": "wavetable-vocal",
       "name": "Wavetable Vocal",
       "description": "Vocal formants bank with LFO-controlled position morphing.",

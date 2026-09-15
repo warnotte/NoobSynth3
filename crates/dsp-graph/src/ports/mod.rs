@@ -7,8 +7,10 @@ mod input_ports;
 mod output_ports;
 mod input_port_index;
 mod output_port_index;
+mod input_voice_lanes;
 
 pub use input_ports::*;
 pub use output_ports::*;
 pub use input_port_index::*;
 pub use output_port_index::*;
+pub use input_voice_lanes::*;

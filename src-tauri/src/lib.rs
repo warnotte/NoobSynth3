@@ -134,6 +134,10 @@ enum AudioCommand {
     module_id: String,
     reply: mpsc::Sender<Result<GolGridPacket, String>>,
   },
+  GetHandpanLevels {
+    module_id: String,
+    reply: mpsc::Sender<Result<Vec<u16>, String>>,
+  },
   GetParticlePositions {
     module_id: String,
     reply: mpsc::Sender<Result<Vec<f32>, String>>,
@@ -693,6 +697,17 @@ fn audio_thread(rx: mpsc::Receiver<AudioCommand>, scope: Arc<Mutex<ScopeSnapshot
           }
         } else {
           Ok(GolGridPacket { grid: Vec::new(), step: -1 })
+        };
+        let _ = reply.send(result);
+      }
+      AudioCommand::GetHandpanLevels { module_id, reply } => {
+        let result = if let Some(graph) = &state.graph {
+          match graph.lock() {
+            Ok(engine) => Ok(engine.get_handpan_levels(&module_id)),
+            Err(_) => Err("graph engine unavailable".to_string()),
+          }
+        } else {
+          Ok(Vec::new())
         };
         let _ = reply.send(result);
       }
@@ -1659,6 +1674,24 @@ fn native_get_gol_grid(
 }
 
 #[tauri::command]
+fn native_get_handpan_levels(
+  state: State<NativeAudioState>,
+  module_id: String,
+) -> Result<Vec<u16>, String> {
+  let (reply_tx, reply_rx) = mpsc::channel();
+  state
+    .tx
+    .send(AudioCommand::GetHandpanLevels {
+      module_id,
+      reply: reply_tx,
+    })
+    .map_err(|_| "native audio thread unavailable".to_string())?;
+  reply_rx
+    .recv()
+    .map_err(|_| "native audio thread unavailable".to_string())?
+}
+
+#[tauri::command]
 fn native_get_particle_positions(
   state: State<NativeAudioState>,
   module_id: String,
@@ -1918,6 +1951,7 @@ pub fn run() {
       // Sequencer commands
       native_get_sequencer_step,
       native_get_gol_grid,
+      native_get_handpan_levels,
       native_get_particle_positions,
       native_load_particle_buffer,
       native_seek_midi_sequencer,

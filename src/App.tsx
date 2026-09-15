@@ -10,6 +10,7 @@ import { useUndoableState } from './hooks/useUndoableState'
 import { UndoProvider } from './hooks/UndoContext'
 import {
   setUrlPreset,
+  setUrlProject,
   clearUrlShareParams,
 } from './utils/urlSharing'
 import { defaultGraph } from './state/defaultGraph'
@@ -153,7 +154,7 @@ const isDev = import.meta.env.DEV
 // setParamString / native_set_param_string. Anything not listed here is normalized to a
 // number and DROPPED if it isn't one — so every string-serialized module (sequencer grids,
 // text, etc.) MUST appear here, or its live edits silently never reach the engine.
-const STRING_PARAMS = new Set(['stepData', 'drumData', 'midiData', 'speechText', 'cellData', 'patternData', 'samplePath'])
+const STRING_PARAMS = new Set(['stepData', 'drumData', 'midiData', 'speechText', 'cellData', 'patternData', 'samplePath', 'scaleNotes'])
 
 function App() {
   const engine = useMemo(() => new AudioEngine(), [])
@@ -714,6 +715,7 @@ function App() {
     nativeSamplerBridge,
     nativeGameOfLifeBridge,
     nativeMeterBridge,
+    nativeHandpanBridge,
     nativeParticleBridge,
   } = useNativeBridges({ isTauri, tauriNativeRunning, tauriMapId, invokeTauri })
 
@@ -896,9 +898,10 @@ function App() {
   })
 
   // URL preset/patch sharing
-  const { urlGraph, urlPresetId, clearUrlGraph } = useUrlPreset({
+  const { urlGraph, urlPresetId, urlProjectFile, clearUrlGraph } = useUrlPreset({
     presets,
     presetsReady: presetStatus === 'ready',
+    projects,
   })
 
   const queueEngineRestart = (nextGraph: GraphState) => {
@@ -1127,11 +1130,23 @@ function App() {
       const payload = (await response.json()) as unknown
       if (!isRecord(payload)) throw new Error('Invalid project file.')
       applyProject(payload)
+      const project = projects.find((p) => p.file === file)
+      if (project) setUrlProject(project.id)
     } catch (error) {
       console.error(error)
       setImportError('Failed to load project.')
     }
-  }, [applyProject])
+  }, [applyProject, projects])
+
+  // Open a project shared by link (?project=<id>) once the projects list is known.
+  useEffect(() => {
+    if (!urlProjectFile) return
+    const file = urlProjectFile
+    queueMicrotask(() => {
+      clearUrlGraph()
+      void handleApplyProject(file)
+    })
+  }, [urlProjectFile, clearUrlGraph, handleApplyProject])
 
   const handlePresetFileChange = useCallback(
     async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -2147,6 +2162,7 @@ function App() {
     nativeParticle: nativeParticleBridge,
     nativeGameOfLife: nativeGameOfLifeBridge,
     nativeMeter: nativeMeterBridge,
+    nativeHandpan: nativeHandpanBridge,
     updateParam,
     setManualGate,
     triggerManualSync,

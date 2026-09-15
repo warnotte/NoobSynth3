@@ -4,7 +4,7 @@
 > Do not edit by hand — re-run the script. This is the single place to look up a
 > module's ports and parameters when building patches or presets.
 
-_99 modules._
+_100 modules._
 
 ## sources
 
@@ -24,6 +24,7 @@ _99 modules._
 | **Spectral Swarm** | `spectral-swarm` | 3x4 | `pitch` (cv), `gate` (gate), `sync` (sync), `formant-cv` (cv) | `out` (audio) | `frequency`=110, `partials`=16, `detune`=15, `drift`=0.3, `density`=0.8, `evolution`=4, `inharmonic`=0, `tilt`=-3, `spread`=0.7, `shimmer`=0, `attack`=2, `release`=3, `waveform`=0, `oddEven`=0, `fundamentalMix`=0.5, `formantFreq`=0, `formantQ`=2, `freeze`=0, `chorus`=0, `attackLow`=1, `attackHigh`=1, `releaseLow`=1, `releaseHigh`=1 |
 | **Resonator** | `resonator` | 2x3 | `in` (audio), `pitch` (cv), `gate` (gate), `strum` (gate), `damp` (cv) | `out` (audio) | `frequency`=220, `structure`=0.5, `brightness`=0.7, `damping`=0.7, `position`=0.5, `mode`=0, `polyphony`=1, `internalExc`=0.8, `chorus`=0 |
 | **Koshi Chime** | `koshi` | 3x2 | `wind` (cv), `gate` (gate), `pitch` (cv), `vel` (cv) | `out` (audio), `gate` (gate), `cv` (cv) | `tuning`=0, `wind`=0.5, `gust`=0.5, `sustain`=1, `brightness`=0.5, `body`=0.5, `tune`=0, `octave`=0, `seed`=1, `level`=0.8 |
+| **Handpan** | `handpan` | 3x4 | `gate` (gate), `pitch` (cv), `vel` (cv) | `out` (audio) | `scale`=0, `scaleNotes`="D3/(F3 G3) A3 Bb3 C4 D4 E4 F4 G4 A4 C…", `pitchRef`=0, `attack`=0.5, `pan`=0, `instrument`=0, `tune`=0, `octave`=0, `sustain`=1, `bloom`=0.5, `resonance`=0.5, `cavity`=0.5, `humanize`=0.5, `seed`=1, `level`=0.8 |
 | **Wavetable** | `wavetable` | 2x3 | `pitch` (cv), `gate` (gate), `position` (cv), `sync` (sync) | `out` (audio) | `frequency`=220, `bank`=0, `position`=0, `unison`=1, `detune`=15, `spread`=0.5, `morphSpeed`=0, `subMix`=0, `attack`=0.01, `release`=0.3 |
 | **Granular** | `granular` | 3x4 | `in` (audio), `trigger` (gate), `position` (cv), `pitch` (cv) | `out` (audio) | `position`=0.5, `size`=100, `density`=8, `pitch`=1, `spray`=0.1, `scatter`=0, `panSpread`=0.5, `shape`=1, `level`=0.8, `enabled`=1 |
 | **Sampler** | `sampler` | 2x3 | `trigger` (gate), `pitch` (cv) | `out` (audio) | `pitch`=1, `level`=0.85, `attack`=0.003, `release`=0.01, `loopMode`=0, `loopStart`=0, `loopEnd`=1, `enabled`=1, `samplePath`="" |
@@ -105,7 +106,7 @@ _99 modules._
 | **SID Player** | `sid-player` | 3x5 | `reset` (sync) | `out` (audio), `gate-1` (gate), `gate-2` (gate), `gate-3` (gate), `cv-1` (cv), `cv-2` (cv), `cv-3` (cv), `wf-1` (cv), `wf-2` (cv), `wf-3` (cv) | `playing`=0, `song`=1, `chipModel`=0 |
 | **AY Player** | `ay-player` | 3x5 | `reset` (sync) | `out` (audio), `gate-a` (gate), `gate-b` (gate), `gate-c` (gate), `cv-a` (cv), `cv-b` (cv), `cv-c` (cv) | `playing`=0, `loop`=1 |
 | **Chord Seq** | `chord-sequencer` | 3x5 | `clock` (sync), `reset` (sync) | `cv-1` (cv), `gate-1` (gate), `cv-2` (cv), `gate-2` (gate), `cv-3` (cv), `gate-3` (gate), `cv-4` (cv), `gate-4` (gate), `step-out` (cv), `root-cv` (cv) | `enabled`=true, `tempo`=120, `rate`=2, `gateLength`=50, `swing`=0, `length`=4, `strumSpeed`=0, `strumDirection`=0, `voicing`=0, `stepData`="[{"root":60,"chordType":0,"inversion"…" |
-| **Polyrhythm** | `polyrhythm-sequencer` | 3x5 | `clock` (sync), `reset` (sync) | `cv-1` (cv), `gate-1` (gate), `cv-2` (cv), `gate-2` (gate), `cv-3` (cv), `gate-3` (gate), `cv-4` (cv), `gate-4` (gate), `step-out` (cv) | `enabled`=true, `tempo`=120, `rate`=3, `gateLength`=50, `swing`=0, `track1Length`=8, `track2Length`=12, `track3Length`=16, `track4Length`=7, `track1Mute`=false, `track2Mute`=false, `track3Mute`=false, `track4Mute`=false, `stepData`="[{"track":0,"step":0,"pitch":-1,"gate…" |
+| **Polyrhythm** | `polyrhythm-sequencer` | 3x5 | `clock` (sync), `reset` (sync) | `cv-1` (cv), `gate-1` (gate), `cv-2` (cv), `gate-2` (gate), `cv-3` (cv), `gate-3` (gate), `cv-4` (cv), `gate-4` (gate), `step-out` (cv) | `enabled`=true, `tempo`=120, `rate`=3, `gateLength`=50, `swing`=0, `track1Length`=8, `track2Length`=12, `track3Length`=16, `track4Length`=7, `track1Mute`=false, `track2Mute`=false, `track3Mute`=false, `track4Mute`=false, `stepData`="[{"track":0,"step":0,"pitch":4,"gate"…" |
 | **Clock Div** | `clock-divider` | 1x2 | `clock` (sync), `reset` (sync) | `div-2` (sync), `div-4` (sync), `div-8` (sync), `div-16` (sync) | — |
 | **Game of Life** | `game-of-life` | 4x4 | `clock` (sync), `reset` (sync) | `cv` (cv), `gate` (gate), `pulse` (sync), `density` (cv) | `evolveRate`=4, `range`=2, `scale`=0, `root`=0, `wrap`=1 |
 | **Gravity Seq** | `gravity-sequencer` | 2x4 | `reset` (sync) | `cv` (cv), `gate` (gate), `pulse` (sync), `x` (cv), `y` (cv) | `speed`=1, `bodies`=4, `eccentricity`=0.3, `spread`=1, `range`=2, `scale`=0, `root`=0, `chaos`=0 |

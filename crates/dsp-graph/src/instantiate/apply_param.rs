@@ -681,6 +681,24 @@ pub(crate) fn apply_param(state: &mut ModuleState, param: &str, value: f32) {
       "level" => state.level.set(value),
       _ => {}
     },
+    ModuleState::Handpan(state) => match param {
+      "scale" => state.scale.set(value),
+      "pitchRef" => state.pitch_ref.set(value),
+      "instrument" => state.instrument.set(value),
+      "pan" => state.pan.set(value),
+      "attack" => state.attack.set(value),
+      "tune" => state.tune.set(value),
+      "octave" => state.octave.set(value),
+      "sustain" => state.sustain.set(value),
+      "bloom" => state.bloom.set(value),
+      "resonance" => state.resonance.set(value),
+      "cavity" => state.cavity.set(value),
+      "humanize" => state.humanize.set(value),
+      "seed" => state.seed.set(value),
+      "level" => state.level.set(value),
+      "strike" => state.strike.set(value),
+      _ => {}
+    },
     ModuleState::Wavetable(state) => match param {
       "frequency" => state.frequency.set(value),
       "bank" => state.bank.set(value),

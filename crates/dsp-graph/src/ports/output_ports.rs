@@ -207,6 +207,10 @@ pub fn output_ports(module_type: ModuleType) -> Vec<PortInfo> {
     ModuleType::Resonator => vec![
       PortInfo { channels: 1 },  // audio out
     ],
+    // Handpan - stereo audio
+    ModuleType::Handpan => vec![
+      PortInfo { channels: 2 },  // stereo audio out
+    ],
     // Koshi - stereo audio + strike gate + strike CV
     ModuleType::Koshi => vec![
       PortInfo { channels: 2 },  // stereo audio out

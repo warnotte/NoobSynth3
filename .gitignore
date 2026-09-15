@@ -31,3 +31,7 @@ src/engine/worklets/wasm/*.js
 # Local sample imports (e.g. AudioRealism TR-909 pack — license forbids redistribution; load at runtime only)
 sample_import/
 sample-import/
+
+# Machine-local presets (personal / copyrighted files: listed in the app, never committed)
+public/midi-presets/local/
+public/presets/local/

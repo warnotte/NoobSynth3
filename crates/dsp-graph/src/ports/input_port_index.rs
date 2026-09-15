@@ -296,6 +296,13 @@ pub fn input_port_index(module_type: ModuleType, port_id: &str) -> Option<usize>
       "damp" | "damper" => Some(4),
       _ => None,
     },
+    // Handpan - 3 inputs
+    ModuleType::Handpan => match port_id {
+      "gate" | "strike" => Some(0),
+      "pitch" | "pitch-cv" | "1volt" => Some(1),
+      "vel" | "velocity" => Some(2),
+      _ => None,
+    },
     // Koshi - 4 inputs
     ModuleType::Koshi => match port_id {
       "wind" | "wind-cv" => Some(0),

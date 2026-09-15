@@ -225,13 +225,31 @@ Indicateur de charge CPU audio en temps réel, **toujours actif quand le moteur 
 Le MIDI File Sequencer supporte la polyphonie par piste via le système de voix du graph engine:
 - Marqué comme `is_poly_type()` → N instances créées (une par voix)
 - Contribue à `resolve_voice_count()` via le param `voices` (défaut: 4)
-- Allocation de voix par piste (notes simultanées d'une piste → voix différentes)
+- Allocation de voix par piste, calculée au parse (déterministe, identique dans toutes les instances) :
+  chaque note prend **la première voix libre à son tick** (sa note précédente est terminée) ; si toutes
+  sonnent encore, on vole celle qui se termine le plus tôt. (Avant : round-robin repartant de la voix 0 à
+  chaque tick, sans regarder les notes tenues → une basse tenue était coupée par l'arpège suivant, et les
+  deux gates fusionnaient : la 2e note ne déclenchait rien.)
+- Note-on sur une voix dont le gate est encore haut (vol) → le gate retombe **un échantillon**, pour que
+  chaque note-on soit un vrai front montant en aval (ADSR, handpan…)
 - Chaque instance n'output que les notes où `note.voice == voice_index`
 - Fonctionne comme Control: 1 CV/Gate par piste, mais N instances poly
 
 **Fichiers clés:**
-- `crates/dsp-core/src/sequencers/midi_file_sequencer.rs` - DSP avec voice_index
+- `crates/dsp-core/src/sequencers/midi_file_sequencer.rs` - DSP avec voice_index (+ tests d'allocation)
 - `crates/dsp-graph/src/lib.rs` - is_poly_type() et resolve_voice_count()
+
+### Voice lanes (poly → module non-poly, entrée CV/gate)
+Règle générique du routage (`set_graph`) : par défaut, une connexion CV/gate d'un module **poly** vers un
+module **non-poly** ne transmet que la voix 0. Si l'entrée cible déclare `input_voice_lanes()`
+(`crates/dsp-graph/src/ports/input_voice_lanes.rs`, opt-in par port), elle est élargie à une **voie
+(canal) par voix** : voix i → canal i (`ConnectionEdge.target_channel`), une source non-poly → canal 0.
+Le module lit `inputs[idx].channel_count()` voies. Opt-in parce que beaucoup de modules interprètent une
+entrée multi-canal comme de la stéréo (ou la mixent en mono — le tap du Scope met à zéro au-delà de
+2 canaux) : élargir toutes les entrées changerait ce qu'ils reçoivent. Si une entrée reçoit aussi une
+connexion audio, elle garde le comportement classique.
+- Premier utilisateur : **Handpan** (gate/pitch/vel) → accords d'un séquenceur MIDI ou du clavier sur une
+  seule coque partagée. Test : `engine_handpan_poly_chord_from_midi_sequencer` (`tests/presets.rs`).
 
 ### AY Player (AY-3-8910 / YM2149)
 Lecteur de fichiers chiptune pour les puces sonores AY-3-8910 (ZX Spectrum, Amstrad CPC, MSX) et YM2149 (Atari ST).
@@ -300,6 +318,7 @@ Le mode Tauri utilise `cpal` (WASAPI/CoreAudio/ALSA) au lieu de Web Audio. Les f
 | `NativeParticleBridge` | Particle positions polling + buffer loading |
 | `NativeGameOfLifeBridge` | Grid + playhead polling |
 | `NativeMeterBridge` | Packed peak L/R level polling |
+| `NativeHandpanBridge` | Vibration amplitude of the 15 note fields (u16 / 20000) polling |
 
 **Pattern d'implémentation:**
 1. Mode Web: `engine.watchXxx()` (subscription via AudioWorklet messages)

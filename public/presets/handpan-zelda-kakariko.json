@@ -1,0 +1,678 @@
+{
+  "id": "handpan-zelda-kakariko",
+  "name": "Handpans - Zelda Kakariko (8 pistes)",
+  "group": "Physical Modeling",
+  "description": "Kakariko Village (Zelda: A Link to the Past, SNES, Koji Kondo) : les 8 pistes du MIDI sur 8 handpans, un par piste, doublures jouees par deux handpans de part et d'autre de la stereo.",
+  "graph": {
+    "modules": [
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "A propos",
+        "position": {
+          "x": 40,
+          "y": 40
+        },
+        "params": {
+          "text": "ZELDA - KAKARIKO VILLAGE (8 pistes)\nA Link to the Past (SNES), musique de Koji Kondo, MIDI de Thomas Rungeard.\n\nUn orchestre de 8 handpans, un par piste du fichier : trois lignes de cordes, la melodie, deux\nshakuhachis et glockenspiel + celesta. Les doublures a l'unisson sont jouees par deux handpans\ndifferents places de chaque cote : comme deux joueurs, jamais parfaitement ensemble (HUMAN).\nLes noms des pistes du fichier sont les credits du MIDI.\n\nSequenceur a 4 VOIX : au plus 1 frappes au meme instant sur une piste, donc chaque note est jouee.\nSur un handpan la duree de la note ne compte pas : une voix reprise continue de sonner.\n\nPiste 1 du fichier \"Zelda III,\" (125 notes) -> Cordes basses\nPiste 2 du fichier \"a link to the past.\" (125 notes) -> Cordes 2\nPiste 3 du fichier \"<<<<<+>>>>>\" (125 notes) -> Cordes 3\nPiste 4 du fichier \"Original song composed\" (78 notes) -> Melodie\nPiste 5 du fichier \"by Koji Kondo, MIDI\" (36 notes) -> Shakuhachi 1\nPiste 6 du fichier \"translation performed by\" (36 notes) -> Shakuhachi 2\nPiste 7 du fichier \"Thomas Rungeard.\" (20 notes) -> Glockenspiel\nPiste 8 du fichier \"<<<<<+>>>>>\" (20 notes) -> Celesta\nChaque handpan a sa gamme libre (les notes de sa partie), son exemplaire (INSTR.) et sa place\ndans la stereo (PAN). Recharger le meme fichier dans le lecteur MIDI ne change rien au routage."
+        }
+      },
+      {
+        "id": "midi-1",
+        "type": "midi-file-sequencer",
+        "name": "MIDI",
+        "position": {
+          "x": 40,
+          "y": 300
+        },
+        "params": {
+          "enabled": true,
+          "tempo": 132,
+          "gateLength": 90,
+          "loop": true,
+          "voices": 4,
+          "midiData": "{\"ticksPerBeat\":120,\"totalTicks\":30640,\"tempo\":132.000132000132,\"tracks\":[{\"name\":\"             Zelda III,\",\"channel\":0,\"notes\":[{\"tick\":480,\"note\":46,\"velocity\":100,\"duration\":240},{\"tick\":720,\"note\":62,\"velocity\":100,\"duration\":240},{\"tick\":960,\"note\":43,\"velocity\":100,\"duration\":240},{\"tick\":1200,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":1440,\"note\":48,\"velocity\":100,\"duration\":240},{\"tick\":1680,\"note\":65,\"velocity\":100,\"duration\":240},{\"tick\":1920,\"note\":41,\"velocity\":100,\"duration\":240},{\"tick\":2160,\"note\":63,\"velocity\":100,\"duration\":240},{\"tick\":2400,\"note\":46,\"velocity\":100,\"duration\":240},{\"tick\":2640,\"note\":62,\"velocity\":100,\"duration\":240},{\"tick\":2880,\"note\":43,\"velocity\":100,\"duration\":240},{\"tick\":3120,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":3360,\"note\":48,\"velocity\":100,\"duration\":240},{\"tick\":3600,\"note\":65,\"velocity\":100,\"duration\":240},{\"tick\":3840,\"note\":41,\"velocity\":100,\"duration\":240},{\"tick\":4080,\"note\":63,\"velocity\":100,\"duration\":240},{\"tick\":4320,\"note\":46,\"velocity\":100,\"duration\":240},{\"tick\":4560,\"note\":62,\"velocity\":100,\"duration\":240},{\"tick\":4800,\"note\":43,\"velocity\":100,\"duration\":240},{\"tick\":5040,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":5280,\"note\":48,\"velocity\":100,\"duration\":240},{\"tick\":5520,\"note\":65,\"velocity\":100,\"duration\":240},{\"tick\":5760,\"note\":41,\"velocity\":100,\"duration\":240},{\"tick\":6000,\"note\":63,\"velocity\":100,\"duration\":240},{\"tick\":6240,\"note\":39,\"velocity\":100,\"duration\":240},{\"tick\":6480,\"note\":55,\"velocity\":100,\"duration\":240},{\"tick\":6720,\"note\":41,\"velocity\":100,\"duration\":240},{\"tick\":6960,\"note\":53,\"velocity\":100,\"duration\":240},{\"tick\":7200,\"note\":46,\"velocity\":100,\"duration\":240},{\"tick\":7440,\"note\":53,\"velocity\":100,\"duration\":240},{\"tick\":7680,\"note\":43,\"velocity\":100,\"duration\":240},{\"tick\":7920,\"note\":50,\"velocity\":100,\"duration\":240},{\"tick\":8160,\"note\":48,\"velocity\":100,\"duration\":240},{\"tick\":8400,\"note\":55,\"velocity\":100,\"duration\":240},{\"tick\":8640,\"note\":41,\"velocity\":100,\"duration\":240},{\"tick\":8880,\"note\":48,\"velocity\":100,\"duration\":240},{\"tick\":9120,\"note\":46,\"velocity\":100,\"duration\":240},{\"tick\":9360,\"note\":53,\"velocity\":100,\"duration\":240},{\"tick\":9600,\"note\":46,\"velocity\":100,\"duration\":240},{\"tick\":9840,\"note\":53,\"velocity\":100,\"duration\":240},{\"tick\":10080,\"note\":46,\"velocity\":100,\"duration\":240},{\"tick\":10320,\"note\":62,\"velocity\":100,\"duration\":240},{\"tick\":10560,\"note\":43,\"velocity\":100,\"duration\":240},{\"tick\":10800,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":11040,\"note\":48,\"velocity\":100,\"duration\":240},{\"tick\":11280,\"note\":65,\"velocity\":100,\"duration\":240},{\"tick\":11520,\"note\":41,\"velocity\":100,\"duration\":240},{\"tick\":11760,\"note\":63,\"velocity\":100,\"duration\":240},{\"tick\":12000,\"note\":46,\"velocity\":100,\"duration\":240},{\"tick\":12240,\"note\":62,\"velocity\":100,\"duration\":240},{\"tick\":12480,\"note\":43,\"velocity\":100,\"duration\":240},{\"tick\":12720,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":12960,\"note\":48,\"velocity\":100,\"duration\":240},{\"tick\":13200,\"note\":65,\"velocity\":100,\"duration\":240},{\"tick\":13440,\"note\":41,\"velocity\":100,\"duration\":240},{\"tick\":13680,\"note\":63,\"velocity\":100,\"duration\":240},{\"tick\":13920,\"note\":39,\"velocity\":100,\"duration\":240},{\"tick\":14160,\"note\":55,\"velocity\":100,\"duration\":240},{\"tick\":14400,\"note\":41,\"velocity\":100,\"duration\":240},{\"tick\":14640,\"note\":53,\"velocity\":100,\"duration\":240},{\"tick\":14880,\"note\":46,\"velocity\":100,\"duration\":240},{\"tick\":15120,\"note\":53,\"velocity\":100,\"duration\":240},{\"tick\":15360,\"note\":43,\"velocity\":100,\"duration\":240},{\"tick\":15600,\"note\":50,\"velocity\":100,\"duration\":240},{\"tick\":15840,\"note\":48,\"velocity\":100,\"duration\":240},{\"tick\":16080,\"note\":55,\"velocity\":100,\"duration\":240},{\"tick\":16320,\"note\":41,\"velocity\":100,\"duration\":240},{\"tick\":16560,\"note\":48,\"velocity\":100,\"duration\":240},{\"tick\":16800,\"note\":46,\"velocity\":100,\"duration\":240},{\"tick\":17040,\"note\":53,\"velocity\":100,\"duration\":240},{\"tick\":17280,\"note\":46,\"velocity\":100,\"duration\":240},{\"tick\":17520,\"note\":53,\"velocity\":100,\"duration\":240},{\"tick\":17760,\"note\":39,\"velocity\":100,\"duration\":240},{\"tick\":18000,\"note\":55,\"velocity\":100,\"duration\":240},{\"tick\":18240,\"note\":39,\"velocity\":100,\"duration\":240},{\"tick\":18480,\"note\":55,\"velocity\":100,\"duration\":240},{\"tick\":18720,\"note\":38,\"velocity\":100,\"duration\":240},{\"tick\":18960,\"note\":53,\"velocity\":100,\"duration\":240},{\"tick\":19200,\"note\":38,\"velocity\":100,\"duration\":240},{\"tick\":19440,\"note\":53,\"velocity\":100,\"duration\":240},{\"tick\":19680,\"note\":48,\"velocity\":100,\"duration\":240},{\"tick\":19920,\"note\":55,\"velocity\":100,\"duration\":240},{\"tick\":20160,\"note\":41,\"velocity\":100,\"duration\":240},{\"tick\":20400,\"note\":48,\"velocity\":100,\"duration\":240},{\"tick\":20640,\"note\":46,\"velocity\":100,\"duration\":240},{\"tick\":20880,\"note\":53,\"velocity\":100,\"duration\":240},{\"tick\":21120,\"note\":44,\"velocity\":100,\"duration\":240},{\"tick\":21360,\"note\":53,\"velocity\":100,\"duration\":240},{\"tick\":21600,\"note\":39,\"velocity\":100,\"duration\":240},{\"tick\":21840,\"note\":55,\"velocity\":100,\"duration\":240},{\"tick\":22080,\"note\":39,\"velocity\":100,\"duration\":240},{\"tick\":22320,\"note\":55,\"velocity\":100,\"duration\":240},{\"tick\":22560,\"note\":38,\"velocity\":100,\"duration\":240},{\"tick\":22800,\"note\":53,\"velocity\":100,\"duration\":240},{\"tick\":23040,\"note\":38,\"velocity\":100,\"duration\":240},{\"tick\":23280,\"note\":53,\"velocity\":100,\"duration\":240},{\"tick\":23520,\"note\":48,\"velocity\":100,\"duration\":240},{\"tick\":23760,\"note\":55,\"velocity\":100,\"duration\":240},{\"tick\":24000,\"note\":41,\"velocity\":100,\"duration\":240},{\"tick\":24240,\"note\":48,\"velocity\":100,\"duration\":240},{\"tick\":24480,\"note\":46,\"velocity\":100,\"duration\":240},{\"tick\":24720,\"note\":53,\"velocity\":100,\"duration\":240},{\"tick\":24960,\"note\":46,\"velocity\":100,\"duration\":240},{\"tick\":25200,\"note\":62,\"velocity\":100,\"duration\":240},{\"tick\":25440,\"note\":43,\"velocity\":100,\"duration\":240},{\"tick\":25680,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":25920,\"note\":48,\"velocity\":100,\"duration\":240},{\"tick\":26160,\"note\":65,\"velocity\":100,\"duration\":240},{\"tick\":26400,\"note\":41,\"velocity\":100,\"duration\":240},{\"tick\":26640,\"note\":63,\"velocity\":100,\"duration\":240},{\"tick\":26880,\"note\":46,\"velocity\":100,\"duration\":240},{\"tick\":27120,\"note\":62,\"velocity\":100,\"duration\":240},{\"tick\":27360,\"note\":43,\"velocity\":100,\"duration\":240},{\"tick\":27600,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":27840,\"note\":48,\"velocity\":100,\"duration\":240},{\"tick\":28080,\"note\":65,\"velocity\":100,\"duration\":240},{\"tick\":28320,\"note\":41,\"velocity\":100,\"duration\":240},{\"tick\":28560,\"note\":63,\"velocity\":100,\"duration\":240},{\"tick\":28800,\"note\":46,\"velocity\":100,\"duration\":240},{\"tick\":29040,\"note\":62,\"velocity\":100,\"duration\":240},{\"tick\":29280,\"note\":43,\"velocity\":100,\"duration\":240},{\"tick\":29520,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":29760,\"note\":48,\"velocity\":100,\"duration\":240},{\"tick\":30000,\"note\":65,\"velocity\":100,\"duration\":240},{\"tick\":30240,\"note\":41,\"velocity\":100,\"duration\":240}]},{\"name\":\"      a link to the past.\",\"channel\":1,\"notes\":[{\"tick\":560,\"note\":53,\"velocity\":100,\"duration\":240},{\"tick\":800,\"note\":58,\"velocity\":100,\"duration\":200},{\"tick\":1040,\"note\":50,\"velocity\":100,\"duration\":240},{\"tick\":1280,\"note\":55,\"velocity\":100,\"duration\":200},{\"tick\":1520,\"note\":55,\"velocity\":100,\"duration\":240},{\"tick\":1760,\"note\":58,\"velocity\":100,\"duration\":200},{\"tick\":2000,\"note\":53,\"velocity\":100,\"duration\":240},{\"tick\":2240,\"note\":60,\"velocity\":100,\"duration\":200},{\"tick\":2480,\"note\":53,\"velocity\":100,\"duration\":240},{\"tick\":2720,\"note\":58,\"velocity\":100,\"duration\":200},{\"tick\":2960,\"note\":50,\"velocity\":100,\"duration\":240},{\"tick\":3200,\"note\":55,\"velocity\":100,\"duration\":200},{\"tick\":3440,\"note\":55,\"velocity\":100,\"duration\":240},{\"tick\":3680,\"note\":58,\"velocity\":100,\"duration\":200},{\"tick\":3920,\"note\":53,\"velocity\":100,\"duration\":240},{\"tick\":4160,\"note\":60,\"velocity\":100,\"duration\":200},{\"tick\":4400,\"note\":53,\"velocity\":100,\"duration\":240},{\"tick\":4640,\"note\":58,\"velocity\":100,\"duration\":200},{\"tick\":4880,\"note\":50,\"velocity\":100,\"duration\":240},{\"tick\":5120,\"note\":55,\"velocity\":100,\"duration\":200},{\"tick\":5360,\"note\":55,\"velocity\":100,\"duration\":240},{\"tick\":5600,\"note\":58,\"velocity\":100,\"duration\":200},{\"tick\":5840,\"note\":53,\"velocity\":100,\"duration\":240},{\"tick\":6080,\"note\":60,\"velocity\":100,\"duration\":200},{\"tick\":6320,\"note\":46,\"velocity\":100,\"duration\":240},{\"tick\":6560,\"note\":58,\"velocity\":100,\"duration\":200},{\"tick\":6800,\"note\":48,\"velocity\":100,\"duration\":240},{\"tick\":7040,\"note\":57,\"velocity\":100,\"duration\":200},{\"tick\":7280,\"note\":53,\"velocity\":100,\"duration\":240},{\"tick\":7520,\"note\":58,\"velocity\":100,\"duration\":200},{\"tick\":7760,\"note\":50,\"velocity\":100,\"duration\":240},{\"tick\":8000,\"note\":58,\"velocity\":100,\"duration\":200},{\"tick\":8240,\"note\":55,\"velocity\":100,\"duration\":240},{\"tick\":8480,\"note\":58,\"velocity\":100,\"duration\":200},{\"tick\":8720,\"note\":48,\"velocity\":100,\"duration\":240},{\"tick\":8960,\"note\":57,\"velocity\":100,\"duration\":200},{\"tick\":9200,\"note\":53,\"velocity\":100,\"duration\":240},{\"tick\":9440,\"note\":58,\"velocity\":100,\"duration\":200},{\"tick\":9680,\"note\":53,\"velocity\":100,\"duration\":240},{\"tick\":9920,\"note\":58,\"velocity\":100,\"duration\":200},{\"tick\":10160,\"note\":53,\"velocity\":100,\"duration\":240},{\"tick\":10400,\"note\":58,\"velocity\":100,\"duration\":200},{\"tick\":10640,\"note\":50,\"velocity\":100,\"duration\":240},{\"tick\":10880,\"note\":55,\"velocity\":100,\"duration\":200},{\"tick\":11120,\"note\":55,\"velocity\":100,\"duration\":240},{\"tick\":11360,\"note\":58,\"velocity\":100,\"duration\":200},{\"tick\":11600,\"note\":53,\"velocity\":100,\"duration\":240},{\"tick\":11840,\"note\":60,\"velocity\":100,\"duration\":200},{\"tick\":12080,\"note\":53,\"velocity\":100,\"duration\":240},{\"tick\":12320,\"note\":58,\"velocity\":100,\"duration\":200},{\"tick\":12560,\"note\":50,\"velocity\":100,\"duration\":240},{\"tick\":12800,\"note\":55,\"velocity\":100,\"duration\":200},{\"tick\":13040,\"note\":55,\"velocity\":100,\"duration\":240},{\"tick\":13280,\"note\":58,\"velocity\":100,\"duration\":200},{\"tick\":13520,\"note\":53,\"velocity\":100,\"duration\":240},{\"tick\":13760,\"note\":60,\"velocity\":100,\"duration\":200},{\"tick\":14000,\"note\":46,\"velocity\":100,\"duration\":240},{\"tick\":14240,\"note\":58,\"velocity\":100,\"duration\":200},{\"tick\":14480,\"note\":48,\"velocity\":100,\"duration\":240},{\"tick\":14720,\"note\":57,\"velocity\":100,\"duration\":200},{\"tick\":14960,\"note\":53,\"velocity\":100,\"duration\":240},{\"tick\":15200,\"note\":58,\"velocity\":100,\"duration\":200},{\"tick\":15440,\"note\":50,\"velocity\":100,\"duration\":240},{\"tick\":15680,\"note\":58,\"velocity\":100,\"duration\":200},{\"tick\":15920,\"note\":55,\"velocity\":100,\"duration\":240},{\"tick\":16160,\"note\":58,\"velocity\":100,\"duration\":200},{\"tick\":16400,\"note\":48,\"velocity\":100,\"duration\":240},{\"tick\":16640,\"note\":57,\"velocity\":100,\"duration\":200},{\"tick\":16880,\"note\":53,\"velocity\":100,\"duration\":240},{\"tick\":17120,\"note\":58,\"velocity\":100,\"duration\":200},{\"tick\":17360,\"note\":53,\"velocity\":100,\"duration\":240},{\"tick\":17600,\"note\":58,\"velocity\":100,\"duration\":200},{\"tick\":17840,\"note\":46,\"velocity\":100,\"duration\":240},{\"tick\":18080,\"note\":58,\"velocity\":100,\"duration\":200},{\"tick\":18320,\"note\":46,\"velocity\":100,\"duration\":240},{\"tick\":18560,\"note\":58,\"velocity\":100,\"duration\":200},{\"tick\":18800,\"note\":53,\"velocity\":100,\"duration\":240},{\"tick\":19040,\"note\":58,\"velocity\":100,\"duration\":200},{\"tick\":19280,\"note\":53,\"velocity\":100,\"duration\":240},{\"tick\":19520,\"note\":58,\"velocity\":100,\"duration\":200},{\"tick\":19760,\"note\":55,\"velocity\":100,\"duration\":240},{\"tick\":20000,\"note\":58,\"velocity\":100,\"duration\":200},{\"tick\":20240,\"note\":48,\"velocity\":100,\"duration\":240},{\"tick\":20480,\"note\":57,\"velocity\":100,\"duration\":200},{\"tick\":20720,\"note\":53,\"velocity\":100,\"duration\":240},{\"tick\":20960,\"note\":58,\"velocity\":100,\"duration\":200},{\"tick\":21200,\"note\":53,\"velocity\":100,\"duration\":240},{\"tick\":21440,\"note\":56,\"velocity\":100,\"duration\":200},{\"tick\":21680,\"note\":46,\"velocity\":100,\"duration\":240},{\"tick\":21920,\"note\":58,\"velocity\":100,\"duration\":200},{\"tick\":22160,\"note\":46,\"velocity\":100,\"duration\":240},{\"tick\":22400,\"note\":58,\"velocity\":100,\"duration\":200},{\"tick\":22640,\"note\":53,\"velocity\":100,\"duration\":240},{\"tick\":22880,\"note\":58,\"velocity\":100,\"duration\":200},{\"tick\":23120,\"note\":53,\"velocity\":100,\"duration\":240},{\"tick\":23360,\"note\":58,\"velocity\":100,\"duration\":200},{\"tick\":23600,\"note\":55,\"velocity\":100,\"duration\":240},{\"tick\":23840,\"note\":58,\"velocity\":100,\"duration\":200},{\"tick\":24080,\"note\":48,\"velocity\":100,\"duration\":240},{\"tick\":24320,\"note\":57,\"velocity\":100,\"duration\":200},{\"tick\":24560,\"note\":53,\"velocity\":100,\"duration\":240},{\"tick\":24800,\"note\":58,\"velocity\":100,\"duration\":200},{\"tick\":25040,\"note\":53,\"velocity\":100,\"duration\":240},{\"tick\":25280,\"note\":58,\"velocity\":100,\"duration\":200},{\"tick\":25520,\"note\":50,\"velocity\":100,\"duration\":240},{\"tick\":25760,\"note\":55,\"velocity\":100,\"duration\":200},{\"tick\":26000,\"note\":55,\"velocity\":100,\"duration\":240},{\"tick\":26240,\"note\":58,\"velocity\":100,\"duration\":200},{\"tick\":26480,\"note\":53,\"velocity\":100,\"duration\":240},{\"tick\":26720,\"note\":60,\"velocity\":100,\"duration\":200},{\"tick\":26960,\"note\":53,\"velocity\":100,\"duration\":240},{\"tick\":27200,\"note\":58,\"velocity\":100,\"duration\":200},{\"tick\":27440,\"note\":50,\"velocity\":100,\"duration\":240},{\"tick\":27680,\"note\":55,\"velocity\":100,\"duration\":200},{\"tick\":27920,\"note\":55,\"velocity\":100,\"duration\":240},{\"tick\":28160,\"note\":58,\"velocity\":100,\"duration\":200},{\"tick\":28400,\"note\":53,\"velocity\":100,\"duration\":240},{\"tick\":28640,\"note\":60,\"velocity\":100,\"duration\":200},{\"tick\":28880,\"note\":53,\"velocity\":100,\"duration\":240},{\"tick\":29120,\"note\":58,\"velocity\":100,\"duration\":200},{\"tick\":29360,\"note\":50,\"velocity\":100,\"duration\":240},{\"tick\":29600,\"note\":55,\"velocity\":100,\"duration\":200},{\"tick\":29840,\"note\":55,\"velocity\":100,\"duration\":240},{\"tick\":30080,\"note\":58,\"velocity\":100,\"duration\":200},{\"tick\":30320,\"note\":53,\"velocity\":100,\"duration\":240}]},{\"name\":\"         <<<<<+>>>>>\",\"channel\":2,\"notes\":[{\"tick\":640,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":880,\"note\":53,\"velocity\":100,\"duration\":80},{\"tick\":1120,\"note\":55,\"velocity\":100,\"duration\":240},{\"tick\":1360,\"note\":50,\"velocity\":100,\"duration\":80},{\"tick\":1600,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":1840,\"note\":55,\"velocity\":100,\"duration\":80},{\"tick\":2080,\"note\":60,\"velocity\":100,\"duration\":240},{\"tick\":2320,\"note\":57,\"velocity\":100,\"duration\":80},{\"tick\":2560,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":2800,\"note\":53,\"velocity\":100,\"duration\":80},{\"tick\":3040,\"note\":55,\"velocity\":100,\"duration\":240},{\"tick\":3280,\"note\":50,\"velocity\":100,\"duration\":80},{\"tick\":3520,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":3760,\"note\":55,\"velocity\":100,\"duration\":80},{\"tick\":4000,\"note\":60,\"velocity\":100,\"duration\":240},{\"tick\":4240,\"note\":57,\"velocity\":100,\"duration\":80},{\"tick\":4480,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":4720,\"note\":53,\"velocity\":100,\"duration\":80},{\"tick\":4960,\"note\":55,\"velocity\":100,\"duration\":240},{\"tick\":5200,\"note\":50,\"velocity\":100,\"duration\":80},{\"tick\":5440,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":5680,\"note\":55,\"velocity\":100,\"duration\":80},{\"tick\":5920,\"note\":60,\"velocity\":100,\"duration\":240},{\"tick\":6160,\"note\":57,\"velocity\":100,\"duration\":80},{\"tick\":6400,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":6640,\"note\":55,\"velocity\":100,\"duration\":80},{\"tick\":6880,\"note\":57,\"velocity\":100,\"duration\":240},{\"tick\":7120,\"note\":53,\"velocity\":100,\"duration\":80},{\"tick\":7360,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":7600,\"note\":53,\"velocity\":100,\"duration\":80},{\"tick\":7840,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":8080,\"note\":50,\"velocity\":100,\"duration\":80},{\"tick\":8320,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":8560,\"note\":55,\"velocity\":100,\"duration\":80},{\"tick\":8800,\"note\":57,\"velocity\":100,\"duration\":240},{\"tick\":9040,\"note\":48,\"velocity\":100,\"duration\":80},{\"tick\":9280,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":9520,\"note\":53,\"velocity\":100,\"duration\":80},{\"tick\":9760,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":10000,\"note\":53,\"velocity\":100,\"duration\":80},{\"tick\":10240,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":10480,\"note\":53,\"velocity\":100,\"duration\":80},{\"tick\":10720,\"note\":55,\"velocity\":100,\"duration\":240},{\"tick\":10960,\"note\":50,\"velocity\":100,\"duration\":80},{\"tick\":11200,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":11440,\"note\":55,\"velocity\":100,\"duration\":80},{\"tick\":11680,\"note\":60,\"velocity\":100,\"duration\":240},{\"tick\":11920,\"note\":57,\"velocity\":100,\"duration\":80},{\"tick\":12160,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":12400,\"note\":53,\"velocity\":100,\"duration\":80},{\"tick\":12640,\"note\":55,\"velocity\":100,\"duration\":240},{\"tick\":12880,\"note\":50,\"velocity\":100,\"duration\":80},{\"tick\":13120,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":13360,\"note\":55,\"velocity\":100,\"duration\":80},{\"tick\":13600,\"note\":60,\"velocity\":100,\"duration\":240},{\"tick\":13840,\"note\":57,\"velocity\":100,\"duration\":80},{\"tick\":14080,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":14320,\"note\":55,\"velocity\":100,\"duration\":80},{\"tick\":14560,\"note\":57,\"velocity\":100,\"duration\":240},{\"tick\":14800,\"note\":53,\"velocity\":100,\"duration\":80},{\"tick\":15040,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":15280,\"note\":53,\"velocity\":100,\"duration\":80},{\"tick\":15520,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":15760,\"note\":50,\"velocity\":100,\"duration\":80},{\"tick\":16000,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":16240,\"note\":55,\"velocity\":100,\"duration\":80},{\"tick\":16480,\"note\":57,\"velocity\":100,\"duration\":240},{\"tick\":16720,\"note\":48,\"velocity\":100,\"duration\":80},{\"tick\":16960,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":17200,\"note\":53,\"velocity\":100,\"duration\":80},{\"tick\":17440,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":17680,\"note\":53,\"velocity\":100,\"duration\":80},{\"tick\":17920,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":18160,\"note\":55,\"velocity\":100,\"duration\":80},{\"tick\":18400,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":18640,\"note\":55,\"velocity\":100,\"duration\":80},{\"tick\":18880,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":19120,\"note\":53,\"velocity\":100,\"duration\":80},{\"tick\":19360,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":19600,\"note\":53,\"velocity\":100,\"duration\":80},{\"tick\":19840,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":20080,\"note\":55,\"velocity\":100,\"duration\":80},{\"tick\":20320,\"note\":57,\"velocity\":100,\"duration\":240},{\"tick\":20560,\"note\":48,\"velocity\":100,\"duration\":80},{\"tick\":20800,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":21040,\"note\":53,\"velocity\":100,\"duration\":80},{\"tick\":21280,\"note\":56,\"velocity\":100,\"duration\":240},{\"tick\":21520,\"note\":53,\"velocity\":100,\"duration\":80},{\"tick\":21760,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":22000,\"note\":55,\"velocity\":100,\"duration\":80},{\"tick\":22240,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":22480,\"note\":55,\"velocity\":100,\"duration\":80},{\"tick\":22720,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":22960,\"note\":53,\"velocity\":100,\"duration\":80},{\"tick\":23200,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":23440,\"note\":53,\"velocity\":100,\"duration\":80},{\"tick\":23680,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":23920,\"note\":55,\"velocity\":100,\"duration\":80},{\"tick\":24160,\"note\":57,\"velocity\":100,\"duration\":240},{\"tick\":24400,\"note\":48,\"velocity\":100,\"duration\":80},{\"tick\":24640,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":24880,\"note\":53,\"velocity\":100,\"duration\":80},{\"tick\":25120,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":25360,\"note\":53,\"velocity\":100,\"duration\":80},{\"tick\":25600,\"note\":55,\"velocity\":100,\"duration\":240},{\"tick\":25840,\"note\":50,\"velocity\":100,\"duration\":80},{\"tick\":26080,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":26320,\"note\":55,\"velocity\":100,\"duration\":80},{\"tick\":26560,\"note\":60,\"velocity\":100,\"duration\":240},{\"tick\":26800,\"note\":57,\"velocity\":100,\"duration\":80},{\"tick\":27040,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":27280,\"note\":53,\"velocity\":100,\"duration\":80},{\"tick\":27520,\"note\":55,\"velocity\":100,\"duration\":240},{\"tick\":27760,\"note\":50,\"velocity\":100,\"duration\":80},{\"tick\":28000,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":28240,\"note\":55,\"velocity\":100,\"duration\":80},{\"tick\":28480,\"note\":60,\"velocity\":100,\"duration\":240},{\"tick\":28720,\"note\":57,\"velocity\":100,\"duration\":80},{\"tick\":28960,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":29200,\"note\":53,\"velocity\":100,\"duration\":80},{\"tick\":29440,\"note\":55,\"velocity\":100,\"duration\":240},{\"tick\":29680,\"note\":50,\"velocity\":100,\"duration\":80},{\"tick\":29920,\"note\":58,\"velocity\":100,\"duration\":240},{\"tick\":30160,\"note\":55,\"velocity\":100,\"duration\":80},{\"tick\":30400,\"note\":60,\"velocity\":100,\"duration\":240}]},{\"name\":\" Original song composed\",\"channel\":3,\"notes\":[{\"tick\":2240,\"note\":65,\"velocity\":100,\"duration\":120},{\"tick\":2400,\"note\":70,\"velocity\":100,\"duration\":280},{\"tick\":2720,\"note\":65,\"velocity\":100,\"duration\":120},{\"tick\":2880,\"note\":74,\"velocity\":100,\"duration\":280},{\"tick\":3200,\"note\":70,\"velocity\":100,\"duration\":120},{\"tick\":3360,\"note\":77,\"velocity\":100,\"duration\":760},{\"tick\":4160,\"note\":65,\"velocity\":100,\"duration\":120},{\"tick\":4320,\"note\":70,\"velocity\":100,\"duration\":280},{\"tick\":4640,\"note\":65,\"velocity\":100,\"duration\":120},{\"tick\":4800,\"note\":74,\"velocity\":100,\"duration\":280},{\"tick\":5120,\"note\":70,\"velocity\":100,\"duration\":120},{\"tick\":5280,\"note\":77,\"velocity\":100,\"duration\":760},{\"tick\":6080,\"note\":77,\"velocity\":100,\"duration\":120},{\"tick\":6240,\"note\":79,\"velocity\":100,\"duration\":440},{\"tick\":6720,\"note\":69,\"velocity\":100,\"duration\":280},{\"tick\":7040,\"note\":79,\"velocity\":100,\"duration\":120},{\"tick\":7200,\"note\":77,\"velocity\":100,\"duration\":440},{\"tick\":7680,\"note\":74,\"velocity\":100,\"duration\":440},{\"tick\":8160,\"note\":74,\"velocity\":100,\"duration\":440},{\"tick\":8640,\"note\":74,\"velocity\":100,\"duration\":280},{\"tick\":8960,\"note\":72,\"velocity\":100,\"duration\":120},{\"tick\":9120,\"note\":70,\"velocity\":100,\"duration\":760},{\"tick\":9920,\"note\":65,\"velocity\":100,\"duration\":120},{\"tick\":10080,\"note\":70,\"velocity\":100,\"duration\":280},{\"tick\":10400,\"note\":65,\"velocity\":100,\"duration\":120},{\"tick\":10560,\"note\":74,\"velocity\":100,\"duration\":280},{\"tick\":10880,\"note\":70,\"velocity\":100,\"duration\":120},{\"tick\":11040,\"note\":77,\"velocity\":100,\"duration\":760},{\"tick\":11840,\"note\":65,\"velocity\":100,\"duration\":120},{\"tick\":12000,\"note\":70,\"velocity\":100,\"duration\":280},{\"tick\":12320,\"note\":65,\"velocity\":100,\"duration\":120},{\"tick\":12480,\"note\":74,\"velocity\":100,\"duration\":280},{\"tick\":12800,\"note\":70,\"velocity\":100,\"duration\":120},{\"tick\":12960,\"note\":77,\"velocity\":100,\"duration\":760},{\"tick\":13760,\"note\":77,\"velocity\":100,\"duration\":120},{\"tick\":13920,\"note\":79,\"velocity\":100,\"duration\":440},{\"tick\":14400,\"note\":69,\"velocity\":100,\"duration\":280},{\"tick\":14720,\"note\":79,\"velocity\":100,\"duration\":120},{\"tick\":14880,\"note\":77,\"velocity\":100,\"duration\":440},{\"tick\":15360,\"note\":74,\"velocity\":100,\"duration\":440},{\"tick\":15840,\"note\":74,\"velocity\":100,\"duration\":440},{\"tick\":16320,\"note\":74,\"velocity\":100,\"duration\":280},{\"tick\":16640,\"note\":72,\"velocity\":100,\"duration\":120},{\"tick\":16800,\"note\":70,\"velocity\":100,\"duration\":760},{\"tick\":17600,\"note\":70,\"velocity\":100,\"duration\":120},{\"tick\":17760,\"note\":70,\"velocity\":100,\"duration\":440},{\"tick\":18240,\"note\":69,\"velocity\":100,\"duration\":280},{\"tick\":18560,\"note\":72,\"velocity\":100,\"duration\":120},{\"tick\":18720,\"note\":70,\"velocity\":100,\"duration\":440},{\"tick\":19200,\"note\":65,\"velocity\":100,\"duration\":440},{\"tick\":19680,\"note\":63,\"velocity\":100,\"duration\":280},{\"tick\":20000,\"note\":62,\"velocity\":100,\"duration\":120},{\"tick\":20160,\"note\":63,\"velocity\":100,\"duration\":280},{\"tick\":20480,\"note\":65,\"velocity\":100,\"duration\":120},{\"tick\":20640,\"note\":62,\"velocity\":100,\"duration\":760},{\"tick\":21440,\"note\":70,\"velocity\":100,\"duration\":120},{\"tick\":21600,\"note\":70,\"velocity\":100,\"duration\":440},{\"tick\":22080,\"note\":69,\"velocity\":100,\"duration\":280},{\"tick\":22400,\"note\":72,\"velocity\":100,\"duration\":120},{\"tick\":22560,\"note\":70,\"velocity\":100,\"duration\":280},{\"tick\":22880,\"note\":65,\"velocity\":100,\"duration\":120},{\"tick\":23040,\"note\":77,\"velocity\":100,\"duration\":440},{\"tick\":23520,\"note\":75,\"velocity\":100,\"duration\":440},{\"tick\":24000,\"note\":74,\"velocity\":100,\"duration\":280},{\"tick\":24320,\"note\":72,\"velocity\":100,\"duration\":120},{\"tick\":24480,\"note\":70,\"velocity\":100,\"duration\":760},{\"tick\":26720,\"note\":65,\"velocity\":100,\"duration\":120},{\"tick\":26880,\"note\":70,\"velocity\":100,\"duration\":280},{\"tick\":27200,\"note\":65,\"velocity\":100,\"duration\":120},{\"tick\":27360,\"note\":74,\"velocity\":100,\"duration\":280},{\"tick\":27680,\"note\":70,\"velocity\":100,\"duration\":120},{\"tick\":27840,\"note\":77,\"velocity\":100,\"duration\":760},{\"tick\":28640,\"note\":65,\"velocity\":100,\"duration\":120},{\"tick\":28800,\"note\":70,\"velocity\":100,\"duration\":280},{\"tick\":29120,\"note\":65,\"velocity\":100,\"duration\":120},{\"tick\":29280,\"note\":74,\"velocity\":100,\"duration\":280},{\"tick\":29600,\"note\":70,\"velocity\":100,\"duration\":120},{\"tick\":29760,\"note\":77,\"velocity\":100,\"duration\":760}]},{\"name\":\"    by Koji Kondo, MIDI\",\"channel\":4,\"notes\":[{\"tick\":2240,\"note\":77,\"velocity\":100,\"duration\":120},{\"tick\":2400,\"note\":82,\"velocity\":100,\"duration\":280},{\"tick\":2720,\"note\":77,\"velocity\":100,\"duration\":120},{\"tick\":2880,\"note\":86,\"velocity\":100,\"duration\":280},{\"tick\":3200,\"note\":82,\"velocity\":100,\"duration\":120},{\"tick\":3360,\"note\":89,\"velocity\":100,\"duration\":760},{\"tick\":4160,\"note\":77,\"velocity\":100,\"duration\":120},{\"tick\":4320,\"note\":82,\"velocity\":100,\"duration\":280},{\"tick\":4640,\"note\":77,\"velocity\":100,\"duration\":120},{\"tick\":4800,\"note\":86,\"velocity\":100,\"duration\":280},{\"tick\":5120,\"note\":82,\"velocity\":100,\"duration\":120},{\"tick\":5280,\"note\":89,\"velocity\":100,\"duration\":760},{\"tick\":9920,\"note\":77,\"velocity\":100,\"duration\":120},{\"tick\":10080,\"note\":82,\"velocity\":100,\"duration\":280},{\"tick\":10400,\"note\":77,\"velocity\":100,\"duration\":120},{\"tick\":10560,\"note\":86,\"velocity\":100,\"duration\":280},{\"tick\":10880,\"note\":82,\"velocity\":100,\"duration\":120},{\"tick\":11040,\"note\":89,\"velocity\":100,\"duration\":760},{\"tick\":11840,\"note\":77,\"velocity\":100,\"duration\":120},{\"tick\":12000,\"note\":82,\"velocity\":100,\"duration\":280},{\"tick\":12320,\"note\":77,\"velocity\":100,\"duration\":120},{\"tick\":12480,\"note\":86,\"velocity\":100,\"duration\":280},{\"tick\":12800,\"note\":82,\"velocity\":100,\"duration\":120},{\"tick\":12960,\"note\":89,\"velocity\":100,\"duration\":760},{\"tick\":26720,\"note\":77,\"velocity\":100,\"duration\":120},{\"tick\":26880,\"note\":82,\"velocity\":100,\"duration\":280},{\"tick\":27200,\"note\":77,\"velocity\":100,\"duration\":120},{\"tick\":27360,\"note\":86,\"velocity\":100,\"duration\":280},{\"tick\":27680,\"note\":82,\"velocity\":100,\"duration\":120},{\"tick\":27840,\"note\":89,\"velocity\":100,\"duration\":760},{\"tick\":28640,\"note\":77,\"velocity\":100,\"duration\":120},{\"tick\":28800,\"note\":82,\"velocity\":100,\"duration\":280},{\"tick\":29120,\"note\":77,\"velocity\":100,\"duration\":120},{\"tick\":29280,\"note\":86,\"velocity\":100,\"duration\":280},{\"tick\":29600,\"note\":82,\"velocity\":100,\"duration\":120},{\"tick\":29760,\"note\":89,\"velocity\":100,\"duration\":760}]},{\"name\":\" translation performed by\",\"channel\":5,\"notes\":[{\"tick\":2240,\"note\":77,\"velocity\":100,\"duration\":120},{\"tick\":2400,\"note\":82,\"velocity\":100,\"duration\":280},{\"tick\":2720,\"note\":77,\"velocity\":100,\"duration\":120},{\"tick\":2880,\"note\":86,\"velocity\":100,\"duration\":280},{\"tick\":3200,\"note\":82,\"velocity\":100,\"duration\":120},{\"tick\":3360,\"note\":89,\"velocity\":100,\"duration\":760},{\"tick\":4160,\"note\":77,\"velocity\":100,\"duration\":120},{\"tick\":4320,\"note\":82,\"velocity\":100,\"duration\":280},{\"tick\":4640,\"note\":77,\"velocity\":100,\"duration\":120},{\"tick\":4800,\"note\":86,\"velocity\":100,\"duration\":280},{\"tick\":5120,\"note\":82,\"velocity\":100,\"duration\":120},{\"tick\":5280,\"note\":89,\"velocity\":100,\"duration\":760},{\"tick\":9920,\"note\":77,\"velocity\":100,\"duration\":120},{\"tick\":10080,\"note\":82,\"velocity\":100,\"duration\":280},{\"tick\":10400,\"note\":77,\"velocity\":100,\"duration\":120},{\"tick\":10560,\"note\":86,\"velocity\":100,\"duration\":280},{\"tick\":10880,\"note\":82,\"velocity\":100,\"duration\":120},{\"tick\":11040,\"note\":89,\"velocity\":100,\"duration\":760},{\"tick\":11840,\"note\":77,\"velocity\":100,\"duration\":120},{\"tick\":12000,\"note\":82,\"velocity\":100,\"duration\":280},{\"tick\":12320,\"note\":77,\"velocity\":100,\"duration\":120},{\"tick\":12480,\"note\":86,\"velocity\":100,\"duration\":280},{\"tick\":12800,\"note\":82,\"velocity\":100,\"duration\":120},{\"tick\":12960,\"note\":89,\"velocity\":100,\"duration\":760},{\"tick\":26720,\"note\":77,\"velocity\":100,\"duration\":120},{\"tick\":26880,\"note\":82,\"velocity\":100,\"duration\":280},{\"tick\":27200,\"note\":77,\"velocity\":100,\"duration\":120},{\"tick\":27360,\"note\":86,\"velocity\":100,\"duration\":280},{\"tick\":27680,\"note\":82,\"velocity\":100,\"duration\":120},{\"tick\":27840,\"note\":89,\"velocity\":100,\"duration\":760},{\"tick\":28640,\"note\":77,\"velocity\":100,\"duration\":120},{\"tick\":28800,\"note\":82,\"velocity\":100,\"duration\":280},{\"tick\":29120,\"note\":77,\"velocity\":100,\"duration\":120},{\"tick\":29280,\"note\":86,\"velocity\":100,\"duration\":280},{\"tick\":29600,\"note\":82,\"velocity\":100,\"duration\":120},{\"tick\":29760,\"note\":89,\"velocity\":100,\"duration\":760}]},{\"name\":\"     Thomas Rungeard.\",\"channel\":6,\"notes\":[{\"tick\":6080,\"note\":89,\"velocity\":100,\"duration\":120},{\"tick\":6240,\"note\":91,\"velocity\":100,\"duration\":440},{\"tick\":6720,\"note\":81,\"velocity\":100,\"duration\":280},{\"tick\":7040,\"note\":91,\"velocity\":100,\"duration\":120},{\"tick\":7200,\"note\":89,\"velocity\":100,\"duration\":440},{\"tick\":7680,\"note\":86,\"velocity\":100,\"duration\":440},{\"tick\":8160,\"note\":86,\"velocity\":100,\"duration\":440},{\"tick\":8640,\"note\":86,\"velocity\":100,\"duration\":280},{\"tick\":8960,\"note\":84,\"velocity\":100,\"duration\":120},{\"tick\":9120,\"note\":82,\"velocity\":100,\"duration\":760},{\"tick\":13760,\"note\":89,\"velocity\":100,\"duration\":120},{\"tick\":13920,\"note\":91,\"velocity\":100,\"duration\":440},{\"tick\":14400,\"note\":81,\"velocity\":100,\"duration\":280},{\"tick\":14720,\"note\":91,\"velocity\":100,\"duration\":120},{\"tick\":14880,\"note\":89,\"velocity\":100,\"duration\":440},{\"tick\":15360,\"note\":86,\"velocity\":100,\"duration\":440},{\"tick\":15840,\"note\":86,\"velocity\":100,\"duration\":440},{\"tick\":16320,\"note\":86,\"velocity\":100,\"duration\":280},{\"tick\":16640,\"note\":84,\"velocity\":100,\"duration\":120},{\"tick\":16800,\"note\":82,\"velocity\":100,\"duration\":760}]},{\"name\":\"         <<<<<+>>>>>\",\"channel\":7,\"notes\":[{\"tick\":6080,\"note\":89,\"velocity\":100,\"duration\":120},{\"tick\":6240,\"note\":91,\"velocity\":100,\"duration\":440},{\"tick\":6720,\"note\":81,\"velocity\":100,\"duration\":280},{\"tick\":7040,\"note\":91,\"velocity\":100,\"duration\":120},{\"tick\":7200,\"note\":89,\"velocity\":100,\"duration\":440},{\"tick\":7680,\"note\":86,\"velocity\":100,\"duration\":440},{\"tick\":8160,\"note\":86,\"velocity\":100,\"duration\":440},{\"tick\":8640,\"note\":86,\"velocity\":100,\"duration\":280},{\"tick\":8960,\"note\":84,\"velocity\":100,\"duration\":120},{\"tick\":9120,\"note\":82,\"velocity\":100,\"duration\":760},{\"tick\":13760,\"note\":89,\"velocity\":100,\"duration\":120},{\"tick\":13920,\"note\":91,\"velocity\":100,\"duration\":440},{\"tick\":14400,\"note\":81,\"velocity\":100,\"duration\":280},{\"tick\":14720,\"note\":91,\"velocity\":100,\"duration\":120},{\"tick\":14880,\"note\":89,\"velocity\":100,\"duration\":440},{\"tick\":15360,\"note\":86,\"velocity\":100,\"duration\":440},{\"tick\":15840,\"note\":86,\"velocity\":100,\"duration\":440},{\"tick\":16320,\"note\":86,\"velocity\":100,\"duration\":280},{\"tick\":16640,\"note\":84,\"velocity\":100,\"duration\":120},{\"tick\":16800,\"note\":82,\"velocity\":100,\"duration\":760}]}]}",
+          "selectedFile": "zelda-kakariko.mid",
+          "mute1": false,
+          "mute2": false,
+          "mute3": false,
+          "mute4": false,
+          "mute5": false,
+          "mute6": false,
+          "mute7": false,
+          "mute8": false
+        }
+      },
+      {
+        "id": "hp-1",
+        "type": "handpan",
+        "name": "Cordes basses",
+        "position": {
+          "x": 520,
+          "y": 40
+        },
+        "params": {
+          "scale": 6,
+          "scaleNotes": "D2/ Eb2 F2 G2 Ab2 Bb2 C3 D3 F3 G3 Bb3 D4 Eb4 F4",
+          "pitchRef": 1,
+          "attack": 0.4,
+          "humanize": 0.3,
+          "sustain": 1.2,
+          "bloom": 0.5,
+          "resonance": 0.5,
+          "cavity": 0.4,
+          "tune": 0,
+          "octave": 0,
+          "pan": -0.3,
+          "instrument": 61,
+          "seed": 71,
+          "level": 0.75
+        }
+      },
+      {
+        "id": "hp-2",
+        "type": "handpan",
+        "name": "Cordes 2",
+        "position": {
+          "x": 520,
+          "y": 620
+        },
+        "params": {
+          "scale": 6,
+          "scaleNotes": "Bb2/ C3 D3 F3 G3 Ab3 A3 Bb3 C4",
+          "pitchRef": 1,
+          "attack": 0.4,
+          "humanize": 0.3,
+          "sustain": 1,
+          "bloom": 0.5,
+          "resonance": 0.5,
+          "cavity": 0.4,
+          "tune": 0,
+          "octave": 0,
+          "pan": 0.25,
+          "instrument": 62,
+          "seed": 72,
+          "level": 0.65
+        }
+      },
+      {
+        "id": "hp-3",
+        "type": "handpan",
+        "name": "Cordes 3",
+        "position": {
+          "x": 520,
+          "y": 1200
+        },
+        "params": {
+          "scale": 6,
+          "scaleNotes": "C3/ D3 F3 G3 Ab3 A3 Bb3 C4",
+          "pitchRef": 1,
+          "attack": 0.4,
+          "humanize": 0.3,
+          "sustain": 1,
+          "bloom": 0.5,
+          "resonance": 0.5,
+          "cavity": 0.4,
+          "tune": 0,
+          "octave": 0,
+          "pan": -0.1,
+          "instrument": 63,
+          "seed": 73,
+          "level": 0.65
+        }
+      },
+      {
+        "id": "hp-4",
+        "type": "handpan",
+        "name": "Melodie",
+        "position": {
+          "x": 520,
+          "y": 1780
+        },
+        "params": {
+          "scale": 6,
+          "scaleNotes": "D4/ Eb4 F4 A4 Bb4 C5 D5 Eb5 F5 G5",
+          "pitchRef": 1,
+          "attack": 0.55,
+          "humanize": 0.3,
+          "sustain": 1,
+          "bloom": 0.5,
+          "resonance": 0.5,
+          "cavity": 0.4,
+          "tune": 0,
+          "octave": 0,
+          "pan": 0.1,
+          "instrument": 64,
+          "seed": 74,
+          "level": 1
+        }
+      },
+      {
+        "id": "hp-5",
+        "type": "handpan",
+        "name": "Shakuhachi 1",
+        "position": {
+          "x": 520,
+          "y": 2360
+        },
+        "params": {
+          "scale": 6,
+          "scaleNotes": "F5/ Bb5 D6 F6",
+          "pitchRef": 1,
+          "attack": 0.5,
+          "humanize": 0.3,
+          "sustain": 1,
+          "bloom": 0.5,
+          "resonance": 0.5,
+          "cavity": 0.4,
+          "tune": 0,
+          "octave": 0,
+          "pan": 0.55,
+          "instrument": 65,
+          "seed": 75,
+          "level": 0.7
+        }
+      },
+      {
+        "id": "hp-6",
+        "type": "handpan",
+        "name": "Shakuhachi 2",
+        "position": {
+          "x": 520,
+          "y": 2940
+        },
+        "params": {
+          "scale": 6,
+          "scaleNotes": "F5/ Bb5 D6 F6",
+          "pitchRef": 1,
+          "attack": 0.5,
+          "humanize": 0.3,
+          "sustain": 1,
+          "bloom": 0.5,
+          "resonance": 0.5,
+          "cavity": 0.4,
+          "tune": 0,
+          "octave": 0,
+          "pan": -0.55,
+          "instrument": 66,
+          "seed": 76,
+          "level": 0.7
+        }
+      },
+      {
+        "id": "hp-7",
+        "type": "handpan",
+        "name": "Glockenspiel",
+        "position": {
+          "x": 520,
+          "y": 3520
+        },
+        "params": {
+          "scale": 6,
+          "scaleNotes": "A5/ Bb5 C6 D6 F6 G6",
+          "pitchRef": 1,
+          "attack": 0.6,
+          "humanize": 0.3,
+          "sustain": 1,
+          "bloom": 0.5,
+          "resonance": 0.5,
+          "cavity": 0.4,
+          "tune": 0,
+          "octave": 0,
+          "pan": 0.75,
+          "instrument": 67,
+          "seed": 77,
+          "level": 0.6
+        }
+      },
+      {
+        "id": "hp-8",
+        "type": "handpan",
+        "name": "Celesta",
+        "position": {
+          "x": 520,
+          "y": 4100
+        },
+        "params": {
+          "scale": 6,
+          "scaleNotes": "A5/ Bb5 C6 D6 F6 G6",
+          "pitchRef": 1,
+          "attack": 0.6,
+          "humanize": 0.3,
+          "sustain": 1,
+          "bloom": 0.5,
+          "resonance": 0.5,
+          "cavity": 0.4,
+          "tune": 0,
+          "octave": 0,
+          "pan": -0.75,
+          "instrument": 68,
+          "seed": 78,
+          "level": 0.6
+        }
+      },
+      {
+        "id": "mix-1",
+        "type": "mixer-8",
+        "name": "Ensemble",
+        "position": {
+          "x": 1000,
+          "y": 300
+        },
+        "params": {
+          "level1": 1,
+          "level2": 1,
+          "level3": 1,
+          "level4": 1,
+          "level5": 1,
+          "level6": 1,
+          "level7": 1,
+          "level8": 1
+        }
+      },
+      {
+        "id": "rev-1",
+        "type": "reverb",
+        "name": "Salle",
+        "position": {
+          "x": 1240,
+          "y": 300
+        },
+        "params": {
+          "time": 0.6,
+          "damp": 0.45,
+          "preDelay": 14,
+          "mix": 0.26
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Out",
+        "position": {
+          "x": 1680,
+          "y": 300
+        },
+        "params": {
+          "level": 2.7
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": {
+          "moduleId": "midi-1",
+          "portId": "cv-1"
+        },
+        "to": {
+          "moduleId": "hp-1",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "midi-1",
+          "portId": "gate-1"
+        },
+        "to": {
+          "moduleId": "hp-1",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "midi-1",
+          "portId": "vel-1"
+        },
+        "to": {
+          "moduleId": "hp-1",
+          "portId": "vel"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "midi-1",
+          "portId": "cv-2"
+        },
+        "to": {
+          "moduleId": "hp-2",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "midi-1",
+          "portId": "gate-2"
+        },
+        "to": {
+          "moduleId": "hp-2",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "midi-1",
+          "portId": "vel-2"
+        },
+        "to": {
+          "moduleId": "hp-2",
+          "portId": "vel"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "midi-1",
+          "portId": "cv-3"
+        },
+        "to": {
+          "moduleId": "hp-3",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "midi-1",
+          "portId": "gate-3"
+        },
+        "to": {
+          "moduleId": "hp-3",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "midi-1",
+          "portId": "vel-3"
+        },
+        "to": {
+          "moduleId": "hp-3",
+          "portId": "vel"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "midi-1",
+          "portId": "cv-4"
+        },
+        "to": {
+          "moduleId": "hp-4",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "midi-1",
+          "portId": "gate-4"
+        },
+        "to": {
+          "moduleId": "hp-4",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "midi-1",
+          "portId": "vel-4"
+        },
+        "to": {
+          "moduleId": "hp-4",
+          "portId": "vel"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "midi-1",
+          "portId": "cv-5"
+        },
+        "to": {
+          "moduleId": "hp-5",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "midi-1",
+          "portId": "gate-5"
+        },
+        "to": {
+          "moduleId": "hp-5",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "midi-1",
+          "portId": "vel-5"
+        },
+        "to": {
+          "moduleId": "hp-5",
+          "portId": "vel"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "midi-1",
+          "portId": "cv-6"
+        },
+        "to": {
+          "moduleId": "hp-6",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "midi-1",
+          "portId": "gate-6"
+        },
+        "to": {
+          "moduleId": "hp-6",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "midi-1",
+          "portId": "vel-6"
+        },
+        "to": {
+          "moduleId": "hp-6",
+          "portId": "vel"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "midi-1",
+          "portId": "cv-7"
+        },
+        "to": {
+          "moduleId": "hp-7",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "midi-1",
+          "portId": "gate-7"
+        },
+        "to": {
+          "moduleId": "hp-7",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "midi-1",
+          "portId": "vel-7"
+        },
+        "to": {
+          "moduleId": "hp-7",
+          "portId": "vel"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "midi-1",
+          "portId": "cv-8"
+        },
+        "to": {
+          "moduleId": "hp-8",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "midi-1",
+          "portId": "gate-8"
+        },
+        "to": {
+          "moduleId": "hp-8",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "midi-1",
+          "portId": "vel-8"
+        },
+        "to": {
+          "moduleId": "hp-8",
+          "portId": "vel"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "hp-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mix-1",
+          "portId": "in-1"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "hp-2",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mix-1",
+          "portId": "in-2"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "hp-3",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mix-1",
+          "portId": "in-3"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "hp-4",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mix-1",
+          "portId": "in-4"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "hp-5",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mix-1",
+          "portId": "in-5"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "hp-6",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mix-1",
+          "portId": "in-6"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "hp-7",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mix-1",
+          "portId": "in-7"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "hp-8",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mix-1",
+          "portId": "in-8"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "mix-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "rev-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "rev-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "out-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      }
+    ]
+  }
+}

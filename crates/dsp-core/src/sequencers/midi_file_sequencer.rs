@@ -461,19 +461,18 @@ impl MidiFileSequencer {
                 a.tick.cmp(&b.tick).then_with(|| a.note.cmp(&b.note))
             });
 
-            // Assign voices: notes at same tick get different voices (round-robin)
-            // Notes at different ticks can reuse voices
-            let mut current_tick = track.notes[0].tick;
-            let mut voice_at_tick = 0usize;
-
+            // Assign each note the lowest voice that is free at its tick (its previous note has
+            // ended); when every voice is still sounding, steal the one that ends soonest. Reusing a
+            // still-sounding voice would cut that note and merge the two gates into one (no new
+            // edge, so the second note never triggers). Deterministic: every poly instance parses
+            // the same data and computes the same allocation.
+            let mut voice_free_at = [0u32; MAX_POLY_VOICES];
             for note in &mut track.notes {
-                if note.tick != current_tick {
-                    // New tick, reset voice counter
-                    current_tick = note.tick;
-                    voice_at_tick = 0;
-                }
-                note.voice = (voice_at_tick % vc) as u8;
-                voice_at_tick += 1;
+                let voice = (0..vc)
+                    .find(|&v| voice_free_at[v] <= note.tick)
+                    .unwrap_or_else(|| (0..vc).min_by_key(|&v| voice_free_at[v]).unwrap_or(0));
+                note.voice = voice as u8;
+                voice_free_at[voice] = note.tick + note.duration.max(1);
             }
         }
 
@@ -730,6 +729,7 @@ impl MidiFileSequencer {
             // Process each track
             for track_idx in 0..MIDI_TRACKS {
                 let track = &mut self.tracks[track_idx];
+                let mut retrigger = false;
 
                 // Check for new notes to trigger
                 while track.note_index < track.notes.len() {
@@ -746,6 +746,9 @@ impl MidiFileSequencer {
                             self.gate_length_samples[track_idx] =
                                 ((note_duration_samples as f64 * gate_pct as f64) as usize).max(1);
 
+                            // A note-on while this voice's gate is still high (voice stolen) drops the
+                            // gate for one sample, so every note-on is a real rising edge downstream.
+                            retrigger |= self.gate_on[track_idx];
                             self.gate_on[track_idx] = true;
                             self.gate_samples[track_idx] = 0;
                             self.current_cv[track_idx] = Self::note_to_cv(note.note);
@@ -788,7 +791,7 @@ impl MidiFileSequencer {
                     out_vel[track_idx][i] = 0.0;
                 } else {
                     out_cv[track_idx][i] = self.current_cv[track_idx];
-                    out_gate[track_idx][i] = self.current_gate[track_idx];
+                    out_gate[track_idx][i] = if retrigger { 0.0 } else { self.current_gate[track_idx] };
                     out_vel[track_idx][i] = self.current_velocity[track_idx];
                 }
             }
@@ -820,5 +823,80 @@ impl MidiFileSequencer {
             };
             outputs.tick_out[i] = progress;
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn midi(notes: &[(u32, u8, u32)]) -> String {
+        let list: Vec<String> = notes
+            .iter()
+            .map(|(tick, note, dur)| format!("{{\"tick\":{tick},\"note\":{note},\"velocity\":100,\"duration\":{dur}}}"))
+            .collect();
+        format!("{{\"ticksPerBeat\":480,\"totalTicks\":1920,\"tempo\":120,\"tracks\":[{{\"notes\":[{}]}}]}}", list.join(","))
+    }
+
+    fn voices(seq: &MidiFileSequencer) -> Vec<u8> {
+        seq.tracks[0].notes.iter().map(|n| n.voice).collect()
+    }
+
+    /// A held note keeps its voice: later notes go to a free voice instead of cutting it.
+    #[test]
+    fn allocation_skips_still_sounding_voices() {
+        let mut seq = MidiFileSequencer::new(48_000.0);
+        seq.set_voice_count(4);
+        // held bass (0..960), then an arpeggio over it
+        seq.parse_midi_data(&midi(&[(0, 48, 960), (240, 60, 120), (480, 64, 120), (720, 67, 120)]));
+        assert_eq!(voices(&seq), vec![0, 1, 1, 1], "the bass stays on voice 0, the arpeggio reuses voice 1 once free");
+    }
+
+    /// With every voice busy, the voice that ends soonest is stolen.
+    #[test]
+    fn allocation_steals_the_voice_ending_first() {
+        let mut seq = MidiFileSequencer::new(48_000.0);
+        seq.set_voice_count(2);
+        seq.parse_midi_data(&midi(&[(0, 48, 960), (0, 55, 240), (120, 60, 120)]));
+        assert_eq!(voices(&seq), vec![0, 1, 1]);
+    }
+
+    /// A note-on on a voice whose gate is still high must still produce a rising edge.
+    #[test]
+    fn stolen_voice_retriggers_with_a_gate_dip() {
+        let sr = 48_000.0;
+        let mut seq = MidiFileSequencer::new(sr);
+        seq.set_voice_count(1);
+        seq.set_voice_index(0);
+        // second note starts while the first (480 ticks = 0.5 s) is still gated
+        seq.parse_midi_data(&midi(&[(0, 60, 480), (240, 64, 480)]));
+        let frames = 256;
+        let one = [1.0f32];
+        let zero = [0.0f32];
+        let tempo = [120.0f32];
+        let gate_len = [90.0f32];
+        let mut edges = 0;
+        let mut prev = 0.0;
+        for _ in 0..(0.4 * sr / frames as f32) as usize {
+            let mut bufs: Vec<Vec<f32>> = (0..25).map(|_| vec![0.0; frames]).collect();
+            let [cv_1, gate_1, vel_1, cv_2, gate_2, vel_2, cv_3, gate_3, vel_3, cv_4, gate_4, vel_4, cv_5, gate_5, vel_5, cv_6, gate_6, vel_6, cv_7, gate_7, vel_7, cv_8, gate_8, vel_8, tick_out] =
+                bufs.iter_mut().map(|b| b.as_mut_slice()).collect::<Vec<_>>().try_into().unwrap_or_else(|_| unreachable!());
+            let outputs = MidiFileSequencerOutputs {
+                cv_1, gate_1, vel_1, cv_2, gate_2, vel_2, cv_3, gate_3, vel_3, cv_4, gate_4, vel_4,
+                cv_5, gate_5, vel_5, cv_6, gate_6, vel_6, cv_7, gate_7, vel_7, cv_8, gate_8, vel_8, tick_out,
+            };
+            seq.process_block(
+                outputs,
+                MidiFileSequencerInputs { clock: None, reset: None },
+                MidiFileSequencerParams { enabled: &one, tempo: &tempo, gate_length: &gate_len, loop_enabled: &zero, mute: [&zero; MIDI_TRACKS] },
+            );
+            for &g in &bufs[1] {
+                if g > 0.5 && prev <= 0.5 {
+                    edges += 1;
+                }
+                prev = g;
+            }
+        }
+        assert_eq!(edges, 2, "both note-ons must be rising edges");
     }
 }

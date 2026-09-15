@@ -48,6 +48,8 @@ export class AudioEngine {
   private watchedSequencers: Set<string> = new Set()
   private golGridCallbacks: Map<string, (grid: number[], step: number) => void> = new Map()
   private watchedGolModules: Set<string> = new Set()
+  private handpanLevelCallbacks: Map<string, (levels: number[]) => void> = new Map()
+  private watchedHandpans: Set<string> = new Set()
   private midiEventCallback: ((events: Array<{track: number, note: number, velocity: number, isNoteOn: boolean}>) => void) | null = null
   private watchedMidiSeq: string | null = null
   private granularLoadCallbacks: Map<string, (length: number) => void> = new Map()
@@ -402,6 +404,25 @@ export class AudioEngine {
     })
   }
 
+  /** Vibration amplitude of each handpan note field (15 values, linear amplitude). */
+  watchHandpanLevels(moduleId: string, callback: (levels: number[]) => void): () => void {
+    this.handpanLevelCallbacks.set(moduleId, callback)
+    this.watchedHandpans.add(moduleId)
+    this.syncWatchedHandpans()
+    return () => {
+      this.handpanLevelCallbacks.delete(moduleId)
+      this.watchedHandpans.delete(moduleId)
+      this.syncWatchedHandpans()
+    }
+  }
+
+  private syncWatchedHandpans(): void {
+    this.graphNode?.port.postMessage({
+      type: 'watchHandpans',
+      moduleIds: Array.from(this.watchedHandpans).map((id) => this.mapId(id)),
+    })
+  }
+
   watchGranularPosition(moduleId: string, callback: (position: number) => void): () => void {
     this.granularPositionCallbacks.set(moduleId, callback)
     this.watchedGranulars.add(moduleId)
@@ -684,7 +705,7 @@ export class AudioEngine {
 
     // Listen for messages from the worklet
     this.graphNode.port.onmessage = (event) => {
-      const data = event.data as { type: string; steps?: Record<string, number>; positions?: Record<string, number> | number[]; data?: number[]; voices?: Record<string, number[]>; elapsed?: Record<string, number>; moduleId?: string; peakL?: number; peakR?: number; grid?: number[]; step?: number; beats?: number; x?: number; y?: number; gate?: boolean }
+      const data = event.data as { type: string; steps?: Record<string, number>; positions?: Record<string, number> | number[]; data?: number[]; voices?: Record<string, number[]>; elapsed?: Record<string, number>; moduleId?: string; peakL?: number; peakR?: number; grid?: number[]; levels?: number[]; step?: number; beats?: number; x?: number; y?: number; gate?: boolean }
       if (data.type === 'transportBeats' && data.beats != null) {
         if (this.transportBeatsCallback) {
           this.transportBeatsCallback(data.beats)
@@ -705,6 +726,11 @@ export class AudioEngine {
         const callback = data.moduleId ? this.golGridCallbacks.get(this.unmapId(data.moduleId)) : undefined
         if (callback && data.grid) {
           callback(data.grid, data.step ?? 0)
+        }
+      } else if (data.type === 'handpanLevels') {
+        const callback = data.moduleId ? this.handpanLevelCallbacks.get(this.unmapId(data.moduleId)) : undefined
+        if (callback && data.levels) {
+          callback(data.levels.map((v) => v / 20000))
         }
       } else if (data.type === 'midiEvents' && data.data && this.midiEventCallback) {
         const events: Array<{track: number, note: number, velocity: number, isNoteOn: boolean}> = []
@@ -809,6 +835,10 @@ export class AudioEngine {
     // Re-send watched GOL modules if any
     if (this.watchedGolModules.size > 0) {
       this.syncWatchedGolModules()
+    }
+
+    if (this.watchedHandpans.size > 0) {
+      this.syncWatchedHandpans()
     }
 
     // Re-send watched SIDs if any

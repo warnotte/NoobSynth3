@@ -359,8 +359,8 @@ sans couplage graphe/moteur. Consommé par `applyPreset` et la SidePanel.
 **Fichier:** `useNativeBridges.ts`
 
 **Rôle:** Construit les bridges "natifs" Tauri standalone pour les modules de données
-pures (SID/AY chiptune, séquenceurs, theremin, granular, Game of Life, meter, particle
-cloud). Chaque bridge est un petit objet d'appels `invokeTauri('native_*')`, gated sur
+pures (SID/AY chiptune, séquenceurs, theremin, granular, sampler, Game of Life, meter,
+handpan, particle cloud). Chaque bridge est un petit objet d'appels `invokeTauri('native_*')`, gated sur
 `isTauri` et actif uniquement quand le moteur natif tourne. Consommé par les module
 controls (via `moduleControls` d'App).
 

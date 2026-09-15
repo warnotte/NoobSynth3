@@ -221,7 +221,7 @@ export function MidiFileSequencerControls({ module, engine, status, audioMode, n
 
           <select
             className="midi-seq-preset-select"
-            value=""
+            value={midiPresets.find((preset) => `${preset.id}.mid` === selectedFile)?.id ?? ''}
             onChange={(e) => handlePresetLoad(e.target.value)}
           >
             <option value="">Presets...</option>

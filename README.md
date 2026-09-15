@@ -4,13 +4,15 @@ Synthétiseur modulaire inspiré de VCV Rack, construit avec React + Rust/WASM.
 
 **[Démo en ligne](https://warnotte.github.io/NoobSynth3/)**
 
+🎧 **Nouveau : [Le Songe d'Hyrule](docs/HANDPAN.md)** — classique × Nintendo en 6 minutes, joué par le handpan (100<sup>e</sup> module), l'orgue et les puces NES/SNES. [▶️ Ouvrir dans la démo](https://warnotte.github.io/NoobSynth3/?project=songe-hyrule) · [MP3](https://github.com/warnotte/NoobSynth3/releases/download/v0.17.0/Le-Songe-d-Hyrule.mp3)
+
 ![NoobSynth3 Screenshot](docs/screenshot.png)
 ![NoobSynth3 Screenshot mixer](docs/mixer.png)
 
 ## Caractéristiques
 
 ### Moteur Audio
-- **99 modules DSP** : oscillateurs (VCO, Supersaw, FM, Karplus, Wavetable, Granular, Sampler, Particle Cloud, Speech Synth, Theremin, carillon Koshi...), filtres (SVF/Ladder), effets (Reverb, Delay, Chorus, Leslie, Tube Amp, Glitch...), séquenceurs (+ Harmonist : harmonie générative autonome), drums TR-909/808 (+ boîte à rythmes TR-909 tout-en-un), et plus
+- **100 modules DSP** : oscillateurs (VCO, Supersaw, FM, Karplus, Wavetable, Granular, Sampler, Particle Cloud, Speech Synth, Theremin, carillon Koshi, handpan...), filtres (SVF/Ladder), effets (Reverb, Delay, Chorus, Leslie, Tube Amp, Glitch...), séquenceurs (+ Harmonist : harmonie générative autonome), drums TR-909/808 (+ boîte à rythmes TR-909 tout-en-un), et plus
 - **Polyphonie** : 1/2/4/8 voix avec voice stealing
 - **Rust → WebAssembly** : DSP haute performance dans un AudioWorklet
 - **2 modes** : Web Audio, Standalone (Tauri/WASAPI)
@@ -80,9 +82,10 @@ Ouvrir l'app, cliquer **Play**, puis jouer avec le clavier ou charger un preset.
 |----------|-------------|
 | [Architecture](docs/ARCHITECTURE.md) | Vue d'ensemble technique (2 modes) |
 | [Développement](docs/DEVELOPMENT.md) | Guide de build et contribution |
-| [Modules](docs/MODULES.md) | Référence des 99 modules DSP |
+| [Modules](docs/MODULES.md) | Référence des 100 modules DSP |
 | [Presets](docs/PRESETS.md) | Format des presets, checklist de création |
 | [Features](docs/FEATURES.md) | Notes d'implémentation par feature/module |
+| [Handpan et Le Songe d'Hyrule](docs/HANDPAN.md) | Le 100e module, ses presets MIDI et la pièce classique × Nintendo |
 | [Roadmap](docs/ROADMAP.md) | Plan de développement |
 
 ## Licence

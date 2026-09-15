@@ -258,6 +258,90 @@ fn engine_koshi_wind() {
 }
 
 #[test]
+fn engine_handpan() {
+    // A handpan struck by a step sequencer (gate + pitch) through the native GraphEngine:
+    // audible, finite, not too hot; and silent when nothing strikes it.
+    let render_peak = |connected: bool| {
+        let connections = if connected {
+            serde_json::json!([
+                { "from": { "moduleId": "seq-1", "portId": "gate-out" }, "to": { "moduleId": "hp-1", "portId": "gate" }, "kind": "gate" },
+                { "from": { "moduleId": "seq-1", "portId": "cv-out" }, "to": { "moduleId": "hp-1", "portId": "pitch" }, "kind": "cv" },
+                { "from": { "moduleId": "hp-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+            ])
+        } else {
+            serde_json::json!([
+                { "from": { "moduleId": "hp-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+            ])
+        };
+        let payload = serde_json::json!({
+            "modules": [
+                { "id": "seq-1", "type": "step-sequencer", "params": { "enabled": true, "tempo": 120, "rate": 4 } },
+                { "id": "hp-1", "type": "handpan", "params": { "resonance": 1.0, "bloom": 1.0, "humanize": 1.0 } },
+                { "id": "out-1", "type": "output", "params": { "level": 1.0 } }
+            ],
+            "connections": connections,
+            "taps": []
+        });
+        let mut engine = GraphEngine::new(SAMPLE_RATE);
+        engine.set_graph_json(&payload.to_string()).expect("should load");
+        let mut max_abs = 0.0f32;
+        for _ in 0..BLOCKS * 2 {
+            for &sample in engine.render(FRAMES) {
+                assert!(sample.is_finite(), "handpan produced NaN/Inf");
+                max_abs = max_abs.max(sample.abs());
+            }
+        }
+        max_abs
+    };
+    let played = render_peak(true);
+    assert!(played > 0.01, "handpan struck by a sequencer should ring (got {played})");
+    assert!(played < 1.5, "handpan output too hot (got {played})");
+    assert_eq!(render_peak(false), 0.0, "an unstruck handpan must be silent");
+}
+
+#[test]
+fn engine_handpan_poly_chord_from_midi_sequencer() {
+    // A poly MIDI file sequencer (4 voices, one track) plays a D4-A4-D5 chord into ONE handpan:
+    // each voice must arrive on its own input lane, so all three fields ring at once
+    // (the generic poly -> mono rule would only forward voice 0).
+    let midi_data = serde_json::json!({
+        "ticksPerBeat": 480, "totalTicks": 1920, "tempo": 120,
+        "tracks": [{ "name": "chord", "channel": 0, "notes": [
+            { "tick": 0, "note": 62, "velocity": 100, "duration": 480 },
+            { "tick": 0, "note": 69, "velocity": 100, "duration": 480 },
+            { "tick": 0, "note": 74, "velocity": 100, "duration": 480 }
+        ]}]
+    });
+    let payload = serde_json::json!({
+        "modules": [
+            { "id": "midi-1", "type": "midi-file-sequencer", "params": { "enabled": true, "voices": 4, "midiData": midi_data.to_string() } },
+            { "id": "hp-1", "type": "handpan", "params": { "pitchRef": 1 } },
+            { "id": "out-1", "type": "output", "params": { "level": 1.0 } }
+        ],
+        "connections": [
+            { "from": { "moduleId": "midi-1", "portId": "gate-1" }, "to": { "moduleId": "hp-1", "portId": "gate" }, "kind": "gate" },
+            { "from": { "moduleId": "midi-1", "portId": "cv-1" }, "to": { "moduleId": "hp-1", "portId": "pitch" }, "kind": "cv" },
+            { "from": { "moduleId": "midi-1", "portId": "vel-1" }, "to": { "moduleId": "hp-1", "portId": "vel" }, "kind": "cv" },
+            { "from": { "moduleId": "hp-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" }
+        ],
+        "taps": []
+    });
+    let mut engine = GraphEngine::new(SAMPLE_RATE);
+    engine.set_graph_json(&payload.to_string()).expect("should load");
+    for _ in 0..40 {
+        for &sample in engine.render(FRAMES) {
+            assert!(sample.is_finite());
+        }
+    }
+    let levels = engine.get_handpan_levels("hp-1");
+    assert_eq!(levels.len(), 15, "default D Kurde 15 layout");
+    for (field, name) in [(6, "D4"), (10, "A4"), (12, "D5")] {
+        assert!(levels[field] > 2000, "{name} should ring from its own voice lane (level {})", levels[field]);
+    }
+    assert!(levels[7] < levels[6] / 4, "E4 was not played and must stay far quieter than D4");
+}
+
+#[test]
 fn engine_sid_player() {
     // SidPlayer carries 64KB of C64 RAM inline → needs a big stack to construct
     // (same reason the Tauri audio thread uses a large stack). Run on a 64MB thread.

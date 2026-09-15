@@ -12,6 +12,7 @@ export type ModuleType =
   | 'spectral-swarm'
   | 'resonator'
   | 'koshi'
+  | 'handpan'
   | 'wavetable'
   | 'granular'
   | 'sampler'

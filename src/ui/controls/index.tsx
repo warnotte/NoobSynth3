@@ -10,7 +10,7 @@
 import { useComputerKeyboard } from '../../hooks/useComputerKeyboard'
 import type { AudioEngine } from '../../engine/WasmGraphEngine'
 import type { Connection, ModuleSpec } from '../../shared/graph'
-import type { ControlProps, NativeScopeBridge, NativeChiptuneBridge, NativeSequencerBridge, NativeGranularBridge, NativeSamplerBridge, NativeThereminBridge, NativeParticleBridge, NativeGameOfLifeBridge, NativeMeterBridge } from './types'
+import type { ControlProps, NativeScopeBridge, NativeChiptuneBridge, NativeSequencerBridge, NativeGranularBridge, NativeSamplerBridge, NativeThereminBridge, NativeParticleBridge, NativeGameOfLifeBridge, NativeMeterBridge, NativeHandpanBridge } from './types'
 
 import { renderSourceControls } from './sources'
 import { renderFilterControls } from './FilterControls'
@@ -36,11 +36,12 @@ export type ModuleControlsProps = {
   nativeParticle?: NativeParticleBridge | null
   nativeGameOfLife?: NativeGameOfLifeBridge | null
   nativeMeter?: NativeMeterBridge | null
+  nativeHandpan?: NativeHandpanBridge | null
   updateParam: (
     moduleId: string,
     paramId: string,
     value: number | string | boolean,
-    options?: { skipEngine?: boolean },
+    options?: { skipEngine?: boolean; skipHistory?: boolean },
   ) => void
   setManualGate: (moduleId: string, isOn: boolean) => void
   triggerManualSync: (moduleId: string) => void
@@ -77,6 +78,7 @@ export const ModuleControls = ({
   nativeParticle,
   nativeGameOfLife,
   nativeMeter,
+  nativeHandpan,
   updateParam,
   setManualGate,
   triggerManualSync,
@@ -143,6 +145,7 @@ export const ModuleControls = ({
     nativeParticle,
     nativeGameOfLife,
     nativeMeter,
+    nativeHandpan,
     updateParam,
     setManualGate,
     triggerManualSync,
@@ -176,4 +179,4 @@ export const ModuleControls = ({
 }
 
 // Re-export types for external use
-export type { ControlProps, NativeScopeBridge, NativeChiptuneBridge, NativeSequencerBridge, NativeGranularBridge, NativeSamplerBridge, NativeThereminBridge, NativeParticleBridge, NativeGameOfLifeBridge, NativeMeterBridge } from './types'
+export type { ControlProps, NativeScopeBridge, NativeChiptuneBridge, NativeSequencerBridge, NativeGranularBridge, NativeSamplerBridge, NativeThereminBridge, NativeParticleBridge, NativeGameOfLifeBridge, NativeMeterBridge, NativeHandpanBridge } from './types'

@@ -304,3 +304,22 @@ pub struct KoshiState {
     pub seed: ParamBuffer,
     pub level: ParamBuffer,
 }
+
+pub struct HandpanState {
+    pub handpan: Handpan,
+    pub scale: ParamBuffer,
+    pub pitch_ref: ParamBuffer,
+    pub attack: ParamBuffer,
+    pub pan: ParamBuffer,
+    pub instrument: ParamBuffer,
+    pub tune: ParamBuffer,
+    pub octave: ParamBuffer,
+    pub sustain: ParamBuffer,
+    pub bloom: ParamBuffer,
+    pub resonance: ParamBuffer,
+    pub cavity: ParamBuffer,
+    pub humanize: ParamBuffer,
+    pub seed: ParamBuffer,
+    pub level: ParamBuffer,
+    pub strike: ParamBuffer,
+}

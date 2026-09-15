@@ -12,6 +12,7 @@ export const moduleSizes: Record<ModuleType, string> = {
   'spectral-swarm': '3x4',
   'resonator': '2x3',
   koshi: '3x2',
+  handpan: '3x4',
   'wavetable': '2x3',
   'granular': '3x4',
   sampler: '2x3',
@@ -132,6 +133,7 @@ export const modulePortLayouts: Partial<Record<ModuleType, 'stacked' | 'strip'>>
   'spectral-swarm': 'strip',
   'resonator': 'strip',
   koshi: 'strip',
+  handpan: 'strip',
   'wavetable': 'strip',
   'granular': 'strip',
   sampler: 'strip',
@@ -253,6 +255,7 @@ export const moduleCatalog: { type: ModuleType; label: string; category: ModuleC
   { type: 'spectral-swarm', label: 'Spectral Swarm', category: 'sources' },
   { type: 'resonator', label: 'Resonator', category: 'sources' },
   { type: 'koshi', label: 'Koshi Chime', category: 'sources' },
+  { type: 'handpan', label: 'Handpan', category: 'sources' },
   { type: 'wavetable', label: 'Wavetable', category: 'sources' },
   { type: 'granular', label: 'Granular', category: 'sources' },
   { type: 'sampler', label: 'Sampler', category: 'sources' },
@@ -365,6 +368,7 @@ export const modulePrefixes: Record<ModuleType, string> = {
   'spectral-swarm': 'swarm',
   'resonator': 'res',
   koshi: 'koshi',
+  handpan: 'hpan',
   'wavetable': 'wt',
   'granular': 'gran',
   sampler: 'smp',
@@ -476,6 +480,7 @@ export const moduleLabels: Record<ModuleType, string> = {
   'spectral-swarm': 'Spectral Swarm',
   'resonator': 'Resonator',
   koshi: 'Koshi Chime',
+  handpan: 'Handpan',
   'wavetable': 'Wavetable',
   'granular': 'Granular',
   sampler: 'Sampler',
@@ -675,6 +680,23 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     tune: 0,              // Global tune in cents (-100..100)
     octave: 0,            // Transpose (-2..1)
     seed: 1,              // Wind random seed (1-99) — give each chime its own
+    level: 0.8,           // Output level (0-1)
+  },
+  handpan: {
+    scale: 0,             // 0-5 built-in (Kurde 15, Kurde 9, Celtic, Integral, Pygmy, Aegean), 6 = free scale
+    scaleNotes: 'D3/(F3 G3) A3 Bb3 C4 D4 E4 F4 G4 A4 C5 D5 E5 F5', // Free scale, maker notation (used when scale = 6)
+    pitchRef: 0,          // Pitch CV reference: 0 = C4 (step/chord/control), 1 = A4 (MIDI file sequencer)
+    attack: 0.5,          // Touch: 0 soft pad, 0.5 measured, 1 hard fingertip (tick + direct upper partials)
+    pan: 0,               // Whole-instrument stereo placement (-1 left .. 1 right)
+    instrument: 0,        // Exemplar: 0 = reference handpan, 1..99 = other instruments (tuning, cavity, sustain, colour)
+    tune: 0,              // Global tune in cents (-100..100)
+    octave: 0,            // Transpose (-1..1)
+    sustain: 1.0,         // Decay time multiplier (0.25-2, 1 = measured T60 ≈ 3-4.5 s)
+    bloom: 0.5,           // Octave/fifth bloom after the strike (0.5 = measured)
+    resonance: 0.5,       // Sympathetic shell halo (0.5 = measured)
+    cavity: 0.5,          // Air cavity (Helmholtz) resonance (0.5 = measured)
+    humanize: 0.5,        // Per-strike variation: velocity, strike position, tick (0-1)
+    seed: 1,              // Humanize random seed (1-99)
     level: 0.8,           // Output level (0-1)
   },
   'wavetable': {
