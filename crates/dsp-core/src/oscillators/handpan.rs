@@ -53,19 +53,22 @@ pub const HANDPAN_SCALES: [(&str, &str); 6] = [
 pub const HANDPAN_CUSTOM_SCALE: i32 = HANDPAN_SCALES.len() as i32;
 
 const PARTIAL_RATIOS: [f32; NUM_PARTIALS] = [1.0, 2.0, 3.0, 4.0, 6.0];
-const DING_RATIOS: [f32; NUM_PARTIALS] = [1.0, 292.0 / 144.2, 437.5 / 144.2, 4.0, 6.0];
+/// Measured Ding partials 144.2 / 292.0 / 437.5 Hz: the octave and fifth sit on the note, the fundamental
+/// ~21 c under it (they used to be applied the other way round, pushing octave and fifth 20 c sharp).
+const DING_RATIOS: [f32; NUM_PARTIALS] = [144.2 * 2.0 / 292.0, 2.0, 437.5 * 2.0 / 292.0, 4.0, 6.0];
 const RATIO_JITTER: f32 = 0.005;
 /// Which draw of that measured spread this instrument gets: the bloom time follows each mode's
 /// mistuning, and this draw reproduces the ear-validated prototype (median octave peak 110 ms).
 const RATIO_SALT: u32 = 32;
-const PITCH_JITTER_CENTS: f32 = 4.0;
+const PITCH_JITTER_CENTS: f32 = 1.5;
 const PARTIAL_T60_MUL: [f32; NUM_PARTIALS] = [0.85, 1.05, 1.2, 0.85, 0.8];
 const DING_T60_MUL: f32 = 1.6;
-/// The Ding's stretch and long ring come from a large low dome: full up to ~D3, fading out by A4.
+/// The Ding's stretch (a fundamental ~21 c flat under an in-tune octave and fifth) and long ring come
+/// from a large low dome: full up to ~D3, gone by G3.
 /// A high lowest note of a free scale (e.g. a MIDI part) is a plain melodic field, so its octave
 /// and fifth stay in tune with the fields above it.
 const DING_STRETCH_FULL_HZ: f32 = 150.0;
-const DING_STRETCH_NONE_HZ: f32 = 440.0;
+const DING_STRETCH_NONE_HZ: f32 = 200.0;
 /// Exemplar global tuning spread: several instruments playing together (doubled parts) beat audibly
 /// beyond a few cents, so exemplars stay as close as a well-tuned set.
 const EXEMPLAR_TUNE_CENTS: f32 = 2.0;
@@ -634,10 +637,13 @@ impl Handpan {
         }
         field.active[k] = true;
         let t60 = t60_base * PARTIAL_T60_MUL[k];
-        field.modes_a[k].set(f - split * 0.5, t60, sr);
-        field.modes_b[k].set(f + split * 0.5, t60 * 0.97, sr);
         let (lo, hi) = if k == 0 { TWIN_MIX_FUND } else { TWIN_MIX_OTHER };
-        field.twin_mix[k] = lo + (hi - lo) * jitter(i, k, 4 + salt).abs();
+        let twin = lo + (hi - lo) * jitter(i, k, 4 + salt).abs();
+        field.twin_mix[k] = twin;
+        // The pair is centred on its amplitude-weighted pitch: the louder twin used to sit half a split
+        // flat, which pulled every partial a few cents under its target.
+        field.modes_a[k].set(f - split * twin / (1.0 + twin), t60, sr);
+        field.modes_b[k].set(f + split / (1.0 + twin), t60 * 0.97, sr);
         let ga = field.modes_a[k].gain_at(field.modes_a[k].w());
         let gb = field.modes_b[k].gain_at(field.modes_b[k].w());
         field.recv_a[k] = BUS_MAX.min(self.bus_loop / ga);
