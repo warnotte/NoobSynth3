@@ -14,6 +14,7 @@ use crate::common::{input_at, Sample};
 // Scanner vibrato constants (Hammond-style)
 const SCANNER_RATE: f32 = 7.0; // Hz, fixed scanner speed
 const SCANNER_BUF_MS: f32 = 3.0; // Max delay in ms
+const SILENT_ENVELOPE: f32 = 1e-6;
 
 /// Number of drawbars (organ stops)
 pub const ORGAN_DRAWBARS: usize = 8;
@@ -264,6 +265,44 @@ impl PipeOrgan {
     ) {
         if output.is_empty() {
             return;
+        }
+
+        // Released and faded out (-120 dB) with no gate in this block: nothing to hear. Skipping the
+        // additive bank keeps idle voices (a poly patch clones the organ per voice) from costing as
+        // much as sounding ones.
+        if self.envelope < SILENT_ENVELOPE {
+            let gate_in_block = match inputs.gate {
+                Some(gate) => gate.iter().take(output.len()).any(|&g| g > 0.5),
+                None => false,
+            };
+            if !gate_in_block {
+                // Keep every running phase moving as if the block had been computed: voices that
+                // restart together must not all come back in phase (octave doublings would add up).
+                let frames = output.len() as f32;
+                let base_freq = params.frequency.last().copied().unwrap_or(220.0);
+                let pitch_cv = input_at(inputs.pitch, output.len() - 1);
+                let freq = if pitch_cv != 0.0 { base_freq * 2.0_f32.powf(pitch_cv) } else { base_freq };
+                self.smooth_freq += (1.0 - 0.99_f32.powf(frames)) * (freq - self.smooth_freq);
+                let drawbar_params = [
+                    params.drawbar_16, params.drawbar_8, params.drawbar_4, params.drawbar_223,
+                    params.drawbar_2, params.drawbar_135, params.drawbar_113, params.drawbar_1,
+                ];
+                for (j, &ratio) in DRAWBAR_RATIOS.iter().enumerate() {
+                    if drawbar_params[j].last().copied().unwrap_or(0.0) >= 0.001 {
+                        self.phases[j] = (self.phases[j] + self.smooth_freq * ratio * frames * self.inv_sample_rate).fract();
+                    }
+                }
+                let trem_rate = params.trem_rate.last().copied().unwrap_or(6.0);
+                self.tremulant_phase = (self.tremulant_phase + trem_rate * frames * self.inv_sample_rate).fract();
+                self.wind_phase = (self.wind_phase + 0.13 * frames * self.inv_sample_rate).fract();
+                self.wind_phase2 = (self.wind_phase2 + 0.17 * frames * self.inv_sample_rate).fract();
+                output.fill(0.0);
+                self.envelope = 0.0;
+                let last = input_at(inputs.gate, output.len() - 1);
+                self.last_gate = last;
+                self.perc_last_gate = last;
+                return;
+            }
         }
 
         let two_pi = std::f32::consts::TAU;
