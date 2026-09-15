@@ -26,6 +26,7 @@ use dsp_core::{
     HiHat909Inputs, HiHat909Params, HpfInputs, HpfParams,
     KarplusInputs, KarplusParams,
     KoshiInputs, KoshiParams,
+    HandpanInputs, HandpanParams, HANDPAN_LANES,
     Kick808Inputs, Kick808Params,
     Kick909Inputs, Kick909Params,
     LfoInputs, LfoParams,
@@ -601,6 +602,44 @@ pub(crate) fn process(
                 &mut gate_out[..frames],
                 &mut cv_out[..frames],
                 KoshiInputs { wind_cv, gate, pitch_cv, vel_cv },
+                params,
+            );
+        }
+        ModuleState::Handpan(state) => {
+            // Input 0: gate (strike), Input 1: pitch CV (nearest note field), Input 2: velocity CV.
+            // Each input carries HANDPAN_LANES channels: one lane per voice of a poly source.
+            let lanes = |idx: usize| -> [Option<&[f32]>; HANDPAN_LANES] {
+                let mut out = [None; HANDPAN_LANES];
+                if connections.len() > idx && !connections[idx].is_empty() {
+                    for (lane, slot) in out.iter_mut().enumerate().take(inputs[idx].channel_count()) {
+                        *slot = Some(&inputs[idx].channel(lane)[..frames]);
+                    }
+                }
+                out
+            };
+            let params = HandpanParams {
+                scale: state.scale.slice(frames)[0].round() as i32,
+                pitch_ref: state.pitch_ref.slice(frames)[0].round() as i32,
+                attack: state.attack.slice(frames)[0],
+                pan: state.pan.slice(frames)[0],
+                instrument: state.instrument.slice(frames)[0].round() as i32,
+                tune: state.tune.slice(frames)[0],
+                octave: state.octave.slice(frames)[0].round() as i32,
+                sustain: state.sustain.slice(frames)[0],
+                bloom: state.bloom.slice(frames)[0],
+                resonance: state.resonance.slice(frames)[0],
+                cavity: state.cavity.slice(frames)[0],
+                humanize: state.humanize.slice(frames)[0],
+                seed: state.seed.slice(frames)[0] as i32,
+                level: state.level.slice(frames)[0],
+                strike: state.strike.slice(frames)[0],
+            };
+            // Output 0: stereo audio
+            let (out_l, out_r) = outputs[0].channels_mut_2();
+            state.handpan.process_block(
+                &mut out_l[..frames],
+                &mut out_r[..frames],
+                HandpanInputs { gate: lanes(0), pitch_cv: lanes(1), vel_cv: lanes(2) },
                 params,
             );
         }

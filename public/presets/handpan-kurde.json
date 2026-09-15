@@ -1,0 +1,82 @@
+{
+  "id": "handpan-kurde",
+  "name": "Handpan Kurde",
+  "description": "Le handpan D Kurde 15 notes (100e module) joue un groove en doubles-croches : Ding grave sur les temps forts, arpeges et notes fantomes. Humanisation a 50 % pour que deux mesures ne sonnent jamais pareil, petite piece autour.",
+  "group": "Physical Modeling",
+  "graph": {
+    "modules": [
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "Handpan Kurde",
+        "position": { "x": 40, "y": 40 },
+        "params": {
+          "text": "HANDPAN KURDE\n\nUn handpan D Kurde 15 notes (Ding D3, notes du dessous F3 G3, puis A3 Bb3 C4 D4 E4 F4 G4\nA4 C5 D5 E5 F5), modelise sur des enregistrements reels : partiels accordes 1:2:3, octave et\nquinte qui s'epanouissent ~110 ms apres la frappe, coque qui fait chanter les notes voisines,\nresonance d'air de la cavite.\n\nJeu : le step sequencer envoie hauteur + gate + velocite. Le handpan arrondit chaque note a la\nzone la plus proche de sa gamme (on ne peut jouer que ses 15 notes, comme le vrai) et laisse\nsonner les precedentes.\n\nA toucher sur le handpan :\n- HUMAN : variation de chaque frappe (force, position sur la zone, claquement)\n- BLOOM : epanouissement de l'octave et de la quinte\n- HALO : resonance sympathique de la coque\n- CAVITY : le souffle grave de la cavite\n- SUSTAIN : duree de resonance\n\nEssayez aussi de changer les hauteurs du sequenceur : toute note est ramenee dans la gamme."
+        }
+      },
+      {
+        "id": "seq-1",
+        "type": "step-sequencer",
+        "name": "Groove",
+        "position": { "x": 40, "y": 300 },
+        "params": {
+          "enabled": true,
+          "tempo": 84,
+          "rate": 4,
+          "gateLength": 30,
+          "swing": 12,
+          "slideTime": 50,
+          "length": 16,
+          "direction": 0,
+          "stepData": "[{\"pitch\":-10,\"gate\":true,\"velocity\":100,\"slide\":false},{\"pitch\":0,\"gate\":false,\"velocity\":100,\"slide\":false},{\"pitch\":-3,\"gate\":true,\"velocity\":55,\"slide\":false},{\"pitch\":2,\"gate\":true,\"velocity\":70,\"slide\":false},{\"pitch\":5,\"gate\":true,\"velocity\":85,\"slide\":false},{\"pitch\":0,\"gate\":false,\"velocity\":100,\"slide\":false},{\"pitch\":9,\"gate\":true,\"velocity\":60,\"slide\":false},{\"pitch\":7,\"gate\":true,\"velocity\":45,\"slide\":false},{\"pitch\":-10,\"gate\":true,\"velocity\":90,\"slide\":false},{\"pitch\":0,\"gate\":false,\"velocity\":100,\"slide\":false},{\"pitch\":0,\"gate\":true,\"velocity\":50,\"slide\":false},{\"pitch\":4,\"gate\":true,\"velocity\":70,\"slide\":false},{\"pitch\":5,\"gate\":true,\"velocity\":80,\"slide\":false},{\"pitch\":2,\"gate\":true,\"velocity\":45,\"slide\":false},{\"pitch\":12,\"gate\":true,\"velocity\":75,\"slide\":false},{\"pitch\":9,\"gate\":true,\"velocity\":55,\"slide\":false}]"
+        }
+      },
+      {
+        "id": "handpan-1",
+        "type": "handpan",
+        "name": "Handpan D Kurde",
+        "position": { "x": 520, "y": 300 },
+        "params": {
+          "tune": 0,
+          "octave": 0,
+          "sustain": 1.0,
+          "bloom": 0.5,
+          "resonance": 0.5,
+          "cavity": 0.5,
+          "humanize": 0.5,
+          "seed": 7,
+          "level": 0.8
+        }
+      },
+      {
+        "id": "rev-1",
+        "type": "reverb",
+        "name": "Piece",
+        "position": { "x": 1000, "y": 300 },
+        "params": { "time": 0.5, "damp": 0.45, "preDelay": 12, "mix": 0.25 }
+      },
+      {
+        "id": "scope-1",
+        "type": "scope",
+        "name": "Scope",
+        "position": { "x": 1000, "y": 40 },
+        "params": {}
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Out",
+        "position": { "x": 1440, "y": 300 },
+        "params": { "level": 1.6 }
+      }
+    ],
+    "connections": [
+      { "from": { "moduleId": "seq-1", "portId": "cv-out" }, "to": { "moduleId": "handpan-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "seq-1", "portId": "gate-out" }, "to": { "moduleId": "handpan-1", "portId": "gate" }, "kind": "gate" },
+      { "from": { "moduleId": "seq-1", "portId": "velocity-out" }, "to": { "moduleId": "handpan-1", "portId": "vel" }, "kind": "cv" },
+      { "from": { "moduleId": "handpan-1", "portId": "out" }, "to": { "moduleId": "rev-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "rev-1", "portId": "out" }, "to": { "moduleId": "out-1", "portId": "in" }, "kind": "audio" },
+      { "from": { "moduleId": "handpan-1", "portId": "out" }, "to": { "moduleId": "scope-1", "portId": "in-a" }, "kind": "audio" }
+    ]
+  }
+}

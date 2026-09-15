@@ -14,7 +14,7 @@ use dsp_core::effects::compressor::{Compressor, CompressorParams};
 pub use types::{ModuleType, PortInfo, ConnectionEdge, TapSource, ParamBuffer, TransportContext};
 pub use buffer::{Buffer, mix_buffers, downmix_to_mono};
 pub use state::*;
-pub use ports::{input_ports, output_ports, input_port_index, output_port_index};
+pub use ports::{input_ports, output_ports, input_port_index, output_port_index, input_voice_lanes};
 use module_type::normalize_module_type;
 use serde::Deserialize;
 use std::collections::{HashMap, VecDeque};
@@ -324,6 +324,18 @@ impl GraphEngine {
       if let Some(module) = self.modules.get(*index) {
         if let ModuleState::GameOfLife(state) = &module.state {
           return state.gol.grid_state().to_vec();
+        }
+      }
+    }
+    Vec::new()
+  }
+
+  /// Vibration amplitude of each handpan note field (fixed-point: value / 20000), empty if not a handpan.
+  pub fn get_handpan_levels(&self, module_id: &str) -> Vec<u16> {
+    if let Some(index) = self.module_map.get(module_id).and_then(|list| list.first()) {
+      if let Some(module) = self.modules.get(*index) {
+        if let ModuleState::Handpan(state) = &module.state {
+          return state.handpan.field_levels().into_iter().map(|a| (a.clamp(0.0, 3.0) * 20000.0) as u16).collect();
         }
       }
     }
@@ -654,7 +666,17 @@ impl GraphEngine {
           buffer.clear();
           for edge in &module.connections[input_index] {
             let source = &self.output_buffers[edge.source_module][edge.source_port];
-            mix_buffers(buffer, source, edge.gain);
+            match edge.target_channel {
+              Some(lane) if lane < buffer.channel_count() && source.channel_count() > 0 => {
+                let src = source.channel(0);
+                let dst = buffer.channel_mut(lane);
+                for i in 0..dst.len().min(src.len()) {
+                  dst[i] += src[i] * edge.gain;
+                }
+              }
+              Some(_) => {}
+              None => mix_buffers(buffer, source, edge.gain),
+            }
           }
         }
         for (output_index, info) in module.outputs.iter().enumerate() {
@@ -862,6 +884,36 @@ impl GraphEngine {
       output_buffers.push(outputs);
     }
 
+    // Voice lanes: a mono CV/gate input that declares `input_voice_lanes` on a non-poly module,
+    // fed by a poly source, carries one channel per voice. Lane 0 holds voice 0 — exactly what
+    // the poly -> mono rule forwards — and the module receives every voice (chords on a single
+    // shared instrument). Inputs that don't declare it keep the classic behaviour.
+    let mut lane_ports: Vec<(usize, usize)> = Vec::new();
+    let mut audio_ports: Vec<(usize, usize)> = Vec::new();
+    for connection in &graph.connections {
+      let (Some(from_list), Some(to_list)) =
+        (module_map.get(&connection.from.module_id), module_map.get(&connection.to.module_id))
+      else {
+        continue;
+      };
+      let to_type = modules[to_list[0]].module_type;
+      let Some(target_port) = input_port_index(to_type, &connection.to.port_id) else { continue };
+      let key = (to_list[0], target_port);
+      if connection.kind == "audio" {
+        audio_ports.push(key);
+      } else if is_poly_type(modules[from_list[0]].module_type)
+        && !is_poly_type(to_type)
+        && input_voice_lanes(to_type, target_port)
+        && modules[to_list[0]].inputs[target_port].channels == 1
+      {
+        lane_ports.push(key);
+      }
+    }
+    lane_ports.retain(|key| !audio_ports.contains(key));
+    for &(module_index, port) in &lane_ports {
+      modules[module_index].inputs[port].channels = voice_count;
+    }
+
     for connection in &graph.connections {
       let from_indices = module_map.get(&connection.from.module_id);
       let to_indices = module_map.get(&connection.to.module_id);
@@ -882,7 +934,20 @@ impl GraphEngine {
       let target_is_poly = is_poly_type(to_type);
       let is_audio = connection.kind == "audio";
 
-      if source_is_poly && target_is_poly {
+      if lane_ports.contains(&(to_list[0], target_port)) {
+        let target = to_list[0];
+        for (lane, &source) in from_list.iter().enumerate() {
+          modules[target].connections[target_port].push(ConnectionEdge {
+            source_module: source,
+            source_port,
+            gain: 1.0,
+            target_channel: Some(if source_is_poly { lane } else { 0 }),
+          });
+          if !source_is_poly {
+            break;
+          }
+        }
+      } else if source_is_poly && target_is_poly {
         let count = from_list.len().min(to_list.len());
         for i in 0..count {
           let target = to_list[i];
@@ -890,6 +955,7 @@ impl GraphEngine {
             source_module: from_list[i],
             source_port,
             gain: 1.0,
+            target_channel: None,
           };
           modules[target].connections[target_port].push(edge);
         }
@@ -902,6 +968,7 @@ impl GraphEngine {
               source_module: source,
               source_port,
               gain,
+              target_channel: None,
             });
           }
         } else {
@@ -910,6 +977,7 @@ impl GraphEngine {
             source_module: from_list[0],
             source_port,
             gain: 1.0,
+            target_channel: None,
           });
         }
       } else if !source_is_poly && target_is_poly {
@@ -918,6 +986,7 @@ impl GraphEngine {
             source_module: from_list[0],
             source_port,
             gain: 1.0,
+            target_channel: None,
           });
         }
       } else {
@@ -926,6 +995,7 @@ impl GraphEngine {
           source_module: from_list[0],
           source_port,
           gain: 1.0,
+          target_channel: None,
         });
       }
     }

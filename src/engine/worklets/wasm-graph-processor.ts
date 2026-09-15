@@ -77,6 +77,7 @@ type GraphMessage =
   | { type: 'resetTransport' }
   | { type: 'setMasterFxParam'; param: string; value: number }
   | { type: 'watchGol'; moduleIds: string[] }
+  | { type: 'watchHandpans'; moduleIds: string[] }
   | { type: 'dispose' }
 
 class WasmGraphProcessor extends AudioWorkletProcessor {
@@ -88,6 +89,7 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
   private lastSteps: Map<string, number> = new Map()
   private stepPollCounter = 0
   private watchedGolModules: string[] = []
+  private watchedHandpans: string[] = []
   private watchedMidiSeq: string | null = null
   private watchedGranulars: string[] = []
   private lastPositions: Map<string, number> = new Map()
@@ -142,6 +144,10 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
     if (message.type === 'watchSequencers') {
       this.watchedSequencers = message.moduleIds
       this.lastSteps.clear()
+      return
+    }
+    if (message.type === 'watchHandpans') {
+      this.watchedHandpans = message.moduleIds
       return
     }
     if (message.type === 'watchGol') {
@@ -419,6 +425,15 @@ class WasmGraphProcessor extends AudioWorkletProcessor {
         if (grid.length > 0) {
           const step = this.engine.get_sequencer_step(moduleId)
           this.port.postMessage({ type: 'golGrid', moduleId, grid: Array.from(grid), step })
+        }
+      }
+    }
+
+    if (shouldPoll && this.watchedHandpans.length > 0) {
+      for (const moduleId of this.watchedHandpans) {
+        const levels = this.engine.get_handpan_levels(moduleId)
+        if (levels.length > 0) {
+          this.port.postMessage({ type: 'handpanLevels', moduleId, levels: Array.from(levels) })
         }
       }
     }

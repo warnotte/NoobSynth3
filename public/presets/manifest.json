@@ -1073,6 +1073,13 @@
       "group": "Physical Modeling"
     },
     {
+      "id": "handpan-kurde",
+      "name": "Handpan Kurde",
+      "description": "Le handpan D Kurde 15 notes (100e module) joue un groove en doubles-croches : Ding grave sur les temps forts, arpeges et notes fantomes. Humanisation a 50 % pour que deux mesures ne sonnent jamais pareil, petite piece autour.",
+      "file": "handpan-kurde.json",
+      "group": "Physical Modeling"
+    },
+    {
       "id": "wavetable-vocal",
       "name": "Wavetable Vocal",
       "description": "Vocal formants bank with LFO-controlled position morphing.",

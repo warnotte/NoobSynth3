@@ -82,6 +82,14 @@ export type NativeGameOfLifeBridge = {
 }
 
 /**
+ * Bridge for the native handpan (Tauri mode): vibration amplitude of the 15 note fields.
+ */
+export type NativeHandpanBridge = {
+  isActive: boolean
+  getHandpanLevels: (moduleId: string) => Promise<number[]>
+}
+
+/**
  * Bridge for the native level meter (Tauri mode): packed peak L/R (u32,
  * L in the high 16 bits, R in the low 16 bits, each fixed-point /10000).
  */
@@ -122,12 +130,14 @@ export type ControlProps = {
   nativeGameOfLife?: NativeGameOfLifeBridge | null
   /** Native level meter bridge (Tauri mode) */
   nativeMeter?: NativeMeterBridge | null
+  /** Native handpan bridge (Tauri mode) */
+  nativeHandpan?: NativeHandpanBridge | null
   /** Update a module parameter */
   updateParam: (
     moduleId: string,
     paramId: string,
     value: number | string | boolean,
-    options?: { skipEngine?: boolean },
+    options?: { skipEngine?: boolean; skipHistory?: boolean },
   ) => void
   /** Set manual gate state (for control module) */
   setManualGate: (moduleId: string, isOn: boolean) => void

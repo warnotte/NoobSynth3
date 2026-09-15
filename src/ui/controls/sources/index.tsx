@@ -23,6 +23,7 @@ import { PipeOrganControls } from './PipeOrganControls'
 import { SpectralSwarmControls } from './SpectralSwarmControls'
 import { ResonatorControls } from './ResonatorControls'
 import { KoshiControls } from './KoshiControls'
+import { HandpanControls } from './HandpanControls'
 import { WavetableControls } from './WavetableControls'
 import { ParticleCloudControls } from './ParticleCloudControls'
 import { SpeechSynthControls } from './SpeechSynthControls'
@@ -82,6 +83,9 @@ export function renderSourceControls(props: ControlProps): React.ReactElement | 
 
     case 'koshi':
       return <KoshiControls {...props} />
+
+    case 'handpan':
+      return <HandpanControls {...props} />
 
     case 'wavetable':
       return <WavetableControls {...props} />
@@ -146,6 +150,7 @@ export {
   SpectralSwarmControls,
   ResonatorControls,
   KoshiControls,
+  HandpanControls,
   WavetableControls,
   ParticleCloudControls,
   SpeechSynthControls,

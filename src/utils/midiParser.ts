@@ -150,17 +150,29 @@ export type MidiPresetManifest = {
   presets: MidiPresetEntry[]
 }
 
+async function fetchManifest(path: string): Promise<MidiPresetManifest | null> {
+  try {
+    const response = await fetch(`${import.meta.env.BASE_URL}${path}`)
+    if (!response.ok) return null
+    const manifest = (await response.json()) as MidiPresetManifest
+    return Array.isArray(manifest?.presets) ? manifest : null
+  } catch {
+    return null
+  }
+}
+
 /**
- * Load the MIDI presets manifest
+ * Load the MIDI presets manifest, plus the optional machine-local one in `midi-presets/local/`
+ * (gitignored: personal files show up in the player without ever being committed or published).
  */
 export async function loadMidiPresetManifest(): Promise<MidiPresetManifest> {
-  try {
-    const response = await fetch(`${import.meta.env.BASE_URL}midi-presets/manifest.json`)
-    if (!response.ok) {
-      return { version: 1, presets: [] }
-    }
-    return (await response.json()) as MidiPresetManifest
-  } catch {
-    return { version: 1, presets: [] }
-  }
+  const [shared, local] = await Promise.all([
+    fetchManifest('midi-presets/manifest.json'),
+    fetchManifest('midi-presets/local/manifest.json'),
+  ])
+  const presets = [
+    ...(shared?.presets ?? []),
+    ...(local?.presets ?? []).map((p) => ({ ...p, id: `local-${p.id}`, file: `local/${p.file}` })),
+  ]
+  return { version: 1, presets }
 }

@@ -20,6 +20,7 @@ pub enum ModuleType {
     SpectralSwarm,
     Resonator,
     Koshi,
+    Handpan,
     Wavetable,
     Granular,
     Sampler,
@@ -134,6 +135,9 @@ pub struct ConnectionEdge {
     pub source_module: usize,
     pub source_port: usize,
     pub gain: f32,
+    /// When set, the source's first channel is added to this single input channel only
+    /// (one lane per poly voice) instead of the usual mix/up-mix into every channel.
+    pub target_channel: Option<usize>,
 }
 
 /// Global transport state passed to each module during processing.

@@ -112,6 +112,11 @@ Voice 2: VCO → VCF → VCA ─┼→ Chorus → Delay → Reverb → Out
 Voice 3: VCO → VCF → VCA ─┘
 ```
 
+Vers un module **non** polyphonique, l'audio des voix est mixé ; une CV/gate ne transmet que la voix 0 —
+sauf si l'entrée déclare des **voice lanes** (`ports/input_voice_lanes.rs`, opt-in par port) : elle reçoit
+alors un canal par voix (voix i → canal i), ce qui permet à un instrument partagé (Handpan) de jouer des
+accords.
+
 ## Types de ports
 
 | Type | Description |

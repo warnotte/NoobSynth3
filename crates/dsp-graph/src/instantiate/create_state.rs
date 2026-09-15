@@ -717,6 +717,30 @@ pub(crate) fn create_state(
       seed: ParamBuffer::new(param_number(params, "seed", 1.0)),
       level: ParamBuffer::new(param_number(params, "level", 0.8)),
     }),
+    ModuleType::Handpan => ModuleState::Handpan(HandpanState {
+      handpan: {
+        let mut handpan = Handpan::new(sample_rate);
+        if let Some(notes) = params.get("scaleNotes").and_then(|v| v.as_str()) {
+          handpan.set_custom_notes(notes);
+        }
+        handpan
+      },
+      scale: ParamBuffer::new(param_number(params, "scale", 0.0)),
+      pitch_ref: ParamBuffer::new(param_number(params, "pitchRef", 0.0)),
+      instrument: ParamBuffer::new(param_number(params, "instrument", 0.0)),
+      pan: ParamBuffer::new(param_number(params, "pan", 0.0)),
+      attack: ParamBuffer::new(param_number(params, "attack", 0.5)),
+      tune: ParamBuffer::new(param_number(params, "tune", 0.0)),
+      octave: ParamBuffer::new(param_number(params, "octave", 0.0)),
+      sustain: ParamBuffer::new(param_number(params, "sustain", 1.0)),
+      bloom: ParamBuffer::new(param_number(params, "bloom", 0.5)),
+      resonance: ParamBuffer::new(param_number(params, "resonance", 0.5)),
+      cavity: ParamBuffer::new(param_number(params, "cavity", 0.5)),
+      humanize: ParamBuffer::new(param_number(params, "humanize", 0.5)),
+      seed: ParamBuffer::new(param_number(params, "seed", 1.0)),
+      level: ParamBuffer::new(param_number(params, "level", 0.8)),
+      strike: ParamBuffer::new(param_number(params, "strike", 0.0)),
+    }),
     ModuleType::Wavetable => ModuleState::Wavetable(WavetableState {
       wavetable: Wavetable::new(sample_rate),
       frequency: ParamBuffer::new(param_number(params, "frequency", 220.0)),

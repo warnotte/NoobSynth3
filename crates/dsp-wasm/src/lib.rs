@@ -95,6 +95,11 @@ impl WasmGraphEngine {
     self.engine.get_gol_grid(module_id)
   }
 
+  /// Get handpan note-field vibration amplitudes (15 × u16, value / 20000)
+  pub fn get_handpan_levels(&self, module_id: &str) -> Vec<u16> {
+    self.engine.get_handpan_levels(module_id)
+  }
+
   /// Get meter peak levels packed as u32 (high16=left, low16=right)
   pub fn get_meter_level(&self, module_id: &str) -> u32 {
     self.engine.get_meter_level(module_id)

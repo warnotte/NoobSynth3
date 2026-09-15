@@ -41,8 +41,8 @@ App.tsx                          # Root component, state management, undo/redo
     ├── ModuleCard.tsx           # Single module frame (header, ports, body)
     │   └── controls/            # Module-specific controls
     │       ├── index.tsx        # Router → category files
-    │       ├── sources/         # Source modules (18 files, 20 types — granular/sampler
-    │       │   └── ... (20 modules)  #   are controlled one level up, in controls/)
+    │       ├── sources/         # Source modules (19 files, 21 types — granular/sampler
+    │       │   └── ... (21 modules)  #   are controlled one level up, in controls/)
     │       ├── sequencers/      # Sequencer modules (17 files)
     │       │   └── ... (17 modules)
     │       ├── io/              # I/O modules (8 files — send/receive share one file)
@@ -103,7 +103,7 @@ Câbles et jacks sont colorés par type de signal :
 - Resize overrides are kept in `moduleSizeOverrides` inside the `useModuleResize` hook (`src/hooks/useModuleResize.ts`, wired from `src/App.tsx`) and only applied by `getModuleSize` while Dev Resize is enabled.
 - Rack grid overlay is always on via `.rack-grid-overlay` in `src/ui/RackView.tsx`, driven by `--rack-unit-x/y`, `--rack-gap`, `--rack-pad-y` in `src/styles.css`.
 - Lab Panel (`module.type === 'lab'`) renders a full layout stress test (Osc/Env/Mod/Util) in `src/ui/controls/IOControls.tsx`, using `updateParam(..., { skipEngine: true })`.
-- **Galerie des 99 modules** : `node design/mockups/gallery.mjs` (dev server requis) — construit un graphe avec un module de chaque type, le charge via l'import BrandRail, screenshote chaque module dans `design/gallery/<type>.png` et signale les débordements de `.module-controls`. À lancer après toute modif des primitives/CSS des modules. Scan ciblé par preset : `node design/mockups/check-overflow.mjs [preset...]`.
+- **Galerie des 100 modules** : `node design/mockups/gallery.mjs` (dev server requis) — construit un graphe avec un module de chaque type, le charge via l'import BrandRail, screenshote chaque module dans `design/gallery/<type>.png` et signale les débordements de `.module-controls`. À lancer après toute modif des primitives/CSS des modules. Scan ciblé par preset : `node design/mockups/check-overflow.mjs [preset...]`.
 
 ### Remove Dev Resize (rollback checklist)
 
@@ -126,7 +126,7 @@ Câbles et jacks sont colorés par type de signal :
 | `useUrlPreset` | Chargement preset/patch depuis l'URL (`?preset` / `?patch`, liens partageables) | `hooks/useUrlPreset.ts` |
 | `useModuleResize` | Outil Dev Resize : overrides de taille, preview, drag de redimensionnement + `getModuleSize` (source de vérité du span grille) | `hooks/useModuleResize.ts` |
 | `usePresetLibrary` | Chargement des bibliothèques presets / projets multi-rack / templates (data only) | `hooks/usePresetLibrary.ts` |
-| `useNativeBridges` | Construit les 7 ponts natifs Tauri (chiptune, sequencer, theremin, granular, Game of Life, meter, particle cloud) — `invokeTauri('native_*')` | `hooks/useNativeBridges.ts` |
+| `useNativeBridges` | Construit les 9 ponts natifs Tauri (chiptune, sequencer, theremin, granular, sampler, Game of Life, meter, handpan, particle cloud) — `invokeTauri('native_*')` | `hooks/useNativeBridges.ts` |
 
 Voir `src/hooks/HOOKS.md` pour la documentation détaillée.
 
@@ -156,7 +156,7 @@ Voir `src/hooks/HOOKS.md` pour la documentation détaillée.
 | `crates/dsp-graph/src/process/` | DSP processing for all module types (split by category) |
 | `crates/dsp-graph/src/instantiate/` | Module creation and parameter updates (per function) |
 | `crates/dsp-graph/src/state/` | State structs for each module type (split by category) |
-| `crates/dsp-graph/src/ports/` | Port definitions per module (per function) |
+| `crates/dsp-graph/src/ports/` | Port definitions per module (per function) — incl. `input_voice_lanes.rs` (opt-in: CV/gate inputs that receive one channel per poly voice) |
 | `crates/dsp-graph/src/module_type.rs` | `normalize_module_type()` — module-type string → ModuleType enum map |
 | `src/ui/controls/` | UI controls split by category (see controls/ARCHITECTURE.md) |
 | `src/state/moduleRegistry.ts` | Module catalog, defaults, categories |
@@ -210,7 +210,7 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 
 ### Documentation (obligatoire)
 - [ ] `docs/MODULES.md` - Documentation complète du module
-- [ ] `README.md` - Mettre à jour le compte de modules (actuellement 93)
+- [ ] `README.md` - Mettre à jour le compte de modules (actuellement 100)
 - [ ] `CLAUDE.md` - Ajouter à la liste "Module Types" si pertinent
 
 ### Vérification (après ajout/modif de module)
@@ -261,6 +261,7 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 | CPU Meter | DSP load avg + peak | ✅ | ✅ `native_get_cpu_load` |
 | Game of Life | Grid state + playhead | ✅ | ✅ `NativeGameOfLifeBridge` |
 | Meter | Peak L/R level | ✅ | ✅ `NativeMeterBridge` |
+| Handpan | Niveau de vibration de chaque zone (halo compris) | ✅ `watchHandpanLevels` | ✅ `NativeHandpanBridge` (`native_get_handpan_levels`) — la frappe au clic passe par le param `strike` (`nonce*64 + zone`, ne frappe que sur CHANGEMENT de valeur) : parité Web/Tauri gratuite via `updateParam(..., { skipHistory: true })` |
 | Mixer Master VU | Master bus peak (post-FX) | ✅ `watchMeter('__master__')` | ✅ `native_get_meter_level('__master__')` — id sentinelle réservé dans `get_meter_level()`, exempt du mapping rack (`_` initial) |
 | Theremin | Pad position | ✅ | ✅ `NativeThereminBridge` |
 | Particle Cloud | Grain positions | ✅ | ✅ `NativeParticleBridge` (parité Web atteinte ; viz lente ~10 px/s par design, figée transport arrêté — voir Known Limitations) |
@@ -268,12 +269,14 @@ Lors de l'ajout d'un nouveau module, mettre à jour **tous** ces fichiers :
 
 **⚠️ RÈGLE:** Toute nouvelle feature UI↔Audio DOIT être implémentée pour Tauri en même temps que Web. Ne jamais merger une feature Web-only. **Garde-fou auto:** `npm run check:ui-audio` échoue si un contrôle utilise `engine.watch*` sans chemin natif (le bug récurrent type Game-of-Life/Meter).
 
-## Module Types (99 total)
+## Module Types (100 total)
 
-### Sources (20)
-oscillator, supersaw, karplus, fm-op, fm-matrix, nes-osc, snes-osc, noise, tb-303, shepard, pipe-organ, spectral-swarm, resonator, koshi, wavetable, granular, sampler, particle-cloud, speech-synth, theremin
+### Sources (21)
+oscillator, supersaw, karplus, fm-op, fm-matrix, nes-osc, snes-osc, noise, tb-303, shepard, pipe-organ, spectral-swarm, resonator, koshi, handpan, wavetable, granular, sampler, particle-cloud, speech-synth, theremin
 
 **Koshi Chime** (`koshi`) : carillon Koshi 8 tiges modélisé sur les enregistrements officiels (banc spectrogramme : partiels libre-libre 2.79/5.55/8.9, accordage étiré, T60, tube). Autonome (battant pendulaire poussé par le vent) ET jouable (gate + pitch CV) ; publie chaque frappe sur `gate`/`cv`. DSP : `crates/dsp-core/src/oscillators/koshi.rs`.
+
+**Handpan** (`handpan`, 100e module) : handpan en synthèse modale **couplée** calée sur 3 instruments réels ET validée à l'oreille sur un prototype WAV avant tout code Rust (recette née de l'échec du piano, retiré). 6 gammes intégrées (D Kurde 15/9, Celtic, Integral, Pygmy, Aegean — confirmées par ≥2 sources) + **gamme libre** en notation fabricant `D3/(F3 G3) A3…` (param string `scaleNotes`, dans `STRING_PARAMS`, parseur miroir Rust `parse_handpan_scale` ↔ TS `handpanScales.ts`, 32 zones max). Accords via les **voice lanes** (gate/pitch/vel reçoivent une voie par voix d'une source poly), `pitchRef` C4/A4 (MIDI), `attack` (toucher). Partiels 1:2:3 par zone, Ding étiré, **bloom** octave/quinte (~110 ms) par non-linéarité quadratique normalisée sur la réponse exacte du mode, halo de coque (voisines du dessous + bus linéaire global borné : gain de boucle < 1 garanti), cavité d'air 87,5 Hz, humanisation par frappe. Toutes les zones dans UNE instance (jamais poly-clonée) → résonance sympathique réelle. Joué gate + pitch CV (arrondi à la zone la plus proche) OU au clic/glisser sur la coque de l'écran, dont les zones s'illuminent selon leur vibration réelle lue dans le moteur. Voix silencieuse → calcul sauté (piège dénormalisé). DSP : `crates/dsp-core/src/oscillators/handpan.rs`. Preset démo : `handpan-kurde`.
 
 ### Filters (2)
 vcf, hpf
@@ -355,6 +358,8 @@ Ces features ont les structures de données en place mais la logique n'est pas c
 | `engine_basic_render` | Empty graph renders silence |
 | `engine_single_oscillator` | Single oscillator produces non-zero, non-NaN output |
 | `engine_nes_osc` | NES oscillator → output produces a continuous non-zero tone (chip DSP regression) |
+| `engine_handpan` | Handpan struck by a step sequencer rings (finite, not too hot) and stays silent when unstruck |
+| `engine_handpan_poly_chord_from_midi_sequencer` | Poly MIDI sequencer chord → ONE handpan: every voice arrives on its own input lane (generic voice-lanes routing) |
 | `engine_sid_player` | SID player with a real `.sid` loaded produces audio via the native `GraphEngine` (64 MB thread; mirrors the Tauri path) |
 
 ```bash
@@ -423,6 +428,7 @@ Presets dans `public/presets/`, structure `{ id, name, description, group, graph
 | Bug | Cause | Fix |
 |-----|-------|-----|
 | Scope sans signal (ligne plate) | `getAnalyserNode` (Web) / `getNativeScopeBuffer` (Tauri) cherchaient l'ID UI nu (`scope-1`) alors que les maps de taps sont keyées par l'ID rack-préfixé (`rack-1/scope-1`, flattenRacks préfixe toujours) → lookup raté → null → tracé plat | Mapper l'ID au lookup : `getAnalyserNode` via `mapId(...)`, `getNativeScopeBuffer` préfixe avec le rack actif. Même classe de bug que `tauriMapId`. (dd88ad3, tag v0.5.1) |
+| MIDI seq poly : notes tenues coupées + notes perdues | Voix attribuées « round-robin depuis la voix 0 à chaque tick » sans regarder les notes encore tenues → une basse tenue était coupée par l'arpège suivant et les deux gates fusionnaient (pas de front → la 2e note ne déclenchait rien). Découvert en jouant Avril 14th sur le handpan : ~53 notes sur 489 perdues | Allocation « première voix libre à ce tick, sinon vol de celle qui finit le plus tôt » + creux de gate d'1 échantillon sur re-déclenchement (`midi_file_sequencer.rs`, 3 tests) → 0 vol sur 489 notes avec 8 voix |
 | Clap909 auto-trigger | `clap_stage: 0` causait re-trigger | Init `clap_stage: 3` |
 | Accent non audible | CV lu en continu, pas latché | Ajout `latched_accent` |
 | Playhead UI désync | JS setInterval indépendant | Polling WASM `get_sequencer_step()` |

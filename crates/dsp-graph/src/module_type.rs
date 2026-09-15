@@ -94,6 +94,7 @@ pub(crate) fn normalize_module_type(raw: &str) -> ModuleType {
     "spectral-swarm" => ModuleType::SpectralSwarm,
     "resonator" => ModuleType::Resonator,
     "koshi" => ModuleType::Koshi,
+    "handpan" => ModuleType::Handpan,
     "wavetable" => ModuleType::Wavetable,
     "granular" => ModuleType::Granular,
     "sampler" => ModuleType::Sampler,

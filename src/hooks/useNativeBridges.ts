@@ -165,6 +165,20 @@ export function useNativeBridges({
     }
   }, [isTauri, tauriNativeRunning])
 
+  // Native handpan bridge for Tauri standalone mode (note-field vibration levels)
+  const nativeHandpanBridge = useMemo(() => {
+    if (!isTauri) {
+      return null
+    }
+    return {
+      isActive: tauriNativeRunning,
+      getHandpanLevels: async (moduleId: string): Promise<number[]> => {
+        const raw = await invokeTauri<number[]>('native_get_handpan_levels', { moduleId: tauriMapId(moduleId) })
+        return raw.map((v) => v / 20000)
+      },
+    }
+  }, [isTauri, tauriNativeRunning])
+
   // Native particle cloud bridge for Tauri standalone mode
   const nativeParticleBridge = useMemo(() => {
     if (!isTauri) {
@@ -195,6 +209,7 @@ export function useNativeBridges({
     nativeSamplerBridge,
     nativeGameOfLifeBridge,
     nativeMeterBridge,
+    nativeHandpanBridge,
     nativeParticleBridge,
   }
 }

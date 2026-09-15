@@ -34,6 +34,7 @@ mod pipe_organ;
 mod spectral_swarm;
 mod resonator;
 mod koshi;
+mod handpan;
 mod wavetable;
 mod granular;
 mod sampler;
@@ -56,6 +57,7 @@ pub use pipe_organ::{PipeOrgan, PipeOrganParams, PipeOrganInputs, OrganVoicing, 
 pub use spectral_swarm::{SpectralSwarm, SpectralSwarmParams, SpectralSwarmInputs};
 pub use resonator::{Resonator, ResonatorParams, ResonatorInputs};
 pub use koshi::{Koshi, KoshiParams, KoshiInputs, KOSHI_NUM_RODS, KOSHI_TUNING_NAMES};
+pub use handpan::{Handpan, HandpanParams, HandpanInputs, HandpanLayout, parse_handpan_scale, HANDPAN_MAX_FIELDS, HANDPAN_LANES, HANDPAN_SCALES, HANDPAN_CUSTOM_SCALE, HANDPAN_STRIKE_BASE};
 pub use wavetable::{Wavetable, WavetableParams, WavetableInputs};
 pub use granular::{Granular, GranularParams, GranularInputs, GrainShape};
 pub use sampler::{Sampler, SamplerParams, SamplerInputs};

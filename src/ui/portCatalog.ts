@@ -611,6 +611,16 @@ export const modulePorts: Record<ModuleType, ModulePorts> = {
       { id: 'cv', label: 'CV', kind: 'cv', direction: 'out' },
     ],
   },
+  handpan: {
+    inputs: [
+      { id: 'gate', label: 'Strike', kind: 'gate', direction: 'in' },
+      { id: 'pitch', label: '1V/Oct', kind: 'cv', direction: 'in' },
+      { id: 'vel', label: 'Vel', kind: 'cv', direction: 'in' },
+    ],
+    outputs: [
+      { id: 'out', label: 'Out', kind: 'audio', direction: 'out' },
+    ],
+  },
   'wavetable': {
     inputs: [
       { id: 'pitch', label: '1V/Oct', kind: 'cv', direction: 'in' },

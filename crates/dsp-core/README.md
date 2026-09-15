@@ -15,7 +15,7 @@ Bibliothèque DSP (Digital Signal Processing) pure Rust, sans dépendances exter
 src/
 ├── lib.rs              # Exports publics
 ├── common.rs           # Utilitaires partagés
-├── oscillators/        # Sources sonores (20 modules)
+├── oscillators/        # Sources sonores (21 modules)
 │   ├── vco.rs          # VCO principal (unison, PWM, FM, sub, sync)
 │   ├── supersaw.rs     # 7 voix désaccordées
 │   ├── karplus.rs      # Karplus-Strong (cordes pincées)
@@ -31,6 +31,7 @@ src/
 │   ├── spectral_swarm.rs # Essaim d'oscillateurs
 │   ├── resonator.rs    # Résonance sympathique (Rings-style)
 │   ├── koshi.rs        # Carillon Koshi (8 tiges modales + battant pendulaire)
+│   ├── handpan.rs      # Handpan D Kurde 15 notes (modes couplés par la coque + bloom)
 │   ├── wavetable.rs    # Synthèse wavetable
 │   ├── granular.rs     # Synthèse granulaire
 │   ├── sampler.rs      # Lecteur de sample .wav (one-shot, accordé V/oct)
@@ -113,7 +114,7 @@ src/
 
 ## Modules
 
-### Oscillateurs (20)
+### Oscillateurs (21)
 
 | Struct | Description |
 |--------|-------------|
@@ -131,6 +132,7 @@ src/
 | `SpectralSwarm` | Essaim d'oscillateurs |
 | `Resonator` | Résonance sympathique (Rings-style) |
 | `Koshi` | Carillon Koshi : 8 tiges modales (paires de modes désaccordées) + battant pendulaire pousse par le vent |
+| `Handpan` | Handpan D Kurde 15 notes : partiels 1:2:3 par zone, bloom octave/quinte (non-linéarité quadratique), halo sympathique de la coque, cavité d'air |
 | `Wavetable` | Synthèse wavetable |
 | `Granular` | Synthèse granulaire |
 | `Sampler` | Lecteur de sample .wav one-shot, accordé V/oct |

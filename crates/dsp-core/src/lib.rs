@@ -49,6 +49,7 @@ pub use oscillators::{
     SpectralSwarm, SpectralSwarmParams, SpectralSwarmInputs,
     Resonator, ResonatorParams, ResonatorInputs,
     Koshi, KoshiParams, KoshiInputs, KOSHI_NUM_RODS, KOSHI_TUNING_NAMES,
+    Handpan, HandpanParams, HandpanInputs, HandpanLayout, parse_handpan_scale, HANDPAN_MAX_FIELDS, HANDPAN_LANES, HANDPAN_SCALES, HANDPAN_CUSTOM_SCALE, HANDPAN_STRIKE_BASE,
     Wavetable, WavetableParams, WavetableInputs,
     Granular, GranularParams, GranularInputs, GrainShape,
     Sampler, SamplerParams, SamplerInputs,

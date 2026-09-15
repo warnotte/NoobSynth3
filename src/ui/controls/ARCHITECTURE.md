@@ -20,6 +20,8 @@ src/ui/controls/
 │   ├── SupersawControls.tsx
 │   ├── KarplusControls.tsx
 │   ├── KoshiControls.tsx
+│   ├── HandpanControls.tsx
+│   ├── handpanScales.ts     # gammes handpan + parseur notation fabricant (miroir de handpan.rs)
 │   ├── NesOscControls.tsx
 │   ├── SnesOscControls.tsx
 │   ├── Tb303Controls.tsx
@@ -193,7 +195,8 @@ export type ControlProps = {
   nativeParticle?: NativeParticleBridge | null
   nativeGameOfLife?: NativeGameOfLifeBridge | null
   nativeMeter?: NativeMeterBridge | null
-  updateParam: (moduleId: string, paramId: string, value: number | string | boolean, options?: { skipEngine?: boolean }) => void
+  nativeHandpan?: NativeHandpanBridge | null
+  updateParam: (moduleId: string, paramId: string, value: number | string | boolean, options?: { skipEngine?: boolean; skipHistory?: boolean }) => void
   // ... autres props (voir types.ts pour la liste complète)
 }
 ```
