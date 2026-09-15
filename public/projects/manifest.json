@@ -112,6 +112,13 @@
       "description": "Avril 14th (Aphex Twin) : melodie et accompagnement sur deux handpans distincts, chacun dans son rack.",
       "file": "handpan-avril-14th-project.json",
       "group": "Handpan"
+    },
+    {
+      "id": "songe-hyrule",
+      "name": "Le Songe d'Hyrule 🏰",
+      "description": "Classique x Nintendo en un seul morceau de 6 minutes, tout en ré : Toccata de Bach a l'orgue, Dark World sur puce SNES, le roi de la montagne, Fontaine des fees a la harpe, Prelude BWV 846 en NES, Gymnopedie et Kakariko aux handpans, Trumpet Voluntary en finale. 5 racks, automation de volume pour les enchainements.",
+      "file": "songe-hyrule.json",
+      "group": "Songs"
     }
   ]
 }

@@ -110,6 +110,31 @@
       "id": "smw-overworld",
       "name": "Super Mario World - Overworld (SNES, melodie + basse)",
       "file": "smw-overworld.mid"
+    },
+    {
+      "id": "songe-hyrule-orgue",
+      "name": "Le Songe d'Hyrule - Orgue",
+      "file": "songe-hyrule-orgue.mid"
+    },
+    {
+      "id": "songe-hyrule-handpans",
+      "name": "Le Songe d'Hyrule - Handpans",
+      "file": "songe-hyrule-handpans.mid"
+    },
+    {
+      "id": "songe-hyrule-puces",
+      "name": "Le Songe d'Hyrule - Puces",
+      "file": "songe-hyrule-puces.mid"
+    },
+    {
+      "id": "songe-hyrule-harpe",
+      "name": "Le Songe d'Hyrule - Harpe & cloches",
+      "file": "songe-hyrule-harpe.mid"
+    },
+    {
+      "id": "songe-hyrule-rythme",
+      "name": "Le Songe d'Hyrule - Rythme",
+      "file": "songe-hyrule-rythme.mid"
     }
   ]
 }
