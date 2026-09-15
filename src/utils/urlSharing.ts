@@ -5,6 +5,7 @@
  * Supports two modes:
  * - ?preset=<id> : Load an existing preset by ID
  * - ?patch=<compressed> : Load a custom patch (compressed JSON)
+ * - ?project=<id> : Load a multi-rack project listed in the Projects section
  *
  * To remove this feature, delete this file and remove the import from App.tsx
  */
@@ -12,11 +13,12 @@
 import LZString from 'lz-string'
 import type { GraphState } from '../shared/graph'
 
-export type UrlShareMode = 'preset' | 'patch' | null
+export type UrlShareMode = 'preset' | 'patch' | 'project' | null
 
 export interface UrlShareData {
   mode: UrlShareMode
   presetId?: string
+  projectId?: string
   graph?: GraphState
 }
 
@@ -34,6 +36,11 @@ export function parseUrlShare(): UrlShareData {
   const presetId = params.get('preset')
   if (presetId) {
     return { mode: 'preset', presetId }
+  }
+
+  const projectId = params.get('project')
+  if (projectId) {
+    return { mode: 'project', projectId }
   }
 
   // Check for compressed patch
@@ -90,6 +97,7 @@ export function getCleanUrl(): string {
   const url = new URL(window.location.href)
   url.searchParams.delete('preset')
   url.searchParams.delete('patch')
+  url.searchParams.delete('project')
   return url.toString()
 }
 
@@ -100,11 +108,12 @@ export function clearUrlShareParams(): void {
   if (typeof window === 'undefined') return
 
   const url = new URL(window.location.href)
-  const hadParams = url.searchParams.has('preset') || url.searchParams.has('patch')
+  const hadParams = url.searchParams.has('preset') || url.searchParams.has('patch') || url.searchParams.has('project')
 
   if (hadParams) {
     url.searchParams.delete('preset')
     url.searchParams.delete('patch')
+    url.searchParams.delete('project')
     window.history.replaceState({}, '', url.toString())
   }
 }
@@ -125,7 +134,22 @@ export function setUrlPreset(presetId: string): void {
 
   const url = new URL(window.location.href)
   url.searchParams.delete('patch')
+  url.searchParams.delete('project')
   url.searchParams.set('preset', presetId)
+  window.history.replaceState({}, '', url.toString())
+}
+
+/**
+ * Update the browser URL to reflect a loaded project (without page reload): the address bar is then
+ * a link that opens this project.
+ */
+export function setUrlProject(projectId: string): void {
+  if (typeof window === 'undefined') return
+
+  const url = new URL(window.location.href)
+  url.searchParams.delete('patch')
+  url.searchParams.delete('preset')
+  url.searchParams.set('project', projectId)
   window.history.replaceState({}, '', url.toString())
 }
 
@@ -136,7 +160,7 @@ export function getCurrentShareUrl(): string | null {
   if (typeof window === 'undefined') return null
 
   const params = new URLSearchParams(window.location.search)
-  if (params.has('preset') || params.has('patch')) {
+  if (params.has('preset') || params.has('patch') || params.has('project')) {
     return window.location.href
   }
   return null

@@ -1,6 +1,6 @@
 [package]
 name = "noobsynth3"
-version = "0.16.1"
+version = "0.17.0"
 description = "NoobSynth3 Modular Synthesizer"
 authors = ["you"]
 license = ""
