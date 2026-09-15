@@ -84,6 +84,34 @@
       "description": "Cinq racks autour du carillon Koshi : une maree de fond (~24 min) porte une meteo plus rapide, Terra et Aqua derivent en phase l'un contre l'autre, une Ombre fait glisser un sinus vers chaque tige frappee, un rack Halo transforme la resonance des carillons en nappe granulaire. Generatif infini, rien de sequence.",
       "file": "jardin-de-vent.json",
       "group": "Ambient"
+    },
+    {
+      "id": "handpan-zelda-kakariko-project",
+      "name": "Handpans - Zelda Kakariko (orchestre)",
+      "description": "Kakariko Village (Zelda: A Link to the Past, SNES) : 8 handpans, un par piste du MIDI, en 3 racks (cordes, melodie + shakuhachis, cloches) avec un fader par famille.",
+      "file": "handpan-zelda-kakariko-project.json",
+      "group": "Handpan"
+    },
+    {
+      "id": "handpan-zelda-dark-world-project",
+      "name": "Handpans - Zelda Dark World (orchestre)",
+      "description": "Dark World (Zelda: A Link to the Past, SNES) : les 8 pistes que charge le lecteur MIDI sur 8 handpans, en 3 racks (cordes, basses, cuivres).",
+      "file": "handpan-zelda-dark-world-project.json",
+      "group": "Handpan"
+    },
+    {
+      "id": "handpan-zelda-fairy-project",
+      "name": "Handpans - Zelda Fairy Fountain (2 racks)",
+      "description": "La Fontaine des Fees (Zelda: A Link to the Past, SNES) : arpeges et melodie sur deux handpans, chacun dans son rack.",
+      "file": "handpan-zelda-fairy-project.json",
+      "group": "Handpan"
+    },
+    {
+      "id": "handpan-avril-14th-project",
+      "name": "Handpans - Aphex Twin Avril 14th (2 racks)",
+      "description": "Avril 14th (Aphex Twin) : melodie et accompagnement sur deux handpans distincts, chacun dans son rack.",
+      "file": "handpan-avril-14th-project.json",
+      "group": "Handpan"
     }
   ]
 }

@@ -1129,6 +1129,13 @@
       "group": "Physical Modeling"
     },
     {
+      "id": "handpan-avril-14th",
+      "name": "Handpans - Aphex Twin Avril 14th (8 voix)",
+      "description": "Avril 14th (Aphex Twin) sur deux handpans distincts : melodie a droite, accompagnement a gauche, sequenceur a 8 voix.",
+      "file": "handpan-avril-14th.json",
+      "group": "Physical Modeling"
+    },
+    {
       "id": "wavetable-vocal",
       "name": "Wavetable Vocal",
       "description": "Vocal formants bank with LFO-controlled position morphing.",
