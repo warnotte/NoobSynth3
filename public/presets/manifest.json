@@ -1094,6 +1094,27 @@
       "group": "Physical Modeling"
     },
     {
+      "id": "handpan-purcell-trumpet",
+      "name": "Handpans - Purcell Trumpet Voluntary (4 voix)",
+      "description": "Trumpet Voluntary (Jeremiah Clarke, longtemps attribue a Purcell) sur quatre handpans : trompette, main droite, main gauche et pedalier de l'orgue, sequenceur a 4 voix.",
+      "file": "handpan-purcell-trumpet.json",
+      "group": "Physical Modeling"
+    },
+    {
+      "id": "handpan-monolithe",
+      "name": "Handpans - Monolithe (4 voix)",
+      "description": "Monolithe, composition originale du projet (projet Songs), sur deux handpans : melodie a droite, arpege a gauche, sequenceur a 4 voix.",
+      "file": "handpan-monolithe.json",
+      "group": "Physical Modeling"
+    },
+    {
+      "id": "handpan-lumiere",
+      "name": "Handpans - Lumiere (4 voix)",
+      "description": "Lumiere, composition originale du projet (projet Songs), sur deux handpans : melodie a droite, arpege a gauche, sequenceur a 4 voix.",
+      "file": "handpan-lumiere.json",
+      "group": "Physical Modeling"
+    },
+    {
       "id": "wavetable-vocal",
       "name": "Wavetable Vocal",
       "description": "Vocal formants bank with LFO-controlled position morphing.",
