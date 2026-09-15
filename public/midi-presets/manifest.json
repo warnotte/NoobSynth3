@@ -105,6 +105,11 @@
       "id": "avril-14th",
       "name": "Aphex Twin - Avril 14th (2 mains)",
       "file": "avril-14th.mid"
+    },
+    {
+      "id": "smw-overworld",
+      "name": "Super Mario World - Overworld (SNES, melodie + basse)",
+      "file": "smw-overworld.mid"
     }
   ]
 }

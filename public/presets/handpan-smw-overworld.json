@@ -1,0 +1,252 @@
+{
+  "id": "handpan-smw-overworld",
+  "name": "Handpans - Super Mario World Overworld (4 voix)",
+  "group": "Physical Modeling",
+  "description": "Le theme du monde de Super Mario World (SNES, Koji Kondo) sur deux handpans : la melodie a droite, la basse qui marche a gauche, sequenceur a 4 voix.",
+  "graph": {
+    "modules": [
+      {
+        "id": "notes-1",
+        "type": "notes",
+        "name": "A propos",
+        "position": {
+          "x": 40,
+          "y": 40
+        },
+        "params": {
+          "text": "SUPER MARIO WORLD - OVERWORLD (4 voix)\nSuper Mario World (SNES, 1990), musique de Koji Kondo.\n\nLe theme du monde en fa majeur : la melodie sur un handpan, la basse qui marche (chromatique)\nsur un autre, tenue courte pour que les notes ne se melangent pas. Fichier tire des donnees du\nmodule Mario (scripts/mario-song-midi.mjs).\n\nSequenceur a 4 VOIX : au plus 1 frappes au meme instant sur une piste, donc chaque note est jouee.\nSur un handpan la duree de la note ne compte pas : une voix reprise continue de sonner.\n\nPiste 1 du fichier \"Melodie\" (73 notes) -> Melodie\nPiste 2 du fichier \"Basse\" (74 notes) -> Basse\nChaque handpan a sa gamme libre (les notes de sa partie), son exemplaire (INSTR.) et sa place\ndans la stereo (PAN). Recharger le meme fichier dans le lecteur MIDI ne change rien au routage."
+        }
+      },
+      {
+        "id": "midi-1",
+        "type": "midi-file-sequencer",
+        "name": "MIDI",
+        "position": {
+          "x": 40,
+          "y": 300
+        },
+        "params": {
+          "enabled": true,
+          "tempo": 132,
+          "gateLength": 90,
+          "loop": true,
+          "voices": 4,
+          "midiData": "{\"ticksPerBeat\":480,\"totalTicks\":23039,\"tempo\":132.000132000132,\"tracks\":[{\"name\":\"Melodie\",\"channel\":0,\"notes\":[{\"tick\":0,\"note\":69,\"velocity\":101,\"duration\":479},{\"tick\":480,\"note\":65,\"velocity\":101,\"duration\":359},{\"tick\":840,\"note\":60,\"velocity\":101,\"duration\":119},{\"tick\":960,\"note\":62,\"velocity\":101,\"duration\":119},{\"tick\":1080,\"note\":65,\"velocity\":101,\"duration\":119},{\"tick\":1320,\"note\":65,\"velocity\":101,\"duration\":479},{\"tick\":1800,\"note\":62,\"velocity\":101,\"duration\":119},{\"tick\":1920,\"note\":60,\"velocity\":101,\"duration\":119},{\"tick\":2160,\"note\":65,\"velocity\":101,\"duration\":119},{\"tick\":2400,\"note\":65,\"velocity\":101,\"duration\":119},{\"tick\":2640,\"note\":72,\"velocity\":101,\"duration\":239},{\"tick\":2880,\"note\":69,\"velocity\":101,\"duration\":359},{\"tick\":3240,\"note\":67,\"velocity\":101,\"duration\":479},{\"tick\":3720,\"note\":60,\"velocity\":101,\"duration\":119},{\"tick\":3840,\"note\":69,\"velocity\":101,\"duration\":479},{\"tick\":4320,\"note\":65,\"velocity\":101,\"duration\":359},{\"tick\":4680,\"note\":60,\"velocity\":101,\"duration\":119},{\"tick\":4800,\"note\":62,\"velocity\":101,\"duration\":119},{\"tick\":4920,\"note\":65,\"velocity\":101,\"duration\":119},{\"tick\":5160,\"note\":65,\"velocity\":101,\"duration\":479},{\"tick\":5640,\"note\":62,\"velocity\":101,\"duration\":119},{\"tick\":5760,\"note\":60,\"velocity\":101,\"duration\":119},{\"tick\":6000,\"note\":65,\"velocity\":101,\"duration\":119},{\"tick\":6240,\"note\":70,\"velocity\":101,\"duration\":119},{\"tick\":6360,\"note\":69,\"velocity\":101,\"duration\":119},{\"tick\":6480,\"note\":67,\"velocity\":101,\"duration\":119},{\"tick\":6600,\"note\":65,\"velocity\":101,\"duration\":959},{\"tick\":7680,\"note\":69,\"velocity\":101,\"duration\":479},{\"tick\":8160,\"note\":65,\"velocity\":101,\"duration\":359},{\"tick\":8520,\"note\":60,\"velocity\":101,\"duration\":119},{\"tick\":8640,\"note\":62,\"velocity\":101,\"duration\":119},{\"tick\":8760,\"note\":65,\"velocity\":101,\"duration\":119},{\"tick\":9000,\"note\":65,\"velocity\":101,\"duration\":479},{\"tick\":9480,\"note\":62,\"velocity\":101,\"duration\":119},{\"tick\":9600,\"note\":60,\"velocity\":101,\"duration\":119},{\"tick\":9840,\"note\":65,\"velocity\":101,\"duration\":119},{\"tick\":10080,\"note\":65,\"velocity\":101,\"duration\":119},{\"tick\":10320,\"note\":72,\"velocity\":101,\"duration\":239},{\"tick\":10560,\"note\":69,\"velocity\":101,\"duration\":359},{\"tick\":10920,\"note\":67,\"velocity\":101,\"duration\":479},{\"tick\":11400,\"note\":60,\"velocity\":101,\"duration\":119},{\"tick\":11520,\"note\":69,\"velocity\":101,\"duration\":479},{\"tick\":12000,\"note\":65,\"velocity\":101,\"duration\":359},{\"tick\":12360,\"note\":60,\"velocity\":101,\"duration\":119},{\"tick\":12480,\"note\":62,\"velocity\":101,\"duration\":119},{\"tick\":12600,\"note\":65,\"velocity\":101,\"duration\":119},{\"tick\":12840,\"note\":65,\"velocity\":101,\"duration\":479},{\"tick\":13320,\"note\":62,\"velocity\":101,\"duration\":119},{\"tick\":13440,\"note\":60,\"velocity\":101,\"duration\":119},{\"tick\":13680,\"note\":65,\"velocity\":101,\"duration\":119},{\"tick\":13920,\"note\":70,\"velocity\":101,\"duration\":119},{\"tick\":14040,\"note\":69,\"velocity\":101,\"duration\":119},{\"tick\":14160,\"note\":67,\"velocity\":101,\"duration\":119},{\"tick\":14280,\"note\":65,\"velocity\":101,\"duration\":959},{\"tick\":15360,\"note\":69,\"velocity\":101,\"duration\":359},{\"tick\":15720,\"note\":65,\"velocity\":101,\"duration\":359},{\"tick\":16080,\"note\":60,\"velocity\":101,\"duration\":239},{\"tick\":16320,\"note\":69,\"velocity\":101,\"duration\":359},{\"tick\":16680,\"note\":65,\"velocity\":101,\"duration\":599},{\"tick\":17280,\"note\":68,\"velocity\":101,\"duration\":119},{\"tick\":17400,\"note\":65,\"velocity\":101,\"duration\":119},{\"tick\":17520,\"note\":60,\"velocity\":101,\"duration\":119},{\"tick\":17760,\"note\":68,\"velocity\":101,\"duration\":359},{\"tick\":18120,\"note\":67,\"velocity\":101,\"duration\":1079},{\"tick\":19200,\"note\":69,\"velocity\":101,\"duration\":359},{\"tick\":19560,\"note\":65,\"velocity\":101,\"duration\":359},{\"tick\":19920,\"note\":60,\"velocity\":101,\"duration\":239},{\"tick\":20160,\"note\":69,\"velocity\":101,\"duration\":359},{\"tick\":20520,\"note\":65,\"velocity\":101,\"duration\":599},{\"tick\":21120,\"note\":68,\"velocity\":101,\"duration\":119},{\"tick\":21240,\"note\":65,\"velocity\":101,\"duration\":119},{\"tick\":21360,\"note\":60,\"velocity\":101,\"duration\":239},{\"tick\":21600,\"note\":72,\"velocity\":101,\"duration\":1439}]},{\"name\":\"Basse\",\"channel\":1,\"notes\":[{\"tick\":0,\"note\":41,\"velocity\":101,\"duration\":239},{\"tick\":480,\"note\":45,\"velocity\":101,\"duration\":239},{\"tick\":960,\"note\":46,\"velocity\":101,\"duration\":239},{\"tick\":1440,\"note\":47,\"velocity\":101,\"duration\":239},{\"tick\":1920,\"note\":45,\"velocity\":101,\"duration\":239},{\"tick\":2400,\"note\":44,\"velocity\":101,\"duration\":239},{\"tick\":2880,\"note\":43,\"velocity\":101,\"duration\":239},{\"tick\":3120,\"note\":36,\"velocity\":101,\"duration\":239},{\"tick\":3360,\"note\":38,\"velocity\":101,\"duration\":239},{\"tick\":3600,\"note\":40,\"velocity\":101,\"duration\":239},{\"tick\":3840,\"note\":41,\"velocity\":101,\"duration\":239},{\"tick\":4320,\"note\":45,\"velocity\":101,\"duration\":239},{\"tick\":4800,\"note\":46,\"velocity\":101,\"duration\":239},{\"tick\":5280,\"note\":47,\"velocity\":101,\"duration\":239},{\"tick\":5760,\"note\":48,\"velocity\":101,\"duration\":239},{\"tick\":6000,\"note\":36,\"velocity\":101,\"duration\":239},{\"tick\":6240,\"note\":40,\"velocity\":101,\"duration\":239},{\"tick\":6480,\"note\":43,\"velocity\":101,\"duration\":239},{\"tick\":6720,\"note\":41,\"velocity\":101,\"duration\":239},{\"tick\":6960,\"note\":36,\"velocity\":101,\"duration\":239},{\"tick\":7200,\"note\":41,\"velocity\":101,\"duration\":239},{\"tick\":7680,\"note\":41,\"velocity\":101,\"duration\":239},{\"tick\":8160,\"note\":45,\"velocity\":101,\"duration\":239},{\"tick\":8640,\"note\":46,\"velocity\":101,\"duration\":239},{\"tick\":9120,\"note\":47,\"velocity\":101,\"duration\":239},{\"tick\":9600,\"note\":45,\"velocity\":101,\"duration\":239},{\"tick\":10080,\"note\":44,\"velocity\":101,\"duration\":239},{\"tick\":10560,\"note\":43,\"velocity\":101,\"duration\":239},{\"tick\":10800,\"note\":36,\"velocity\":101,\"duration\":239},{\"tick\":11040,\"note\":38,\"velocity\":101,\"duration\":239},{\"tick\":11280,\"note\":40,\"velocity\":101,\"duration\":239},{\"tick\":11520,\"note\":41,\"velocity\":101,\"duration\":239},{\"tick\":12000,\"note\":45,\"velocity\":101,\"duration\":239},{\"tick\":12480,\"note\":46,\"velocity\":101,\"duration\":239},{\"tick\":12960,\"note\":47,\"velocity\":101,\"duration\":239},{\"tick\":13440,\"note\":48,\"velocity\":101,\"duration\":239},{\"tick\":13680,\"note\":36,\"velocity\":101,\"duration\":239},{\"tick\":13920,\"note\":40,\"velocity\":101,\"duration\":239},{\"tick\":14160,\"note\":43,\"velocity\":101,\"duration\":239},{\"tick\":14400,\"note\":41,\"velocity\":101,\"duration\":239},{\"tick\":14640,\"note\":36,\"velocity\":101,\"duration\":239},{\"tick\":14880,\"note\":41,\"velocity\":101,\"duration\":239},{\"tick\":15360,\"note\":45,\"velocity\":101,\"duration\":239},{\"tick\":15600,\"note\":46,\"velocity\":101,\"duration\":239},{\"tick\":15840,\"note\":48,\"velocity\":101,\"duration\":239},{\"tick\":16080,\"note\":50,\"velocity\":101,\"duration\":239},{\"tick\":16320,\"note\":48,\"velocity\":101,\"duration\":239},{\"tick\":16560,\"note\":45,\"velocity\":101,\"duration\":239},{\"tick\":16800,\"note\":41,\"velocity\":101,\"duration\":239},{\"tick\":17040,\"note\":43,\"velocity\":101,\"duration\":239},{\"tick\":17280,\"note\":44,\"velocity\":101,\"duration\":239},{\"tick\":17520,\"note\":48,\"velocity\":101,\"duration\":239},{\"tick\":17760,\"note\":50,\"velocity\":101,\"duration\":239},{\"tick\":18000,\"note\":53,\"velocity\":101,\"duration\":239},{\"tick\":18240,\"note\":55,\"velocity\":101,\"duration\":239},{\"tick\":18480,\"note\":53,\"velocity\":101,\"duration\":239},{\"tick\":18720,\"note\":52,\"velocity\":101,\"duration\":239},{\"tick\":18960,\"note\":48,\"velocity\":101,\"duration\":239},{\"tick\":19200,\"note\":46,\"velocity\":101,\"duration\":239},{\"tick\":19440,\"note\":45,\"velocity\":101,\"duration\":239},{\"tick\":19680,\"note\":46,\"velocity\":101,\"duration\":239},{\"tick\":19920,\"note\":48,\"velocity\":101,\"duration\":239},{\"tick\":20160,\"note\":53,\"velocity\":101,\"duration\":239},{\"tick\":20400,\"note\":52,\"velocity\":101,\"duration\":239},{\"tick\":20640,\"note\":48,\"velocity\":101,\"duration\":239},{\"tick\":20880,\"note\":45,\"velocity\":101,\"duration\":239},{\"tick\":21120,\"note\":47,\"velocity\":101,\"duration\":239},{\"tick\":21360,\"note\":48,\"velocity\":101,\"duration\":239},{\"tick\":21600,\"note\":53,\"velocity\":101,\"duration\":239},{\"tick\":21840,\"note\":48,\"velocity\":101,\"duration\":239},{\"tick\":22080,\"note\":46,\"velocity\":101,\"duration\":239},{\"tick\":22320,\"note\":50,\"velocity\":101,\"duration\":239},{\"tick\":22560,\"note\":48,\"velocity\":101,\"duration\":239},{\"tick\":22800,\"note\":52,\"velocity\":101,\"duration\":239}]}]}",
+          "selectedFile": "smw-overworld.mid",
+          "mute1": false,
+          "mute2": false,
+          "mute3": false,
+          "mute4": false,
+          "mute5": false,
+          "mute6": false,
+          "mute7": false,
+          "mute8": false
+        }
+      },
+      {
+        "id": "hp-1",
+        "type": "handpan",
+        "name": "Melodie",
+        "position": {
+          "x": 520,
+          "y": 40
+        },
+        "params": {
+          "scale": 6,
+          "scaleNotes": "C4/ D4 F4 G4 Ab4 A4 Bb4 C5",
+          "pitchRef": 1,
+          "attack": 0.55,
+          "humanize": 0.3,
+          "sustain": 0.9,
+          "bloom": 0.5,
+          "resonance": 0.5,
+          "cavity": 0.4,
+          "tune": 0,
+          "octave": 0,
+          "pan": 0.35,
+          "instrument": 71,
+          "seed": 81,
+          "level": 1
+        }
+      },
+      {
+        "id": "hp-2",
+        "type": "handpan",
+        "name": "Basse",
+        "position": {
+          "x": 520,
+          "y": 620
+        },
+        "params": {
+          "scale": 6,
+          "scaleNotes": "C2/ D2 E2 F2 G2 Ab2 A2 Bb2 B2 C3 D3 E3 F3 G3",
+          "pitchRef": 1,
+          "attack": 0.5,
+          "humanize": 0.3,
+          "sustain": 0.7,
+          "bloom": 0.5,
+          "resonance": 0.5,
+          "cavity": 0.4,
+          "tune": 0,
+          "octave": 0,
+          "pan": -0.35,
+          "instrument": 72,
+          "seed": 82,
+          "level": 0.9
+        }
+      },
+      {
+        "id": "mix-1",
+        "type": "mixer",
+        "name": "Duo",
+        "position": {
+          "x": 1000,
+          "y": 300
+        },
+        "params": {
+          "levelA": 0.8,
+          "levelB": 0.8
+        }
+      },
+      {
+        "id": "rev-1",
+        "type": "reverb",
+        "name": "Salle",
+        "position": {
+          "x": 1240,
+          "y": 300
+        },
+        "params": {
+          "time": 0.5,
+          "damp": 0.45,
+          "preDelay": 12,
+          "mix": 0.2
+        }
+      },
+      {
+        "id": "out-1",
+        "type": "output",
+        "name": "Out",
+        "position": {
+          "x": 1680,
+          "y": 300
+        },
+        "params": {
+          "level": 1.5
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": {
+          "moduleId": "midi-1",
+          "portId": "cv-1"
+        },
+        "to": {
+          "moduleId": "hp-1",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "midi-1",
+          "portId": "gate-1"
+        },
+        "to": {
+          "moduleId": "hp-1",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "midi-1",
+          "portId": "vel-1"
+        },
+        "to": {
+          "moduleId": "hp-1",
+          "portId": "vel"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "midi-1",
+          "portId": "cv-2"
+        },
+        "to": {
+          "moduleId": "hp-2",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "midi-1",
+          "portId": "gate-2"
+        },
+        "to": {
+          "moduleId": "hp-2",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "midi-1",
+          "portId": "vel-2"
+        },
+        "to": {
+          "moduleId": "hp-2",
+          "portId": "vel"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "hp-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mix-1",
+          "portId": "in-a"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "hp-2",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mix-1",
+          "portId": "in-b"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "mix-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "rev-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "rev-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "out-1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      }
+    ]
+  }
+}

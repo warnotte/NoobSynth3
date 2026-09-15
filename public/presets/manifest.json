@@ -1136,6 +1136,13 @@
       "group": "Physical Modeling"
     },
     {
+      "id": "handpan-smw-overworld",
+      "name": "Handpans - Super Mario World Overworld (4 voix)",
+      "description": "Le theme du monde de Super Mario World (SNES, Koji Kondo) sur deux handpans : la melodie a droite, la basse qui marche a gauche, sequenceur a 4 voix.",
+      "file": "handpan-smw-overworld.json",
+      "group": "Physical Modeling"
+    },
+    {
       "id": "wavetable-vocal",
       "name": "Wavetable Vocal",
       "description": "Vocal formants bank with LFO-controlled position morphing.",

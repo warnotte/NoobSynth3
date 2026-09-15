@@ -269,6 +269,26 @@ duo({
   level: 2.7,
 })
 
+// Super Mario World - Overworld (SNES), from the Mario module's song data (scripts/mario-song-midi.mjs):
+// melody and walking bass only (the module's harmony channel was derived mechanically and clashes).
+duo({
+  id: 'handpan-smw-overworld',
+  name: 'Handpans - Super Mario World Overworld (4 voix)',
+  description: "Le theme du monde de Super Mario World (SNES, Koji Kondo) sur deux handpans : la melodie a droite, la basse qui marche a gauche, sequenceur a 4 voix.",
+  file: 'smw-overworld.mid',
+  voices: 4,
+  text: ['SUPER MARIO WORLD - OVERWORLD (4 voix)', 'Super Mario World (SNES, 1990), musique de Koji Kondo.', '',
+    'Le theme du monde en fa majeur : la melodie sur un handpan, la basse qui marche (chromatique)',
+    'sur un autre, tenue courte pour que les notes ne se melangent pas. Fichier tire des donnees du',
+    'module Mario (scripts/mario-song-midi.mjs).'],
+  parts: [
+    { name: 'Melodie', params: { pan: 0.35, instrument: 71, seed: 81, attack: 0.55, sustain: 0.9, level: 1 } },
+    { name: 'Basse', params: { pan: -0.35, instrument: 72, seed: 82, attack: 0.5, sustain: 0.7, level: 0.9 } },
+  ],
+  reverb: { time: 0.5, damp: 0.45, preDelay: 12, mix: 0.2 },
+  level: 1.5,
+})
+
 // ---- Multi-rack projects: one rack per instrument family, every rack plays the same MIDI file with its
 // own sequencer (they start together), so the mixer console gets a fader per family. In a project the
 // mixer fader REPLACES each rack's output level (src/state/rackFlatten.ts, max +6 dB).
