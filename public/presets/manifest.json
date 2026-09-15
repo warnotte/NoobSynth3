@@ -1080,6 +1080,20 @@
       "group": "Physical Modeling"
     },
     {
+      "id": "handpan-zelda-fairy",
+      "name": "Handpans - Zelda Fairy Fountain (4 voix)",
+      "description": "La Fontaine des Fees (Zelda: A Link to the Past, SNES, Koji Kondo) sur deux handpans : arpeges de harpe a gauche, melodie a droite, sequenceur a 4 voix.",
+      "file": "handpan-zelda-fairy.json",
+      "group": "Physical Modeling"
+    },
+    {
+      "id": "handpan-satie-gymnopedie",
+      "name": "Handpans - Satie Gymnopedie n°1 (8 voix)",
+      "description": "Gymnopedie n°1 d'Erik Satie sur deux handpans : main droite a droite, main gauche a gauche, sequenceur a 8 voix, notes exactes.",
+      "file": "handpan-satie-gymnopedie.json",
+      "group": "Physical Modeling"
+    },
+    {
       "id": "wavetable-vocal",
       "name": "Wavetable Vocal",
       "description": "Vocal formants bank with LFO-controlled position morphing.",
