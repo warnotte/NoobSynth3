@@ -61,6 +61,18 @@ const RATIO_SALT: u32 = 32;
 const PITCH_JITTER_CENTS: f32 = 4.0;
 const PARTIAL_T60_MUL: [f32; NUM_PARTIALS] = [0.85, 1.05, 1.2, 0.85, 0.8];
 const DING_T60_MUL: f32 = 1.6;
+/// The Ding's stretch and long ring come from a large low dome: full up to ~D3, fading out by A4.
+/// A high lowest note of a free scale (e.g. a MIDI part) is a plain melodic field, so its octave
+/// and fifth stay in tune with the fields above it.
+const DING_STRETCH_FULL_HZ: f32 = 150.0;
+const DING_STRETCH_NONE_HZ: f32 = 440.0;
+/// Exemplar global tuning spread: several instruments playing together (doubled parts) beat audibly
+/// beyond a few cents, so exemplars stay as close as a well-tuned set.
+const EXEMPLAR_TUNE_CENTS: f32 = 2.0;
+/// Register terms follow the measured range only (C3..A5 around C4): extrapolated further up they
+/// made the top fields shrill.
+const REGISTER_MIN_OCT: f32 = -1.0;
+const REGISTER_MAX_OCT: f32 = 1.75;
 /// Level injected directly by the strike (dB): the octave and fifth mostly grow through the bloom.
 const DIRECT_DB: [f32; NUM_PARTIALS] = [0.0, -18.0, -26.0, -25.0, -28.0];
 /// Per unit of `attack - 0.5`: a sharper touch injects more octave/fifth and upper partials
@@ -527,13 +539,13 @@ impl Handpan {
     self.bus_loop = resonance.min(BUS_LOOP_MAX);
     self.neighbor_gain = 2.0 * resonance;
     // Instrument identity: 0 is the ear-validated reference handpan. Any other value is another
-    // exemplar within the spread measured between real instruments (global tuning ±8 c, cavity
+    // exemplar within the spread measured between real instruments (global tuning ±2 c, cavity
     // 0.55-0.9x the Ding, T60 ±20 %, brightness ±2 dB, tick ±3 dB) and its own per-field draws.
     let instrument = p.instrument.clamp(0, 999) as u32;
     let salt = instrument * INSTRUMENT_SALT_STEP;
     self.salt = salt;
     let personal = |k: u32| if instrument == 0 { 0.0 } else { jitter(instrument as usize, 0, 100 + k) };
-    let tune_offset = 8.0 * personal(1);
+    let tune_offset = EXEMPLAR_TUNE_CENTS * personal(1);
     let t60_personality = 1.0 + 0.2 * personal(2);
     let bright_db = 2.0 * personal(3);
     self.tick_db = 3.0 * personal(4);
@@ -596,11 +608,19 @@ impl Handpan {
       field.midi = layout.notes[i] as i32 + 12 * octave;
       let cents = p.tune + tune_offset + PITCH_JITTER_CENTS * jitter(i, 0, 1 + salt);
       field.f0 = 440.0 * 2f32.powf((layout.notes[i] as f32 - 69.0) / 12.0 + cents / 1200.0 + octave as f32);
-      let t60_base = 4.0 * (field.f0 / 200.0).powf(-0.15) * if is_ding { DING_T60_MUL } else { 1.0 } * sustain * t60_personality;
+      let ding_amount = if is_ding {
+        ((DING_STRETCH_NONE_HZ / field.f0).log2() / (DING_STRETCH_NONE_HZ / DING_STRETCH_FULL_HZ).log2()).clamp(0.0, 1.0)
+      } else {
+        0.0
+      };
+      let ding_t60 = if ding_amount >= 1.0 { DING_T60_MUL } else { 1.0 + (DING_T60_MUL - 1.0) * ding_amount };
+      let t60_base = 4.0 * (field.f0 / 200.0).powf(-0.15) * if is_ding { ding_t60 } else { 1.0 } * sustain * t60_personality;
 
       for k in 0..NUM_PARTIALS {
-        let ratio = if is_ding {
+        let ratio = if is_ding && ding_amount >= 1.0 {
           DING_RATIOS[k]
+        } else if is_ding {
+          PARTIAL_RATIOS[k] + (DING_RATIOS[k] - PARTIAL_RATIOS[k]) * ding_amount
         } else {
           PARTIAL_RATIOS[k] * (1.0 + RATIO_JITTER * jitter(i, k, RATIO_SALT + salt))
         };
@@ -626,7 +646,7 @@ impl Handpan {
 
       // Bloom couplings normalised on the exact response of the receiving mode at the driving
       // frequency, so the grown octave/fifth land on the measured level whatever their mistuning.
-      let register_db = OCT_REGISTER_DB * (field.f0 / REGISTER_REF_HZ).log2();
+      let register_db = OCT_REGISTER_DB * (field.f0 / REGISTER_REF_HZ).log2().clamp(REGISTER_MIN_OCT, REGISTER_MAX_OCT);
       let oct_lin = db(OCT_BLOOM_DB + register_db + bloom_offset_db + bright_db + OCT_BLOOM_JITTER_DB * jitter(i, 0, 5 + salt));
       let fifth_lin = db(FIFTH_BLOOM_DB + bloom_offset_db + bright_db + FIFTH_BLOOM_JITTER_DB * jitter(i, 0, 6 + salt));
       let w1 = field.modes_a[0].w();
@@ -712,7 +732,7 @@ impl Handpan {
     self.cavity.s1 += vel * 2.0 * p.cavity.clamp(0.0, 1.0) * db(CAVITY_KICK_DB) * (f0 / 200.0).powf(-0.5);
 
     let sr = self.sample_rate;
-    let register = (f0 / REGISTER_REF_HZ).log2();
+    let register = (f0 / REGISTER_REF_HZ).log2().clamp(REGISTER_MIN_OCT, REGISTER_MAX_OCT);
     let tick_hz = TICK_HZ * (f0 / REGISTER_REF_HZ).powf(TICK_HZ_REGISTER_EXP) * (1.0 + 0.15 * h * n_tick);
     for bp in self.tick_bp.iter_mut() {
       bp.set(tick_hz, TICK_Q, sr);

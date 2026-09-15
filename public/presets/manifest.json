@@ -1101,6 +1101,20 @@
       "group": "Physical Modeling"
     },
     {
+      "id": "handpan-zelda-kakariko",
+      "name": "Handpans - Zelda Kakariko (8 pistes)",
+      "description": "Kakariko Village (Zelda: A Link to the Past, SNES, Koji Kondo) : les 8 pistes du MIDI sur 8 handpans, un par piste, doublures jouees par deux handpans de part et d'autre de la stereo.",
+      "file": "handpan-zelda-kakariko.json",
+      "group": "Physical Modeling"
+    },
+    {
+      "id": "handpan-zelda-dark-world",
+      "name": "Handpans - Zelda Dark World (8 pistes)",
+      "description": "Dark World (Zelda: A Link to the Past, SNES, Koji Kondo) : les 8 pistes que charge le lecteur MIDI sur 8 handpans, cordes, basses doublees et cuivres.",
+      "file": "handpan-zelda-dark-world.json",
+      "group": "Physical Modeling"
+    },
+    {
       "id": "handpan-monolithe",
       "name": "Handpans - Monolithe (4 voix)",
       "description": "Monolithe, composition originale du projet (projet Songs), sur deux handpans : melodie a droite, arpege a gauche, sequenceur a 4 voix.",

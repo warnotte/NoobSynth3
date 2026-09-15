@@ -306,7 +306,10 @@ puis validé à l'oreille sur un prototype avant le portage :
 
 - **Partiels 1 : 2 : 3** (+ 4× et 6× faibles) par zone, à ±0,5 % — le fabricant accorde l'octave et la
   « quinte composée » de chaque zone. Le **Ding est étiré** (mesuré 144,2 / 292 / 437,5 Hz) pour que son
-  octave et sa quinte tombent sur les zones D4 et A4 : elles sonnent ensemble.
+  octave et sa quinte tombent sur les zones D4 et A4 : elles sonnent ensemble. L'étirement (et la tenue
+  plus longue) ne vaut que pour un Ding grave : il s'efface de D3 à A4, pour qu'une gamme libre dont la note la
+  plus basse est aiguë (partie MIDI) reste juste. Accord : ±2 cents entre exemplaires, pour que plusieurs
+  handpans jouent ensemble sans battre ; renforts de registre limités à la plage mesurée (C3-A5).
 - **Bloom** : l'octave et la quinte ne sont presque pas frappées, elles **montent après la frappe**
   (maximum ~110 ms, -16 / -26 dB). Modélisé comme la non-linéarité quadratique de l'acier (fondamentale²
   → octave, fondamentale × octave → quinte) ; le léger désaccord de ces modes fixe le temps de bloom. Plus
@@ -352,7 +355,7 @@ Voix entièrement silencieuse → calcul sauté (pas de piège des flottants dé
 | `humanize` | 0-1 | Variation de chaque frappe : force ±6 dB, frappe en retard jusqu'à 25 ms (deux mains ne tombent jamais pile ensemble), position sur la zone (octave/quinte ±4 dB, équilibre des modes jumeaux), claquement ±3 dB. La frappe à la souris n'est jamais retardée |
 | `seed` | 1-99 | Graine de l'humanisation |
 | `pan` | -1..1 | Place tout l'instrument dans la stéréo (resserre l'image de la coque) — deux handpans côte à côte |
-| `instrument` | 0-99 | Exemplaire : 0 = handpan de référence, 1-99 = autres instruments du même modèle (accord global ±8 ct, cavité 0,55-0,9× le Ding, tenue ±20 %, couleur ±2 dB, claquement ±3 dB, tirages par zone propres) |
+| `instrument` | 0-99 | Exemplaire : 0 = handpan de référence, 1-99 = autres instruments du même modèle (accord global ±2 ct, cavité 0,55-0,9× le Ding, tenue ±20 %, couleur ±2 dB, claquement ±3 dB, tirages par zone propres) |
 | `level` | 0-1 | Niveau de sortie |
 
 **Entrées** : gate (frappe), pitch (CV V/oct, référence `pitchRef` : zone la plus proche ; Ding si non câblé), vel (CV 0-1, 0.8 si non câblé) — chacune accepte une voie par voix d'une source polyphonique
