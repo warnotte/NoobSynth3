@@ -1,10 +1,10 @@
 {
   "bus": {
-    "orgue": 7.1773,
-    "handpans": 1.1453,
-    "puces": 1.9699,
-    "harpe": 6.101,
-    "rythme": 0.31
+    "orgue": 7.2542,
+    "handpans": 1.4603,
+    "puces": 1.991,
+    "harpe": 6.1663,
+    "rythme": 0.3133
   },
   "orgue": {
     "toccata": 0.4183,
@@ -17,13 +17,13 @@
     "final": 0.4868
   },
   "handpans": {
-    "darkworld": 0.6589,
-    "fairy": 0.661,
-    "prelude": 0.8202,
-    "gymnopedie": 0.6474,
+    "darkworld": 0.5567,
+    "fairy": 0.6283,
+    "prelude": 0.9115,
+    "gymnopedie": 0.8295,
     "kakariko": 1,
     "finale": 0.5,
-    "final": 0.4206
+    "final": 0.4072
   },
   "puces": {
     "darkworld": 0.8198,

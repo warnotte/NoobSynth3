@@ -45,7 +45,7 @@ const trackIndex = (src, pattern) => src.tracks.map((t, i) => (pattern.test(t.na
 // ---------------------------------------------------------------- arrangement lanes
 const RACKS = [
   { id: 'orgue', name: 'Orgue', lanes: ['grand', 'fonds', 'pedale'] },
-  { id: 'handpans', name: 'Handpans', lanes: ['basse', 'medium', 'aigu'] },
+  { id: 'handpans', name: 'Handpans', lanes: ['basse', 'medium', 'aigu', 'fee-arpeges', 'fee-melodie'] },
   { id: 'puces', name: 'Puces', lanes: ['snes', 'pulse', 'triangle'] },
   { id: 'harpe', name: 'Harpe & cloches', lanes: ['harpe', 'cloche'] },
   { id: 'rythme', name: 'Rythme', lanes: ['kick', 'snare', 'hat', 'crash', 'tom'] },
@@ -153,15 +153,15 @@ let at = 0
   at = section('jingle', 'Jingle "secret" (Zelda)', at, at + 1.9, { racks: ['puces', 'harpe'], fadeOut: 0.2 })
 }
 
-// 5. Fairy Fountain (Ab minor -> D minor): arpeggios and melody on the handpans alone, like the
-//    handpan preset the user loved.
+// 5. Fairy Fountain, exactly like the handpan preset the user loved (handpan-zelda-fairy): original key
+//    (the "secret" jingle before it is the door, transposing it into D lost its high register), arpeggios
+//    and melody each on their own handpan with the preset's settings.
 {
   const s = source('zelda-fairy.mid')
-  const T = -6
   const to = s.midi.duration
-  excerpt(s, { tracks: [0], from: 0, to, at, transpose: T, lane: 'handpans', vel: 0.9 })
-  excerpt(s, { tracks: [1], from: 0, to, at, transpose: T, lane: 'handpans', vel: 1 })
-  at = section('fairy', 'Fontaine des fées (Zelda) — handpans', at, at + to, { racks: ['handpans'], fadeOut: 2.2 }) + 0.8
+  excerpt(s, { tracks: [0], from: 0, to, at, lane: 'handpans.fee-arpeges' })
+  excerpt(s, { tracks: [1], from: 0, to, at, lane: 'handpans.fee-melodie' })
+  at = section('fairy', 'Fontaine des fées (Zelda) — handpans, comme le preset', at, at + to, { racks: ['handpans'], fadeOut: 2.2 }) + 0.8
 }
 
 // 6. Prelude BWV 846 (C major -> D major), bars 1-11: arpeggios on the NES pulse, each bar's harmony
@@ -298,6 +298,7 @@ function parseLikeApp(midi) {
 const LANE_NAMES = {
   'orgue.grand': 'Grand orgue', 'orgue.fonds': 'Fonds doux', 'orgue.pedale': 'Pedale',
   'handpans.basse': 'Handpan basse', 'handpans.medium': 'Handpan medium', 'handpans.aigu': 'Handpan aigu',
+  'handpans.fee-arpeges': 'Fontaine arpeges', 'handpans.fee-melodie': 'Fontaine melodie',
   'puces.snes': 'SNES', 'puces.pulse': 'NES pulse', 'puces.triangle': 'NES triangle',
   'harpe.harpe': 'Harpe', 'harpe.cloche': 'Cloches',
   'rythme.kick': 'Grosse caisse', 'rythme.snare': 'Caisse claire', 'rythme.hat': 'Charleston', 'rythme.crash': 'Cymbale', 'rythme.tom': 'Timbales',
@@ -457,6 +458,9 @@ const pushRack = (rack, lines, chains, mixerName, reverb, fx = [], extraModules 
     ['basse', { pan: -0.35, instrument: 41, seed: 51, attack: 0.45, sustain: 1.05, cavity: 0.5 }],
     ['medium', { pan: 0.25, instrument: 42, seed: 52, attack: 0.5, sustain: 0.95 }],
     ['aigu', { pan: 0.55, instrument: 43, seed: 53, attack: 0.5, sustain: 0.9 }],
+    // the two handpans of the Fairy Fountain preset, same settings
+    ['fee-arpeges', { pan: -0.5, instrument: 11, seed: 34, attack: 0.5, sustain: 1.2, humanize: 0.3, resonance: 0.5 }],
+    ['fee-melodie', { pan: 0.5, instrument: 3, seed: 21, attack: 0.45, sustain: 1, humanize: 0.3, resonance: 0.5, level: 0.7 }],
   ].map(([lane, extra], i) => {
     const t = laneTrack(rack, lane)
     const id = `hp-${lane}`
@@ -465,7 +469,7 @@ const pushRack = (rack, lines, chains, mixerName, reverb, fx = [], extraModules 
       conns: [c('midi-1', `cv-${t}`, id, 'pitch', 'cv'), c('midi-1', `gate-${t}`, id, 'gate', 'gate'), c('midi-1', `vel-${t}`, id, 'vel', 'cv'), c(id, 'out', 'mix-1', `in-${i + 1}`, 'audio')],
     }
   })
-  pushRack(rack, ['Trois handpans par registre (basse < C4, medium < C6, aigu) : chaque note va au handpan de son', 'registre, sans repliement d\'octave. Chaque handpan a pour gamme libre les notes qu\'il joue.'], hp, 'Handpans', { time: 0.65, damp: 0.45, preDelay: 16, mix: 0.26 })
+  pushRack(rack, ['Trois handpans par registre (basse < C4, medium < C6, aigu) : chaque note va au handpan de son', 'registre, sans repliement d\'octave. Chaque handpan a pour gamme libre les notes qu\'il joue.', 'Deux handpans dedies a la Fontaine des fees, regles comme le preset "Handpans - Zelda Fairy Fountain"', '(arpeges a gauche, melodie a droite, tonalite d\'origine).'], hp, 'Handpans', { time: 0.65, damp: 0.45, preDelay: 16, mix: 0.26 })
 }
 
 // PUCES

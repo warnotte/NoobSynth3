@@ -12,7 +12,7 @@ musiques de jeux Nintendo.
 
 ## Le Songe d'Hyrule
 
-Un seul morceau, tout ramené en **ré** (mineur, puis majeur). Les mondes se croisent : Bach et Grieg
+Un seul morceau, presque tout ramené en **ré** (mineur, puis majeur) : seule la Fontaine des fées garde sa tonalité d'origine, derrière le jingle « secret » qui lui sert de porte. Les mondes se croisent : Bach et Grieg
 joués par les puces sonores de la NES et de la Super Nintendo, Zelda joué à l'orgue de cathédrale et aux
 handpans.
 
@@ -22,7 +22,7 @@ handpans.
 | 0:24 | Dark World (Zelda: A Link to the Past) | puce SNES, orgue, handpans, batterie | do m → ré m |
 | 1:30 | Dans l'antre du roi de la montagne (Grieg) | puces NES, orgue, timbales — accelerando final | si m → ré m |
 | 2:18 | Jingle « secret » (Zelda) | puce SNES, cloches | — |
-| 2:20 | Fontaine des fées (Zelda) | handpans | la♭ m → ré m |
+| 2:20 | Fontaine des fées (Zelda) | 2 handpans, réglés comme le preset | tonalité d'origine |
 | 3:09 | Prélude BWV 846 (Bach) | puce NES, flûtes d'orgue | do M → ré M |
 | 3:44 | Gymnopédie n°1 (Satie) | handpans, flûtes d'orgue | ré majeur |
 | 4:33 | Village Cocorico / Kakariko (Zelda) | handpans, shakuhachi SNES, cloches | si♭ M → ré M |
