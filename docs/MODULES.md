@@ -57,7 +57,7 @@ Synthèse physique par modélisation de cordes pincées. Idéal pour guitares, h
 - **Basse** : frequency basse, damping faible, decay très élevé (0.998+)
 - **Clavecin** : damping élevé, brightness élevé, decay court
 
-> **TODO**: Revoir la synthèse Karplus-Strong - algorithme à affiner pour un son plus authentique.
+**Comportement :** chaque note résonne jusqu'à sa fin naturelle (la voix s'éteint après une période entière sous -80 dB) et tombe sur sa fréquence à 1-2 cents près : la ligne de délai est raccourcie du retard de son filtre d'amortissement. Au-dessus de ~1 kHz les notes restent brèves, c'est ce filtre (`damping` ne descend pas sous un coefficient de 0.5). L'excitation est centrée (sans composante continue).
 
 ### NES Osc (2A03)
 
