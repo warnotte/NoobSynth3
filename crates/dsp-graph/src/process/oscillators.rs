@@ -623,6 +623,7 @@ pub(crate) fn process(
                 attack: state.attack.slice(frames)[0],
                 pan: state.pan.slice(frames)[0],
                 instrument: state.instrument.slice(frames)[0].round() as i32,
+                construction: state.construction.slice(frames)[0].round() as i32,
                 tune: state.tune.slice(frames)[0],
                 octave: state.octave.slice(frames)[0].round() as i32,
                 sustain: state.sustain.slice(frames)[0],

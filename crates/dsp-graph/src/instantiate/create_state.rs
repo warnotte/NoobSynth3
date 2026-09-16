@@ -728,6 +728,7 @@ pub(crate) fn create_state(
       scale: ParamBuffer::new(param_number(params, "scale", 0.0)),
       pitch_ref: ParamBuffer::new(param_number(params, "pitchRef", 0.0)),
       instrument: ParamBuffer::new(param_number(params, "instrument", 0.0)),
+      construction: ParamBuffer::new(param_number(params, "construction", 0.0)),
       pan: ParamBuffer::new(param_number(params, "pan", 0.0)),
       attack: ParamBuffer::new(param_number(params, "attack", 0.5)),
       tune: ParamBuffer::new(param_number(params, "tune", 0.0)),

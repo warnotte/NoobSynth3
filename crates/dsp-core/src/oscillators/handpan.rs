@@ -124,6 +124,51 @@ const TICK_HZ_REGISTER_EXP: f32 = -0.18;
 const TICK_Q: f32 = 0.9;
 const TICK_TAU_MS: f32 = 13.0;
 const TICK_LEVEL: f32 = 0.117;
+/// A construction reshapes the whole instrument the way the steel, the shell and the note fields of
+/// real handpans differ. Every field is an offset or a factor on the reference sound: construction 0
+/// is identity (+0 dB, x1), so the ear-validated handpan renders bit for bit as before.
+#[derive(Clone, Copy)]
+struct Construction {
+  /// decay time of every partial, and per partial [fund, octave, fifth, 4x, 6x]
+  t60_mul: f32,
+  partial_t60: [f32; NUM_PARTIALS],
+  /// octave and fifth bloom level (dB)
+  oct_db: f32,
+  fifth_db: f32,
+  /// 4x and 6x partials struck directly (dB): brightness of the note body
+  upper_db: f32,
+  /// fundamental's amplitude-dependent early loss
+  drain_mul: f32,
+  /// octave/fifth mistuning spread: smaller = later, slower bloom
+  mistune_mul: f32,
+  /// air cavity: level (dB), frequency as a ratio of the Ding (0 = keep), decay
+  cavity_db: f32,
+  cavity_ratio: f32,
+  cavity_t60_mul: f32,
+  /// finger tick: level (dB), length, colour
+  tick_db: f32,
+  tick_tau_mul: f32,
+  tick_hz_mul: f32,
+  /// sympathetic halo of the shell
+  halo_mul: f32,
+}
+
+const CONSTRUCTIONS: [Construction; 4] = [
+  // 0. Reference: the ear-validated D Kurde (stainless phone recording + GAMEDRIX + FreePats fit).
+  Construction { t60_mul: 1.0, partial_t60: [1.0; NUM_PARTIALS], oct_db: 0.0, fifth_db: 0.0, upper_db: 0.0, drain_mul: 1.0, mistune_mul: 1.0, cavity_db: 0.0, cavity_ratio: 0.0, cavity_t60_mul: 1.0, tick_db: 0.0, tick_tau_mul: 1.0, tick_hz_mul: 1.0, halo_mul: 1.0 },
+  // 1. Pure ("pur"), fitted on the median of FreePats Hang (PANArt, nitrided), Shellopan (nitrided) and
+  //    Mudra (stainless): octave -7 dB and fifth -25 dB under the fundamental at 0.5 s, shorter ring,
+  //    crisp ~3.7 kHz tick, brighter body, almost no cavity.
+  Construction { t60_mul: 0.75, partial_t60: [1.0; NUM_PARTIALS], oct_db: 4.5, fifth_db: -11.0, upper_db: 6.0, drain_mul: 0.8, mistune_mul: 1.0, cavity_db: -30.0, cavity_ratio: 0.0, cavity_t60_mul: 1.0, tick_db: 0.0, tick_tau_mul: 1.05, tick_hz_mul: 1.35, halo_mul: 1.0 },
+  // 2. Rich ("riche"), fitted on Yishama and GAMEDRIX: octave level with the fundamental, fifth -7 dB at
+  //    0.5 s and still growing at 2 s, slower bloom, gentle early loss, long soft tick (~55 ms).
+  Construction { t60_mul: 1.1, partial_t60: [1.0, 1.0, 1.4, 1.0, 1.0], oct_db: 15.0, fifth_db: 21.0, upper_db: 3.0, drain_mul: 0.15, mistune_mul: 0.6, cavity_db: -3.0, cavity_ratio: 0.0, cavity_t60_mul: 1.0, tick_db: -2.0, tick_tau_mul: 4.0, tick_hz_mul: 1.0, halo_mul: 1.2 },
+  // 3. Large shell ("grande coque"), from Pantheon Halo Genesis vs Cirrus/Stratus and the PANArt Hang
+  //    played upright: darker body, longer ring, a strong deep air cavity near half the Ding, more halo.
+  Construction { t60_mul: 1.2, partial_t60: [1.1, 1.0, 1.0, 1.0, 1.0], oct_db: -1.0, fifth_db: 0.0, upper_db: -5.0, drain_mul: 1.0, mistune_mul: 1.0, cavity_db: 8.0, cavity_ratio: 0.53, cavity_t60_mul: 1.5, tick_db: -3.0, tick_tau_mul: 1.2, tick_hz_mul: 0.8, halo_mul: 1.3 },
+];
+pub const HANDPAN_CONSTRUCTIONS: usize = CONSTRUCTIONS.len();
+
 /// Humanize at 1: strikes land up to this late and spread ±HUMAN_VEL_DB.
 const HUMAN_DELAY_MS: f32 = 25.0;
 const HUMAN_VEL_DB: f32 = 6.0;
@@ -353,6 +398,7 @@ pub struct HandpanParams {
   pub level: f32,
   pub pan: f32,       // -1..1 whole-instrument stereo placement (0 = centred shell layout)
   pub instrument: i32, // 0 = reference exemplar, 1..999 = other exemplars (tuning, cavity, T60, colour)
+  pub construction: i32, // 0 = reference, 1 = pure (nitrided-like), 2 = rich, 3 = large shell
   /// Manual strike from the UI, encoded `nonce * HANDPAN_STRIKE_BASE + field`: a strike fires only
   /// when the value CHANGES, so reloading a patch that stored the last value never plays a phantom note.
   pub strike: f32,
@@ -382,6 +428,7 @@ pub struct Handpan {
   cavity_pan_r: f32,
   salt: u32,
   tick_db: f32,
+  cons: Construction,
   coef_key: (i32, u32, i32, i32, i32, i32, i32),
   bus_loop: f32,
   neighbor_gain: f32,
@@ -437,6 +484,7 @@ impl Handpan {
       cavity_pan_r: 0.7071,
       salt: 0,
       tick_db: 0.0,
+      cons: CONSTRUCTIONS[0],
       coef_key: (i32::MIN, 0, 0, 0, 0, 0, 0),
       bus_loop: 0.5,
       neighbor_gain: 1.0,
@@ -511,7 +559,7 @@ impl Handpan {
     let custom_key = if scale == HANDPAN_CUSTOM_SCALE { self.custom_version } else { 0 };
     let key = (
       (scale * 3 + p.octave) * 1024 + p.instrument.clamp(0, 999),
-      custom_key,
+      custom_key + ((p.construction.clamp(0, HANDPAN_CONSTRUCTIONS as i32 - 1) as u32) << 28),
       (p.tune * 10.0) as i32,
       (p.sustain * 1000.0) as i32,
       (p.bloom * 1000.0) as i32,
@@ -538,7 +586,9 @@ impl Handpan {
     let octave = p.octave.clamp(-1, 1);
     let sustain = p.sustain.clamp(0.25, 2.0);
     let bloom_offset_db = (p.bloom.clamp(0.0, 1.0) - 0.5) * 16.0;
-    let resonance = p.resonance.clamp(0.0, 1.0);
+    let cons = CONSTRUCTIONS[p.construction.clamp(0, HANDPAN_CONSTRUCTIONS as i32 - 1) as usize];
+    self.cons = cons;
+    let resonance = p.resonance.clamp(0.0, 1.0) * cons.halo_mul;
     self.bus_loop = resonance.min(BUS_LOOP_MAX);
     self.neighbor_gain = 2.0 * resonance;
     // Instrument identity: 0 is the ear-validated reference handpan. Any other value is another
@@ -617,7 +667,7 @@ impl Handpan {
         0.0
       };
       let ding_t60 = if ding_amount >= 1.0 { DING_T60_MUL } else { 1.0 + (DING_T60_MUL - 1.0) * ding_amount };
-      let t60_base = 4.0 * (field.f0 / 200.0).powf(-0.15) * if is_ding { ding_t60 } else { 1.0 } * sustain * t60_personality;
+      let t60_base = 4.0 * (field.f0 / 200.0).powf(-0.15) * if is_ding { ding_t60 } else { 1.0 } * sustain * t60_personality * cons.t60_mul;
 
       for k in 0..NUM_PARTIALS {
         let ratio = if is_ding && ding_amount >= 1.0 {
@@ -625,7 +675,7 @@ impl Handpan {
         } else if is_ding {
           PARTIAL_RATIOS[k] + (DING_RATIOS[k] - PARTIAL_RATIOS[k]) * ding_amount
         } else {
-          PARTIAL_RATIOS[k] * (1.0 + RATIO_JITTER * jitter(i, k, RATIO_SALT + salt))
+          PARTIAL_RATIOS[k] * (1.0 + RATIO_JITTER * cons.mistune_mul * jitter(i, k, RATIO_SALT + salt))
         };
         let f = field.f0 * ratio;
         let split = SPLIT_MAX_HZ.min(f * (0.001 + 0.003 * jitter(i, k, 3 + salt).abs()));
@@ -636,7 +686,7 @@ impl Handpan {
           continue;
         }
         field.active[k] = true;
-        let t60 = t60_base * PARTIAL_T60_MUL[k];
+        let t60 = t60_base * PARTIAL_T60_MUL[k] * cons.partial_t60[k];
         let (lo, hi) = if k == 0 { TWIN_MIX_FUND } else { TWIN_MIX_OTHER };
         let twin = lo + (hi - lo) * jitter(i, k, 4 + salt).abs();
         field.twin_mix[k] = twin;
@@ -653,19 +703,21 @@ impl Handpan {
       // Bloom couplings normalised on the exact response of the receiving mode at the driving
       // frequency, so the grown octave/fifth land on the measured level whatever their mistuning.
       let register_db = OCT_REGISTER_DB * (field.f0 / REGISTER_REF_HZ).log2().clamp(REGISTER_MIN_OCT, REGISTER_MAX_OCT);
-      let oct_lin = db(OCT_BLOOM_DB + register_db + bloom_offset_db + bright_db + OCT_BLOOM_JITTER_DB * jitter(i, 0, 5 + salt));
-      let fifth_lin = db(FIFTH_BLOOM_DB + bloom_offset_db + bright_db + FIFTH_BLOOM_JITTER_DB * jitter(i, 0, 6 + salt));
+      let oct_lin = db(OCT_BLOOM_DB + register_db + bloom_offset_db + bright_db + OCT_BLOOM_JITTER_DB * jitter(i, 0, 5 + salt) + cons.oct_db);
+      let fifth_lin = db(FIFTH_BLOOM_DB + bloom_offset_db + bright_db + FIFTH_BLOOM_JITTER_DB * jitter(i, 0, 6 + salt) + cons.fifth_db);
       let w1 = field.modes_a[0].w();
       let w2 = field.modes_a[1].w();
       field.k2 = if field.active[1] { oct_lin / (A_REF * field.modes_a[1].gain_at(2.0 * w1)) } else { 0.0 };
       field.k3 = if field.active[2] { fifth_lin / (oct_lin * A_REF * field.modes_a[2].gain_at(w1 + w2)) } else { 0.0 };
     }
-    let cavity_hz = if instrument == 0 {
+    let cavity_hz = if cons.cavity_ratio > 0.0 {
+      self.fields[layout.ding].f0 * cons.cavity_ratio
+    } else if instrument == 0 {
       CAVITY_HZ
     } else {
       self.fields[layout.ding].f0 * (0.55 + 0.35 * personal(5).abs())
     };
-    self.cavity.set(cavity_hz, CAVITY_T60, sr);
+    self.cavity.set(cavity_hz, CAVITY_T60 * cons.cavity_t60_mul, sr);
     self.cavity_recv = BUS_MAX.min(self.bus_loop / self.cavity.gain_at(self.cavity.w()));
   }
 
@@ -698,6 +750,7 @@ impl Handpan {
     let touch = p.attack.clamp(0.0, 1.0) - 0.5;
     // Humanised strike position on the field: shifts the octave/fifth balance and which twin rings.
     let pos_db = [0.0, 4.0 * h * n_oct, 4.0 * h * n_fifth, 0.0, 0.0];
+    let cons = self.cons;
     let twin_scale = (1.0 + 0.8 * h * n_twin).max(0.0);
 
     {
@@ -706,7 +759,8 @@ impl Handpan {
         if !f.active[k] {
           continue;
         }
-        let amp = vel * db(DIRECT_DB[k] + pos_db[k] + ATTACK_PARTIAL_DB[k] * touch);
+        let upper = if k >= 3 { cons.upper_db } else { 0.0 };
+        let amp = vel * db(DIRECT_DB[k] + pos_db[k] + ATTACK_PARTIAL_DB[k] * touch + upper);
         f.modes_a[k].s1 += amp;
         f.modes_b[k].s1 += amp * f.twin_mix[k] * twin_scale;
       }
@@ -735,19 +789,19 @@ impl Handpan {
     }
 
     let f0 = self.fields[field_i].f0;
-    self.cavity.s1 += vel * 2.0 * p.cavity.clamp(0.0, 1.0) * db(CAVITY_KICK_DB) * (f0 / 200.0).powf(-0.5);
+    self.cavity.s1 += vel * 2.0 * p.cavity.clamp(0.0, 1.0) * db(CAVITY_KICK_DB + cons.cavity_db) * (f0 / 200.0).powf(-0.5);
 
     let sr = self.sample_rate;
     let register = (f0 / REGISTER_REF_HZ).log2().clamp(REGISTER_MIN_OCT, REGISTER_MAX_OCT);
-    let tick_hz = TICK_HZ * (f0 / REGISTER_REF_HZ).powf(TICK_HZ_REGISTER_EXP) * (1.0 + 0.15 * h * n_tick);
+    let tick_hz = TICK_HZ * (f0 / REGISTER_REF_HZ).powf(TICK_HZ_REGISTER_EXP) * (1.0 + 0.15 * h * n_tick) * cons.tick_hz_mul;
     for bp in self.tick_bp.iter_mut() {
       bp.set(tick_hz, TICK_Q, sr);
     }
-    let tau = TICK_TAU_MS * 0.001 * sr;
+    let tau = TICK_TAU_MS * 0.001 * sr * cons.tick_tau_mul;
     self.tick_left = (6.0 * tau) as u32;
     self.tick_env = 1.0;
     self.tick_decay = (-1.0 / tau).exp();
-    self.tick_amp = vel * TICK_LEVEL * db(3.0 * h * n_tick + ATTACK_TICK_DB * touch + self.tick_db + TICK_REGISTER_DB * register);
+    self.tick_amp = vel * TICK_LEVEL * db(3.0 * h * n_tick + ATTACK_TICK_DB * touch + self.tick_db + TICK_REGISTER_DB * register + cons.tick_db);
     self.last_field = field_i;
     self.strike_count = self.strike_count.wrapping_add(1);
     self.silent = false;
@@ -895,7 +949,7 @@ impl Handpan {
   /// Amplitude-dependent behaviour of each field, from its fundamental's amplitude: the nonlinear
   /// drain of the fundamental and the pitch glide of every partial.
   fn update_dynamics(&mut self) {
-    let drain_per_amp = DRAIN_DB_S * std::f32::consts::LN_10 / (20.0 * self.sample_rate);
+    let drain_per_amp = DRAIN_DB_S * self.cons.drain_mul * std::f32::consts::LN_10 / (20.0 * self.sample_rate);
     let cent = std::f32::consts::LN_2 / 1200.0;
     for f in self.fields[..self.layout.len].iter_mut() {
       let a = &f.modes_a[0];
@@ -965,6 +1019,7 @@ mod tests {
       level: 1.0,
       pan: 0.0,
       instrument: 0,
+      construction: 0,
       strike: 0.0,
     }
   }

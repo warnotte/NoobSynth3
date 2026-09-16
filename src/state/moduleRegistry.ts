@@ -689,6 +689,7 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
     attack: 0.5,          // Touch: 0 soft pad, 0.5 measured, 1 hard fingertip (tick + direct upper partials)
     pan: 0,               // Whole-instrument stereo placement (-1 left .. 1 right)
     instrument: 0,        // Exemplar: 0 = reference handpan, 1..99 = other instruments (tuning, cavity, sustain, colour)
+    construction: 0,      // Construction: 0 = reference, 1 = pure (nitrided-like), 2 = rich, 3 = large shell
     tune: 0,              // Global tune in cents (-100..100)
     octave: 0,            // Transpose (-1..1)
     sustain: 1.0,         // Decay time multiplier (0.25-2, 1 = measured T60 ≈ 3-4.5 s)

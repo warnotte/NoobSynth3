@@ -685,6 +685,7 @@ pub(crate) fn apply_param(state: &mut ModuleState, param: &str, value: f32) {
       "scale" => state.scale.set(value),
       "pitchRef" => state.pitch_ref.set(value),
       "instrument" => state.instrument.set(value),
+      "construction" => state.construction.set(value),
       "pan" => state.pan.set(value),
       "attack" => state.attack.set(value),
       "tune" => state.tune.set(value),

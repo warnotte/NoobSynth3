@@ -312,6 +312,7 @@ pub struct HandpanState {
     pub attack: ParamBuffer,
     pub pan: ParamBuffer,
     pub instrument: ParamBuffer,
+    pub construction: ParamBuffer,
     pub tune: ParamBuffer,
     pub octave: ParamBuffer,
     pub sustain: ParamBuffer,
