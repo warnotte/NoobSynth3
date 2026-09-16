@@ -66,6 +66,7 @@
       { "id": "lfo-2", "type": "lfo", "name": "Vibrato", "position": { "x": 6, "y": 22 }, "params": { "rate": 2.0, "depth": 0.12, "offset": 0, "shape": "triangle", "bipolar": true } },
       { "id": "lfo-3", "type": "lfo", "name": "Bass Sweep", "position": { "x": 9, "y": 22 }, "params": { "rate": 0.3, "depth": 0.6, "offset": 0, "shape": "sine", "bipolar": true } },
       { "id": "sh-1", "type": "sample-hold", "name": "S&H", "position": { "x": 12, "y": 22 }, "params": { "mode": 0 } },
+      { "id": "sh-1-att", "type": "gain", "name": "Pitch Mod 1/12", "position": { "x": 12, "y": 23 }, "params": { "gain": 0.083333 } },
       { "id": "slew-1", "type": "slew", "name": "Slew", "position": { "x": 15, "y": 22 }, "params": { "rise": 0.15, "fall": 0.25 } },
       { "id": "quant-1", "type": "quantizer", "name": "Quantizer", "position": { "x": 5, "y": 12 }, "params": { "root": 0, "scale": 3 } },
       { "id": "mixer-main", "type": "mixer-8", "name": "Main Mix", "position": { "x": 20, "y": 7 },
@@ -165,7 +166,8 @@
       { "from": { "moduleId": "slew-1", "portId": "out" }, "to": { "moduleId": "vcf-1", "portId": "mod" }, "kind": "cv" },
       { "from": { "moduleId": "chaos-1", "portId": "gate" }, "to": { "moduleId": "sh-1", "portId": "trig" }, "kind": "sync" },
       { "from": { "moduleId": "chaos-1", "portId": "y" }, "to": { "moduleId": "sh-1", "portId": "in" }, "kind": "cv" },
-      { "from": { "moduleId": "sh-1", "portId": "out" }, "to": { "moduleId": "fmop-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "sh-1", "portId": "out" }, "to": { "moduleId": "sh-1-att", "portId": "in" }, "kind": "cv" },
+      { "from": { "moduleId": "sh-1-att", "portId": "out" }, "to": { "moduleId": "fmop-1", "portId": "pitch" }, "kind": "cv" },
       { "from": { "moduleId": "lfo-1", "portId": "cv-out" }, "to": { "moduleId": "vcf-1", "portId": "mod" }, "kind": "cv" },
       { "from": { "moduleId": "lfo-2", "portId": "cv-out" }, "to": { "moduleId": "supersaw-1", "portId": "pitch" }, "kind": "cv" },
       { "from": { "moduleId": "lfo-3", "portId": "cv-out" }, "to": { "moduleId": "bass-1", "portId": "cutoff-cv" }, "kind": "cv" }

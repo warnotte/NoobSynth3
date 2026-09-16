@@ -62,7 +62,7 @@ pub struct FmOperator {
 
 /// Input signals for FM operator.
 pub struct FmOperatorInputs<'a> {
-    /// Pitch CV (semitones from base frequency)
+    /// Pitch CV (1 V/octave from base frequency, like every sequencer and oscillator)
     pub pitch: Option<&'a [Sample]>,
     /// Gate signal for envelope
     pub gate: Option<&'a [Sample]>,
@@ -134,11 +134,11 @@ impl FmOperator {
             let sustain = params.sustain[0].clamp(0.0, 1.0);
             let release_ms = params.release[0].max(0.1);
 
-            // Get pitch CV (semitones offset)
+            // Get pitch CV (1 V/octave)
             let pitch_cv = inputs.pitch.map_or(0.0, |p| p[i.min(p.len() - 1)]);
 
-            // Calculate frequency: base * ratio * 2^(pitch/12)
-            let freq = base_freq * ratio * (2.0_f32).powf(pitch_cv / 12.0);
+            // Calculate frequency: base * ratio * 2^pitch
+            let freq = base_freq * ratio * (2.0_f32).powf(pitch_cv);
 
             // Get gate and detect edges
             let gate = inputs.gate.map_or(0.0, |g| g[i.min(g.len() - 1)]);
@@ -225,5 +225,54 @@ impl FmOperator {
             // Apply envelope and level
             output[i] = out * self.env_level * level;
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const SR: f32 = 48_000.0;
+
+    /// Frequency of a sine from its rising zero crossings (linear interpolation).
+    fn frequency(x: &[f32]) -> f32 {
+        let crossings: Vec<f32> = x
+            .windows(2)
+            .enumerate()
+            .filter(|(_, w)| w[0] < 0.0 && w[1] >= 0.0)
+            .map(|(i, w)| i as f32 + w[0] / (w[0] - w[1]))
+            .collect();
+        (crossings.len() - 1) as f32 * SR / (crossings[crossings.len() - 1] - crossings[0])
+    }
+
+    fn tone(pitch_cv: f32) -> f32 {
+        let mut op = FmOperator::new(SR);
+        let mut out = vec![0.0; 24_000];
+        let gate = vec![1.0; out.len()];
+        let pitch = vec![pitch_cv; out.len()];
+        op.process_block(
+            &mut out,
+            FmOperatorInputs { pitch: Some(&pitch), gate: Some(&gate), fm_in: None, index_cv: None },
+            FmOperatorParams {
+                frequency: &[220.0],
+                ratio: &[1.0],
+                level: &[1.0],
+                feedback: &[0.0],
+                attack: &[1.0],
+                decay: &[1.0],
+                sustain: &[1.0],
+                release: &[10.0],
+            },
+        );
+        frequency(&out[4_800..])
+    }
+
+    /// Pitch CV is 1 V/octave like every sequencer: +1 is one octave up, not one semitone.
+    #[test]
+    fn pitch_cv_is_one_volt_per_octave() {
+        let (f0, f1, f12) = (tone(0.0), tone(1.0), tone(7.0 / 12.0));
+        assert!((f0 - 220.0).abs() < 0.5, "base pitch {f0} Hz");
+        assert!((f1 - 440.0).abs() < 1.0, "+1 V must be one octave up ({f1} Hz)");
+        assert!((f12 - 329.63).abs() < 1.0, "+7/12 V must be a fifth up ({f12} Hz)");
     }
 }

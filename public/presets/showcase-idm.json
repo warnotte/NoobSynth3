@@ -31,8 +31,9 @@
       { "id": "gain-5", "type": "gain", "name": "VCA Turing", "position": { "x": 13, "y": 9 }, "params": { "gain": 0.7 } },
       { "id": "quant-1", "type": "quantizer", "name": "Quantizer", "position": { "x": 5, "y": 9 }, "params": { "root": 0, "scale": 0 } },
       { "id": "chaos-1", "type": "chaos", "name": "Chaos", "position": { "x": 0, "y": 12 }, "params": { "speed": 0.6, "rho": 32, "sigma": 12, "beta": 2.66 } },
-      { "id": "lfo-1", "type": "lfo", "name": "LFO Fast", "position": { "x": 3, "y": 12 }, "params": { "rate": 3.5, "depth": 0.2, "offset": 0, "shape": "square", "bipolar": true } },
+      { "id": "lfo-1", "type": "lfo", "name": "LFO Fast", "position": { "x": 3, "y": 12 }, "params": { "rate": 3.5, "depth": 0.016667, "offset": 0, "shape": "square", "bipolar": true } },
       { "id": "sh-1", "type": "sample-hold", "name": "S&H", "position": { "x": 6, "y": 12 }, "params": { "mode": 0 } },
+      { "id": "sh-1-att", "type": "gain", "name": "Pitch Mod 1/12", "position": { "x": 6, "y": 13 }, "params": { "gain": 0.083333 } },
       { "id": "slew-1", "type": "slew", "name": "Slew", "position": { "x": 9, "y": 12 }, "params": { "rise": 0.1, "fall": 0.15 } },
       { "id": "mixer-1", "type": "mixer-8", "name": "Mixer", "position": { "x": 16, "y": 0 },
         "params": { "level1": 0.8, "level2": 0.6, "level3": 1.0, "level4": 0.35, "level5": 0.7, "level6": 0, "level7": 0, "level8": 0 } },
@@ -86,7 +87,8 @@
       { "from": { "moduleId": "slew-1", "portId": "out" }, "to": { "moduleId": "vcf-1", "portId": "mod" }, "kind": "cv" },
       { "from": { "moduleId": "chaos-1", "portId": "gate" }, "to": { "moduleId": "sh-1", "portId": "trig" }, "kind": "sync" },
       { "from": { "moduleId": "chaos-1", "portId": "y" }, "to": { "moduleId": "sh-1", "portId": "in" }, "kind": "cv" },
-      { "from": { "moduleId": "sh-1", "portId": "out" }, "to": { "moduleId": "fmop-1", "portId": "pitch" }, "kind": "cv" },
+      { "from": { "moduleId": "sh-1", "portId": "out" }, "to": { "moduleId": "sh-1-att", "portId": "in" }, "kind": "cv" },
+      { "from": { "moduleId": "sh-1-att", "portId": "out" }, "to": { "moduleId": "fmop-1", "portId": "pitch" }, "kind": "cv" },
       { "from": { "moduleId": "lfo-1", "portId": "cv-out" }, "to": { "moduleId": "fmop-2", "portId": "pitch" }, "kind": "cv" }
     ]
   }
