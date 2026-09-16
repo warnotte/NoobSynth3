@@ -1,0 +1,77 @@
+{
+  "songe-hyrule": {
+    "kind": "project",
+    "seconds": 356,
+    "sha256": "67b1b60cdd17f0aea388ad1ad7dfa7ab11b7650fa6e50c709072619877408900"
+  },
+  "handpan-zelda-kakariko-project": {
+    "kind": "project",
+    "seconds": 45,
+    "sha256": "484125387fb0f7a26d763e45f22efa44d9ec3605b9a5c9b98a1bf973b8ab3012"
+  },
+  "handpan-zelda-dark-world-project": {
+    "kind": "project",
+    "seconds": 45,
+    "sha256": "04b26b8251fb82096034be2d2f6d3018be937e992ae7f737fa26a71d0a898a15"
+  },
+  "handpan-zelda-fairy-project": {
+    "kind": "project",
+    "seconds": 45,
+    "sha256": "aa96fbb4bfa0adfcb3863291f699b4d8926f303ea47ace3d83f1cc9d65d70a72"
+  },
+  "handpan-avril-14th-project": {
+    "kind": "project",
+    "seconds": 45,
+    "sha256": "e7ab5cc9ec46c215965c641ff314a83938f3be192f84a31c8373a3b0f61a37fe"
+  },
+  "handpan-kurde": {
+    "kind": "preset",
+    "seconds": 30,
+    "sha256": "fea69ec5fe5819906f5d5906ccd0d21e7bec77446c2fd692382230e318991a22"
+  },
+  "handpan-zelda-fairy": {
+    "kind": "preset",
+    "seconds": 45,
+    "sha256": "27cee6e224e9df33f2e9a990f4e4c917fbf213f1a7c2dc1497fdb383bbdcb95b"
+  },
+  "handpan-zelda-kakariko": {
+    "kind": "preset",
+    "seconds": 45,
+    "sha256": "a5fbc85bad901e76e9f2b1b32733b2449921056bc41e784a7f8025f4bac3e1c3"
+  },
+  "handpan-zelda-dark-world": {
+    "kind": "preset",
+    "seconds": 45,
+    "sha256": "e250a58463e4948536889e44f79309bf9abce0aed4ddf58699650057174d8090"
+  },
+  "handpan-smw-overworld": {
+    "kind": "preset",
+    "seconds": 30,
+    "sha256": "23934ed87f2e484a6b3310ae8216752984a02830ee0a3ba7fc447cb12df430ea"
+  },
+  "handpan-satie-gymnopedie": {
+    "kind": "preset",
+    "seconds": 45,
+    "sha256": "fca3ab5d4e8bd79298c0d634c88cb71a1411cf6eed879019d7d6f1f10e62176f"
+  },
+  "handpan-avril-14th": {
+    "kind": "preset",
+    "seconds": 45,
+    "sha256": "10dfdb5209b8e677a53ec0847ba0f6e679afee2de8b478d4d2dfa42a171e8ed5"
+  },
+  "handpan-purcell-trumpet": {
+    "kind": "preset",
+    "seconds": 45,
+    "sha256": "f7d192bab6de4207a4119133b6e2decb3365e9955f1ae8ce0d3af264db772b03"
+  },
+  "handpan-monolithe": {
+    "kind": "preset",
+    "seconds": 45,
+    "sha256": "3c3f3de183dabbb6b8ea942b2691f9f0a3d0ff079a6f73eaabe429610ea4f66f"
+  },
+  "handpan-lumiere": {
+    "kind": "preset",
+    "seconds": 45,
+    "sha256": "7ffaab8e0b8b9b2d7eaaa6ea0b4f99fccf27deb07fe8a4fdea13893cfd7c5c4e"
+  }
+}
