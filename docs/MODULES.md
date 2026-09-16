@@ -331,6 +331,11 @@ puis validé à l'oreille sur un prototype avant le portage :
 - **Cavité d'air** (Helmholtz) à 87,5 Hz, discrète (~-28 dB), et un **claquement de doigt** : bruit filtré
   autour de ~3 kHz qui s'éteint en ~25 ms (mesuré 3,3-3,4 kHz et 25-31 ms), plus ou moins fort selon le
   toucher du joueur → réglage `attack`.
+- **Scintillement** : au-dessus des partiels accordés, la coque rayonne une série d'harmoniques très
+  faibles (5× à 12× la note, -40 à -56 dB sous la fondamentale, davantage avec un toucher dur) et quelques
+  modes de coque inharmoniques entre 3,5 et 14 kHz : l'« air » qui brille autour de la frappe. Niveaux
+  mesurés (GAMEDRIX, FreePats) puis relevés de 12 dB, choisis à l'oreille parmi trois variantes. Ces modes
+  ne sont plus calculés dès qu'ils passent sous ~-90 dBFS.
 
 Toutes les zones vivent dans **une seule instance** (jamais clonée par voix) : c'est ce qui rend la
 résonance sympathique réelle. Joué au **gate + CV de hauteur** : la note reçue est ramenée à la zone la plus
