@@ -94,7 +94,11 @@ export class AudioEngine {
    * beats/steps sur l'ancien port → affichage de mesure qui clignote entre
    * deux valeurs + CPU gaspillé à chaque changement de preset).
    */
+  /** Structure last sent to the worklet (null = nothing sent to the current worklet yet). */
+  private lastGraphSignature: string | null = null
+
   private destroyGraphNode(): void {
+    this.lastGraphSignature = null
     if (!this.graphNode) {
       return
     }
@@ -903,10 +907,31 @@ export class AudioEngine {
     return true
   }
 
+  /**
+   * What a preserve-mode rebuild actually depends on: module ids and types, the voice count (control /
+   * MIDI file sequencer `voices`), cables and scope taps. The params of modules that already exist are
+   * ignored by such a rebuild (their live state wins; params travel through setParam).
+   */
+  private graphStructureSignature(graph: GraphState): string {
+    return JSON.stringify([
+      graph.modules.map((m) => [m.id, m.type, m.type === 'control' || m.type === 'midi-file-sequencer' ? m.params.voices ?? null : null]),
+      graph.connections.map((c) => [c.from.moduleId, c.from.portId, c.to.moduleId, c.to.portId, c.kind]),
+      this.tapOutputs.map((t) => [t.moduleId, t.portId]),
+    ])
+  }
+
   private sendGraph(fresh = false): void {
     if (!this.graphNode || !this.currentGraph) {
       return
     }
+    // The engine rebuilds the whole graph on the audio thread (every module, MIDI data, delay lines):
+    // ~4 ms on a small project, ~90 ms on a 5-rack one — silence meanwhile. Clicking a rack tab re-sent
+    // an unchanged graph (twice), so skip identical structures unless a fresh start is asked for.
+    const signature = this.graphStructureSignature(this.currentGraph)
+    if (!fresh && signature === this.lastGraphSignature) {
+      return
+    }
+    this.lastGraphSignature = signature
     const payload = {
       modules: this.currentGraph.modules,
       connections: this.currentGraph.connections,
