@@ -64,7 +64,8 @@ chanter ses voisines.
 | Octave du Ding D3 (justesse) | juste | +20,5 ct | +0,6 ct |
 
 La fondamentale chute vite puis laisse sonner l'octave et la quinte. Une note frappée fort démarre ~8 cents
-trop haut et se pose. Chaque partiel rayonne de sa propre zone de la coque. Plusieurs handpans jouent
+trop haut et se pose. Chaque partiel rayonne de sa propre zone de la coque. Au-dessus des notes, de très
+faibles harmoniques aiguës et modes de coque font scintiller la frappe. Plusieurs handpans jouent
 ensemble sans battre (accord entre exemplaires à ±2 cents).
 
 Détails techniques : [MODULES.md → Handpan](MODULES.md#handpan).

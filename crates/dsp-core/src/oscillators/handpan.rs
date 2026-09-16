@@ -124,6 +124,25 @@ const TICK_HZ_REGISTER_EXP: f32 = -0.18;
 const TICK_Q: f32 = 0.9;
 const TICK_TAU_MS: f32 = 13.0;
 const TICK_LEVEL: f32 = 0.117;
+/// Upper harmonic comb ("sparkle"): above the tuned partials a real shell radiates a smooth, weak
+/// harmonic series that rings for seconds (measured GAMEDRIX / FreePats in the attack: 5x ≈ -52 dB …
+/// 12x ≈ -68 dB re the fundamental). Single modes rung by the strike, louder with a harder touch.
+/// The last entries are untuned high shell modes (inharmonic, 3.5-14 kHz): the "air" above the harmonic
+/// series, measured as broadband 4-16 kHz energy around -60 dB re the note.
+const SPARKLE: usize = 13;
+const HARMONIC_SPARKLE: usize = 7;
+const SPARKLE_RATIOS: [f32; SPARKLE] = [5.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.3, 15.7, 18.2, 21.5, 25.1, 29.4];
+const SPARKLE_DB: [f32; SPARKLE] = [-52.0, -56.0, -61.0, -64.0, -65.0, -67.0, -68.0, -66.0, -66.0, -66.0, -66.0, -66.0, -66.0];
+const SPARKLE_OFFSET_DB: f32 = 12.0;
+const SPARKLE_T60_MUL: f32 = 0.5;
+const SHIMMER_OFFSET_DB: f32 = 12.0;
+const SHIMMER_T60_MUL: f32 = 0.25;
+const SHIMMER_MAX_HZ: f32 = 14_000.0;
+const SPARKLE_ATTACK_DB: f32 = 16.0;
+/// The sparkle modes of a zone stop being computed once their summed energy falls below this (about
+/// -90 dBFS at the output, one 16-bit step). On 8 handpans the sparkle costs +18 % CPU with this threshold,
+/// +27 % when the modes ring down to -120 dB — for no audible difference.
+const SPARKLE_SILENT: f32 = 1e-9;
 /// Humanize at 1: strikes land up to this late and spread ±HUMAN_VEL_DB.
 const HUMAN_DELAY_MS: f32 = 25.0;
 const HUMAN_VEL_DB: f32 = 6.0;
@@ -297,6 +316,12 @@ struct Field {
   /// fundamental amplitude / A_REF the drain and glide were last set for (< 0 = stale)
   dyn_amp: f32,
   out: f32,
+  /// upper harmonic comb, rung by the strike only and skipped once it has died out
+  sparkle: [Mode; SPARKLE],
+  sparkle_active: [bool; SPARKLE],
+  sparkle_rad_l: [(f32, f32); SPARKLE],
+  sparkle_rad_r: [(f32, f32); SPARKLE],
+  sparkle_on: bool,
 }
 
 /// Topology-preserving state-variable band-pass, unity gain at the centre.
@@ -650,6 +675,30 @@ impl Handpan {
         field.recv_b[k] = BUS_MAX.min(self.bus_loop / gb);
       }
 
+      for j in 0..SPARKLE {
+        let shimmer = j >= HARMONIC_SPARKLE;
+        let spread = if shimmer { 0.04 } else { RATIO_JITTER };
+        let ratio = SPARKLE_RATIOS[j] * (1.0 + spread * jitter(i, 16 + j, RATIO_SALT + salt));
+        let f = field.f0 * ratio;
+        field.sparkle_active[j] = f < sr * 0.45 && (!shimmer || (f > 3_500.0 && f < SHIMMER_MAX_HZ));
+        if !field.sparkle_active[j] {
+          field.sparkle[j].clear();
+          continue;
+        }
+        let t60 = if shimmer {
+          t60_base * SHIMMER_T60_MUL
+        } else {
+          t60_base * SPARKLE_T60_MUL * 1.1 * (SPARKLE_RATIOS[j] / 5.0).powf(-0.6)
+        };
+        field.sparkle[j].set(f, t60, sr);
+        let offset = if is_ding { 0.0 } else { pan - 0.5 };
+        let sparkle_pan = place((0.5 + 0.8 * offset + 0.15 * jitter(i, 16 + j, 9 + salt)).clamp(0.0, 1.0));
+        let half = 0.5 * (40.0 * jitter(i, 16 + j, 8 + salt)).to_radians();
+        let (gl, gr) = ((sparkle_pan * PI * 0.5).cos(), (sparkle_pan * PI * 0.5).sin());
+        field.sparkle_rad_l[j] = (gl * half.cos(), gl * half.sin());
+        field.sparkle_rad_r[j] = (gr * half.cos(), -gr * half.sin());
+      }
+
       // Bloom couplings normalised on the exact response of the receiving mode at the driving
       // frequency, so the grown octave/fifth land on the measured level whatever their mistuning.
       let register_db = OCT_REGISTER_DB * (field.f0 / REGISTER_REF_HZ).log2().clamp(REGISTER_MIN_OCT, REGISTER_MAX_OCT);
@@ -709,6 +758,13 @@ impl Handpan {
         let amp = vel * db(DIRECT_DB[k] + pos_db[k] + ATTACK_PARTIAL_DB[k] * touch);
         f.modes_a[k].s1 += amp;
         f.modes_b[k].s1 += amp * f.twin_mix[k] * twin_scale;
+      }
+      for j in 0..SPARKLE {
+        if f.sparkle_active[j] {
+          let offset = if j >= HARMONIC_SPARKLE { SHIMMER_OFFSET_DB } else { SPARKLE_OFFSET_DB };
+          f.sparkle[j].s1 += vel * db(SPARKLE_DB[j] + offset + SPARKLE_ATTACK_DB * touch);
+          f.sparkle_on = true;
+        }
       }
       self.tick_pan_l = f.pan_l;
       self.tick_pan_r = f.pan_r;
@@ -858,6 +914,15 @@ impl Handpan {
           r += f.rad_r[k].0 * y + f.rad_r[k].1 * x;
         }
         f.out = s;
+        if f.sparkle_on {
+          for j in 0..SPARKLE {
+            if f.sparkle_active[j] {
+              let (y, x) = f.sparkle[j].tick(0.0);
+              l += f.sparkle_rad_l[j].0 * y + f.sparkle_rad_l[j].1 * x;
+              r += f.sparkle_rad_r[j].0 * y + f.sparkle_rad_r[j].1 * x;
+            }
+          }
+        }
       }
 
       let cav = self.cavity.tick(self.cavity_recv * BUS_SAT * (bus / BUS_SAT).tanh()).0;
@@ -898,6 +963,10 @@ impl Handpan {
     let drain_per_amp = DRAIN_DB_S * std::f32::consts::LN_10 / (20.0 * self.sample_rate);
     let cent = std::f32::consts::LN_2 / 1200.0;
     for f in self.fields[..self.layout.len].iter_mut() {
+      if f.sparkle_on && f.sparkle.iter().map(|m| m.s1 * m.s1 + m.s2 * m.s2).sum::<f32>() < SPARKLE_SILENT {
+        f.sparkle.iter_mut().for_each(Mode::clear);
+        f.sparkle_on = false;
+      }
       let a = &f.modes_a[0];
       let amp = ((a.s1 * a.s1 + a.s2 * a.s2).sqrt() / A_REF).min(2.0);
       if (amp - f.dyn_amp).abs() < 1e-4 {
@@ -914,6 +983,10 @@ impl Handpan {
           f.modes_b[k].retune(factor);
         }
       }
+      if f.sparkle_on {
+        let factor = (GLIDE_CENTS[NUM_PARTIALS - 1] * cent * amp).exp();
+        f.sparkle.iter_mut().for_each(|m| m.retune(factor));
+      }
     }
   }
 
@@ -925,6 +998,8 @@ impl Handpan {
       }
       f.out = 0.0;
       f.dyn_amp = -1.0;
+      f.sparkle.iter_mut().for_each(Mode::clear);
+      f.sparkle_on = false;
     }
     self.cavity.clear();
     self.tick_left = 0;
@@ -1138,6 +1213,22 @@ mod tests {
     let early = bin(&out[(0.005 * SR) as usize..(0.005 * SR) as usize + w], f_oct);
     let later = bin(&out[(0.10 * SR) as usize..(0.10 * SR) as usize + w], f_oct);
     assert!(later > 1.5 * early, "octave should bloom (early {early:.5}, at 100ms {later:.5})");
+  }
+
+  /// The upper harmonics (5x-12x) ring above the tuned partials after the strike, then stop being computed.
+  #[test]
+  fn sparkle_rings_then_switches_off() {
+    let mut hp = Handpan::new(SR);
+    let p = HandpanParams { humanize: 0.0, ..params() };
+    let out = render(&mut hp, &[(0.0, 69.0)], 0.2, p);
+    let f0 = hp.fields[10].f0;
+    // 50-150 ms: after the ~13 ms tick, 7x is a sparkle mode, 6.5x sits between two harmonics
+    let w = &out[(0.05 * SR) as usize..(0.15 * SR) as usize];
+    let (harmonic, between) = (bin(w, 7.0 * f0), bin(w, 6.5 * f0));
+    assert!(harmonic > 10.0 * between, "7x should sparkle ({harmonic:.2e} vs {between:.2e} between harmonics)");
+    assert!(hp.fields[10].sparkle_on);
+    let _ = render(&mut hp, &[], 20.0, p);
+    assert!(!hp.fields[10].sparkle_on, "a died-out sparkle must not keep costing CPU");
   }
 
   /// Striking A4 must ring the Ding (its stretched fifth sits on A4) and the field just below (G4).

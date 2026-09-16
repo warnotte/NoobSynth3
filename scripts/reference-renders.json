@@ -2,76 +2,76 @@
   "songe-hyrule": {
     "kind": "project",
     "seconds": 356,
-    "sha256": "cc82eee55ea26f196f7de127cc5e79af7c2aa9f35c532e9e486ee7cde420c244"
+    "sha256": "6e3a63655da2b2646476a56664af61a12620c306acd8476976d3cdf23d84ee5b"
   },
   "handpan-zelda-kakariko-project": {
     "kind": "project",
     "seconds": 45,
-    "sha256": "484125387fb0f7a26d763e45f22efa44d9ec3605b9a5c9b98a1bf973b8ab3012"
+    "sha256": "02c05d762441d772f781bdeda52974ac8aefb26e2fe75822244729c326f74aa8"
   },
   "handpan-zelda-dark-world-project": {
     "kind": "project",
     "seconds": 45,
-    "sha256": "04b26b8251fb82096034be2d2f6d3018be937e992ae7f737fa26a71d0a898a15"
+    "sha256": "144815bcc46bead709e7794a4d0bbdd6299622e53fb31984f03cdcb51ca43d8c"
   },
   "handpan-zelda-fairy-project": {
     "kind": "project",
     "seconds": 45,
-    "sha256": "aa96fbb4bfa0adfcb3863291f699b4d8926f303ea47ace3d83f1cc9d65d70a72"
+    "sha256": "98490c97c337a09d827052d53d9ef68a245313348d584a7f932ebc559392db38"
   },
   "handpan-avril-14th-project": {
     "kind": "project",
     "seconds": 45,
-    "sha256": "e7ab5cc9ec46c215965c641ff314a83938f3be192f84a31c8373a3b0f61a37fe"
+    "sha256": "1f0fb941303ba6ae8a31ff290423828fa8212fdde5e413c3522635aa31e068ce"
   },
   "handpan-kurde": {
     "kind": "preset",
     "seconds": 30,
-    "sha256": "fea69ec5fe5819906f5d5906ccd0d21e7bec77446c2fd692382230e318991a22"
+    "sha256": "c2467e7ce5d89cbcf1178ef375370f1cfaae2a77dabe9d95a25d9c9d9d622e06"
   },
   "handpan-zelda-fairy": {
     "kind": "preset",
     "seconds": 45,
-    "sha256": "27cee6e224e9df33f2e9a990f4e4c917fbf213f1a7c2dc1497fdb383bbdcb95b"
+    "sha256": "ca5a8c41e0b5c0a54e30e2588162dc6a1ad0026ca228da8a57b50fc27a1c3bb4"
   },
   "handpan-zelda-kakariko": {
     "kind": "preset",
     "seconds": 45,
-    "sha256": "a5fbc85bad901e76e9f2b1b32733b2449921056bc41e784a7f8025f4bac3e1c3"
+    "sha256": "8568e9d605579c7a6ec6c250a3352df50a33575268520f243f73639ec511d779"
   },
   "handpan-zelda-dark-world": {
     "kind": "preset",
     "seconds": 45,
-    "sha256": "e250a58463e4948536889e44f79309bf9abce0aed4ddf58699650057174d8090"
+    "sha256": "90339eeb416c8f4e926444a51b0a5aab6816d855921ce026b818a02b6b0e3e2b"
   },
   "handpan-smw-overworld": {
     "kind": "preset",
     "seconds": 30,
-    "sha256": "23934ed87f2e484a6b3310ae8216752984a02830ee0a3ba7fc447cb12df430ea"
+    "sha256": "126bf13200368ddc278869d05d4851ca29449819b46d3a0638cb340fb3b98779"
   },
   "handpan-satie-gymnopedie": {
     "kind": "preset",
     "seconds": 45,
-    "sha256": "fca3ab5d4e8bd79298c0d634c88cb71a1411cf6eed879019d7d6f1f10e62176f"
+    "sha256": "79241847984f526b95aec6ec834b4df03ddf692a963e5459c58b1f2c7394cc82"
   },
   "handpan-avril-14th": {
     "kind": "preset",
     "seconds": 45,
-    "sha256": "10dfdb5209b8e677a53ec0847ba0f6e679afee2de8b478d4d2dfa42a171e8ed5"
+    "sha256": "0454c82a857e43913d64fbb7570942c44b384558bb04a56148cbd0d94f0835c2"
   },
   "handpan-purcell-trumpet": {
     "kind": "preset",
     "seconds": 45,
-    "sha256": "f7d192bab6de4207a4119133b6e2decb3365e9955f1ae8ce0d3af264db772b03"
+    "sha256": "b705f0e6ad24e0e51015f550ba2495e6efef336414eb9e8e143c229baf984784"
   },
   "handpan-monolithe": {
     "kind": "preset",
     "seconds": 45,
-    "sha256": "3c3f3de183dabbb6b8ea942b2691f9f0a3d0ff079a6f73eaabe429610ea4f66f"
+    "sha256": "c990992a7c8f46824223b013c1e317e65b357b460c56ab5091179623991e7333"
   },
   "handpan-lumiere": {
     "kind": "preset",
     "seconds": 45,
-    "sha256": "7ffaab8e0b8b9b2d7eaaa6ea0b4f99fccf27deb07fe8a4fdea13893cfd7c5c4e"
+    "sha256": "b2c0c53c902efbc45950f775133f78026f3d3072a964795d36fe5345cda885e5"
   }
 }
