@@ -29,6 +29,7 @@ const REFERENCES = [
   ['preset', 'handpan-zelda-kakariko', 45],
   ['preset', 'handpan-zelda-dark-world', 45],
   ['preset', 'handpan-smw-overworld', 30],
+  ['preset', 'handpan-smw-athletic', 30],
   ['preset', 'handpan-satie-gymnopedie', 45],
   ['preset', 'handpan-avril-14th', 45],
   ['preset', 'handpan-purcell-trumpet', 45],

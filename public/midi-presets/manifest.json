@@ -108,8 +108,13 @@
     },
     {
       "id": "smw-overworld",
-      "name": "Super Mario World - Overworld (SNES, melodie + basse)",
+      "name": "Super Mario World - Overworld (SNES, 8 pistes)",
       "file": "smw-overworld.mid"
+    },
+    {
+      "id": "smw-athletic",
+      "name": "Super Mario World - Athletic (SNES, 5 pistes)",
+      "file": "smw-athletic.mid"
     },
     {
       "id": "songe-hyrule-orgue",

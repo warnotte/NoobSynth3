@@ -47,7 +47,12 @@
   "handpan-smw-overworld": {
     "kind": "preset",
     "seconds": 30,
-    "sha256": "126bf13200368ddc278869d05d4851ca29449819b46d3a0638cb340fb3b98779"
+    "sha256": "117c68d82709420a3d44ec3d20da900fe2d6e493c4941b4642b8b8808f03e01c"
+  },
+  "handpan-smw-athletic": {
+    "kind": "preset",
+    "seconds": 30,
+    "sha256": "28fce52ea242161d03fdfeeeb22a3ac34ab34f7587dc4b71027d1629f2e738b7"
   },
   "handpan-satie-gymnopedie": {
     "kind": "preset",
