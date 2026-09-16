@@ -97,8 +97,9 @@ const buildScopeTaps = (modules: ModuleSpec[]): NativeTap[] => {
 }
 
 const buildGraphSignature = (graph: GraphState): string => {
+  // voices (control / MIDI file sequencer) sets the engine's voice count: a structural change
   const moduleSignature = graph.modules
-    .map((module) => `${module.id}:${module.type}`)
+    .map((module) => `${module.id}:${module.type}:${module.type === 'control' || module.type === 'midi-file-sequencer' ? String(module.params.voices ?? '') : ''}`)
     .sort()
     .join('|')
   const connectionSignature = graph.connections
@@ -568,7 +569,10 @@ function App() {
     if (!isTauri || !tauriNativeRunning) {
       return
     }
-    scheduleNativeGraphSync(buildCombinedGraph(graphRef.current), graphStructureSignature)
+    // Signature of the COMBINED graph (all racks): clicking a rack tab changes the active rack's graph but
+    // not what the engine plays, and must not rebuild the native engine (audible gap on big projects).
+    const combined = buildCombinedGraph(graphRef.current)
+    scheduleNativeGraphSync(combined, buildGraphSignature(combined))
   }, [graphStructureSignature, isTauri, scheduleNativeGraphSync, tauriNativeRunning])
 
   useEffect(() => {
