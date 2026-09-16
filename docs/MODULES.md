@@ -48,7 +48,7 @@ Synthèse physique par modélisation de cordes pincées. Idéal pour guitares, h
 | `brightness` | 0-1 | Brillance du "pluck" initial |
 | `pluckPos` | 0.1-0.9 | Position du pincement (affecte les harmoniques) |
 
-**Entrées** : pitch (CV), gate (gate - déclenche le pluck)
+**Entrées** : pitch (CV 1 V/octave, comme tous les séquenceurs), gate (gate - déclenche le pluck)
 **Sorties** : out (audio)
 
 **Conseils son :**
@@ -451,7 +451,7 @@ Opérateur FM avec enveloppe intégrée. Utilisable comme source ou modulateur F
 | `sustain` | 0-1 | Niveau de maintien |
 | `release` | 1-5000 ms | Temps de relâchement |
 
-**Entrées** : pitch (CV), gate (gate), fm (audio), index-cv (cv — ajoutée
+**Entrées** : pitch (CV 1 V/octave, comme tous les séquenceurs), gate (gate), fm (audio), index-cv (cv — ajoutée
 directement à `level`, qui fait aussi office d'index de modulation, ~-1..1)
 **Sorties** : out (audio)
 

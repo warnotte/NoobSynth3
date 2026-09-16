@@ -66,10 +66,16 @@ pub struct KarplusParams<'a> {
 
 /// Input signals for Karplus-Strong.
 pub struct KarplusInputs<'a> {
-    /// Pitch CV (semitones offset)
+    /// Pitch CV (1 V/octave, like every sequencer and oscillator: +1 = one octave up)
     pub pitch: Option<&'a [Sample]>,
     /// Gate signal (triggers pluck on rising edge)
     pub gate: Option<&'a [Sample]>,
+}
+
+/// Pitch law: 1 V/octave, like every sequencer and oscillator (+1 = one octave up).
+#[inline]
+fn pitched(freq: f32, pitch_cv: f32) -> f32 {
+    freq * (2.0_f32).powf(pitch_cv)
 }
 
 impl KarplusStrong {
@@ -149,7 +155,7 @@ impl KarplusStrong {
 
             // Apply pitch CV
             let pitch_cv = inputs.pitch.map(|p| p.get(i).copied().unwrap_or(0.0)).unwrap_or(0.0);
-            let freq = freq_param * (2.0_f32).powf(pitch_cv / 12.0);
+            let freq = pitched(freq_param, pitch_cv);
             let freq_clamped = freq.clamp(20.0, self.sample_rate / 2.0);
 
             // Calculate delay length
@@ -199,5 +205,18 @@ impl KarplusStrong {
 
             output[i] = out;
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// Pitch CV is 1 V/octave like every sequencer: +1 is one octave up, not one semitone.
+    #[test]
+    fn pitch_cv_is_one_volt_per_octave() {
+        assert!((pitched(220.0, 1.0) - 440.0).abs() < 1e-3);
+        assert!((pitched(220.0, -1.0) - 110.0).abs() < 1e-3);
+        assert!((pitched(220.0, 7.0 / 12.0) - 329.627_6).abs() < 0.01, "+7/12 V is a fifth up");
     }
 }

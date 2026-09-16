@@ -406,7 +406,7 @@ function busModules(rack, reverb, fx = []) {
   return { modules, connections }
 }
 
-function voiceChain(rack, lane, idx, source, adsr, vca, { pitchScale } = {}) {
+function voiceChain(rack, lane, idx, source, adsr, vca) {
   // pitch (+ gate) -> source -> ADSR-gated VCA -> mixer input idx
   const t = laneTrack(rack, lane)
   const y = 40 + 300 * (idx - 1)
@@ -416,13 +416,7 @@ function voiceChain(rack, lane, idx, source, adsr, vca, { pitchScale } = {}) {
   const amp = { id: `vca-${lane}`, type: 'gain', name: `VCA ${label}`, position: { x: 880, y }, params: { gain: laneGain(`${rack.id}.${lane}`, vca) } }
   const modules = [src, env, amp]
   const conns = [c('midi-1', `gate-${t}`, env.id, 'gate', 'gate'), c(env.id, 'env', amp.id, 'cv', 'cv'), c(src.id, 'out', amp.id, 'in', 'audio'), c(amp.id, 'out', 'mix-1', `in-${idx}`, 'audio')]
-  if (pitchScale) {
-    // this module reads pitch CV in semitones: scale the sequencer's 1 V/oct by 12
-    modules.push({ id: `pitch-${lane}`, type: 'gain', name: `Pitch x12 ${label}`, position: { x: 280, y }, params: { gain: 12 } })
-    conns.push(c('midi-1', `cv-${t}`, `pitch-${lane}`, 'in', 'cv'), c(`pitch-${lane}`, 'out', src.id, 'pitch', 'cv'))
-  } else {
-    conns.push(c('midi-1', `cv-${t}`, src.id, 'pitch', 'cv'))
-  }
+  conns.push(c('midi-1', `cv-${t}`, src.id, 'pitch', 'cv'))
   if (['pipe-organ', 'karplus', 'fm-op'].includes(source.type)) conns.push(c('midi-1', `gate-${t}`, src.id, 'gate', 'gate'))
   return { modules, conns }
 }
@@ -487,11 +481,11 @@ const pushRack = (rack, lines, chains, mixerName, reverb, fx = [], extraModules 
   const rack = RACKS[3]
   const bellMod = { id: 'bell-mod', type: 'fm-op', name: 'Cloche (modulateur)', position: { x: 520, y: 620 }, params: { frequency: 440, ratio: 3.5, level: 0.55, feedback: 0, attack: 1, decay: 600, sustain: 0, release: 600 } }
   const tc = laneTrack(rack, 'cloche')
-  pushRack(rack, ['Harpe (Karplus) : arpeges de la Fontaine des fees. Cloches (deux operateurs FM, rapport 3.5) :', 'glockenspiel de Kakariko, jingle "secret", accord final. Karplus et FM Op lisent leur CV de', 'hauteur en demi-tons : un Gain x12 convertit le 1 V/oct du sequenceur.'], [
-    voiceChain(rack, 'harpe', 1, { type: 'karplus', name: 'Harpe', params: { frequency: 440, damping: 0.35, decay: 0.997, brightness: 0.55, pluckPos: 0.28 } }, { attack: 0.001, decay: 0.1, sustain: 1, release: 2.5 }, 0.7, { pitchScale: true }),
-    voiceChain(rack, 'cloche', 2, { type: 'fm-op', name: 'Cloche', params: { frequency: 440, ratio: 1, level: 1, feedback: 0.05, attack: 2, decay: 1800, sustain: 0, release: 1400 } }, { attack: 0.001, decay: 0.1, sustain: 1, release: 1.5 }, 0.5, { pitchScale: true }),
+  pushRack(rack, ['Harpe (Karplus) : arpeges de la Fontaine des fees. Cloches (deux operateurs FM, rapport 3.5) :', 'glockenspiel de Kakariko, jingle "secret", accord final.'], [
+    voiceChain(rack, 'harpe', 1, { type: 'karplus', name: 'Harpe', params: { frequency: 440, damping: 0.35, decay: 0.997, brightness: 0.55, pluckPos: 0.28 } }, { attack: 0.001, decay: 0.1, sustain: 1, release: 2.5 }, 0.7),
+    voiceChain(rack, 'cloche', 2, { type: 'fm-op', name: 'Cloche', params: { frequency: 440, ratio: 1, level: 1, feedback: 0.05, attack: 2, decay: 1800, sustain: 0, release: 1400 } }, { attack: 0.001, decay: 0.1, sustain: 1, release: 1.5 }, 0.5),
   ], 'Harpe & cloches', { time: 0.75, damp: 0.4, preDelay: 22, mix: 0.32 }, [], [bellMod], [
-    c('pitch-cloche', 'out', 'bell-mod', 'pitch', 'cv'), c('midi-1', `gate-${tc}`, 'bell-mod', 'gate', 'gate'), c('bell-mod', 'out', 'src-cloche', 'fm', 'audio'),
+    c('midi-1', `cv-${tc}`, 'bell-mod', 'pitch', 'cv'), c('midi-1', `gate-${tc}`, 'bell-mod', 'gate', 'gate'), c('bell-mod', 'out', 'src-cloche', 'fm', 'audio'),
   ])
 }
 

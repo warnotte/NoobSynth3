@@ -98,8 +98,15 @@
         "id": "att_pitch",
         "type": "gain",
         "name": "Pitch Mod",
-        "params": { "gain": 0.5 },
+        "params": { "gain": 0.041667 },
         "position": { "x": 8, "y": 14 }
+      },
+      {
+        "id": "att_pitch_y",
+        "type": "gain",
+        "name": "Pitch Mod Y 1/12",
+        "params": { "gain": 0.083333 },
+        "position": { "x": 8, "y": 15 }
       },
       {
         "id": "att_z",
@@ -147,6 +154,11 @@
       },
       {
         "from": { "moduleId": "chaos", "portId": "y" },
+        "to": { "moduleId": "att_pitch_y", "portId": "in" },
+        "kind": "cv"
+      },
+      {
+        "from": { "moduleId": "att_pitch_y", "portId": "out" },
         "to": { "moduleId": "fm2", "portId": "pitch" },
         "kind": "cv"
       },

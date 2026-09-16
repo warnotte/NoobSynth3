@@ -1570,7 +1570,7 @@
               "y": 40
             },
             "params": {
-              "text": "LE SONGE D'HYRULE — rack HARPE & CLOCHES\n\nHarpe (Karplus) : arpeges de la Fontaine des fees. Cloches (deux operateurs FM, rapport 3.5) :\nglockenspiel de Kakariko, jingle \"secret\", accord final. Karplus et FM Op lisent leur CV de\nhauteur en demi-tons : un Gain x12 convertit le 1 V/oct du sequenceur.\n\nLe rack ORGUE (1er onglet) decrit tout le morceau."
+              "text": "LE SONGE D'HYRULE — rack HARPE & CLOCHES\n\nHarpe (Karplus) : arpeges de la Fontaine des fees. Cloches (deux operateurs FM, rapport 3.5) :\nglockenspiel de Kakariko, jingle \"secret\", accord final.\n\nLe rack ORGUE (1er onglet) decrit tout le morceau."
             }
           },
           {
@@ -1643,18 +1643,6 @@
             }
           },
           {
-            "id": "pitch-harpe",
-            "type": "gain",
-            "name": "Pitch x12 Harpe",
-            "position": {
-              "x": 280,
-              "y": 40
-            },
-            "params": {
-              "gain": 12
-            }
-          },
-          {
             "type": "fm-op",
             "name": "Cloche",
             "params": {
@@ -1698,18 +1686,6 @@
             },
             "params": {
               "gain": 0.5
-            }
-          },
-          {
-            "id": "pitch-cloche",
-            "type": "gain",
-            "name": "Pitch x12 Cloches",
-            "position": {
-              "x": 280,
-              "y": 340
-            },
-            "params": {
-              "gain": 12
             }
           },
           {
@@ -1848,17 +1824,6 @@
               "portId": "cv-1"
             },
             "to": {
-              "moduleId": "pitch-harpe",
-              "portId": "in"
-            },
-            "kind": "cv"
-          },
-          {
-            "from": {
-              "moduleId": "pitch-harpe",
-              "portId": "out"
-            },
-            "to": {
               "moduleId": "src-harpe",
               "portId": "pitch"
             },
@@ -1925,17 +1890,6 @@
               "portId": "cv-2"
             },
             "to": {
-              "moduleId": "pitch-cloche",
-              "portId": "in"
-            },
-            "kind": "cv"
-          },
-          {
-            "from": {
-              "moduleId": "pitch-cloche",
-              "portId": "out"
-            },
-            "to": {
               "moduleId": "src-cloche",
               "portId": "pitch"
             },
@@ -1954,8 +1908,8 @@
           },
           {
             "from": {
-              "moduleId": "pitch-cloche",
-              "portId": "out"
+              "moduleId": "midi-1",
+              "portId": "cv-2"
             },
             "to": {
               "moduleId": "bell-mod",
