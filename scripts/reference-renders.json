@@ -82,11 +82,11 @@
   "deux-mondes": {
     "kind": "project",
     "seconds": 425,
-    "sha256": "ee07b4c79152f860b36f02c83df16d4265d01c1547fb4bd5b642fb5ec9cc6a3c"
+    "sha256": "e01951fe53f87e6f420c79e6bbbe37a303c7d31d72e272605574466ad8a89272"
   },
   "deux-mondes-orchestre": {
     "kind": "project",
     "seconds": 425,
-    "sha256": "89f115e390b5ef70bcefe5913fd667d28546b2d4332d5eb074bc8cdd008d0cea"
+    "sha256": "1636047a1cdd8724908bca907df1f3bffb4c9f2962376ee0a64a1016aff49655"
   }
 }

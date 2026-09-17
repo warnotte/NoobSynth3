@@ -4,7 +4,7 @@
 // render_graph example, 3. measures each rack's ACTIVE loudness per section (90th percentile of 400 ms
 // RMS windows, so a short roll in a quiet section isn't boosted), 4. writes scripts/deux-mondes-levels.json
 // so every section hits its loudness with the intended balance, 5. regenerates and checks the full mix.
-import { execFileSync } from 'node:child_process'
+import { execFileSync, spawnSync } from 'node:child_process'
 import { readFileSync, writeFileSync, rmSync, existsSync } from 'node:fs'
 
 const RENDER = 'target/release/examples/render_graph.exe'
@@ -37,6 +37,8 @@ const TARGET_ORCHESTRE = {
 const TARGETS = ORCHESTRE ? TARGET_ORCHESTRE : TARGET
 
 const run = (cmd, args) => execFileSync(cmd, args, { stdio: ['ignore', 'pipe', 'inherit'] }).toString()
+/** render_graph reports `peak=` on stderr, measured PER CHANNEL before the mono downmix: that is the peak that
+ *  matters (panned instruments make a channel louder than the downmix — this suite hit 1.33 while mono said 0.90). */
 const readF32 = (path) => { const b = readFileSync(path); return new Float32Array(b.buffer, b.byteOffset, (b.length / 4) | 0) }
 const activeDb = (x, a, b) => {
   const W = Math.round(0.4 * SR)
@@ -99,20 +101,31 @@ writeFileSync(LEVELS, JSON.stringify(levels, null, 2) + '\n')
 
 // 5. regenerate and check the mix
 run('node', GEN)
-const report = run(RENDER, [`target/${ID}-flat.json`, `target/${ID}-mix.f32`, String(duration)])
+const renderMix = () => {
+  const r = spawnSync(RENDER, [`target/${ID}-flat.json`, `target/${ID}-mix.f32`, String(duration)], { encoding: 'utf8' })
+  const text = `${r.stdout ?? ''}${r.stderr ?? ''}`
+  process.stderr.write(text)
+  return { text, peak: Number(/peak=([\d.]+)/.exec(text)?.[1] ?? NaN) }
+}
+let report = renderMix().text
 let mix = readF32(`target/${ID}-mix.f32`)
 const peakOfMix = (x) => { let p = 0; let at = 0; x.forEach((v, i) => { if (Math.abs(v) > p) { p = Math.abs(v); at = i / SR } }); return [p, at] }
-let [peak, peakAt] = peakOfMix(mix)
-if (peak > MIX_PEAK) {
-  // sums of racks can still overshoot: scale every bus so the whole mix fits, render once more
+let [, peakAt] = peakOfMix(mix)
+let peak = Number(/peak=([\d.]+)/.exec(report)?.[1] ?? NaN) // per-channel (stereo), not the mono downmix
+// Only the section that holds the peak is lowered (scaling the whole piece for one loud hit costs 3 dB
+// everywhere). Up to three passes, since lowering one section can reveal another one.
+for (let pass = 0; pass < 3 && peak > MIX_PEAK; pass++) {
   const k = MIX_PEAK / peak
-  for (const r of RACKS) levels.bus[r] = +(levels.bus[r] * k).toFixed(4)
+  const hit = sections.find((s) => peakAt >= s.at - 0.5 && peakAt <= s.end + 0.5) ?? sections.at(-1)
+  for (const r of RACKS) if (levels[r]?.[hit.key] !== undefined) levels[r][hit.key] = +(levels[r][hit.key] * k).toFixed(4)
   writeFileSync(LEVELS, JSON.stringify(levels, null, 2) + '\n')
-  console.log(`mix peak ${peak.toFixed(2)} at ${peakAt.toFixed(1)} s -> every bus x${k.toFixed(3)}`)
+  console.log(`mix peak ${peak.toFixed(2)} at ${peakAt.toFixed(1)} s (${hit.key}) -> cette section x${k.toFixed(3)}`)
   run('node', GEN)
-  run(RENDER, [`target/${ID}-flat.json`, `target/${ID}-mix.f32`, String(duration)])
+  const again = renderMix()
+  report = again.text
   mix = readF32(`target/${ID}-mix.f32`);
-  [peak, peakAt] = peakOfMix(mix)
+  [, peakAt] = peakOfMix(mix)
+  peak = again.peak
 }
-console.log(`mix peak ${peak.toFixed(3)} at ${peakAt.toFixed(1)} s\n` + sections.map((s) => `${s.key.padEnd(11)} active ${activeDb(mix, s.at + 0.3, Math.max(s.at + 1, s.end - s.fadeOut)).toFixed(1)} dBFS (target ${TARGETS[s.key][0]})`).join('\n'))
+console.log(`mix peak (par canal) ${peak.toFixed(3)}, mono max at ${peakAt.toFixed(1)} s\n` + sections.map((s) => `${s.key.padEnd(11)} active ${activeDb(mix, s.at + 0.3, Math.max(s.at + 1, s.end - s.fadeOut)).toFixed(1)} dBFS (target ${TARGETS[s.key][0]})`).join('\n'))
 if (/nan/i.test(report)) console.warn(report)
