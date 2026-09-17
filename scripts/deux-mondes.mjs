@@ -6,16 +6,21 @@
 //   node scripts/deux-mondes.mjs              build into target/deux-mondes-build/ (the app is not touched)
 //   node scripts/deux-mondes.mjs --public     write the project, MIDI files and manifests into public/
 //   node scripts/deux-mondes-calibrate.mjs    render each rack, set the per-section levels (target/ only)
+//   add --orchestre to any of them for the ORCHESTRAL variant (project deux-mondes-orchestre): trumpets and string
+//   ensemble take the melodies and harmonies where the original is brass or strings; the first version is untouched.
 //
 // Writing public/ makes the Vite dev server reload the open page: warn the user before using --public.
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs'
 import toneMidi from '@tonejs/midi'
 const { Midi } = toneMidi
 
-const ID = 'deux-mondes'
-const TITLE = "Les Deux Mondes d'Hyrule"
+const ORCHESTRE = process.argv.includes('--orchestre')
+const ID = ORCHESTRE ? 'deux-mondes-orchestre' : 'deux-mondes'
+const TITLE = ORCHESTRE ? "Les Deux Mondes d'Hyrule (orchestre)" : "Les Deux Mondes d'Hyrule"
 const PUBLIC = process.argv.includes('--public')
-const BUILD = 'target/deux-mondes-build'
+const BUILD = `target/${ID}-build`
+/** first version lane, or the orchestral one in the --orchestre variant (null = not played in that version) */
+const pickLane = (first, orchestre) => (ORCHESTRE ? orchestre : first)
 const BPM = 120
 const PPQ = 480
 const TICKS_PER_SEC = (BPM / 60) * PPQ
@@ -47,6 +52,9 @@ const RACKS = [
   { id: 'nappe', name: 'Nappe', lanes: ['flutes'] },
   { id: 'orgue', name: 'Orgue', lanes: ['grand', 'sombre', 'pedale'] },
   { id: 'percu', name: 'Percussions', lanes: ['timbales', 'caisse'] },
+  // orchestral variant only (empty, hence dropped, in the first version)
+  { id: 'cuivres', name: 'Trompettes', lanes: ['trompettes'] },
+  { id: 'cordes', name: 'Cordes', lanes: ['cordes'] },
 ]
 const lanes = Object.fromEntries(RACKS.flatMap((r) => r.lanes.map((l) => [`${r.id}.${l}`, []])))
 
@@ -64,6 +72,7 @@ function put(lane, n) {
 
 /** notes of `tracks` in [from, to) seconds of a source, placed at `at` */
 function excerpt(src, { tracks, from, to, at, transpose = 0, lane, vel = 1, filter = () => true, tail = 0 }) {
+  if (!lane) return
   for (const ti of tracks) {
     for (const n of src.tracks[ti].notes) {
       if (n.t < from - 1e-6 || n.t >= to - 1e-6 || !filter(n)) continue
@@ -85,11 +94,11 @@ let at = 0
 {
   const s = source('Zelda3_Story_Theme.mid')
   const to = 2.2 + bars(32, 135)
-  excerpt(s, { tracks: onChannel(s, 1), from: 0, to, at, lane: 'handpans', vel: 0.95 })
+  excerpt(s, { tracks: onChannel(s, 1), from: 0, to, at, lane: pickLane('handpans', 'cordes.cordes'), vel: 0.95 })
   excerpt(s, { tracks: [...onChannel(s, 2), ...onChannel(s, 4)], from: 0, to, at, lane: 'nappe.flutes', vel: 0.8 })
   excerpt(s, { tracks: onChannel(s, 3), from: 0, to, at, lane: 'orgue.pedale', vel: 0.8 })
   excerpt(s, { tracks: [...onChannel(s, 5), ...onChannel(s, 6)], from: 0, to, at, lane: 'harpe.harpe', vel: 0.4 })
-  at = section('prologue', 'Prologue — la légende s’ouvre', at, at + to, { racks: ['handpans', 'nappe', 'orgue', 'harpe'], fadeOut: 2 }) + 0.8
+  at = section('prologue', 'Prologue — la légende s’ouvre', at, at + to, { racks: [pickLane('handpans', 'cordes'), 'nappe', 'orgue', 'harpe'], fadeOut: 2 }) + 0.8
 }
 
 // 2. Light World (Haakon Marthinsen; 91-99 % agreement) — the brass fanfare on the full organ, the trumpet theme on the
@@ -98,14 +107,14 @@ let at = 0
   const s = source('Zelda3_Light_World_Theme.mid')
   const to = 7.1 + bars(32, 135)
   const trombones = s.tracks.map((t, i) => (t.notes.length && t.notes[0].t < 1 && t.notes.at(-1).t < 8 && [2, 3, 4].includes(t.channel) ? i : -1)).filter((i) => i >= 0)
-  excerpt(s, { tracks: trombones, from: 0, to, at, lane: 'orgue.grand', vel: 0.85 })
-  excerpt(s, { tracks: onChannel(s, 1), from: 0, to, at, lane: 'handpans', vel: 1 })
-  excerpt(s, { tracks: onChannel(s, 1), from: 0, to, at, lane: 'snes.cuivre', vel: 0.55 })
+  excerpt(s, { tracks: trombones, from: 0, to, at, lane: pickLane('orgue.grand', 'cuivres.trompettes'), vel: 0.85 })
+  excerpt(s, { tracks: onChannel(s, 1), from: 0, to, at, lane: 'handpans', vel: ORCHESTRE ? 0.5 : 1 })
+  excerpt(s, { tracks: onChannel(s, 1), from: 0, to, at, lane: pickLane('snes.cuivre', 'cuivres.trompettes'), vel: ORCHESTRE ? 1 : 0.55 })
   excerpt(s, { tracks: onChannel(s, 2), from: 0, to, at, lane: 'harpe.pizz', vel: 0.85 })
-  excerpt(s, { tracks: onChannel(s, 5).filter((i) => !trombones.includes(i)), from: 0, to, at, lane: 'harpe.harpe', vel: 0.55 })
-  excerpt(s, { tracks: [...onChannel(s, 3), ...onChannel(s, 4)].filter((i) => !trombones.includes(i)), from: 0, to, at, lane: 'nappe.flutes', vel: 0.6 })
+  excerpt(s, { tracks: onChannel(s, 5).filter((i) => !trombones.includes(i)), from: 0, to, at, lane: pickLane('harpe.harpe', 'cordes.cordes'), vel: 0.55 })
+  excerpt(s, { tracks: [...onChannel(s, 3), ...onChannel(s, 4)].filter((i) => !trombones.includes(i)), from: 0, to, at, lane: pickLane('nappe.flutes', 'cordes.cordes'), vel: 0.6 })
   excerpt(s, { tracks: onChannel(s, 7), from: 0, to, at, lane: 'percu.timbales', vel: 0.9 })
-  at = section('lightworld', 'Light World — le thème du héros', at, at + to, { racks: ['orgue', 'handpans', 'snes', 'harpe', 'nappe', 'percu'], fadeOut: 2 }) + 0.8
+  at = section('lightworld', 'Light World — le thème du héros', at, at + to, { racks: ORCHESTRE ? ['cuivres', 'handpans', 'harpe', 'cordes', 'percu'] : ['orgue', 'handpans', 'snes', 'harpe', 'nappe', 'percu'], fadeOut: 2 }) + 0.8
 }
 
 // 3. Fée (Haakon Marthinsen; 77-86 % agreement) — the fountain's seven harps, the top voice doubled by bells.
@@ -126,8 +135,8 @@ let at = 0
   excerpt(s, { tracks: onChannel(s, 4), from: 0, to, at, lane: 'handpans', vel: 0.7 })
   excerpt(s, { tracks: onChannel(s, 2), from: 0, to, at, lane: 'handpans', vel: 0.85 })
   excerpt(s, { tracks: onChannel(s, 3), from: 0, to, at, lane: 'harpe.cloche', vel: 0.45 })
-  excerpt(s, { tracks: onChannel(s, 5), from: 0, to, at, lane: 'nappe.flutes', vel: 0.6 })
-  at = section('lostwoods', 'Lost Woods — la forêt perdue', at, at + to, { racks: ['snes', 'handpans', 'harpe', 'nappe'], fadeOut: 2.5 }) + 1
+  excerpt(s, { tracks: onChannel(s, 5), from: 0, to, at, lane: pickLane('nappe.flutes', 'cordes.cordes'), vel: 0.6 })
+  at = section('lostwoods', 'Lost Woods — la forêt perdue', at, at + to, { racks: ['snes', 'handpans', 'harpe', pickLane('nappe', 'cordes')], fadeOut: 2.5 }) + 1
 }
 
 // 5. Dark World (Ryan Pruitt; 87-97 % agreement) — the horn ostinato on the dark organ, the bass on the pedal, the
@@ -135,12 +144,12 @@ let at = 0
 {
   const s = source('The_Dark_World_No_Quicktime.mid')
   const to = bars(32, 137)
-  excerpt(s, { tracks: onChannel(s, 2), from: 0, to, at, lane: 'orgue.sombre', vel: 0.75 })
+  excerpt(s, { tracks: onChannel(s, 2), from: 0, to, at, lane: pickLane('orgue.sombre', 'cuivres.trompettes'), vel: ORCHESTRE ? 0.6 : 0.75 })
   excerpt(s, { tracks: onChannel(s, 1), from: 0, to, at, lane: 'orgue.pedale', vel: 0.8 })
-  excerpt(s, { tracks: onChannel(s, 3), from: 0, to, at, lane: 'snes.sombre', vel: 0.7 })
+  excerpt(s, { tracks: onChannel(s, 3), from: 0, to, at, lane: pickLane('snes.sombre', 'cordes.cordes'), vel: 0.7 })
   excerpt(s, { tracks: [...onChannel(s, 4), ...onChannel(s, 5)], from: 0, to, at, lane: 'handpans', vel: 1 })
   excerpt(s, { tracks: onChannel(s, 10), from: 0, to, at, lane: 'percu.caisse', vel: 0.55 })
-  at = section('darkworld', 'Dark World — la chute dans l’ombre', at, at + to, { racks: ['orgue', 'snes', 'handpans', 'percu'], fadeOut: 2 }) + 1
+  at = section('darkworld', 'Dark World — la chute dans l’ombre', at, at + to, { racks: ORCHESTRE ? ['cuivres', 'orgue', 'cordes', 'handpans', 'percu'] : ['orgue', 'snes', 'handpans', 'percu'], fadeOut: 2 }) + 1
 }
 
 // 6. Ganon (Mark Jansen; 84 % agreement) — the trumpet lead on the dark SNES voice, the trumpet harmonies on the dark
@@ -148,12 +157,13 @@ let at = 0
 {
   const s = source('z3ganonbat.mid')
   const to = 1.8 + bars(24, 120)
-  excerpt(s, { tracks: onChannel(s, 2), from: 0, to, at, lane: 'snes.sombre', vel: 0.95 })
+  excerpt(s, { tracks: onChannel(s, 2), from: 0, to, at, lane: pickLane('snes.sombre', 'cuivres.trompettes'), vel: 0.95 })
   excerpt(s, { tracks: [...onChannel(s, 4), ...onChannel(s, 5), ...onChannel(s, 6)], from: 0, to, at, lane: 'orgue.sombre', vel: 0.7 })
+  excerpt(s, { tracks: [...onChannel(s, 4), ...onChannel(s, 5), ...onChannel(s, 6)], from: 0, to, at, lane: pickLane(null, 'cordes.cordes'), vel: 0.6 })
   excerpt(s, { tracks: onChannel(s, 1), from: 0, to, at, lane: 'orgue.pedale', vel: 0.8 })
   excerpt(s, { tracks: onChannel(s, 7), from: 0, to, at, lane: 'handpans', vel: 1 })
   excerpt(s, { tracks: onChannel(s, 10), from: 0, to, at, lane: 'percu.caisse', vel: 0.5 })
-  at = section('ganon', 'Ganon — le combat', at, at + to, { racks: ['snes', 'orgue', 'handpans', 'percu'], fadeOut: 2.5 }) + 1.5
+  at = section('ganon', 'Ganon — le combat', at, at + to, { racks: ORCHESTRE ? ['cuivres', 'orgue', 'cordes', 'handpans', 'percu'] : ['snes', 'orgue', 'handpans', 'percu'], fadeOut: 2.5 }) + 1.5
 }
 
 // 7. Générique (core shared by three transcriptions, 90-100 %) — from the snare's entrance: the pan flute theme on the
@@ -166,14 +176,17 @@ let at = 0
   excerpt(s, { tracks: onChannel(s, 3), from, to, at, lane: 'handpans', vel: 1 })
   excerpt(s, { tracks: onChannel(s, 3), from, to, at, lane: 'snes.lead', vel: 0.4 })
   excerpt(s, { tracks: onChannel(s, 3), from: to - 25, to, at: at + (to - 25 - from), lane: 'harpe.cloche', transpose: 12, vel: 0.35 })
-  excerpt(s, { tracks: onChannel(s, 1), from, to, at, lane: 'nappe.flutes', vel: 0.6 })
+  excerpt(s, { tracks: onChannel(s, 1), from, to, at, lane: pickLane('nappe.flutes', 'cordes.cordes'), vel: 0.6 })
+  excerpt(s, { tracks: onChannel(s, 3), from: to - 25, to, at: at + (to - 25 - from), lane: pickLane(null, 'cuivres.trompettes'), vel: 0.7 })
   excerpt(s, { tracks: onChannel(s, 2), from, to, at, lane: 'harpe.harpe', vel: 0.55 })
   excerpt(s, { tracks: onChannel(s, 10), from, to, at, lane: 'percu.caisse', vel: 0.55 })
-  at = section('generique', 'Générique — le retour de la lumière', at, at + (to - from), { racks: ['handpans', 'snes', 'harpe', 'nappe', 'percu'], fadeOut: 4 })
+  at = section('generique', 'Générique — le retour de la lumière', at, at + (to - from), { racks: ORCHESTRE ? ['handpans', 'snes', 'harpe', 'cordes', 'cuivres', 'percu'] : ['handpans', 'snes', 'harpe', 'nappe', 'percu'], fadeOut: 4 })
 }
 
-// lanes nobody plays in this arrangement are dropped (the MIDI player skips empty tracks)
+// lanes nobody plays in this arrangement are dropped (the MIDI player skips empty tracks), then empty racks
 for (const r of RACKS) r.lanes = r.lanes.filter((l) => lanes[`${r.id}.${l}`].length)
+for (let i = RACKS.length - 1; i >= 0; i--) if (!RACKS[i].lanes.length) RACKS.splice(i, 1)
+const rackOf = (id) => RACKS.find((r) => r.id === id)
 
 // ---------------------------------------------------------------- volume lanes (mix + transitions)
 const LEVELS_PATH = new URL(`./${ID}-levels.json`, import.meta.url)
@@ -215,6 +228,7 @@ const LANE_NAMES = {
   'snes.lead': 'SNES', 'snes.cuivre': 'SNES cuivres', 'snes.sombre': 'SNES sombre', 'nappe.flutes': 'Flutes',
   'orgue.grand': 'Grand orgue', 'orgue.sombre': 'Orgue sombre', 'orgue.pedale': 'Pedale',
   'percu.timbales': 'Timbales', 'percu.caisse': 'Caisse claire',
+  'cuivres.trompettes': 'Trompettes', 'cordes.cordes': 'Cordes',
 }
 const midiData = {}
 for (const rack of RACKS) {
@@ -312,6 +326,7 @@ function busModules(rack, reverb, fx = []) {
   }
 }
 function voiceChain(rack, lane, idx, source, adsr, vca) {
+  if (!rack.lanes.includes(lane)) return null // lane not played in this version
   const t = laneTrack(rack, lane)
   const y = 40 + 300 * (idx - 1)
   const label = LANE_NAMES[`${rack.id}.${lane}`]
@@ -323,7 +338,7 @@ function voiceChain(rack, lane, idx, source, adsr, vca) {
   return { lane, modules: [src, env, amp], conns }
 }
 /** keep the chains of the lanes that are played, renumbering their mixer inputs */
-const played = (rack, chains) => chains.filter((ch) => rack.lanes.includes(ch.lane)).map((ch, i) => ({
+const played = (rack, chains) => chains.filter((ch) => ch && rack.lanes.includes(ch.lane)).map((ch, i) => ({
   ...ch, conns: ch.conns.map((k) => (k.to.moduleId === 'mix-1' ? { ...k, to: { ...k.to, portId: `in-${i + 1}` } } : k)),
 }))
 const mixer8 = (name, n) => ({ id: 'mix-1', type: 'mixer-8', name, position: { x: 1000, y: 300 }, params: Object.fromEntries(Array.from({ length: n }, (_, i) => [`level${i + 1}`, 1])) })
@@ -341,7 +356,7 @@ const pushRack = (rack, lines, chains, mixerName, reverb, fx = [], extraModules 
 
 // HANDPANS
 {
-  const rack = RACKS[0]
+  const rack = rackOf('handpans')
   const hp = [
     ['basse', { pan: -0.3, instrument: 121, seed: 131, attack: 0.45, sustain: 0.85, cavity: 0.5 }],
     ['medium', { pan: 0.15, instrument: 122, seed: 132, attack: 0.55, sustain: 1 }],
@@ -360,9 +375,9 @@ const pushRack = (rack, lines, chains, mixerName, reverb, fx = [], extraModules 
 
 // HARPE & CLOCHES
 {
-  const rack = RACKS[1]
+  const rack = rackOf('harpe')
   const bellMod = { id: 'bell-mod', type: 'fm-op', name: 'Cloche (modulateur)', position: { x: 520, y: 920 }, params: { frequency: 440, ratio: 3.5, level: 0.45, feedback: 0, attack: 1, decay: 500, sustain: 0, release: 500 } }
-  const tc = laneTrack(rack, 'cloche')
+  const tc = rack.lanes.includes('cloche') ? laneTrack(rack, 'cloche') : 0
   pushRack(rack, ['Harpe (Karplus) : le tremolo du prologue, les harmonies de Light World, les sept harpes de la fontaine,', 'le generique ; harpe basse pincee pour le tuba. Cloches (FM, rapport 3.5) : la fee, les piccolos, le final.'], played(rack, [
     voiceChain(rack, 'harpe', 1, { type: 'karplus', name: 'Harpe', params: { frequency: 440, damping: 0.3, decay: 0.997, brightness: 0.55, pluckPos: 0.28 } }, { attack: 0.001, decay: 0.1, sustain: 1, release: 1.2 }, 0.5),
     voiceChain(rack, 'pizz', 2, { type: 'karplus', name: 'Harpe basse', params: { frequency: 440, damping: 0.25, decay: 0.997, brightness: 0.45, pluckPos: 0.35 } }, { attack: 0.001, decay: 0.1, sustain: 1, release: 0.8 }, 0.7),
@@ -374,7 +389,7 @@ const pushRack = (rack, lines, chains, mixerName, reverb, fx = [], extraModules 
 
 // SNES
 {
-  const rack = RACKS[2]
+  const rack = rackOf('snes')
   pushRack(rack, ['La puce sonore de la Super Nintendo (S-DSP) : onde cloche pour Lost Woods et le generique, onde', 'dent de scie douce en cuivres pour le theme du heros, onde cordes sombre et lo-fi pour Dark World et Ganon.'], played(rack, [
     voiceChain(rack, 'lead', 1, { type: 'snes-osc', name: 'SNES', params: { frequency: 440, fine: 0, volume: 1, wave: 3, gauss: 0.7, color: 0.6, lofi: 0.4 } }, { attack: 0.004, decay: 0.25, sustain: 0.55, release: 0.35 }, 0.45),
     voiceChain(rack, 'cuivre', 2, { type: 'snes-osc', name: 'SNES cuivres', params: { frequency: 440, fine: 0, volume: 1, wave: 1, gauss: 0.8, color: 0.45, lofi: 0.35 } }, { attack: 0.03, decay: 0.2, sustain: 0.7, release: 0.25 }, 0.35),
@@ -384,7 +399,7 @@ const pushRack = (rack, lines, chains, mixerName, reverb, fx = [], extraModules 
 
 // NAPPE
 {
-  const rack = RACKS[3]
+  const rack = rackOf('nappe')
   const flutes = { type: 'pipe-organ', name: 'Flutes', params: { frequency: 440, drawbar16: 0, drawbar8: 0.85, drawbar4: 0.5, drawbar223: 0, drawbar2: 0.2, drawbar135: 0, drawbar113: 0, drawbar1: 0, voicing: 1, chiff: 0.1, percussion: 0, chorusVibrato: 0, tremulant: 0.18, tremRate: 5.2, wind: 0.1, brightness: 0.45 } }
   pushRack(rack, ['Nappe douce de flutes d\'orgue (8\' et 4\', tremblant) : lignes interieures du prologue, cordes de Light World', 'et de Lost Woods, cordes aigues du generique.'], played(rack, [
     voiceChain(rack, 'flutes', 1, flutes, { attack: 0.12, decay: 0.2, sustain: 1, release: 0.8 }, 0.3),
@@ -393,7 +408,7 @@ const pushRack = (rack, lines, chains, mixerName, reverb, fx = [], extraModules 
 
 // ORGUE
 {
-  const rack = RACKS[4]
+  const rack = rackOf('orgue')
   const organ = (drawbars, extra) => ({ type: 'pipe-organ', name: 'Orgue', params: { frequency: 440, ...drawbars, percussion: 0, chorusVibrato: 0, tremRate: 5.5, ...extra } })
   pushRack(rack, ['Grand orgue brillant pour la fanfare de Light World ; orgue sombre (16\' et 8\' ronds) pour l\'ostinato de', 'Dark World et les cuivres de Ganon ; pedale 16\' pour les basses du prologue, de Dark World et de Ganon.'], played(rack, [
     voiceChain(rack, 'grand', 1, organ({ drawbar16: 0.5, drawbar8: 1, drawbar4: 0.85, drawbar223: 0.45, drawbar2: 0.7, drawbar135: 0.25, drawbar113: 0.35, drawbar1: 0.45 }, { voicing: 0, chiff: 0.25, wind: 0.08, brightness: 0.75, tremulant: 0 }), { attack: 0.01, decay: 0.1, sustain: 1, release: 0.35 }, 0.4),
@@ -404,7 +419,7 @@ const pushRack = (rack, lines, chains, mixerName, reverb, fx = [], extraModules 
 
 // PERCUSSIONS
 {
-  const rack = RACKS[5]
+  const rack = rackOf('percu')
   const drum = (lane, type, params, i) => {
     const t = laneTrack(rack, lane)
     const id = `drum-${lane}`
@@ -419,6 +434,44 @@ const pushRack = (rack, lines, chains, mixerName, reverb, fx = [], extraModules 
   pushRack(rack, ['Timbale 909 grave pour Light World ; caisse claire 909 (calee sur une vraie TR-909) pour les marches de', 'Dark World, de Ganon et du generique.'], chains, 'Percussions', { time: 0.6, damp: 0.5, preDelay: 15, mix: 0.2 })
 }
 
+// TROMPETTES (orchestral variant): two detuned saws in a low-pass that opens 2.5 octaves on the attack and settles
+// (the "Trompettes" candidate chosen by ear in the orchestral audition)
+if (rackOf('cuivres')) {
+  const rack = rackOf('cuivres')
+  const t = laneTrack(rack, 'trompettes')
+  const chain = {
+    lane: 'trompettes',
+    modules: [
+      { id: 'src-trompettes', type: 'oscillator', name: 'Trompettes', position: { x: 520, y: 40 }, params: { frequency: 440, type: 'sawtooth', pwm: 0.5, unison: 2, detune: 6, subMix: 0, subOct: 1 } },
+      { id: 'vcf-trompettes', type: 'vcf', name: 'Filtre cuivres', position: { x: 640, y: 40 }, params: { cutoff: 1500, resonance: 0.12, drive: 0.25, envAmount: 3, modAmount: 0, keyTrack: 0.8, model: 'ladder', mode: 'lp', slope: 24 } },
+      { id: 'fenv-trompettes', type: 'adsr', name: 'Env filtre', position: { x: 640, y: 340 }, params: { attack: 0.008, decay: 0.25, sustain: 0.5, release: 0.3 } },
+      { id: 'adsr-trompettes', type: 'adsr', name: 'Env Trompettes', position: { x: 760, y: 40 }, params: { attack: 0.006, decay: 0.2, sustain: 0.9, release: 0.25 } },
+      { id: 'vca-trompettes', type: 'gain', name: 'VCA Trompettes', position: { x: 880, y: 40 }, params: { gain: laneGain('cuivres.trompettes', 0.5) } },
+    ],
+    conns: [
+      c('midi-1', `cv-${t}`, 'src-trompettes', 'pitch', 'cv'), c('midi-1', `cv-${t}`, 'vcf-trompettes', 'key', 'cv'),
+      c('midi-1', `gate-${t}`, 'fenv-trompettes', 'gate', 'gate'), c('midi-1', `gate-${t}`, 'adsr-trompettes', 'gate', 'gate'),
+      c('src-trompettes', 'out', 'vcf-trompettes', 'in', 'audio'), c('fenv-trompettes', 'env', 'vcf-trompettes', 'env', 'cv'),
+      c('vcf-trompettes', 'out', 'vca-trompettes', 'in', 'audio'), c('adsr-trompettes', 'env', 'vca-trompettes', 'cv', 'cv'),
+      c('vca-trompettes', 'out', 'mix-1', 'in-1', 'audio'),
+    ],
+  }
+  pushRack(rack, ['Trompettes : deux dents de scie desaccordees dans un filtre ladder qui s\'ouvre de 3 octaves en 8 ms a', 'l\'attaque puis se pose (attaque franche). Fanfare et theme de Light World, ostinato de Dark World, Ganon, fin du generique.'], [chain], 'Trompettes', { time: 0.75, damp: 0.4, preDelay: 20, mix: 0.28 })
+}
+
+// CORDES (orchestral variant): saw pair through a soft low-pass, slow bow envelope, Ensemble chorus (the "Ensemble
+// Strings" candidate chosen by ear)
+if (rackOf('cordes')) {
+  const rack = rackOf('cordes')
+  pushRack(rack, ['Cordes : dents de scie, filtre doux, archet lent et effet Ensemble. Melodie du prologue, harmonies de', 'Light World, nappes de Lost Woods et de Dark World, soutien de Ganon, cordes du generique.'], [
+    { ...voiceChain(rack, 'cordes', 1, { type: 'oscillator', name: 'Cordes', params: { frequency: 440, type: 'sawtooth', pwm: 0.5, unison: 2, detune: 4, subMix: 0.1, subOct: 1 } }, { attack: 0.35, decay: 1, sustain: 0.85, release: 0.9 }, 0.5) },
+  ].map((ch) => ({
+    ...ch,
+    modules: [...ch.modules, { id: 'vcf-cordes', type: 'vcf', name: 'Filtre cordes', position: { x: 640, y: 40 }, params: { cutoff: 1600, resonance: 0.2, drive: 0.1, envAmount: 0, modAmount: 0, keyTrack: 0.5, model: 'svf', mode: 'lp', slope: 12 } }],
+    conns: ch.conns.filter((k) => !(k.from.moduleId === 'src-cordes' && k.to.moduleId === 'vca-cordes')).concat([c('src-cordes', 'out', 'vcf-cordes', 'in', 'audio'), c('vcf-cordes', 'out', 'vca-cordes', 'in', 'audio')]),
+  })), 'Cordes', { time: 0.85, damp: 0.4, preDelay: 25, mix: 0.35 }, [{ module: { id: 'ens-1', type: 'ensemble', name: 'Ensemble', position: { x: 1120, y: 300 }, params: { rate: 0.35, depth: 16, delay: 12, mix: 0.75, spread: 0.9 } } }])
+}
+
 // ---------------------------------------------------------------- project + manifests + bench
 const MIXER_VOLUME = levels.mixer ?? {}
 const project = {
@@ -427,14 +480,17 @@ const project = {
 }
 writeFileSync(`${OUT_PROJECTS}/${ID}.json`, JSON.stringify(project, null, 2) + '\n')
 if (PUBLIC) {
-  const entry = { id: ID, name: `${TITLE} 🗡️`, description: "Zelda: A Link to the Past (Koji Kondo) en suite : le prologue, le theme du heros de Light World, la fontaine des fees, Lost Woods, la chute dans le Dark World, Ganon, et le generique. Handpans, harpe, puce SNES, orgues, caisse claire 909. 6 racks, automation de volume.", file: `${ID}.json`, group: 'Songs' }
+  const entry = ORCHESTRE
+    ? { id: ID, name: `${TITLE} 🎺`, description: "Variante orchestrale des Deux Mondes d'Hyrule : trompettes et cordes prennent les fanfares, les themes et les harmonies (prologue, Light World, Dark World, Ganon, generique) ; handpans, harpe, puce SNES et orgue restent en couleur. 8 racks, automation de volume.", file: `${ID}.json`, group: 'Songs' }
+    : { id: ID, name: `${TITLE} 🗡️`, description: "Zelda: A Link to the Past (Koji Kondo) en suite : le prologue, le theme du heros de Light World, la fontaine des fees, Lost Woods, la chute dans le Dark World, Ganon, et le generique. Handpans, harpe, puce SNES, orgues, caisse claire 909. 6 racks, automation de volume.", file: `${ID}.json`, group: 'Songs' }
   const projManifest = JSON.parse(readFileSync('public/projects/manifest.json', 'utf8'))
   if (projManifest.projects.some((e) => e.id === ID)) projManifest.projects = projManifest.projects.map((e) => (e.id === ID ? entry : e))
   else projManifest.projects.push(entry)
   writeFileSync('public/projects/manifest.json', JSON.stringify(projManifest, null, 2) + '\n')
   const midiManifest = JSON.parse(readFileSync('public/midi-presets/manifest.json', 'utf8'))
   const midiEntries = RACKS.map((r) => ({ id: `${ID}-${r.id}`, name: `${TITLE} - ${r.name}`, file: `${ID}-${r.id}.mid` }))
-  midiManifest.presets = [...midiManifest.presets.filter((e) => !e.id.startsWith(`${ID}-`)), ...midiEntries]
+  const others = midiManifest.presets.filter((e) => !RACKS.some((r) => e.id === `${ID}-${r.id}`))
+  midiManifest.presets = [...others, ...midiEntries]
   writeFileSync('public/midi-presets/manifest.json', JSON.stringify(midiManifest, null, 2) + '\n')
 }
 

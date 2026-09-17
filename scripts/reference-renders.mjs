@@ -36,6 +36,7 @@ const REFERENCES = [
   ['preset', 'handpan-monolithe', 45],
   ['preset', 'handpan-lumiere', 45],
   ['project', 'deux-mondes', 425],
+  ['project', 'deux-mondes-orchestre', 425],
 ]
 
 /** A project as the app plays it (src/state/rackFlatten.ts): ids prefixed by rack, the mixer fader

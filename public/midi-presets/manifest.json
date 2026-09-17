@@ -170,6 +170,46 @@
       "id": "deux-mondes-percu",
       "name": "Les Deux Mondes d'Hyrule - Percussions",
       "file": "deux-mondes-percu.mid"
+    },
+    {
+      "id": "deux-mondes-orchestre-handpans",
+      "name": "Les Deux Mondes d'Hyrule (orchestre) - Handpans",
+      "file": "deux-mondes-orchestre-handpans.mid"
+    },
+    {
+      "id": "deux-mondes-orchestre-harpe",
+      "name": "Les Deux Mondes d'Hyrule (orchestre) - Harpe & cloches",
+      "file": "deux-mondes-orchestre-harpe.mid"
+    },
+    {
+      "id": "deux-mondes-orchestre-snes",
+      "name": "Les Deux Mondes d'Hyrule (orchestre) - SNES",
+      "file": "deux-mondes-orchestre-snes.mid"
+    },
+    {
+      "id": "deux-mondes-orchestre-nappe",
+      "name": "Les Deux Mondes d'Hyrule (orchestre) - Nappe",
+      "file": "deux-mondes-orchestre-nappe.mid"
+    },
+    {
+      "id": "deux-mondes-orchestre-orgue",
+      "name": "Les Deux Mondes d'Hyrule (orchestre) - Orgue",
+      "file": "deux-mondes-orchestre-orgue.mid"
+    },
+    {
+      "id": "deux-mondes-orchestre-percu",
+      "name": "Les Deux Mondes d'Hyrule (orchestre) - Percussions",
+      "file": "deux-mondes-orchestre-percu.mid"
+    },
+    {
+      "id": "deux-mondes-orchestre-cuivres",
+      "name": "Les Deux Mondes d'Hyrule (orchestre) - Trompettes",
+      "file": "deux-mondes-orchestre-cuivres.mid"
+    },
+    {
+      "id": "deux-mondes-orchestre-cordes",
+      "name": "Les Deux Mondes d'Hyrule (orchestre) - Cordes",
+      "file": "deux-mondes-orchestre-cordes.mid"
     }
   ]
 }
