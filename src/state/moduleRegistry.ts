@@ -981,7 +981,7 @@ export const moduleDefaults: Record<ModuleType, Record<string, number | string |
   },
   '909-snare': {
     tune: 200,          // Tone frequency Hz
-    tone: 0.5,          // Tone/noise mix 0-1
+    tone: 0.5,          // Noise length 0-1 (TR-909 TONE)
     snappy: 0.5,        // Noise snap 0-1
     decay: 0.3,         // Decay time 0-1
   },
