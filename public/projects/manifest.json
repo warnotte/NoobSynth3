@@ -119,6 +119,13 @@
       "description": "Classique x Nintendo en un seul morceau de 6 minutes, tout en ré : Toccata de Bach a l'orgue, Dark World sur puce SNES, le roi de la montagne, Fontaine des fees a la harpe, Prelude BWV 846 en NES, Gymnopedie et Kakariko aux handpans, Trumpet Voluntary en finale. 5 racks, automation de volume pour les enchainements.",
       "file": "songe-hyrule.json",
       "group": "Songs"
+    },
+    {
+      "id": "reve-dinosaur",
+      "name": "Le Rêve de Dinosaur Land 🍄",
+      "description": "Super Mario World (Koji Kondo) en suite magique : Star Road sur la puce SNES, Overworld et Athletic aux handpans et a la harpe, carte de Donut Plains, Forest of Illusion, un chateau tenebreux a l'orgue et aux timbales, puis le generique de fin. 6 racks, automation de volume.",
+      "file": "reve-dinosaur.json",
+      "group": "Songs"
     }
   ]
 }

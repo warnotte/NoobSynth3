@@ -4,6 +4,11 @@
     "seconds": 356,
     "sha256": "cd3f846eeb815c9af1d0ca1ce5b059464029d43eb52396e65bf6039f5d43e19f"
   },
+  "reve-dinosaur": {
+    "kind": "project",
+    "seconds": 394,
+    "sha256": "1eb42fcff4b5c1c9d022edafa41f30efa933df9edcd382883fc1a3b228a32042"
+  },
   "handpan-zelda-kakariko-project": {
     "kind": "project",
     "seconds": 45,

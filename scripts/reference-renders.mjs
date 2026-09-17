@@ -20,6 +20,7 @@ const STORE = 'scripts/reference-renders.json'
 // [kind, id, seconds]. The Songe is rendered in full: it is the demo that must never change.
 const REFERENCES = [
   ['project', 'songe-hyrule', 356],
+  ['project', 'reve-dinosaur', 394],
   ['project', 'handpan-zelda-kakariko-project', 45],
   ['project', 'handpan-zelda-dark-world-project', 45],
   ['project', 'handpan-zelda-fairy-project', 45],

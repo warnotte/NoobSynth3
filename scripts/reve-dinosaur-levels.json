@@ -1,0 +1,45 @@
+{
+  "bus": {
+    "handpans": 1.238,
+    "harpe": 6.568,
+    "snes": 3.0848,
+    "nappe": 1.373,
+    "orgue": 3.1116,
+    "percu": 0.2498
+  },
+  "handpans": {
+    "starroad": 0.2706,
+    "overworld": 0.5703,
+    "donut": 0.4618,
+    "athletic": 0.4737,
+    "forest": 1,
+    "castle": 0.7656,
+    "ending": 0.6589
+  },
+  "harpe": {
+    "starroad": 0.1088,
+    "overworld": 0.5274,
+    "donut": 0.6394,
+    "athletic": 0.7267,
+    "ending": 1
+  },
+  "snes": {
+    "starroad": 1,
+    "donut": 0.7387,
+    "forest": 0.4689,
+    "castle": 0.7068,
+    "ending": 0.7438
+  },
+  "nappe": {
+    "starroad": 0.5887,
+    "overworld": 0.7571,
+    "forest": 0.8762,
+    "ending": 1
+  },
+  "orgue": {
+    "castle": 1
+  },
+  "percu": {
+    "castle": 1
+  }
+}
