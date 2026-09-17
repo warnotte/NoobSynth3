@@ -25,15 +25,9 @@ const SLEW_RISE = 0.3
 const SLEW_FALL = 0.9
 
 // ---------------------------------------------------------------- sources
-// Overworld and Athletic are bundled (public/midi-presets). The other transcriptions stay out of the repo:
-// download them once into sample_import/smw/vgmusic/ (git-ignored) from https://www.vgmusic.com/music/console/nintendo/snes/
-const VGMUSIC = 'https://www.vgmusic.com/music/console/nintendo/snes/'
+// Overworld and Athletic are bundled (public/midi-presets); the other transcriptions are kept byte for byte in
+// scripts/sources/smw/ (see SOURCES.md there) so the project can always be regenerated from the repository alone.
 function source(path) {
-  if (!existsSync(path)) {
-    const file = path.split('/').pop()
-    throw new Error(`missing source ${path}: download it with
-  curl -sL -o ${path} ${VGMUSIC}${file}`)
-  }
   const buf = readFileSync(path)
   const midi = new Midi(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength))
   const tracks = midi.tracks.map((t) => ({
@@ -89,7 +83,7 @@ let at = 0
 // 1. Star Road (SMW, A minor feel on D / C) — the sparkling riff on the SNES chip doubled by bells, the two
 //    sustained harmony voices as an organ flute bed, the bass on the low handpan. GM drum tracks left out.
 {
-  const s = source('sample_import/smw/vgmusic/SMW-Star_Road.mid') // Frederico Saar, 96-100 % agreement
+  const s = source('scripts/sources/smw/SMW-Star_Road.mid') // Frederico Saar, 96-100 % agreement
   const to = 23.05
   excerpt(s, { tracks: onChannel(s, 1), from: 0, to, at, lane: 'snes.lead', vel: 0.9 })
   excerpt(s, { tracks: onChannel(s, 1), from: 0, to, at, lane: 'harpe.cloche', transpose: 12, vel: 0.55 })
@@ -116,7 +110,7 @@ let at = 0
 // 3. Donut Plains map (Daniel Lippert; 100 % agreement with The Ultimate Koopa) — the marimba lead on the harp,
 //    its ocarina double on the SNES chip, the two harmony lines on the handpans, the bass pinched, piccolo bells.
 {
-  const s = source('sample_import/smw/vgmusic/SMWWorldMap.mid')
+  const s = source('scripts/sources/smw/SMWWorldMap.mid')
   const to = 43.3
   excerpt(s, { tracks: onChannel(s, 4), from: 0, to, at, lane: 'harpe.harpe', vel: 0.8 })
   excerpt(s, { tracks: onChannel(s, 5), from: 0, to, at, lane: 'snes.lead', vel: 0.5 })
@@ -141,7 +135,7 @@ let at = 0
 // 5. Forest of Illusion (Daniel Lippert, 97 % agreement with SwordBolt; C minor) — the lead on the handpans with a
 //    faint SNES double, the chords as the flute bed, the bass on the low handpan: the light starts to fade.
 {
-  const s = source('sample_import/smw/vgmusic/SMWForestOfIllusion.mid')
+  const s = source('scripts/sources/smw/SMWForestOfIllusion.mid')
   const to = 65.9
   excerpt(s, { tracks: onChannel(s, 2), from: 0, to, at, lane: 'handpans', vel: 0.95 })
   excerpt(s, { tracks: onChannel(s, 3), from: 0, to, at, lane: 'snes.lead', vel: 0.35 })
@@ -154,7 +148,7 @@ let at = 0
 //    organ, the "dun dun" and the second bass on the 16' pedal, the leads on the SNES chip (strings wave, dark and
 //    lo-fi), the bass line on the low handpan, the drums as low timpani. Ends inside the accelerando.
 {
-  const s = source('sample_import/smw/vgmusic/smwcstle.mid')
+  const s = source('scripts/sources/smw/smwcstle.mid')
   const to = 68
   excerpt(s, { tracks: onChannel(s, 1), from: 0, to, at, lane: 'orgue.ostinato', vel: 0.8 })
   excerpt(s, { tracks: onChannel(s, 2), from: 0, to, at, lane: 'orgue.pedale', vel: 1 })
@@ -169,7 +163,7 @@ let at = 0
 //    the handpans with a bell-chip double, the accordion and strings as the flute bed, the guitar arpeggios on the
 //    harp, the tuba pinched; octave bells join the lead for the last phrases.
 {
-  const s = source('sample_import/smw/vgmusic/Smwend.mid')
+  const s = source('scripts/sources/smw/Smwend.mid')
   const to = (192 * 60) / 133
   excerpt(s, { tracks: onChannel(s, 5), from: 0, to, at, lane: 'handpans', vel: 1 })
   excerpt(s, { tracks: onChannel(s, 5), from: 0, to, at, lane: 'snes.lead', vel: 0.4 })
