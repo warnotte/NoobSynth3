@@ -78,5 +78,10 @@
     "kind": "preset",
     "seconds": 45,
     "sha256": "b2c0c53c902efbc45950f775133f78026f3d3072a964795d36fe5345cda885e5"
+  },
+  "deux-mondes": {
+    "kind": "project",
+    "seconds": 425,
+    "sha256": "ee07b4c79152f860b36f02c83df16d4265d01c1547fb4bd5b642fb5ec9cc6a3c"
   }
 }

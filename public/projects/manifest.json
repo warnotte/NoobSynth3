@@ -119,6 +119,13 @@
       "description": "Classique x Nintendo en un seul morceau de 6 minutes, tout en ré : Toccata de Bach a l'orgue, Dark World sur puce SNES, le roi de la montagne, Fontaine des fees a la harpe, Prelude BWV 846 en NES, Gymnopedie et Kakariko aux handpans, Trumpet Voluntary en finale. 5 racks, automation de volume pour les enchainements.",
       "file": "songe-hyrule.json",
       "group": "Songs"
+    },
+    {
+      "id": "deux-mondes",
+      "name": "Les Deux Mondes d'Hyrule 🗡️",
+      "description": "Zelda: A Link to the Past (Koji Kondo) en suite : le prologue, le theme du heros de Light World, la fontaine des fees, Lost Woods, la chute dans le Dark World, Ganon, et le generique. Handpans, harpe, puce SNES, orgues, caisse claire 909. 6 racks, automation de volume.",
+      "file": "deux-mondes.json",
+      "group": "Songs"
     }
   ]
 }

@@ -140,6 +140,36 @@
       "id": "songe-hyrule-rythme",
       "name": "Le Songe d'Hyrule - Rythme",
       "file": "songe-hyrule-rythme.mid"
+    },
+    {
+      "id": "deux-mondes-handpans",
+      "name": "Les Deux Mondes d'Hyrule - Handpans",
+      "file": "deux-mondes-handpans.mid"
+    },
+    {
+      "id": "deux-mondes-harpe",
+      "name": "Les Deux Mondes d'Hyrule - Harpe & cloches",
+      "file": "deux-mondes-harpe.mid"
+    },
+    {
+      "id": "deux-mondes-snes",
+      "name": "Les Deux Mondes d'Hyrule - SNES",
+      "file": "deux-mondes-snes.mid"
+    },
+    {
+      "id": "deux-mondes-nappe",
+      "name": "Les Deux Mondes d'Hyrule - Nappe",
+      "file": "deux-mondes-nappe.mid"
+    },
+    {
+      "id": "deux-mondes-orgue",
+      "name": "Les Deux Mondes d'Hyrule - Orgue",
+      "file": "deux-mondes-orgue.mid"
+    },
+    {
+      "id": "deux-mondes-percu",
+      "name": "Les Deux Mondes d'Hyrule - Percussions",
+      "file": "deux-mondes-percu.mid"
     }
   ]
 }
