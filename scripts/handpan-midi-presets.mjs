@@ -269,24 +269,59 @@ duo({
   level: 2.7,
 })
 
-// Super Mario World - Overworld (SNES), from the Mario module's song data (scripts/mario-song-midi.mjs):
-// melody and walking bass only (the module's harmony channel was derived mechanically and clashes).
+// Super Mario World - Overworld (SNES): VGMusic transcription by SevenChaos, chosen on numbers among six:
+// 83-86 % of its notes match Forrest Riedl's independent transcription and it agrees best with the other
+// four; 8 tracks, so the MIDI player loads all of them. Guitar and pizzicato double the same off-beat chords.
 duo({
   id: 'handpan-smw-overworld',
-  name: 'Handpans - Super Mario World Overworld (4 voix)',
-  description: "Le theme du monde de Super Mario World (SNES, Koji Kondo) sur deux handpans : la melodie a droite, la basse qui marche a gauche, sequenceur a 4 voix.",
+  name: 'Handpans - Super Mario World Overworld (8 pistes)',
+  description: "Le theme du monde de Super Mario World (SNES, Koji Kondo) : les 8 pistes du MIDI sur 8 handpans, melodie, deux basses, accords en contretemps doubles de chaque cote, flute et violoncelle.",
   file: 'smw-overworld.mid',
   voices: 4,
-  text: ['SUPER MARIO WORLD - OVERWORLD (4 voix)', 'Super Mario World (SNES, 1990), musique de Koji Kondo.', '',
-    'Le theme du monde en fa majeur : la melodie sur un handpan, la basse qui marche (chromatique)',
-    'sur un autre, tenue courte pour que les notes ne se melangent pas. Fichier tire des donnees du',
-    'module Mario (scripts/mario-song-midi.mjs).'],
+  maxFields: 104,
+  text: ['SUPER MARIO WORLD - OVERWORLD (8 pistes)', 'Super Mario World (SNES, 1990), musique de Koji Kondo, MIDI de SevenChaos (VGMusic).', '',
+    "Un orchestre de 8 handpans, un par piste : la fanfare d'intro, le tuba et la contrebasse, la",
+    'melodie (steel drums dans le fichier), les accords en contretemps joues par deux handpans places',
+    "de chaque cote (guitare et pizzicati), la flute et le violoncelle.",
+    'Transcription choisie parmi six : 83-86 % de ses notes se retrouvent dans une autre transcription',
+    'independante. Deux tours du theme, en boucle.'],
   parts: [
-    { name: 'Melodie', params: { pan: 0.35, instrument: 71, seed: 81, attack: 0.55, sustain: 0.9, level: 1 } },
-    { name: 'Basse', params: { pan: -0.35, instrument: 72, seed: 82, attack: 0.5, sustain: 0.7, level: 0.9 } },
+    { name: 'Fanfare', params: { pan: 0.6, instrument: 81, seed: 91, attack: 0.6, level: 0.6 } },
+    { name: 'Tuba', params: { pan: -0.25, instrument: 82, seed: 92, attack: 0.45, sustain: 0.7, level: 0.9 } },
+    { name: 'Guitare', params: { pan: 0.55, instrument: 83, seed: 93, attack: 0.45, sustain: 0.6, level: 0.5 } },
+    { name: 'Melodie', params: { pan: 0.1, instrument: 84, seed: 94, attack: 0.55, level: 1 } },
+    { name: 'Contrebasse', params: { pan: -0.45, instrument: 85, seed: 95, attack: 0.45, sustain: 0.7, level: 0.85 } },
+    { name: 'Pizzicati', params: { pan: -0.55, instrument: 86, seed: 96, attack: 0.45, sustain: 0.6, level: 0.5 } },
+    { name: 'Flute', params: { pan: 0.3, instrument: 87, seed: 97, attack: 0.5, level: 0.75 } },
+    { name: 'Violoncelle', params: { pan: -0.15, instrument: 88, seed: 98, attack: 0.5, level: 0.75 } },
   ],
   reverb: { time: 0.5, damp: 0.45, preDelay: 12, mix: 0.2 },
-  level: 1.5,
+  level: 1.55,
+})
+
+// Super Mario World - Athletic (SNES): VGMusic transcription by AI Musicware Branch; three independent
+// transcriptions share 96-97 % of their notes. The file's Yoshi drum track (two bongo pitches a semitone
+// apart, which would ring as a constant clash on a handpan) is removed from the published copy.
+duo({
+  id: 'handpan-smw-athletic',
+  name: 'Handpans - Super Mario World Athletic (5 pistes)',
+  description: "Le theme athletique de Super Mario World (SNES, Koji Kondo) : les 5 pistes du MIDI sur 5 handpans, melodie, basse, contretemps et deux voix d'accords.",
+  file: 'smw-athletic.mid',
+  voices: 4,
+  text: ['SUPER MARIO WORLD - ATHLETIC (5 pistes)', 'Super Mario World (SNES, 1990), musique de Koji Kondo, MIDI de AI Musicware Branch (VGMusic).', '',
+    "Le theme des niveaux athletiques en 5 handpans : la melodie, la basse (tres grave, sol 1 a sol 2),",
+    "le contretemps et les deux voix d'accords, places de part et d'autre de la stereo.",
+    'Trois transcriptions independantes partagent 96-97 % de leurs notes. La piste de batterie',
+    '"Yoshi" du fichier est retiree : deux bongos a un demi-ton, un frottement permanent sur un handpan.'],
+  parts: [
+    { name: 'Melodie', params: { pan: 0.15, instrument: 89, seed: 99, attack: 0.55, level: 1 } },
+    { name: 'Basse', params: { pan: -0.2, instrument: 90, seed: 100, attack: 0.5, sustain: 0.7, level: 0.9 } },
+    { name: 'Contretemps', params: { pan: 0.5, instrument: 91, seed: 101, attack: 0.45, sustain: 0.7, level: 0.6 } },
+    { name: 'Accords medium', params: { pan: -0.5, instrument: 92, seed: 102, attack: 0.45, level: 0.65 } },
+    { name: 'Accords graves', params: { pan: 0.35, instrument: 93, seed: 103, attack: 0.45, level: 0.65 } },
+  ],
+  reverb: { time: 0.5, damp: 0.45, preDelay: 12, mix: 0.2 },
+  level: 1.3,
 })
 
 // ---- Multi-rack projects: one rack per instrument family, every rack plays the same MIDI file with its

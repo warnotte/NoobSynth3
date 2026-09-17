@@ -81,7 +81,8 @@ piste. Le fichier du lecteur MIDI est identique à celui du preset.
 | Zelda · Fairy Fountain | 2 handpans, 4 voix | [▶️](https://warnotte.github.io/NoobSynth3/?preset=handpan-zelda-fairy) |
 | Zelda · Kakariko | 8 handpans | [▶️](https://warnotte.github.io/NoobSynth3/?preset=handpan-zelda-kakariko) |
 | Zelda · Dark World | 8 handpans | [▶️](https://warnotte.github.io/NoobSynth3/?preset=handpan-zelda-dark-world) |
-| Super Mario World · Overworld | 2 handpans | [▶️](https://warnotte.github.io/NoobSynth3/?preset=handpan-smw-overworld) |
+| Super Mario World · Overworld | 8 handpans | [▶️](https://warnotte.github.io/NoobSynth3/?preset=handpan-smw-overworld) |
+| Super Mario World · Athletic | 5 handpans | [▶️](https://warnotte.github.io/NoobSynth3/?preset=handpan-smw-athletic) |
 | Satie · Gymnopédie n°1 | 2 handpans, 8 voix | [▶️](https://warnotte.github.io/NoobSynth3/?preset=handpan-satie-gymnopedie) |
 | Aphex Twin · Avril 14th | 2 handpans, 8 voix | [▶️](https://warnotte.github.io/NoobSynth3/?preset=handpan-avril-14th) |
 | Purcell · Trumpet Voluntary | 4 handpans | [▶️](https://warnotte.github.io/NoobSynth3/?preset=handpan-purcell-trumpet) |
@@ -97,4 +98,6 @@ Avril 14th en 2 racks.
 
 Musiques originales : Johann Sebastian Bach, Edvard Grieg, Erik Satie, Jeremiah Clarke (domaine public) ;
 Koji Kondo (Nintendo) ; Aphex Twin. Les fichiers MIDI viennent des séquenceurs mentionnés dans les fichiers
-eux-mêmes. Références sonores du handpan : pack GAMEDRIX974 (freesound, CC0), Hang FreePats (CC0).
+eux-mêmes. Super Mario World : transcriptions de SevenChaos (Overworld) et AI Musicware Branch (Athletic),
+publiées sur VGMusic, choisies parmi onze parce que des transcriptions indépendantes y retrouvent 83 à 97 %
+des mêmes notes ; la piste de batterie « Yoshi » d'Athletic est retirée. Références sonores du handpan : pack GAMEDRIX974 (freesound, CC0), Hang FreePats (CC0).

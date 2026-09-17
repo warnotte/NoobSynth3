@@ -1137,9 +1137,16 @@
     },
     {
       "id": "handpan-smw-overworld",
-      "name": "Handpans - Super Mario World Overworld (4 voix)",
-      "description": "Le theme du monde de Super Mario World (SNES, Koji Kondo) sur deux handpans : la melodie a droite, la basse qui marche a gauche, sequenceur a 4 voix.",
+      "name": "Handpans - Super Mario World Overworld (8 pistes)",
+      "description": "Le theme du monde de Super Mario World (SNES, Koji Kondo) : les 8 pistes du MIDI sur 8 handpans, melodie, deux basses, accords en contretemps doubles de chaque cote, flute et violoncelle.",
       "file": "handpan-smw-overworld.json",
+      "group": "Physical Modeling"
+    },
+    {
+      "id": "handpan-smw-athletic",
+      "name": "Handpans - Super Mario World Athletic (5 pistes)",
+      "description": "Le theme athletique de Super Mario World (SNES, Koji Kondo) : les 5 pistes du MIDI sur 5 handpans, melodie, basse, contretemps et deux voix d'accords.",
+      "file": "handpan-smw-athletic.json",
       "group": "Physical Modeling"
     },
     {
