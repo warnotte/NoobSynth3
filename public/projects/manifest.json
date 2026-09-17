@@ -121,6 +121,13 @@
       "group": "Songs"
     },
     {
+      "id": "reve-dinosaur",
+      "name": "Le Rêve de Dinosaur Land 🍄",
+      "description": "Super Mario World (Koji Kondo) en suite magique : Star Road sur la puce SNES, Overworld et Athletic aux handpans et a la harpe, carte de Donut Plains, Forest of Illusion, un chateau tenebreux a l'orgue et aux timbales, puis le generique de fin. 6 racks, automation de volume.",
+      "file": "reve-dinosaur.json",
+      "group": "Songs"
+    },
+    {
       "id": "deux-mondes",
       "name": "Les Deux Mondes d'Hyrule 🗡️",
       "description": "Zelda: A Link to the Past (Koji Kondo) en suite : le prologue, le theme du heros de Light World, la fontaine des fees, Lost Woods, la chute dans le Dark World, Ganon, et le generique. Handpans, harpe, puce SNES, orgues, caisse claire 909. 6 racks, automation de volume.",

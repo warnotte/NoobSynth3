@@ -142,6 +142,36 @@
       "file": "songe-hyrule-rythme.mid"
     },
     {
+      "id": "reve-dinosaur-handpans",
+      "name": "Le Rêve de Dinosaur Land - Handpans",
+      "file": "reve-dinosaur-handpans.mid"
+    },
+    {
+      "id": "reve-dinosaur-harpe",
+      "name": "Le Rêve de Dinosaur Land - Harpe & cloches",
+      "file": "reve-dinosaur-harpe.mid"
+    },
+    {
+      "id": "reve-dinosaur-snes",
+      "name": "Le Rêve de Dinosaur Land - SNES",
+      "file": "reve-dinosaur-snes.mid"
+    },
+    {
+      "id": "reve-dinosaur-nappe",
+      "name": "Le Rêve de Dinosaur Land - Nappe",
+      "file": "reve-dinosaur-nappe.mid"
+    },
+    {
+      "id": "reve-dinosaur-orgue",
+      "name": "Le Rêve de Dinosaur Land - Orgue",
+      "file": "reve-dinosaur-orgue.mid"
+    },
+    {
+      "id": "reve-dinosaur-percu",
+      "name": "Le Rêve de Dinosaur Land - Timbales",
+      "file": "reve-dinosaur-percu.mid"
+    },
+    {
       "id": "deux-mondes-handpans",
       "name": "Les Deux Mondes d'Hyrule - Handpans",
       "file": "deux-mondes-handpans.mid"
