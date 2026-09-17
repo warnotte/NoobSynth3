@@ -55,6 +55,7 @@ Chaque connexion utilise des objets imbriqués `from`/`to` avec `moduleId` et `p
 3. [ ] **Module Notes** - **OBLIGATOIRE** : Ajouter un module `notes` explicatif dans le preset
 4. [ ] `npm run check:presets <preset-name>` - Vérifie qu'aucun câble ne vise un port inexistant
    (le moteur ignore silencieusement un port inconnu → preset qui joue avec un câble mort)
+5. [ ] `npm run check:preset-params <preset-name>` - Vérifie qu'aucun `params` ne porte un nom que le moteur ignore (ex. `steps` au lieu de `drumData`, `bpm` au lieu de `tempo`, `level` sur une voix 909) et qu'aucun réglage de batterie ne sort de la plage de son knob (le DSP `clamp()` en silence)
 
 ```json
 {

@@ -14,9 +14,9 @@
           "y": 120
         },
         "params": {
-          "bpm": 120,
           "running": true,
-          "rate": 4
+          "rate": 4,
+          "tempo": 120
         }
       },
       {
@@ -30,24 +30,9 @@
         "params": {
           "swing": 0.15,
           "rate": 4,
-          "steps": [
-            { "kick": true, "snare": false, "hhc": true, "hho": false, "clap": false, "tom": false, "rim": false, "aux": false, "accKick": false, "accSnare": false, "accHhc": false, "accHho": false, "accClap": false, "accTom": false, "accRim": false, "accAux": false },
-            { "kick": false, "snare": false, "hhc": true, "hho": false, "clap": false, "tom": false, "rim": false, "aux": false, "accKick": false, "accSnare": false, "accHhc": false, "accHho": false, "accClap": false, "accTom": false, "accRim": false, "accAux": false },
-            { "kick": false, "snare": false, "hhc": true, "hho": false, "clap": false, "tom": false, "rim": false, "aux": false, "accKick": false, "accSnare": false, "accHhc": false, "accHho": false, "accClap": false, "accTom": false, "accRim": false, "accAux": false },
-            { "kick": false, "snare": false, "hhc": true, "hho": false, "clap": false, "tom": false, "rim": false, "aux": false, "accKick": false, "accSnare": false, "accHhc": false, "accHho": false, "accClap": false, "accTom": false, "accRim": false, "accAux": false },
-            { "kick": false, "snare": true, "hhc": true, "hho": false, "clap": false, "tom": false, "rim": false, "aux": false, "accKick": false, "accSnare": true, "accHhc": false, "accHho": false, "accClap": false, "accTom": false, "accRim": false, "accAux": false },
-            { "kick": false, "snare": false, "hhc": true, "hho": false, "clap": false, "tom": false, "rim": false, "aux": false, "accKick": false, "accSnare": false, "accHhc": false, "accHho": false, "accClap": false, "accTom": false, "accRim": false, "accAux": false },
-            { "kick": false, "snare": false, "hhc": true, "hho": false, "clap": false, "tom": false, "rim": false, "aux": false, "accKick": false, "accSnare": false, "accHhc": false, "accHho": false, "accClap": false, "accTom": false, "accRim": false, "accAux": false },
-            { "kick": false, "snare": false, "hhc": true, "hho": false, "clap": false, "tom": false, "rim": false, "aux": false, "accKick": false, "accSnare": false, "accHhc": false, "accHho": false, "accClap": false, "accTom": false, "accRim": false, "accAux": false },
-            { "kick": true, "snare": false, "hhc": true, "hho": false, "clap": false, "tom": false, "rim": false, "aux": false, "accKick": false, "accSnare": false, "accHhc": false, "accHho": false, "accClap": false, "accTom": false, "accRim": false, "accAux": false },
-            { "kick": false, "snare": false, "hhc": true, "hho": false, "clap": false, "tom": false, "rim": false, "aux": false, "accKick": false, "accSnare": false, "accHhc": false, "accHho": false, "accClap": false, "accTom": false, "accRim": false, "accAux": false },
-            { "kick": true, "snare": false, "hhc": true, "hho": false, "clap": false, "tom": false, "rim": false, "aux": false, "accKick": false, "accSnare": false, "accHhc": false, "accHho": false, "accClap": false, "accTom": false, "accRim": false, "accAux": false },
-            { "kick": false, "snare": false, "hhc": true, "hho": false, "clap": false, "tom": false, "rim": false, "aux": false, "accKick": false, "accSnare": false, "accHhc": false, "accHho": false, "accClap": false, "accTom": false, "accRim": false, "accAux": false },
-            { "kick": false, "snare": true, "hhc": true, "hho": false, "clap": false, "tom": false, "rim": false, "aux": false, "accKick": false, "accSnare": true, "accHhc": false, "accHho": false, "accClap": false, "accTom": false, "accRim": false, "accAux": false },
-            { "kick": false, "snare": false, "hhc": true, "hho": false, "clap": false, "tom": false, "rim": false, "aux": false, "accKick": false, "accSnare": false, "accHhc": false, "accHho": false, "accClap": false, "accTom": false, "accRim": false, "accAux": false },
-            { "kick": false, "snare": false, "hhc": true, "hho": false, "clap": false, "tom": false, "rim": true, "aux": false, "accKick": false, "accSnare": false, "accHhc": false, "accHho": false, "accClap": false, "accTom": false, "accRim": false, "accAux": false },
-            { "kick": false, "snare": false, "hhc": true, "hho": false, "clap": false, "tom": false, "rim": false, "aux": false, "accKick": false, "accSnare": false, "accHhc": false, "accHho": false, "accClap": false, "accTom": false, "accRim": false, "accAux": false }
-          ]
+          "drumData": "{\"tracks\":[[{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":1},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":1},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":1,\"a\":0},{\"g\":1,\"a\":0},{\"g\":1,\"a\":0},{\"g\":1,\"a\":0},{\"g\":1,\"a\":0},{\"g\":1,\"a\":0},{\"g\":1,\"a\":0},{\"g\":1,\"a\":0},{\"g\":1,\"a\":0},{\"g\":1,\"a\":0},{\"g\":1,\"a\":0},{\"g\":1,\"a\":0},{\"g\":1,\"a\":0},{\"g\":1,\"a\":0},{\"g\":1,\"a\":0},{\"g\":1,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":1,\"a\":0},{\"g\":0,\"a\":0}],[{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0},{\"g\":0,\"a\":0}]]}",
+          "enabled": 1,
+          "tempo": 120
         }
       },
       {
@@ -59,10 +44,9 @@
           "y": 120
         },
         "params": {
-          "tune": 0,
+          "tune": 55,
           "attack": 0.3,
-          "decay": 0.5,
-          "level": 0.9
+          "decay": 0.5
         }
       },
       {
@@ -74,10 +58,9 @@
           "y": 320
         },
         "params": {
-          "tune": 0,
+          "tune": 200,
           "tone": 0.5,
-          "snappy": 0.6,
-          "level": 0.8
+          "snappy": 0.6
         }
       },
       {
@@ -89,10 +72,9 @@
           "y": 520
         },
         "params": {
-          "tune": 0.1,
+          "tune": 1,
           "decay": 0.3,
-          "open": 0,
-          "level": 0.5
+          "open": 0
         }
       },
       {
@@ -104,8 +86,7 @@
           "y": 520
         },
         "params": {
-          "tune": 0,
-          "level": 0.6
+          "tune": 400
         }
       },
       {
@@ -171,70 +152,149 @@
     ],
     "connections": [
       {
-        "from": { "moduleId": "clock-1", "portId": "clock" },
-        "to": { "moduleId": "drum-seq-1", "portId": "clock" },
+        "from": {
+          "moduleId": "clock-1",
+          "portId": "clock"
+        },
+        "to": {
+          "moduleId": "drum-seq-1",
+          "portId": "clock"
+        },
         "kind": "sync"
       },
       {
-        "from": { "moduleId": "drum-seq-1", "portId": "gate-kick" },
-        "to": { "moduleId": "kick-1", "portId": "trigger" },
+        "from": {
+          "moduleId": "drum-seq-1",
+          "portId": "gate-kick"
+        },
+        "to": {
+          "moduleId": "kick-1",
+          "portId": "trigger"
+        },
         "kind": "gate"
       },
       {
-        "from": { "moduleId": "drum-seq-1", "portId": "acc-kick" },
-        "to": { "moduleId": "kick-1", "portId": "accent" },
+        "from": {
+          "moduleId": "drum-seq-1",
+          "portId": "acc-kick"
+        },
+        "to": {
+          "moduleId": "kick-1",
+          "portId": "accent"
+        },
         "kind": "cv"
       },
       {
-        "from": { "moduleId": "drum-seq-1", "portId": "gate-snare" },
-        "to": { "moduleId": "snare-1", "portId": "trigger" },
+        "from": {
+          "moduleId": "drum-seq-1",
+          "portId": "gate-snare"
+        },
+        "to": {
+          "moduleId": "snare-1",
+          "portId": "trigger"
+        },
         "kind": "gate"
       },
       {
-        "from": { "moduleId": "drum-seq-1", "portId": "acc-snare" },
-        "to": { "moduleId": "snare-1", "portId": "accent" },
+        "from": {
+          "moduleId": "drum-seq-1",
+          "portId": "acc-snare"
+        },
+        "to": {
+          "moduleId": "snare-1",
+          "portId": "accent"
+        },
         "kind": "cv"
       },
       {
-        "from": { "moduleId": "drum-seq-1", "portId": "gate-hhc" },
-        "to": { "moduleId": "hihat-1", "portId": "trigger" },
+        "from": {
+          "moduleId": "drum-seq-1",
+          "portId": "gate-hhc"
+        },
+        "to": {
+          "moduleId": "hihat-1",
+          "portId": "trigger"
+        },
         "kind": "gate"
       },
       {
-        "from": { "moduleId": "drum-seq-1", "portId": "gate-rim" },
-        "to": { "moduleId": "rim-1", "portId": "trigger" },
+        "from": {
+          "moduleId": "drum-seq-1",
+          "portId": "gate-rim"
+        },
+        "to": {
+          "moduleId": "rim-1",
+          "portId": "trigger"
+        },
         "kind": "gate"
       },
       {
-        "from": { "moduleId": "kick-1", "portId": "out" },
-        "to": { "moduleId": "mixer-1", "portId": "in-1" },
+        "from": {
+          "moduleId": "kick-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mixer-1",
+          "portId": "in-1"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "snare-1", "portId": "out" },
-        "to": { "moduleId": "mixer-1", "portId": "in-2" },
+        "from": {
+          "moduleId": "snare-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mixer-1",
+          "portId": "in-2"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "hihat-1", "portId": "out" },
-        "to": { "moduleId": "mixer-1", "portId": "in-3" },
+        "from": {
+          "moduleId": "hihat-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mixer-1",
+          "portId": "in-3"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "rim-1", "portId": "out" },
-        "to": { "moduleId": "mixer-1", "portId": "in-4" },
+        "from": {
+          "moduleId": "rim-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "mixer-1",
+          "portId": "in-4"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "mixer-1", "portId": "out" },
-        "to": { "moduleId": "comp-1", "portId": "in" },
+        "from": {
+          "moduleId": "mixer-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "comp-1",
+          "portId": "in"
+        },
         "kind": "audio"
       },
       {
-        "from": { "moduleId": "comp-1", "portId": "out" },
-        "to": { "moduleId": "out-1", "portId": "in" },
+        "from": {
+          "moduleId": "comp-1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "out-1",
+          "portId": "in"
+        },
         "kind": "audio"
       }
-    ]
+    ],
+    "taps": []
   }
 }

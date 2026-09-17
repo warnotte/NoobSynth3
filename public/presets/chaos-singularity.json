@@ -85,7 +85,7 @@
         "id": "perc",
         "type": "909-rimshot",
         "name": "Ticks",
-        "params": { "tune": 1200, "decay": 0.1 },
+        "params": { "tune": 600 },
         "position": { "x": 14, "y": 14 }
       },
       {

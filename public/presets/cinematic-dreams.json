@@ -285,14 +285,14 @@
         "type": "909-hihat",
         "name": "HiHat",
         "position": { "x": 11, "y": 24 },
-        "params": { "tune": 8000, "decay": 0.12, "tone": 0.35 }
+        "params": { "tune": 1, "decay": 0.12, "tone": 0.35 }
       },
       {
         "id": "clap-1",
         "type": "909-clap",
         "name": "Clap",
         "position": { "x": 13, "y": 24 },
-        "params": { "tone": 0.35, "decay": 0.2, "spread": 0.3 }
+        "params": { "tone": 0.35, "decay": 0.2 }
       },
       {
         "id": "mixer-drums",
