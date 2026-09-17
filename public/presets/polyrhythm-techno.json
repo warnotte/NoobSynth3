@@ -124,21 +124,21 @@
         "type": "909-hihat",
         "name": "HiHat",
         "position": { "x": 12, "y": 12 },
-        "params": { "tune": 9000, "decay": 0.08, "tone": 0.5 }
+        "params": { "tune": 1, "decay": 0.08, "tone": 0.5 }
       },
       {
         "id": "clap-1",
         "type": "909-clap",
         "name": "Clap",
         "position": { "x": 14, "y": 12 },
-        "params": { "tone": 0.45, "decay": 0.2, "spread": 0.3 }
+        "params": { "tone": 0.45, "decay": 0.2 }
       },
       {
         "id": "rim-1",
         "type": "909-rimshot",
         "name": "Rim",
         "position": { "x": 16, "y": 12 },
-        "params": { "tune": 800, "decay": 0.15, "snap": 0.6 }
+        "params": { "tune": 600 }
       },
       {
         "id": "mixer-drums",

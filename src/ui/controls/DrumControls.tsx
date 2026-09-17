@@ -11,7 +11,7 @@ import { RotaryKnob } from '../RotaryKnob'
 import { formatInt, formatPercent } from '../formatters'
 
 // TR-808 & TR-909 Drum knob configurations
-const drumConfigs: Record<string, DrumKnobConfig[]> = {
+export const drumConfigs: Record<string, DrumKnobConfig[]> = {
   // TR-808 Drums
   '808-kick': [
     { label: 'Tune', param: 'tune', min: 20, max: 80, step: 1, defaultVal: 45, unit: 'Hz', format: formatInt },

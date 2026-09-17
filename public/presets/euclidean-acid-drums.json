@@ -101,10 +101,8 @@
         "position": { "x": 400, "y": 50 },
         "params": {
           "tune": 50,
-          "attack": 50,
-          "decay": 70,
-          "tone": 0.4,
-          "level": 1
+          "attack": 0.5,
+          "decay": 0.7
         }
       },
       {
@@ -113,11 +111,10 @@
         "name": "Snare",
         "position": { "x": 400, "y": 150 },
         "params": {
-          "tune": 50,
+          "tune": 200,
           "tone": 0.5,
           "snappy": 0.6,
-          "decay": 50,
-          "level": 0.8
+          "decay": 0.5
         }
       },
       {
@@ -126,10 +123,8 @@
         "name": "HiHat",
         "position": { "x": 400, "y": 250 },
         "params": {
-          "mode": 0,
-          "decay": 30,
-          "tone": 0.6,
-          "level": 0.5
+          "decay": 0.3,
+          "tone": 0.6
         }
       },
       {

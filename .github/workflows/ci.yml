@@ -69,5 +69,10 @@ jobs:
       - name: npm ci
         run: npm ci
 
+      - name: Garde-fous presets (cables morts + parametres morts/hors plage)
+        run: |
+          npm run check:presets
+          npm run check:preset-params
+
       - name: npm run build
         run: npm run build
