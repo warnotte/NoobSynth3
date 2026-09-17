@@ -1,0 +1,50 @@
+{
+  "bus": {
+    "handpans": 1.1222,
+    "harpe": 4.8512,
+    "snes": 5.4821,
+    "nappe": 2.443,
+    "orgue": 7.4039,
+    "percu": 0.3898
+  },
+  "handpans": {
+    "prologue": 1,
+    "lightworld": 0.573,
+    "lostwoods": 0.687,
+    "darkworld": 0.773,
+    "ganon": 0.5047,
+    "generique": 0.5937
+  },
+  "harpe": {
+    "prologue": 0.6085,
+    "lightworld": 0.9574,
+    "fee": 0.444,
+    "lostwoods": 0.1226,
+    "generique": 0.4474
+  },
+  "snes": {
+    "lightworld": 0.3101,
+    "lostwoods": 0.99,
+    "darkworld": 0.2973,
+    "ganon": 1,
+    "generique": 0.2903
+  },
+  "nappe": {
+    "prologue": 0.4853,
+    "lightworld": 0.7537,
+    "lostwoods": 1,
+    "generique": 0.6431
+  },
+  "orgue": {
+    "prologue": 0.185,
+    "lightworld": 0.9574,
+    "darkworld": 0.2611,
+    "ganon": 0.3924
+  },
+  "percu": {
+    "lightworld": 0.2301,
+    "darkworld": 0.6378,
+    "ganon": 0.7386,
+    "generique": 0.7137
+  }
+}

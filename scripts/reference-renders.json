@@ -83,5 +83,15 @@
     "kind": "preset",
     "seconds": 45,
     "sha256": "b2c0c53c902efbc45950f775133f78026f3d3072a964795d36fe5345cda885e5"
+  },
+  "deux-mondes": {
+    "kind": "project",
+    "seconds": 425,
+    "sha256": "e01951fe53f87e6f420c79e6bbbe37a303c7d31d72e272605574466ad8a89272"
+  },
+  "deux-mondes-orchestre": {
+    "kind": "project",
+    "seconds": 425,
+    "sha256": "1636047a1cdd8724908bca907df1f3bffb4c9f2962376ee0a64a1016aff49655"
   }
 }
