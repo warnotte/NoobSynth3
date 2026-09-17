@@ -2138,14 +2138,23 @@ Grosse caisse TR-909 avec click d'attaque.
 
 ### 909 Snare
 
-Caisse claire avec mix tone/noise.
+Caisse claire calée sur une vraie TR-909 (pack d'échantillons AudioRealism : 125 positions TUNE/TONE/SNAPPY,
+ajustement hors ligne sur le spectrogramme, puis choisie à l'oreille contre la machine et l'ancien module).
+
+- **Corps** : deux oscillateurs, une note et sa quinte (rapport 1,5), qui démarrent environ une octave plus
+  haut et redescendent en ~7 ms (le « tchak » de la 909). Le grave est un triangle arrondi qui s'installe en
+  1 ms et sonne ~200 ms ; la quinte est surtout un coup bref.
+- **Bruit** : bruit blanc filtré 1-10,5 kHz, tenu en plateau puis coupé, `(1 - t/L)²`. Comme sur la
+  machine, TONE règle sa longueur et SNAPPY son niveau (même part d'aigus que la vraie 909 : 9 / 21 / 32 %
+  de l'énergie au-dessus de 2 kHz à SNAPPY 50 / 75 / 100 %).
+- Un nouveau coup fait disparaître le précédent en 2 ms (pas de clic).
 
 | Paramètre | Range | Description |
 |-----------|-------|-------------|
-| `tune` | 100-400 Hz | Fréquence du tone |
-| `tone` | 0-1 | Balance tone/noise |
-| `snappy` | 0-1 | Snap du noise |
-| `decay` | 0-1 | Durée du son |
+| `tune` | 100-400 Hz | Hauteur du grave une fois posé (la machine couvre ~116-231 Hz) |
+| `tone` | 0-1 | Longueur du bruit : 114 / 253 / 332 ms à 0 / 50 / 100 % |
+| `snappy` | 0-1 | Niveau du bruit (0 = corps seul) |
+| `decay` | 0-1 | 0,3 = la machine ; plus bas / plus haut raccourcit / allonge corps et bruit |
 
 ### 909 HiHat
 
