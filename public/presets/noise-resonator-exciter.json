@@ -7,7 +7,6 @@
         "name": "Keys",
         "position": { "x": 50, "y": 50 },
         "params": {
-          "octave": 3,
           "glide": 0.01
         }
       },

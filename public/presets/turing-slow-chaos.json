@@ -64,10 +64,8 @@
           "frequency": 440,
           "damping": 0.01,
           "brightness": 0.9,
-          "stretch": 0.0,
           "feedback": 0.997,
-          "position": 0.1,
-          "noise": "white"
+          "position": 0.1
         }
       },
       {
@@ -105,8 +103,7 @@
         "name": "High Pass",
         "position": { "x": 6, "y": 0 },
         "params": {
-          "cutoff": 800,
-          "resonance": 0.1
+          "cutoff": 800
         }
       },
       {

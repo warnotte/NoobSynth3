@@ -224,7 +224,7 @@
         "type": "phaser",
         "name": "Phaser",
         "position": { "x": 21, "y": 0 },
-        "params": { "rate": 0.3, "depth": 0.6, "stages": 6, "mix": 0.3, "feedback": 0.4 }
+        "params": { "rate": 0.3, "depth": 0.6, "mix": 0.3, "feedback": 0.4 }
       },
       {
         "id": "delay-1",

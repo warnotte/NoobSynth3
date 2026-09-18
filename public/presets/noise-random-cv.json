@@ -44,18 +44,14 @@
         "type": "sample-hold",
         "name": "S&H Pitch",
         "position": { "x": 200, "y": 200 },
-        "params": {
-          "slew": 0.01
-        }
+        "params": {}
       },
       {
         "id": "sh-filter",
         "type": "sample-hold",
         "name": "S&H Flt",
         "position": { "x": 200, "y": 350 },
-        "params": {
-          "slew": 0.05
-        }
+        "params": {}
       },
       {
         "id": "quantizer-1",
@@ -75,8 +71,7 @@
         "params": {
           "frequency": 220,
           "type": "sawtooth",
-          "pwm": 0.5,
-          "sync": false
+          "pwm": 0.5
         }
       },
       {

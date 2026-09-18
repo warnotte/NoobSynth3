@@ -217,8 +217,7 @@
           "mix": 0.4,
           "pitch": -5,
           "grainSize": 150,
-          "density": 0.5,
-          "spread": 1.0
+          "density": 0.5
         }
       },
       {

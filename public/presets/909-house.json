@@ -93,8 +93,7 @@
         },
         "params": {
           "tone": 0.6,
-          "decay": 0.35,
-          "spread": 0.6
+          "decay": 0.35
         }
       },
       {

@@ -101,8 +101,6 @@
           "footage4": 0.6,
           "footage223": 0.3,
           "footage2": 0.4,
-          "attack": 0.3,
-          "release": 1.5,
           "chiff": 0.1,
           "wind": 0.05
         }
@@ -204,8 +202,7 @@
           "mix": 0.3,
           "grainSize": 80,
           "pitch": 0,
-          "density": 0.7,
-          "spread": 0.8
+          "density": 0.7
         }
       },
       {

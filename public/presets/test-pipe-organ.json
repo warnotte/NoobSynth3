@@ -15,9 +15,7 @@
         },
         "params": {
           "voices": 4,
-          "portamento": 0,
-          "bendRange": 2,
-          "stealMode": 0
+          "portamento": 0
         }
       },
       {

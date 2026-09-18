@@ -37,16 +37,7 @@
         "type": "speech-synth",
         "name": "Speech",
         "position": { "x": 320, "y": 120 },
-        "params": {
-          "frequency": 180,
-          "formant1": 730,
-          "formant2": 1090,
-          "formant3": 2440,
-          "nasality": 0.2,
-          "breathiness": 0.15,
-          "vibrato": 0.3,
-          "vibratoRate": 5
-        }
+        "params": {}
       },
       {
         "id": "gltch-1",

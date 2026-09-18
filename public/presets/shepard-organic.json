@@ -69,7 +69,6 @@
         "type": "scope",
         "params": {
           "mode": "spectrogram",
-          "timeScale": 1,
           "gain": 1
         },
         "position": {

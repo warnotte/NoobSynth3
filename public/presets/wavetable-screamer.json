@@ -7,7 +7,6 @@
         "name": "Control",
         "position": { "x": 50, "y": 50 },
         "params": {
-          "octave": 4,
           "glide": 25
         }
       },
@@ -79,8 +78,7 @@
         "params": {
           "drive": 0.5,
           "tone": 0.7,
-          "mix": 0.35,
-          "output": 0.75
+          "mix": 0.35
         }
       },
       {

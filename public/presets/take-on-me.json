@@ -72,9 +72,7 @@
         "type": "cv-vca",
         "name": "Riff VCA",
         "position": { "col": 11, "row": 1 },
-        "params": {
-          "depth": 1.0
-        }
+        "params": {}
       },
       {
         "id": "chorus-1",
@@ -163,9 +161,7 @@
         "type": "cv-vca",
         "name": "Bass VCA",
         "position": { "col": 12, "row": 4 },
-        "params": {
-          "depth": 1.0
-        }
+        "params": {}
       },
 
       {
@@ -303,9 +299,7 @@
         "type": "cv-vca",
         "name": "Pad VCA",
         "position": { "col": 12, "row": 11 },
-        "params": {
-          "depth": 1.0
-        }
+        "params": {}
       },
 
       {

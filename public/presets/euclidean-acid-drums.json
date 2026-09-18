@@ -133,7 +133,6 @@
         "name": "303",
         "position": { "x": 400, "y": 450 },
         "params": {
-          "frequency": 55,
           "waveform": 0,
           "cutoff": 550,
           "resonance": 0.8,

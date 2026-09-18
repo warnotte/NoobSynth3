@@ -39,10 +39,8 @@
           "frequency": 220,
           "damping": 0.02,
           "brightness": 0.7,
-          "stretch": 0.0,
           "feedback": 0.996,
-          "position": 0.15,
-          "noise": "white"
+          "position": 0.15
         }
       },
       {

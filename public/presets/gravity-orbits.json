@@ -26,7 +26,7 @@
         "type": "oscillator",
         "name": "Pluck Osc",
         "position": { "col": 5, "row": 1 },
-        "params": { "frequency": 261.63, "type": "sawtooth", "level": 0.6 }
+        "params": { "frequency": 261.63, "type": "sawtooth" }
       },
       {
         "id": "osc-2",
