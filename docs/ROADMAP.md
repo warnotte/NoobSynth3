@@ -45,6 +45,22 @@
 
 ## Next Up / Backlog
 
+### Son (état au 2026-09-18, après v0.18.0)
+- [ ] **Presets Karplus trop faibles** — `plucked-chords`, `karplus-bass`, `gravity-orbits` sortent vers
+  −40 dBFS, quasi inaudibles à côté des autres presets. À recalibrer au banc (`render_graph`), puis à
+  l'oreille.
+- [ ] **Crête stéréo du Songe d'Hyrule et du Rêve de Dinosaur Land** — calibrés avec l'ancienne mesure
+  (crête du mix mono) ; crêtes réelles par canal 1,02 et 0,97. Mineur. Le calibrage des Deux Mondes lit
+  déjà la bonne crête (`deux-mondes-calibrate.mjs`), à reporter dans les deux autres scripts.
+- [ ] **Compositions originales pour handpan** (projet mono + poly) — idée notée lors du chantier
+  handpan, jamais commencée.
+- [x] ~~Paramètres morts des presets~~ — **clos.** Garde-fou `check:preset-params` en CI ; lot 1 (120
+  clés sans knob équivalent) supprimé sans changer un échantillon ; les 87 renommages restants sont
+  tolérés en baseline : le lot testé (19 charleys) mesurait 40 à 56 dB sous le mix, inaudible. Ne rouvrir
+  que si un preset est muet ou franchement faux (cas `compressor-drums`).
+- [ ] **Release v0.18.0** — construite en brouillon (9 installeurs), à publier depuis GitHub.
+
+### Reste du backlog
 - [ ] **Pan par channel** (mixer) — pas de contrôle de pan trouvé dans `MixerConsole`/le state mixer.
 - [ ] **Limiteur de bus master** — pas de limiteur trouvé (le seul "limiter" du code est le slew
   limiter d'un modulateur, sans rapport).
