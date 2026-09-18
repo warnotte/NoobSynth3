@@ -78,8 +78,7 @@
         },
         "params": {
           "tone": 0.5,
-          "decay": 0.4,
-          "spread": 0.5
+          "decay": 0.4
         }
       },
       {
@@ -105,9 +104,7 @@
           "y": 1
         },
         "params": {
-          "tune": 500,
-          "tone": 0.6,
-          "decay": 0.2
+          "tune": 500
         }
       },
       {

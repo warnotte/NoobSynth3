@@ -71,8 +71,7 @@
         "position": { "x": 350, "y": 250 },
         "params": {
           "tone": 0.55,
-          "decay": 0.35,
-          "spread": 0.4
+          "decay": 0.35
         }
       },
       {

@@ -7,7 +7,6 @@
         "name": "Control",
         "position": { "x": 50, "y": 50 },
         "params": {
-          "octave": 3,
           "glide": 0.15
         }
       },
@@ -116,8 +115,7 @@
           "mix": 0.35,
           "pitch": 7,
           "grainSize": 80,
-          "density": 0.7,
-          "spread": 0.8
+          "density": 0.7
         }
       },
       {

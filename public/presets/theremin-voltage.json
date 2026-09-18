@@ -11,13 +11,12 @@
         "name": "Theremin",
         "position": { "x": 40, "y": 60 },
         "params": {
-          "frequency": 220, "volume": 0, "gate": 0,
-          "waveform": 2,
+          "frequency": 220, "volume": 0, "waveform": 2,
           "vibratoRate": 6, "vibratoDepth": 0.5,
           "tremoloRate": 5, "tremoloDepth": 0,
           "tone": 0.5, "glide": 0.1, "level": 0.8,
           "scaleLock": true, "scale": 4, "root": 9,
-          "loFreq": 110, "hiFreq": 880, "preset": 0
+          "loFreq": 110, "hiFreq": 880
         }
       },
       {

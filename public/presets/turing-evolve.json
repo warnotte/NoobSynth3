@@ -102,7 +102,6 @@
           "mix": 0.4,
           "grainSize": 80,
           "pitch": 0,
-          "spread": 0.3,
           "density": 0.7
         }
       },

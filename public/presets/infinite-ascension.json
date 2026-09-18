@@ -139,7 +139,6 @@
           "rate": 0.08,
           "depth": 0.7,
           "feedback": 0.4,
-          "stages": 6,
           "mix": 0.35
         }
       },

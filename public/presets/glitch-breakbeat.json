@@ -40,8 +40,7 @@
         "params": {
           "tune": 45,
           "decay": 0.6,
-          "tone": 0.5,
-          "drive": 0.4
+          "tone": 0.5
         }
       },
       {

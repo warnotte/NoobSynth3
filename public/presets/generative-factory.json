@@ -212,8 +212,7 @@
         "position": { "x": 7, "y": 12 },
         "params": {
           "tone": 0.55,
-          "decay": 0.3,
-          "spread": 0.5
+          "decay": 0.3
         }
       },
       {

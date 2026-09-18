@@ -94,7 +94,7 @@
         "type": "phaser",
         "name": "Phaser",
         "position": { "x": 18, "y": 0 },
-        "params": { "rate": 0.15, "depth": 0.6, "feedback": 0.4, "mix": 0.35, "stages": 6, "spread": 0.5 }
+        "params": { "rate": 0.15, "depth": 0.6, "feedback": 0.4, "mix": 0.35 }
       },
 
       {

@@ -74,8 +74,7 @@
         "name": "Whstl Flt",
         "position": { "x": 200, "y": 250 },
         "params": {
-          "cutoff": 3500,
-          "resonance": 0.15
+          "cutoff": 3500
         }
       },
       {

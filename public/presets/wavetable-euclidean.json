@@ -60,9 +60,7 @@
         "type": "sample-hold",
         "name": "S&H",
         "position": { "x": 350, "y": 250 },
-        "params": {
-          "slew": 0.02
-        }
+        "params": {}
       },
       {
         "id": "wt-1",
@@ -119,8 +117,7 @@
         "params": {
           "drive": 0.25,
           "tone": 0.5,
-          "mix": 0.3,
-          "output": 0.8
+          "mix": 0.3
         }
       },
       {

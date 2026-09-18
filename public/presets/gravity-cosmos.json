@@ -26,7 +26,7 @@
         "type": "supersaw",
         "name": "Supersaw",
         "position": { "col": 5, "row": 1 },
-        "params": { "frequency": 261.63, "detune": 0.3, "mix": 0.7, "level": 0.5 }
+        "params": { "frequency": 261.63, "detune": 0.3, "mix": 0.7 }
       },
       {
         "id": "adsr-1",

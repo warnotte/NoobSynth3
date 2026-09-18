@@ -30,14 +30,14 @@
         "type": "oscillator",
         "name": "Saw Lead",
         "position": { "col": 7, "row": 1 },
-        "params": { "frequency": 261.63, "type": "sawtooth", "level": 0.7 }
+        "params": { "frequency": 261.63, "type": "sawtooth" }
       },
       {
         "id": "osc-2",
         "type": "oscillator",
         "name": "Sub Sine",
         "position": { "col": 7, "row": 3 },
-        "params": { "frequency": 130.81, "type": "sine", "level": 0.4 }
+        "params": { "frequency": 130.81, "type": "sine" }
       },
       {
         "id": "adsr-1",

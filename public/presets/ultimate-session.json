@@ -83,8 +83,7 @@
         "position": { "x": 450, "y": 200 },
         "params": {
           "tone": 0.5,
-          "decay": 0.4,
-          "spread": 0.35
+          "decay": 0.4
         }
       },
       {
@@ -184,7 +183,6 @@
         "name": "Lead",
         "position": { "x": 50, "y": 500 },
         "params": {
-          "octave": 4,
           "glide": 0.02
         }
       },

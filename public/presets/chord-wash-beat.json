@@ -130,7 +130,7 @@
         "type": "909-clap",
         "name": "Clap",
         "position": { "x": 9, "y": 8 },
-        "params": { "tone": 0.45, "decay": 0.3, "spread": 0.4 }
+        "params": { "tone": 0.45, "decay": 0.3 }
       },
       {
         "id": "mixer-drum",

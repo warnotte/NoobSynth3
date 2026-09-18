@@ -46,9 +46,7 @@
         "name": "Rim",
         "position": { "x": 150, "y": 200 },
         "params": {
-          "tune": 300,
-          "tone": 0.4,
-          "decay": 0.3
+          "tune": 300
         }
       },
       {

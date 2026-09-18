@@ -113,14 +113,12 @@
         "name": "303",
         "position": { "x": 250, "y": 350 },
         "params": {
-          "frequency": 55,
           "cutoff": 600,
           "resonance": 0.75,
           "envMod": 0.7,
           "decay": 0.25,
           "accent": 0.6,
-          "waveform": 0,
-          "drive": 0.3
+          "waveform": 0
         }
       },
       {
@@ -131,8 +129,7 @@
         "params": {
           "drive": 0.35,
           "tone": 0.55,
-          "mix": 0.4,
-          "output": 0.75
+          "mix": 0.4
         }
       },
       {

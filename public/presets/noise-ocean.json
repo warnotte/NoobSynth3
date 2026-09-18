@@ -74,8 +74,7 @@
         "name": "Foam Flt",
         "position": { "x": 200, "y": 250 },
         "params": {
-          "cutoff": 2500,
-          "resonance": 0
+          "cutoff": 2500
         }
       },
       {
