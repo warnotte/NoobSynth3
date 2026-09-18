@@ -44,6 +44,24 @@ Rythme), avec un fader chacun dans la console MIXER.
 - Les volumes sont **calibrés au banc** (`scripts/songe-hyrule-calibrate.mjs`) : chaque section tombe à
   ±1 dB de sa cible, crête du mix 0,90.
 
+## Les deux suites suivantes
+
+Même mécanique que le Songe (un fichier MIDI par rack, piste « Volume » en automation, niveaux calibrés au
+banc), avec les sources versionnées dans `scripts/sources/` pour que tout se régénère depuis le dépôt seul.
+
+| Suite | Tableaux | Racks | Ouvrir |
+|-------|----------|-------|--------|
+| **Le Rêve de Dinosaur Land** 🍄 — Super Mario World (Koji Kondo) | Star Road sur la puce SNES, Overworld et Athletic aux handpans et à la harpe, carte de Donut Plains, Forest of Illusion, un château ténébreux à l'orgue et aux timbales, générique de fin | 6 | [▶️](https://warnotte.github.io/NoobSynth3/?project=reve-dinosaur) |
+| **Les Deux Mondes d'Hyrule** 🗡️ — Zelda: A Link to the Past | prologue, thème du héros (Light World), fontaine des fées, Lost Woods, chute dans le Dark World, Ganon, générique | 6 | [▶️](https://warnotte.github.io/NoobSynth3/?project=deux-mondes) |
+| **Les Deux Mondes d'Hyrule (orchestre)** 🎺 | mêmes tableaux ; trompettes (deux dents de scie dans un filtre ladder qui s'ouvre de trois octaves en 8 ms) et cordes (Ensemble) prennent fanfares, thèmes et harmonies ; handpans, harpe, SNES et orgue restent en couleur | 8 | [▶️](https://warnotte.github.io/NoobSynth3/?project=deux-mondes-orchestre) |
+
+- Générateurs : `scripts/reve-dinosaur.mjs`, `scripts/deux-mondes.mjs` (`--orchestre` pour la variante) ;
+  calibrage : `scripts/*-calibrate.mjs`. Ils écrivent dans `target/` par défaut, `--public` pour l'app.
+- Les transcriptions MIDI ont été choisies objectivement : accord note à note entre transcriptions
+  indépendantes du même thème (`scripts/sources/*/SOURCES.md`).
+- Le calibrage des Deux Mondes lit la **crête stéréo par canal** (un instrument panoramisé fait monter
+  un canal au-dessus du mix mono : 1,33 mesuré contre 0,90 en mono) et ne baisse que la section fautive.
+
 ## Le handpan
 
 Un handpan D Kurde 15 notes (Ding D3, notes du dessous F3 G3), dans n'importe quelle gamme :

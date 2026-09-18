@@ -4,7 +4,7 @@ Synthétiseur modulaire inspiré de VCV Rack, construit avec React + Rust/WASM.
 
 **[Démo en ligne](https://warnotte.github.io/NoobSynth3/)**
 
-🎧 **Nouveau : [Le Songe d'Hyrule](docs/HANDPAN.md)** — classique × Nintendo en 6 minutes, joué par le handpan (100<sup>e</sup> module), l'orgue et les puces NES/SNES. [▶️ Ouvrir dans la démo](https://warnotte.github.io/NoobSynth3/?project=songe-hyrule) · [MP3](https://github.com/warnotte/NoobSynth3/releases/download/v0.17.0/Le-Songe-d-Hyrule.mp3)
+🎧 **Trois suites à écouter** ([comment elles sont faites](docs/HANDPAN.md)) — [Le Songe d'Hyrule](https://warnotte.github.io/NoobSynth3/?project=songe-hyrule) (classique × Nintendo, 6 min · [MP3](https://github.com/warnotte/NoobSynth3/releases/download/v0.17.0/Le-Songe-d-Hyrule.mp3)), [Le Rêve de Dinosaur Land](https://warnotte.github.io/NoobSynth3/?project=reve-dinosaur) (Super Mario World en 7 tableaux) et [Les Deux Mondes d'Hyrule](https://warnotte.github.io/NoobSynth3/?project=deux-mondes) (Zelda: A Link to the Past, aussi en [version orchestre](https://warnotte.github.io/NoobSynth3/?project=deux-mondes-orchestre)) — jouées par le handpan (100<sup>e</sup> module), l'orgue, les puces NES/SNES et la batterie 909.
 
 ![NoobSynth3 Screenshot](docs/screenshot.png)
 ![NoobSynth3 Screenshot mixer](docs/mixer.png)
@@ -85,7 +85,7 @@ Ouvrir l'app, cliquer **Play**, puis jouer avec le clavier ou charger un preset.
 | [Modules](docs/MODULES.md) | Référence des 100 modules DSP |
 | [Presets](docs/PRESETS.md) | Format des presets, checklist de création |
 | [Features](docs/FEATURES.md) | Notes d'implémentation par feature/module |
-| [Handpan et Le Songe d'Hyrule](docs/HANDPAN.md) | Le 100e module, ses presets MIDI et la pièce classique × Nintendo |
+| [Handpan et les suites](docs/HANDPAN.md) | Le 100e module, ses presets MIDI, et les trois suites (Le Songe d'Hyrule, Le Rêve de Dinosaur Land, Les Deux Mondes d'Hyrule) |
 | [Roadmap](docs/ROADMAP.md) | Plan de développement |
 
 ## Licence
