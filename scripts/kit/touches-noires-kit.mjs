@@ -24,6 +24,19 @@ export const mergeRuns = (notes) => { const out = []
 export const lanes = (notes, count) => { const L = Array.from({ length: count }, () => [])
   for (const n of [...notes].sort((a, b) => a.tick - b.tick || b.note - a.note)) { const lane = L.find((l) => !l.length || l[l.length - 1].tick + l[l.length - 1].dur <= n.tick) || L[count - 1]; lane.push(n) }
   return L }
+/** Distribue les notes à `count` voix à TOUR DE RÔLE, en sautant une voix qui tient encore sa note (sinon vol de celle qui finit
+ *  le plus tôt). Sur une ligne mono c'est exactement « note i → voix i % count » : le release de chaque note sonne sur les suivantes. */
+export const deal = (notes, count) => { const V = Array.from({ length: count }, () => []), end = (l) => (l.length ? l[l.length - 1].tick + l[l.length - 1].dur : -Infinity); let next = 0
+  for (const n of notes) { const order = Array.from({ length: count }, (_, k) => (next + k) % count)
+    const v = order.find((k) => end(V[k]) <= n.tick) ?? order.reduce((a, b) => (end(V[b]) < end(V[a]) ? b : a)); V[v].push(n); next = (v + 1) % count }
+  return V }
+/** Ligne mono tirée d'une partie polyphonique : la note la plus haute (`top` = true) ou la plus basse qui sonne ; une note de la
+ *  ligne s'arrête quand la suivante commence. */
+export const line = (notes, top = true) => { const out = [], wins = (a, b) => (top ? a.note > b.note : a.note < b.note)
+  for (const n of [...notes].sort((a, b) => a.tick - b.tick || (top ? b.note - a.note : a.note - b.note))) { const p = out[out.length - 1]
+    if (p && p.tick + p.dur > n.tick) { if (p.tick === n.tick || !wins(n, p)) continue; p.dur = n.tick - p.tick }
+    out.push({ ...n }) }
+  return out }
 /** Trois voix par RÔLE : au-dessus de `top`, entre `mid` et `top`, en dessous. */
 export const byRole = (notes, top = 61, mid = 58) => [notes.filter((n) => n.note >= top), notes.filter((n) => n.note >= mid && n.note < top), notes.filter((n) => n.note < mid)]
 /** Chaque note dure jusqu'à la suivante de sa voie (au plus `max` ticks). */
@@ -44,6 +57,7 @@ const A = 'audio', C = 'cv', G = 'gate', NV = 4, GATE = 90
 /**
  * @param o.bpm, o.ticksPerBeat, o.totalTicks
  * @param o.parts  lead / bass : [{tick, note, dur}] · pad : 3 voies · pluck : jusqu'à 4 voies · kick / snap / hat : [{tick, vel}]
+ *                 shadow : ligne mono que suit l'ombre (par défaut le lead ; à donner quand le lead est polyphonique, voir `line`)
  * @param o.question  [midi, midi] de la nappe haute (ou null pour s'en passer)
  * @param o.notesText texte du module Notes · o.outLevel niveau de sortie (à calibrer au banc : crête ≈ 0,95)
  */
@@ -54,7 +68,7 @@ export function buildKit({ bpm, ticksPerBeat, totalTicks, parts, question = [70,
   const mel = (notes, vel = 96) => ({ notes: (notes ?? []).map((n) => ({ tick: n.tick, note: n.note, velocity: vel, duration: n.dur })) })
   const hit = (hits, lenMs) => ({ notes: (hits ?? []).map((h) => ({ tick: h.tick, note: 60, velocity: h.vel ?? 100, duration: msTicks(lenMs) })) })
   const data = (tracks) => JSON.stringify({ ticksPerBeat, totalTicks, tracks })
-  const lead = parts.lead ?? [], leadV = Array.from({ length: NV }, (_, v) => lead.filter((_, i) => i % NV === v))
+  const lead = parts.lead ?? [], leadV = deal(lead, NV), shadowLine = parts.shadow ?? lead
   const pad = [0, 1, 2].map((i) => parts.pad?.[i] ?? []), pluck = [0, 1, 2, 3].map((i) => parts.pluck?.[i] ?? [])
   const seqP = (md, gateLength = GATE) => ({ enabled: true, tempo: bpm, gateLength, loop: true, voices: 1, midiData: md })
   const lv = (name, v) => (solo && solo !== name ? 0 : v)
@@ -63,7 +77,7 @@ export function buildKit({ bpm, ticksPerBeat, totalTicks, parts, question = [70,
     { id: 'notes', type: 'notes', name: notesName, params: { text: notesText ?? '' } },
     { id: 'seq', type: 'midi-file-sequencer', name: 'MIDI (lead 4 voix, basse, batterie)', params: seqP(data([...leadV.map((l) => mel(l)), mel(parts.bass, 90), hit(parts.kick, 80), hit(parts.snap, 12), hit(parts.kick, 6)])) },
     { id: 'seq2', type: 'midi-file-sequencer', name: 'MIDI (nappe, accords pinces, charley)', params: seqP(data([...pad.map((l) => mel(l, 80)), ...pluck.map((l) => mel(l, 92)), hit(parts.hat, 25)])) },
-    { id: 'seq3', type: 'midi-file-sequencer', name: 'MIDI (pinces du lead, ombre)', params: seqP(data([...leadV.map((l) => hit(l, 8)), mel(lead)])) },
+    { id: 'seq3', type: 'midi-file-sequencer', name: 'MIDI (pinces du lead, ombre)', params: seqP(data([...leadV.map((l) => hit(l, 8)), mel(shadowLine)])) },
     ...(question ? [{ id: 'seq4', type: 'midi-file-sequencer', name: 'MIDI (porte de la question, 100 %)', params: seqP(data([mel([{ tick: 0, note: 60, dur: totalTicks - ticksPerBeat * 2 }], 100)]), 100) }] : []),
     // lead : 4 copies du même synthé
     ...Array.from({ length: NV }, (_, v) => [saw('lead' + v, 'Lead voix ' + (v + 1), LEAD_TUNE, { fmExp: 22 / 1200 }), lp('leadf' + v, 'Filtre lead ' + (v + 1), 1350, 0.05, 12, 0.5, { envAmount: 1.6 }),
