@@ -1703,6 +1703,13 @@
       "group": "Showcase"
     },
     {
+      "id": "touches-noires",
+      "name": "Touches noires",
+      "description": "Lead polyphonique qui ronronne (LFO 12,7 Hz), nappe a tremolo, batterie fabriquee en sinus et bruit : une couleur faite de modules de base, ecrite sur les touches noires.",
+      "file": "touches-noires.json",
+      "group": "Showcase"
+    },
+    {
       "id": "envelope-follower-test",
       "name": "Envelope Follower",
       "description": "Audio envelope controls VCF cutoff via Envelope Follower module.",
