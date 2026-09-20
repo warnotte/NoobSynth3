@@ -4,8 +4,6 @@ Synthétiseur modulaire inspiré de VCV Rack, construit avec React + Rust/WASM.
 
 **[Démo en ligne](https://warnotte.github.io/NoobSynth3/)**
 
-🎧 **Trois suites à écouter** ([comment elles sont faites](docs/HANDPAN.md)) — [Le Songe d'Hyrule](https://warnotte.github.io/NoobSynth3/?project=songe-hyrule) (classique × Nintendo, 6 min · [MP3](https://github.com/warnotte/NoobSynth3/releases/download/v0.17.0/Le-Songe-d-Hyrule.mp3)), [Le Rêve de Dinosaur Land](https://warnotte.github.io/NoobSynth3/?project=reve-dinosaur) (Super Mario World en 7 tableaux) et [Les Deux Mondes d'Hyrule](https://warnotte.github.io/NoobSynth3/?project=deux-mondes) (Zelda: A Link to the Past, aussi en [version orchestre](https://warnotte.github.io/NoobSynth3/?project=deux-mondes-orchestre)) — jouées par le handpan (100<sup>e</sup> module), l'orgue, les puces NES/SNES et la batterie 909.
-
 ![NoobSynth3 Screenshot](docs/screenshot.png)
 ![NoobSynth3 Screenshot mixer](docs/mixer.png)
 
