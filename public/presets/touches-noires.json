@@ -1,0 +1,3767 @@
+{
+  "id": "touches-noires",
+  "name": "Touches noires",
+  "group": "Showcase",
+  "description": "Lead polyphonique qui ronronne (LFO 12,7 Hz), nappe a tremolo, batterie fabriquee en sinus et bruit : une couleur faite de modules de base, ecrite sur les touches noires.",
+  "graph": {
+    "modules": [
+      {
+        "id": "notes",
+        "type": "notes",
+        "name": "Touches noires",
+        "params": {
+          "text": "TOUCHES NOIRES\n\nUne couleur faite de modules de base (VCO, VCF, ADSR, VCA, LFO, bruit) : pas de boite a rythmes, pas de sample.\nTout est ecrit sur les cinq touches noires (do# re# fa# sol# la#) : aucune note ne peut sonner faux.\n\n- LE RONRON : deux LFO a 12,7 Hz font trembler la hauteur (+-22 cents) et le volume du lead. A cette vitesse on n'entend plus\n  un vibrato mais un grain. Baisser RATE vers 5 Hz = vibrato normal.\n- LEAD A 4 VOIX : les notes sont distribuees a tour de role a 4 copies du synthe, pour que le RELEASE de chaque note sonne\n  par-dessus les suivantes. Il GONFLE sur les notes tenues, et son OMBRE (une octave plus bas, ronron lent a 6,5 Hz) eclot dessous.\n- LA QUESTION : une nappe haute ne tient que la#4 + do#5, une tierce sans fondamentale (fa# majeur ? la# mineur ?).\n- NAPPE : do#4 + la#3 tenus, la voix du bas tourne (fa# re# fa# sol#), tremolo 6,5 Hz. ACCORDS PINCES sur les contretemps.\n- BATTERIE FABRIQUEE : kick = sinus 42 Hz + 95 Hz dont la hauteur tombe en 30 ms, coupe net ; clac = 15 ms de bruit rose\n  pousse dans un filtre + un corps a 180 Hz ; charley = bruit au-dessus de 5,5 kHz. Mono, sec, pas de reverb.\n- Le lead est accorde 37 cents trop haut, la nappe et la basse 20 : les voix frottent un peu.\n\nL'ADSR de ce synthe monte, tient tant que la note dure, puis RELACHE : les sons percussifs sont une note tres courte + le\nRELEASE. 24 mesures : nappe + batterie · le lead entre mesure 5 · basse et accords mesure 9 · charley mesure 13 · mesures 21-24\nle lead reste seul puis la nappe revient. Ce kit peut jouer n'importe quelles notes : voir scripts/kit/touches-noires-kit.mjs."
+        },
+        "position": {
+          "x": 40,
+          "y": 40
+        }
+      },
+      {
+        "id": "seq",
+        "type": "midi-file-sequencer",
+        "name": "MIDI (lead 4 voix, basse, batterie)",
+        "params": {
+          "enabled": true,
+          "tempo": 132,
+          "gateLength": 90,
+          "loop": true,
+          "voices": 1,
+          "midiData": "{\"ticksPerBeat\":480,\"totalTicks\":46080,\"tracks\":[{\"notes\":[{\"tick\":7680,\"note\":63,\"velocity\":96,\"duration\":600},{\"tick\":9360,\"note\":70,\"velocity\":96,\"duration\":120},{\"tick\":10800,\"note\":61,\"velocity\":96,\"duration\":240},{\"tick\":12120,\"note\":73,\"velocity\":96,\"duration\":120},{\"tick\":13440,\"note\":68,\"velocity\":96,\"duration\":120},{\"tick\":15120,\"note\":63,\"velocity\":96,\"duration\":240},{\"tick\":16080,\"note\":73,\"velocity\":96,\"duration\":240},{\"tick\":18000,\"note\":68,\"velocity\":96,\"duration\":120},{\"tick\":19440,\"note\":63,\"velocity\":96,\"duration\":240},{\"tick\":20880,\"note\":73,\"velocity\":96,\"duration\":240},{\"tick\":21600,\"note\":68,\"velocity\":96,\"duration\":480},{\"tick\":23760,\"note\":63,\"velocity\":96,\"duration\":240},{\"tick\":24960,\"note\":66,\"velocity\":96,\"duration\":960},{\"tick\":26880,\"note\":73,\"velocity\":96,\"duration\":480},{\"tick\":27840,\"note\":68,\"velocity\":96,\"duration\":720},{\"tick\":29040,\"note\":68,\"velocity\":96,\"duration\":240},{\"tick\":31200,\"note\":73,\"velocity\":96,\"duration\":120},{\"tick\":32400,\"note\":68,\"velocity\":96,\"duration\":240},{\"tick\":33600,\"note\":63,\"velocity\":96,\"duration\":960},{\"tick\":35520,\"note\":68,\"velocity\":96,\"duration\":480},{\"tick\":36600,\"note\":73,\"velocity\":96,\"duration\":120},{\"tick\":38400,\"note\":63,\"velocity\":96,\"duration\":600},{\"tick\":40080,\"note\":70,\"velocity\":96,\"duration\":120},{\"tick\":41520,\"note\":61,\"velocity\":96,\"duration\":240},{\"tick\":42840,\"note\":73,\"velocity\":96,\"duration\":120},{\"tick\":44160,\"note\":68,\"velocity\":96,\"duration\":120},{\"tick\":45840,\"note\":63,\"velocity\":96,\"duration\":240}]},{\"notes\":[{\"tick\":8280,\"note\":66,\"velocity\":96,\"duration\":120},{\"tick\":9480,\"note\":68,\"velocity\":96,\"duration\":120},{\"tick\":11040,\"note\":63,\"velocity\":96,\"duration\":480},{\"tick\":12240,\"note\":70,\"velocity\":96,\"duration\":240},{\"tick\":13560,\"note\":70,\"velocity\":96,\"duration\":120},{\"tick\":15360,\"note\":70,\"velocity\":96,\"duration\":480},{\"tick\":16320,\"note\":70,\"velocity\":96,\"duration\":720},{\"tick\":18120,\"note\":66,\"velocity\":96,\"duration\":120},{\"tick\":19680,\"note\":66,\"velocity\":96,\"duration\":480},{\"tick\":21120,\"note\":70,\"velocity\":96,\"duration\":120},{\"tick\":22080,\"note\":66,\"velocity\":96,\"duration\":960},{\"tick\":24000,\"note\":68,\"velocity\":96,\"duration\":720},{\"tick\":25920,\"note\":63,\"velocity\":96,\"duration\":240},{\"tick\":27360,\"note\":70,\"velocity\":96,\"duration\":120},{\"tick\":28560,\"note\":66,\"velocity\":96,\"duration\":240},{\"tick\":29280,\"note\":66,\"velocity\":96,\"duration\":1200},{\"tick\":31320,\"note\":75,\"velocity\":96,\"duration\":120},{\"tick\":32640,\"note\":66,\"velocity\":96,\"duration\":720},{\"tick\":34560,\"note\":61,\"velocity\":96,\"duration\":240},{\"tick\":36000,\"note\":70,\"velocity\":96,\"duration\":240},{\"tick\":36720,\"note\":70,\"velocity\":96,\"duration\":240},{\"tick\":39000,\"note\":66,\"velocity\":96,\"duration\":120},{\"tick\":40200,\"note\":68,\"velocity\":96,\"duration\":120},{\"tick\":41760,\"note\":63,\"velocity\":96,\"duration\":480},{\"tick\":42960,\"note\":70,\"velocity\":96,\"duration\":240},{\"tick\":44280,\"note\":70,\"velocity\":96,\"duration\":120}]},{\"notes\":[{\"tick\":8400,\"note\":63,\"velocity\":96,\"duration\":240},{\"tick\":9600,\"note\":66,\"velocity\":96,\"duration\":960},{\"tick\":11520,\"note\":73,\"velocity\":96,\"duration\":480},{\"tick\":12480,\"note\":68,\"velocity\":96,\"duration\":720},{\"tick\":13680,\"note\":68,\"velocity\":96,\"duration\":240},{\"tick\":15840,\"note\":73,\"velocity\":96,\"duration\":120},{\"tick\":17040,\"note\":68,\"velocity\":96,\"duration\":240},{\"tick\":18240,\"note\":63,\"velocity\":96,\"duration\":960},{\"tick\":20160,\"note\":68,\"velocity\":96,\"duration\":480},{\"tick\":21240,\"note\":73,\"velocity\":96,\"duration\":120},{\"tick\":23040,\"note\":63,\"velocity\":96,\"duration\":600},{\"tick\":24720,\"note\":70,\"velocity\":96,\"duration\":120},{\"tick\":26160,\"note\":61,\"velocity\":96,\"duration\":240},{\"tick\":27480,\"note\":73,\"velocity\":96,\"duration\":120},{\"tick\":28800,\"note\":68,\"velocity\":96,\"duration\":120},{\"tick\":30480,\"note\":63,\"velocity\":96,\"duration\":240},{\"tick\":31440,\"note\":73,\"velocity\":96,\"duration\":240},{\"tick\":33360,\"note\":68,\"velocity\":96,\"duration\":120},{\"tick\":34800,\"note\":63,\"velocity\":96,\"duration\":240},{\"tick\":36240,\"note\":73,\"velocity\":96,\"duration\":240},{\"tick\":36960,\"note\":68,\"velocity\":96,\"duration\":480},{\"tick\":39120,\"note\":63,\"velocity\":96,\"duration\":240},{\"tick\":40320,\"note\":66,\"velocity\":96,\"duration\":960},{\"tick\":42240,\"note\":73,\"velocity\":96,\"duration\":480},{\"tick\":43200,\"note\":68,\"velocity\":96,\"duration\":720},{\"tick\":44400,\"note\":68,\"velocity\":96,\"duration\":240}]},{\"notes\":[{\"tick\":8640,\"note\":68,\"velocity\":96,\"duration\":720},{\"tick\":10560,\"note\":63,\"velocity\":96,\"duration\":240},{\"tick\":12000,\"note\":70,\"velocity\":96,\"duration\":120},{\"tick\":13200,\"note\":66,\"velocity\":96,\"duration\":240},{\"tick\":13920,\"note\":66,\"velocity\":96,\"duration\":1200},{\"tick\":15960,\"note\":75,\"velocity\":96,\"duration\":120},{\"tick\":17280,\"note\":66,\"velocity\":96,\"duration\":720},{\"tick\":19200,\"note\":61,\"velocity\":96,\"duration\":240},{\"tick\":20640,\"note\":70,\"velocity\":96,\"duration\":240},{\"tick\":21360,\"note\":70,\"velocity\":96,\"duration\":240},{\"tick\":23640,\"note\":66,\"velocity\":96,\"duration\":120},{\"tick\":24840,\"note\":68,\"velocity\":96,\"duration\":120},{\"tick\":26400,\"note\":63,\"velocity\":96,\"duration\":480},{\"tick\":27600,\"note\":70,\"velocity\":96,\"duration\":240},{\"tick\":28920,\"note\":70,\"velocity\":96,\"duration\":120},{\"tick\":30720,\"note\":70,\"velocity\":96,\"duration\":480},{\"tick\":31680,\"note\":70,\"velocity\":96,\"duration\":720},{\"tick\":33480,\"note\":66,\"velocity\":96,\"duration\":120},{\"tick\":35040,\"note\":66,\"velocity\":96,\"duration\":480},{\"tick\":36480,\"note\":70,\"velocity\":96,\"duration\":120},{\"tick\":37440,\"note\":66,\"velocity\":96,\"duration\":960},{\"tick\":39360,\"note\":68,\"velocity\":96,\"duration\":720},{\"tick\":41280,\"note\":63,\"velocity\":96,\"duration\":240},{\"tick\":42720,\"note\":70,\"velocity\":96,\"duration\":120},{\"tick\":43920,\"note\":66,\"velocity\":96,\"duration\":240},{\"tick\":44640,\"note\":66,\"velocity\":96,\"duration\":1200}]},{\"notes\":[{\"tick\":15360,\"note\":46,\"velocity\":90,\"duration\":1680},{\"tick\":17280,\"note\":46,\"velocity\":90,\"duration\":1440},{\"tick\":18720,\"note\":44,\"velocity\":90,\"duration\":480},{\"tick\":19200,\"note\":42,\"velocity\":90,\"duration\":1920},{\"tick\":21120,\"note\":39,\"velocity\":90,\"duration\":960},{\"tick\":22080,\"note\":37,\"velocity\":90,\"duration\":960},{\"tick\":23040,\"note\":42,\"velocity\":90,\"duration\":1680},{\"tick\":24960,\"note\":42,\"velocity\":90,\"duration\":1440},{\"tick\":26400,\"note\":44,\"velocity\":90,\"duration\":480},{\"tick\":26880,\"note\":39,\"velocity\":90,\"duration\":1680},{\"tick\":28800,\"note\":39,\"velocity\":90,\"duration\":960},{\"tick\":29760,\"note\":37,\"velocity\":90,\"duration\":960},{\"tick\":30720,\"note\":46,\"velocity\":90,\"duration\":1680},{\"tick\":32640,\"note\":46,\"velocity\":90,\"duration\":1440},{\"tick\":34080,\"note\":44,\"velocity\":90,\"duration\":480},{\"tick\":34560,\"note\":42,\"velocity\":90,\"duration\":1920},{\"tick\":36480,\"note\":39,\"velocity\":90,\"duration\":960},{\"tick\":37440,\"note\":37,\"velocity\":90,\"duration\":960}]},{\"notes\":[{\"tick\":0,\"note\":60,\"velocity\":110,\"duration\":94},{\"tick\":960,\"note\":60,\"velocity\":100,\"duration\":94},{\"tick\":1200,\"note\":60,\"velocity\":58,\"duration\":94},{\"tick\":1920,\"note\":60,\"velocity\":110,\"duration\":94},{\"tick\":2880,\"note\":60,\"velocity\":100,\"duration\":94},{\"tick\":3120,\"note\":60,\"velocity\":58,\"duration\":94},{\"tick\":3840,\"note\":60,\"velocity\":110,\"duration\":94},{\"tick\":4800,\"note\":60,\"velocity\":100,\"duration\":94},{\"tick\":5040,\"note\":60,\"velocity\":58,\"duration\":94},{\"tick\":5760,\"note\":60,\"velocity\":110,\"duration\":94},{\"tick\":6720,\"note\":60,\"velocity\":100,\"duration\":94},{\"tick\":6960,\"note\":60,\"velocity\":58,\"duration\":94},{\"tick\":7680,\"note\":60,\"velocity\":110,\"duration\":94},{\"tick\":8640,\"note\":60,\"velocity\":100,\"duration\":94},{\"tick\":8880,\"note\":60,\"velocity\":58,\"duration\":94},{\"tick\":9600,\"note\":60,\"velocity\":110,\"duration\":94},{\"tick\":10560,\"note\":60,\"velocity\":100,\"duration\":94},{\"tick\":10800,\"note\":60,\"velocity\":58,\"duration\":94},{\"tick\":11520,\"note\":60,\"velocity\":110,\"duration\":94},{\"tick\":12480,\"note\":60,\"velocity\":100,\"duration\":94},{\"tick\":12720,\"note\":60,\"velocity\":58,\"duration\":94},{\"tick\":13440,\"note\":60,\"velocity\":110,\"duration\":94},{\"tick\":14400,\"note\":60,\"velocity\":100,\"duration\":94},{\"tick\":14640,\"note\":60,\"velocity\":58,\"duration\":94},{\"tick\":15360,\"note\":60,\"velocity\":110,\"duration\":94},{\"tick\":16320,\"note\":60,\"velocity\":100,\"duration\":94},{\"tick\":16560,\"note\":60,\"velocity\":58,\"duration\":94},{\"tick\":17280,\"note\":60,\"velocity\":110,\"duration\":94},{\"tick\":18240,\"note\":60,\"velocity\":100,\"duration\":94},{\"tick\":18480,\"note\":60,\"velocity\":58,\"duration\":94},{\"tick\":19200,\"note\":60,\"velocity\":110,\"duration\":94},{\"tick\":20160,\"note\":60,\"velocity\":100,\"duration\":94},{\"tick\":20400,\"note\":60,\"velocity\":58,\"duration\":94},{\"tick\":21120,\"note\":60,\"velocity\":110,\"duration\":94},{\"tick\":22080,\"note\":60,\"velocity\":100,\"duration\":94},{\"tick\":22320,\"note\":60,\"velocity\":58,\"duration\":94},{\"tick\":23040,\"note\":60,\"velocity\":110,\"duration\":94},{\"tick\":24000,\"note\":60,\"velocity\":100,\"duration\":94},{\"tick\":24240,\"note\":60,\"velocity\":58,\"duration\":94},{\"tick\":24960,\"note\":60,\"velocity\":110,\"duration\":94},{\"tick\":25920,\"note\":60,\"velocity\":100,\"duration\":94},{\"tick\":26160,\"note\":60,\"velocity\":58,\"duration\":94},{\"tick\":26880,\"note\":60,\"velocity\":110,\"duration\":94},{\"tick\":27840,\"note\":60,\"velocity\":100,\"duration\":94},{\"tick\":28080,\"note\":60,\"velocity\":58,\"duration\":94},{\"tick\":28800,\"note\":60,\"velocity\":110,\"duration\":94},{\"tick\":29760,\"note\":60,\"velocity\":100,\"duration\":94},{\"tick\":30000,\"note\":60,\"velocity\":58,\"duration\":94},{\"tick\":30720,\"note\":60,\"velocity\":110,\"duration\":94},{\"tick\":31680,\"note\":60,\"velocity\":100,\"duration\":94},{\"tick\":31920,\"note\":60,\"velocity\":58,\"duration\":94},{\"tick\":32640,\"note\":60,\"velocity\":110,\"duration\":94},{\"tick\":33600,\"note\":60,\"velocity\":100,\"duration\":94},{\"tick\":33840,\"note\":60,\"velocity\":58,\"duration\":94},{\"tick\":34560,\"note\":60,\"velocity\":110,\"duration\":94},{\"tick\":35520,\"note\":60,\"velocity\":100,\"duration\":94},{\"tick\":35760,\"note\":60,\"velocity\":58,\"duration\":94},{\"tick\":36480,\"note\":60,\"velocity\":110,\"duration\":94},{\"tick\":37440,\"note\":60,\"velocity\":100,\"duration\":94},{\"tick\":37680,\"note\":60,\"velocity\":58,\"duration\":94}]},{\"notes\":[{\"tick\":480,\"note\":60,\"velocity\":105,\"duration\":14},{\"tick\":1440,\"note\":60,\"velocity\":110,\"duration\":14},{\"tick\":720,\"note\":60,\"velocity\":30,\"duration\":14},{\"tick\":1680,\"note\":60,\"velocity\":38,\"duration\":14},{\"tick\":2400,\"note\":60,\"velocity\":105,\"duration\":14},{\"tick\":3360,\"note\":60,\"velocity\":110,\"duration\":14},{\"tick\":2640,\"note\":60,\"velocity\":30,\"duration\":14},{\"tick\":3600,\"note\":60,\"velocity\":38,\"duration\":14},{\"tick\":4320,\"note\":60,\"velocity\":105,\"duration\":14},{\"tick\":5280,\"note\":60,\"velocity\":110,\"duration\":14},{\"tick\":4560,\"note\":60,\"velocity\":30,\"duration\":14},{\"tick\":5520,\"note\":60,\"velocity\":38,\"duration\":14},{\"tick\":6240,\"note\":60,\"velocity\":105,\"duration\":14},{\"tick\":7200,\"note\":60,\"velocity\":110,\"duration\":14},{\"tick\":6480,\"note\":60,\"velocity\":30,\"duration\":14},{\"tick\":7440,\"note\":60,\"velocity\":38,\"duration\":14},{\"tick\":8160,\"note\":60,\"velocity\":105,\"duration\":14},{\"tick\":9120,\"note\":60,\"velocity\":110,\"duration\":14},{\"tick\":8400,\"note\":60,\"velocity\":30,\"duration\":14},{\"tick\":9360,\"note\":60,\"velocity\":38,\"duration\":14},{\"tick\":10080,\"note\":60,\"velocity\":105,\"duration\":14},{\"tick\":11040,\"note\":60,\"velocity\":110,\"duration\":14},{\"tick\":10320,\"note\":60,\"velocity\":30,\"duration\":14},{\"tick\":11280,\"note\":60,\"velocity\":38,\"duration\":14},{\"tick\":12000,\"note\":60,\"velocity\":105,\"duration\":14},{\"tick\":12960,\"note\":60,\"velocity\":110,\"duration\":14},{\"tick\":12240,\"note\":60,\"velocity\":30,\"duration\":14},{\"tick\":13200,\"note\":60,\"velocity\":38,\"duration\":14},{\"tick\":13920,\"note\":60,\"velocity\":105,\"duration\":14},{\"tick\":14880,\"note\":60,\"velocity\":110,\"duration\":14},{\"tick\":14160,\"note\":60,\"velocity\":30,\"duration\":14},{\"tick\":15120,\"note\":60,\"velocity\":38,\"duration\":14},{\"tick\":15840,\"note\":60,\"velocity\":105,\"duration\":14},{\"tick\":16800,\"note\":60,\"velocity\":110,\"duration\":14},{\"tick\":16080,\"note\":60,\"velocity\":30,\"duration\":14},{\"tick\":17040,\"note\":60,\"velocity\":38,\"duration\":14},{\"tick\":17760,\"note\":60,\"velocity\":105,\"duration\":14},{\"tick\":18720,\"note\":60,\"velocity\":110,\"duration\":14},{\"tick\":18000,\"note\":60,\"velocity\":30,\"duration\":14},{\"tick\":18960,\"note\":60,\"velocity\":38,\"duration\":14},{\"tick\":19680,\"note\":60,\"velocity\":105,\"duration\":14},{\"tick\":20640,\"note\":60,\"velocity\":110,\"duration\":14},{\"tick\":19920,\"note\":60,\"velocity\":30,\"duration\":14},{\"tick\":20880,\"note\":60,\"velocity\":38,\"duration\":14},{\"tick\":21600,\"note\":60,\"velocity\":105,\"duration\":14},{\"tick\":22560,\"note\":60,\"velocity\":110,\"duration\":14},{\"tick\":21840,\"note\":60,\"velocity\":30,\"duration\":14},{\"tick\":22800,\"note\":60,\"velocity\":38,\"duration\":14},{\"tick\":23520,\"note\":60,\"velocity\":105,\"duration\":14},{\"tick\":24480,\"note\":60,\"velocity\":110,\"duration\":14},{\"tick\":23760,\"note\":60,\"velocity\":30,\"duration\":14},{\"tick\":24720,\"note\":60,\"velocity\":38,\"duration\":14},{\"tick\":25440,\"note\":60,\"velocity\":105,\"duration\":14},{\"tick\":26400,\"note\":60,\"velocity\":110,\"duration\":14},{\"tick\":25680,\"note\":60,\"velocity\":30,\"duration\":14},{\"tick\":26640,\"note\":60,\"velocity\":38,\"duration\":14},{\"tick\":27360,\"note\":60,\"velocity\":105,\"duration\":14},{\"tick\":28320,\"note\":60,\"velocity\":110,\"duration\":14},{\"tick\":27600,\"note\":60,\"velocity\":30,\"duration\":14},{\"tick\":28560,\"note\":60,\"velocity\":38,\"duration\":14},{\"tick\":29280,\"note\":60,\"velocity\":105,\"duration\":14},{\"tick\":30240,\"note\":60,\"velocity\":110,\"duration\":14},{\"tick\":29520,\"note\":60,\"velocity\":30,\"duration\":14},{\"tick\":30480,\"note\":60,\"velocity\":38,\"duration\":14},{\"tick\":31200,\"note\":60,\"velocity\":105,\"duration\":14},{\"tick\":32160,\"note\":60,\"velocity\":110,\"duration\":14},{\"tick\":31440,\"note\":60,\"velocity\":30,\"duration\":14},{\"tick\":32400,\"note\":60,\"velocity\":38,\"duration\":14},{\"tick\":33120,\"note\":60,\"velocity\":105,\"duration\":14},{\"tick\":34080,\"note\":60,\"velocity\":110,\"duration\":14},{\"tick\":33360,\"note\":60,\"velocity\":30,\"duration\":14},{\"tick\":34320,\"note\":60,\"velocity\":38,\"duration\":14},{\"tick\":35040,\"note\":60,\"velocity\":105,\"duration\":14},{\"tick\":36000,\"note\":60,\"velocity\":110,\"duration\":14},{\"tick\":35280,\"note\":60,\"velocity\":30,\"duration\":14},{\"tick\":36240,\"note\":60,\"velocity\":38,\"duration\":14},{\"tick\":36960,\"note\":60,\"velocity\":105,\"duration\":14},{\"tick\":37920,\"note\":60,\"velocity\":110,\"duration\":14},{\"tick\":37200,\"note\":60,\"velocity\":30,\"duration\":14},{\"tick\":38160,\"note\":60,\"velocity\":38,\"duration\":14}]},{\"notes\":[{\"tick\":0,\"note\":60,\"velocity\":110,\"duration\":7},{\"tick\":960,\"note\":60,\"velocity\":100,\"duration\":7},{\"tick\":1200,\"note\":60,\"velocity\":58,\"duration\":7},{\"tick\":1920,\"note\":60,\"velocity\":110,\"duration\":7},{\"tick\":2880,\"note\":60,\"velocity\":100,\"duration\":7},{\"tick\":3120,\"note\":60,\"velocity\":58,\"duration\":7},{\"tick\":3840,\"note\":60,\"velocity\":110,\"duration\":7},{\"tick\":4800,\"note\":60,\"velocity\":100,\"duration\":7},{\"tick\":5040,\"note\":60,\"velocity\":58,\"duration\":7},{\"tick\":5760,\"note\":60,\"velocity\":110,\"duration\":7},{\"tick\":6720,\"note\":60,\"velocity\":100,\"duration\":7},{\"tick\":6960,\"note\":60,\"velocity\":58,\"duration\":7},{\"tick\":7680,\"note\":60,\"velocity\":110,\"duration\":7},{\"tick\":8640,\"note\":60,\"velocity\":100,\"duration\":7},{\"tick\":8880,\"note\":60,\"velocity\":58,\"duration\":7},{\"tick\":9600,\"note\":60,\"velocity\":110,\"duration\":7},{\"tick\":10560,\"note\":60,\"velocity\":100,\"duration\":7},{\"tick\":10800,\"note\":60,\"velocity\":58,\"duration\":7},{\"tick\":11520,\"note\":60,\"velocity\":110,\"duration\":7},{\"tick\":12480,\"note\":60,\"velocity\":100,\"duration\":7},{\"tick\":12720,\"note\":60,\"velocity\":58,\"duration\":7},{\"tick\":13440,\"note\":60,\"velocity\":110,\"duration\":7},{\"tick\":14400,\"note\":60,\"velocity\":100,\"duration\":7},{\"tick\":14640,\"note\":60,\"velocity\":58,\"duration\":7},{\"tick\":15360,\"note\":60,\"velocity\":110,\"duration\":7},{\"tick\":16320,\"note\":60,\"velocity\":100,\"duration\":7},{\"tick\":16560,\"note\":60,\"velocity\":58,\"duration\":7},{\"tick\":17280,\"note\":60,\"velocity\":110,\"duration\":7},{\"tick\":18240,\"note\":60,\"velocity\":100,\"duration\":7},{\"tick\":18480,\"note\":60,\"velocity\":58,\"duration\":7},{\"tick\":19200,\"note\":60,\"velocity\":110,\"duration\":7},{\"tick\":20160,\"note\":60,\"velocity\":100,\"duration\":7},{\"tick\":20400,\"note\":60,\"velocity\":58,\"duration\":7},{\"tick\":21120,\"note\":60,\"velocity\":110,\"duration\":7},{\"tick\":22080,\"note\":60,\"velocity\":100,\"duration\":7},{\"tick\":22320,\"note\":60,\"velocity\":58,\"duration\":7},{\"tick\":23040,\"note\":60,\"velocity\":110,\"duration\":7},{\"tick\":24000,\"note\":60,\"velocity\":100,\"duration\":7},{\"tick\":24240,\"note\":60,\"velocity\":58,\"duration\":7},{\"tick\":24960,\"note\":60,\"velocity\":110,\"duration\":7},{\"tick\":25920,\"note\":60,\"velocity\":100,\"duration\":7},{\"tick\":26160,\"note\":60,\"velocity\":58,\"duration\":7},{\"tick\":26880,\"note\":60,\"velocity\":110,\"duration\":7},{\"tick\":27840,\"note\":60,\"velocity\":100,\"duration\":7},{\"tick\":28080,\"note\":60,\"velocity\":58,\"duration\":7},{\"tick\":28800,\"note\":60,\"velocity\":110,\"duration\":7},{\"tick\":29760,\"note\":60,\"velocity\":100,\"duration\":7},{\"tick\":30000,\"note\":60,\"velocity\":58,\"duration\":7},{\"tick\":30720,\"note\":60,\"velocity\":110,\"duration\":7},{\"tick\":31680,\"note\":60,\"velocity\":100,\"duration\":7},{\"tick\":31920,\"note\":60,\"velocity\":58,\"duration\":7},{\"tick\":32640,\"note\":60,\"velocity\":110,\"duration\":7},{\"tick\":33600,\"note\":60,\"velocity\":100,\"duration\":7},{\"tick\":33840,\"note\":60,\"velocity\":58,\"duration\":7},{\"tick\":34560,\"note\":60,\"velocity\":110,\"duration\":7},{\"tick\":35520,\"note\":60,\"velocity\":100,\"duration\":7},{\"tick\":35760,\"note\":60,\"velocity\":58,\"duration\":7},{\"tick\":36480,\"note\":60,\"velocity\":110,\"duration\":7},{\"tick\":37440,\"note\":60,\"velocity\":100,\"duration\":7},{\"tick\":37680,\"note\":60,\"velocity\":58,\"duration\":7}]}]}"
+        },
+        "position": {
+          "x": 290,
+          "y": 40
+        }
+      },
+      {
+        "id": "seq2",
+        "type": "midi-file-sequencer",
+        "name": "MIDI (nappe, accords pinces, charley)",
+        "params": {
+          "enabled": true,
+          "tempo": 132,
+          "gateLength": 90,
+          "loop": true,
+          "voices": 1,
+          "midiData": "{\"ticksPerBeat\":480,\"totalTicks\":46080,\"tracks\":[{\"notes\":[{\"tick\":0,\"note\":61,\"velocity\":80,\"duration\":1920},{\"tick\":1920,\"note\":61,\"velocity\":80,\"duration\":1920},{\"tick\":3840,\"note\":61,\"velocity\":80,\"duration\":1920},{\"tick\":5760,\"note\":61,\"velocity\":80,\"duration\":1920},{\"tick\":7680,\"note\":61,\"velocity\":80,\"duration\":1920},{\"tick\":9600,\"note\":61,\"velocity\":80,\"duration\":1920},{\"tick\":11520,\"note\":61,\"velocity\":80,\"duration\":1920},{\"tick\":13440,\"note\":61,\"velocity\":80,\"duration\":1920},{\"tick\":15360,\"note\":61,\"velocity\":80,\"duration\":1920},{\"tick\":17280,\"note\":61,\"velocity\":80,\"duration\":1920},{\"tick\":19200,\"note\":61,\"velocity\":80,\"duration\":1920},{\"tick\":21120,\"note\":61,\"velocity\":80,\"duration\":1920},{\"tick\":23040,\"note\":61,\"velocity\":80,\"duration\":1920},{\"tick\":24960,\"note\":61,\"velocity\":80,\"duration\":1920},{\"tick\":26880,\"note\":61,\"velocity\":80,\"duration\":1920},{\"tick\":28800,\"note\":61,\"velocity\":80,\"duration\":1920},{\"tick\":30720,\"note\":61,\"velocity\":80,\"duration\":1920},{\"tick\":32640,\"note\":61,\"velocity\":80,\"duration\":1920},{\"tick\":34560,\"note\":61,\"velocity\":80,\"duration\":1920},{\"tick\":36480,\"note\":61,\"velocity\":80,\"duration\":1920},{\"tick\":42240,\"note\":61,\"velocity\":80,\"duration\":1920},{\"tick\":44160,\"note\":61,\"velocity\":80,\"duration\":1920}]},{\"notes\":[{\"tick\":0,\"note\":58,\"velocity\":80,\"duration\":1920},{\"tick\":1920,\"note\":58,\"velocity\":80,\"duration\":1920},{\"tick\":3840,\"note\":58,\"velocity\":80,\"duration\":1920},{\"tick\":5760,\"note\":58,\"velocity\":80,\"duration\":1920},{\"tick\":7680,\"note\":58,\"velocity\":80,\"duration\":1920},{\"tick\":9600,\"note\":58,\"velocity\":80,\"duration\":1920},{\"tick\":11520,\"note\":58,\"velocity\":80,\"duration\":1920},{\"tick\":13440,\"note\":58,\"velocity\":80,\"duration\":1920},{\"tick\":15360,\"note\":58,\"velocity\":80,\"duration\":1920},{\"tick\":17280,\"note\":58,\"velocity\":80,\"duration\":1920},{\"tick\":19200,\"note\":58,\"velocity\":80,\"duration\":1920},{\"tick\":21120,\"note\":58,\"velocity\":80,\"duration\":1920},{\"tick\":23040,\"note\":58,\"velocity\":80,\"duration\":1920},{\"tick\":24960,\"note\":58,\"velocity\":80,\"duration\":1920},{\"tick\":26880,\"note\":58,\"velocity\":80,\"duration\":1920},{\"tick\":28800,\"note\":58,\"velocity\":80,\"duration\":1920},{\"tick\":30720,\"note\":58,\"velocity\":80,\"duration\":1920},{\"tick\":32640,\"note\":58,\"velocity\":80,\"duration\":1920},{\"tick\":34560,\"note\":58,\"velocity\":80,\"duration\":1920},{\"tick\":36480,\"note\":58,\"velocity\":80,\"duration\":1920},{\"tick\":42240,\"note\":58,\"velocity\":80,\"duration\":1920},{\"tick\":44160,\"note\":58,\"velocity\":80,\"duration\":1920}]},{\"notes\":[{\"tick\":0,\"note\":54,\"velocity\":80,\"duration\":1920},{\"tick\":1920,\"note\":51,\"velocity\":80,\"duration\":1920},{\"tick\":3840,\"note\":54,\"velocity\":80,\"duration\":1920},{\"tick\":5760,\"note\":56,\"velocity\":80,\"duration\":1920},{\"tick\":7680,\"note\":54,\"velocity\":80,\"duration\":1920},{\"tick\":9600,\"note\":51,\"velocity\":80,\"duration\":1920},{\"tick\":11520,\"note\":54,\"velocity\":80,\"duration\":1920},{\"tick\":13440,\"note\":56,\"velocity\":80,\"duration\":1920},{\"tick\":15360,\"note\":54,\"velocity\":80,\"duration\":1920},{\"tick\":17280,\"note\":51,\"velocity\":80,\"duration\":1920},{\"tick\":19200,\"note\":54,\"velocity\":80,\"duration\":1920},{\"tick\":21120,\"note\":56,\"velocity\":80,\"duration\":1920},{\"tick\":23040,\"note\":54,\"velocity\":80,\"duration\":1920},{\"tick\":24960,\"note\":51,\"velocity\":80,\"duration\":1920},{\"tick\":26880,\"note\":54,\"velocity\":80,\"duration\":1920},{\"tick\":28800,\"note\":56,\"velocity\":80,\"duration\":1920},{\"tick\":30720,\"note\":54,\"velocity\":80,\"duration\":1920},{\"tick\":32640,\"note\":51,\"velocity\":80,\"duration\":1920},{\"tick\":34560,\"note\":54,\"velocity\":80,\"duration\":1920},{\"tick\":36480,\"note\":56,\"velocity\":80,\"duration\":1920},{\"tick\":42240,\"note\":54,\"velocity\":80,\"duration\":1920},{\"tick\":44160,\"note\":56,\"velocity\":80,\"duration\":1920}]},{\"notes\":[{\"tick\":15600,\"note\":73,\"velocity\":92,\"duration\":120},{\"tick\":16080,\"note\":70,\"velocity\":92,\"duration\":120},{\"tick\":16560,\"note\":73,\"velocity\":92,\"duration\":120},{\"tick\":17040,\"note\":66,\"velocity\":92,\"duration\":120},{\"tick\":17520,\"note\":70,\"velocity\":92,\"duration\":120},{\"tick\":18000,\"note\":66,\"velocity\":92,\"duration\":120},{\"tick\":18480,\"note\":70,\"velocity\":92,\"duration\":120},{\"tick\":18960,\"note\":63,\"velocity\":92,\"duration\":120},{\"tick\":19440,\"note\":73,\"velocity\":92,\"duration\":120},{\"tick\":19920,\"note\":70,\"velocity\":92,\"duration\":120},{\"tick\":20400,\"note\":73,\"velocity\":92,\"duration\":120},{\"tick\":20880,\"note\":66,\"velocity\":92,\"duration\":120},{\"tick\":21360,\"note\":73,\"velocity\":92,\"duration\":120},{\"tick\":21840,\"note\":68,\"velocity\":92,\"duration\":120},{\"tick\":22320,\"note\":75,\"velocity\":92,\"duration\":120},{\"tick\":22800,\"note\":68,\"velocity\":92,\"duration\":120},{\"tick\":23280,\"note\":73,\"velocity\":92,\"duration\":120},{\"tick\":23760,\"note\":70,\"velocity\":92,\"duration\":120},{\"tick\":24240,\"note\":73,\"velocity\":92,\"duration\":120},{\"tick\":24720,\"note\":66,\"velocity\":92,\"duration\":120},{\"tick\":25200,\"note\":70,\"velocity\":92,\"duration\":120},{\"tick\":25680,\"note\":66,\"velocity\":92,\"duration\":120},{\"tick\":26160,\"note\":70,\"velocity\":92,\"duration\":120},{\"tick\":26640,\"note\":63,\"velocity\":92,\"duration\":120},{\"tick\":27120,\"note\":73,\"velocity\":92,\"duration\":120},{\"tick\":27600,\"note\":70,\"velocity\":92,\"duration\":120},{\"tick\":28080,\"note\":73,\"velocity\":92,\"duration\":120},{\"tick\":28560,\"note\":66,\"velocity\":92,\"duration\":120},{\"tick\":29040,\"note\":73,\"velocity\":92,\"duration\":120},{\"tick\":29520,\"note\":68,\"velocity\":92,\"duration\":120},{\"tick\":30000,\"note\":75,\"velocity\":92,\"duration\":120},{\"tick\":30480,\"note\":68,\"velocity\":92,\"duration\":120},{\"tick\":30960,\"note\":73,\"velocity\":92,\"duration\":120},{\"tick\":31440,\"note\":70,\"velocity\":92,\"duration\":120},{\"tick\":31920,\"note\":73,\"velocity\":92,\"duration\":120},{\"tick\":32400,\"note\":66,\"velocity\":92,\"duration\":120},{\"tick\":32880,\"note\":70,\"velocity\":92,\"duration\":120},{\"tick\":33360,\"note\":66,\"velocity\":92,\"duration\":120},{\"tick\":33840,\"note\":70,\"velocity\":92,\"duration\":120},{\"tick\":34320,\"note\":63,\"velocity\":92,\"duration\":120},{\"tick\":34800,\"note\":73,\"velocity\":92,\"duration\":120},{\"tick\":35280,\"note\":70,\"velocity\":92,\"duration\":120},{\"tick\":35760,\"note\":73,\"velocity\":92,\"duration\":120},{\"tick\":36240,\"note\":66,\"velocity\":92,\"duration\":120},{\"tick\":36720,\"note\":73,\"velocity\":92,\"duration\":120},{\"tick\":37200,\"note\":68,\"velocity\":92,\"duration\":120},{\"tick\":37680,\"note\":75,\"velocity\":92,\"duration\":120},{\"tick\":38160,\"note\":68,\"velocity\":92,\"duration\":120}]},{\"notes\":[]},{\"notes\":[]},{\"notes\":[]},{\"notes\":[{\"tick\":23040,\"note\":60,\"velocity\":100,\"duration\":29},{\"tick\":23280,\"note\":60,\"velocity\":62,\"duration\":29},{\"tick\":23520,\"note\":60,\"velocity\":100,\"duration\":29},{\"tick\":23760,\"note\":60,\"velocity\":66,\"duration\":29},{\"tick\":24000,\"note\":60,\"velocity\":100,\"duration\":29},{\"tick\":24240,\"note\":60,\"velocity\":62,\"duration\":29},{\"tick\":24480,\"note\":60,\"velocity\":100,\"duration\":29},{\"tick\":24720,\"note\":60,\"velocity\":70,\"duration\":29},{\"tick\":23400,\"note\":60,\"velocity\":30,\"duration\":29},{\"tick\":24360,\"note\":60,\"velocity\":30,\"duration\":29},{\"tick\":24840,\"note\":60,\"velocity\":34,\"duration\":29},{\"tick\":24960,\"note\":60,\"velocity\":100,\"duration\":29},{\"tick\":25200,\"note\":60,\"velocity\":62,\"duration\":29},{\"tick\":25440,\"note\":60,\"velocity\":100,\"duration\":29},{\"tick\":25680,\"note\":60,\"velocity\":66,\"duration\":29},{\"tick\":25920,\"note\":60,\"velocity\":100,\"duration\":29},{\"tick\":26160,\"note\":60,\"velocity\":62,\"duration\":29},{\"tick\":26400,\"note\":60,\"velocity\":100,\"duration\":29},{\"tick\":26640,\"note\":60,\"velocity\":70,\"duration\":29},{\"tick\":25320,\"note\":60,\"velocity\":30,\"duration\":29},{\"tick\":26280,\"note\":60,\"velocity\":30,\"duration\":29},{\"tick\":26760,\"note\":60,\"velocity\":34,\"duration\":29},{\"tick\":26880,\"note\":60,\"velocity\":100,\"duration\":29},{\"tick\":27120,\"note\":60,\"velocity\":62,\"duration\":29},{\"tick\":27360,\"note\":60,\"velocity\":100,\"duration\":29},{\"tick\":27600,\"note\":60,\"velocity\":66,\"duration\":29},{\"tick\":27840,\"note\":60,\"velocity\":100,\"duration\":29},{\"tick\":28080,\"note\":60,\"velocity\":62,\"duration\":29},{\"tick\":28320,\"note\":60,\"velocity\":100,\"duration\":29},{\"tick\":28560,\"note\":60,\"velocity\":70,\"duration\":29},{\"tick\":27240,\"note\":60,\"velocity\":30,\"duration\":29},{\"tick\":28200,\"note\":60,\"velocity\":30,\"duration\":29},{\"tick\":28680,\"note\":60,\"velocity\":34,\"duration\":29},{\"tick\":28800,\"note\":60,\"velocity\":100,\"duration\":29},{\"tick\":29040,\"note\":60,\"velocity\":62,\"duration\":29},{\"tick\":29280,\"note\":60,\"velocity\":100,\"duration\":29},{\"tick\":29520,\"note\":60,\"velocity\":66,\"duration\":29},{\"tick\":29760,\"note\":60,\"velocity\":100,\"duration\":29},{\"tick\":30000,\"note\":60,\"velocity\":62,\"duration\":29},{\"tick\":30240,\"note\":60,\"velocity\":100,\"duration\":29},{\"tick\":30480,\"note\":60,\"velocity\":70,\"duration\":29},{\"tick\":29160,\"note\":60,\"velocity\":30,\"duration\":29},{\"tick\":30120,\"note\":60,\"velocity\":30,\"duration\":29},{\"tick\":30600,\"note\":60,\"velocity\":34,\"duration\":29},{\"tick\":30720,\"note\":60,\"velocity\":100,\"duration\":29},{\"tick\":30960,\"note\":60,\"velocity\":62,\"duration\":29},{\"tick\":31200,\"note\":60,\"velocity\":100,\"duration\":29},{\"tick\":31440,\"note\":60,\"velocity\":66,\"duration\":29},{\"tick\":31680,\"note\":60,\"velocity\":100,\"duration\":29},{\"tick\":31920,\"note\":60,\"velocity\":62,\"duration\":29},{\"tick\":32160,\"note\":60,\"velocity\":100,\"duration\":29},{\"tick\":32400,\"note\":60,\"velocity\":70,\"duration\":29},{\"tick\":31080,\"note\":60,\"velocity\":30,\"duration\":29},{\"tick\":32040,\"note\":60,\"velocity\":30,\"duration\":29},{\"tick\":32520,\"note\":60,\"velocity\":34,\"duration\":29},{\"tick\":32640,\"note\":60,\"velocity\":100,\"duration\":29},{\"tick\":32880,\"note\":60,\"velocity\":62,\"duration\":29},{\"tick\":33120,\"note\":60,\"velocity\":100,\"duration\":29},{\"tick\":33360,\"note\":60,\"velocity\":66,\"duration\":29},{\"tick\":33600,\"note\":60,\"velocity\":100,\"duration\":29},{\"tick\":33840,\"note\":60,\"velocity\":62,\"duration\":29},{\"tick\":34080,\"note\":60,\"velocity\":100,\"duration\":29},{\"tick\":34320,\"note\":60,\"velocity\":70,\"duration\":29},{\"tick\":33000,\"note\":60,\"velocity\":30,\"duration\":29},{\"tick\":33960,\"note\":60,\"velocity\":30,\"duration\":29},{\"tick\":34440,\"note\":60,\"velocity\":34,\"duration\":29},{\"tick\":34560,\"note\":60,\"velocity\":100,\"duration\":29},{\"tick\":34800,\"note\":60,\"velocity\":62,\"duration\":29},{\"tick\":35040,\"note\":60,\"velocity\":100,\"duration\":29},{\"tick\":35280,\"note\":60,\"velocity\":66,\"duration\":29},{\"tick\":35520,\"note\":60,\"velocity\":100,\"duration\":29},{\"tick\":35760,\"note\":60,\"velocity\":62,\"duration\":29},{\"tick\":36000,\"note\":60,\"velocity\":100,\"duration\":29},{\"tick\":36240,\"note\":60,\"velocity\":70,\"duration\":29},{\"tick\":34920,\"note\":60,\"velocity\":30,\"duration\":29},{\"tick\":35880,\"note\":60,\"velocity\":30,\"duration\":29},{\"tick\":36360,\"note\":60,\"velocity\":34,\"duration\":29},{\"tick\":36480,\"note\":60,\"velocity\":100,\"duration\":29},{\"tick\":36720,\"note\":60,\"velocity\":62,\"duration\":29},{\"tick\":36960,\"note\":60,\"velocity\":100,\"duration\":29},{\"tick\":37200,\"note\":60,\"velocity\":66,\"duration\":29},{\"tick\":37440,\"note\":60,\"velocity\":100,\"duration\":29},{\"tick\":37680,\"note\":60,\"velocity\":62,\"duration\":29},{\"tick\":37920,\"note\":60,\"velocity\":100,\"duration\":29},{\"tick\":38160,\"note\":60,\"velocity\":70,\"duration\":29},{\"tick\":36840,\"note\":60,\"velocity\":30,\"duration\":29},{\"tick\":37800,\"note\":60,\"velocity\":30,\"duration\":29},{\"tick\":38280,\"note\":60,\"velocity\":34,\"duration\":29}]}]}"
+        },
+        "position": {
+          "x": 540,
+          "y": 40
+        }
+      },
+      {
+        "id": "seq3",
+        "type": "midi-file-sequencer",
+        "name": "MIDI (pinces du lead, ombre)",
+        "params": {
+          "enabled": true,
+          "tempo": 132,
+          "gateLength": 90,
+          "loop": true,
+          "voices": 1,
+          "midiData": "{\"ticksPerBeat\":480,\"totalTicks\":46080,\"tracks\":[{\"notes\":[{\"tick\":7680,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":9360,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":10800,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":12120,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":13440,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":15120,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":16080,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":18000,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":19440,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":20880,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":21600,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":23760,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":24960,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":26880,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":27840,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":29040,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":31200,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":32400,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":33600,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":35520,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":36600,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":38400,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":40080,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":41520,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":42840,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":44160,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":45840,\"note\":60,\"velocity\":100,\"duration\":9}]},{\"notes\":[{\"tick\":8280,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":9480,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":11040,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":12240,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":13560,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":15360,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":16320,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":18120,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":19680,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":21120,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":22080,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":24000,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":25920,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":27360,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":28560,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":29280,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":31320,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":32640,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":34560,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":36000,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":36720,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":39000,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":40200,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":41760,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":42960,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":44280,\"note\":60,\"velocity\":100,\"duration\":9}]},{\"notes\":[{\"tick\":8400,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":9600,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":11520,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":12480,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":13680,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":15840,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":17040,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":18240,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":20160,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":21240,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":23040,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":24720,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":26160,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":27480,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":28800,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":30480,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":31440,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":33360,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":34800,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":36240,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":36960,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":39120,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":40320,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":42240,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":43200,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":44400,\"note\":60,\"velocity\":100,\"duration\":9}]},{\"notes\":[{\"tick\":8640,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":10560,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":12000,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":13200,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":13920,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":15960,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":17280,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":19200,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":20640,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":21360,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":23640,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":24840,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":26400,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":27600,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":28920,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":30720,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":31680,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":33480,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":35040,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":36480,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":37440,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":39360,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":41280,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":42720,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":43920,\"note\":60,\"velocity\":100,\"duration\":9},{\"tick\":44640,\"note\":60,\"velocity\":100,\"duration\":9}]},{\"notes\":[{\"tick\":7680,\"note\":63,\"velocity\":96,\"duration\":600},{\"tick\":8280,\"note\":66,\"velocity\":96,\"duration\":120},{\"tick\":8400,\"note\":63,\"velocity\":96,\"duration\":240},{\"tick\":8640,\"note\":68,\"velocity\":96,\"duration\":720},{\"tick\":9360,\"note\":70,\"velocity\":96,\"duration\":120},{\"tick\":9480,\"note\":68,\"velocity\":96,\"duration\":120},{\"tick\":9600,\"note\":66,\"velocity\":96,\"duration\":960},{\"tick\":10560,\"note\":63,\"velocity\":96,\"duration\":240},{\"tick\":10800,\"note\":61,\"velocity\":96,\"duration\":240},{\"tick\":11040,\"note\":63,\"velocity\":96,\"duration\":480},{\"tick\":11520,\"note\":73,\"velocity\":96,\"duration\":480},{\"tick\":12000,\"note\":70,\"velocity\":96,\"duration\":120},{\"tick\":12120,\"note\":73,\"velocity\":96,\"duration\":120},{\"tick\":12240,\"note\":70,\"velocity\":96,\"duration\":240},{\"tick\":12480,\"note\":68,\"velocity\":96,\"duration\":720},{\"tick\":13200,\"note\":66,\"velocity\":96,\"duration\":240},{\"tick\":13440,\"note\":68,\"velocity\":96,\"duration\":120},{\"tick\":13560,\"note\":70,\"velocity\":96,\"duration\":120},{\"tick\":13680,\"note\":68,\"velocity\":96,\"duration\":240},{\"tick\":13920,\"note\":66,\"velocity\":96,\"duration\":1200},{\"tick\":15120,\"note\":63,\"velocity\":96,\"duration\":240},{\"tick\":15360,\"note\":70,\"velocity\":96,\"duration\":480},{\"tick\":15840,\"note\":73,\"velocity\":96,\"duration\":120},{\"tick\":15960,\"note\":75,\"velocity\":96,\"duration\":120},{\"tick\":16080,\"note\":73,\"velocity\":96,\"duration\":240},{\"tick\":16320,\"note\":70,\"velocity\":96,\"duration\":720},{\"tick\":17040,\"note\":68,\"velocity\":96,\"duration\":240},{\"tick\":17280,\"note\":66,\"velocity\":96,\"duration\":720},{\"tick\":18000,\"note\":68,\"velocity\":96,\"duration\":120},{\"tick\":18120,\"note\":66,\"velocity\":96,\"duration\":120},{\"tick\":18240,\"note\":63,\"velocity\":96,\"duration\":960},{\"tick\":19200,\"note\":61,\"velocity\":96,\"duration\":240},{\"tick\":19440,\"note\":63,\"velocity\":96,\"duration\":240},{\"tick\":19680,\"note\":66,\"velocity\":96,\"duration\":480},{\"tick\":20160,\"note\":68,\"velocity\":96,\"duration\":480},{\"tick\":20640,\"note\":70,\"velocity\":96,\"duration\":240},{\"tick\":20880,\"note\":73,\"velocity\":96,\"duration\":240},{\"tick\":21120,\"note\":70,\"velocity\":96,\"duration\":120},{\"tick\":21240,\"note\":73,\"velocity\":96,\"duration\":120},{\"tick\":21360,\"note\":70,\"velocity\":96,\"duration\":240},{\"tick\":21600,\"note\":68,\"velocity\":96,\"duration\":480},{\"tick\":22080,\"note\":66,\"velocity\":96,\"duration\":960},{\"tick\":23040,\"note\":63,\"velocity\":96,\"duration\":600},{\"tick\":23640,\"note\":66,\"velocity\":96,\"duration\":120},{\"tick\":23760,\"note\":63,\"velocity\":96,\"duration\":240},{\"tick\":24000,\"note\":68,\"velocity\":96,\"duration\":720},{\"tick\":24720,\"note\":70,\"velocity\":96,\"duration\":120},{\"tick\":24840,\"note\":68,\"velocity\":96,\"duration\":120},{\"tick\":24960,\"note\":66,\"velocity\":96,\"duration\":960},{\"tick\":25920,\"note\":63,\"velocity\":96,\"duration\":240},{\"tick\":26160,\"note\":61,\"velocity\":96,\"duration\":240},{\"tick\":26400,\"note\":63,\"velocity\":96,\"duration\":480},{\"tick\":26880,\"note\":73,\"velocity\":96,\"duration\":480},{\"tick\":27360,\"note\":70,\"velocity\":96,\"duration\":120},{\"tick\":27480,\"note\":73,\"velocity\":96,\"duration\":120},{\"tick\":27600,\"note\":70,\"velocity\":96,\"duration\":240},{\"tick\":27840,\"note\":68,\"velocity\":96,\"duration\":720},{\"tick\":28560,\"note\":66,\"velocity\":96,\"duration\":240},{\"tick\":28800,\"note\":68,\"velocity\":96,\"duration\":120},{\"tick\":28920,\"note\":70,\"velocity\":96,\"duration\":120},{\"tick\":29040,\"note\":68,\"velocity\":96,\"duration\":240},{\"tick\":29280,\"note\":66,\"velocity\":96,\"duration\":1200},{\"tick\":30480,\"note\":63,\"velocity\":96,\"duration\":240},{\"tick\":30720,\"note\":70,\"velocity\":96,\"duration\":480},{\"tick\":31200,\"note\":73,\"velocity\":96,\"duration\":120},{\"tick\":31320,\"note\":75,\"velocity\":96,\"duration\":120},{\"tick\":31440,\"note\":73,\"velocity\":96,\"duration\":240},{\"tick\":31680,\"note\":70,\"velocity\":96,\"duration\":720},{\"tick\":32400,\"note\":68,\"velocity\":96,\"duration\":240},{\"tick\":32640,\"note\":66,\"velocity\":96,\"duration\":720},{\"tick\":33360,\"note\":68,\"velocity\":96,\"duration\":120},{\"tick\":33480,\"note\":66,\"velocity\":96,\"duration\":120},{\"tick\":33600,\"note\":63,\"velocity\":96,\"duration\":960},{\"tick\":34560,\"note\":61,\"velocity\":96,\"duration\":240},{\"tick\":34800,\"note\":63,\"velocity\":96,\"duration\":240},{\"tick\":35040,\"note\":66,\"velocity\":96,\"duration\":480},{\"tick\":35520,\"note\":68,\"velocity\":96,\"duration\":480},{\"tick\":36000,\"note\":70,\"velocity\":96,\"duration\":240},{\"tick\":36240,\"note\":73,\"velocity\":96,\"duration\":240},{\"tick\":36480,\"note\":70,\"velocity\":96,\"duration\":120},{\"tick\":36600,\"note\":73,\"velocity\":96,\"duration\":120},{\"tick\":36720,\"note\":70,\"velocity\":96,\"duration\":240},{\"tick\":36960,\"note\":68,\"velocity\":96,\"duration\":480},{\"tick\":37440,\"note\":66,\"velocity\":96,\"duration\":960},{\"tick\":38400,\"note\":63,\"velocity\":96,\"duration\":600},{\"tick\":39000,\"note\":66,\"velocity\":96,\"duration\":120},{\"tick\":39120,\"note\":63,\"velocity\":96,\"duration\":240},{\"tick\":39360,\"note\":68,\"velocity\":96,\"duration\":720},{\"tick\":40080,\"note\":70,\"velocity\":96,\"duration\":120},{\"tick\":40200,\"note\":68,\"velocity\":96,\"duration\":120},{\"tick\":40320,\"note\":66,\"velocity\":96,\"duration\":960},{\"tick\":41280,\"note\":63,\"velocity\":96,\"duration\":240},{\"tick\":41520,\"note\":61,\"velocity\":96,\"duration\":240},{\"tick\":41760,\"note\":63,\"velocity\":96,\"duration\":480},{\"tick\":42240,\"note\":73,\"velocity\":96,\"duration\":480},{\"tick\":42720,\"note\":70,\"velocity\":96,\"duration\":120},{\"tick\":42840,\"note\":73,\"velocity\":96,\"duration\":120},{\"tick\":42960,\"note\":70,\"velocity\":96,\"duration\":240},{\"tick\":43200,\"note\":68,\"velocity\":96,\"duration\":720},{\"tick\":43920,\"note\":66,\"velocity\":96,\"duration\":240},{\"tick\":44160,\"note\":68,\"velocity\":96,\"duration\":120},{\"tick\":44280,\"note\":70,\"velocity\":96,\"duration\":120},{\"tick\":44400,\"note\":68,\"velocity\":96,\"duration\":240},{\"tick\":44640,\"note\":66,\"velocity\":96,\"duration\":1200},{\"tick\":45840,\"note\":63,\"velocity\":96,\"duration\":240}]}]}"
+        },
+        "position": {
+          "x": 790,
+          "y": 40
+        }
+      },
+      {
+        "id": "seq4",
+        "type": "midi-file-sequencer",
+        "name": "MIDI (porte de la question, 100 %)",
+        "params": {
+          "enabled": true,
+          "tempo": 132,
+          "gateLength": 100,
+          "loop": true,
+          "voices": 1,
+          "midiData": "{\"ticksPerBeat\":480,\"totalTicks\":46080,\"tracks\":[{\"notes\":[{\"tick\":0,\"note\":60,\"velocity\":100,\"duration\":45120}]}]}"
+        },
+        "position": {
+          "x": 1040,
+          "y": 40
+        }
+      },
+      {
+        "id": "lead0",
+        "type": "oscillator",
+        "name": "Lead voix 1",
+        "params": {
+          "frequency": 449.5049045517765,
+          "type": "sawtooth",
+          "fmExp": 0.018333333333333333
+        },
+        "position": {
+          "x": 1290,
+          "y": 40
+        }
+      },
+      {
+        "id": "leadf0",
+        "type": "vcf",
+        "name": "Filtre lead 1",
+        "params": {
+          "cutoff": 1350,
+          "resonance": 0.05,
+          "drive": 0,
+          "envAmount": 1.6,
+          "modAmount": 0,
+          "keyTrack": 0.5,
+          "model": "svf",
+          "mode": "lp",
+          "slope": 12
+        },
+        "position": {
+          "x": 1540,
+          "y": 40
+        }
+      },
+      {
+        "id": "leadfe0",
+        "type": "adsr",
+        "name": "Pince du filtre 1",
+        "params": {
+          "attack": 0.001,
+          "decay": 0.3,
+          "sustain": 1,
+          "release": 0.16
+        },
+        "position": {
+          "x": 1790,
+          "y": 40
+        }
+      },
+      {
+        "id": "leade0",
+        "type": "adsr",
+        "name": "Env lead 1",
+        "params": {
+          "attack": 0.006,
+          "decay": 0.3,
+          "sustain": 1,
+          "release": 0.38
+        },
+        "position": {
+          "x": 40,
+          "y": 340
+        }
+      },
+      {
+        "id": "leadv0",
+        "type": "gain",
+        "name": "VCA lead 1",
+        "params": {
+          "gain": 0.9
+        },
+        "position": {
+          "x": 290,
+          "y": 340
+        }
+      },
+      {
+        "id": "leadsw0",
+        "type": "adsr",
+        "name": "Gonflement 1",
+        "params": {
+          "attack": 0.45,
+          "decay": 0.3,
+          "sustain": 1,
+          "release": 0.38
+        },
+        "position": {
+          "x": 540,
+          "y": 340
+        }
+      },
+      {
+        "id": "leadsv0",
+        "type": "gain",
+        "name": "VCA gonflement 1",
+        "params": {
+          "gain": 1
+        },
+        "position": {
+          "x": 790,
+          "y": 340
+        }
+      },
+      {
+        "id": "leadsum0",
+        "type": "mixer",
+        "name": "Corps + gonflement 1",
+        "params": {
+          "levelA": 0.5,
+          "levelB": 0.85
+        },
+        "position": {
+          "x": 1040,
+          "y": 340
+        }
+      },
+      {
+        "id": "lead1",
+        "type": "oscillator",
+        "name": "Lead voix 2",
+        "params": {
+          "frequency": 449.5049045517765,
+          "type": "sawtooth",
+          "fmExp": 0.018333333333333333
+        },
+        "position": {
+          "x": 1290,
+          "y": 340
+        }
+      },
+      {
+        "id": "leadf1",
+        "type": "vcf",
+        "name": "Filtre lead 2",
+        "params": {
+          "cutoff": 1350,
+          "resonance": 0.05,
+          "drive": 0,
+          "envAmount": 1.6,
+          "modAmount": 0,
+          "keyTrack": 0.5,
+          "model": "svf",
+          "mode": "lp",
+          "slope": 12
+        },
+        "position": {
+          "x": 1540,
+          "y": 340
+        }
+      },
+      {
+        "id": "leadfe1",
+        "type": "adsr",
+        "name": "Pince du filtre 2",
+        "params": {
+          "attack": 0.001,
+          "decay": 0.3,
+          "sustain": 1,
+          "release": 0.16
+        },
+        "position": {
+          "x": 1790,
+          "y": 340
+        }
+      },
+      {
+        "id": "leade1",
+        "type": "adsr",
+        "name": "Env lead 2",
+        "params": {
+          "attack": 0.006,
+          "decay": 0.3,
+          "sustain": 1,
+          "release": 0.38
+        },
+        "position": {
+          "x": 40,
+          "y": 640
+        }
+      },
+      {
+        "id": "leadv1",
+        "type": "gain",
+        "name": "VCA lead 2",
+        "params": {
+          "gain": 0.9
+        },
+        "position": {
+          "x": 290,
+          "y": 640
+        }
+      },
+      {
+        "id": "leadsw1",
+        "type": "adsr",
+        "name": "Gonflement 2",
+        "params": {
+          "attack": 0.45,
+          "decay": 0.3,
+          "sustain": 1,
+          "release": 0.38
+        },
+        "position": {
+          "x": 540,
+          "y": 640
+        }
+      },
+      {
+        "id": "leadsv1",
+        "type": "gain",
+        "name": "VCA gonflement 2",
+        "params": {
+          "gain": 1
+        },
+        "position": {
+          "x": 790,
+          "y": 640
+        }
+      },
+      {
+        "id": "leadsum1",
+        "type": "mixer",
+        "name": "Corps + gonflement 2",
+        "params": {
+          "levelA": 0.5,
+          "levelB": 0.85
+        },
+        "position": {
+          "x": 1040,
+          "y": 640
+        }
+      },
+      {
+        "id": "lead2",
+        "type": "oscillator",
+        "name": "Lead voix 3",
+        "params": {
+          "frequency": 449.5049045517765,
+          "type": "sawtooth",
+          "fmExp": 0.018333333333333333
+        },
+        "position": {
+          "x": 1290,
+          "y": 640
+        }
+      },
+      {
+        "id": "leadf2",
+        "type": "vcf",
+        "name": "Filtre lead 3",
+        "params": {
+          "cutoff": 1350,
+          "resonance": 0.05,
+          "drive": 0,
+          "envAmount": 1.6,
+          "modAmount": 0,
+          "keyTrack": 0.5,
+          "model": "svf",
+          "mode": "lp",
+          "slope": 12
+        },
+        "position": {
+          "x": 1540,
+          "y": 640
+        }
+      },
+      {
+        "id": "leadfe2",
+        "type": "adsr",
+        "name": "Pince du filtre 3",
+        "params": {
+          "attack": 0.001,
+          "decay": 0.3,
+          "sustain": 1,
+          "release": 0.16
+        },
+        "position": {
+          "x": 1790,
+          "y": 640
+        }
+      },
+      {
+        "id": "leade2",
+        "type": "adsr",
+        "name": "Env lead 3",
+        "params": {
+          "attack": 0.006,
+          "decay": 0.3,
+          "sustain": 1,
+          "release": 0.38
+        },
+        "position": {
+          "x": 40,
+          "y": 940
+        }
+      },
+      {
+        "id": "leadv2",
+        "type": "gain",
+        "name": "VCA lead 3",
+        "params": {
+          "gain": 0.9
+        },
+        "position": {
+          "x": 290,
+          "y": 940
+        }
+      },
+      {
+        "id": "leadsw2",
+        "type": "adsr",
+        "name": "Gonflement 3",
+        "params": {
+          "attack": 0.45,
+          "decay": 0.3,
+          "sustain": 1,
+          "release": 0.38
+        },
+        "position": {
+          "x": 540,
+          "y": 940
+        }
+      },
+      {
+        "id": "leadsv2",
+        "type": "gain",
+        "name": "VCA gonflement 3",
+        "params": {
+          "gain": 1
+        },
+        "position": {
+          "x": 790,
+          "y": 940
+        }
+      },
+      {
+        "id": "leadsum2",
+        "type": "mixer",
+        "name": "Corps + gonflement 3",
+        "params": {
+          "levelA": 0.5,
+          "levelB": 0.85
+        },
+        "position": {
+          "x": 1040,
+          "y": 940
+        }
+      },
+      {
+        "id": "lead3",
+        "type": "oscillator",
+        "name": "Lead voix 4",
+        "params": {
+          "frequency": 449.5049045517765,
+          "type": "sawtooth",
+          "fmExp": 0.018333333333333333
+        },
+        "position": {
+          "x": 1290,
+          "y": 940
+        }
+      },
+      {
+        "id": "leadf3",
+        "type": "vcf",
+        "name": "Filtre lead 4",
+        "params": {
+          "cutoff": 1350,
+          "resonance": 0.05,
+          "drive": 0,
+          "envAmount": 1.6,
+          "modAmount": 0,
+          "keyTrack": 0.5,
+          "model": "svf",
+          "mode": "lp",
+          "slope": 12
+        },
+        "position": {
+          "x": 1540,
+          "y": 940
+        }
+      },
+      {
+        "id": "leadfe3",
+        "type": "adsr",
+        "name": "Pince du filtre 4",
+        "params": {
+          "attack": 0.001,
+          "decay": 0.3,
+          "sustain": 1,
+          "release": 0.16
+        },
+        "position": {
+          "x": 1790,
+          "y": 940
+        }
+      },
+      {
+        "id": "leade3",
+        "type": "adsr",
+        "name": "Env lead 4",
+        "params": {
+          "attack": 0.006,
+          "decay": 0.3,
+          "sustain": 1,
+          "release": 0.38
+        },
+        "position": {
+          "x": 40,
+          "y": 1240
+        }
+      },
+      {
+        "id": "leadv3",
+        "type": "gain",
+        "name": "VCA lead 4",
+        "params": {
+          "gain": 0.9
+        },
+        "position": {
+          "x": 290,
+          "y": 1240
+        }
+      },
+      {
+        "id": "leadsw3",
+        "type": "adsr",
+        "name": "Gonflement 4",
+        "params": {
+          "attack": 0.45,
+          "decay": 0.3,
+          "sustain": 1,
+          "release": 0.38
+        },
+        "position": {
+          "x": 540,
+          "y": 1240
+        }
+      },
+      {
+        "id": "leadsv3",
+        "type": "gain",
+        "name": "VCA gonflement 4",
+        "params": {
+          "gain": 1
+        },
+        "position": {
+          "x": 790,
+          "y": 1240
+        }
+      },
+      {
+        "id": "leadsum3",
+        "type": "mixer",
+        "name": "Corps + gonflement 4",
+        "params": {
+          "levelA": 0.5,
+          "levelB": 0.85
+        },
+        "position": {
+          "x": 1040,
+          "y": 1240
+        }
+      },
+      {
+        "id": "leadpoly",
+        "type": "mixer-8",
+        "name": "Les 4 voix du lead",
+        "params": {
+          "level1": 1,
+          "level2": 1,
+          "level3": 1,
+          "level4": 1
+        },
+        "position": {
+          "x": 1290,
+          "y": 1240
+        }
+      },
+      {
+        "id": "purrp",
+        "type": "lfo",
+        "name": "Ronron hauteur",
+        "params": {
+          "rate": 12.7,
+          "depth": 1,
+          "offset": 0,
+          "shape": "sine",
+          "bipolar": true
+        },
+        "position": {
+          "x": 1540,
+          "y": 1240
+        }
+      },
+      {
+        "id": "purra",
+        "type": "lfo",
+        "name": "Ronron volume",
+        "params": {
+          "rate": 12.7,
+          "depth": 0.23,
+          "offset": 0.77,
+          "shape": "sine",
+          "bipolar": true
+        },
+        "position": {
+          "x": 1790,
+          "y": 1240
+        }
+      },
+      {
+        "id": "trem",
+        "type": "gain",
+        "name": "Tremolo lead",
+        "params": {
+          "gain": 1
+        },
+        "position": {
+          "x": 40,
+          "y": 1540
+        }
+      },
+      {
+        "id": "shadow",
+        "type": "oscillator",
+        "name": "Ombre (octave dessous)",
+        "params": {
+          "frequency": 224.75245227588826,
+          "type": "sawtooth",
+          "fmExp": 0.018333333333333333
+        },
+        "position": {
+          "x": 290,
+          "y": 1540
+        }
+      },
+      {
+        "id": "shadowf",
+        "type": "vcf",
+        "name": "Filtre ombre",
+        "params": {
+          "cutoff": 520,
+          "resonance": 0.05,
+          "drive": 0,
+          "envAmount": 0,
+          "modAmount": 0,
+          "keyTrack": 0.5,
+          "model": "svf",
+          "mode": "lp",
+          "slope": 12
+        },
+        "position": {
+          "x": 540,
+          "y": 1540
+        }
+      },
+      {
+        "id": "shadowe",
+        "type": "adsr",
+        "name": "Eclosion ombre",
+        "params": {
+          "attack": 0.35,
+          "decay": 0.3,
+          "sustain": 1,
+          "release": 0.015
+        },
+        "position": {
+          "x": 790,
+          "y": 1540
+        }
+      },
+      {
+        "id": "shadowv",
+        "type": "gain",
+        "name": "VCA ombre",
+        "params": {
+          "gain": 0.9
+        },
+        "position": {
+          "x": 1040,
+          "y": 1540
+        }
+      },
+      {
+        "id": "purr2a",
+        "type": "lfo",
+        "name": "Ronron lent volume",
+        "params": {
+          "rate": 6.5,
+          "depth": 0.25,
+          "offset": 0.75,
+          "shape": "sine",
+          "bipolar": true
+        },
+        "position": {
+          "x": 1290,
+          "y": 1540
+        }
+      },
+      {
+        "id": "shadowt",
+        "type": "gain",
+        "name": "Tremolo ombre",
+        "params": {
+          "gain": 1
+        },
+        "position": {
+          "x": 1540,
+          "y": 1540
+        }
+      },
+      {
+        "id": "leadmix",
+        "type": "mixer",
+        "name": "Lead + ombre",
+        "params": {
+          "levelA": 1,
+          "levelB": 0.45
+        },
+        "position": {
+          "x": 1790,
+          "y": 1540
+        }
+      },
+      {
+        "id": "echo",
+        "type": "delay",
+        "name": "Echo (faible)",
+        "params": {
+          "time": 681.8181818181819,
+          "feedback": 0.15,
+          "mix": 0.1,
+          "tone": 0.3,
+          "pingPong": false
+        },
+        "position": {
+          "x": 40,
+          "y": 1840
+        }
+      },
+      {
+        "id": "pad0",
+        "type": "oscillator",
+        "name": "Nappe voix 1",
+        "params": {
+          "frequency": 445.1125537328459,
+          "type": "sawtooth"
+        },
+        "position": {
+          "x": 290,
+          "y": 1840
+        }
+      },
+      {
+        "id": "pade0",
+        "type": "adsr",
+        "name": "Env nappe 1",
+        "params": {
+          "attack": 0.03,
+          "decay": 0.3,
+          "sustain": 1,
+          "release": 0.65
+        },
+        "position": {
+          "x": 540,
+          "y": 1840
+        }
+      },
+      {
+        "id": "padv0",
+        "type": "gain",
+        "name": "VCA nappe 1",
+        "params": {
+          "gain": 1
+        },
+        "position": {
+          "x": 790,
+          "y": 1840
+        }
+      },
+      {
+        "id": "pad1",
+        "type": "oscillator",
+        "name": "Nappe voix 2",
+        "params": {
+          "frequency": 445.8845436971297,
+          "type": "sawtooth"
+        },
+        "position": {
+          "x": 1040,
+          "y": 1840
+        }
+      },
+      {
+        "id": "pade1",
+        "type": "adsr",
+        "name": "Env nappe 2",
+        "params": {
+          "attack": 0.03,
+          "decay": 0.3,
+          "sustain": 1,
+          "release": 0.65
+        },
+        "position": {
+          "x": 1290,
+          "y": 1840
+        }
+      },
+      {
+        "id": "padv1",
+        "type": "gain",
+        "name": "VCA nappe 2",
+        "params": {
+          "gain": 1
+        },
+        "position": {
+          "x": 1540,
+          "y": 1840
+        }
+      },
+      {
+        "id": "pad2",
+        "type": "oscillator",
+        "name": "Nappe voix 3",
+        "params": {
+          "frequency": 446.6578725778289,
+          "type": "sawtooth"
+        },
+        "position": {
+          "x": 1790,
+          "y": 1840
+        }
+      },
+      {
+        "id": "pade2",
+        "type": "adsr",
+        "name": "Env nappe 3",
+        "params": {
+          "attack": 0.03,
+          "decay": 0.3,
+          "sustain": 1,
+          "release": 0.65
+        },
+        "position": {
+          "x": 40,
+          "y": 2140
+        }
+      },
+      {
+        "id": "padv2",
+        "type": "gain",
+        "name": "VCA nappe 3",
+        "params": {
+          "gain": 1
+        },
+        "position": {
+          "x": 290,
+          "y": 2140
+        }
+      },
+      {
+        "id": "padmix",
+        "type": "mixer-8",
+        "name": "Mix nappe",
+        "params": {
+          "level1": 0.8,
+          "level2": 0.8,
+          "level3": 0.8
+        },
+        "position": {
+          "x": 540,
+          "y": 2140
+        }
+      },
+      {
+        "id": "padf",
+        "type": "vcf",
+        "name": "Filtre nappe",
+        "params": {
+          "cutoff": 900,
+          "resonance": 0.1,
+          "drive": 0,
+          "envAmount": 0,
+          "modAmount": 0,
+          "keyTrack": 0,
+          "model": "svf",
+          "mode": "lp",
+          "slope": 12
+        },
+        "position": {
+          "x": 790,
+          "y": 2140
+        }
+      },
+      {
+        "id": "padlfo",
+        "type": "lfo",
+        "name": "Tremolo nappe",
+        "params": {
+          "rate": 6.5,
+          "depth": 0.2,
+          "offset": 0.8,
+          "shape": "sine",
+          "bipolar": true
+        },
+        "position": {
+          "x": 1040,
+          "y": 2140
+        }
+      },
+      {
+        "id": "padv",
+        "type": "gain",
+        "name": "Tremolo nappe (VCA)",
+        "params": {
+          "gain": 1
+        },
+        "position": {
+          "x": 1290,
+          "y": 2140
+        }
+      },
+      {
+        "id": "pl0",
+        "type": "oscillator",
+        "name": "Accord pince 1",
+        "params": {
+          "frequency": 445.1125537328459,
+          "type": "sawtooth",
+          "fmExp": 0.008333333333333333
+        },
+        "position": {
+          "x": 1540,
+          "y": 2140
+        }
+      },
+      {
+        "id": "plf0",
+        "type": "vcf",
+        "name": "Filtre pince 1",
+        "params": {
+          "cutoff": 850,
+          "resonance": 0.1,
+          "drive": 0,
+          "envAmount": 1.8,
+          "modAmount": 0,
+          "keyTrack": 0.5,
+          "model": "svf",
+          "mode": "lp",
+          "slope": 12
+        },
+        "position": {
+          "x": 1790,
+          "y": 2140
+        }
+      },
+      {
+        "id": "ple0",
+        "type": "adsr",
+        "name": "Env pince 1",
+        "params": {
+          "attack": 0.003,
+          "decay": 0.3,
+          "sustain": 1,
+          "release": 0.14
+        },
+        "position": {
+          "x": 40,
+          "y": 2440
+        }
+      },
+      {
+        "id": "plv0",
+        "type": "gain",
+        "name": "VCA pince 1",
+        "params": {
+          "gain": 1
+        },
+        "position": {
+          "x": 290,
+          "y": 2440
+        }
+      },
+      {
+        "id": "pl1",
+        "type": "oscillator",
+        "name": "Accord pince 2",
+        "params": {
+          "frequency": 445.1125537328459,
+          "type": "sawtooth",
+          "fmExp": 0.008333333333333333
+        },
+        "position": {
+          "x": 540,
+          "y": 2440
+        }
+      },
+      {
+        "id": "plf1",
+        "type": "vcf",
+        "name": "Filtre pince 2",
+        "params": {
+          "cutoff": 850,
+          "resonance": 0.1,
+          "drive": 0,
+          "envAmount": 1.8,
+          "modAmount": 0,
+          "keyTrack": 0.5,
+          "model": "svf",
+          "mode": "lp",
+          "slope": 12
+        },
+        "position": {
+          "x": 790,
+          "y": 2440
+        }
+      },
+      {
+        "id": "ple1",
+        "type": "adsr",
+        "name": "Env pince 2",
+        "params": {
+          "attack": 0.003,
+          "decay": 0.3,
+          "sustain": 1,
+          "release": 0.14
+        },
+        "position": {
+          "x": 1040,
+          "y": 2440
+        }
+      },
+      {
+        "id": "plv1",
+        "type": "gain",
+        "name": "VCA pince 2",
+        "params": {
+          "gain": 1
+        },
+        "position": {
+          "x": 1290,
+          "y": 2440
+        }
+      },
+      {
+        "id": "pl2",
+        "type": "oscillator",
+        "name": "Accord pince 3",
+        "params": {
+          "frequency": 445.1125537328459,
+          "type": "sawtooth",
+          "fmExp": 0.008333333333333333
+        },
+        "position": {
+          "x": 1540,
+          "y": 2440
+        }
+      },
+      {
+        "id": "plf2",
+        "type": "vcf",
+        "name": "Filtre pince 3",
+        "params": {
+          "cutoff": 850,
+          "resonance": 0.1,
+          "drive": 0,
+          "envAmount": 1.8,
+          "modAmount": 0,
+          "keyTrack": 0.5,
+          "model": "svf",
+          "mode": "lp",
+          "slope": 12
+        },
+        "position": {
+          "x": 1790,
+          "y": 2440
+        }
+      },
+      {
+        "id": "ple2",
+        "type": "adsr",
+        "name": "Env pince 3",
+        "params": {
+          "attack": 0.003,
+          "decay": 0.3,
+          "sustain": 1,
+          "release": 0.14
+        },
+        "position": {
+          "x": 40,
+          "y": 2740
+        }
+      },
+      {
+        "id": "plv2",
+        "type": "gain",
+        "name": "VCA pince 3",
+        "params": {
+          "gain": 1
+        },
+        "position": {
+          "x": 290,
+          "y": 2740
+        }
+      },
+      {
+        "id": "pl3",
+        "type": "oscillator",
+        "name": "Accord pince 4",
+        "params": {
+          "frequency": 445.1125537328459,
+          "type": "sawtooth",
+          "fmExp": 0.008333333333333333
+        },
+        "position": {
+          "x": 540,
+          "y": 2740
+        }
+      },
+      {
+        "id": "plf3",
+        "type": "vcf",
+        "name": "Filtre pince 4",
+        "params": {
+          "cutoff": 850,
+          "resonance": 0.1,
+          "drive": 0,
+          "envAmount": 1.8,
+          "modAmount": 0,
+          "keyTrack": 0.5,
+          "model": "svf",
+          "mode": "lp",
+          "slope": 12
+        },
+        "position": {
+          "x": 790,
+          "y": 2740
+        }
+      },
+      {
+        "id": "ple3",
+        "type": "adsr",
+        "name": "Env pince 4",
+        "params": {
+          "attack": 0.003,
+          "decay": 0.3,
+          "sustain": 1,
+          "release": 0.14
+        },
+        "position": {
+          "x": 1040,
+          "y": 2740
+        }
+      },
+      {
+        "id": "plv3",
+        "type": "gain",
+        "name": "VCA pince 4",
+        "params": {
+          "gain": 1
+        },
+        "position": {
+          "x": 1290,
+          "y": 2740
+        }
+      },
+      {
+        "id": "plmix",
+        "type": "mixer-8",
+        "name": "Mix accords pinces",
+        "params": {
+          "level1": 0.8,
+          "level2": 0.8,
+          "level3": 0.8,
+          "level4": 0.8
+        },
+        "position": {
+          "x": 1540,
+          "y": 2740
+        }
+      },
+      {
+        "id": "pltrem",
+        "type": "gain",
+        "name": "Ronron des accords",
+        "params": {
+          "gain": 1
+        },
+        "position": {
+          "x": 1790,
+          "y": 2740
+        }
+      },
+      {
+        "id": "bass",
+        "type": "oscillator",
+        "name": "Basse (+ sous-octave)",
+        "params": {
+          "frequency": 445.1125537328459,
+          "type": "sawtooth",
+          "subMix": 0.18,
+          "subOct": 1
+        },
+        "position": {
+          "x": 40,
+          "y": 3040
+        }
+      },
+      {
+        "id": "bassf",
+        "type": "vcf",
+        "name": "Filtre basse",
+        "params": {
+          "cutoff": 420,
+          "resonance": 0.15,
+          "drive": 0,
+          "envAmount": 0,
+          "modAmount": 0,
+          "keyTrack": 0.3,
+          "model": "svf",
+          "mode": "lp",
+          "slope": 24
+        },
+        "position": {
+          "x": 290,
+          "y": 3040
+        }
+      },
+      {
+        "id": "basse",
+        "type": "adsr",
+        "name": "Env basse",
+        "params": {
+          "attack": 0.008,
+          "decay": 0.3,
+          "sustain": 1,
+          "release": 0.08
+        },
+        "position": {
+          "x": 540,
+          "y": 3040
+        }
+      },
+      {
+        "id": "bassv",
+        "type": "gain",
+        "name": "VCA basse",
+        "params": {
+          "gain": 0.9
+        },
+        "position": {
+          "x": 790,
+          "y": 3040
+        }
+      },
+      {
+        "id": "kosc",
+        "type": "oscillator",
+        "name": "Kick corps (sinus 95 Hz)",
+        "params": {
+          "frequency": 95,
+          "type": "sine",
+          "fmExp": 0.75
+        },
+        "position": {
+          "x": 1040,
+          "y": 3040
+        }
+      },
+      {
+        "id": "ksub",
+        "type": "oscillator",
+        "name": "Kick SUB (sinus 42 Hz)",
+        "params": {
+          "frequency": 42,
+          "type": "sine",
+          "fmExp": 0.45
+        },
+        "position": {
+          "x": 1290,
+          "y": 3040
+        }
+      },
+      {
+        "id": "kmix",
+        "type": "mixer",
+        "name": "Corps + sub",
+        "params": {
+          "levelA": 0.55,
+          "levelB": 0.36
+        },
+        "position": {
+          "x": 1540,
+          "y": 3040
+        }
+      },
+      {
+        "id": "kpitch",
+        "type": "adsr",
+        "name": "Chute du kick",
+        "params": {
+          "attack": 0.001,
+          "decay": 0.3,
+          "sustain": 1,
+          "release": 0.032
+        },
+        "position": {
+          "x": 1790,
+          "y": 3040
+        }
+      },
+      {
+        "id": "kenv",
+        "type": "adsr",
+        "name": "Env kick",
+        "params": {
+          "attack": 0.002,
+          "decay": 0.3,
+          "sustain": 1,
+          "release": 0.022
+        },
+        "position": {
+          "x": 40,
+          "y": 3340
+        }
+      },
+      {
+        "id": "kvca",
+        "type": "gain",
+        "name": "VCA kick",
+        "params": {
+          "gain": 1
+        },
+        "position": {
+          "x": 290,
+          "y": 3340
+        }
+      },
+      {
+        "id": "kvel",
+        "type": "gain",
+        "name": "Force kick",
+        "params": {
+          "gain": 1
+        },
+        "position": {
+          "x": 540,
+          "y": 3340
+        }
+      },
+      {
+        "id": "ktickenv",
+        "type": "adsr",
+        "name": "Env tic",
+        "params": {
+          "attack": 0.0005,
+          "decay": 0.3,
+          "sustain": 1,
+          "release": 0.005
+        },
+        "position": {
+          "x": 790,
+          "y": 3340
+        }
+      },
+      {
+        "id": "ktick",
+        "type": "gain",
+        "name": "Tic du kick",
+        "params": {
+          "gain": 1
+        },
+        "position": {
+          "x": 1040,
+          "y": 3340
+        }
+      },
+      {
+        "id": "noise2",
+        "type": "noise",
+        "name": "Bruit rose (clac)",
+        "params": {
+          "level": 1,
+          "noiseType": "pink",
+          "stereo": 0,
+          "pan": 0
+        },
+        "position": {
+          "x": 1290,
+          "y": 3340
+        }
+      },
+      {
+        "id": "nlp",
+        "type": "vcf",
+        "name": "Bruit adouci + pousse",
+        "params": {
+          "cutoff": 2600,
+          "resonance": 0.15,
+          "drive": 0.8,
+          "envAmount": 0,
+          "modAmount": 0,
+          "keyTrack": 0,
+          "model": "svf",
+          "mode": "lp",
+          "slope": 12
+        },
+        "position": {
+          "x": 1540,
+          "y": 3340
+        }
+      },
+      {
+        "id": "senv",
+        "type": "adsr",
+        "name": "Env clac",
+        "params": {
+          "attack": 0.0005,
+          "decay": 0.3,
+          "sustain": 1,
+          "release": 0.014
+        },
+        "position": {
+          "x": 1790,
+          "y": 3340
+        }
+      },
+      {
+        "id": "svca",
+        "type": "gain",
+        "name": "Clac (bruit)",
+        "params": {
+          "gain": 1
+        },
+        "position": {
+          "x": 40,
+          "y": 3640
+        }
+      },
+      {
+        "id": "sbody",
+        "type": "oscillator",
+        "name": "Corps du clac 180 Hz",
+        "params": {
+          "frequency": 180,
+          "type": "sine",
+          "fmExp": 0.7
+        },
+        "position": {
+          "x": 290,
+          "y": 3640
+        }
+      },
+      {
+        "id": "sbenv",
+        "type": "adsr",
+        "name": "Env corps",
+        "params": {
+          "attack": 0.0005,
+          "decay": 0.3,
+          "sustain": 1,
+          "release": 0.03
+        },
+        "position": {
+          "x": 540,
+          "y": 3640
+        }
+      },
+      {
+        "id": "sbvca",
+        "type": "gain",
+        "name": "VCA corps",
+        "params": {
+          "gain": 1
+        },
+        "position": {
+          "x": 790,
+          "y": 3640
+        }
+      },
+      {
+        "id": "svel",
+        "type": "gain",
+        "name": "Force clac",
+        "params": {
+          "gain": 1
+        },
+        "position": {
+          "x": 1040,
+          "y": 3640
+        }
+      },
+      {
+        "id": "q1",
+        "type": "oscillator",
+        "name": "Question (note 1)",
+        "params": {
+          "frequency": 471.58032351596904,
+          "type": "sawtooth"
+        },
+        "position": {
+          "x": 1290,
+          "y": 3640
+        }
+      },
+      {
+        "id": "q2",
+        "type": "oscillator",
+        "name": "Question (note 2)",
+        "params": {
+          "frequency": 562.4286903665895,
+          "type": "sawtooth"
+        },
+        "position": {
+          "x": 1540,
+          "y": 3640
+        }
+      },
+      {
+        "id": "qmix",
+        "type": "mixer",
+        "name": "Mix question",
+        "params": {
+          "levelA": 0.8,
+          "levelB": 0.8
+        },
+        "position": {
+          "x": 1790,
+          "y": 3640
+        }
+      },
+      {
+        "id": "qf",
+        "type": "vcf",
+        "name": "Filtre question",
+        "params": {
+          "cutoff": 1700,
+          "resonance": 0.05,
+          "drive": 0,
+          "envAmount": 0,
+          "modAmount": 0,
+          "keyTrack": 0,
+          "model": "svf",
+          "mode": "lp",
+          "slope": 12
+        },
+        "position": {
+          "x": 40,
+          "y": 3940
+        }
+      },
+      {
+        "id": "qe",
+        "type": "adsr",
+        "name": "Porte question",
+        "params": {
+          "attack": 0.6,
+          "decay": 0.3,
+          "sustain": 1,
+          "release": 1.2
+        },
+        "position": {
+          "x": 290,
+          "y": 3940
+        }
+      },
+      {
+        "id": "qg",
+        "type": "gain",
+        "name": "Porte question (VCA)",
+        "params": {
+          "gain": 1
+        },
+        "position": {
+          "x": 540,
+          "y": 3940
+        }
+      },
+      {
+        "id": "qv",
+        "type": "gain",
+        "name": "Tremolo question",
+        "params": {
+          "gain": 1
+        },
+        "position": {
+          "x": 790,
+          "y": 3940
+        }
+      },
+      {
+        "id": "noise",
+        "type": "noise",
+        "name": "Bruit blanc",
+        "params": {
+          "level": 1,
+          "noiseType": "white",
+          "stereo": 0,
+          "pan": 0
+        },
+        "position": {
+          "x": 1040,
+          "y": 3940
+        }
+      },
+      {
+        "id": "hhpf",
+        "type": "hpf",
+        "name": "Charley > 5,5 kHz",
+        "params": {
+          "cutoff": 5500
+        },
+        "position": {
+          "x": 1290,
+          "y": 3940
+        }
+      },
+      {
+        "id": "henv",
+        "type": "adsr",
+        "name": "Env charley",
+        "params": {
+          "attack": 0.0005,
+          "decay": 0.3,
+          "sustain": 1,
+          "release": 0.03
+        },
+        "position": {
+          "x": 1540,
+          "y": 3940
+        }
+      },
+      {
+        "id": "hvca",
+        "type": "gain",
+        "name": "VCA charley",
+        "params": {
+          "gain": 1
+        },
+        "position": {
+          "x": 1790,
+          "y": 3940
+        }
+      },
+      {
+        "id": "hvel",
+        "type": "gain",
+        "name": "Force charley",
+        "params": {
+          "gain": 1
+        },
+        "position": {
+          "x": 40,
+          "y": 4240
+        }
+      },
+      {
+        "id": "drums",
+        "type": "mixer-8",
+        "name": "Bus batterie",
+        "params": {
+          "level1": 1,
+          "level2": 0.35,
+          "level3": 1,
+          "level4": 0.5,
+          "level5": 0.17
+        },
+        "position": {
+          "x": 290,
+          "y": 4240
+        }
+      },
+      {
+        "id": "bus",
+        "type": "mixer-8",
+        "name": "Bus",
+        "params": {
+          "level1": 0.52,
+          "level2": 0.16,
+          "level3": 0.37,
+          "level4": 1,
+          "level5": 0.045,
+          "level6": 0.16
+        },
+        "position": {
+          "x": 540,
+          "y": 4240
+        }
+      },
+      {
+        "id": "glue",
+        "type": "compressor",
+        "name": "Colle (compresseur)",
+        "params": {
+          "threshold": -27,
+          "ratio": 3,
+          "attack": 20,
+          "release": 200,
+          "makeup": 7,
+          "mix": 1
+        },
+        "position": {
+          "x": 790,
+          "y": 4240
+        }
+      },
+      {
+        "id": "scope",
+        "type": "scope",
+        "name": "Scope",
+        "params": {},
+        "position": {
+          "x": 1040,
+          "y": 4240
+        }
+      },
+      {
+        "id": "out",
+        "type": "output",
+        "name": "Out",
+        "params": {
+          "level": 2.35
+        },
+        "position": {
+          "x": 1290,
+          "y": 4240
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": {
+          "moduleId": "seq",
+          "portId": "cv-1"
+        },
+        "to": {
+          "moduleId": "lead0",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "seq",
+          "portId": "cv-1"
+        },
+        "to": {
+          "moduleId": "leadf0",
+          "portId": "key"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "seq",
+          "portId": "gate-1"
+        },
+        "to": {
+          "moduleId": "leade0",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "seq3",
+          "portId": "gate-1"
+        },
+        "to": {
+          "moduleId": "leadfe0",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "leadfe0",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "leadf0",
+          "portId": "env"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "purrp",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "lead0",
+          "portId": "fm-exp"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "lead0",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "leadf0",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "leadf0",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "leadv0",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "leade0",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "leadv0",
+          "portId": "cv"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "leadv0",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "leadsum0",
+          "portId": "in-a"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "leadf0",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "leadsv0",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "seq",
+          "portId": "gate-1"
+        },
+        "to": {
+          "moduleId": "leadsw0",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "leadsw0",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "leadsv0",
+          "portId": "cv"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "leadsv0",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "leadsum0",
+          "portId": "in-b"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "leadsum0",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "leadpoly",
+          "portId": "in-1"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "seq",
+          "portId": "cv-2"
+        },
+        "to": {
+          "moduleId": "lead1",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "seq",
+          "portId": "cv-2"
+        },
+        "to": {
+          "moduleId": "leadf1",
+          "portId": "key"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "seq",
+          "portId": "gate-2"
+        },
+        "to": {
+          "moduleId": "leade1",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "seq3",
+          "portId": "gate-2"
+        },
+        "to": {
+          "moduleId": "leadfe1",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "leadfe1",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "leadf1",
+          "portId": "env"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "purrp",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "lead1",
+          "portId": "fm-exp"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "lead1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "leadf1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "leadf1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "leadv1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "leade1",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "leadv1",
+          "portId": "cv"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "leadv1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "leadsum1",
+          "portId": "in-a"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "leadf1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "leadsv1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "seq",
+          "portId": "gate-2"
+        },
+        "to": {
+          "moduleId": "leadsw1",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "leadsw1",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "leadsv1",
+          "portId": "cv"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "leadsv1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "leadsum1",
+          "portId": "in-b"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "leadsum1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "leadpoly",
+          "portId": "in-2"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "seq",
+          "portId": "cv-3"
+        },
+        "to": {
+          "moduleId": "lead2",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "seq",
+          "portId": "cv-3"
+        },
+        "to": {
+          "moduleId": "leadf2",
+          "portId": "key"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "seq",
+          "portId": "gate-3"
+        },
+        "to": {
+          "moduleId": "leade2",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "seq3",
+          "portId": "gate-3"
+        },
+        "to": {
+          "moduleId": "leadfe2",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "leadfe2",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "leadf2",
+          "portId": "env"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "purrp",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "lead2",
+          "portId": "fm-exp"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "lead2",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "leadf2",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "leadf2",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "leadv2",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "leade2",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "leadv2",
+          "portId": "cv"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "leadv2",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "leadsum2",
+          "portId": "in-a"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "leadf2",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "leadsv2",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "seq",
+          "portId": "gate-3"
+        },
+        "to": {
+          "moduleId": "leadsw2",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "leadsw2",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "leadsv2",
+          "portId": "cv"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "leadsv2",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "leadsum2",
+          "portId": "in-b"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "leadsum2",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "leadpoly",
+          "portId": "in-3"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "seq",
+          "portId": "cv-4"
+        },
+        "to": {
+          "moduleId": "lead3",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "seq",
+          "portId": "cv-4"
+        },
+        "to": {
+          "moduleId": "leadf3",
+          "portId": "key"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "seq",
+          "portId": "gate-4"
+        },
+        "to": {
+          "moduleId": "leade3",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "seq3",
+          "portId": "gate-4"
+        },
+        "to": {
+          "moduleId": "leadfe3",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "leadfe3",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "leadf3",
+          "portId": "env"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "purrp",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "lead3",
+          "portId": "fm-exp"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "lead3",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "leadf3",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "leadf3",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "leadv3",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "leade3",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "leadv3",
+          "portId": "cv"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "leadv3",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "leadsum3",
+          "portId": "in-a"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "leadf3",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "leadsv3",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "seq",
+          "portId": "gate-4"
+        },
+        "to": {
+          "moduleId": "leadsw3",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "leadsw3",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "leadsv3",
+          "portId": "cv"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "leadsv3",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "leadsum3",
+          "portId": "in-b"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "leadsum3",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "leadpoly",
+          "portId": "in-4"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "leadpoly",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "trem",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "purra",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "trem",
+          "portId": "cv"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "trem",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "leadmix",
+          "portId": "in-a"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "leadmix",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "echo",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "echo",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "bus",
+          "portId": "in-1"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "seq3",
+          "portId": "cv-5"
+        },
+        "to": {
+          "moduleId": "shadow",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "seq3",
+          "portId": "cv-5"
+        },
+        "to": {
+          "moduleId": "shadowf",
+          "portId": "key"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "purrp",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "shadow",
+          "portId": "fm-exp"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "shadow",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "shadowf",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "shadowf",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "shadowv",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "seq3",
+          "portId": "gate-5"
+        },
+        "to": {
+          "moduleId": "shadowe",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "shadowe",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "shadowv",
+          "portId": "cv"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "shadowv",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "shadowt",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "purr2a",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "shadowt",
+          "portId": "cv"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "shadowt",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "leadmix",
+          "portId": "in-b"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "seq2",
+          "portId": "cv-1"
+        },
+        "to": {
+          "moduleId": "pad0",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "seq2",
+          "portId": "gate-1"
+        },
+        "to": {
+          "moduleId": "pade0",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "pad0",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "padv0",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "pade0",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "padv0",
+          "portId": "cv"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "padv0",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "padmix",
+          "portId": "in-1"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "seq2",
+          "portId": "cv-2"
+        },
+        "to": {
+          "moduleId": "pad1",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "seq2",
+          "portId": "gate-2"
+        },
+        "to": {
+          "moduleId": "pade1",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "pad1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "padv1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "pade1",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "padv1",
+          "portId": "cv"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "padv1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "padmix",
+          "portId": "in-2"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "seq2",
+          "portId": "cv-3"
+        },
+        "to": {
+          "moduleId": "pad2",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "seq2",
+          "portId": "gate-3"
+        },
+        "to": {
+          "moduleId": "pade2",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "pad2",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "padv2",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "pade2",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "padv2",
+          "portId": "cv"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "padv2",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "padmix",
+          "portId": "in-3"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "padmix",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "padf",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "padf",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "padv",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "padlfo",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "padv",
+          "portId": "cv"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "padv",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "bus",
+          "portId": "in-2"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "seq2",
+          "portId": "cv-4"
+        },
+        "to": {
+          "moduleId": "pl0",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "seq2",
+          "portId": "cv-4"
+        },
+        "to": {
+          "moduleId": "plf0",
+          "portId": "key"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "seq2",
+          "portId": "gate-4"
+        },
+        "to": {
+          "moduleId": "ple0",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "purrp",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "pl0",
+          "portId": "fm-exp"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "pl0",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "plf0",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "ple0",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "plf0",
+          "portId": "env"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "plf0",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "plv0",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "ple0",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "plv0",
+          "portId": "cv"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "plv0",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "plmix",
+          "portId": "in-1"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "seq2",
+          "portId": "cv-5"
+        },
+        "to": {
+          "moduleId": "pl1",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "seq2",
+          "portId": "cv-5"
+        },
+        "to": {
+          "moduleId": "plf1",
+          "portId": "key"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "seq2",
+          "portId": "gate-5"
+        },
+        "to": {
+          "moduleId": "ple1",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "purrp",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "pl1",
+          "portId": "fm-exp"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "pl1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "plf1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "ple1",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "plf1",
+          "portId": "env"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "plf1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "plv1",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "ple1",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "plv1",
+          "portId": "cv"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "plv1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "plmix",
+          "portId": "in-2"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "seq2",
+          "portId": "cv-6"
+        },
+        "to": {
+          "moduleId": "pl2",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "seq2",
+          "portId": "cv-6"
+        },
+        "to": {
+          "moduleId": "plf2",
+          "portId": "key"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "seq2",
+          "portId": "gate-6"
+        },
+        "to": {
+          "moduleId": "ple2",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "purrp",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "pl2",
+          "portId": "fm-exp"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "pl2",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "plf2",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "ple2",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "plf2",
+          "portId": "env"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "plf2",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "plv2",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "ple2",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "plv2",
+          "portId": "cv"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "plv2",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "plmix",
+          "portId": "in-3"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "seq2",
+          "portId": "cv-7"
+        },
+        "to": {
+          "moduleId": "pl3",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "seq2",
+          "portId": "cv-7"
+        },
+        "to": {
+          "moduleId": "plf3",
+          "portId": "key"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "seq2",
+          "portId": "gate-7"
+        },
+        "to": {
+          "moduleId": "ple3",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "purrp",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "pl3",
+          "portId": "fm-exp"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "pl3",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "plf3",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "ple3",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "plf3",
+          "portId": "env"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "plf3",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "plv3",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "ple3",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "plv3",
+          "portId": "cv"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "plv3",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "plmix",
+          "portId": "in-4"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "plmix",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "pltrem",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "purra",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "pltrem",
+          "portId": "cv"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "pltrem",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "bus",
+          "portId": "in-6"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "seq",
+          "portId": "cv-5"
+        },
+        "to": {
+          "moduleId": "bass",
+          "portId": "pitch"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "seq",
+          "portId": "gate-5"
+        },
+        "to": {
+          "moduleId": "basse",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "bass",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "bassf",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "bassf",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "bassv",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "basse",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "bassv",
+          "portId": "cv"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "bassv",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "bus",
+          "portId": "in-3"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "seq",
+          "portId": "gate-8"
+        },
+        "to": {
+          "moduleId": "kpitch",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "seq",
+          "portId": "gate-6"
+        },
+        "to": {
+          "moduleId": "kenv",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "seq",
+          "portId": "gate-8"
+        },
+        "to": {
+          "moduleId": "ktickenv",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "kpitch",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "kosc",
+          "portId": "fm-exp"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "kpitch",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "ksub",
+          "portId": "fm-exp"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "kosc",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "kmix",
+          "portId": "in-a"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "ksub",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "kmix",
+          "portId": "in-b"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "kmix",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "kvca",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "kenv",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "kvca",
+          "portId": "cv"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "kvca",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "kvel",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "seq",
+          "portId": "vel-6"
+        },
+        "to": {
+          "moduleId": "kvel",
+          "portId": "cv"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "kvel",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "drums",
+          "portId": "in-1"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "noise2",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "nlp",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "nlp",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "ktick",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "ktickenv",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "ktick",
+          "portId": "cv"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "ktick",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "drums",
+          "portId": "in-2"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "seq",
+          "portId": "gate-7"
+        },
+        "to": {
+          "moduleId": "senv",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "seq",
+          "portId": "gate-7"
+        },
+        "to": {
+          "moduleId": "sbenv",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "nlp",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "svca",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "senv",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "svca",
+          "portId": "cv"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "sbenv",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "sbody",
+          "portId": "fm-exp"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "sbody",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "sbvca",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "sbenv",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "sbvca",
+          "portId": "cv"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "svca",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "svel",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "seq",
+          "portId": "vel-7"
+        },
+        "to": {
+          "moduleId": "svel",
+          "portId": "cv"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "svel",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "drums",
+          "portId": "in-3"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "sbvca",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "drums",
+          "portId": "in-4"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "seq2",
+          "portId": "gate-8"
+        },
+        "to": {
+          "moduleId": "henv",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "noise",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "hhpf",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "hhpf",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "hvca",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "henv",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "hvca",
+          "portId": "cv"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "hvca",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "hvel",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "seq2",
+          "portId": "vel-8"
+        },
+        "to": {
+          "moduleId": "hvel",
+          "portId": "cv"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "hvel",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "drums",
+          "portId": "in-5"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "drums",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "bus",
+          "portId": "in-4"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "q1",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "qmix",
+          "portId": "in-a"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "q2",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "qmix",
+          "portId": "in-b"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "qmix",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "qf",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "qf",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "qg",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "seq4",
+          "portId": "gate-1"
+        },
+        "to": {
+          "moduleId": "qe",
+          "portId": "gate"
+        },
+        "kind": "gate"
+      },
+      {
+        "from": {
+          "moduleId": "qe",
+          "portId": "env"
+        },
+        "to": {
+          "moduleId": "qg",
+          "portId": "cv"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "qg",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "qv",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "padlfo",
+          "portId": "cv-out"
+        },
+        "to": {
+          "moduleId": "qv",
+          "portId": "cv"
+        },
+        "kind": "cv"
+      },
+      {
+        "from": {
+          "moduleId": "qv",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "bus",
+          "portId": "in-5"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "bus",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "glue",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "glue",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "out",
+          "portId": "in"
+        },
+        "kind": "audio"
+      },
+      {
+        "from": {
+          "moduleId": "glue",
+          "portId": "out"
+        },
+        "to": {
+          "moduleId": "scope",
+          "portId": "in-a"
+        },
+        "kind": "audio"
+      }
+    ]
+  }
+}
